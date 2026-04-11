@@ -9,31 +9,77 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Bed, Bath, Maximize, Car, Phone, ChevronRight, Check, MapPin } from "lucide-react";
-import { formatMGA, mgaToEur, formatEUR } from "@/config/currency";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { supabase } from "@/integrations/supabase/client";
 import { seedListings, seedAgencies } from "@/data/seed-listings";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const ListingDetail = () => {
   const { id } = useParams();
   const { t } = useTranslation();
+  const { formatPrice, formatPriceSecondary } = useCurrency();
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [selectedImg, setSelectedImg] = useState(0);
-  const listing = seedListings.find(l => l.id === id);
-  
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const listing = seedListings.find((l) => l.id === id);
   if (!listing) return <div className="min-h-screen flex items-center justify-center font-serif text-xl">Annonce introuvable</div>;
 
-  const agency = seedAgencies.find(a => a.id === listing.agency_id);
-  const similar = seedListings.filter(l => l.id !== listing.id && l.region === listing.region).slice(0, 4);
-  const getAgency = (aid: string) => seedAgencies.find(a => a.id === aid);
+  const agency = seedAgencies.find((a) => a.id === listing.agency_id);
+  const similar = seedListings.filter((l) => l.id !== listing.id && l.region === listing.region).slice(0, 4);
+  const getAgency = (aid: string) => seedAgencies.find((a) => a.id === aid);
 
-  const transactionLabel = listing.transaction === 'vente' ? 'Vente' : listing.transaction === 'location' ? 'Location' : 'Location vacances';
+  const transactionLabel = listing.transaction === "vente" ? "Vente" : listing.transaction === "location" ? "Location" : "Location vacances";
+
+  const handleRevealPhone = async () => {
+    setPhoneRevealed(true);
+    // Track lead
+    try {
+      await supabase.from("leads").insert({
+        listing_id: listing.id,
+        visitor_name: "Visiteur",
+        type: "phone_reveal" as const,
+      });
+    } catch {}
+  };
+
+  const handleContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactName && !contactEmail) {
+      toast.error("Veuillez renseigner votre nom ou email");
+      return;
+    }
+    setSending(true);
+    try {
+      await supabase.from("leads").insert({
+        listing_id: listing.id,
+        visitor_name: contactName,
+        visitor_email: contactEmail,
+        visitor_phone: contactPhone,
+        message: contactMessage,
+        type: "contact_form" as const,
+      });
+      toast.success("Message envoyé !");
+      setContactName("");
+      setContactEmail("");
+      setContactPhone("");
+      setContactMessage("");
+    } catch {
+      toast.error("Erreur lors de l'envoi");
+    }
+    setSending(false);
+  };
 
   return (
     <>
       <Helmet><title>{listing.title} — ImmoNex</title></Helmet>
       <Header />
       <div className="container mx-auto px-4 py-6">
-        {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">Accueil</Link>
           <ChevronRight className="h-3 w-3" />
@@ -43,9 +89,7 @@ const ListingDetail = () => {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Gallery */}
             <div className="space-y-3">
               <div className="rounded-2xl overflow-hidden aspect-video">
                 <img src={listing.images[selectedImg]} alt={listing.title} className="w-full h-full object-cover" />
@@ -53,8 +97,7 @@ const ListingDetail = () => {
               {listing.images.length > 1 && (
                 <div className="flex gap-2">
                   {listing.images.map((img, i) => (
-                    <button key={i} onClick={() => setSelectedImg(i)}
-                      className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${i === selectedImg ? 'border-primary' : 'border-transparent'}`}>
+                    <button key={i} onClick={() => setSelectedImg(i)} className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${i === selectedImg ? "border-primary" : "border-transparent"}`}>
                       <img src={img} alt="" className="w-full h-full object-cover" />
                     </button>
                   ))}
@@ -62,7 +105,6 @@ const ListingDetail = () => {
               )}
             </div>
 
-            {/* Price & specs */}
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Badge variant="outline" className="font-sans">{transactionLabel}</Badge>
@@ -72,11 +114,10 @@ const ListingDetail = () => {
               <p className="flex items-center gap-1 text-sm text-muted-foreground font-sans mb-4">
                 <MapPin className="h-4 w-4" /> {listing.city}, {listing.region}
               </p>
-              <p className="text-2xl font-bold text-primary font-sans">{formatMGA(listing.price_mga)}</p>
-              <p className="text-sm text-muted-foreground font-sans">{formatEUR(mgaToEur(listing.price_mga))}</p>
+              <p className="text-2xl font-bold text-primary font-sans">{formatPrice(listing.price_mga)}</p>
+              <p className="text-sm text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
             </div>
 
-            {/* Key specs */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {listing.rooms > 0 && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
@@ -100,27 +141,23 @@ const ListingDetail = () => {
               </div>
             </div>
 
-            {/* Description */}
             <div>
               <h2 className="font-serif text-xl font-bold mb-3">{t("listing.description")}</h2>
               <p className="font-sans text-muted-foreground leading-relaxed">{listing.description}</p>
             </div>
 
-            {/* Features */}
             <div>
               <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
               <div className="grid grid-cols-2 gap-2">
-                {listing.features.map(f => (
+                {listing.features.map((f) => (
                   <div key={f} className="flex items-center gap-2 text-sm font-sans">
-                    <Check className="h-4 w-4 text-success" />
-                    {f}
+                    <Check className="h-4 w-4 text-success" /> {f}
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Sidebar - Agency card */}
           <div className="space-y-6">
             {agency && (
               <div className="bg-card rounded-2xl border border-border p-6 space-y-4 sticky top-20">
@@ -134,26 +171,21 @@ const ListingDetail = () => {
                   </div>
                 </div>
 
-                <Button
-                  onClick={() => setPhoneRevealed(true)}
-                  variant={phoneRevealed ? "outline" : "default"}
-                  className={`w-full font-sans ${!phoneRevealed ? 'gradient-primary border-0' : ''}`}
-                  style={!phoneRevealed ? { color: '#FAFAFA' } : undefined}
-                >
+                <Button onClick={handleRevealPhone} variant={phoneRevealed ? "outline" : "default"} className={`w-full font-sans ${!phoneRevealed ? "gradient-primary border-0" : ""}`} style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}>
                   <Phone className="h-4 w-4 mr-2" />
                   {phoneRevealed ? "+261 34 12 345 67" : t("listing.revealPhone")}
                 </Button>
 
-                <div className="space-y-3">
+                <form onSubmit={handleContact} className="space-y-3">
                   <h4 className="font-serif font-semibold">{t("listing.contact")}</h4>
-                  <Input placeholder={t("auth.name")} className="font-sans" />
-                  <Input placeholder={t("auth.email")} type="email" className="font-sans" />
-                  <Input placeholder={t("auth.phone")} className="font-sans" />
-                  <Textarea placeholder="Votre message..." className="font-sans" rows={3} />
-                  <Button className="w-full gradient-primary border-0 font-sans" style={{ color: '#FAFAFA' }}>
-                    {t("common.send")}
+                  <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans" />
+                  <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans" />
+                  <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans" />
+                  <Textarea placeholder="Votre message..." value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans" rows={3} />
+                  <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+                    {sending ? "..." : t("common.send")}
                   </Button>
-                </div>
+                </form>
 
                 <Link to={`/agence/${agency.slug}`} className="block text-center text-sm text-primary font-sans hover:underline">
                   Voir toutes les annonces de {agency.name}
@@ -163,12 +195,11 @@ const ListingDetail = () => {
           </div>
         </div>
 
-        {/* Similar */}
         {similar.length > 0 && (
           <section className="mt-16">
             <h2 className="font-serif text-2xl font-bold mb-6">{t("listing.similar")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {similar.map(l => {
+              {similar.map((l) => {
                 const ag = getAgency(l.agency_id);
                 return <ListingCard key={l.id} listing={l} agencyName={ag?.name} agencyLogo={ag?.logo} />;
               })}
