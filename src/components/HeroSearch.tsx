@@ -25,11 +25,17 @@ const ROOM_OPTIONS = [
   { label: "5+", value: "5" },
 ];
 
+const TYPES_WITHOUT_ROOMS = ["terrain", "local_commercial", "bureau"];
+
 const HeroSearch = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
   const [type, setType] = useState("");
+  const handleTypeChange = (v: string) => {
+    setType(v);
+    if (TYPES_WITHOUT_ROOMS.includes(v)) setRooms("");
+  };
   const [ville, setVille] = useState("");
   const [arrondissement, setArrondissement] = useState("");
   const [quartiers, setQuartiers] = useState<string[]>([]);
@@ -115,7 +121,7 @@ const HeroSearch = () => {
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
                   {t("hero.type")}
                 </label>
-                <Select value={type} onValueChange={setType}>
+                <Select value={type} onValueChange={handleTypeChange}>
                   <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
                     <SelectValue placeholder="Tous les types" />
                   </SelectTrigger>
@@ -185,22 +191,24 @@ const HeroSearch = () => {
                 </PopoverContent>
               </Popover>
 
-              {/* Rooms */}
-              <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                  Chambres
-                </label>
-                <Select value={rooms} onValueChange={setRooms}>
-                  <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                    <SelectValue placeholder="Toutes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ROOM_OPTIONS.map((r) => (
-                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Rooms — hidden for terrain/bureau/local_commercial */}
+              {!TYPES_WITHOUT_ROOMS.includes(type) && (
+                <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
+                    Chambres
+                  </label>
+                  <Select value={rooms} onValueChange={setRooms}>
+                    <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
+                      <SelectValue placeholder="Toutes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROOM_OPTIONS.map((r) => (
+                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Search Button */}
               <div className="px-2">
@@ -217,7 +225,7 @@ const HeroSearch = () => {
 
             {/* Mobile: vertical */}
             <div className="lg:hidden space-y-3">
-              <Select value={type} onValueChange={setType}>
+              <Select value={type} onValueChange={handleTypeChange}>
                 <SelectTrigger className="font-sans">
                   <SelectValue placeholder={t("hero.type")} />
                 </SelectTrigger>

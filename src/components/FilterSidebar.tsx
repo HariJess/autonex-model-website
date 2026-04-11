@@ -11,6 +11,8 @@ import BudgetRangeSlider from "@/components/BudgetRangeSlider";
 import { X } from "lucide-react";
 import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
 
+const TYPES_WITHOUT_ROOMS = ["terrain", "local_commercial", "bureau"];
+
 const EQUIPMENTS = [
   "Piscine", "Parking", "Jardin", "Climatisation",
   "Sécurité 24h", "Meublé", "Vue mer", "Ascenseur",
@@ -162,7 +164,8 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
             </AccordionContent>
           </AccordionItem>
 
-          {/* Rooms */}
+          {/* Rooms — only for residential types */}
+          {!filters.types.some(t => TYPES_WITHOUT_ROOMS.includes(t)) && (
           <AccordionItem value="rooms" className="border-b border-border px-4">
             <AccordionTrigger className="font-serif text-sm font-semibold py-3">Chambres</AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -175,8 +178,10 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
               </div>
             </AccordionContent>
           </AccordionItem>
+          )}
 
-          {/* Bathrooms */}
+          {/* Bathrooms — only for residential types */}
+          {!filters.types.some(t => TYPES_WITHOUT_ROOMS.includes(t)) && (
           <AccordionItem value="bathrooms" className="border-b border-border px-4">
             <AccordionTrigger className="font-serif text-sm font-semibold py-3">Salles de bain</AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -189,6 +194,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
               </div>
             </AccordionContent>
           </AccordionItem>
+          )}
 
           {/* Equipment */}
           <AccordionItem value="equipment" className="border-b border-border px-4">
