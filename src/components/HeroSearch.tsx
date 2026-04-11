@@ -163,7 +163,7 @@ const HeroSearch = () => {
                       Budget
                     </label>
                     <div className="flex items-center gap-1.5">
-                      <DollarSign className="h-3.5 w-3.5 text-accent shrink-0" />
+                      <BudgetIcon className="h-3.5 w-3.5 text-accent shrink-0" />
                       <span className={`font-sans text-sm truncate ${budgetLabel ? "text-foreground" : "text-muted-foreground"}`}>
                         {budgetLabel || "Budget"}
                       </span>
@@ -178,6 +178,7 @@ const HeroSearch = () => {
                     onMinChange={setPriceMin}
                     onMaxChange={setPriceMax}
                     onClose={() => setBudgetOpen(false)}
+                    onCurrencyChange={setBudgetCurrency}
                   />
                 </PopoverContent>
               </Popover>
