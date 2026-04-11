@@ -7,7 +7,7 @@ const EXCHANGE_RATE = 5050;
 
 const RANGES: Record<string, { max: number; step: number }> = {
   vente: { max: 5_000_000_000, step: 10_000_000 },
-  location: { max: 10_000_000, step: 100_000 },
+  location: { max: 30_000_000, step: 100_000 },
   location_vacances: { max: 1_000_000, step: 10_000 },
 };
 
@@ -20,11 +20,11 @@ const PRESETS_MGA: Record<string, { label: string; min: number; max: number }[]>
     { label: "500M+", min: 500_000_000, max: 5_000_000_000 },
   ],
   location: [
-    { label: "< 300k", min: 0, max: 300_000 },
-    { label: "300-600k", min: 300_000, max: 600_000 },
-    { label: "600k-1M", min: 600_000, max: 1_000_000 },
-    { label: "1-2M", min: 1_000_000, max: 2_000_000 },
-    { label: "2M+", min: 2_000_000, max: 10_000_000 },
+    { label: "< 500k", min: 0, max: 500_000 },
+    { label: "500k-1M", min: 500_000, max: 1_000_000 },
+    { label: "1-3M", min: 1_000_000, max: 3_000_000 },
+    { label: "3-10M", min: 3_000_000, max: 10_000_000 },
+    { label: "10M+", min: 10_000_000, max: 30_000_000 },
   ],
   location_vacances: [
     { label: "< 100k", min: 0, max: 100_000 },
@@ -43,11 +43,12 @@ const PRESETS_EUR: Record<string, { label: string; min: number; max: number }[]>
     { label: "100k€+", min: 505_000_000, max: 5_000_000_000 },
   ],
   location: [
-    { label: "< 60€", min: 0, max: 303_000 },
-    { label: "60-120€", min: 303_000, max: 606_000 },
-    { label: "120-200€", min: 606_000, max: 1_010_000 },
-    { label: "200-400€", min: 1_010_000, max: 2_020_000 },
-    { label: "400€+", min: 2_020_000, max: 10_000_000 },
+    { label: "< 100€", min: 0, max: 505_000 },
+    { label: "100-500€", min: 505_000, max: 2_525_000 },
+    { label: "500-1k€", min: 2_525_000, max: 5_050_000 },
+    { label: "1-2k€", min: 5_050_000, max: 10_100_000 },
+    { label: "2-5k€", min: 10_100_000, max: 25_250_000 },
+    { label: "5k€+", min: 25_250_000, max: 30_000_000 },
   ],
   location_vacances: [
     { label: "< 20€", min: 0, max: 101_000 },
