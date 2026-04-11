@@ -61,10 +61,7 @@ const HeroSearch = () => {
       : ville
     : "";
 
-  const budgetLabel =
-    priceMin || priceMax
-      ? `${priceMin ? (priceMin / 1_000_000).toFixed(0) + "M" : "0"} - ${priceMax ? (priceMax / 1_000_000).toFixed(0) + "M" : "∞"} Ar`
-      : "";
+  const budgetLabel = formatBudgetLabel(priceMin, priceMax);
 
   return (
     <section className="relative overflow-hidden py-20 lg:py-32">
