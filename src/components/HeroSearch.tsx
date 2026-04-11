@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, MapPin, Home, DollarSign, BedDouble } from "lucide-react";
+import { Search, MapPin, Home, DollarSign, BedDouble, Euro, Banknote } from "lucide-react";
 import { villes } from "@/data/madagascar-locations";
 import { useState } from "react";
 import LocationSelector from "@/components/LocationSelector";
@@ -39,6 +39,7 @@ const HeroSearch = () => {
   const [rooms, setRooms] = useState("");
   const [locationOpen, setLocationOpen] = useState(false);
   const [budgetOpen, setBudgetOpen] = useState(false);
+  const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -61,7 +62,8 @@ const HeroSearch = () => {
       : ville
     : "";
 
-  const budgetLabel = formatBudgetLabel(priceMin, priceMax);
+  const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency);
+  const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
 
   return (
     <section className="relative overflow-hidden py-20 lg:py-32">
