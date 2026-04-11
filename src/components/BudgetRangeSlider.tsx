@@ -70,6 +70,7 @@ interface BudgetRangeSliderProps {
   onMinChange: (v: number) => void;
   onMaxChange: (v: number) => void;
   onClose?: () => void;
+  onCurrencyChange?: (c: "MGA" | "EUR") => void;
 }
 
 const BudgetRangeSlider = ({
@@ -79,6 +80,7 @@ const BudgetRangeSlider = ({
   onMinChange,
   onMaxChange,
   onClose,
+  onCurrencyChange,
 }: BudgetRangeSliderProps) => {
   const [displayCurrency, setDisplayCurrency] = useState<"MGA" | "EUR">("MGA");
 
