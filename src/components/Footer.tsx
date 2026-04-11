@@ -13,13 +13,13 @@ const Footer = () => {
           <div className="space-y-4">
             <img src={logo} alt="ImmoNex" className="h-10" />
             <p className="text-sm opacity-70 font-sans">
-              Le portail immobilier N°1 de Madagascar. Trouvez votre bien idéal parmi des milliers d'annonces.
+              {t("footer.tagline")}
             </p>
           </div>
 
           {/* Links 1 */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-lg">Immobilier</h4>
+            <h4 className="font-semibold text-lg">{t("footer.realEstate")}</h4>
             <div className="flex flex-col gap-2 text-sm font-sans opacity-70">
               <Link to="/recherche?transaction=vente" className="hover:opacity-100 transition-opacity">{t("nav.buy")}</Link>
               <Link to="/recherche?transaction=location" className="hover:opacity-100 transition-opacity">{t("nav.rent")}</Link>
@@ -30,7 +30,7 @@ const Footer = () => {
 
           {/* Links 2 */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-lg">Informations</h4>
+            <h4 className="font-semibold text-lg">{t("footer.information")}</h4>
             <div className="flex flex-col gap-2 text-sm font-sans opacity-70">
               <Link to="/conseils" className="hover:opacity-100 transition-opacity">{t("nav.advice")}</Link>
             </div>

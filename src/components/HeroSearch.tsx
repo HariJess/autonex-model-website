@@ -9,11 +9,12 @@ import { useState } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
 import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
+import type { ListingType } from "@/types/listing";
 
 const TRANSACTIONS = [
-  { value: "vente", label: "Acheter" },
-  { value: "location", label: "Louer" },
-  { value: "location_vacances", label: "Location vacances" },
+  { value: "vente", labelKey: "nav.buy" },
+  { value: "location", labelKey: "nav.rent" },
+  { value: "location_vacances", labelKey: "search.vacationRental" },
 ];
 
 const ROOM_OPTIONS = [
@@ -25,7 +26,7 @@ const ROOM_OPTIONS = [
   { label: "5+", value: "5" },
 ];
 
-const TYPES_WITHOUT_ROOMS = ["terrain", "local_commercial", "bureau"];
+const TYPES_WITHOUT_ROOMS: ListingType[] = ["terrain", "local_commercial", "bureau"];
 
 const HeroSearch = () => {
   const { t } = useTranslation();
@@ -34,7 +35,7 @@ const HeroSearch = () => {
   const [type, setType] = useState("");
   const handleTypeChange = (v: string) => {
     setType(v);
-    if (TYPES_WITHOUT_ROOMS.includes(v)) setRooms("");
+    if (TYPES_WITHOUT_ROOMS.includes(v as ListingType)) setRooms("");
   };
   const [ville, setVille] = useState("");
   const [arrondissement, setArrondissement] = useState("");
@@ -47,6 +48,8 @@ const HeroSearch = () => {
   const [mobileLocationOpen, setMobileLocationOpen] = useState(false);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
+
+  const showRooms = !TYPES_WITHOUT_ROOMS.includes(type as ListingType);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -107,7 +110,7 @@ const HeroSearch = () => {
                     : "bg-white/20 text-white/80 hover:bg-white/30 backdrop-blur-sm"
                 }`}
               >
-                {tr.label}
+                {t(tr.labelKey)}
               </button>
             ))}
           </div>
@@ -116,14 +119,14 @@ const HeroSearch = () => {
           <div className="bg-card rounded-b-2xl rounded-tr-2xl shadow-2xl p-3 md:p-4 -mb-12 relative z-10">
             {/* Desktop: horizontal */}
             <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border">
-              {/* Type — canonical values */}
+              {/* Type */}
               <div className="flex-1 border-r border-border px-3 py-2">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
                   {t("hero.type")}
                 </label>
                 <Select value={type} onValueChange={handleTypeChange}>
                   <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                    <SelectValue placeholder="Tous les types" />
+                    <SelectValue placeholder={t("hero.allTypes")} />
                   </SelectTrigger>
                   <SelectContent>
                     {LISTING_TYPES.map((lt) => (
@@ -138,12 +141,12 @@ const HeroSearch = () => {
                 <PopoverTrigger asChild>
                   <button className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors">
                     <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
-                      Localisation
+                      {t("hero.location")}
                     </label>
                     <div className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5 text-accent shrink-0" />
                       <span className={`font-sans text-sm truncate ${locationLabel ? "text-foreground" : "text-muted-foreground"}`}>
-                        {locationLabel || "Ville, quartier..."}
+                        {locationLabel || t("hero.location")}
                       </span>
                     </div>
                   </button>
@@ -192,14 +195,14 @@ const HeroSearch = () => {
               </Popover>
 
               {/* Rooms — hidden for terrain/bureau/local_commercial */}
-              {!TYPES_WITHOUT_ROOMS.includes(type) && (
+              {showRooms && (
                 <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                    Chambres
+                    {t("hero.rooms")}
                   </label>
                   <Select value={rooms} onValueChange={setRooms}>
                     <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                      <SelectValue placeholder="Toutes" />
+                      <SelectValue placeholder={t("hero.allRooms")} />
                     </SelectTrigger>
                     <SelectContent>
                       {ROOM_OPTIONS.map((r) => (
@@ -240,7 +243,7 @@ const HeroSearch = () => {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start font-sans text-sm gap-2">
                     <MapPin className="h-4 w-4 text-accent" />
-                    {locationLabel || "Localisation"}
+                    {locationLabel || t("hero.location")}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[calc(100vw-2rem)] p-4" align="start">
@@ -257,6 +260,19 @@ const HeroSearch = () => {
                   />
                 </PopoverContent>
               </Popover>
+
+              {showRooms && (
+                <Select value={rooms} onValueChange={setRooms}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder={t("hero.rooms")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROOM_OPTIONS.map((r) => (
+                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
 
               <div className="flex gap-2">
                 <Input

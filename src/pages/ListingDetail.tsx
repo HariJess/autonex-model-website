@@ -32,18 +32,22 @@ const ListingDetail = () => {
 
   const { data: listing, isLoading, error: fetchError } = useListing(id);
 
-  // Increment views once per listing per page load
+  // Increment views once per listing per session (debounced)
   useEffect(() => {
     if (listing?.id && viewIncremented.current !== listing.id) {
       viewIncremented.current = listing.id;
-      supabase.rpc("increment_views", { listing_uuid: listing.id }).then(() => {});
+      const timer = setTimeout(() => {
+        supabase.rpc("increment_views", { listing_uuid: listing.id }).then(() => {});
+      }, 2000); // 2s delay to filter bots/quick bounces
+      return () => clearTimeout(timer);
     }
   }, [listing?.id]);
 
-  // Fetch similar listings by same type + ville
+  // Fetch similar listings by same transaction + type + ville
   const { data: similar = [] } = useDbListings({
     ville: listing?.ville ?? undefined,
     types: listing?.type ? [listing.type] : undefined,
+    transaction: listing?.transaction ?? undefined,
     limit: 5,
   });
   const filteredSimilar = similar.filter((l) => l.id !== listing?.id).slice(0, 4);
@@ -57,7 +61,7 @@ const ListingDetail = () => {
       type: "phone_reveal" as const,
     });
     if (leadError) {
-      console.error("Failed to track phone reveal:", leadError.message);
+      toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
     }
   };
 
@@ -65,7 +69,7 @@ const ListingDetail = () => {
     e.preventDefault();
     if (!listing) return;
     if (!contactName.trim() && !contactEmail.trim()) {
-      toast.error(t("common.error"));
+      toast.error(t("listing.contactNameOrEmail", "Veuillez renseigner au moins votre nom ou email"));
       return;
     }
     setSending(true);
@@ -80,7 +84,7 @@ const ListingDetail = () => {
     if (leadError) {
       toast.error(leadError.message);
     } else {
-      toast.success("Message envoyé !");
+      toast.success(t("listing.messageSent", "Message envoyé !"));
       setContactName("");
       setContactEmail("");
       setContactPhone("");
@@ -89,7 +93,6 @@ const ListingDetail = () => {
     setSending(false);
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <>
@@ -102,7 +105,6 @@ const ListingDetail = () => {
     );
   }
 
-  // Error state (distinct from not found)
   if (fetchError && !listing) {
     return (
       <>
@@ -111,28 +113,27 @@ const ListingDetail = () => {
           <AlertCircle className="h-12 w-12 text-destructive mb-4" />
           <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
           <p className="text-muted-foreground font-sans mb-6">{(fetchError as Error).message}</p>
-          <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">Retour</Button>
+          <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
         </div>
         <Footer />
       </>
     );
   }
 
-  // Not found state
   if (!listing) {
     return (
       <>
         <Header />
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-          <h1 className="font-serif text-2xl font-bold mb-2">Annonce introuvable</h1>
+          <h1 className="font-serif text-2xl font-bold mb-2">{t("listing.notFound", "Annonce introuvable")}</h1>
           <p className="text-muted-foreground font-sans mb-6">
-            Cette annonce n'existe pas ou a été supprimée.
+            {t("listing.notFoundDesc", "Cette annonce n'existe pas ou a été supprimée.")}
           </p>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">Retour</Button>
+            <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
             <Button onClick={() => navigate("/recherche")} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-              Voir toutes les annonces
+              {t("listing.viewAll", "Voir toutes les annonces")}
             </Button>
           </div>
         </div>
@@ -154,7 +155,7 @@ const ListingDetail = () => {
       <Header />
       <div className="container mx-auto px-4 py-6">
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
-          <Link to="/" className="hover:text-primary">Accueil</Link>
+          <Link to="/" className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
           <ChevronRight className="h-3 w-3" />
           <Link to="/recherche" className="hover:text-primary">{t("search.title")}</Link>
           <ChevronRight className="h-3 w-3" />
@@ -241,7 +242,6 @@ const ListingDetail = () => {
 
           <div className="space-y-6">
             <div className="bg-card rounded-2xl border border-border p-6 space-y-4 sticky top-20">
-              {/* Owner / Agency info */}
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
@@ -255,8 +255,8 @@ const ListingDetail = () => {
                   </div>
                 )}
                 <div>
-                  <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? "Propriétaire"}</h3>
-                  {listing.agency_verified && <Badge variant="secondary" className="text-xs font-sans">Vérifié</Badge>}
+                  <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Propriétaire")}</h3>
+                  {listing.agency_verified && <Badge variant="secondary" className="text-xs font-sans">{t("listing.verified", "Vérifié")}</Badge>}
                 </div>
               </div>
 
@@ -268,16 +268,16 @@ const ListingDetail = () => {
               >
                 <Phone className="h-4 w-4 mr-2" />
                 {phoneRevealed
-                  ? (listing.owner_phone || "Non renseigné")
+                  ? (listing.owner_phone || t("listing.noPhone", "Non renseigné"))
                   : t("listing.revealPhone")}
               </Button>
 
               <form onSubmit={handleContact} className="space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact")}</h4>
-                <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans" />
-                <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans" />
-                <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans" />
-                <Textarea placeholder="Votre message..." value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans" rows={3} />
+                <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans" maxLength={100} />
+                <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans" maxLength={255} />
+                <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans" maxLength={30} />
+                <Textarea placeholder={t("listing.yourMessage", "Votre message...")} value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans" rows={3} maxLength={1000} />
                 <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
                   {sending ? t("common.loading") : t("common.send")}
                 </Button>
@@ -285,7 +285,7 @@ const ListingDetail = () => {
 
               {listing.agency_slug && (
                 <Link to={`/agence/${listing.agency_slug}`} className="block text-center text-sm text-primary font-sans hover:underline">
-                  Voir toutes les annonces de {listing.agency_name}
+                  {t("listing.viewAgencyListings", { name: listing.agency_name ?? "" })}
                 </Link>
               )}
             </div>
