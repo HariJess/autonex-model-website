@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, Home, Loader2, AlertCircle } from "lucide-react";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
-import type { DisplayListing } from "@/types/listing";
 import { useDbListings } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useState, useMemo, useCallback, lazy, Suspense } from "react";
@@ -35,8 +34,7 @@ function filtersFromParams(sp: URLSearchParams): SearchFilters {
     surfaceMax: Number(sp.get("surface_max")) || 0,
     rooms: sp.get("chambres") ? sp.get("chambres")!.split(",").map(Number).filter((n) => !isNaN(n)) : [],
     bathrooms: sp.get("sdb") ? sp.get("sdb")!.split(",").map(Number).filter((n) => !isNaN(n)) : [],
-    equipments: [],
-    proximities: [],
+    equipments: sp.get("equip") ? sp.get("equip")!.split(",").filter(Boolean) : [],
   };
 }
 
@@ -55,6 +53,7 @@ function filtersToParams(f: SearchFilters): URLSearchParams {
   if (f.surfaceMax && f.surfaceMax < 1000) p.set("surface_max", String(f.surfaceMax));
   if (f.rooms.length) p.set("chambres", f.rooms.join(","));
   if (f.bathrooms.length) p.set("sdb", f.bathrooms.join(","));
+  if (f.equipments.length) p.set("equip", f.equipments.join(","));
   return p;
 }
 
@@ -137,11 +136,12 @@ const SearchPage = () => {
     }
 
     // Sort
-    results.sort((a, b) => {
-      if (sort === "priceAsc") return a.price_mga - b.price_mga;
-      if (sort === "priceDesc") return b.price_mga - a.price_mga;
-      return 0;
-    });
+    if (sort === "priceAsc") {
+      results.sort((a, b) => a.price_mga - b.price_mga);
+    } else if (sort === "priceDesc") {
+      results.sort((a, b) => b.price_mga - a.price_mga);
+    }
+    // "recent" = default DB order (created_at desc), no re-sort needed
 
     return results;
   }, [dbListings, filters, sort]);
@@ -194,7 +194,7 @@ const SearchPage = () => {
   const activeFilterCount = activeChips.length;
 
   const breadcrumbs = useMemo(() => {
-    const crumbs: { label: string; to?: string }[] = [{ label: t("nav.buy").includes("Ach") ? "Accueil" : "Home", to: "/" }];
+    const crumbs: { label: string; to?: string }[] = [{ label: t("nav.home", "Accueil"), to: "/" }];
     if (filters.transaction) {
       crumbs.push({ label: TRANSACTION_LABELS[filters.transaction as keyof typeof TRANSACTION_LABELS] || filters.transaction, to: `/recherche?transaction=${filters.transaction}` });
     }
@@ -207,20 +207,20 @@ const SearchPage = () => {
     if (filters.types.length === 1) {
       parts.push(LISTING_TYPE_LABELS_PLURAL[filters.types[0] as keyof typeof LISTING_TYPE_LABELS_PLURAL] || filters.types[0]);
     } else {
-      parts.push("Biens immobiliers");
+      parts.push(t("search.properties", "Biens immobiliers"));
     }
-    if (filters.transaction === "vente") parts.push("à vendre");
-    else if (filters.transaction === "location") parts.push("à louer");
-    else if (filters.transaction === "location_vacances") parts.push("en location vacances");
+    if (filters.transaction === "vente") parts.push(t("search.forSale", "à vendre"));
+    else if (filters.transaction === "location") parts.push(t("search.forRent", "à louer"));
+    else if (filters.transaction === "location_vacances") parts.push(t("search.vacationRental", "en location vacances"));
     if (filters.ville) parts.push(`à ${filters.ville}`);
     return parts.join(" ");
-  }, [filters]);
+  }, [filters, t]);
 
   const emptyFilters: SearchFilters = {
     transaction: "", types: [], ville: "", arrondissement: "",
     quartiers: [], quartierLibre: "", priceMin: 0, priceMax: 0,
     surfaceMin: 0, surfaceMax: 0, rooms: [], bathrooms: [],
-    equipments: [], proximities: [],
+    equipments: [],
   };
 
   return (
@@ -249,7 +249,7 @@ const SearchPage = () => {
 
         <h1 className="font-serif text-xl md:text-2xl font-bold mb-2">
           {pageTitle}{" "}
-          <span className="text-muted-foreground font-normal text-lg">({filtered.length} annonce{filtered.length !== 1 ? "s" : ""})</span>
+          <span className="text-muted-foreground font-normal text-lg">({filtered.length} {t("search.listingCount", "annonce")}{filtered.length !== 1 ? "s" : ""})</span>
         </h1>
 
         {activeChips.length > 0 && (
@@ -266,7 +266,7 @@ const SearchPage = () => {
               </Badge>
             ))}
             <Button variant="ghost" size="sm" className="text-xs font-sans text-muted-foreground h-6" onClick={() => updateFilters(emptyFilters)}>
-              Effacer tout
+              {t("common.clearAll", "Effacer tout")}
             </Button>
           </div>
         )}
@@ -287,7 +287,7 @@ const SearchPage = () => {
                       <SlidersHorizontal className="h-4 w-4" />
                       {t("search.filters")}
                       {activeFilterCount > 0 && (
-                        <Badge variant="default" className="h-5 w-5 p-0 flex items-center justify-center text-[10px] gradient-primary text-white border-0">
+                        <Badge variant="default" className="h-5 w-5 p-0 flex items-center justify-center text-[10px] gradient-primary border-0" style={{ color: "#FAFAFA" }}>
                           {activeFilterCount}
                         </Badge>
                       )}
@@ -304,7 +304,8 @@ const SearchPage = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="hidden md:flex items-center border border-border rounded-lg overflow-hidden">
+                {/* View mode toggle — visible on both mobile and desktop */}
+                <div className="flex items-center border border-border rounded-lg overflow-hidden">
                   {([
                     { mode: "grid" as ViewMode, icon: LayoutGrid },
                     { mode: "list" as ViewMode, icon: List },
@@ -314,6 +315,7 @@ const SearchPage = () => {
                       key={mode}
                       onClick={() => setViewMode(mode)}
                       className={`p-2 transition-colors ${viewMode === mode ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                      aria-label={`Vue ${mode}`}
                     >
                       <Icon className="h-4 w-4" />
                     </button>
@@ -321,7 +323,7 @@ const SearchPage = () => {
                 </div>
 
                 <Select value={sort} onValueChange={setSort}>
-                  <SelectTrigger className="w-40 font-sans text-sm">
+                  <SelectTrigger className="w-32 sm:w-40 font-sans text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -406,10 +408,10 @@ const SearchPage = () => {
                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                   <Home className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <p className="font-serif text-xl text-foreground mb-2">Aucune annonce ne correspond</p>
-                <p className="font-sans text-sm text-muted-foreground mb-4">Essayez de modifier ou réinitialiser vos filtres</p>
+                <p className="font-serif text-xl text-foreground mb-2">{t("search.noResults", "Aucune annonce ne correspond")}</p>
+                <p className="font-sans text-sm text-muted-foreground mb-4">{t("search.tryDifferent", "Essayez de modifier ou réinitialiser vos filtres")}</p>
                 <Button variant="outline" className="font-sans" onClick={() => updateFilters(emptyFilters)}>
-                  Réinitialiser les filtres
+                  {t("search.resetFilters", "Réinitialiser les filtres")}
                 </Button>
               </div>
             )}

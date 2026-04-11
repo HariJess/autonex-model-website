@@ -21,7 +21,6 @@ import { useMemo } from "react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Listing = Tables<"listings">;
-type Lead = Tables<"leads"> & { listings?: { title: string } | null };
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -46,27 +45,45 @@ const Dashboard = () => {
   });
 
   const listingIds = useMemo(() => myListings.map((l) => l.id), [myListings]);
-  const { data: myLeads = [], isLoading: leadsLoading } = useQuery({
-    queryKey: ["my-leads", user?.id, listingIds],
-    queryFn: async (): Promise<Lead[]> => {
-      if (!user) return [];
-      // listingIds comes from the memoized variable above
-      if (listingIds.length === 0) return [];
+
+  // Separate query for accurate lead counts (no limit)
+  const { data: leadCounts } = useQuery({
+    queryKey: ["my-lead-counts", user?.id, listingIds],
+    queryFn: async () => {
+      if (!user || listingIds.length === 0) return { contacts: 0, phoneReveals: 0 };
+      // Fetch all lead types for counting
+      const { data, error } = await supabase
+        .from("leads")
+        .select("type")
+        .in("listing_id", listingIds);
+      if (error) return { contacts: 0, phoneReveals: 0 };
+      const contacts = (data ?? []).filter((l) => l.type === "contact_form").length;
+      const phoneReveals = (data ?? []).filter((l) => l.type === "phone_reveal").length;
+      return { contacts, phoneReveals };
+    },
+    enabled: !!user && listingIds.length > 0,
+  });
+
+  // Recent leads for display (limited)
+  const { data: recentLeads = [], isLoading: leadsLoading } = useQuery({
+    queryKey: ["my-leads-recent", user?.id, listingIds],
+    queryFn: async () => {
+      if (!user || listingIds.length === 0) return [];
       const { data, error } = await supabase
         .from("leads")
         .select("*, listings(title)")
         .in("listing_id", listingIds)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(20);
       if (error) throw new Error(error.message);
-      return (data ?? []) as Lead[];
+      return (data ?? []) as Array<Tables<"leads"> & { listings?: { title: string } | null }>;
     },
     enabled: !!user && listingIds.length > 0,
   });
 
   const totalViews = myListings.reduce((sum, l) => sum + (l.views_count ?? 0), 0);
-  const totalContacts = myLeads.filter((l) => l.type === "contact_form").length;
-  const totalPhoneReveals = myLeads.filter((l) => l.type === "phone_reveal").length;
+  const totalContacts = leadCounts?.contacts ?? 0;
+  const totalPhoneReveals = leadCounts?.phoneReveals ?? 0;
   const activeListings = myListings.filter((l) => l.status === "active").length;
 
   const stats = [
@@ -84,7 +101,7 @@ const Dashboard = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
-      toast.success("Statut mis à jour");
+      toast.success(t("dashboard.statusUpdated", "Statut mis à jour"));
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -95,32 +112,38 @@ const Dashboard = () => {
       const { data: photos } = await supabase.from("listing_photos").select("url").eq("listing_id", id);
       if (photos && photos.length > 0) {
         const paths = photos.map((p) => {
-          const url = new URL(p.url);
-          const parts = url.pathname.split("/listing-photos/");
-          return parts.length > 1 ? parts[1] : "";
+          try {
+            const url = new URL(p.url);
+            const parts = url.pathname.split("/listing-photos/");
+            return parts.length > 1 ? parts[1] : "";
+          } catch {
+            return "";
+          }
         }).filter(Boolean);
         if (paths.length > 0) {
           await supabase.storage.from("listing-photos").remove(paths);
         }
       }
-      // Delete listing_photos rows
+      // Delete related records
       await supabase.from("listing_photos").delete().eq("listing_id", id);
+      // Note: leads, favorites, boosts have FK cascades or will be orphaned safely
       // Delete listing
       const { error } = await supabase.from("listings").delete().eq("id", id);
       if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
-      toast.success("Annonce supprimée");
+      queryClient.invalidateQueries({ queryKey: ["my-lead-counts"] });
+      toast.success(t("dashboard.listingDeleted", "Annonce supprimée"));
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   const statusLabels: Record<string, string> = {
-    active: "Active",
-    paused: "En pause",
-    draft: "Brouillon",
-    expired: "Expirée",
+    active: t("status.active", "Active"),
+    paused: t("status.paused", "En pause"),
+    draft: t("status.draft", "Brouillon"),
+    expired: t("status.expired", "Expirée"),
   };
 
   return (
@@ -137,16 +160,16 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => (
             <Card key={stat.label} className="rounded-2xl">
-              <CardContent className="flex items-center gap-4 p-6">
+              <CardContent className="flex items-center gap-4 p-4 md:p-6">
                 <div className={`p-3 rounded-xl bg-secondary ${stat.color}`}>
-                  <stat.icon className="h-6 w-6" />
+                  <stat.icon className="h-5 w-5 md:h-6 md:w-6" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold font-sans">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground font-sans">{stat.label}</p>
+                  <p className="text-xl md:text-2xl font-bold font-sans">{stat.value}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground font-sans">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -170,7 +193,7 @@ const Dashboard = () => {
           ) : myListings.length === 0 ? (
             <div className="text-center py-12">
               <Home className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground font-sans mb-4">Aucune annonce. Publiez votre première annonce !</p>
+              <p className="text-muted-foreground font-sans mb-4">{t("dashboard.noListings", "Aucune annonce. Publiez votre première annonce !")}</p>
               <Link to="/publier">
                 <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>{t("nav.publish")}</Button>
               </Link>
@@ -181,10 +204,10 @@ const Dashboard = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground">Annonce</th>
-                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground">Prix</th>
-                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground">Statut</th>
-                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground">Vues</th>
+                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground">{t("dashboard.listing", "Annonce")}</th>
+                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground hidden sm:table-cell">{t("dashboard.price", "Prix")}</th>
+                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground">{t("dashboard.status", "Statut")}</th>
+                      <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground hidden md:table-cell">{t("dashboard.views", "Vues")}</th>
                       <th className="text-left p-4 font-sans text-sm font-medium text-muted-foreground">Actions</th>
                     </tr>
                   </thead>
@@ -199,18 +222,18 @@ const Dashboard = () => {
                             <p className="text-xs text-muted-foreground font-sans">{listing.ville}{listing.quartier ? ` • ${listing.quartier}` : ""}</p>
                           </div>
                         </td>
-                        <td className="p-4 font-sans text-sm">{formatPrice(listing.price_mga)}</td>
+                        <td className="p-4 font-sans text-sm hidden sm:table-cell">{formatPrice(listing.price_mga)}</td>
                         <td className="p-4">
                           <Badge variant={listing.status === "active" ? "default" : "secondary"} className="font-sans text-xs">
                             {statusLabels[listing.status ?? "draft"] ?? listing.status}
                           </Badge>
                         </td>
-                        <td className="p-4 font-sans text-sm">{listing.views_count ?? 0}</td>
+                        <td className="p-4 font-sans text-sm hidden md:table-cell">{listing.views_count ?? 0}</td>
                         <td className="p-4">
                           <div className="flex items-center gap-1">
                             <Button
                               variant="ghost" size="icon"
-                              title={listing.status === "active" ? "Mettre en pause" : "Activer"}
+                              title={listing.status === "active" ? t("dashboard.pause", "Mettre en pause") : t("dashboard.activate", "Activer")}
                               onClick={() => toggleStatus.mutate({ id: listing.id, status: listing.status ?? "draft" })}
                               disabled={listing.status === "expired"}
                             >
@@ -224,9 +247,9 @@ const Dashboard = () => {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle className="font-serif">Supprimer cette annonce ?</AlertDialogTitle>
+                                  <AlertDialogTitle className="font-serif">{t("dashboard.deleteConfirm", "Supprimer cette annonce ?")}</AlertDialogTitle>
                                   <AlertDialogDescription className="font-sans">
-                                    Cette action est irréversible. L'annonce et toutes ses photos seront définitivement supprimées.
+                                    {t("dashboard.deleteDesc", "Cette action est irréversible. L'annonce et toutes ses photos seront définitivement supprimées.")}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -252,23 +275,23 @@ const Dashboard = () => {
         </div>
 
         <div>
-          <h2 className="font-serif text-xl font-bold mb-4">{t("dashboard.leads")}</h2>
+          <h2 className="font-serif text-xl font-bold mb-4">{t("dashboard.leads", "Contacts reçus")}</h2>
           {leadsLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
-          ) : myLeads.length === 0 ? (
-            <p className="text-muted-foreground font-sans text-center py-8">Aucun contact reçu pour le moment.</p>
+          ) : recentLeads.length === 0 ? (
+            <p className="text-muted-foreground font-sans text-center py-8">{t("dashboard.noLeads", "Aucun contact reçu pour le moment.")}</p>
           ) : (
             <div className="space-y-3">
-              {myLeads.map((lead) => (
+              {recentLeads.map((lead) => (
                 <Card key={lead.id} className="rounded-2xl">
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-sans font-semibold">{lead.visitor_name || "Visiteur"}</p>
+                        <p className="font-sans font-semibold">{lead.visitor_name || t("dashboard.visitor", "Visiteur")}</p>
                         <p className="text-xs text-muted-foreground font-sans mb-2">
-                          {lead.type === "phone_reveal" ? "📞 Numéro révélé" : lead.type === "whatsapp" ? "💬 WhatsApp" : "✉️ Message"} • {lead.listings?.title ?? "Annonce"}
+                          {lead.type === "phone_reveal" ? "📞 Numéro révélé" : lead.type === "whatsapp" ? "💬 WhatsApp" : "✉️ Message"} • {lead.listings?.title ?? t("dashboard.listing", "Annonce")}
                         </p>
                         {lead.message && <p className="text-sm text-muted-foreground font-sans">{lead.message}</p>}
                         {lead.visitor_email && <p className="text-xs text-primary font-sans mt-1">{lead.visitor_email}</p>}

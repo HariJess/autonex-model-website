@@ -17,7 +17,7 @@ const Index = () => {
   const { t } = useTranslation();
   const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
 
-  const { data: agencies = [] } = useQuery({
+  const { data: agencies = [], isLoading: agenciesLoading } = useQuery({
     queryKey: ["agencies-home"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -54,10 +54,10 @@ const Index = () => {
 
       <HeroSearch />
 
-      {/* Latest listings */}
+      {/* Latest listings — labeled honestly */}
       <section className="container mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.featured")}</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Dernières annonces")}</h2>
           <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">
             {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
           </Link>
@@ -73,7 +73,7 @@ const Index = () => {
           </div>
         ) : listings.length === 0 ? (
           <p className="text-center text-muted-foreground font-sans py-12">
-            Aucune annonce pour le moment. Soyez le premier à publier !
+            {t("home.noListings", "Aucune annonce pour le moment. Soyez le premier à publier !")}
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -84,16 +84,16 @@ const Index = () => {
         )}
       </section>
 
-      {/* Nos villes */}
+      {/* Cities */}
       <section className="bg-secondary/50 py-16">
         <div className="container mx-auto px-4">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">Nos villes</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">{t("sections.cities", "Nos villes")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {villes.map((ville) => {
               const count = villeCounts[ville.name] ?? 0;
               return (
                 <Link key={ville.name} to={`/recherche?ville=${ville.name}`} className="group relative rounded-2xl overflow-hidden aspect-[3/2]">
-                  <img src={ville.image} alt={ville.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <img src={ville.image} alt={ville.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
                   <div className="absolute bottom-3 left-3">
                     <h3 className="font-serif font-bold text-lg" style={{ color: "#FAFAFA" }}>{ville.name}</h3>
@@ -109,8 +109,12 @@ const Index = () => {
       {/* Partner agencies */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">{t("sections.agencies")}</h2>
-        {agencies.length === 0 ? (
-          <p className="text-center text-muted-foreground font-sans">Aucune agence partenaire pour le moment.</p>
+        {agenciesLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+        ) : agencies.length === 0 ? (
+          <p className="text-center text-muted-foreground font-sans">{t("home.noAgencies", "Aucune agence partenaire pour le moment.")}</p>
         ) : (
           <div className="flex flex-wrap justify-center gap-8">
             {agencies.map((agency) => (
@@ -129,7 +133,7 @@ const Index = () => {
         )}
       </section>
 
-      {/* Blog */}
+      {/* Blog — uses seed data consistently */}
       <section className="bg-secondary/50 py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
