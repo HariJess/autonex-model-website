@@ -11,6 +11,8 @@ import BudgetRangeSlider from "@/components/BudgetRangeSlider";
 import { X } from "lucide-react";
 import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
 
+const TYPES_WITHOUT_ROOMS = ["terrain", "local_commercial", "bureau"];
+
 const EQUIPMENTS = [
   "Piscine", "Parking", "Jardin", "Climatisation",
   "Sécurité 24h", "Meublé", "Vue mer", "Ascenseur",

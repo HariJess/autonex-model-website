@@ -25,6 +25,8 @@ const ROOM_OPTIONS = [
   { label: "5+", value: "5" },
 ];
 
+const TYPES_WITHOUT_ROOMS = ["terrain", "local_commercial", "bureau"];
+
 const HeroSearch = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -185,22 +187,24 @@ const HeroSearch = () => {
                 </PopoverContent>
               </Popover>
 
-              {/* Rooms */}
-              <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                  Chambres
-                </label>
-                <Select value={rooms} onValueChange={setRooms}>
-                  <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                    <SelectValue placeholder="Toutes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ROOM_OPTIONS.map((r) => (
-                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Rooms — hidden for terrain/bureau/local_commercial */}
+              {!TYPES_WITHOUT_ROOMS.includes(type) && (
+                <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
+                    Chambres
+                  </label>
+                  <Select value={rooms} onValueChange={setRooms}>
+                    <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
+                      <SelectValue placeholder="Toutes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROOM_OPTIONS.map((r) => (
+                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Search Button */}
               <div className="px-2">
