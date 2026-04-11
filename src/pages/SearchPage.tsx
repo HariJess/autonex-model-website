@@ -13,7 +13,8 @@ import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, H
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import type { DisplayListing } from "@/types/listing";
 import { useDbListings } from "@/hooks/useListings";
-import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from "react";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { useState, useMemo, useCallback, lazy, Suspense } from "react";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -61,6 +62,7 @@ const SearchPage = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [sort, setSort] = useState("recent");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [hoveredListingId, setHoveredListingId] = useState<string>();
@@ -349,13 +351,13 @@ const SearchPage = () => {
 
             {/* Results */}
             {!isLoading && !queryError && viewMode === "map" ? (
-              <div className="flex gap-4 h-[600px]">
-                <div className="w-[60%]">
+              <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
+                <div className="w-full lg:w-[60%] h-[400px] lg:h-full">
                   <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>}>
-                    <ListingsMap listings={filtered} onMarkerClick={(id) => navigate(`/annonce/${id}`)} />
+                    <ListingsMap listings={filtered} onMarkerClick={(id) => navigate(`/annonce/${id}`)} hoveredId={hoveredListingId} />
                   </Suspense>
                 </div>
-                <div className="w-[40%] overflow-y-auto space-y-3">
+                <div className="w-full lg:w-[40%] overflow-y-auto space-y-3 max-h-[600px]">
                   {filtered.map((listing) => (
                     <div key={listing.id} onMouseEnter={() => setHoveredListingId(listing.id)} onMouseLeave={() => setHoveredListingId(undefined)}>
                       <ListingCard listing={listing} />
@@ -366,8 +368,8 @@ const SearchPage = () => {
             ) : !isLoading && !queryError && viewMode === "list" ? (
               <div className="space-y-4">
                 {filtered.map((listing) => (
-                  <div key={listing.id} className="flex bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow">
-                    <Link to={`/annonce/${listing.id}`} className="w-72 h-48 flex-shrink-0">
+                  <div key={listing.id} className="flex flex-col sm:flex-row bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow">
+                    <Link to={`/annonce/${listing.id}`} className="w-full sm:w-72 h-48 flex-shrink-0">
                       <img src={listing.images[0] ?? "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"} alt={listing.title} className="w-full h-full object-cover" />
                     </Link>
                     <div className="flex-1 p-4 flex flex-col justify-between">
@@ -384,7 +386,7 @@ const SearchPage = () => {
                         </div>
                       </div>
                       <div className="flex items-center justify-between mt-3">
-                        <span className="font-serif font-bold text-lg text-primary">{listing.price_mga.toLocaleString("fr-FR")} Ar</span>
+                        <span className="font-serif font-bold text-lg text-primary">{formatPrice(listing.price_mga)}</span>
                       </div>
                     </div>
                   </div>

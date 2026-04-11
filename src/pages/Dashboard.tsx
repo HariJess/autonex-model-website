@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useMemo } from "react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Listing = Tables<"listings">;
@@ -44,11 +45,12 @@ const Dashboard = () => {
     retry: 1,
   });
 
+  const listingIds = useMemo(() => myListings.map((l) => l.id), [myListings]);
   const { data: myLeads = [], isLoading: leadsLoading } = useQuery({
-    queryKey: ["my-leads", user?.id, myListings.length],
+    queryKey: ["my-leads", user?.id, listingIds],
     queryFn: async (): Promise<Lead[]> => {
       if (!user) return [];
-      const listingIds = myListings.map((l) => l.id);
+      // listingIds comes from the memoized variable above
       if (listingIds.length === 0) return [];
       const { data, error } = await supabase
         .from("leads")
@@ -59,7 +61,7 @@ const Dashboard = () => {
       if (error) throw new Error(error.message);
       return (data ?? []) as Lead[];
     },
-    enabled: !!user && myListings.length > 0,
+    enabled: !!user && listingIds.length > 0,
   });
 
   const totalViews = myListings.reduce((sum, l) => sum + (l.views_count ?? 0), 0);
