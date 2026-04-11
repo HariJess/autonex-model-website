@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { useDbListings } from "@/hooks/useListings";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,20 +15,20 @@ import { seedBlogPosts } from "@/data/seed-listings";
 
 const Index = () => {
   const { t } = useTranslation();
-  const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
+  const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
 
   const { data: agencies = [] } = useQuery({
     queryKey: ["agencies-home"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("agencies")
         .select("id, name, slug, logo_url, verified")
         .order("name");
+      if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
 
-  // Count active listings per ville
   const { data: villeCounts = {} } = useQuery({
     queryKey: ["ville-counts"],
     queryFn: async () => {
@@ -48,13 +48,13 @@ const Index = () => {
     <>
       <Helmet>
         <title>ImmoNex Madagascar — Portail immobilier N°1</title>
-        <meta name="description" content="Trouvez votre futur chez-vous à Madagascar. Vente, location, projets neufs dans toutes les villes." />
+        <meta name="description" content="Trouvez votre futur chez-vous à Madagascar. Vente, location dans toutes les villes." />
       </Helmet>
       <Header />
 
       <HeroSearch />
 
-      {/* Featured listings */}
+      {/* Latest listings */}
       <section className="container mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.featured")}</h2>
@@ -65,6 +65,11 @@ const Index = () => {
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : listingsError ? (
+          <div className="flex flex-col items-center py-12 text-center">
+            <AlertCircle className="h-8 w-8 text-destructive mb-2" />
+            <p className="text-muted-foreground font-sans">{t("common.error")}</p>
           </div>
         ) : listings.length === 0 ? (
           <p className="text-center text-muted-foreground font-sans py-12">
@@ -124,7 +129,7 @@ const Index = () => {
         )}
       </section>
 
-      {/* Blog — still uses seed data, that's fine for static content */}
+      {/* Blog */}
       <section className="bg-secondary/50 py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">

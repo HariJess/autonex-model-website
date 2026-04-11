@@ -4,21 +4,24 @@ import type { DisplayListing } from "@/types/listing";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Fix leaflet default marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+// Fix leaflet default marker icons — use bundled fallback
+const defaultIcon = new L.Icon({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
+L.Marker.prototype.options.icon = defaultIcon;
 
 interface ListingsMapProps {
   listings: DisplayListing[];
-  hoveredId?: string;
   onMarkerClick?: (id: string) => void;
 }
 
-const ListingsMap = ({ listings, hoveredId, onMarkerClick }: ListingsMapProps) => {
+const ListingsMap = ({ listings, onMarkerClick }: ListingsMapProps) => {
   const { formatPrice } = useCurrency();
 
   const mappable = listings.filter((l) => l.lat != null && l.lng != null);

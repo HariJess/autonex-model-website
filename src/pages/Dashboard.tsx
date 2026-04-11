@@ -11,7 +11,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Eye, Phone, MessageSquare, Home, Zap, Pause, Trash2, CreditCard, Play, Loader2, Plus } from "lucide-react";
+import { Eye, Phone, MessageSquare, Home, Pause, Trash2, Play, Loader2, Plus, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -28,7 +28,7 @@ const Dashboard = () => {
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
-  const { data: myListings = [], isLoading: listingsLoading } = useQuery({
+  const { data: myListings = [], isLoading: listingsLoading, error: listingsError } = useQuery({
     queryKey: ["my-listings", user?.id],
     queryFn: async (): Promise<Listing[]> => {
       if (!user) return [];
@@ -37,13 +37,14 @@ const Dashboard = () => {
         .select("*")
         .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data ?? [];
     },
     enabled: !!user,
+    retry: 1,
   });
 
-  const { data: myLeads = [] } = useQuery({
+  const { data: myLeads = [], isLoading: leadsLoading } = useQuery({
     queryKey: ["my-leads", user?.id, myListings.length],
     queryFn: async (): Promise<Lead[]> => {
       if (!user) return [];
@@ -54,8 +55,8 @@ const Dashboard = () => {
         .select("*, listings(title)")
         .in("listing_id", listingIds)
         .order("created_at", { ascending: false })
-        .limit(20);
-      if (error) throw error;
+        .limit(50);
+      if (error) throw new Error(error.message);
       return (data ?? []) as Lead[];
     },
     enabled: !!user && myListings.length > 0,
@@ -77,7 +78,7 @@ const Dashboard = () => {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const newStatus = status === "active" ? "paused" : "active";
       const { error } = await supabase.from("listings").update({ status: newStatus as "active" | "paused" }).eq("id", id);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
@@ -88,8 +89,23 @@ const Dashboard = () => {
 
   const deleteListing = useMutation({
     mutationFn: async (id: string) => {
+      // Delete photos from storage first
+      const { data: photos } = await supabase.from("listing_photos").select("url").eq("listing_id", id);
+      if (photos && photos.length > 0) {
+        const paths = photos.map((p) => {
+          const url = new URL(p.url);
+          const parts = url.pathname.split("/listing-photos/");
+          return parts.length > 1 ? parts[1] : "";
+        }).filter(Boolean);
+        if (paths.length > 0) {
+          await supabase.storage.from("listing-photos").remove(paths);
+        }
+      }
+      // Delete listing_photos rows
+      await supabase.from("listing_photos").delete().eq("listing_id", id);
+      // Delete listing
       const { error } = await supabase.from("listings").delete().eq("id", id);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
@@ -97,6 +113,13 @@ const Dashboard = () => {
     },
     onError: (err: Error) => toast.error(err.message),
   });
+
+  const statusLabels: Record<string, string> = {
+    active: "Active",
+    paused: "En pause",
+    draft: "Brouillon",
+    expired: "Expirée",
+  };
 
   return (
     <>
@@ -107,7 +130,7 @@ const Dashboard = () => {
           <h1 className="font-serif text-3xl font-bold">{t("dashboard.title")}</h1>
           <Link to="/publier">
             <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-              <Plus className="h-4 w-4 mr-2" /> Nouvelle annonce
+              <Plus className="h-4 w-4 mr-2" /> {t("nav.publish")}
             </Button>
           </Link>
         </div>
@@ -128,22 +151,16 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <Card className="rounded-2xl">
-          <CardContent className="flex items-center justify-between p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-accent/10 text-accent">
-                <CreditCard className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="font-bold font-sans text-lg">{t("dashboard.credits")}: {(profile?.credits_balance ?? 0).toLocaleString()} Ar</p>
-                <p className="text-sm text-muted-foreground font-sans capitalize">{profile?.role}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <div>
           <h2 className="font-serif text-xl font-bold mb-4">{t("dashboard.myListings")}</h2>
+
+          {listingsError && (
+            <div className="flex items-center gap-2 text-destructive mb-4">
+              <AlertCircle className="h-5 w-5" />
+              <p className="font-sans text-sm">{(listingsError as Error).message}</p>
+            </div>
+          )}
+
           {listingsLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -153,7 +170,7 @@ const Dashboard = () => {
               <Home className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground font-sans mb-4">Aucune annonce. Publiez votre première annonce !</p>
               <Link to="/publier">
-                <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>Publier une annonce</Button>
+                <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>{t("nav.publish")}</Button>
               </Link>
             </div>
           ) : (
@@ -182,8 +199,8 @@ const Dashboard = () => {
                         </td>
                         <td className="p-4 font-sans text-sm">{formatPrice(listing.price_mga)}</td>
                         <td className="p-4">
-                          <Badge variant={listing.status === "active" ? "default" : "secondary"} className="font-sans text-xs capitalize">
-                            {listing.status}
+                          <Badge variant={listing.status === "active" ? "default" : "secondary"} className="font-sans text-xs">
+                            {statusLabels[listing.status ?? "draft"] ?? listing.status}
                           </Badge>
                         </td>
                         <td className="p-4 font-sans text-sm">{listing.views_count ?? 0}</td>
@@ -193,12 +210,13 @@ const Dashboard = () => {
                               variant="ghost" size="icon"
                               title={listing.status === "active" ? "Mettre en pause" : "Activer"}
                               onClick={() => toggleStatus.mutate({ id: listing.id, status: listing.status ?? "draft" })}
+                              disabled={listing.status === "expired"}
                             >
                               {listing.status === "active" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" title="Supprimer">
+                                <Button variant="ghost" size="icon" title={t("common.delete")}>
                                   <Trash2 className="h-4 w-4 text-destructive" />
                                 </Button>
                               </AlertDialogTrigger>
@@ -210,12 +228,12 @@ const Dashboard = () => {
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel className="font-sans">Annuler</AlertDialogCancel>
+                                  <AlertDialogCancel className="font-sans">{t("common.cancel")}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => deleteListing.mutate(listing.id)}
                                     className="bg-destructive text-destructive-foreground font-sans"
                                   >
-                                    Supprimer
+                                    {t("common.delete")}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -233,7 +251,11 @@ const Dashboard = () => {
 
         <div>
           <h2 className="font-serif text-xl font-bold mb-4">{t("dashboard.leads")}</h2>
-          {myLeads.length === 0 ? (
+          {leadsLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : myLeads.length === 0 ? (
             <p className="text-muted-foreground font-sans text-center py-8">Aucun contact reçu pour le moment.</p>
           ) : (
             <div className="space-y-3">

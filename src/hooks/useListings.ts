@@ -8,7 +8,6 @@ export function useListing(id: string | undefined) {
     queryKey: ["listing", id],
     queryFn: async (): Promise<DisplayListing | null> => {
       if (!id) return null;
-      // Validate UUID format
       if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
         return null;
       }
@@ -17,7 +16,8 @@ export function useListing(id: string | undefined) {
         .select("*")
         .eq("id", id)
         .maybeSingle();
-      if (error || !listing) return null;
+      if (error) throw new Error(`Erreur de chargement: ${error.message}`);
+      if (!listing) return null;
 
       const { data: photos } = await supabase
         .from("listing_photos")
@@ -41,7 +41,6 @@ export function useListing(id: string | undefined) {
         agencyInfo = data;
       }
 
-      // Check for active boosts
       let badge: DisplayListing["badge"] = null;
       const { data: boosts } = await supabase
         .from("boosts")
@@ -91,10 +90,11 @@ export function useListing(id: string | undefined) {
       };
     },
     enabled: !!id,
+    retry: 1,
   });
 }
 
-interface ListingsFilters {
+export interface ListingsFilters {
   transaction?: string;
   types?: string[];
   ville?: string;
@@ -105,6 +105,7 @@ interface ListingsFilters {
   surfaceMax?: number;
   searchText?: string;
   limit?: number;
+  ownerIds?: string[];
 }
 
 /** Fetch active listings from Supabase with optional filters */
@@ -126,6 +127,9 @@ export function useDbListings(filters: ListingsFilters = {}) {
       }
       if (filters.ville) {
         query = query.eq("ville", filters.ville);
+      }
+      if (filters.ownerIds && filters.ownerIds.length > 0) {
+        query = query.in("owner_id", filters.ownerIds);
       }
       if (filters.priceMin) {
         query = query.gte("price_mga", filters.priceMin);
@@ -157,9 +161,10 @@ export function useDbListings(filters: ListingsFilters = {}) {
       }
 
       const { data: listings, error } = await query;
-      if (error || !listings) return [];
+      if (error) throw new Error(`Erreur recherche: ${error.message}`);
+      if (!listings || listings.length === 0) return [];
 
-      // Batch-fetch photos for all listings
+      // Batch-fetch photos
       const listingIds = listings.map((l) => l.id);
       const { data: allPhotos } = await supabase
         .from("listing_photos")
@@ -172,6 +177,20 @@ export function useDbListings(filters: ListingsFilters = {}) {
         const arr = photosByListing.get(p.listing_id) ?? [];
         arr.push(p.url);
         photosByListing.set(p.listing_id, arr);
+      });
+
+      // Batch-fetch boosts
+      const { data: allBoosts } = await supabase
+        .from("boosts")
+        .select("listing_id, type")
+        .in("listing_id", listingIds)
+        .gte("ends_at", new Date().toISOString());
+
+      const boostByListing = new Map<string, DisplayListing["badge"]>();
+      allBoosts?.forEach((b) => {
+        if (!boostByListing.has(b.listing_id)) {
+          boostByListing.set(b.listing_id, b.type === "top" ? "boost" : b.type === "featured" ? "coup_de_coeur" : null);
+        }
       });
 
       return listings.map((listing) => {
@@ -200,9 +219,10 @@ export function useDbListings(filters: ListingsFilters = {}) {
           views_count: listing.views_count,
           created_at: listing.created_at,
           owner_id: listing.owner_id,
-          badge: null,
+          badge: boostByListing.get(listing.id) ?? null,
         };
       });
     },
+    retry: 1,
   });
 }

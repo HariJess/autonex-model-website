@@ -8,6 +8,7 @@ import { Search, MapPin, Euro, Banknote } from "lucide-react";
 import { useState } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
+import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
 
 const TRANSACTIONS = [
   { value: "vente", label: "Acheter" },
@@ -109,21 +110,19 @@ const HeroSearch = () => {
           <div className="bg-card rounded-b-2xl rounded-tr-2xl shadow-2xl p-3 md:p-4 -mb-12 relative z-10">
             {/* Desktop: horizontal */}
             <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border">
-              {/* Type */}
+              {/* Type — canonical values */}
               <div className="flex-1 border-r border-border px-3 py-2">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                  Type de bien
+                  {t("hero.type")}
                 </label>
                 <Select value={type} onValueChange={setType}>
                   <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
                     <SelectValue placeholder="Tous les types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="appartement">Appartement</SelectItem>
-                    <SelectItem value="villa">Villa / Maison</SelectItem>
-                    <SelectItem value="terrain">Terrain</SelectItem>
-                    <SelectItem value="commercial">Local commercial</SelectItem>
-                    <SelectItem value="bureau">Bureau</SelectItem>
+                    {LISTING_TYPES.map((lt) => (
+                      <SelectItem key={lt} value={lt}>{LISTING_TYPE_LABELS[lt]}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -220,14 +219,12 @@ const HeroSearch = () => {
             <div className="lg:hidden space-y-3">
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger className="font-sans">
-                  <SelectValue placeholder="Type de bien" />
+                  <SelectValue placeholder={t("hero.type")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="appartement">Appartement</SelectItem>
-                  <SelectItem value="villa">Villa / Maison</SelectItem>
-                  <SelectItem value="terrain">Terrain</SelectItem>
-                  <SelectItem value="commercial">Local commercial</SelectItem>
-                  <SelectItem value="bureau">Bureau</SelectItem>
+                  {LISTING_TYPES.map((lt) => (
+                    <SelectItem key={lt} value={lt}>{LISTING_TYPE_LABELS[lt]}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -255,14 +252,14 @@ const HeroSearch = () => {
 
               <div className="flex gap-2">
                 <Input
-                  placeholder="Budget min"
+                  placeholder={t("hero.budgetMin")}
                   type="number"
                   value={priceMin || ""}
                   onChange={(e) => setPriceMin(Number(e.target.value))}
                   className="font-sans"
                 />
                 <Input
-                  placeholder="Budget max"
+                  placeholder={t("hero.budgetMax")}
                   type="number"
                   value={priceMax || ""}
                   onChange={(e) => setPriceMax(Number(e.target.value))}
