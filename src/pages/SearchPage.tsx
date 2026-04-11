@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { SlidersHorizontal, X, LayoutGrid, List, Map, ChevronRight, Home } from "lucide-react";
+import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, Home } from "lucide-react";
 import { seedListings, seedAgencies, type SeedListing } from "@/data/seed-listings";
 import { villes } from "@/data/madagascar-locations";
 import { useState, useMemo, useCallback, Suspense, lazy } from "react";
@@ -340,7 +340,7 @@ const SearchPage = () => {
                   {([
                     { mode: "grid" as ViewMode, icon: LayoutGrid },
                     { mode: "list" as ViewMode, icon: List },
-                    { mode: "map" as ViewMode, icon: Map },
+                    { mode: "map" as ViewMode, icon: MapIcon },
                   ]).map(({ mode, icon: Icon }) => (
                     <button
                       key={mode}
