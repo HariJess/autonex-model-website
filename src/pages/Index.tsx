@@ -142,7 +142,7 @@ const Index = () => {
             {seedBlogPosts.slice(0, 3).map((post) => (
               <Link key={post.id} to={`/conseils/${post.slug}`} className="group rounded-2xl overflow-hidden bg-card border border-border shadow-sm hover:shadow-md transition-all">
                 <div className="aspect-video overflow-hidden">
-                  <img src={post.cover} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={post.cover} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                 </div>
                 <div className="p-5 space-y-2">
                   <span className="text-xs font-sans font-medium text-primary">{post.category}</span>

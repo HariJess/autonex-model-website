@@ -42,7 +42,11 @@ const ListingCard = ({ listing, agencyName, agencyLogo }: ListingCardProps) => {
             </Badge>
           </div>
         )}
-        <button onClick={(e) => { e.preventDefault(); setFavorited(!favorited); }} className="absolute top-3 right-3 p-2 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card transition-colors">
+        <button
+          onClick={(e) => { e.preventDefault(); setFavorited(!favorited); }}
+          className="absolute top-3 right-3 p-2 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card transition-colors"
+          title="Ajouter aux favoris (bientôt disponible)"
+        >
           <Heart className={`h-4 w-4 ${favorited ? "fill-accent text-accent" : "text-foreground"}`} />
         </button>
         {images.length > 1 && (

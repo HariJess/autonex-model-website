@@ -18,7 +18,7 @@ const EQUIPMENTS = [
   "Sécurité 24h", "Meublé", "Vue mer", "Ascenseur",
 ];
 
-const PROXIMITIES = ["École", "Marché", "Centre-ville", "Plage", "Aéroport"];
+
 
 export interface SearchFilters {
   transaction: string;
@@ -209,18 +209,6 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
             </AccordionContent>
           </AccordionItem>
 
-          {/* Proximity */}
-          <AccordionItem value="proximity" className="px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">À proximité</AccordionTrigger>
-            <AccordionContent className="pb-3 space-y-1">
-              {PROXIMITIES.map((pr) => (
-                <label key={pr} className="flex items-center gap-2 py-0.5 cursor-pointer">
-                  <Checkbox checked={filters.proximities.includes(pr)} onCheckedChange={() => update({ proximities: toggleInArray(filters.proximities, pr) })} />
-                  <span className="font-sans text-sm">{pr}</span>
-                </label>
-              ))}
-            </AccordionContent>
-          </AccordionItem>
         </Accordion>
       </div>
     </div>

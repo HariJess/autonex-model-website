@@ -19,9 +19,10 @@ L.Marker.prototype.options.icon = defaultIcon;
 interface ListingsMapProps {
   listings: DisplayListing[];
   onMarkerClick?: (id: string) => void;
+  hoveredId?: string;
 }
 
-const ListingsMap = ({ listings, onMarkerClick }: ListingsMapProps) => {
+const ListingsMap = ({ listings, onMarkerClick, hoveredId }: ListingsMapProps) => {
   const { formatPrice } = useCurrency();
 
   const mappable = listings.filter((l) => l.lat != null && l.lng != null);

@@ -89,7 +89,8 @@ const PublishPage = () => {
     return () => {
       photoPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photoPreviews]);
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
