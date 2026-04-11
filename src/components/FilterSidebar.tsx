@@ -18,8 +18,6 @@ const EQUIPMENTS = [
   "Sécurité 24h", "Meublé", "Vue mer", "Ascenseur",
 ];
 
-
-
 export interface SearchFilters {
   transaction: string;
   types: string[];
@@ -34,7 +32,6 @@ export interface SearchFilters {
   rooms: number[];
   bathrooms: number[];
   equipments: string[];
-  proximities: string[];
 }
 
 interface FilterSidebarProps {
@@ -62,17 +59,22 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
       transaction: "", types: [], ville: "", arrondissement: "",
       quartiers: [], quartierLibre: "", priceMin: 0, priceMax: 0,
       surfaceMin: 0, surfaceMax: 0, rooms: [], bathrooms: [],
-      equipments: [], proximities: [],
+      equipments: [],
     });
   };
+
+  // Show rooms/bathrooms only when no exclusively non-residential type is selected,
+  // or when mixed selections include at least one residential type
+  const hasResidentialType = filters.types.length === 0 ||
+    filters.types.some(tp => !TYPES_WITHOUT_ROOMS.includes(tp));
 
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between px-1 pb-2">
-        <h3 className="font-serif font-bold text-lg">Filtres</h3>
+        <h3 className="font-serif font-bold text-lg">{t("search.filters")}</h3>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" className="text-xs font-sans text-muted-foreground h-7" onClick={resetFilters}>
-            Effacer
+            {t("common.clear", "Effacer")}
           </Button>
           {isMobile && onClose && (
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
@@ -90,9 +92,9 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
             <AccordionContent className="pb-3">
               <RadioGroup value={filters.transaction} onValueChange={(v) => update({ transaction: v })}>
                 {[
-                  { value: "vente", label: "Vente" },
-                  { value: "location", label: "Location" },
-                  { value: "location_vacances", label: "Location vacances" },
+                  { value: "vente", label: t("transaction.sale", "Vente") },
+                  { value: "location", label: t("transaction.rent", "Location") },
+                  { value: "location_vacances", label: t("transaction.vacation", "Location vacances") },
                 ].map((opt) => (
                   <div key={opt.value} className="flex items-center gap-2 py-0.5">
                     <RadioGroupItem value={opt.value} id={`tr-${opt.value}`} />
@@ -103,9 +105,9 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
             </AccordionContent>
           </AccordionItem>
 
-          {/* Type — using canonical types */}
+          {/* Type */}
           <AccordionItem value="type" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Type de bien</AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.propertyType", "Type de bien")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
               {LISTING_TYPES.map((typeVal) => (
                 <label key={typeVal} className="flex items-center gap-2 py-0.5 cursor-pointer">
@@ -121,7 +123,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
 
           {/* Location */}
           <AccordionItem value="location" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Localisation</AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.location", "Localisation")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <LocationSelector
                 selectedVille={filters.ville}
@@ -164,41 +166,41 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
             </AccordionContent>
           </AccordionItem>
 
-          {/* Rooms — only for residential types */}
-          {!filters.types.some(t => TYPES_WITHOUT_ROOMS.includes(t)) && (
-          <AccordionItem value="rooms" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Chambres</AccordionTrigger>
-            <AccordionContent className="pb-3">
-              <div className="flex flex-wrap gap-1.5">
-                {[{ label: "Studio", value: 0 }, { label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }, { label: "4", value: 4 }, { label: "5+", value: 5 }].map((r) => (
-                  <Button key={r.value} variant="outline" size="sm" className={`font-sans text-xs h-8 px-3 ${filters.rooms.includes(r.value) ? "border-primary bg-primary/10 text-primary" : ""}`} onClick={() => update({ rooms: toggleInNumArray(filters.rooms, r.value) })}>
-                    {r.label}
-                  </Button>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          {/* Rooms — only when at least one residential type or no type selected */}
+          {hasResidentialType && (
+            <AccordionItem value="rooms" className="border-b border-border px-4">
+              <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("listing.rooms", "Chambres")}</AccordionTrigger>
+              <AccordionContent className="pb-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {[{ label: "Studio", value: 0 }, { label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }, { label: "4", value: 4 }, { label: "5+", value: 5 }].map((r) => (
+                    <Button key={r.value} variant="outline" size="sm" className={`font-sans text-xs h-8 px-3 ${filters.rooms.includes(r.value) ? "border-primary bg-primary/10 text-primary" : ""}`} onClick={() => update({ rooms: toggleInNumArray(filters.rooms, r.value) })}>
+                      {r.label}
+                    </Button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           )}
 
-          {/* Bathrooms — only for residential types */}
-          {!filters.types.some(t => TYPES_WITHOUT_ROOMS.includes(t)) && (
-          <AccordionItem value="bathrooms" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Salles de bain</AccordionTrigger>
-            <AccordionContent className="pb-3">
-              <div className="flex flex-wrap gap-1.5">
-                {[1, 2, 3, 4].map((b) => (
-                  <Button key={b} variant="outline" size="sm" className={`font-sans text-xs h-8 px-3 ${filters.bathrooms.includes(b) ? "border-primary bg-primary/10 text-primary" : ""}`} onClick={() => update({ bathrooms: toggleInNumArray(filters.bathrooms, b) })}>
-                    {b}{b === 4 ? "+" : ""}
-                  </Button>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          {/* Bathrooms — same logic */}
+          {hasResidentialType && (
+            <AccordionItem value="bathrooms" className="border-b border-border px-4">
+              <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("listing.bathrooms", "Salles de bain")}</AccordionTrigger>
+              <AccordionContent className="pb-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {[1, 2, 3, 4].map((b) => (
+                    <Button key={b} variant="outline" size="sm" className={`font-sans text-xs h-8 px-3 ${filters.bathrooms.includes(b) ? "border-primary bg-primary/10 text-primary" : ""}`} onClick={() => update({ bathrooms: toggleInNumArray(filters.bathrooms, b) })}>
+                      {b}{b === 4 ? "+" : ""}
+                    </Button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           )}
 
           {/* Equipment */}
           <AccordionItem value="equipment" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Équipements</AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("listing.features", "Équipements")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
               {EQUIPMENTS.map((eq) => (
                 <label key={eq} className="flex items-center gap-2 py-0.5 cursor-pointer">
