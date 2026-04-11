@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, MapPin, Home, DollarSign, BedDouble, Euro, Banknote } from "lucide-react";
-import { villes } from "@/data/madagascar-locations";
+import { Search, MapPin, Euro, Banknote } from "lucide-react";
 import { useState } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
@@ -37,7 +36,8 @@ const HeroSearch = () => {
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(0);
   const [rooms, setRooms] = useState("");
-  const [locationOpen, setLocationOpen] = useState(false);
+  const [desktopLocationOpen, setDesktopLocationOpen] = useState(false);
+  const [mobileLocationOpen, setMobileLocationOpen] = useState(false);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
 
@@ -48,6 +48,7 @@ const HeroSearch = () => {
     if (ville) params.set("ville", ville);
     if (arrondissement) params.set("arr", arrondissement);
     if (quartiers.length) params.set("quartiers", quartiers.join(","));
+    if (quartierLibre.trim()) params.set("q", quartierLibre.trim());
     if (priceMin) params.set("prix_min", String(priceMin));
     if (priceMax) params.set("prix_max", String(priceMax));
     if (rooms) params.set("chambres", rooms);
@@ -57,10 +58,12 @@ const HeroSearch = () => {
   const locationLabel = ville
     ? quartiers.length > 0
       ? `${ville} — ${quartiers.slice(0, 2).join(", ")}${quartiers.length > 2 ? "..." : ""}`
+      : quartierLibre.trim()
+      ? `${ville} — ${quartierLibre.trim()}`
       : arrondissement
       ? `${ville}, ${arrondissement}`
       : ville
-    : "";
+    : quartierLibre.trim();
 
   const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency);
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
@@ -126,7 +129,7 @@ const HeroSearch = () => {
               </div>
 
               {/* Location */}
-              <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+              <Popover open={desktopLocationOpen} onOpenChange={setDesktopLocationOpen}>
                 <PopoverTrigger asChild>
                   <button className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors">
                     <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
@@ -150,7 +153,7 @@ const HeroSearch = () => {
                     onArrChange={setArrondissement}
                     onQuartiersChange={setQuartiers}
                     onQuartierLibreChange={setQuartierLibre}
-                    onClose={() => setLocationOpen(false)}
+                    onClose={() => setDesktopLocationOpen(false)}
                   />
                 </PopoverContent>
               </Popover>
@@ -228,7 +231,7 @@ const HeroSearch = () => {
                 </SelectContent>
               </Select>
 
-              <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+              <Popover open={mobileLocationOpen} onOpenChange={setMobileLocationOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start font-sans text-sm gap-2">
                     <MapPin className="h-4 w-4 text-accent" />
@@ -245,6 +248,7 @@ const HeroSearch = () => {
                     onArrChange={setArrondissement}
                     onQuartiersChange={setQuartiers}
                     onQuartierLibreChange={setQuartierLibre}
+                    onClose={() => setMobileLocationOpen(false)}
                   />
                 </PopoverContent>
               </Popover>
