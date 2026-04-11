@@ -8,7 +8,7 @@ import { Search, MapPin, Home, DollarSign, BedDouble } from "lucide-react";
 import { villes } from "@/data/madagascar-locations";
 import { useState } from "react";
 import LocationSelector from "@/components/LocationSelector";
-import BudgetRangeSlider from "@/components/BudgetRangeSlider";
+import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
 
 const TRANSACTIONS = [
   { value: "vente", label: "Acheter" },
