@@ -70,6 +70,7 @@ interface BudgetRangeSliderProps {
   onMinChange: (v: number) => void;
   onMaxChange: (v: number) => void;
   onClose?: () => void;
+  onCurrencyChange?: (c: "MGA" | "EUR") => void;
 }
 
 const BudgetRangeSlider = ({
@@ -79,8 +80,14 @@ const BudgetRangeSlider = ({
   onMinChange,
   onMaxChange,
   onClose,
+  onCurrencyChange,
 }: BudgetRangeSliderProps) => {
   const [displayCurrency, setDisplayCurrency] = useState<"MGA" | "EUR">("MGA");
+
+  const handleCurrencyChange = (c: "MGA" | "EUR") => {
+    setDisplayCurrency(c);
+    onCurrencyChange?.(c);
+  };
 
   const txKey = transaction && RANGES[transaction] ? transaction : "vente";
   const range = RANGES[txKey];
@@ -121,7 +128,7 @@ const BudgetRangeSlider = ({
             className={`px-3 py-1 text-xs font-sans font-medium transition-colors ${
               displayCurrency === "MGA" ? "gradient-primary text-white" : "hover:bg-muted"
             }`}
-            onClick={() => setDisplayCurrency("MGA")}
+            onClick={() => handleCurrencyChange("MGA")}
           >
             MGA
           </button>
@@ -129,7 +136,7 @@ const BudgetRangeSlider = ({
             className={`px-3 py-1 text-xs font-sans font-medium transition-colors ${
               displayCurrency === "EUR" ? "gradient-primary text-white" : "hover:bg-muted"
             }`}
-            onClick={() => setDisplayCurrency("EUR")}
+            onClick={() => handleCurrencyChange("EUR")}
           >
             EUR
           </button>
