@@ -36,7 +36,7 @@ const ListingDetail = () => {
   useEffect(() => {
     if (listing?.id && viewIncremented.current !== listing.id) {
       viewIncremented.current = listing.id;
-      supabase.rpc("increment_views", { listing_uuid: listing.id }).catch(() => {});
+      supabase.rpc("increment_views", { listing_uuid: listing.id }).then(() => {});
     }
   }, [listing?.id]);
 
