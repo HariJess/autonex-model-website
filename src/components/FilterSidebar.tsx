@@ -9,15 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider from "@/components/BudgetRangeSlider";
 import { X } from "lucide-react";
-import type { SeedListing } from "@/data/seed-listings";
-
-const PROPERTY_TYPES = [
-  { value: "appartement", label: "Appartement" },
-  { value: "villa", label: "Villa / Maison" },
-  { value: "terrain", label: "Terrain" },
-  { value: "commercial", label: "Local commercial" },
-  { value: "bureau", label: "Bureau" },
-];
+import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
 
 const EQUIPMENTS = [
   "Piscine", "Parking", "Jardin", "Climatisation",
@@ -46,12 +38,11 @@ export interface SearchFilters {
 interface FilterSidebarProps {
   filters: SearchFilters;
   onFiltersChange: (f: SearchFilters) => void;
-  listings: SeedListing[];
   onClose?: () => void;
   isMobile?: boolean;
 }
 
-const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }: FilterSidebarProps) => {
+const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSidebarProps) => {
   const { t } = useTranslation();
 
   const update = (partial: Partial<SearchFilters>) => {
@@ -64,28 +55,12 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
   const toggleInNumArray = (arr: number[], item: number) =>
     arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
 
-  const countByType = (type: string) =>
-    listings.filter((l) => l.type === type).length;
-
-  const countByTransaction = (tr: string) =>
-    listings.filter((l) => l.transaction === tr).length;
-
   const resetFilters = () => {
     onFiltersChange({
-      transaction: "",
-      types: [],
-      ville: "",
-      arrondissement: "",
-      quartiers: [],
-      quartierLibre: "",
-      priceMin: 0,
-      priceMax: 0,
-      surfaceMin: 0,
-      surfaceMax: 0,
-      rooms: [],
-      bathrooms: [],
-      equipments: [],
-      proximities: [],
+      transaction: "", types: [], ville: "", arrondissement: "",
+      quartiers: [], quartierLibre: "", priceMin: 0, priceMax: 0,
+      surfaceMin: 0, surfaceMax: 0, rooms: [], bathrooms: [],
+      equipments: [], proximities: [],
     });
   };
 
@@ -109,9 +84,7 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
         <Accordion type="multiple" defaultValue={["transaction", "type", "location", "budget"]} className="w-full">
           {/* Transaction */}
           <AccordionItem value="transaction" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Transaction
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Transaction</AccordionTrigger>
             <AccordionContent className="pb-3">
               <RadioGroup value={filters.transaction} onValueChange={(v) => update({ transaction: v })}>
                 {[
@@ -121,30 +94,24 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
                 ].map((opt) => (
                   <div key={opt.value} className="flex items-center gap-2 py-0.5">
                     <RadioGroupItem value={opt.value} id={`tr-${opt.value}`} />
-                    <Label htmlFor={`tr-${opt.value}`} className="font-sans text-sm cursor-pointer flex-1">
-                      {opt.label}
-                    </Label>
-                    <span className="text-xs text-muted-foreground font-sans">({countByTransaction(opt.value)})</span>
+                    <Label htmlFor={`tr-${opt.value}`} className="font-sans text-sm cursor-pointer flex-1">{opt.label}</Label>
                   </div>
                 ))}
               </RadioGroup>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Type */}
+          {/* Type — using canonical types */}
           <AccordionItem value="type" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Type de bien
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Type de bien</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
-              {PROPERTY_TYPES.map((pt) => (
-                <label key={pt.value} className="flex items-center gap-2 py-0.5 cursor-pointer">
+              {LISTING_TYPES.map((typeVal) => (
+                <label key={typeVal} className="flex items-center gap-2 py-0.5 cursor-pointer">
                   <Checkbox
-                    checked={filters.types.includes(pt.value)}
-                    onCheckedChange={() => update({ types: toggleInArray(filters.types, pt.value) })}
+                    checked={filters.types.includes(typeVal)}
+                    onCheckedChange={() => update({ types: toggleInArray(filters.types, typeVal) })}
                   />
-                  <span className="font-sans text-sm flex-1">{pt.label}</span>
-                  <span className="text-xs text-muted-foreground font-sans">({countByType(pt.value)})</span>
+                  <span className="font-sans text-sm flex-1">{LISTING_TYPE_LABELS[typeVal]}</span>
                 </label>
               ))}
             </AccordionContent>
@@ -152,9 +119,7 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
 
           {/* Location */}
           <AccordionItem value="location" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Localisation
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Localisation</AccordionTrigger>
             <AccordionContent className="pb-3">
               <LocationSelector
                 selectedVille={filters.ville}
@@ -171,9 +136,7 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
 
           {/* Budget */}
           <AccordionItem value="budget" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Budget (Ar)
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Budget</AccordionTrigger>
             <AccordionContent className="pb-3">
               <BudgetRangeSlider
                 transaction={filters.transaction}
@@ -187,33 +150,13 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
 
           {/* Surface */}
           <AccordionItem value="surface" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Surface (m²)
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Surface (m²)</AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="space-y-3">
-                <Slider
-                  min={0}
-                  max={1000}
-                  step={10}
-                  value={[filters.surfaceMin, filters.surfaceMax || 1000]}
-                  onValueChange={([min, max]) => update({ surfaceMin: min, surfaceMax: max })}
-                />
+                <Slider min={0} max={1000} step={10} value={[filters.surfaceMin, filters.surfaceMax || 1000]} onValueChange={([min, max]) => update({ surfaceMin: min, surfaceMax: max })} />
                 <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    value={filters.surfaceMin || ""}
-                    onChange={(e) => update({ surfaceMin: Number(e.target.value) })}
-                    placeholder="Min"
-                    className="font-sans text-sm"
-                  />
-                  <Input
-                    type="number"
-                    value={filters.surfaceMax || ""}
-                    onChange={(e) => update({ surfaceMax: Number(e.target.value) })}
-                    placeholder="Max"
-                    className="font-sans text-sm"
-                  />
+                  <Input type="number" value={filters.surfaceMin || ""} onChange={(e) => update({ surfaceMin: Number(e.target.value) })} placeholder="Min" className="font-sans text-sm" />
+                  <Input type="number" value={filters.surfaceMax || ""} onChange={(e) => update({ surfaceMax: Number(e.target.value) })} placeholder="Max" className="font-sans text-sm" />
                 </div>
               </div>
             </AccordionContent>
@@ -221,30 +164,11 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
 
           {/* Rooms */}
           <AccordionItem value="rooms" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Chambres
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Chambres</AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="flex flex-wrap gap-1.5">
-                {[
-                  { label: "Studio", value: 0 },
-                  { label: "1", value: 1 },
-                  { label: "2", value: 2 },
-                  { label: "3", value: 3 },
-                  { label: "4", value: 4 },
-                  { label: "5+", value: 5 },
-                ].map((r) => (
-                  <Button
-                    key={r.value}
-                    variant="outline"
-                    size="sm"
-                    className={`font-sans text-xs h-8 px-3 ${
-                      filters.rooms.includes(r.value)
-                        ? "border-primary bg-primary/10 text-primary"
-                        : ""
-                    }`}
-                    onClick={() => update({ rooms: toggleInNumArray(filters.rooms, r.value) })}
-                  >
+                {[{ label: "Studio", value: 0 }, { label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }, { label: "4", value: 4 }, { label: "5+", value: 5 }].map((r) => (
+                  <Button key={r.value} variant="outline" size="sm" className={`font-sans text-xs h-8 px-3 ${filters.rooms.includes(r.value) ? "border-primary bg-primary/10 text-primary" : ""}`} onClick={() => update({ rooms: toggleInNumArray(filters.rooms, r.value) })}>
                     {r.label}
                   </Button>
                 ))}
@@ -254,23 +178,11 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
 
           {/* Bathrooms */}
           <AccordionItem value="bathrooms" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Salles de bain
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Salles de bain</AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="flex flex-wrap gap-1.5">
                 {[1, 2, 3, 4].map((b) => (
-                  <Button
-                    key={b}
-                    variant="outline"
-                    size="sm"
-                    className={`font-sans text-xs h-8 px-3 ${
-                      filters.bathrooms.includes(b)
-                        ? "border-primary bg-primary/10 text-primary"
-                        : ""
-                    }`}
-                    onClick={() => update({ bathrooms: toggleInNumArray(filters.bathrooms, b) })}
-                  >
+                  <Button key={b} variant="outline" size="sm" className={`font-sans text-xs h-8 px-3 ${filters.bathrooms.includes(b) ? "border-primary bg-primary/10 text-primary" : ""}`} onClick={() => update({ bathrooms: toggleInNumArray(filters.bathrooms, b) })}>
                     {b}{b === 4 ? "+" : ""}
                   </Button>
                 ))}
@@ -280,16 +192,11 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
 
           {/* Equipment */}
           <AccordionItem value="equipment" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              Équipements
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">Équipements</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
               {EQUIPMENTS.map((eq) => (
                 <label key={eq} className="flex items-center gap-2 py-0.5 cursor-pointer">
-                  <Checkbox
-                    checked={filters.equipments.includes(eq)}
-                    onCheckedChange={() => update({ equipments: toggleInArray(filters.equipments, eq) })}
-                  />
+                  <Checkbox checked={filters.equipments.includes(eq)} onCheckedChange={() => update({ equipments: toggleInArray(filters.equipments, eq) })} />
                   <span className="font-sans text-sm">{eq}</span>
                 </label>
               ))}
@@ -298,16 +205,11 @@ const FilterSidebar = ({ filters, onFiltersChange, listings, onClose, isMobile }
 
           {/* Proximity */}
           <AccordionItem value="proximity" className="px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">
-              À proximité
-            </AccordionTrigger>
+            <AccordionTrigger className="font-serif text-sm font-semibold py-3">À proximité</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
               {PROXIMITIES.map((pr) => (
                 <label key={pr} className="flex items-center gap-2 py-0.5 cursor-pointer">
-                  <Checkbox
-                    checked={filters.proximities.includes(pr)}
-                    onCheckedChange={() => update({ proximities: toggleInArray(filters.proximities, pr) })}
-                  />
+                  <Checkbox checked={filters.proximities.includes(pr)} onCheckedChange={() => update({ proximities: toggleInArray(filters.proximities, pr) })} />
                   <span className="font-sans text-sm">{pr}</span>
                 </label>
               ))}

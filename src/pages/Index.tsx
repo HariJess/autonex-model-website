@@ -6,14 +6,43 @@ import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-import { seedListings, seedAgencies, seedBlogPosts } from "@/data/seed-listings";
+import { ChevronRight, Loader2 } from "lucide-react";
+import { useDbListings } from "@/hooks/useListings";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { villes } from "@/data/madagascar-locations";
+import { seedBlogPosts } from "@/data/seed-listings";
 
 const Index = () => {
   const { t } = useTranslation();
-  const featured = seedListings.filter((l) => l.badge).slice(0, 8);
-  const getAgency = (id: string) => seedAgencies.find((a) => a.id === id);
+  const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
+
+  const { data: agencies = [] } = useQuery({
+    queryKey: ["agencies-home"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("agencies")
+        .select("id, name, slug, logo_url, verified")
+        .order("name");
+      return data ?? [];
+    },
+  });
+
+  // Count active listings per ville
+  const { data: villeCounts = {} } = useQuery({
+    queryKey: ["ville-counts"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("listings")
+        .select("ville")
+        .eq("status", "active");
+      const counts: Record<string, number> = {};
+      data?.forEach((l) => {
+        if (l.ville) counts[l.ville] = (counts[l.ville] ?? 0) + 1;
+      });
+      return counts;
+    },
+  });
 
   return (
     <>
@@ -33,12 +62,21 @@ const Index = () => {
             {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featured.map((listing) => {
-            const agency = getAgency(listing.agency_id);
-            return <ListingCard key={listing.id} listing={listing} agencyName={agency?.name} agencyLogo={agency?.logo} />;
-          })}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : listings.length === 0 ? (
+          <p className="text-center text-muted-foreground font-sans py-12">
+            Aucune annonce pour le moment. Soyez le premier à publier !
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {listings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Nos villes */}
@@ -47,14 +85,14 @@ const Index = () => {
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">Nos villes</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {villes.map((ville) => {
-              const count = seedListings.filter((l) => l.city === ville.name || l.region === ville.region).length;
+              const count = villeCounts[ville.name] ?? 0;
               return (
                 <Link key={ville.name} to={`/recherche?ville=${ville.name}`} className="group relative rounded-2xl overflow-hidden aspect-[3/2]">
                   <img src={ville.image} alt={ville.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
                   <div className="absolute bottom-3 left-3">
                     <h3 className="font-serif font-bold text-lg" style={{ color: "#FAFAFA" }}>{ville.name}</h3>
-                    <p className="text-xs font-sans opacity-80" style={{ color: "#FAFAFA" }}>{ville.description} • {count} annonces</p>
+                    <p className="text-xs font-sans opacity-80" style={{ color: "#FAFAFA" }}>{ville.description} • {count} annonce{count !== 1 ? "s" : ""}</p>
                   </div>
                 </Link>
               );
@@ -66,19 +104,27 @@ const Index = () => {
       {/* Partner agencies */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">{t("sections.agencies")}</h2>
-        <div className="flex flex-wrap justify-center gap-8">
-          {seedAgencies.map((agency) => (
-            <Link key={agency.id} to={`/agence/${agency.slug}`} className="flex flex-col items-center gap-2 group">
-              <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border shadow-sm group-hover:shadow-md transition-shadow">
-                <img src={agency.logo} alt={agency.name} className="w-full h-full object-cover" />
-              </div>
-              <span className="text-sm font-sans font-medium text-foreground">{agency.name}</span>
-            </Link>
-          ))}
-        </div>
+        {agencies.length === 0 ? (
+          <p className="text-center text-muted-foreground font-sans">Aucune agence partenaire pour le moment.</p>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-8">
+            {agencies.map((agency) => (
+              <Link key={agency.id} to={`/agence/${agency.slug}`} className="flex flex-col items-center gap-2 group">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border shadow-sm group-hover:shadow-md transition-shadow bg-muted flex items-center justify-center">
+                  {agency.logo_url ? (
+                    <img src={agency.logo_url} alt={agency.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-serif text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
+                  )}
+                </div>
+                <span className="text-sm font-sans font-medium text-foreground">{agency.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* Blog */}
+      {/* Blog — still uses seed data, that's fine for static content */}
       <section className="bg-secondary/50 py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
