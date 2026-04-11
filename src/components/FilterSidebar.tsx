@@ -164,7 +164,8 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
             </AccordionContent>
           </AccordionItem>
 
-          {/* Rooms */}
+          {/* Rooms — only for residential types */}
+          {!filters.types.some(t => TYPES_WITHOUT_ROOMS.includes(t)) && (
           <AccordionItem value="rooms" className="border-b border-border px-4">
             <AccordionTrigger className="font-serif text-sm font-semibold py-3">Chambres</AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -177,8 +178,10 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
               </div>
             </AccordionContent>
           </AccordionItem>
+          )}
 
-          {/* Bathrooms */}
+          {/* Bathrooms — only for residential types */}
+          {!filters.types.some(t => TYPES_WITHOUT_ROOMS.includes(t)) && (
           <AccordionItem value="bathrooms" className="border-b border-border px-4">
             <AccordionTrigger className="font-serif text-sm font-semibold py-3">Salles de bain</AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -191,6 +194,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile }: FilterSi
               </div>
             </AccordionContent>
           </AccordionItem>
+          )}
 
           {/* Equipment */}
           <AccordionItem value="equipment" className="border-b border-border px-4">
