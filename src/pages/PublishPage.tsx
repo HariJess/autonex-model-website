@@ -21,7 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { ListingType, TransactionType } from "@/types/listing";
 
-const steps = ["Pack", "Détails", "Photos", "Localisation", "Paiement"];
+const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
 const PublishPage = () => {
   const { t } = useTranslation();
@@ -30,6 +30,14 @@ const PublishPage = () => {
   const [step, setStep] = useState(0);
   const [selectedPack, setSelectedPack] = useState("");
   const [stepErrors, setStepErrors] = useState<string[]>([]);
+
+  const steps = [
+    t("publish.step1", "Pack"),
+    t("publish.step2", "Détails"),
+    t("publish.step3", "Photos"),
+    t("publish.step4", "Localisation"),
+    t("publish.step6", "Paiement"),
+  ];
 
   // Step 2 - Details
   const [listingType, setListingType] = useState<ListingType | "">("");
@@ -55,13 +63,14 @@ const PublishPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [publishing, setPublishing] = useState(false);
 
+  const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
+
   // Fetch real packs from DB
   const { data: dbPacks = [] } = useQuery({
     queryKey: ["packs"],
     queryFn: async () => {
       const { data, error } = await supabase.from("packs").select("*").order("price_mga", { ascending: true });
       if (error || !data || data.length === 0) {
-        // Fallback to hardcoded packs if DB is empty
         return [
           { id: "decouverte", name: "Pack Découverte", price_mga: 0, listings_quota: 1, duration_days: 30, features: [] },
           { id: "pro", name: "Pack Pro", price_mga: 50000, listings_quota: 10, duration_days: 60, features: [] },
@@ -79,7 +88,7 @@ const PublishPage = () => {
     { id: "mvola", name: "MVola" },
     { id: "orange_money", name: "Orange Money" },
     { id: "airtel_money", name: "Airtel Money" },
-    { id: "stripe", name: "Carte bancaire (Stripe)" },
+    { id: "stripe", name: t("publish.creditCard", "Carte bancaire (Stripe)") },
   ];
 
   const progress = ((step + 1) / steps.length) * 100;
@@ -92,6 +101,14 @@ const PublishPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [photoPreviews]);
 
+  // Clear rooms/bathrooms when switching to non-residential type
+  useEffect(() => {
+    if (listingType && !TYPES_WITH_ROOMS.includes(listingType as ListingType)) {
+      setRooms("");
+      setBathrooms("");
+    }
+  }, [listingType]);
+
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files).slice(0, 10);
@@ -101,26 +118,33 @@ const PublishPage = () => {
     }
   };
 
+  const removePhoto = (index: number) => {
+    URL.revokeObjectURL(photoPreviews[index]);
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const validateStep = (s: number): string[] => {
     const errors: string[] = [];
     switch (s) {
       case 0:
-        if (!selectedPack) errors.push("Veuillez choisir un pack");
+        if (!selectedPack) errors.push(t("publish.packRequired", "Veuillez choisir un pack"));
         break;
       case 1:
-        if (!listingType) errors.push("Type de bien requis");
-        if (!transaction) errors.push("Type de transaction requis");
-        if (!title.trim()) errors.push("Titre requis");
-        if (title.trim().length < 5) errors.push("Le titre doit contenir au moins 5 caractères");
-        if (!priceMga || Number(priceMga) <= 0) errors.push("Prix valide requis");
+        if (!listingType) errors.push(t("publish.typeRequired", "Type de bien requis"));
+        if (!transaction) errors.push(t("publish.transactionRequired", "Type de transaction requis"));
+        if (!title.trim()) errors.push(t("publish.titleRequired", "Titre requis"));
+        if (title.trim().length > 0 && title.trim().length < 5) errors.push(t("publish.titleMin", "Le titre doit contenir au moins 5 caractères"));
+        if (!priceMga || Number(priceMga) <= 0) errors.push(t("publish.priceRequired", "Prix valide requis"));
+        if (surface && Number(surface) < 0) errors.push(t("publish.surfaceInvalid", "Surface invalide"));
         break;
       case 2:
         break;
       case 3:
-        if (!ville) errors.push("Ville requise");
+        if (!ville) errors.push(t("publish.villeRequired", "Ville requise"));
         break;
       case 4:
-        if (!isFree && !paymentMethod) errors.push("Méthode de paiement requise");
+        if (!isFree && !paymentMethod) errors.push(t("publish.paymentRequired", "Méthode de paiement requise"));
         break;
     }
     return errors;
@@ -144,7 +168,7 @@ const PublishPage = () => {
       return;
     }
     if (!user) {
-      toast.error("Vous devez être connecté");
+      toast.error(t("publish.loginRequired", "Vous devez être connecté"));
       return;
     }
     setPublishing(true);
@@ -152,8 +176,6 @@ const PublishPage = () => {
     try {
       const region = getRegionForVille(ville);
       const priceNum = Number(priceMga) || 0;
-
-      // Determine initial status: free = active, paid = draft until payment confirmed
       const initialStatus = isFree ? "active" : "draft";
 
       const { data: listing, error: listingError } = await supabase
@@ -167,8 +189,8 @@ const PublishPage = () => {
           price_mga: priceNum,
           price_eur: Math.round((priceNum / 5050) * 100) / 100,
           surface: Number(surface) || null,
-          rooms: Number(rooms) || null,
-          bathrooms: Number(bathrooms) || null,
+          rooms: showRooms ? (Number(rooms) || null) : null,
+          bathrooms: showRooms ? (Number(bathrooms) || null) : null,
           ville,
           arrondissement: arrondissement || null,
           quartier: quartier || null,
@@ -187,7 +209,8 @@ const PublishPage = () => {
         const uploadErrors: string[] = [];
         for (let i = 0; i < photos.length; i++) {
           const file = photos[i];
-          const path = `${listing.id}/${i}-${file.name}`;
+          const ext = file.name.split(".").pop() ?? "jpg";
+          const path = `${listing.id}/${i}-${Date.now()}.${ext}`;
           const { error: uploadError } = await supabase.storage.from("listing-photos").upload(path, file);
           if (uploadError) {
             uploadErrors.push(`Photo ${i + 1}: ${uploadError.message}`);
@@ -201,7 +224,7 @@ const PublishPage = () => {
           }
         }
         if (uploadErrors.length > 0) {
-          toast.warning(`${uploadErrors.length} photo(s) n'ont pas pu être uploadées`);
+          toast.warning(t("publish.photoUploadPartial", `${uploadErrors.length} photo(s) n'ont pas pu être uploadées`));
         }
       }
 
@@ -219,13 +242,13 @@ const PublishPage = () => {
       photoPreviews.forEach((url) => URL.revokeObjectURL(url));
 
       if (isFree) {
-        toast.success("Annonce publiée avec succès !");
+        toast.success(t("publish.successFree", "Annonce publiée avec succès !"));
       } else {
-        toast.success("Annonce créée ! Elle sera activée après confirmation du paiement.");
+        toast.success(t("publish.successPaid", "Annonce créée ! Elle sera activée après confirmation du paiement."));
       }
       navigate("/dashboard");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Erreur lors de la publication";
+      const message = err instanceof Error ? err.message : t("publish.error", "Erreur lors de la publication");
       toast.error(message);
     }
     setPublishing(false);
@@ -270,12 +293,12 @@ const PublishPage = () => {
                 <CardHeader>
                   <CardTitle className="font-serif text-lg">{pack.name}</CardTitle>
                   <CardDescription className="font-sans">
-                    {pack.listings_quota ? `${pack.listings_quota} annonce${pack.listings_quota > 1 ? "s" : ""}` : "Illimité"}, {pack.duration_days ?? 30} jours
+                    {pack.listings_quota ? `${pack.listings_quota} ${t("publish.listing", "annonce")}${pack.listings_quota > 1 ? "s" : ""}` : t("publish.unlimited", "Illimité")}, {pack.duration_days ?? 30} {t("publish.days", "jours")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold font-sans gradient-text">
-                    {(pack.price_mga ?? 0) === 0 ? "Gratuit" : `${(pack.price_mga ?? 0).toLocaleString("fr-FR")} Ar`}
+                    {(pack.price_mga ?? 0) === 0 ? t("publish.free", "Gratuit") : `${(pack.price_mga ?? 0).toLocaleString("fr-FR")} Ar`}
                   </p>
                 </CardContent>
               </Card>
@@ -288,9 +311,9 @@ const PublishPage = () => {
           <div className="space-y-4 bg-card rounded-2xl border border-border p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="font-sans">Type de bien *</Label>
+                <Label className="font-sans">{t("publish.propertyType", "Type de bien")} *</Label>
                 <Select value={listingType} onValueChange={(v) => setListingType(v as ListingType)}>
-                  <SelectTrigger className="font-sans"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+                  <SelectTrigger className="font-sans"><SelectValue placeholder={t("common.select", "Sélectionner")} /></SelectTrigger>
                   <SelectContent>
                     {LISTING_TYPES.map((type) => (
                       <SelectItem key={type} value={type}>{LISTING_TYPE_LABELS[type]}</SelectItem>
@@ -301,28 +324,32 @@ const PublishPage = () => {
               <div className="space-y-2">
                 <Label className="font-sans">Transaction *</Label>
                 <Select value={transaction} onValueChange={(v) => setTransaction(v as TransactionType)}>
-                  <SelectTrigger className="font-sans"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+                  <SelectTrigger className="font-sans"><SelectValue placeholder={t("common.select", "Sélectionner")} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="vente">Vente</SelectItem>
-                    <SelectItem value="location">Location</SelectItem>
-                    <SelectItem value="location_vacances">Location vacances</SelectItem>
+                    <SelectItem value="vente">{t("search.sale")}</SelectItem>
+                    <SelectItem value="location">{t("search.rental")}</SelectItem>
+                    <SelectItem value="location_vacances">{t("search.vacationRental")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="font-sans">Titre *</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="font-sans" placeholder="Ex: Villa moderne avec piscine" />
+              <Label className="font-sans">{t("publish.listingTitle", "Titre")} *</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="font-sans" placeholder={t("publish.titlePlaceholder", "Ex: Villa moderne avec piscine")} maxLength={120} />
             </div>
             <div className="space-y-2">
-              <Label className="font-sans">Description</Label>
-              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="font-sans" rows={4} placeholder="Décrivez votre bien..." />
+              <Label className="font-sans">{t("listing.description")}</Label>
+              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="font-sans" rows={4} placeholder={t("publish.descPlaceholder", "Décrivez votre bien...")} maxLength={5000} />
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-2"><Label className="font-sans">Prix (Ar) *</Label><Input type="number" value={priceMga} onChange={(e) => setPriceMga(e.target.value)} className="font-sans" min={0} /></div>
-              <div className="space-y-2"><Label className="font-sans">Surface (m²)</Label><Input type="number" value={surface} onChange={(e) => setSurface(e.target.value)} className="font-sans" min={0} /></div>
-              <div className="space-y-2"><Label className="font-sans">Chambres</Label><Input type="number" value={rooms} onChange={(e) => setRooms(e.target.value)} className="font-sans" min={0} /></div>
-              <div className="space-y-2"><Label className="font-sans">Sdb</Label><Input type="number" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} className="font-sans" min={0} /></div>
+            <div className={`grid ${showRooms ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2"} gap-4`}>
+              <div className="space-y-2"><Label className="font-sans">{t("publish.priceMga", "Prix (Ar)")} *</Label><Input type="number" value={priceMga} onChange={(e) => setPriceMga(e.target.value)} className="font-sans" min={0} /></div>
+              <div className="space-y-2"><Label className="font-sans">{t("listing.surface")} (m²)</Label><Input type="number" value={surface} onChange={(e) => setSurface(e.target.value)} className="font-sans" min={0} /></div>
+              {showRooms && (
+                <>
+                  <div className="space-y-2"><Label className="font-sans">{t("listing.rooms")}</Label><Input type="number" value={rooms} onChange={(e) => setRooms(e.target.value)} className="font-sans" min={0} /></div>
+                  <div className="space-y-2"><Label className="font-sans">{t("listing.bathrooms")}</Label><Input type="number" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} className="font-sans" min={0} /></div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -332,18 +359,25 @@ const PublishPage = () => {
           <div className="bg-card rounded-2xl border border-border p-6">
             <div className="border-2 border-dashed border-border rounded-2xl p-12 text-center">
               <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="font-sans font-semibold mb-1">Glissez vos photos ici</p>
-              <p className="text-sm text-muted-foreground font-sans mb-4">ou cliquez pour sélectionner (max 10 photos)</p>
+              <p className="font-sans font-semibold mb-1">{t("publish.dragPhotos", "Glissez vos photos ici")}</p>
+              <p className="text-sm text-muted-foreground font-sans mb-4">{t("publish.maxPhotos", "ou cliquez pour sélectionner (max 10 photos)")}</p>
               <input type="file" multiple accept="image/*" onChange={handlePhotoSelect} className="hidden" id="photo-upload" />
               <label htmlFor="photo-upload">
-                <Button variant="outline" className="font-sans" asChild><span>Choisir des fichiers</span></Button>
+                <Button variant="outline" className="font-sans" asChild><span>{t("publish.chooseFiles", "Choisir des fichiers")}</span></Button>
               </label>
             </div>
             {photoPreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-5 gap-2">
                 {photoPreviews.map((url, i) => (
-                  <div key={i} className="aspect-square rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
+                  <div key={i} className="aspect-square rounded-lg bg-secondary flex items-center justify-center overflow-hidden relative group">
                     <img src={url} alt="" className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => removePhoto(i)}
+                      className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label={t("common.delete")}
+                    >
+                      <AlertCircle className="h-3 w-3" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -372,12 +406,12 @@ const PublishPage = () => {
           <div className="space-y-4">
             {/* Summary */}
             <div className="bg-card rounded-2xl border border-border p-6">
-              <h3 className="font-serif font-bold text-lg mb-3">Récapitulatif</h3>
+              <h3 className="font-serif font-bold text-lg mb-3">{t("publish.summary", "Récapitulatif")}</h3>
               <div className="space-y-1 text-sm font-sans">
                 <p><span className="text-muted-foreground">Pack :</span> {selectedPackData?.name ?? selectedPack}</p>
-                <p><span className="text-muted-foreground">Bien :</span> {title}</p>
+                <p><span className="text-muted-foreground">{t("publish.property", "Bien")} :</span> {title}</p>
                 <p><span className="text-muted-foreground">Type :</span> {listingType ? LISTING_TYPE_LABELS[listingType as ListingType] : "-"}</p>
-                <p><span className="text-muted-foreground">Ville :</span> {ville}</p>
+                <p><span className="text-muted-foreground">{t("publish.city", "Ville")} :</span> {ville}</p>
                 <p><span className="text-muted-foreground">Photos :</span> {photos.length}</p>
               </div>
             </div>
@@ -385,13 +419,13 @@ const PublishPage = () => {
             {isFree ? (
               <div className="bg-card rounded-2xl border border-border p-6 text-center">
                 <Check className="h-12 w-12 text-success mx-auto mb-3" />
-                <p className="font-serif font-bold text-lg">Pack gratuit — Aucun paiement requis</p>
+                <p className="font-serif font-bold text-lg">{t("publish.freeNoPayment", "Pack gratuit — Aucun paiement requis")}</p>
               </div>
             ) : (
               <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
-                <h3 className="font-serif font-bold text-lg">Mode de paiement *</h3>
+                <h3 className="font-serif font-bold text-lg">{t("publish.paymentMethod", "Mode de paiement")} *</h3>
                 <p className="text-sm text-muted-foreground font-sans">
-                  Montant : {(selectedPackData?.price_mga ?? 0).toLocaleString("fr-FR")} Ar
+                  {t("publish.amount", "Montant")} : {(selectedPackData?.price_mga ?? 0).toLocaleString("fr-FR")} Ar
                 </p>
                 {paymentMethods.map((m) => (
                   <div key={m.id} onClick={() => setPaymentMethod(m.id)} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${paymentMethod === m.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-primary"}`}>
@@ -401,7 +435,7 @@ const PublishPage = () => {
                   </div>
                 ))}
                 <p className="text-xs text-muted-foreground font-sans">
-                  Votre annonce sera activée après confirmation du paiement.
+                  {t("publish.activationNote", "Votre annonce sera activée après confirmation du paiement.")}
                 </p>
               </div>
             )}

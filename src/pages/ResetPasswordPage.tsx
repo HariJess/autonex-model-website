@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const ResetPasswordPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -18,13 +20,11 @@ const ResetPasswordPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Supabase sends a recovery event via onAuthStateChange
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setReady(true);
       }
     });
-    // Also check hash params for type=recovery
     const hash = window.location.hash;
     if (hash.includes("type=recovery")) {
       setReady(true);
@@ -36,11 +36,11 @@ const ResetPasswordPage = () => {
     e.preventDefault();
     setError(null);
     if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
+      setError(t("auth.passwordMinLength"));
       return;
     }
     if (password !== confirm) {
-      setError("Les mots de passe ne correspondent pas");
+      setError(t("auth.passwordMismatch"));
       return;
     }
     setLoading(true);
@@ -50,37 +50,37 @@ const ResetPasswordPage = () => {
       setError(updateError.message);
       toast.error(updateError.message);
     } else {
-      toast.success("Mot de passe mis à jour avec succès !");
+      toast.success(t("auth.passwordUpdated"));
       navigate("/dashboard");
     }
   };
 
   return (
     <>
-      <Helmet><title>Réinitialiser le mot de passe — ImmoNex</title></Helmet>
+      <Helmet><title>{t("auth.resetPassword")} — ImmoNex</title></Helmet>
       <Header />
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm space-y-6">
           <div className="text-center">
-            <h1 className="font-serif text-2xl font-bold">Nouveau mot de passe</h1>
+            <h1 className="font-serif text-2xl font-bold">{t("auth.newPassword")}</h1>
           </div>
 
           {!ready ? (
             <div className="text-center space-y-4">
               <p className="font-sans text-muted-foreground">
-                Vérification du lien de réinitialisation en cours…
+                {t("auth.resetVerification")}
               </p>
               <p className="text-sm font-sans text-muted-foreground">
-                Si cette page ne change pas, votre lien a peut-être expiré.
+                {t("auth.resetExpired")}
               </p>
               <Link to="/forgot-password" className="text-primary font-sans text-sm hover:underline">
-                Demander un nouveau lien
+                {t("auth.requestNewLink")}
               </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label className="font-sans">Nouveau mot de passe</Label>
+                <Label className="font-sans">{t("auth.newPassword")}</Label>
                 <Input
                   type="password"
                   value={password}
@@ -88,11 +88,11 @@ const ResetPasswordPage = () => {
                   className="font-sans"
                   required
                   minLength={6}
-                  placeholder="Au moins 6 caractères"
+                  placeholder={t("auth.passwordMinLength")}
                 />
               </div>
               <div className="space-y-2">
-                <Label className="font-sans">Confirmer le mot de passe</Label>
+                <Label className="font-sans">{t("auth.confirmPassword")}</Label>
                 <Input
                   type="password"
                   value={confirm}
@@ -104,13 +104,13 @@ const ResetPasswordPage = () => {
               </div>
               {error && <p className="text-sm text-destructive font-sans">{error}</p>}
               <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-                {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+                {loading ? t("auth.updating") : t("auth.updatePassword")}
               </Button>
             </form>
           )}
 
           <p className="text-center text-sm font-sans text-muted-foreground">
-            <Link to="/login" className="text-primary hover:underline">Retour à la connexion</Link>
+            <Link to="/login" className="text-primary hover:underline">{t("auth.backToLogin")}</Link>
           </p>
         </div>
       </div>

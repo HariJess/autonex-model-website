@@ -98,7 +98,7 @@ const Header = () => {
               {user ? (
                 <>
                   <Button variant="ghost" size="sm" onClick={() => { navigate("/dashboard"); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
-                    <User className="h-4 w-4 mr-1" /> Dashboard
+                    <User className="h-4 w-4 mr-1" /> {t("nav.dashboard")}
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => { signOut(); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
                     <LogOut className="h-4 w-4" />

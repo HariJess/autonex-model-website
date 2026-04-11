@@ -27,7 +27,7 @@ const LoginPage = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Connexion réussie !");
+      toast.success(t("auth.loginSuccess"));
       navigate("/dashboard");
     }
   };
@@ -52,7 +52,7 @@ const LoginPage = () => {
             </div>
             <Link to="/forgot-password" className="text-sm text-primary font-sans hover:underline block">{t("auth.forgotPassword")}</Link>
             <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-              {loading ? "..." : t("auth.login")}
+              {loading ? t("common.loading") : t("auth.login")}
             </Button>
           </form>
           <p className="text-center text-sm font-sans text-muted-foreground">
@@ -84,7 +84,7 @@ const SignupPage = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Inscription réussie ! Vérifiez votre email pour confirmer votre compte.");
+      toast.success(t("auth.signupSuccess"));
       navigate("/login");
     }
   };
@@ -112,22 +112,22 @@ const SignupPage = () => {
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{t("auth.name")}</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} className="font-sans" required />
+              <Input value={name} onChange={(e) => setName(e.target.value)} className="font-sans" required maxLength={100} />
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{t("auth.email")}</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans" required />
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans" required maxLength={255} />
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{t("auth.phone")}</Label>
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="font-sans" />
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="font-sans" maxLength={30} />
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{t("auth.password")}</Label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans" required minLength={6} />
             </div>
             <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-              {loading ? "..." : t("auth.signup")}
+              {loading ? t("common.loading") : t("auth.signup")}
             </Button>
           </form>
           <p className="text-center text-sm font-sans text-muted-foreground">
@@ -158,13 +158,13 @@ const ForgotPasswordPage = () => {
       toast.error(error.message);
     } else {
       setSent(true);
-      toast.success("Email de réinitialisation envoyé !");
+      toast.success(t("auth.resetSent"));
     }
   };
 
   return (
     <>
-      <Helmet><title>Mot de passe oublié — ImmoNex</title></Helmet>
+      <Helmet><title>{t("auth.forgotPassword")} — ImmoNex</title></Helmet>
       <Header />
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm space-y-6">
@@ -173,7 +173,7 @@ const ForgotPasswordPage = () => {
           </div>
           {sent ? (
             <p className="text-center font-sans text-muted-foreground">
-              Un email de réinitialisation a été envoyé à <strong>{email}</strong>. Vérifiez votre boîte de réception.
+              {t("auth.resetEmailSent")} <strong>{email}</strong>. {t("auth.checkInbox")}
             </p>
           ) : (
             <form onSubmit={handleReset} className="space-y-4">
@@ -182,12 +182,12 @@ const ForgotPasswordPage = () => {
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans" required />
               </div>
               <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-                {loading ? "..." : "Envoyer le lien"}
+                {loading ? t("common.loading") : t("auth.sendResetLink")}
               </Button>
             </form>
           )}
           <p className="text-center text-sm font-sans text-muted-foreground">
-            <Link to="/login" className="text-primary hover:underline">Retour à la connexion</Link>
+            <Link to="/login" className="text-primary hover:underline">{t("auth.backToLogin")}</Link>
           </p>
         </div>
       </div>

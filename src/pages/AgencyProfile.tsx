@@ -30,7 +30,6 @@ const AgencyProfile = () => {
     enabled: !!slug,
   });
 
-  // Get agent IDs for this agency
   const { data: agentIds = [] } = useQuery({
     queryKey: ["agency-agents", agency?.id],
     queryFn: async () => {
@@ -44,7 +43,6 @@ const AgencyProfile = () => {
     enabled: !!agency?.id,
   });
 
-  // Fetch only this agency's listings via ownerIds filter
   const { data: listings = [], isLoading: listingsLoading } = useDbListings(
     agentIds.length > 0 ? { ownerIds: agentIds } : { ownerIds: ["__none__"] }
   );
@@ -81,10 +79,10 @@ const AgencyProfile = () => {
         <Header />
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-          <h1 className="font-serif text-2xl font-bold mb-2">Agence introuvable</h1>
-          <p className="text-muted-foreground font-sans mb-6">Cette agence n'existe pas ou a été supprimée.</p>
+          <h1 className="font-serif text-2xl font-bold mb-2">{t("agencies.notFound")}</h1>
+          <p className="text-muted-foreground font-sans mb-6">{t("agencies.notFoundDesc")}</p>
           <Link to="/agences">
-            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>Voir toutes les agences</Button>
+            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>{t("agencies.viewAll")}</Button>
           </Link>
         </div>
         <Footer />
@@ -108,22 +106,24 @@ const AgencyProfile = () => {
           <div className="flex-1 text-center md:text-left">
             <div className="flex items-center gap-2 justify-center md:justify-start">
               <h1 className="font-serif text-2xl font-bold">{agency.name}</h1>
-              {agency.verified && <Badge className="bg-success font-sans text-xs" style={{ color: "#FAFAFA" }}>Vérifié</Badge>}
+              {agency.verified && <Badge className="bg-success font-sans text-xs" style={{ color: "#FAFAFA" }}>{t("listing.verified")}</Badge>}
             </div>
-            <p className="text-muted-foreground font-sans mt-2">{agency.bio || "Aucune description disponible."}</p>
+            <p className="text-muted-foreground font-sans mt-2">{agency.bio || t("agencies.noDescription")}</p>
             {agency.phone && <p className="text-sm font-sans text-muted-foreground mt-2">📞 {agency.phone}</p>}
             {agency.email && <p className="text-sm font-sans text-muted-foreground">✉️ {agency.email}</p>}
-            <p className="text-sm font-sans text-primary mt-1">{listings.length} annonce{listings.length !== 1 ? "s" : ""} active{listings.length !== 1 ? "s" : ""}</p>
+            <p className="text-sm font-sans text-primary mt-1">
+              {t("agencies.activeListings", { count: listings.length })}
+            </p>
           </div>
         </div>
 
-        <h2 className="font-serif text-xl font-bold mb-4">Annonces de {agency.name}</h2>
+        <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.listingsOf", { name: agency.name })}</h2>
         {listingsLoading ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : listings.length === 0 ? (
-          <p className="text-muted-foreground font-sans py-8 text-center">Aucune annonce active pour le moment.</p>
+          <p className="text-muted-foreground font-sans py-8 text-center">{t("agencies.noListings")}</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {listings.map((l) => (

@@ -9,7 +9,8 @@
     "login": "Login",
     "signup": "Sign up",
     "dashboard": "Dashboard",
-    "logout": "Logout"
+    "logout": "Logout",
+    "home": "Home"
   },
   "hero": {
     "title": "Find your future home in Madagascar",
@@ -18,10 +19,14 @@
     "type": "Property type",
     "region": "Region",
     "budgetMin": "Min budget",
-    "budgetMax": "Max budget"
+    "budgetMax": "Max budget",
+    "location": "Location",
+    "rooms": "Rooms",
+    "allTypes": "All types",
+    "allRooms": "All"
   },
   "sections": {
-    "featured": "Featured Listings",
+    "featured": "Latest Listings",
     "newProjects": "New Projects",
     "regions": "Our Regions",
     "agencies": "Partner Agencies",
@@ -40,7 +45,18 @@
     "similar": "Similar listings",
     "new": "New",
     "boost": "Boost",
-    "favorite": "Favorite"
+    "favorite": "Favorite",
+    "notFound": "Listing not found",
+    "notFoundDesc": "This listing does not exist or has been removed.",
+    "viewAll": "View all listings",
+    "owner": "Owner",
+    "verified": "Verified",
+    "noPhone": "Not provided",
+    "yourMessage": "Your message...",
+    "messageSent": "Message sent!",
+    "phoneRevealError": "Unable to record the request",
+    "contactNameOrEmail": "Please provide at least your name or email",
+    "viewAgencyListings": "View all listings from {{name}}"
   },
   "search": {
     "title": "Search Results",
@@ -71,19 +87,61 @@
     "school": "School",
     "market": "Market",
     "downtown": "Downtown",
-    "beach": "Beach"
+    "beach": "Beach",
+    "properties": "Properties",
+    "forSale": "for sale",
+    "forRent": "for rent",
+    "listingCount": "listing",
+    "noResults": "No matching listings",
+    "tryDifferent": "Try modifying or resetting your filters",
+    "resetFilters": "Reset filters",
+    "house": "House"
   },
   "publish": {
     "title": "Post a Listing",
-    "step1": "Choose a plan",
-    "step2": "Property details",
+    "step1": "Plan",
+    "step2": "Details",
     "step3": "Photos",
     "step4": "Location",
     "step5": "Options",
     "step6": "Payment",
     "next": "Next",
     "prev": "Previous",
-    "submit": "Publish"
+    "submit": "Publish",
+    "packRequired": "Please choose a plan",
+    "typeRequired": "Property type required",
+    "transactionRequired": "Transaction type required",
+    "titleRequired": "Title required",
+    "titleMin": "Title must be at least 5 characters",
+    "priceRequired": "Valid price required",
+    "surfaceInvalid": "Invalid surface area",
+    "villeRequired": "City required",
+    "paymentRequired": "Payment method required",
+    "loginRequired": "You must be logged in",
+    "propertyType": "Property type",
+    "listingTitle": "Title",
+    "titlePlaceholder": "e.g. Modern villa with pool",
+    "descPlaceholder": "Describe your property...",
+    "priceMga": "Price (Ar)",
+    "dragPhotos": "Drag your photos here",
+    "maxPhotos": "or click to select (max 10 photos)",
+    "chooseFiles": "Choose files",
+    "summary": "Summary",
+    "property": "Property",
+    "city": "City",
+    "freeNoPayment": "Free plan — No payment required",
+    "paymentMethod": "Payment method",
+    "amount": "Amount",
+    "activationNote": "Your listing will be activated after payment confirmation.",
+    "creditCard": "Credit card (Stripe)",
+    "listing": "listing",
+    "unlimited": "Unlimited",
+    "days": "days",
+    "free": "Free",
+    "successFree": "Listing published successfully!",
+    "successPaid": "Listing created! It will be activated after payment confirmation.",
+    "error": "Error publishing listing",
+    "photoUploadPartial": "Some photos could not be uploaded"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -94,7 +152,26 @@
     "myListings": "My listings",
     "leads": "Messages received",
     "credits": "Credits",
-    "buyCredits": "Buy credits"
+    "buyCredits": "Buy credits",
+    "statusUpdated": "Status updated",
+    "listingDeleted": "Listing deleted",
+    "listing": "Listing",
+    "price": "Price",
+    "status": "Status",
+    "views": "Views",
+    "noListings": "No listings yet. Publish your first listing!",
+    "deleteConfirm": "Delete this listing?",
+    "deleteDesc": "This action is irreversible. The listing and all its photos will be permanently deleted.",
+    "pause": "Pause",
+    "activate": "Activate",
+    "visitor": "Visitor",
+    "noLeads": "No contacts received yet."
+  },
+  "status": {
+    "active": "Active",
+    "paused": "Paused",
+    "draft": "Draft",
+    "expired": "Expired"
   },
   "auth": {
     "login": "Login",
@@ -110,7 +187,24 @@
     "developer": "Developer",
     "resetPassword": "Reset password",
     "name": "Full name",
-    "phone": "Phone"
+    "phone": "Phone",
+    "loginSuccess": "Login successful!",
+    "signupSuccess": "Sign up successful! Check your email to confirm your account.",
+    "resetSent": "Password reset email sent!",
+    "resetVerification": "Verifying reset link...",
+    "resetExpired": "If this page doesn't change, your link may have expired.",
+    "requestNewLink": "Request a new link",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "passwordUpdated": "Password updated successfully!",
+    "updatePassword": "Update password",
+    "updating": "Updating...",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to login",
+    "resetEmailSent": "A reset email has been sent to",
+    "checkInbox": "Check your inbox."
   },
   "footer": {
     "about": "About",
@@ -120,7 +214,10 @@
     "contact": "Contact",
     "newsletter": "Get our latest listings",
     "subscribe": "Subscribe",
-    "copyright": "© 2026 ImmoNex Madagascar. All rights reserved."
+    "copyright": "© 2026 ImmoNex Madagascar. All rights reserved.",
+    "realEstate": "Real Estate",
+    "information": "Information",
+    "tagline": "The #1 real estate portal in Madagascar. Find your ideal property among thousands of listings."
   },
   "common": {
     "loading": "Loading...",
@@ -131,6 +228,21 @@
     "edit": "Edit",
     "view": "View",
     "send": "Send",
-    "close": "Close"
+    "close": "Close",
+    "back": "Back",
+    "select": "Select",
+    "clearAll": "Clear all"
+  },
+  "agencies": {
+    "title": "Real estate agencies",
+    "pageTitle": "Partner Agencies",
+    "noAgencies": "No partner agencies at the moment.",
+    "noDescription": "No description.",
+    "notFound": "Agency not found",
+    "notFoundDesc": "This agency does not exist or has been removed.",
+    "viewAll": "View all agencies",
+    "listingsOf": "Listings from {{name}}",
+    "noListings": "No active listings at the moment.",
+    "activeListings": "{{count}} active listing(s)"
   }
 }
