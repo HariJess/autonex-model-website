@@ -37,7 +37,7 @@ const ListingDetail = () => {
     if (listing?.id && viewIncremented.current !== listing.id) {
       viewIncremented.current = listing.id;
       const timer = setTimeout(() => {
-        supabase.rpc("increment_views", { listing_uuid: listing.id }).catch(() => {});
+        supabase.rpc("increment_views", { listing_uuid: listing.id }).then(() => {});
       }, 2000); // 2s delay to filter bots/quick bounces
       return () => clearTimeout(timer);
     }
@@ -285,7 +285,7 @@ const ListingDetail = () => {
 
               {listing.agency_slug && (
                 <Link to={`/agence/${listing.agency_slug}`} className="block text-center text-sm text-primary font-sans hover:underline">
-                  {t("listing.viewAgencyListings", { name: listing.agency_name ?? "" }, `Voir toutes les annonces de ${listing.agency_name}`)}
+                  {t("listing.viewAgencyListings", { name: listing.agency_name ?? "" })}
                 </Link>
               )}
             </div>
