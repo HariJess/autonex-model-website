@@ -8,7 +8,7 @@ import { Search, MapPin, Home, DollarSign, BedDouble } from "lucide-react";
 import { villes } from "@/data/madagascar-locations";
 import { useState } from "react";
 import LocationSelector from "@/components/LocationSelector";
-import BudgetRangeSlider from "@/components/BudgetRangeSlider";
+import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
 
 const TRANSACTIONS = [
   { value: "vente", label: "Acheter" },
@@ -61,10 +61,7 @@ const HeroSearch = () => {
       : ville
     : "";
 
-  const budgetLabel =
-    priceMin || priceMax
-      ? `${priceMin ? (priceMin / 1_000_000).toFixed(0) + "M" : "0"} - ${priceMax ? (priceMax / 1_000_000).toFixed(0) + "M" : "∞"} Ar`
-      : "";
+  const budgetLabel = formatBudgetLabel(priceMin, priceMax);
 
   return (
     <section className="relative overflow-hidden py-20 lg:py-32">
@@ -166,7 +163,7 @@ const HeroSearch = () => {
                     <div className="flex items-center gap-1.5">
                       <DollarSign className="h-3.5 w-3.5 text-accent shrink-0" />
                       <span className={`font-sans text-sm truncate ${budgetLabel ? "text-foreground" : "text-muted-foreground"}`}>
-                        {budgetLabel || "Min - Max"}
+                        {budgetLabel || "Budget"}
                       </span>
                     </div>
                   </button>
@@ -178,6 +175,7 @@ const HeroSearch = () => {
                     maxValue={priceMax}
                     onMinChange={setPriceMin}
                     onMaxChange={setPriceMax}
+                    onClose={() => setBudgetOpen(false)}
                   />
                 </PopoverContent>
               </Popover>
