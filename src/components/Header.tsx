@@ -25,7 +25,6 @@ const Header = () => {
   const navLinks = [
     { label: t("nav.buy"), href: "/recherche?transaction=vente" },
     { label: t("nav.rent"), href: "/recherche?transaction=location" },
-    { label: t("nav.newProjects"), href: "/recherche?type=terrain" },
     { label: t("nav.agencies"), href: "/agences" },
     { label: t("nav.advice"), href: "/conseils" },
   ];
