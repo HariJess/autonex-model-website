@@ -12,11 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Check, Upload, Zap, Heart, Mail, CreditCard } from "lucide-react";
+import { Check, Upload, Zap, Heart, Mail, CreditCard, AlertCircle } from "lucide-react";
+import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
 import { getRegionForVille } from "@/data/madagascar-locations";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { ListingType, TransactionType } from "@/types/listing";
 
 const steps = ["Pack", "Détails", "Photos", "Localisation", "Options", "Paiement"];
 
@@ -26,10 +28,11 @@ const PublishPage = () => {
   const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [selectedPack, setSelectedPack] = useState("");
+  const [stepErrors, setStepErrors] = useState<string[]>([]);
 
   // Step 2 - Details
-  const [listingType, setListingType] = useState("");
-  const [transaction, setTransaction] = useState("");
+  const [listingType, setListingType] = useState<ListingType | "">("");
+  const [transaction, setTransaction] = useState<TransactionType | "">("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priceMga, setPriceMga] = useState("");
@@ -39,6 +42,7 @@ const PublishPage = () => {
 
   // Step 3 - Photos
   const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
   // Step 4 - Location
   const [ville, setVille] = useState("");
@@ -77,7 +81,11 @@ const PublishPage = () => {
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setPhotos(Array.from(e.target.files).slice(0, 10));
+      const files = Array.from(e.target.files).slice(0, 10);
+      // Clean up old previews
+      photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+      setPhotos(files);
+      setPhotoPreviews(files.map((f) => URL.createObjectURL(f)));
     }
   };
 
@@ -85,23 +93,71 @@ const PublishPage = () => {
     setSelectedUpsells((prev) => prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]);
   };
 
+  /** Validate current step, return list of errors */
+  const validateStep = (s: number): string[] => {
+    const errors: string[] = [];
+    switch (s) {
+      case 0:
+        if (!selectedPack) errors.push("Veuillez choisir un pack");
+        break;
+      case 1:
+        if (!listingType) errors.push("Type de bien requis");
+        if (!transaction) errors.push("Type de transaction requis");
+        if (!title.trim()) errors.push("Titre requis");
+        if (title.trim().length < 5) errors.push("Le titre doit contenir au moins 5 caractères");
+        if (!priceMga || Number(priceMga) <= 0) errors.push("Prix valide requis");
+        break;
+      case 2:
+        // Photos optional but recommended
+        break;
+      case 3:
+        if (!ville) errors.push("Ville requise");
+        break;
+      case 4:
+        // Upsells are optional
+        break;
+      case 5:
+        if (selectedPack !== "decouverte" && !paymentMethod) errors.push("Méthode de paiement requise");
+        break;
+    }
+    return errors;
+  };
+
+  const handleNext = () => {
+    const errors = validateStep(step);
+    setStepErrors(errors);
+    if (errors.length > 0) {
+      toast.error(errors[0]);
+      return;
+    }
+    setStep((s) => s + 1);
+  };
+
   const handlePublish = async () => {
-    if (!user) return;
+    const errors = validateStep(5);
+    setStepErrors(errors);
+    if (errors.length > 0) {
+      toast.error(errors[0]);
+      return;
+    }
+    if (!user) {
+      toast.error("Vous devez être connecté");
+      return;
+    }
     setPublishing(true);
 
     try {
       const region = getRegionForVille(ville);
       const priceNum = Number(priceMga) || 0;
 
-      // Create listing
       const { data: listing, error: listingError } = await supabase
         .from("listings")
         .insert({
           owner_id: user.id,
-          title,
-          description,
-          type: listingType as any,
-          transaction: transaction as any,
+          title: title.trim(),
+          description: description.trim() || null,
+          type: listingType as ListingType,
+          transaction: transaction as TransactionType,
           price_mga: priceNum,
           price_eur: Math.round((priceNum / 5050) * 100) / 100,
           surface: Number(surface) || null,
@@ -122,11 +178,14 @@ const PublishPage = () => {
 
       // Upload photos
       if (photos.length > 0 && listing) {
+        const uploadErrors: string[] = [];
         for (let i = 0; i < photos.length; i++) {
           const file = photos[i];
           const path = `${listing.id}/${i}-${file.name}`;
           const { error: uploadError } = await supabase.storage.from("listing-photos").upload(path, file);
-          if (!uploadError) {
+          if (uploadError) {
+            uploadErrors.push(`Photo ${i + 1}: ${uploadError.message}`);
+          } else {
             const { data: urlData } = supabase.storage.from("listing-photos").getPublicUrl(path);
             await supabase.from("listing_photos").insert({
               listing_id: listing.id,
@@ -135,23 +194,30 @@ const PublishPage = () => {
             });
           }
         }
+        if (uploadErrors.length > 0) {
+          toast.warning(`${uploadErrors.length} photo(s) n'ont pas pu être uploadées`);
+        }
       }
 
-      // Create transaction record (mock)
+      // Create transaction record (mock payment)
       if (paymentMethod && selectedPack !== "decouverte") {
         await supabase.from("transactions").insert({
           user_id: user.id,
           amount_mga: selectedPack === "pro" ? 50000 : 200000,
-          method: paymentMethod as any,
+          method: paymentMethod as "mvola" | "orange_money" | "airtel_money" | "stripe",
           status: "success" as const,
           reference: `TXN-${Date.now()}`,
         });
       }
 
+      // Clean up photo previews
+      photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+
       toast.success("Annonce publiée avec succès !");
       navigate("/dashboard");
-    } catch (err: any) {
-      toast.error(err.message || "Erreur lors de la publication");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la publication";
+      toast.error(message);
     }
     setPublishing(false);
   };
@@ -177,6 +243,17 @@ const PublishPage = () => {
           <Progress value={progress} className="h-2" />
         </div>
 
+        {/* Validation errors */}
+        {stepErrors.length > 0 && (
+          <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+            {stepErrors.map((err, i) => (
+              <p key={i} className="text-sm text-destructive font-sans flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" /> {err}
+              </p>
+            ))}
+          </div>
+        )}
+
         {/* Step 1: Pack */}
         {step === 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -199,22 +276,19 @@ const PublishPage = () => {
           <div className="space-y-4 bg-card rounded-2xl border border-border p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="font-sans">Type de bien</Label>
-                <Select value={listingType} onValueChange={setListingType}>
+                <Label className="font-sans">Type de bien *</Label>
+                <Select value={listingType} onValueChange={(v) => setListingType(v as ListingType)}>
                   <SelectTrigger className="font-sans"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="appartement">Appartement</SelectItem>
-                    <SelectItem value="villa">Villa</SelectItem>
-                    <SelectItem value="maison">Maison</SelectItem>
-                    <SelectItem value="terrain">Terrain</SelectItem>
-                    <SelectItem value="local_commercial">Local commercial</SelectItem>
-                    <SelectItem value="bureau">Bureau</SelectItem>
+                    {LISTING_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>{LISTING_TYPE_LABELS[type]}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="font-sans">Transaction</Label>
-                <Select value={transaction} onValueChange={setTransaction}>
+                <Label className="font-sans">Transaction *</Label>
+                <Select value={transaction} onValueChange={(v) => setTransaction(v as TransactionType)}>
                   <SelectTrigger className="font-sans"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="vente">Vente</SelectItem>
@@ -224,13 +298,19 @@ const PublishPage = () => {
                 </Select>
               </div>
             </div>
-            <div className="space-y-2"><Label className="font-sans">Titre</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} className="font-sans" placeholder="Ex: Villa moderne avec piscine" /></div>
-            <div className="space-y-2"><Label className="font-sans">Description</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="font-sans" rows={4} placeholder="Décrivez votre bien..." /></div>
+            <div className="space-y-2">
+              <Label className="font-sans">Titre *</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="font-sans" placeholder="Ex: Villa moderne avec piscine" />
+            </div>
+            <div className="space-y-2">
+              <Label className="font-sans">Description</Label>
+              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="font-sans" rows={4} placeholder="Décrivez votre bien..." />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-2"><Label className="font-sans">Prix (Ar)</Label><Input type="number" value={priceMga} onChange={(e) => setPriceMga(e.target.value)} className="font-sans" /></div>
-              <div className="space-y-2"><Label className="font-sans">Surface (m²)</Label><Input type="number" value={surface} onChange={(e) => setSurface(e.target.value)} className="font-sans" /></div>
-              <div className="space-y-2"><Label className="font-sans">Chambres</Label><Input type="number" value={rooms} onChange={(e) => setRooms(e.target.value)} className="font-sans" /></div>
-              <div className="space-y-2"><Label className="font-sans">Sdb</Label><Input type="number" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} className="font-sans" /></div>
+              <div className="space-y-2"><Label className="font-sans">Prix (Ar) *</Label><Input type="number" value={priceMga} onChange={(e) => setPriceMga(e.target.value)} className="font-sans" min={0} /></div>
+              <div className="space-y-2"><Label className="font-sans">Surface (m²)</Label><Input type="number" value={surface} onChange={(e) => setSurface(e.target.value)} className="font-sans" min={0} /></div>
+              <div className="space-y-2"><Label className="font-sans">Chambres</Label><Input type="number" value={rooms} onChange={(e) => setRooms(e.target.value)} className="font-sans" min={0} /></div>
+              <div className="space-y-2"><Label className="font-sans">Sdb</Label><Input type="number" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} className="font-sans" min={0} /></div>
             </div>
           </div>
         )}
@@ -247,11 +327,11 @@ const PublishPage = () => {
                 <Button variant="outline" className="font-sans" asChild><span>Choisir des fichiers</span></Button>
               </label>
             </div>
-            {photos.length > 0 && (
+            {photoPreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-5 gap-2">
-                {photos.map((f, i) => (
+                {photoPreviews.map((url, i) => (
                   <div key={i} className="aspect-square rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
-                    <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
+                    <img src={url} alt="" className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
@@ -278,6 +358,7 @@ const PublishPage = () => {
         {/* Step 5: Options */}
         {step === 4 && (
           <div className="space-y-4">
+            <p className="text-sm text-muted-foreground font-sans mb-2">Ces options sont facultatives. Vous pouvez les ajouter plus tard.</p>
             {upsells.map((u) => (
               <Card key={u.id} className={`rounded-2xl cursor-pointer transition-colors ${selectedUpsells.includes(u.id) ? "ring-2 ring-primary" : "hover:border-primary"}`} onClick={() => toggleUpsell(u.id)}>
                 <CardContent className="flex items-center gap-4 p-5">
@@ -299,16 +380,24 @@ const PublishPage = () => {
         {/* Step 6: Payment */}
         {step === 5 && (
           <div className="space-y-4">
-            <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
-              <h3 className="font-serif font-bold text-lg">Mode de paiement</h3>
-              {paymentMethods.map((m) => (
-                <div key={m.id} onClick={() => setPaymentMethod(m.id)} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${paymentMethod === m.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-primary"}`}>
-                  <CreditCard className="h-5 w-5 text-primary" />
-                  <span className="font-sans">{m.name}</span>
-                  {paymentMethod === m.id && <Check className="h-4 w-4 text-success ml-auto" />}
-                </div>
-              ))}
-            </div>
+            {selectedPack === "decouverte" ? (
+              <div className="bg-card rounded-2xl border border-border p-6 text-center">
+                <Check className="h-12 w-12 text-success mx-auto mb-3" />
+                <p className="font-serif font-bold text-lg">Pack Découverte — Gratuit</p>
+                <p className="text-sm text-muted-foreground font-sans mt-1">Aucun paiement requis</p>
+              </div>
+            ) : (
+              <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
+                <h3 className="font-serif font-bold text-lg">Mode de paiement *</h3>
+                {paymentMethods.map((m) => (
+                  <div key={m.id} onClick={() => setPaymentMethod(m.id)} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${paymentMethod === m.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-primary"}`}>
+                    <CreditCard className="h-5 w-5 text-primary" />
+                    <span className="font-sans">{m.name}</span>
+                    {paymentMethod === m.id && <Check className="h-4 w-4 text-success ml-auto" />}
+                  </div>
+                ))}
+              </div>
+            )}
             <Button onClick={handlePublish} disabled={publishing} className="w-full gradient-primary border-0 font-sans text-lg py-6" style={{ color: "#FAFAFA" }}>
               {publishing ? "Publication en cours..." : t("publish.submit")}
             </Button>
@@ -316,11 +405,11 @@ const PublishPage = () => {
         )}
 
         <div className="flex justify-between mt-8">
-          <Button variant="outline" onClick={() => setStep((s) => s - 1)} disabled={step === 0} className="font-sans">
+          <Button variant="outline" onClick={() => { setStepErrors([]); setStep((s) => s - 1); }} disabled={step === 0} className="font-sans">
             {t("publish.prev")}
           </Button>
           {step < 5 && (
-            <Button onClick={() => setStep((s) => s + 1)} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+            <Button onClick={handleNext} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
               {t("publish.next")}
             </Button>
           )}
