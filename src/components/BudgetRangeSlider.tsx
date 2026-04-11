@@ -84,6 +84,11 @@ const BudgetRangeSlider = ({
 }: BudgetRangeSliderProps) => {
   const [displayCurrency, setDisplayCurrency] = useState<"MGA" | "EUR">("MGA");
 
+  const handleCurrencyChange = (c: "MGA" | "EUR") => {
+    setDisplayCurrency(c);
+    onCurrencyChange?.(c);
+  };
+
   const txKey = transaction && RANGES[transaction] ? transaction : "vente";
   const range = RANGES[txKey];
   const presets = displayCurrency === "MGA" ? (PRESETS_MGA[txKey] || PRESETS_MGA.vente) : (PRESETS_EUR[txKey] || PRESETS_EUR.vente);
