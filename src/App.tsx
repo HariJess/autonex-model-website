@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import ListingDetail from "./pages/ListingDetail.tsx";
 import { LoginPage, SignupPage, ForgotPasswordPage } from "./pages/AuthPages.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import PublishPage from "./pages/PublishPage.tsx";
 import AgencyProfile from "./pages/AgencyProfile.tsx";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
           <Route path="/agence/:slug" element={<AgencyProfile />} />
