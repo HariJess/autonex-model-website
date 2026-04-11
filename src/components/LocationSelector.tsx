@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { forwardRef, useMemo, useState } from "react";
 import { villes } from "@/data/madagascar-locations";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,7 @@ interface LocationSelectorProps {
   onClose?: () => void;
 }
 
-const LocationSelector = ({
+const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
   selectedVille,
   selectedArr,
   selectedQuartiers,
@@ -28,7 +28,7 @@ const LocationSelector = ({
   onQuartiersChange,
   onQuartierLibreChange,
   onClose,
-}: LocationSelectorProps) => {
+}, ref) => {
   const [search, setSearch] = useState("");
   const [expandedVilles, setExpandedVilles] = useState<string[]>(selectedVille ? [selectedVille] : []);
   const [expandedArrs, setExpandedArrs] = useState<string[]>(selectedArr ? [selectedArr] : []);
@@ -107,7 +107,7 @@ const LocationSelector = ({
   };
 
   return (
-    <div className="w-full">
+    <div ref={ref} className="w-full">
       {chips.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
           {chips.map((c) => (
@@ -225,6 +225,8 @@ const LocationSelector = ({
       </div>
     </div>
   );
-};
+});
+
+LocationSelector.displayName = "LocationSelector";
 
 export default LocationSelector;

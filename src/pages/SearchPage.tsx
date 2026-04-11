@@ -11,10 +11,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SlidersHorizontal, X, LayoutGrid, List, Map, ChevronRight, Home } from "lucide-react";
-import { seedListings, seedAgencies } from "@/data/seed-listings";
+import { seedListings, seedAgencies, type SeedListing } from "@/data/seed-listings";
+import { villes } from "@/data/madagascar-locations";
 import { useState, useMemo, useCallback, Suspense, lazy } from "react";
 
 type ViewMode = "grid" | "list" | "map";
+
+const normalizeLocationText = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const buildListingLocationIndex = (listing: SeedListing) =>
+  normalizeLocationText(
+    [listing.title, listing.description, listing.city, listing.region, listing.features.join(" ")].join(" ")
+  );
+
+const LISTING_LOCATION_INDEX = new Map(
+  seedListings.map((listing) => [listing.id, buildListingLocationIndex(listing)])
+);
 
 const SearchPage = () => {
   const { t } = useTranslation();
@@ -32,7 +50,7 @@ const SearchPage = () => {
     ville: searchParams.get("ville") || "",
     arrondissement: searchParams.get("arr") || "",
     quartiers: searchParams.get("quartiers") ? searchParams.get("quartiers")!.split(",") : [],
-    quartierLibre: "",
+    quartierLibre: searchParams.get("q") || "",
     priceMin: Number(searchParams.get("prix_min")) || 0,
     priceMax: Number(searchParams.get("prix_max")) || 0,
     surfaceMin: 0,
@@ -53,6 +71,7 @@ const SearchPage = () => {
     if (newFilters.ville) params.set("ville", newFilters.ville);
     if (newFilters.arrondissement) params.set("arr", newFilters.arrondissement);
     if (newFilters.quartiers.length) params.set("quartiers", newFilters.quartiers.join(","));
+    if (newFilters.quartierLibre.trim()) params.set("q", newFilters.quartierLibre.trim());
     if (newFilters.priceMin) params.set("prix_min", String(newFilters.priceMin));
     if (newFilters.priceMax) params.set("prix_max", String(newFilters.priceMax));
     if (newFilters.rooms.length) params.set("chambres", newFilters.rooms.join(","));
@@ -62,12 +81,44 @@ const SearchPage = () => {
   // Filter listings
   const filtered = useMemo(() => {
     let results = [...seedListings];
+    const selectedVille = normalizeLocationText(filters.ville);
+    const selectedQuartiers = filters.quartiers.map(normalizeLocationText);
+    const quartierLibre = normalizeLocationText(filters.quartierLibre);
+    const selectedVilleData = villes.find((ville) => ville.name === filters.ville);
+    const selectedArrData = selectedVilleData?.arrondissements.find((arr) => arr.name === filters.arrondissement);
+    const arrondissementKeywords = [
+      normalizeLocationText(filters.arrondissement),
+      ...(selectedArrData?.quartiers.map((quartier) => normalizeLocationText(quartier.name)) ?? []),
+    ].filter(Boolean);
+    const getLocationText = (listing: SeedListing) => LISTING_LOCATION_INDEX.get(listing.id) ?? "";
 
     if (filters.transaction) results = results.filter((l) => l.transaction === filters.transaction);
     if (filters.types.length) results = results.filter((l) => filters.types.includes(l.type));
-    if (filters.ville) results = results.filter((l) =>
-      l.city === filters.ville || l.region.toLowerCase().includes(filters.ville.toLowerCase())
-    );
+    if (filters.ville) {
+      results = results.filter((listing) => {
+        const locationText = getLocationText(listing);
+        return (
+          normalizeLocationText(listing.city) === selectedVille ||
+          normalizeLocationText(listing.region).includes(selectedVille) ||
+          locationText.includes(selectedVille)
+        );
+      });
+    }
+    if (filters.arrondissement) {
+      results = results.filter((listing) => {
+        const locationText = getLocationText(listing);
+        return arrondissementKeywords.some((keyword) => locationText.includes(keyword));
+      });
+    }
+    if (filters.quartiers.length) {
+      results = results.filter((listing) => {
+        const locationText = getLocationText(listing);
+        return selectedQuartiers.some((quartier) => locationText.includes(quartier));
+      });
+    }
+    if (quartierLibre) {
+      results = results.filter((listing) => getLocationText(listing).includes(quartierLibre));
+    }
     if (filters.priceMin) results = results.filter((l) => l.price_mga >= filters.priceMin);
     if (filters.priceMax) results = results.filter((l) => l.price_mga <= filters.priceMax);
     if (filters.rooms.length) {
@@ -121,6 +172,7 @@ const SearchPage = () => {
     if (filters.ville) chips.push({ label: filters.ville, key: "ville" });
     if (filters.arrondissement) chips.push({ label: filters.arrondissement, key: "arr" });
     filters.quartiers.forEach((q) => chips.push({ label: q, key: `q-${q}` }));
+    if (filters.quartierLibre) chips.push({ label: filters.quartierLibre, key: "quartierLibre" });
     if (filters.priceMin || filters.priceMax) {
       chips.push({
         label: `${filters.priceMin ? (filters.priceMin / 1e6).toFixed(0) + "M" : "0"} - ${filters.priceMax ? (filters.priceMax / 1e6).toFixed(0) + "M" : "∞"} Ar`,
@@ -136,9 +188,10 @@ const SearchPage = () => {
     const newFilters = { ...filters };
     if (key === "transaction") newFilters.transaction = "";
     else if (key.startsWith("type-")) newFilters.types = newFilters.types.filter((t) => t !== key.slice(5));
-    else if (key === "ville") { newFilters.ville = ""; newFilters.arrondissement = ""; newFilters.quartiers = []; }
+    else if (key === "ville") { newFilters.ville = ""; newFilters.arrondissement = ""; newFilters.quartiers = []; newFilters.quartierLibre = ""; }
     else if (key === "arr") { newFilters.arrondissement = ""; newFilters.quartiers = []; }
     else if (key.startsWith("q-")) newFilters.quartiers = newFilters.quartiers.filter((q) => q !== key.slice(2));
+    else if (key === "quartierLibre") newFilters.quartierLibre = "";
     else if (key === "price") { newFilters.priceMin = 0; newFilters.priceMax = 0; }
     else if (key.startsWith("room-")) newFilters.rooms = newFilters.rooms.filter((r) => r !== Number(key.slice(5)));
     else if (key.startsWith("eq-")) newFilters.equipments = newFilters.equipments.filter((e) => e !== key.slice(3));
@@ -168,6 +221,7 @@ const SearchPage = () => {
     else if (filters.transaction === "location") parts.push("à louer");
     else if (filters.transaction === "location_vacances") parts.push("en location vacances");
     if (filters.quartiers.length) parts.push(`à ${filters.quartiers.join(", ")}`);
+    else if (filters.quartierLibre) parts.push(`à ${filters.quartierLibre}`);
     else if (filters.arrondissement) parts.push(`à ${filters.arrondissement}`);
     else if (filters.ville) parts.push(`à ${filters.ville}`);
     return parts.join(" ");
