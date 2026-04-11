@@ -5,18 +5,57 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import FilterSidebar, { type SearchFilters } from "@/components/FilterSidebar";
-import ListingsMap from "@/components/ListingsMap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, Home, Loader2 } from "lucide-react";
-import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS } from "@/types/listing";
+import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, Home, Loader2, AlertCircle } from "lucide-react";
+import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import type { DisplayListing } from "@/types/listing";
 import { useDbListings } from "@/hooks/useListings";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from "react";
+
+const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
 type ViewMode = "grid" | "list" | "map";
+
+/** Parse filters from URLSearchParams — single source of truth */
+function filtersFromParams(sp: URLSearchParams): SearchFilters {
+  return {
+    transaction: sp.get("transaction") || "",
+    types: sp.get("type") ? sp.get("type")!.split(",").filter(Boolean) : [],
+    ville: sp.get("ville") || "",
+    arrondissement: sp.get("arr") || "",
+    quartiers: sp.get("quartiers") ? sp.get("quartiers")!.split(",").filter(Boolean) : [],
+    quartierLibre: sp.get("q") || "",
+    priceMin: Number(sp.get("prix_min")) || 0,
+    priceMax: Number(sp.get("prix_max")) || 0,
+    surfaceMin: Number(sp.get("surface_min")) || 0,
+    surfaceMax: Number(sp.get("surface_max")) || 0,
+    rooms: sp.get("chambres") ? sp.get("chambres")!.split(",").map(Number).filter((n) => !isNaN(n)) : [],
+    bathrooms: sp.get("sdb") ? sp.get("sdb")!.split(",").map(Number).filter((n) => !isNaN(n)) : [],
+    equipments: [],
+    proximities: [],
+  };
+}
+
+/** Serialize filters to URLSearchParams */
+function filtersToParams(f: SearchFilters): URLSearchParams {
+  const p = new URLSearchParams();
+  if (f.transaction) p.set("transaction", f.transaction);
+  if (f.types.length) p.set("type", f.types.join(","));
+  if (f.ville) p.set("ville", f.ville);
+  if (f.arrondissement) p.set("arr", f.arrondissement);
+  if (f.quartiers.length) p.set("quartiers", f.quartiers.join(","));
+  if (f.quartierLibre.trim()) p.set("q", f.quartierLibre.trim());
+  if (f.priceMin) p.set("prix_min", String(f.priceMin));
+  if (f.priceMax) p.set("prix_max", String(f.priceMax));
+  if (f.surfaceMin) p.set("surface_min", String(f.surfaceMin));
+  if (f.surfaceMax && f.surfaceMax < 1000) p.set("surface_max", String(f.surfaceMax));
+  if (f.rooms.length) p.set("chambres", f.rooms.join(","));
+  if (f.bathrooms.length) p.set("sdb", f.bathrooms.join(","));
+  return p;
+}
 
 const SearchPage = () => {
   const { t } = useTranslation();
@@ -27,41 +66,15 @@ const SearchPage = () => {
   const [hoveredListingId, setHoveredListingId] = useState<string>();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const [filters, setFilters] = useState<SearchFilters>(() => ({
-    transaction: searchParams.get("transaction") || "",
-    types: searchParams.get("type") ? searchParams.get("type")!.split(",") : [],
-    ville: searchParams.get("ville") || "",
-    arrondissement: searchParams.get("arr") || "",
-    quartiers: searchParams.get("quartiers") ? searchParams.get("quartiers")!.split(",") : [],
-    quartierLibre: searchParams.get("q") || "",
-    priceMin: Number(searchParams.get("prix_min")) || 0,
-    priceMax: Number(searchParams.get("prix_max")) || 0,
-    surfaceMin: 0,
-    surfaceMax: 0,
-    rooms: searchParams.get("chambres") ? searchParams.get("chambres")!.split(",").map(Number) : [],
-    bathrooms: [],
-    equipments: [],
-    proximities: [],
-  }));
+  // URL is source of truth — derive filters from it
+  const filters = useMemo(() => filtersFromParams(searchParams), [searchParams]);
 
   const updateFilters = useCallback((newFilters: SearchFilters) => {
-    setFilters(newFilters);
-    const params = new URLSearchParams();
-    if (newFilters.transaction) params.set("transaction", newFilters.transaction);
-    if (newFilters.types.length === 1) params.set("type", newFilters.types[0]);
-    if (newFilters.types.length > 1) params.set("type", newFilters.types.join(","));
-    if (newFilters.ville) params.set("ville", newFilters.ville);
-    if (newFilters.arrondissement) params.set("arr", newFilters.arrondissement);
-    if (newFilters.quartiers.length) params.set("quartiers", newFilters.quartiers.join(","));
-    if (newFilters.quartierLibre.trim()) params.set("q", newFilters.quartierLibre.trim());
-    if (newFilters.priceMin) params.set("prix_min", String(newFilters.priceMin));
-    if (newFilters.priceMax) params.set("prix_max", String(newFilters.priceMax));
-    if (newFilters.rooms.length) params.set("chambres", newFilters.rooms.join(","));
-    setSearchParams(params, { replace: true });
+    setSearchParams(filtersToParams(newFilters), { replace: true });
   }, [setSearchParams]);
 
   // Fetch from DB with server-side filters
-  const { data: dbListings = [], isLoading } = useDbListings({
+  const { data: dbListings = [], isLoading, error: queryError } = useDbListings({
     transaction: filters.transaction || undefined,
     types: filters.types.length > 0 ? filters.types : undefined,
     ville: filters.ville || undefined,
@@ -72,9 +85,19 @@ const SearchPage = () => {
     surfaceMax: filters.surfaceMax || undefined,
   });
 
-  // Client-side filter for features/equipments and text search
+  // Client-side filter for features/equipments, bathrooms and text search
   const filtered = useMemo(() => {
     let results = [...dbListings];
+
+    // Filter by bathrooms (client-side)
+    if (filters.bathrooms.length > 0) {
+      const hasHighEnd = filters.bathrooms.includes(4);
+      results = results.filter((l) => {
+        if (l.bathrooms == null) return false;
+        if (hasHighEnd && l.bathrooms >= 4) return true;
+        return filters.bathrooms.includes(l.bathrooms);
+      });
+    }
 
     // Filter by equipments (client-side, uses features jsonb)
     if (filters.equipments.length > 0) {
@@ -115,7 +138,6 @@ const SearchPage = () => {
     results.sort((a, b) => {
       if (sort === "priceAsc") return a.price_mga - b.price_mga;
       if (sort === "priceDesc") return b.price_mga - a.price_mga;
-      // Default: recent (already sorted by created_at desc from DB)
       return 0;
     });
 
@@ -126,10 +148,9 @@ const SearchPage = () => {
   const activeChips = useMemo(() => {
     const chips: { label: string; key: string }[] = [];
     if (filters.transaction) {
-      const labels: Record<string, string> = { vente: "Vente", location: "Location", location_vacances: "Location vacances" };
-      chips.push({ label: labels[filters.transaction] || filters.transaction, key: "transaction" });
+      chips.push({ label: TRANSACTION_LABELS[filters.transaction as keyof typeof TRANSACTION_LABELS] || filters.transaction, key: "transaction" });
     }
-    filters.types.forEach((t) => chips.push({ label: LISTING_TYPE_LABELS[t as keyof typeof LISTING_TYPE_LABELS] ?? t, key: `type-${t}` }));
+    filters.types.forEach((tp) => chips.push({ label: LISTING_TYPE_LABELS[tp as keyof typeof LISTING_TYPE_LABELS] ?? tp, key: `type-${tp}` }));
     if (filters.ville) chips.push({ label: filters.ville, key: "ville" });
     if (filters.arrondissement) chips.push({ label: filters.arrondissement, key: "arr" });
     filters.quartiers.forEach((q) => chips.push({ label: q, key: `q-${q}` }));
@@ -140,7 +161,14 @@ const SearchPage = () => {
         key: "price",
       });
     }
+    if (filters.surfaceMin || (filters.surfaceMax && filters.surfaceMax < 1000)) {
+      chips.push({
+        label: `${filters.surfaceMin || 0} - ${filters.surfaceMax && filters.surfaceMax < 1000 ? filters.surfaceMax : "∞"} m²`,
+        key: "surface",
+      });
+    }
     filters.rooms.forEach((r) => chips.push({ label: `${r === 0 ? "Studio" : r + " ch."}`, key: `room-${r}` }));
+    filters.bathrooms.forEach((b) => chips.push({ label: `${b}${b === 4 ? "+" : ""} sdb`, key: `bath-${b}` }));
     filters.equipments.forEach((e) => chips.push({ label: e, key: `eq-${e}` }));
     return chips;
   }, [filters]);
@@ -154,18 +182,23 @@ const SearchPage = () => {
     else if (key.startsWith("q-")) newFilters.quartiers = newFilters.quartiers.filter((q) => q !== key.slice(2));
     else if (key === "quartierLibre") newFilters.quartierLibre = "";
     else if (key === "price") { newFilters.priceMin = 0; newFilters.priceMax = 0; }
+    else if (key === "surface") { newFilters.surfaceMin = 0; newFilters.surfaceMax = 0; }
     else if (key.startsWith("room-")) newFilters.rooms = newFilters.rooms.filter((r) => r !== Number(key.slice(5)));
+    else if (key.startsWith("bath-")) newFilters.bathrooms = newFilters.bathrooms.filter((b) => b !== Number(key.slice(5)));
     else if (key.startsWith("eq-")) newFilters.equipments = newFilters.equipments.filter((e) => e !== key.slice(3));
     updateFilters(newFilters);
   };
 
   const activeFilterCount = activeChips.length;
 
-  const breadcrumbs = [
-    { label: "Accueil", href: "/" },
-    ...(filters.transaction ? [{ label: filters.transaction === "vente" ? "Acheter" : filters.transaction === "location" ? "Louer" : "Location vacances", href: "#" }] : []),
-    ...(filters.ville ? [{ label: filters.ville, href: "#" }] : []),
-  ];
+  const breadcrumbs = useMemo(() => {
+    const crumbs: { label: string; to?: string }[] = [{ label: t("nav.buy").includes("Ach") ? "Accueil" : "Home", to: "/" }];
+    if (filters.transaction) {
+      crumbs.push({ label: TRANSACTION_LABELS[filters.transaction as keyof typeof TRANSACTION_LABELS] || filters.transaction, to: `/recherche?transaction=${filters.transaction}` });
+    }
+    if (filters.ville) crumbs.push({ label: filters.ville });
+    return crumbs;
+  }, [filters, t]);
 
   const pageTitle = useMemo(() => {
     const parts: string[] = [];
@@ -198,15 +231,15 @@ const SearchPage = () => {
           {breadcrumbs.map((bc, i) => (
             <span key={i} className="flex items-center gap-1.5">
               {i > 0 && <ChevronRight className="h-3 w-3" />}
-              {i === 0 ? (
-                <Link to={bc.href} className="hover:text-primary transition-colors flex items-center gap-1">
+              {i === 0 && bc.to ? (
+                <Link to={bc.to} className="hover:text-primary transition-colors flex items-center gap-1">
                   <Home className="h-3.5 w-3.5" />
                   {bc.label}
                 </Link>
-              ) : i === breadcrumbs.length - 1 ? (
-                <span className="text-foreground font-medium">{bc.label}</span>
+              ) : i < breadcrumbs.length - 1 && bc.to ? (
+                <Link to={bc.to} className="hover:text-primary transition-colors">{bc.label}</Link>
               ) : (
-                <Link to={bc.href} className="hover:text-primary transition-colors">{bc.label}</Link>
+                <span className="text-foreground font-medium">{bc.label}</span>
               )}
             </span>
           ))}
@@ -250,7 +283,7 @@ const SearchPage = () => {
                   <SheetTrigger asChild>
                     <Button variant="outline" size="sm" className="lg:hidden font-sans gap-2">
                       <SlidersHorizontal className="h-4 w-4" />
-                      Filtres
+                      {t("search.filters")}
                       {activeFilterCount > 0 && (
                         <Badge variant="default" className="h-5 w-5 p-0 flex items-center justify-center text-[10px] gradient-primary text-white border-0">
                           {activeFilterCount}
@@ -264,7 +297,7 @@ const SearchPage = () => {
                 </Sheet>
 
                 <p className="font-sans text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">{filtered.length}</span> résultat{filtered.length !== 1 ? "s" : ""}
+                  <span className="font-semibold text-foreground">{filtered.length}</span> {t("search.results")}
                 </p>
               </div>
 
@@ -290,13 +323,22 @@ const SearchPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="recent">Plus récents</SelectItem>
-                    <SelectItem value="priceAsc">Prix ↑</SelectItem>
-                    <SelectItem value="priceDesc">Prix ↓</SelectItem>
+                    <SelectItem value="recent">{t("search.recent")}</SelectItem>
+                    <SelectItem value="priceAsc">{t("search.priceAsc")}</SelectItem>
+                    <SelectItem value="priceDesc">{t("search.priceDesc")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
+
+            {/* Error state */}
+            {queryError && !isLoading && (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <AlertCircle className="h-10 w-10 text-destructive mb-3" />
+                <p className="font-serif text-lg text-foreground mb-1">{t("common.error")}</p>
+                <p className="font-sans text-sm text-muted-foreground">{(queryError as Error).message}</p>
+              </div>
+            )}
 
             {/* Loading */}
             {isLoading && (
@@ -306,10 +348,12 @@ const SearchPage = () => {
             )}
 
             {/* Results */}
-            {!isLoading && viewMode === "map" ? (
+            {!isLoading && !queryError && viewMode === "map" ? (
               <div className="flex gap-4 h-[600px]">
                 <div className="w-[60%]">
-                  <ListingsMap listings={filtered} hoveredId={hoveredListingId} onMarkerClick={(id) => navigate(`/annonce/${id}`)} />
+                  <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>}>
+                    <ListingsMap listings={filtered} onMarkerClick={(id) => navigate(`/annonce/${id}`)} />
+                  </Suspense>
                 </div>
                 <div className="w-[40%] overflow-y-auto space-y-3">
                   {filtered.map((listing) => (
@@ -319,7 +363,7 @@ const SearchPage = () => {
                   ))}
                 </div>
               </div>
-            ) : !isLoading && viewMode === "list" ? (
+            ) : !isLoading && !queryError && viewMode === "list" ? (
               <div className="space-y-4">
                 {filtered.map((listing) => (
                   <div key={listing.id} className="flex bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow">
@@ -346,7 +390,7 @@ const SearchPage = () => {
                   </div>
                 ))}
               </div>
-            ) : !isLoading ? (
+            ) : !isLoading && !queryError ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {filtered.map((listing) => (
                   <ListingCard key={listing.id} listing={listing} />
@@ -355,7 +399,7 @@ const SearchPage = () => {
             ) : null}
 
             {/* Empty state */}
-            {!isLoading && filtered.length === 0 && (
+            {!isLoading && !queryError && filtered.length === 0 && (
               <div className="text-center py-20">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                   <Home className="h-8 w-8 text-muted-foreground" />

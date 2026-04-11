@@ -13,7 +13,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useListing, useDbListings } from "@/hooks/useListings";
 import { LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 const ListingDetail = () => {
@@ -28,20 +28,23 @@ const ListingDetail = () => {
   const [contactPhone, setContactPhone] = useState("");
   const [contactMessage, setContactMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const viewIncremented = useRef<string | null>(null);
 
-  const { data: listing, isLoading, error } = useListing(id);
+  const { data: listing, isLoading, error: fetchError } = useListing(id);
 
-  // Increment views on mount (once, for real listings only)
+  // Increment views once per listing per page load
   useEffect(() => {
-    if (listing?.id) {
-      supabase.rpc("increment_views", { listing_uuid: listing.id }).then(() => {});
+    if (listing?.id && viewIncremented.current !== listing.id) {
+      viewIncremented.current = listing.id;
+      supabase.rpc("increment_views", { listing_uuid: listing.id }).catch(() => {});
     }
   }, [listing?.id]);
 
-  // Fetch similar listings
+  // Fetch similar listings by same type + ville
   const { data: similar = [] } = useDbListings({
     ville: listing?.ville ?? undefined,
-    limit: 4,
+    types: listing?.type ? [listing.type] : undefined,
+    limit: 5,
   });
   const filteredSimilar = similar.filter((l) => l.id !== listing?.id).slice(0, 4);
 
@@ -62,7 +65,7 @@ const ListingDetail = () => {
     e.preventDefault();
     if (!listing) return;
     if (!contactName.trim() && !contactEmail.trim()) {
-      toast.error("Veuillez renseigner votre nom ou email");
+      toast.error(t("common.error"));
       return;
     }
     setSending(true);
@@ -75,7 +78,7 @@ const ListingDetail = () => {
       type: "contact_form" as const,
     });
     if (leadError) {
-      toast.error("Erreur lors de l'envoi : " + leadError.message);
+      toast.error(leadError.message);
     } else {
       toast.success("Message envoyé !");
       setContactName("");
@@ -93,6 +96,22 @@ const ListingDetail = () => {
         <Header />
         <div className="min-h-[60vh] flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // Error state (distinct from not found)
+  if (fetchError && !listing) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
+          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+          <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
+          <p className="text-muted-foreground font-sans mb-6">{(fetchError as Error).message}</p>
+          <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">Retour</Button>
         </div>
         <Footer />
       </>
@@ -137,7 +156,7 @@ const ListingDetail = () => {
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">Accueil</Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to="/recherche" className="hover:text-primary">Recherche</Link>
+          <Link to="/recherche" className="hover:text-primary">{t("search.title")}</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-foreground">{listing.title}</span>
         </nav>
@@ -163,6 +182,11 @@ const ListingDetail = () => {
               <div className="flex items-center gap-3 mb-2">
                 <Badge variant="outline" className="font-sans">{transactionLabel}</Badge>
                 <Badge variant="outline" className="font-sans capitalize">{typeLabel}</Badge>
+                {listing.badge && (
+                  <Badge className={`font-sans text-xs ${listing.badge === "boost" ? "gradient-primary" : "bg-accent"}`} style={{ color: "#FAFAFA" }}>
+                    {listing.badge === "boost" ? t("listing.boost") : t("listing.favorite")}
+                  </Badge>
+                )}
               </div>
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{listing.title}</h1>
               <p className="flex items-center gap-1 text-sm text-muted-foreground font-sans mb-4">
@@ -255,7 +279,7 @@ const ListingDetail = () => {
                 <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans" />
                 <Textarea placeholder="Votre message..." value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans" rows={3} />
                 <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-                  {sending ? "Envoi en cours..." : t("common.send")}
+                  {sending ? t("common.loading") : t("common.send")}
                 </Button>
               </form>
 

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Footer = () => {
@@ -16,12 +15,6 @@ const Footer = () => {
             <p className="text-sm opacity-70 font-sans">
               Le portail immobilier N°1 de Madagascar. Trouvez votre bien idéal parmi des milliers d'annonces.
             </p>
-            <div className="flex gap-3">
-              <Facebook className="h-5 w-5 opacity-50 cursor-default" />
-              <Instagram className="h-5 w-5 opacity-50 cursor-default" />
-              <Twitter className="h-5 w-5 opacity-50 cursor-default" />
-              <Youtube className="h-5 w-5 opacity-50 cursor-default" />
-            </div>
           </div>
 
           {/* Links 1 */}
@@ -40,10 +33,6 @@ const Footer = () => {
             <h4 className="font-semibold text-lg">Informations</h4>
             <div className="flex flex-col gap-2 text-sm font-sans opacity-70">
               <Link to="/conseils" className="hover:opacity-100 transition-opacity">{t("nav.advice")}</Link>
-              <span className="opacity-50 cursor-default">{t("footer.about")}</span>
-              <span className="opacity-50 cursor-default">{t("footer.legal")}</span>
-              <span className="opacity-50 cursor-default">{t("footer.privacy")}</span>
-              <span className="opacity-50 cursor-default">{t("footer.terms")}</span>
             </div>
           </div>
         </div>

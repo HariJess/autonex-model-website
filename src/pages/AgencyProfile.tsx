@@ -1,35 +1,36 @@
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useDbListings } from "@/hooks/useListings";
 
 const AgencyProfile = () => {
   const { slug } = useParams();
+  const { t } = useTranslation();
 
-  const { data: agency, isLoading: agencyLoading } = useQuery({
+  const { data: agency, isLoading: agencyLoading, error: agencyError } = useQuery({
     queryKey: ["agency", slug],
     queryFn: async () => {
       if (!slug) return null;
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("agencies")
         .select("*")
         .eq("slug", slug)
         .maybeSingle();
+      if (error) throw new Error(error.message);
       return data;
     },
     enabled: !!slug,
   });
 
-  // Get profiles linked to this agency to find their listings
+  // Get agent IDs for this agency
   const { data: agentIds = [] } = useQuery({
     queryKey: ["agency-agents", agency?.id],
     queryFn: async () => {
@@ -43,8 +44,10 @@ const AgencyProfile = () => {
     enabled: !!agency?.id,
   });
 
-  const { data: allListings = [] } = useDbListings({});
-  const listings = allListings.filter((l) => agentIds.includes(l.owner_id));
+  // Fetch only this agency's listings via ownerIds filter
+  const { data: listings = [], isLoading: listingsLoading } = useDbListings(
+    agentIds.length > 0 ? { ownerIds: agentIds } : { ownerIds: ["__none__"] }
+  );
 
   if (agencyLoading) {
     return (
@@ -52,6 +55,20 @@ const AgencyProfile = () => {
         <Header />
         <div className="min-h-[60vh] flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (agencyError) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
+          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+          <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
+          <p className="text-muted-foreground font-sans mb-6">{(agencyError as Error).message}</p>
         </div>
         <Footer />
       </>
@@ -94,36 +111,26 @@ const AgencyProfile = () => {
               {agency.verified && <Badge className="bg-success font-sans text-xs" style={{ color: "#FAFAFA" }}>Vérifié</Badge>}
             </div>
             <p className="text-muted-foreground font-sans mt-2">{agency.bio || "Aucune description disponible."}</p>
+            {agency.phone && <p className="text-sm font-sans text-muted-foreground mt-2">📞 {agency.phone}</p>}
+            {agency.email && <p className="text-sm font-sans text-muted-foreground">✉️ {agency.email}</p>}
             <p className="text-sm font-sans text-primary mt-1">{listings.length} annonce{listings.length !== 1 ? "s" : ""} active{listings.length !== 1 ? "s" : ""}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <h2 className="font-serif text-xl font-bold mb-4">Annonces de {agency.name}</h2>
-            {listings.length === 0 ? (
-              <p className="text-muted-foreground font-sans py-8 text-center">Aucune annonce active pour le moment.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {listings.map((l) => (
-                  <ListingCard key={l.id} listing={l} agencyName={agency.name} agencyLogo={agency.logo_url ?? undefined} />
-                ))}
-              </div>
-            )}
+        <h2 className="font-serif text-xl font-bold mb-4">Annonces de {agency.name}</h2>
+        {listingsLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
-          <div>
-            <div className="bg-card rounded-2xl border border-border p-6 space-y-4 sticky top-20">
-              <h3 className="font-serif font-bold">Contacter {agency.name}</h3>
-              {agency.phone && <p className="text-sm font-sans text-muted-foreground">📞 {agency.phone}</p>}
-              {agency.email && <p className="text-sm font-sans text-muted-foreground">✉️ {agency.email}</p>}
-              <Input placeholder="Nom" className="font-sans" />
-              <Input placeholder="Email" type="email" className="font-sans" />
-              <Input placeholder="Téléphone" className="font-sans" />
-              <Textarea placeholder="Message..." className="font-sans" rows={3} />
-              <Button className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>Envoyer</Button>
-            </div>
+        ) : listings.length === 0 ? (
+          <p className="text-muted-foreground font-sans py-8 text-center">Aucune annonce active pour le moment.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map((l) => (
+              <ListingCard key={l.id} listing={l} agencyName={agency.name} agencyLogo={agency.logo_url ?? undefined} />
+            ))}
           </div>
-        </div>
+        )}
       </div>
       <Footer />
     </>

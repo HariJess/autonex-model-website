@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -12,15 +12,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Check, Upload, Zap, Heart, Mail, CreditCard, AlertCircle } from "lucide-react";
+import { Check, Upload, CreditCard, AlertCircle } from "lucide-react";
 import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
 import { getRegionForVille } from "@/data/madagascar-locations";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { ListingType, TransactionType } from "@/types/listing";
 
-const steps = ["Pack", "Détails", "Photos", "Localisation", "Options", "Paiement"];
+const steps = ["Pack", "Détails", "Photos", "Localisation", "Paiement"];
 
 const PublishPage = () => {
   const { t } = useTranslation();
@@ -50,25 +51,29 @@ const PublishPage = () => {
   const [quartier, setQuartier] = useState("");
   const [quartierLibre, setQuartierLibre] = useState("");
 
-  // Step 5 - Upsells
-  const [selectedUpsells, setSelectedUpsells] = useState<string[]>([]);
-
-  // Step 6 - Payment
+  // Step 5 - Payment
   const [paymentMethod, setPaymentMethod] = useState("");
   const [publishing, setPublishing] = useState(false);
 
-  const packs = [
-    { id: "decouverte", name: "Pack Découverte", price: "Gratuit", desc: "1 annonce, 30 jours", quota: 1 },
-    { id: "pro", name: "Pack Pro", price: "50 000 Ar", desc: "10 annonces, 60 jours, stats avancées", quota: 10 },
-    { id: "agence", name: "Pack Agence", price: "200 000 Ar/mois", desc: "Annonces illimitées, badge vérifié, dashboard", quota: -1 },
-    { id: "promoteur", name: "Pack Promoteur", price: "Sur devis", desc: "Solutions sur mesure, pages projets dédiées", quota: -1 },
-  ];
+  // Fetch real packs from DB
+  const { data: dbPacks = [] } = useQuery({
+    queryKey: ["packs"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("packs").select("*").order("price_mga", { ascending: true });
+      if (error || !data || data.length === 0) {
+        // Fallback to hardcoded packs if DB is empty
+        return [
+          { id: "decouverte", name: "Pack Découverte", price_mga: 0, listings_quota: 1, duration_days: 30, features: [] },
+          { id: "pro", name: "Pack Pro", price_mga: 50000, listings_quota: 10, duration_days: 60, features: [] },
+          { id: "agence", name: "Pack Agence", price_mga: 200000, listings_quota: null, duration_days: 30, features: [] },
+        ];
+      }
+      return data;
+    },
+  });
 
-  const upsells = [
-    { id: "boost", name: "Boost", price: "15 000 Ar", desc: "Votre annonce en tête des résultats pendant 7 jours", icon: Zap },
-    { id: "coup_de_coeur", name: "Coup de cœur", price: "25 000 Ar", desc: "Badge coup de cœur + mise en avant homepage", icon: Heart },
-    { id: "newsletter", name: "Newsletter", price: "30 000 Ar", desc: "Inclusion dans notre newsletter hebdomadaire", icon: Mail },
-  ];
+  const selectedPackData = dbPacks.find((p) => p.id === selectedPack);
+  const isFree = selectedPackData ? (selectedPackData.price_mga ?? 0) === 0 : selectedPack === "decouverte";
 
   const paymentMethods = [
     { id: "mvola", name: "MVola" },
@@ -79,21 +84,22 @@ const PublishPage = () => {
 
   const progress = ((step + 1) / steps.length) * 100;
 
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files).slice(0, 10);
-      // Clean up old previews
       photoPreviews.forEach((url) => URL.revokeObjectURL(url));
       setPhotos(files);
       setPhotoPreviews(files.map((f) => URL.createObjectURL(f)));
     }
   };
 
-  const toggleUpsell = (id: string) => {
-    setSelectedUpsells((prev) => prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]);
-  };
-
-  /** Validate current step, return list of errors */
   const validateStep = (s: number): string[] => {
     const errors: string[] = [];
     switch (s) {
@@ -108,16 +114,12 @@ const PublishPage = () => {
         if (!priceMga || Number(priceMga) <= 0) errors.push("Prix valide requis");
         break;
       case 2:
-        // Photos optional but recommended
         break;
       case 3:
         if (!ville) errors.push("Ville requise");
         break;
       case 4:
-        // Upsells are optional
-        break;
-      case 5:
-        if (selectedPack !== "decouverte" && !paymentMethod) errors.push("Méthode de paiement requise");
+        if (!isFree && !paymentMethod) errors.push("Méthode de paiement requise");
         break;
     }
     return errors;
@@ -134,7 +136,7 @@ const PublishPage = () => {
   };
 
   const handlePublish = async () => {
-    const errors = validateStep(5);
+    const errors = validateStep(4);
     setStepErrors(errors);
     if (errors.length > 0) {
       toast.error(errors[0]);
@@ -149,6 +151,9 @@ const PublishPage = () => {
     try {
       const region = getRegionForVille(ville);
       const priceNum = Number(priceMga) || 0;
+
+      // Determine initial status: free = active, paid = draft until payment confirmed
+      const initialStatus = isFree ? "active" : "draft";
 
       const { data: listing, error: listingError } = await supabase
         .from("listings")
@@ -168,13 +173,13 @@ const PublishPage = () => {
           quartier: quartier || null,
           quartier_libre: quartierLibre || null,
           region,
-          status: "active" as const,
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: initialStatus,
+          expires_at: new Date(Date.now() + (selectedPackData?.duration_days ?? 30) * 24 * 60 * 60 * 1000).toISOString(),
         })
         .select()
         .single();
 
-      if (listingError) throw listingError;
+      if (listingError) throw new Error(listingError.message);
 
       // Upload photos
       if (photos.length > 0 && listing) {
@@ -199,21 +204,24 @@ const PublishPage = () => {
         }
       }
 
-      // Create transaction record (mock payment)
-      if (paymentMethod && selectedPack !== "decouverte") {
+      // Create transaction record for paid packs
+      if (!isFree && paymentMethod && listing) {
         await supabase.from("transactions").insert({
           user_id: user.id,
-          amount_mga: selectedPack === "pro" ? 50000 : 200000,
+          amount_mga: selectedPackData?.price_mga ?? 0,
           method: paymentMethod as "mvola" | "orange_money" | "airtel_money" | "stripe",
-          status: "success" as const,
-          reference: `TXN-${Date.now()}`,
+          status: "pending",
+          reference: `TXN-${listing.id.slice(0, 8)}-${Date.now()}`,
         });
       }
 
-      // Clean up photo previews
       photoPreviews.forEach((url) => URL.revokeObjectURL(url));
 
-      toast.success("Annonce publiée avec succès !");
+      if (isFree) {
+        toast.success("Annonce publiée avec succès !");
+      } else {
+        toast.success("Annonce créée ! Elle sera activée après confirmation du paiement.");
+      }
       navigate("/dashboard");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Erreur lors de la publication";
@@ -243,7 +251,6 @@ const PublishPage = () => {
           <Progress value={progress} className="h-2" />
         </div>
 
-        {/* Validation errors */}
         {stepErrors.length > 0 && (
           <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
             {stepErrors.map((err, i) => (
@@ -257,14 +264,18 @@ const PublishPage = () => {
         {/* Step 1: Pack */}
         {step === 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {packs.map((pack) => (
+            {dbPacks.map((pack) => (
               <Card key={pack.id} className={`rounded-2xl cursor-pointer transition-all ${selectedPack === pack.id ? "ring-2 ring-primary" : ""}`} onClick={() => setSelectedPack(pack.id)}>
                 <CardHeader>
                   <CardTitle className="font-serif text-lg">{pack.name}</CardTitle>
-                  <CardDescription className="font-sans">{pack.desc}</CardDescription>
+                  <CardDescription className="font-sans">
+                    {pack.listings_quota ? `${pack.listings_quota} annonce${pack.listings_quota > 1 ? "s" : ""}` : "Illimité"}, {pack.duration_days ?? 30} jours
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold font-sans gradient-text">{pack.price}</p>
+                  <p className="text-2xl font-bold font-sans gradient-text">
+                    {(pack.price_mga ?? 0) === 0 ? "Gratuit" : `${(pack.price_mga ?? 0).toLocaleString("fr-FR")} Ar`}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -355,40 +366,32 @@ const PublishPage = () => {
           </div>
         )}
 
-        {/* Step 5: Options */}
+        {/* Step 5: Payment */}
         {step === 4 && (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground font-sans mb-2">Ces options sont facultatives. Vous pouvez les ajouter plus tard.</p>
-            {upsells.map((u) => (
-              <Card key={u.id} className={`rounded-2xl cursor-pointer transition-colors ${selectedUpsells.includes(u.id) ? "ring-2 ring-primary" : "hover:border-primary"}`} onClick={() => toggleUpsell(u.id)}>
-                <CardContent className="flex items-center gap-4 p-5">
-                  <div className="p-3 rounded-xl bg-accent/10 text-accent"><u.icon className="h-6 w-6" /></div>
-                  <div className="flex-1">
-                    <p className="font-sans font-semibold">{u.name}</p>
-                    <p className="text-sm text-muted-foreground font-sans">{u.desc}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold font-sans text-primary">{u.price}</p>
-                    {selectedUpsells.includes(u.id) && <Check className="h-5 w-5 text-success" />}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+            {/* Summary */}
+            <div className="bg-card rounded-2xl border border-border p-6">
+              <h3 className="font-serif font-bold text-lg mb-3">Récapitulatif</h3>
+              <div className="space-y-1 text-sm font-sans">
+                <p><span className="text-muted-foreground">Pack :</span> {selectedPackData?.name ?? selectedPack}</p>
+                <p><span className="text-muted-foreground">Bien :</span> {title}</p>
+                <p><span className="text-muted-foreground">Type :</span> {listingType ? LISTING_TYPE_LABELS[listingType as ListingType] : "-"}</p>
+                <p><span className="text-muted-foreground">Ville :</span> {ville}</p>
+                <p><span className="text-muted-foreground">Photos :</span> {photos.length}</p>
+              </div>
+            </div>
 
-        {/* Step 6: Payment */}
-        {step === 5 && (
-          <div className="space-y-4">
-            {selectedPack === "decouverte" ? (
+            {isFree ? (
               <div className="bg-card rounded-2xl border border-border p-6 text-center">
                 <Check className="h-12 w-12 text-success mx-auto mb-3" />
-                <p className="font-serif font-bold text-lg">Pack Découverte — Gratuit</p>
-                <p className="text-sm text-muted-foreground font-sans mt-1">Aucun paiement requis</p>
+                <p className="font-serif font-bold text-lg">Pack gratuit — Aucun paiement requis</p>
               </div>
             ) : (
               <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
                 <h3 className="font-serif font-bold text-lg">Mode de paiement *</h3>
+                <p className="text-sm text-muted-foreground font-sans">
+                  Montant : {(selectedPackData?.price_mga ?? 0).toLocaleString("fr-FR")} Ar
+                </p>
                 {paymentMethods.map((m) => (
                   <div key={m.id} onClick={() => setPaymentMethod(m.id)} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${paymentMethod === m.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-primary"}`}>
                     <CreditCard className="h-5 w-5 text-primary" />
@@ -396,10 +399,13 @@ const PublishPage = () => {
                     {paymentMethod === m.id && <Check className="h-4 w-4 text-success ml-auto" />}
                   </div>
                 ))}
+                <p className="text-xs text-muted-foreground font-sans">
+                  Votre annonce sera activée après confirmation du paiement.
+                </p>
               </div>
             )}
             <Button onClick={handlePublish} disabled={publishing} className="w-full gradient-primary border-0 font-sans text-lg py-6" style={{ color: "#FAFAFA" }}>
-              {publishing ? "Publication en cours..." : t("publish.submit")}
+              {publishing ? t("common.loading") : t("publish.submit")}
             </Button>
           </div>
         )}
@@ -408,7 +414,7 @@ const PublishPage = () => {
           <Button variant="outline" onClick={() => { setStepErrors([]); setStep((s) => s - 1); }} disabled={step === 0} className="font-sans">
             {t("publish.prev")}
           </Button>
-          {step < 5 && (
+          {step < 4 && (
             <Button onClick={handleNext} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
               {t("publish.next")}
             </Button>
