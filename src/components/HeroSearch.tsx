@@ -32,6 +32,10 @@ const HeroSearch = () => {
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
   const [type, setType] = useState("");
+  const handleTypeChange = (v: string) => {
+    setType(v);
+    if (TYPES_WITHOUT_ROOMS.includes(v)) setRooms("");
+  };
   const [ville, setVille] = useState("");
   const [arrondissement, setArrondissement] = useState("");
   const [quartiers, setQuartiers] = useState<string[]>([]);
