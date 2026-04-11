@@ -119,10 +119,10 @@ export function useDbListings(filters: ListingsFilters = {}) {
         .order("created_at", { ascending: false });
 
       if (filters.transaction) {
-        query = query.eq("transaction", filters.transaction);
+        query = query.eq("transaction", filters.transaction as TransactionType);
       }
       if (filters.types && filters.types.length > 0) {
-        query = query.in("type", filters.types);
+        query = query.in("type", filters.types as ListingType[]);
       }
       if (filters.ville) {
         query = query.eq("ville", filters.ville);
