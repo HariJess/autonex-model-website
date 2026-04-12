@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet : tuiles et marqueurs visibles (container a une hauteur définie dans le composant) */
+.leaflet-container {
+  font-family: inherit;
+  background: hsl(var(--muted));
+}
+
 @layer base {
   :root {
     --background: 0 0% 98%;

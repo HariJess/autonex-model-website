@@ -135,14 +135,20 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
             <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.location", "Localisation")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <LocationSelector
-                selectedVille={filters.ville}
-                selectedArr={filters.arrondissement}
-                selectedQuartiers={filters.quartiers}
-                quartierLibre={filters.quartierLibre}
-                onVilleChange={(v) => update({ ville: v })}
-                onArrChange={(a) => update({ arrondissement: a })}
-                onQuartiersChange={(q) => update({ quartiers: q })}
-                onQuartierLibreChange={(q) => update({ quartierLibre: q })}
+                mode="apply"
+                committed={{
+                  ville: filters.ville,
+                  quartiers: filters.quartiers,
+                  quartierLibre: filters.quartierLibre,
+                }}
+                onCommit={(v) =>
+                  update({
+                    ville: v.ville,
+                    quartiers: v.quartiers,
+                    quartierLibre: v.quartierLibre,
+                    arrondissement: "",
+                  })
+                }
               />
             </AccordionContent>
           </AccordionItem>

@@ -91,7 +91,7 @@ const LocationPicker = ({
         <Input
           value={quartierLibre}
           onChange={(e) => onQuartierLibreChange(e.target.value)}
-          placeholder="Ex: Galaxy Andraharo, Tana Waterfront..."
+          placeholder="Ex. : zone industrielle, lotissement…"
           className="font-sans text-sm"
         />
       </div>

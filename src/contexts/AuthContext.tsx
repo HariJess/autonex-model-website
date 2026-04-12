@@ -16,6 +16,10 @@ export interface SignUpMetadata {
   full_name: string;
   role: "particulier" | "agence";
   phone: string;
+  first_name?: string;
+  last_name?: string;
+  whatsapp_phone?: string;
+  contact_consent?: boolean;
   agency_name?: string;
   agency_address?: string;
   commercial_contact_name?: string;

@@ -312,6 +312,75 @@ export type Database = {
           },
         ]
       }
+      search_analytics_events: {
+        Row: {
+          id: string
+          created_at: string
+          session_id: string | null
+          ville: string | null
+          quartiers: string[] | null
+          quartier_libre: string | null
+          transaction_type: string | null
+          property_types: string[] | null
+          price_min: number | null
+          price_max: number | null
+          surface_min: number | null
+          surface_max: number | null
+          rooms: number[] | null
+          bathrooms: number[] | null
+          equipments: string[] | null
+          exact_result_count: number
+          had_zero_exact: boolean
+          showed_similar_fallback: boolean
+          showed_also_like: boolean
+          path: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          session_id?: string | null
+          ville?: string | null
+          quartiers?: string[] | null
+          quartier_libre?: string | null
+          transaction_type?: string | null
+          property_types?: string[] | null
+          price_min?: number | null
+          price_max?: number | null
+          surface_min?: number | null
+          surface_max?: number | null
+          rooms?: number[] | null
+          bathrooms?: number[] | null
+          equipments?: string[] | null
+          exact_result_count?: number
+          had_zero_exact?: boolean
+          showed_similar_fallback?: boolean
+          showed_also_like?: boolean
+          path?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          session_id?: string | null
+          ville?: string | null
+          quartiers?: string[] | null
+          quartier_libre?: string | null
+          transaction_type?: string | null
+          property_types?: string[] | null
+          price_min?: number | null
+          price_max?: number | null
+          surface_min?: number | null
+          surface_max?: number | null
+          rooms?: number[] | null
+          bathrooms?: number[] | null
+          equipments?: string[] | null
+          exact_result_count?: number
+          had_zero_exact?: boolean
+          showed_similar_fallback?: boolean
+          showed_also_like?: boolean
+          path?: string | null
+        }
+        Relationships: []
+      }
       listings: {
         Row: {
           arrondissement: string | null

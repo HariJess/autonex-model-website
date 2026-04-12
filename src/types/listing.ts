@@ -44,7 +44,7 @@ export type TransactionType = (typeof TRANSACTION_TYPES)[number];
 export const TRANSACTION_LABELS: Record<TransactionType, string> = {
   vente: "Vente",
   location: "Location",
-  location_vacances: "Location vacances",
+  location_vacances: "Vacances / courte durée",
 };
 
 /**
@@ -91,4 +91,9 @@ export interface DisplayListing {
   rejection_reason?: string | null;
   /** Boost types requested at publish; applied after moderation when listing goes live */
   pending_boost_types?: string[];
+  /**
+   * Score for search « Plus récent » ordering: combines active boosts (top, featured, daily_bump, urgent)
+   * with listing creation / bump recency. Higher = shown first.
+   */
+  visibility_rank_score?: number;
 }

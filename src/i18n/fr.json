@@ -12,6 +12,11 @@
     "logout": "Déconnexion",
     "home": "Accueil"
   },
+  "transaction": {
+    "sale": "Vente",
+    "rent": "Location",
+    "vacation": "Vacances / courte durée"
+  },
   "hero": {
     "title": "Trouvez votre futur chez-vous à Madagascar",
     "subtitle": "Le portail immobilier N°1 couvrant toutes les régions de Madagascar",
@@ -66,13 +71,14 @@
     "priceAsc": "Prix croissant",
     "priceDesc": "Prix décroissant",
     "relevance": "Pertinence",
+    "recentSortHint": "Les annonces avec options de visibilité (top, à la une, actualisation) apparaissent en priorité, puis les plus récentes.",
     "results": "résultats",
     "mapView": "Carte",
     "listView": "Liste",
     "transaction": "Transaction",
     "sale": "Vente",
     "rental": "Location",
-    "vacationRental": "Location vacances",
+    "vacationRental": "Vacances / courte durée",
     "propertyType": "Type de bien",
     "apartment": "Appartement",
     "villa": "Villa",
@@ -91,11 +97,28 @@
     "properties": "Biens immobiliers",
     "forSale": "à vendre",
     "forRent": "à louer",
+    "titleVacationPhrase": "— courte durée / vacances",
     "listingCount": "annonce",
     "noResults": "Aucune annonce ne correspond",
     "tryDifferent": "Essayez de modifier ou réinitialiser vos filtres",
+    "tryDifferentWiden": "Élargissez la ville, le budget ou les quartiers, ou réinitialisez les filtres.",
     "resetFilters": "Réinitialiser les filtres",
-    "house": "Maison"
+    "house": "Maison",
+    "suggestionShort": "suggestion",
+    "suggestionsShort": "suggestions",
+    "zeroListingsHeadline": "0 annonce",
+    "resultsSimilarLabel": "suggestions",
+    "noExactMatchTitle": "Aucun bien ne correspond exactement à votre recherche.",
+    "similarIntro": "Voici des biens similaires susceptibles de vous intéresser (même ville, critères assouplis).",
+    "youMayAlsoLike": "Vous pouvez aussi aimer",
+    "alsoLikeHint": "Autres annonces proches de votre recherche, en complément des résultats ci-dessus.",
+    "locationSearchPlaceholder": "Ville, quartier, zone…",
+    "quartierQuickPick": "Quartiers correspondants",
+    "quartiersGroupedHint": "Cochez un ou plusieurs quartiers — tous conservés.",
+    "otherQuartierLabel": "Autre zone (hors liste)",
+    "otherQuartierPlaceholder": "Ex. : lotissement, zone industrielle…",
+    "applyLocation": "Appliquer",
+    "resetLocationDraft": "Réinitialiser"
   },
   "publish": {
     "title": "Publier une annonce",
@@ -141,7 +164,9 @@
     "successFree": "Annonce publiée avec succès !",
     "successPaid": "Annonce créée ! Elle sera activée après confirmation du paiement.",
     "error": "Erreur lors de la publication",
-    "photoUploadPartial": "Certaines photos n'ont pas pu être uploadées"
+    "photoUploadPartial": "Certaines photos n'ont pas pu être uploadées",
+    "mapNoCoordsForCity": "Impossible de placer la carte pour cette ville. Vérifiez le nom ou contactez le support.",
+    "photoPartialFail": "{{n}} photo(s) n’ont pas pu être enregistrées. Vérifiez votre connexion et complétez depuis votre tableau de bord si besoin."
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -165,7 +190,10 @@
     "pause": "Mettre en pause",
     "activate": "Activer",
     "visitor": "Visiteur",
-    "noLeads": "Aucun contact reçu pour le moment."
+    "noLeads": "Aucun contact reçu pour le moment.",
+    "accountIndividual": "Compte particulier",
+    "accountAgency": "Compte professionnel (agence)",
+    "accountAdmin": "Compte administrateur"
   },
   "status": {
     "active": "Active",
@@ -204,7 +232,18 @@
     "sendResetLink": "Envoyer le lien",
     "backToLogin": "Retour à la connexion",
     "resetEmailSent": "Un email de réinitialisation a été envoyé à",
-    "checkInbox": "Vérifiez votre boîte de réception."
+    "checkInbox": "Vérifiez votre boîte de réception.",
+    "signupChooseTitle": "Créer un compte",
+    "signupParticulierCta": "Compte particulier",
+    "signupParticulierDesc": "Propriétaire ou vendeur indépendant",
+    "signupProCta": "Professionnel / agence",
+    "signupProDesc": "Agence immobilière ou activité structurée",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "whatsapp": "WhatsApp (optionnel)",
+    "contactConsent": "J’accepte que mes coordonnées soient utilisées pour les échanges liés à mes annonces sur ImmoNex.",
+    "contactConsentRequired": "Veuillez accepter l’utilisation de vos coordonnées pour continuer.",
+    "fieldsRequired": "Renseignez prénom, nom et téléphone."
   },
   "footer": {
     "about": "À propos",

@@ -1,41 +1,96 @@
-import { forwardRef, useMemo, useState } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { villes } from "@/data/madagascar-locations";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Search, X, MapPin } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface LocationSelectorProps {
-  selectedVille: string;
-  selectedArr: string;
-  selectedQuartiers: string[];
+export type LocationSelection = {
+  ville: string;
+  quartiers: string[];
   quartierLibre: string;
-  onVilleChange: (v: string) => void;
-  onArrChange: (a: string) => void;
-  onQuartiersChange: (q: string[]) => void;
-  onQuartierLibreChange: (q: string) => void;
+};
+
+type LocationSelectorBaseProps = {
   onClose?: () => void;
+};
+
+type LocationSelectorImmediateProps = LocationSelectorBaseProps & {
+  mode?: "immediate";
+  value: LocationSelection;
+  onChange: (next: LocationSelection) => void;
+};
+
+type LocationSelectorApplyProps = LocationSelectorBaseProps & {
+  mode: "apply";
+  committed: LocationSelection;
+  onCommit: (next: LocationSelection) => void;
+};
+
+export type LocationSelectorProps = LocationSelectorImmediateProps | LocationSelectorApplyProps;
+
+function isApplyMode(p: LocationSelectorProps): p is LocationSelectorApplyProps {
+  return p.mode === "apply";
 }
 
-const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
-  selectedVille,
-  selectedArr,
-  selectedQuartiers,
-  quartierLibre,
-  onVilleChange,
-  onArrChange,
-  onQuartiersChange,
-  onQuartierLibreChange,
-  onClose,
-}, ref) => {
+const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((props, ref) => {
+  const { t } = useTranslation();
+  const onClose = props.onClose;
+
+  const committed: LocationSelection = isApplyMode(props)
+    ? props.committed
+    : props.value;
+
+  const [draft, setDraft] = useState<LocationSelection>(committed);
+
+  useEffect(() => {
+    if (isApplyMode(props)) {
+      setDraft(props.committed);
+    }
+  }, [
+    isApplyMode(props) ? props.committed.ville : "",
+    isApplyMode(props) ? props.committed.quartiers.join("\u0001") : "",
+    isApplyMode(props) ? props.committed.quartierLibre : "",
+  ]);
+
+  const live = isApplyMode(props) ? draft : props.value;
+
+  const setLive = (next: LocationSelection) => {
+    if (isApplyMode(props)) {
+      setDraft(next);
+    } else {
+      props.onChange(next);
+    }
+  };
+
   const [search, setSearch] = useState("");
-  const [expandedVilles, setExpandedVilles] = useState<string[]>(selectedVille ? [selectedVille] : []);
-  const [expandedArrs, setExpandedArrs] = useState<string[]>(selectedArr ? [selectedArr] : []);
+  const [expandedVilles, setExpandedVilles] = useState<string[]>(live.ville ? [live.ville] : []);
+  const [expandedArrs, setExpandedArrs] = useState<string[]>([]);
 
   const toggleExpand = (list: string[], item: string, setter: (v: string[]) => void) => {
     setter(list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
   };
+
+  useEffect(() => {
+    if (!live.ville) return;
+    const v = villes.find((x) => x.name === live.ville);
+    if (!v) return;
+    const needExpand: string[] = [];
+    for (const arr of v.arrondissements) {
+      for (const q of arr.quartiers) {
+        if (live.quartiers.includes(q.name)) {
+          needExpand.push(arr.name);
+          break;
+        }
+      }
+    }
+    if (needExpand.length) {
+      setExpandedArrs((prev) => [...new Set([...prev, ...needExpand])]);
+    }
+  }, [live.ville, live.quartiers.join("\u0001")]);
 
   const filteredVilles = useMemo(() => {
     if (!search) return villes;
@@ -51,58 +106,72 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
     );
   }, [search]);
 
+  /** Quartier-first search hits: flat list with grouping label */
+  const quartierSearchHits = useMemo(() => {
+    if (!search.trim() || !live.ville) return null;
+    const s = search.toLowerCase().trim();
+    const v = villes.find((x) => x.name === live.ville);
+    if (!v) return null;
+    const hits: { arrName: string; qName: string }[] = [];
+    for (const arr of v.arrondissements) {
+      for (const q of arr.quartiers) {
+        if (q.name.toLowerCase().includes(s) || arr.name.toLowerCase().includes(s)) {
+          hits.push({ arrName: arr.name, qName: q.name });
+        }
+      }
+    }
+    return hits.length ? hits : null;
+  }, [search, live.ville]);
+
   const handleSelectVille = (villeName: string) => {
-    if (selectedVille === villeName) {
-      onVilleChange("");
-      onArrChange("");
-      onQuartiersChange([]);
+    if (live.ville === villeName) {
+      setLive({ ville: "", quartiers: [], quartierLibre: live.quartierLibre });
     } else {
-      onVilleChange(villeName);
-      onArrChange("");
-      onQuartiersChange([]);
+      setLive({ ville: villeName, quartiers: [], quartierLibre: live.quartierLibre });
       if (!expandedVilles.includes(villeName)) {
         setExpandedVilles([...expandedVilles, villeName]);
       }
     }
+    setSearch("");
   };
 
-  const handleSelectArr = (arrName: string) => {
-    if (selectedArr === arrName) {
-      onArrChange("");
-      onQuartiersChange([]);
-    } else {
-      onArrChange(arrName);
-      onQuartiersChange([]);
-      if (!expandedArrs.includes(arrName)) {
-        setExpandedArrs([...expandedArrs, arrName]);
-      }
-    }
+  const toggleArrExpand = (arrName: string) => {
+    setExpandedArrs((prev) => (prev.includes(arrName) ? prev.filter((x) => x !== arrName) : [...prev, arrName]));
   };
 
   const toggleQuartier = (qName: string) => {
-    onQuartiersChange(
-      selectedQuartiers.includes(qName)
-        ? selectedQuartiers.filter((q) => q !== qName)
-        : [...selectedQuartiers, qName]
-    );
+    const next = live.quartiers.includes(qName)
+      ? live.quartiers.filter((q) => q !== qName)
+      : [...live.quartiers, qName];
+    setLive({ ...live, quartiers: next });
   };
 
-  const chips = [
-    ...(selectedVille ? [{ label: selectedVille, type: "ville" as const }] : []),
-    ...(selectedArr ? [{ label: selectedArr, type: "arr" as const }] : []),
-    ...selectedQuartiers.map((q) => ({ label: q, type: "quartier" as const })),
+  const chips: { label: string; kind: "ville" | "quartier" | "libre" }[] = [
+    ...(live.ville ? [{ label: live.ville, kind: "ville" as const }] : []),
+    ...live.quartiers.map((q) => ({ label: q, kind: "quartier" as const })),
+    ...(live.quartierLibre.trim() ? [{ label: live.quartierLibre.trim(), kind: "libre" as const }] : []),
   ];
 
-  const removeChip = (chip: { label: string; type: string }) => {
-    if (chip.type === "ville") {
-      onVilleChange("");
-      onArrChange("");
-      onQuartiersChange([]);
-    } else if (chip.type === "arr") {
-      onArrChange("");
-      onQuartiersChange([]);
+  const removeChip = (label: string, kind: typeof chips[number]["kind"]) => {
+    if (kind === "ville") {
+      setLive({ ville: "", quartiers: [], quartierLibre: live.quartierLibre });
+    } else if (kind === "quartier") {
+      setLive({ ...live, quartiers: live.quartiers.filter((q) => q !== label) });
     } else {
-      onQuartiersChange(selectedQuartiers.filter((q) => q !== chip.label));
+      setLive({ ...live, quartierLibre: "" });
+    }
+  };
+
+  const handleApply = () => {
+    if (isApplyMode(props)) {
+      props.onCommit(draft);
+      onClose?.();
+    }
+  };
+
+  const handleResetDraft = () => {
+    if (isApplyMode(props)) {
+      setDraft({ ville: "", quartiers: [], quartierLibre: "" });
     }
   };
 
@@ -112,10 +181,10 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
         <div className="flex flex-wrap gap-1.5 mb-3">
           {chips.map((c) => (
             <Badge
-              key={c.label}
+              key={`${c.kind}-${c.label}`}
               variant="secondary"
               className="font-sans text-xs gap-1 cursor-pointer hover:bg-destructive/10"
-              onClick={() => removeChip(c)}
+              onClick={() => removeChip(c.label, c.kind)}
             >
               {c.label}
               <X className="h-3 w-3" />
@@ -127,21 +196,46 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
       <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Rechercher une ville, un quartier..."
+          placeholder={t("search.locationSearchPlaceholder", "Ville, quartier, zone…")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9 font-sans text-sm"
         />
       </div>
 
+      {live.ville && quartierSearchHits && (
+        <div className="mb-2 rounded-lg border border-border bg-muted/20 px-2 py-2">
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-sans mb-1.5">
+            {t("search.quartierQuickPick", "Quartiers correspondants")}
+          </p>
+          <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
+            {quartierSearchHits.map(({ arrName, qName }) => (
+              <label
+                key={`${arrName}-${qName}`}
+                className="flex items-center gap-1.5 text-xs font-sans cursor-pointer rounded-md border border-border/60 px-2 py-1 hover:bg-muted"
+              >
+                <Checkbox
+                  checked={live.quartiers.includes(qName)}
+                  onCheckedChange={() => toggleQuartier(qName)}
+                  className="h-3.5 w-3.5"
+                />
+                <span>{qName}</span>
+                <span className="text-muted-foreground truncate max-w-[140px]">({arrName})</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
       <ScrollArea className="max-h-64">
         <div className="space-y-0.5">
           {filteredVilles.map((ville) => {
             const isVilleExpanded = expandedVilles.includes(ville.name);
-            const isVilleSelected = selectedVille === ville.name;
+            const isVilleSelected = live.ville === ville.name;
             return (
               <div key={ville.name}>
                 <button
+                  type="button"
                   className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-sans hover:bg-muted transition-colors ${
                     isVilleSelected ? "bg-primary/10 text-primary font-medium" : ""
                   }`}
@@ -162,19 +256,20 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
 
                 {isVilleExpanded && (
                   <div className="ml-6 mt-0.5 space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground font-sans px-2 py-0.5">
+                      {t("search.quartiersGroupedHint", "Cochez un ou plusieurs quartiers — tous conservés.")}
+                    </p>
                     {ville.arrondissements.map((arr) => {
                       const isArrExpanded = expandedArrs.includes(arr.name);
-                      const isArrSelected = selectedArr === arr.name;
+                      const hasSelected = arr.quartiers.some((q) => live.quartiers.includes(q.name));
                       return (
                         <div key={arr.name}>
                           <button
+                            type="button"
                             className={`w-full flex items-center gap-2 px-2 py-1 rounded-md text-sm font-sans hover:bg-muted transition-colors ${
-                              isArrSelected ? "bg-primary/5 text-primary font-medium" : "text-muted-foreground"
+                              hasSelected ? "text-primary font-medium" : "text-muted-foreground"
                             }`}
-                            onClick={() => {
-                              handleSelectArr(arr.name);
-                              toggleExpand(expandedArrs, arr.name, setExpandedArrs);
-                            }}
+                            onClick={() => toggleArrExpand(arr.name)}
                           >
                             {isArrExpanded ? (
                               <ChevronDown className="h-3 w-3 shrink-0" />
@@ -192,7 +287,7 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
                                   className="flex items-center gap-2 px-2 py-0.5 rounded text-xs font-sans hover:bg-muted cursor-pointer"
                                 >
                                   <Checkbox
-                                    checked={selectedQuartiers.includes(q.name)}
+                                    checked={live.quartiers.includes(q.name)}
                                     onCheckedChange={() => toggleQuartier(q.name)}
                                     className="h-3.5 w-3.5"
                                   />
@@ -214,15 +309,26 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>(({
 
       <div className="mt-3 pt-3 border-t border-border">
         <label className="text-xs text-muted-foreground font-sans mb-1 block">
-          Autre quartier (si absent de la liste)
+          {t("search.otherQuartierLabel", "Autre zone (hors liste)")}
         </label>
         <Input
-          value={quartierLibre}
-          onChange={(e) => onQuartierLibreChange(e.target.value)}
-          placeholder="Ex: Galaxy Andraharo..."
+          value={live.quartierLibre}
+          onChange={(e) => setLive({ ...live, quartierLibre: e.target.value })}
+          placeholder={t("search.otherQuartierPlaceholder", "Ex. : lotissement, zone industrielle…")}
           className="font-sans text-sm"
         />
       </div>
+
+      {isApplyMode(props) && (
+        <div className="flex flex-wrap gap-2 mt-4">
+          <Button type="button" className="font-sans flex-1 min-w-[120px]" onClick={handleApply}>
+            {t("search.applyLocation", "Appliquer")}
+          </Button>
+          <Button type="button" variant="outline" className="font-sans" onClick={handleResetDraft}>
+            {t("search.resetLocationDraft", "Réinitialiser")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 });

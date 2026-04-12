@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -120,18 +120,26 @@ const PublishPage = () => {
     if (!profile?.agency_id) setAgencySpotlight(false);
   }, [profile?.agency_id]);
 
+  /** Centre-ville suggéré uniquement quand la ville change — pas à chaque arrondissement/quartier (évite d’écraser la position choisie sur la carte). */
+  const lastAutoVilleRef = useRef<string>("");
   useEffect(() => {
     if (!ville) {
       setPinLat(null);
       setPinLng(null);
+      lastAutoVilleRef.current = "";
       return;
     }
-    const s = getSuggestedListingCoordinates(ville, arrondissement || undefined, quartier || undefined);
+    if (lastAutoVilleRef.current === ville) return;
+    lastAutoVilleRef.current = ville;
+    const s = getSuggestedListingCoordinates(ville);
     if (s) {
       setPinLat(s.lat);
       setPinLng(s.lng);
+    } else {
+      setPinLat(null);
+      setPinLng(null);
     }
-  }, [ville, arrondissement, quartier]);
+  }, [ville]);
 
   useEffect(() => {
     return () => {
@@ -315,19 +323,40 @@ const PublishPage = () => {
       await refreshProfile();
 
       if (photos.length > 0 && listing) {
+        let failCount = 0;
+        let position = 0;
         for (let i = 0; i < photos.length; i++) {
           const file = photos[i];
           const ext = file.name.split(".").pop() ?? "jpg";
           const path = `${listing.id}/${i}-${Date.now()}.${ext}`;
           const { error: uploadError } = await supabase.storage.from("listing-photos").upload(path, file);
-          if (!uploadError) {
-            const { data: urlData } = supabase.storage.from("listing-photos").getPublicUrl(path);
-            await supabase.from("listing_photos").insert({
-              listing_id: listing.id,
-              url: urlData.publicUrl,
-              position: i,
-            });
+          if (uploadError) {
+            failCount += 1;
+            console.error("[publish] Échec upload photo:", uploadError.message);
+            continue;
           }
+          const { data: urlData } = supabase.storage.from("listing-photos").getPublicUrl(path);
+          const { error: photoRowErr } = await supabase.from("listing_photos").insert({
+            listing_id: listing.id,
+            url: urlData.publicUrl,
+            position,
+          });
+          if (photoRowErr) {
+            failCount += 1;
+            console.error("[publish] Échec enregistrement photo:", photoRowErr.message);
+            continue;
+          }
+          position += 1;
+        }
+        if (failCount > 0) {
+          toast.error(
+            t(
+              "publish.photoPartialFail",
+              "{{n}} photo(s) n’ont pas pu être enregistrées. Vérifiez votre connexion et complétez depuis votre tableau de bord si besoin.",
+              { n: failCount },
+            ),
+            { duration: 8000 },
+          );
         }
       }
 
@@ -468,7 +497,7 @@ const PublishPage = () => {
                   <SelectContent>
                     <SelectItem value="vente">{t("search.sale", "Vente")}</SelectItem>
                     <SelectItem value="location">{t("search.rental", "Location")}</SelectItem>
-                    <SelectItem value="location_vacances">{t("search.vacationRental", "Location vacances")}</SelectItem>
+                    <SelectItem value="location_vacances">{t("search.vacationRental", "Vacances / courte durée")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -511,9 +540,22 @@ const PublishPage = () => {
               {!ville ? (
                 <p className="text-sm text-muted-foreground font-sans">{t("publish.mapNeedVille", "Choisissez d’abord une ville.")}</p>
               ) : pinLat != null && pinLng != null && isValidListingCoordinates(pinLat, pinLng) ? (
-                <PublishLocationMap lat={pinLat} lng={pinLng} onPositionChange={(la, ln) => { setPinLat(la); setPinLng(ln); }} />
+                <PublishLocationMap
+                  key={ville}
+                  lat={pinLat}
+                  lng={pinLng}
+                  onPositionChange={(la, ln) => {
+                    setPinLat(la);
+                    setPinLng(ln);
+                  }}
+                />
               ) : (
-                <p className="text-sm text-muted-foreground font-sans">{t("common.loading", "Chargement…")}</p>
+                <p className="text-sm text-destructive font-sans">
+                  {t(
+                    "publish.mapNoCoordsForCity",
+                    "Impossible de placer la carte pour cette ville. Vérifiez le nom ou contactez le support.",
+                  )}
+                </p>
               )}
             </div>
           </div>
@@ -582,7 +624,7 @@ const PublishPage = () => {
                       )}
                       <Button type="button" size="sm" variant="destructive" className="text-[10px] h-7 font-sans" onClick={() => removePhoto(i)}>×</Button>
                     </div>
-                    {i === 0 && <span className="absolute top-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-sans">Main</span>}
+                    {i === 0 && <span className="absolute top-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-sans">Couverture</span>}
                   </div>
                 ))}
               </div>

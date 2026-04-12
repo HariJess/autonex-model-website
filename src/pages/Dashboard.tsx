@@ -266,14 +266,32 @@ const Dashboard = () => {
       <Header />
       <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="font-serif text-3xl font-bold">{t("dashboard.title")}</h1>
+          <div>
+            <h1 className="font-serif text-3xl font-bold">{t("dashboard.title")}</h1>
+            {profile?.role && (
+              <p className="text-sm text-muted-foreground font-sans mt-1">
+                {profile.role === "agence"
+                  ? t("dashboard.accountAgency", "Compte professionnel (agence)")
+                  : profile.role === "admin"
+                    ? t("dashboard.accountAdmin", "Compte administrateur")
+                    : t("dashboard.accountIndividual", "Compte particulier")}
+              </p>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {isAdmin && (
-              <Link to="/admin/monetisation">
-                <Button variant="outline" size="sm" className="font-sans">
-                  Admin monétisation
-                </Button>
-              </Link>
+              <>
+                <Link to="/admin/monetisation">
+                  <Button variant="outline" size="sm" className="font-sans">
+                    Admin monétisation
+                  </Button>
+                </Link>
+                <Link to="/admin/recherche">
+                  <Button variant="outline" size="sm" className="font-sans">
+                    Signaux recherche
+                  </Button>
+                </Link>
+              </>
             )}
             <Link to="/publier">
               <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>

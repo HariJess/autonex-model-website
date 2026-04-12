@@ -51,7 +51,6 @@ const HeroSearch = () => {
     if (NO_ROOMS_TYPES.has(v)) setRooms("");
   };
   const [ville, setVille] = useState("");
-  const [arrondissement, setArrondissement] = useState("");
   const [quartiers, setQuartiers] = useState<string[]>([]);
   const [quartierLibre, setQuartierLibre] = useState("");
   const [priceMin, setPriceMin] = useState(0);
@@ -77,7 +76,7 @@ const HeroSearch = () => {
       transaction: TRANSACTIONS.some((tr) => tr.value === transaction) ? transaction : "vente",
       types,
       ville,
-      arrondissement,
+      arrondissement: "",
       quartiers,
       quartierLibre,
       priceMin,
@@ -95,9 +94,7 @@ const HeroSearch = () => {
       ? `${ville} — ${quartiers.slice(0, 2).join(", ")}${quartiers.length > 2 ? "..." : ""}`
       : quartierLibre.trim()
         ? `${ville} — ${quartierLibre.trim()}`
-        : arrondissement
-          ? `${ville}, ${arrondissement}`
-          : ville
+        : ville
     : quartierLibre.trim();
 
   const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency);
@@ -177,14 +174,12 @@ const HeroSearch = () => {
                 </PopoverTrigger>
                 <PopoverContent className="w-96 p-4" align="start">
                   <LocationSelector
-                    selectedVille={ville}
-                    selectedArr={arrondissement}
-                    selectedQuartiers={quartiers}
-                    quartierLibre={quartierLibre}
-                    onVilleChange={setVille}
-                    onArrChange={setArrondissement}
-                    onQuartiersChange={setQuartiers}
-                    onQuartierLibreChange={setQuartierLibre}
+                    value={{ ville, quartiers, quartierLibre }}
+                    onChange={(v) => {
+                      setVille(v.ville);
+                      setQuartiers(v.quartiers);
+                      setQuartierLibre(v.quartierLibre);
+                    }}
                     onClose={() => setDesktopLocationOpen(false)}
                   />
                 </PopoverContent>
@@ -272,14 +267,12 @@ const HeroSearch = () => {
                 </PopoverTrigger>
                 <PopoverContent className="w-[calc(100vw-2rem)] max-w-md p-4" align="start">
                   <LocationSelector
-                    selectedVille={ville}
-                    selectedArr={arrondissement}
-                    selectedQuartiers={quartiers}
-                    quartierLibre={quartierLibre}
-                    onVilleChange={setVille}
-                    onArrChange={setArrondissement}
-                    onQuartiersChange={setQuartiers}
-                    onQuartierLibreChange={setQuartierLibre}
+                    value={{ ville, quartiers, quartierLibre }}
+                    onChange={(v) => {
+                      setVille(v.ville);
+                      setQuartiers(v.quartiers);
+                      setQuartierLibre(v.quartierLibre);
+                    }}
                     onClose={() => setMobileLocationOpen(false)}
                   />
                 </PopoverContent>

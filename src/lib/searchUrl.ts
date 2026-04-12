@@ -55,12 +55,15 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     }
   }
 
+  const quartiers = sp.get("quartiers")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
+  const arrRaw = sp.get("arr")?.trim() ?? "";
   return {
     transaction,
     types,
     ville: sp.get("ville")?.trim() ?? "",
-    arrondissement: sp.get("arr")?.trim() ?? "",
-    quartiers: sp.get("quartiers")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    /** Quartiers multi-sélection : l’arrondissement URL est ignoré si des quartiers sont déjà choisis (évite conflits legacy). */
+    arrondissement: quartiers.length > 0 ? "" : arrRaw,
+    quartiers,
     quartierLibre: sp.get("q")?.trim() ?? "",
     priceMin: parseFiniteNumber(sp.get("prix_min")),
     priceMax: parseFiniteNumber(sp.get("prix_max")),
@@ -77,8 +80,11 @@ export function filtersToSearchParams(f: SearchFilters): URLSearchParams {
   if (f.transaction) p.set("transaction", f.transaction);
   if (f.types.length) p.set("type", f.types.join(","));
   if (f.ville) p.set("ville", f.ville);
-  if (f.arrondissement) p.set("arr", f.arrondissement);
-  if (f.quartiers.length) p.set("quartiers", f.quartiers.join(","));
+  if (f.quartiers.length) {
+    p.set("quartiers", f.quartiers.join(","));
+  } else if (f.arrondissement) {
+    p.set("arr", f.arrondissement);
+  }
   if (f.quartierLibre) p.set("q", f.quartierLibre);
   if (f.priceMin) p.set("prix_min", String(f.priceMin));
   if (f.priceMax) p.set("prix_max", String(f.priceMax));

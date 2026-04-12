@@ -233,19 +233,41 @@ export function useDbListings(filters: ListingsFilters = {}) {
         photosByListing.set(p.listing_id, arr);
       });
 
-      // Batch-fetch boosts
+      // Batch-fetch boosts (starts_at sert au tri « actualisation » / daily_bump)
       const { data: allBoosts } = await supabase
         .from("boosts")
-        .select("listing_id, type")
+        .select("listing_id, type, starts_at")
         .in("listing_id", listingIds)
         .gte("ends_at", new Date().toISOString());
 
       const typesByListing = new Map<string, Set<string>>();
+      const dailyBumpStarts = new Map<string, number>();
       allBoosts?.forEach((b) => {
         const set = typesByListing.get(b.listing_id) ?? new Set<string>();
         set.add(b.type);
         typesByListing.set(b.listing_id, set);
+        if (b.type === "daily_bump" && b.starts_at) {
+          const t = new Date(b.starts_at).getTime();
+          const prev = dailyBumpStarts.get(b.listing_id) ?? 0;
+          if (t > prev) dailyBumpStarts.set(b.listing_id, t);
+        }
       });
+
+      const visibilityRankScore = (
+        listing: (typeof listings)[0],
+        types: Set<string>,
+      ): number => {
+        const created = new Date(listing.created_at ?? 0).getTime();
+        let tier = 0;
+        if (types.has("top")) tier = 4;
+        else if (types.has("featured")) tier = 3;
+        else if (types.has("daily_bump")) tier = 2;
+        else if (types.has("urgent")) tier = 1;
+        const bumpTs = dailyBumpStarts.get(listing.id);
+        const recency =
+          types.has("daily_bump") && bumpTs != null ? Math.max(created, bumpTs) : created;
+        return tier * 1e15 + recency;
+      };
       const badgeForTypes = (types: Set<string>): DisplayListing["badge"] => {
         if (types.has("top")) return "boost";
         if (types.has("featured")) return "coup_de_coeur";
@@ -255,6 +277,7 @@ export function useDbListings(filters: ListingsFilters = {}) {
 
       return listings.map((listing) => {
         const features = Array.isArray(listing.features) ? listing.features as string[] : [];
+        const tset = typesByListing.get(listing.id) ?? new Set<string>();
         return {
           id: listing.id,
           title: listing.title,
@@ -279,7 +302,8 @@ export function useDbListings(filters: ListingsFilters = {}) {
           views_count: listing.views_count,
           created_at: listing.created_at,
           owner_id: listing.owner_id,
-          badge: badgeForTypes(typesByListing.get(listing.id) ?? new Set()),
+          badge: badgeForTypes(tset),
+          visibility_rank_score: visibilityRankScore(listing, tset),
         };
       });
     },

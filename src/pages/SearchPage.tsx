@@ -13,7 +13,7 @@ import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, H
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { useDbListings } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { useMemo, useCallback, useState, lazy, Suspense, type ReactNode } from "react";
+import { useMemo, useCallback, useState, useEffect, useRef, lazy, Suspense, type ReactNode } from "react";
 import {
   searchStateFromParams,
   searchParamsFromState,
@@ -25,6 +25,8 @@ import { SidebarPromoSlot } from "@/components/monetization/SidebarPromoSlot";
 import { SponsoredNativeCard } from "@/components/monetization/SponsoredNativeCard";
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
+import { rankSimilarListings } from "@/lib/searchSimilar";
+import { recordSearchAnalytics } from "@/lib/searchAnalytics";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -91,31 +93,84 @@ const SearchPage = () => {
     surfaceMax: filters.surfaceMax || undefined,
   });
 
-  const filtered = useMemo(() => {
+  const equippedListings = useMemo(() => {
     let results = [...dbListings];
-
     if (filters.equipments.length > 0) {
       results = results.filter((l) => listingMatchesEquipments(l.features, filters.equipments));
     }
+    return results;
+  }, [dbListings, filters.equipments]);
 
-    if (filters.quartiers.length > 0) {
-      results = results.filter((l) =>
-        filters.quartiers.some(
-          (qu) =>
-            (l.quartier?.toLowerCase() ?? "").includes(qu.toLowerCase()) ||
-            (l.quartier_libre?.toLowerCase() ?? "").includes(qu.toLowerCase())
-        )
-      );
-    }
+  const exactMatchListings = useMemo(() => {
+    if (filters.quartiers.length === 0) return equippedListings;
+    return equippedListings.filter((l) =>
+      filters.quartiers.some(
+        (qu) =>
+          (l.quartier?.toLowerCase() ?? "").includes(qu.toLowerCase()) ||
+          (l.quartier_libre?.toLowerCase() ?? "").includes(qu.toLowerCase())
+      )
+    );
+  }, [equippedListings, filters.quartiers]);
 
+  const sortedExact = useMemo(() => {
+    const results = [...exactMatchListings];
     if (sort === "priceAsc") {
       results.sort((a, b) => a.price_mga - b.price_mga);
     } else if (sort === "priceDesc") {
       results.sort((a, b) => b.price_mga - a.price_mga);
+    } else if (sort === "recent") {
+      results.sort((a, b) => {
+        const sa = a.visibility_rank_score ?? new Date(a.created_at ?? 0).getTime();
+        const sb = b.visibility_rank_score ?? new Date(b.created_at ?? 0).getTime();
+        return sb - sa;
+      });
     }
-
     return results;
-  }, [dbListings, filters.equipments, filters.quartiers, sort]);
+  }, [exactMatchListings, sort]);
+
+  const similarFallbackListings = useMemo(() => {
+    if (sortedExact.length > 0) return [];
+    return rankSimilarListings(equippedListings, filters, new Set(), 9);
+  }, [sortedExact.length, equippedListings, filters]);
+
+  const alsoLikeListings = useMemo(() => {
+    if (sortedExact.length < 1 || sortedExact.length > 3) return [];
+    const exclude = new Set(sortedExact.map((l) => l.id));
+    return rankSimilarListings(equippedListings, filters, exclude, 6);
+  }, [sortedExact, equippedListings, filters]);
+
+  /** Grille / liste / carte : résultats exacts, ou suggestions si aucun exact */
+  const displayListings = sortedExact.length > 0 ? sortedExact : similarFallbackListings;
+
+  const analyticsSentRef = useRef<string>("");
+  useEffect(() => {
+    if (isLoading || queryError) return;
+    const key = JSON.stringify({
+      f: filters,
+      n: sortedExact.length,
+      sim: similarFallbackListings.length,
+      also: alsoLikeListings.length,
+    });
+    if (key === analyticsSentRef.current) return;
+    analyticsSentRef.current = key;
+    const timer = window.setTimeout(() => {
+      recordSearchAnalytics({
+        filters,
+        exactResultCount: sortedExact.length,
+        hadZeroExact: sortedExact.length === 0,
+        showedSimilarFallback: sortedExact.length === 0 && similarFallbackListings.length > 0,
+        showedAlsoLike: alsoLikeListings.length > 0,
+      });
+    }, 900);
+    return () => window.clearTimeout(timer);
+  }, [
+    isLoading,
+    queryError,
+    filters,
+    sortedExact.length,
+    similarFallbackListings.length,
+    alsoLikeListings.length,
+  ]);
 
   const activeChips = useMemo(() => {
     const chips: { label: string; key: string }[] = [];
@@ -165,7 +220,6 @@ const SearchPage = () => {
       newFilters.quartierLibre = "";
     } else if (key === "arr") {
       newFilters.arrondissement = "";
-      newFilters.quartiers = [];
     } else if (key.startsWith("q-")) newFilters.quartiers = newFilters.quartiers.filter((q) => q !== key.slice(2));
     else if (key === "quartierLibre") newFilters.quartierLibre = "";
     else if (key === "price") {
@@ -214,7 +268,8 @@ const SearchPage = () => {
     }
     if (filters.transaction === "vente") parts.push(t("search.forSale", "à vendre"));
     else if (filters.transaction === "location") parts.push(t("search.forRent", "à louer"));
-    else if (filters.transaction === "location_vacances") parts.push(t("search.vacationRental", "en location vacances"));
+    else if (filters.transaction === "location_vacances")
+      parts.push(t("search.titleVacationPhrase", "— courte durée / vacances"));
     if (filters.ville) parts.push(`à ${filters.ville}`);
     return parts.join(" ");
   }, [filters, t]);
@@ -223,8 +278,11 @@ const SearchPage = () => {
     queryError instanceof Error ? queryError.message : queryError != null ? String(queryError) : "";
 
   const showToolbar = !isLoading;
-  const showResults = !isLoading && !queryError && filtered.length > 0;
-  const showEmpty = !isLoading && !queryError && filtered.length === 0;
+  const showResults = !isLoading && !queryError && displayListings.length > 0;
+  const showEmpty = !isLoading && !queryError && displayListings.length === 0;
+  const showSimilarBanner = !isLoading && !queryError && sortedExact.length === 0 && similarFallbackListings.length > 0;
+  const showAlsoLikeBlock =
+    !isLoading && !queryError && sortedExact.length >= 1 && sortedExact.length <= 3 && alsoLikeListings.length > 0;
 
   return (
     <>
@@ -260,8 +318,23 @@ const SearchPage = () => {
           {queryError ? t("search.title", "Recherche") : pageTitle}{" "}
           {!queryError && (
             <span className="text-muted-foreground font-normal text-lg">
-              ({filtered.length} {t("search.listingCount", "annonce")}
-              {filtered.length !== 1 ? "s" : ""})
+              {sortedExact.length > 0 ? (
+                <>
+                  ({sortedExact.length}{" "}
+                  {t("search.listingCount", "annonce")}
+                  {sortedExact.length !== 1 ? "s" : ""})
+                </>
+              ) : similarFallbackListings.length > 0 ? (
+                <>
+                  ({similarFallbackListings.length}{" "}
+                  {similarFallbackListings.length > 1
+                    ? t("search.suggestionsShort", "suggestions")
+                    : t("search.suggestionShort", "suggestion")}
+                  )
+                </>
+              ) : (
+                <>({t("search.zeroListingsHeadline", "0 annonce")})</>
+              )}
             </span>
           )}
         </h1>
@@ -347,7 +420,12 @@ const SearchPage = () => {
                     <span className="text-destructive font-medium">{t("search.resultsUnavailable", "Résultats indisponibles")}</span>
                   ) : (
                     <>
-                      <span className="font-semibold text-foreground">{filtered.length}</span> {t("search.results")}
+                      <span className="font-semibold text-foreground">
+                        {sortedExact.length > 0 ? sortedExact.length : displayListings.length}
+                      </span>{" "}
+                      {sortedExact.length === 0 && similarFallbackListings.length > 0
+                        ? t("search.resultsSimilarLabel", "suggestions")
+                        : t("search.results")}
                     </>
                   )}
                 </p>
@@ -387,6 +465,28 @@ const SearchPage = () => {
                 </Select>
               </div>
             </div>
+            {sort === "recent" && (
+              <p className="text-xs text-muted-foreground font-sans -mt-2 mb-2 max-w-3xl">
+                {t(
+                  "search.recentSortHint",
+                  "Les annonces avec options de visibilité (top, à la une, actualisation) apparaissent en priorité, puis les plus récentes.",
+                )}
+              </p>
+            )}
+
+            {showSimilarBanner && (
+              <div className="mb-4 rounded-xl border border-border bg-muted/30 px-4 py-3">
+                <p className="font-sans text-sm font-medium text-foreground">
+                  {t("search.noExactMatchTitle", "Aucun bien ne correspond exactement à votre recherche.")}
+                </p>
+                <p className="font-sans text-sm text-muted-foreground mt-1">
+                  {t(
+                    "search.similarIntro",
+                    "Voici des biens similaires susceptibles de vous intéresser (même ville, critères assouplis).",
+                  )}
+                </p>
+              </div>
+            )}
 
             {queryError && !isLoading && (
               <div className="flex flex-col items-center justify-center py-16 text-center px-2">
@@ -413,11 +513,11 @@ const SearchPage = () => {
                       </div>
                     }
                   >
-                    <ListingsMap listings={filtered} onMarkerClick={(id) => navigate(`/annonce/${id}`)} />
+                    <ListingsMap listings={displayListings} onMarkerClick={(id) => navigate(`/annonce/${id}`)} />
                   </Suspense>
                 </div>
                 <div className="w-full lg:w-[42%] overflow-y-auto space-y-3 max-h-[min(520px,55vh)] lg:max-h-none pr-1">
-                  {filtered.map((listing) => (
+                  {displayListings.map((listing) => (
                     <ListingCard key={listing.id} listing={listing} />
                   ))}
                 </div>
@@ -426,7 +526,7 @@ const SearchPage = () => {
 
             {showResults && viewMode === "list" && (
               <div className="space-y-4">
-                {filtered.map((listing) => (
+                {displayListings.map((listing) => (
                   <div
                     key={listing.id}
                     className="flex flex-col sm:flex-row bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
@@ -470,7 +570,7 @@ const SearchPage = () => {
 
             {showResults && viewMode === "grid" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.flatMap((listing, index): ReactNode[] => {
+                {displayListings.flatMap((listing, index): ReactNode[] => {
                   const out: ReactNode[] = [];
                   if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 2) {
                     out.push(<SponsoredNativeCard key="monetization-sponsored" />);
@@ -481,6 +581,22 @@ const SearchPage = () => {
               </div>
             )}
 
+            {showAlsoLikeBlock && (
+              <div className="mt-8 pt-6 border-t border-border">
+                <h2 className="font-serif text-lg font-semibold mb-3">
+                  {t("search.youMayAlsoLike", "Vous pouvez aussi aimer")}
+                </h2>
+                <p className="font-sans text-xs text-muted-foreground mb-4">
+                  {t("search.alsoLikeHint", "Autres annonces proches de votre recherche, en complément des résultats ci-dessus.")}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {alsoLikeListings.map((listing) => (
+                    <ListingCard key={`also-${listing.id}`} listing={listing} />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {showEmpty && (
               <div className="text-center py-16 md:py-20 px-2">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
@@ -488,7 +604,7 @@ const SearchPage = () => {
                 </div>
                 <p className="font-serif text-xl text-foreground mb-2">{t("search.noResults", "Aucune annonce ne correspond")}</p>
                 <p className="font-sans text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                  {t("search.tryDifferent", "Essayez de modifier ou réinitialiser vos filtres")}
+                  {t("search.tryDifferentWiden", "Élargissez la ville, le budget ou les quartiers, ou réinitialisez les filtres.")}
                 </p>
                 <Button variant="outline" className="font-sans" onClick={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}>
                   {t("search.resetFilters", "Réinitialiser les filtres")}
