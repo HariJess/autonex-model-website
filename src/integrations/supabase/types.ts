@@ -16,36 +16,54 @@ export type Database = {
     Tables: {
       agencies: {
         Row: {
+          address: string | null
           bio: string | null
+          commercial_contact_name: string | null
           created_at: string | null
           email: string | null
           id: string
           logo_url: string | null
           name: string
+          nif: string | null
           phone: string | null
+          reg_commerce: string | null
           slug: string
+          spotlight_until: string | null
+          stat: string | null
           verified: boolean | null
         }
         Insert: {
+          address?: string | null
           bio?: string | null
+          commercial_contact_name?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
           logo_url?: string | null
           name: string
+          nif?: string | null
           phone?: string | null
+          reg_commerce?: string | null
           slug: string
+          spotlight_until?: string | null
+          stat?: string | null
           verified?: boolean | null
         }
         Update: {
+          address?: string | null
           bio?: string | null
+          commercial_contact_name?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
           logo_url?: string | null
           name?: string
+          nif?: string | null
           phone?: string | null
+          reg_commerce?: string | null
           slug?: string
+          spotlight_until?: string | null
+          stat?: string | null
           verified?: boolean | null
         }
         Relationships: []
@@ -131,21 +149,30 @@ export type Database = {
           created_at: string | null
           delta: number
           id: string
+          meta: Json | null
           reason: string | null
+          ref_id: string | null
+          ref_type: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           delta: number
           id?: string
+          meta?: Json | null
           reason?: string | null
+          ref_id?: string | null
+          ref_type?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           delta?: number
           id?: string
+          meta?: Json | null
           reason?: string | null
+          ref_id?: string | null
+          ref_type?: string | null
           user_id?: string
         }
         Relationships: [
@@ -157,6 +184,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      credit_packs: {
+        Row: {
+          credits_amount: number
+          id: string
+          name: string
+          price_mga: number
+          sort_order: number | null
+        }
+        Insert: {
+          credits_amount: number
+          id: string
+          name: string
+          price_mga: number
+          sort_order?: number | null
+        }
+        Update: {
+          credits_amount?: number
+          id?: string
+          name?: string
+          price_mga?: number
+          sort_order?: number | null
+        }
+        Relationships: []
       }
       favorites: {
         Row: {
@@ -270,22 +321,30 @@ export type Database = {
           expires_at: string | null
           features: Json | null
           id: string
+          internal_ref: string | null
+          is_new_program: boolean | null
           lat: number | null
           lng: number | null
           owner_id: string
+          pending_boost_types: Json | null
+          publication_credits_charged: number | null
           price_eur: number | null
           price_mga: number
           quartier: string | null
           quartier_libre: string | null
           region: string | null
+          rejection_reason: string | null
           rooms: number | null
           search_vector: unknown
           status: Database["public"]["Enums"]["listing_status"] | null
           surface: number | null
           title: string
+          toilets: number | null
           transaction: Database["public"]["Enums"]["transaction_type"]
           type: Database["public"]["Enums"]["listing_type"]
+          video_url: string | null
           views_count: number | null
+          virtual_tour_url: string | null
           ville: string | null
         }
         Insert: {
@@ -296,22 +355,30 @@ export type Database = {
           expires_at?: string | null
           features?: Json | null
           id?: string
+          internal_ref?: string | null
+          is_new_program?: boolean | null
           lat?: number | null
           lng?: number | null
           owner_id: string
+          pending_boost_types?: Json | null
           price_eur?: number | null
           price_mga?: number
+          publication_credits_charged?: number | null
           quartier?: string | null
           quartier_libre?: string | null
           region?: string | null
+          rejection_reason?: string | null
           rooms?: number | null
           search_vector?: unknown
           status?: Database["public"]["Enums"]["listing_status"] | null
           surface?: number | null
           title: string
+          toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           type?: Database["public"]["Enums"]["listing_type"]
+          video_url?: string | null
           views_count?: number | null
+          virtual_tour_url?: string | null
           ville?: string | null
         }
         Update: {
@@ -322,22 +389,30 @@ export type Database = {
           expires_at?: string | null
           features?: Json | null
           id?: string
+          internal_ref?: string | null
+          is_new_program?: boolean | null
           lat?: number | null
           lng?: number | null
           owner_id?: string
+          pending_boost_types?: Json | null
           price_eur?: number | null
           price_mga?: number
+          publication_credits_charged?: number | null
           quartier?: string | null
           quartier_libre?: string | null
           region?: string | null
+          rejection_reason?: string | null
           rooms?: number | null
           search_vector?: unknown
           status?: Database["public"]["Enums"]["listing_status"] | null
           surface?: number | null
           title?: string
+          toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           type?: Database["public"]["Enums"]["listing_type"]
+          video_url?: string | null
           views_count?: number | null
+          virtual_tour_url?: string | null
           ville?: string | null
         }
         Relationships: [
@@ -417,29 +492,53 @@ export type Database = {
       }
       transactions: {
         Row: {
+          admin_note: string | null
           amount_mga: number
           created_at: string | null
+          credit_pack_id: string | null
+          credits_granted_at: string | null
           id: string
+          listing_id: string | null
           method: Database["public"]["Enums"]["payment_method"] | null
+          payment_proof_url: string | null
           reference: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: Database["public"]["Enums"]["payment_status"] | null
           user_id: string
         }
         Insert: {
+          admin_note?: string | null
           amount_mga: number
           created_at?: string | null
+          credit_pack_id?: string | null
+          credits_granted_at?: string | null
           id?: string
+          listing_id?: string | null
           method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_proof_url?: string | null
           reference?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["payment_status"] | null
           user_id: string
         }
         Update: {
+          admin_note?: string | null
           amount_mga?: number
           created_at?: string | null
+          credit_pack_id?: string | null
+          credits_granted_at?: string | null
           id?: string
+          listing_id?: string | null
           method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_proof_url?: string | null
           reference?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["payment_status"] | null
           user_id?: string
         }
@@ -458,12 +557,56 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_approve_credit_transaction: {
+        Args: { p_transaction_id: string }
+        Returns: Json
+      }
+      admin_approve_listing_moderation: {
+        Args: { p_listing_id: string }
+        Returns: Json
+      }
+      admin_reject_credit_transaction: {
+        Args: { p_reason: string; p_transaction_id: string }
+        Returns: Json
+      }
+      admin_reject_listing_moderation: {
+        Args: { p_listing_id: string; p_reason: string }
+        Returns: Json
+      }
+      consume_credits: {
+        Args: {
+          p_amount: number
+          p_reason: string
+          p_ref_id?: string | null
+          p_ref_type?: string | null
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      immonex_is_admin: {
+        Args: Record<string, never>
+        Returns: boolean
+      }
       increment_views: { Args: { listing_uuid: string }; Returns: undefined }
     }
     Enums: {
-      boost_type: "top" | "featured" | "newsletter"
+      boost_type:
+        | "top"
+        | "featured"
+        | "newsletter"
+        | "urgent"
+        | "daily_bump"
+        | "agency_spotlight"
       lead_type: "contact_form" | "phone_reveal" | "whatsapp"
-      listing_status: "draft" | "active" | "paused" | "expired"
+      listing_status:
+        | "draft"
+        | "active"
+        | "paused"
+        | "expired"
+        | "pending_payment"
+        | "pending_payment_verification"
+        | "pending_review"
+        | "rejected"
       listing_type:
         | "appartement"
         | "villa"
@@ -471,8 +614,15 @@ export type Database = {
         | "terrain"
         | "local_commercial"
         | "bureau"
-      payment_method: "mvola" | "orange_money" | "airtel_money" | "stripe"
-      payment_status: "pending" | "success" | "failed"
+      payment_method: "mvola" | "orange_money" | "airtel_money" | "stripe" | "bank_transfer"
+      payment_status:
+        | "pending"
+        | "success"
+        | "failed"
+        | "under_review"
+        | "approved"
+        | "rejected"
+        | "cancelled"
       transaction_type: "vente" | "location" | "location_vacances"
       user_role: "particulier" | "agence" | "promoteur" | "admin"
     }
@@ -602,9 +752,18 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      boost_type: ["top", "featured", "newsletter"],
+      boost_type: ["top", "featured", "newsletter", "urgent", "daily_bump", "agency_spotlight"],
       lead_type: ["contact_form", "phone_reveal", "whatsapp"],
-      listing_status: ["draft", "active", "paused", "expired"],
+      listing_status: [
+        "draft",
+        "active",
+        "paused",
+        "expired",
+        "pending_payment",
+        "pending_payment_verification",
+        "pending_review",
+        "rejected",
+      ],
       listing_type: [
         "appartement",
         "villa",
@@ -613,8 +772,16 @@ export const Constants = {
         "local_commercial",
         "bureau",
       ],
-      payment_method: ["mvola", "orange_money", "airtel_money", "stripe"],
-      payment_status: ["pending", "success", "failed"],
+      payment_method: ["mvola", "orange_money", "airtel_money", "stripe", "bank_transfer"],
+      payment_status: [
+        "pending",
+        "success",
+        "failed",
+        "under_review",
+        "approved",
+        "rejected",
+        "cancelled",
+      ],
       transaction_type: ["vente", "location", "location_vacances"],
       user_role: ["particulier", "agence", "promoteur", "admin"],
     },

@@ -13,6 +13,13 @@ export const LISTING_TYPES = [
 
 export type ListingType = (typeof LISTING_TYPES)[number];
 
+/** Types for which bedroom / bathroom filters are usually irrelevant in search UI */
+export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly ListingType[] = [
+  "terrain",
+  "local_commercial",
+  "bureau",
+] as const;
+
 export const LISTING_TYPE_LABELS: Record<ListingType, string> = {
   appartement: "Appartement",
   villa: "Villa",
@@ -75,5 +82,13 @@ export interface DisplayListing {
   agency_slug?: string | null;
   agency_logo?: string | null;
   agency_verified?: boolean;
-  badge?: "boost" | "coup_de_coeur" | "nouveau" | null;
+  badge?: "boost" | "coup_de_coeur" | "nouveau" | "urgent" | null;
+  toilets?: number | null;
+  video_url?: string | null;
+  virtual_tour_url?: string | null;
+  internal_ref?: string | null;
+  is_new_program?: boolean | null;
+  rejection_reason?: string | null;
+  /** Boost types requested at publish; applied after moderation when listing goes live */
+  pending_boost_types?: string[];
 }

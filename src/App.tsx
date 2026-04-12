@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminRoute from "@/components/AdminRoute";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -18,6 +19,7 @@ const SignupPage = lazy(() => import("./pages/AuthPages.tsx").then(m => ({ defau
 const ForgotPasswordPage = lazy(() => import("./pages/AuthPages.tsx").then(m => ({ default: m.ForgotPasswordPage })));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const AdminMonetizationPage = lazy(() => import("./pages/AdminMonetizationPage.tsx"));
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
@@ -49,6 +51,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/admin/monetisation" element={<AdminRoute><AdminMonetizationPage /></AdminRoute>} />
             <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />

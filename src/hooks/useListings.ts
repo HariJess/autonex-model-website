@@ -46,15 +46,16 @@ export function useListing(id: string | undefined) {
         .from("boosts")
         .select("type")
         .eq("listing_id", listing.id)
-        .gte("ends_at", new Date().toISOString())
-        .limit(1);
-      if (boosts && boosts.length > 0) {
-        const boostType = boosts[0].type;
-        if (boostType === "top") badge = "boost";
-        else if (boostType === "featured") badge = "coup_de_coeur";
-      }
+        .gte("ends_at", new Date().toISOString());
+      const boostTypes = new Set((boosts ?? []).map((b) => b.type));
+      if (boostTypes.has("top")) badge = "boost";
+      else if (boostTypes.has("featured")) badge = "coup_de_coeur";
+      else if (boostTypes.has("urgent")) badge = "urgent";
 
       const features = Array.isArray(listing.features) ? listing.features as string[] : [];
+      const pendingBoosts = Array.isArray(listing.pending_boost_types)
+        ? (listing.pending_boost_types as unknown[]).filter((x): x is string => typeof x === "string")
+        : [];
 
       return {
         id: listing.id,
@@ -67,13 +68,14 @@ export function useListing(id: string | undefined) {
         surface: listing.surface,
         rooms: listing.rooms,
         bathrooms: listing.bathrooms,
+        toilets: listing.toilets,
         ville: listing.ville,
         region: listing.region,
         arrondissement: listing.arrondissement,
         quartier: listing.quartier,
         quartier_libre: listing.quartier_libre,
-        lat: listing.lat ? Number(listing.lat) : null,
-        lng: listing.lng ? Number(listing.lng) : null,
+        lat: listing.lat != null && listing.lat !== "" ? Number(listing.lat) : null,
+        lng: listing.lng != null && listing.lng !== "" ? Number(listing.lng) : null,
         features,
         images: photos?.map((p) => p.url) ?? [],
         status: listing.status,
@@ -87,6 +89,12 @@ export function useListing(id: string | undefined) {
         agency_logo: agencyInfo?.logo_url ?? null,
         agency_verified: agencyInfo?.verified ?? false,
         badge,
+        video_url: listing.video_url,
+        virtual_tour_url: listing.virtual_tour_url,
+        internal_ref: listing.internal_ref,
+        is_new_program: listing.is_new_program,
+        rejection_reason: listing.rejection_reason,
+        pending_boost_types: pendingBoosts.length > 0 ? pendingBoosts : undefined,
       };
     },
     enabled: !!id,
@@ -98,14 +106,25 @@ export interface ListingsFilters {
   transaction?: string;
   types?: string[];
   ville?: string;
+  arrondissement?: string;
+  /** Free-text search (title, description, quartier, region, etc.) — server-side ilike OR */
+  freeText?: string;
   priceMin?: number;
   priceMax?: number;
   rooms?: number[];
+  bathrooms?: number[];
   surfaceMin?: number;
   surfaceMax?: number;
   searchText?: string;
   limit?: number;
   ownerIds?: string[];
+  /** When set, only these listing IDs (e.g. boosted featured rail). Other filters ignored. */
+  listingIds?: string[];
+}
+
+/** Strip characters that would break PostgREST `or` / `ilike` filters */
+function sanitizeIlikeTerm(raw: string): string {
+  return raw.trim().replace(/[%_,()]/g, " ").replace(/\s+/g, " ").trim();
 }
 
 /** Fetch active listings from Supabase with optional filters */
@@ -113,48 +132,83 @@ export function useDbListings(filters: ListingsFilters = {}) {
   return useQuery({
     queryKey: ["db-listings", filters],
     queryFn: async (): Promise<DisplayListing[]> => {
+      if (filters.limit === 0) return [];
+
       let query = supabase
         .from("listings")
         .select("*")
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
-      if (filters.transaction) {
-        query = query.eq("transaction", filters.transaction as TransactionType);
-      }
-      if (filters.types && filters.types.length > 0) {
-        query = query.in("type", filters.types as ListingType[]);
-      }
-      if (filters.ville) {
-        query = query.eq("ville", filters.ville);
-      }
-      if (filters.ownerIds && filters.ownerIds.length > 0) {
-        query = query.in("owner_id", filters.ownerIds);
-      }
-      if (filters.priceMin) {
-        query = query.gte("price_mga", filters.priceMin);
-      }
-      if (filters.priceMax) {
-        query = query.lte("price_mga", filters.priceMax);
-      }
-      if (filters.rooms && filters.rooms.length > 0) {
-        const hasHighEnd = filters.rooms.includes(5);
-        if (hasHighEnd) {
-          const otherRooms = filters.rooms.filter((r) => r < 5);
-          if (otherRooms.length > 0) {
-            query = query.or(`rooms.in.(${otherRooms.join(",")}),rooms.gte.5`);
-          } else {
-            query = query.gte("rooms", 5);
-          }
-        } else {
-          query = query.in("rooms", filters.rooms);
+      const idsOnly = filters.listingIds && filters.listingIds.length > 0;
+      if (idsOnly) {
+        query = query.in("id", filters.listingIds!);
+      } else {
+        if (filters.transaction) {
+          query = query.eq("transaction", filters.transaction as TransactionType);
         }
-      }
-      if (filters.surfaceMin) {
-        query = query.gte("surface", filters.surfaceMin);
-      }
-      if (filters.surfaceMax && filters.surfaceMax < 1000) {
-        query = query.lte("surface", filters.surfaceMax);
+        if (filters.types && filters.types.length > 0) {
+          query = query.in("type", filters.types as ListingType[]);
+        }
+        if (filters.ville) {
+          query = query.eq("ville", filters.ville);
+        }
+        const arr = filters.arrondissement?.trim();
+        if (arr) {
+          const safe = sanitizeIlikeTerm(arr);
+          if (safe.length > 0) {
+            query = query.ilike("arrondissement", `%${safe}%`);
+          }
+        }
+        const ft = filters.freeText?.trim();
+        if (ft) {
+          const safe = sanitizeIlikeTerm(ft);
+          if (safe.length >= 1) {
+            const p = `%${safe}%`;
+            query = query.or(
+              `title.ilike.${p},description.ilike.${p},quartier.ilike.${p},quartier_libre.ilike.${p},region.ilike.${p},ville.ilike.${p}`,
+            );
+          }
+        }
+        if (filters.ownerIds && filters.ownerIds.length > 0) {
+          query = query.in("owner_id", filters.ownerIds);
+        }
+        if (filters.priceMin) {
+          query = query.gte("price_mga", filters.priceMin);
+        }
+        if (filters.priceMax) {
+          query = query.lte("price_mga", filters.priceMax);
+        }
+        if (filters.rooms && filters.rooms.length > 0) {
+          const hasHighEnd = filters.rooms.includes(5);
+          if (hasHighEnd) {
+            const otherRooms = filters.rooms.filter((r) => r < 5);
+            if (otherRooms.length > 0) {
+              query = query.or(`rooms.in.(${otherRooms.join(",")}),rooms.gte.5`);
+            } else {
+              query = query.gte("rooms", 5);
+            }
+          } else {
+            query = query.in("rooms", filters.rooms);
+          }
+        }
+        if (filters.bathrooms && filters.bathrooms.length > 0) {
+          const hasPlus = filters.bathrooms.includes(4);
+          const others = filters.bathrooms.filter((b) => b < 4);
+          if (hasPlus && others.length > 0) {
+            query = query.or(`bathrooms.in.(${others.join(",")}),bathrooms.gte.4`);
+          } else if (hasPlus) {
+            query = query.gte("bathrooms", 4);
+          } else {
+            query = query.in("bathrooms", others);
+          }
+        }
+        if (filters.surfaceMin) {
+          query = query.gte("surface", filters.surfaceMin);
+        }
+        if (filters.surfaceMax && filters.surfaceMax > 0) {
+          query = query.lte("surface", filters.surfaceMax);
+        }
       }
       if (filters.limit) {
         query = query.limit(filters.limit);
@@ -186,12 +240,18 @@ export function useDbListings(filters: ListingsFilters = {}) {
         .in("listing_id", listingIds)
         .gte("ends_at", new Date().toISOString());
 
-      const boostByListing = new Map<string, DisplayListing["badge"]>();
+      const typesByListing = new Map<string, Set<string>>();
       allBoosts?.forEach((b) => {
-        if (!boostByListing.has(b.listing_id)) {
-          boostByListing.set(b.listing_id, b.type === "top" ? "boost" : b.type === "featured" ? "coup_de_coeur" : null);
-        }
+        const set = typesByListing.get(b.listing_id) ?? new Set<string>();
+        set.add(b.type);
+        typesByListing.set(b.listing_id, set);
       });
+      const badgeForTypes = (types: Set<string>): DisplayListing["badge"] => {
+        if (types.has("top")) return "boost";
+        if (types.has("featured")) return "coup_de_coeur";
+        if (types.has("urgent")) return "urgent";
+        return null;
+      };
 
       return listings.map((listing) => {
         const features = Array.isArray(listing.features) ? listing.features as string[] : [];
@@ -211,15 +271,15 @@ export function useDbListings(filters: ListingsFilters = {}) {
           arrondissement: listing.arrondissement,
           quartier: listing.quartier,
           quartier_libre: listing.quartier_libre,
-          lat: listing.lat ? Number(listing.lat) : null,
-          lng: listing.lng ? Number(listing.lng) : null,
+          lat: listing.lat != null && listing.lat !== "" ? Number(listing.lat) : null,
+          lng: listing.lng != null && listing.lng !== "" ? Number(listing.lng) : null,
           features,
           images: photosByListing.get(listing.id) ?? [],
           status: listing.status,
           views_count: listing.views_count,
           created_at: listing.created_at,
           owner_id: listing.owner_id,
-          badge: boostByListing.get(listing.id) ?? null,
+          badge: badgeForTypes(typesByListing.get(listing.id) ?? new Set()),
         };
       });
     },

@@ -3,8 +3,10 @@ import { Bed, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useState } from "react";
-import type { DisplayListing } from "@/types/listing";
+import type { DisplayListing, ListingType } from "@/types/listing";
 import { LISTING_TYPE_LABELS } from "@/types/listing";
+
+const STUDIO_TYPES: ListingType[] = ["appartement", "villa", "maison"];
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -23,6 +25,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo }: ListingCardProps) => {
     boost: { label: "Boost", className: "gradient-primary" },
     coup_de_coeur: { label: "Coup de cœur", className: "bg-accent" },
     nouveau: { label: "Nouveau", className: "bg-success" },
+    urgent: { label: "Urgent", className: "bg-destructive" },
   };
 
   const displayAgencyName = agencyName ?? listing.agency_name;
@@ -45,6 +48,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo }: ListingCardProps) => {
         {images.length > 1 && (
           <>
             <button
+              type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i > 0 ? i - 1 : images.length - 1)); }}
               className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-card/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
               aria-label="Photo précédente"
@@ -52,6 +56,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo }: ListingCardProps) => {
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
+              type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i < images.length - 1 ? i + 1 : 0)); }}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-card/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
               aria-label="Photo suivante"
@@ -80,9 +85,25 @@ const ListingCard = ({ listing, agencyName, agencyLogo }: ListingCardProps) => {
           <p className="text-xs text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
         <h3 className="font-serif font-semibold text-foreground leading-tight">{listing.title}</h3>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground font-sans">
-          {listing.rooms != null && listing.rooms > 0 && <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5" />{listing.rooms}</span>}
-          {listing.surface != null && listing.surface > 0 && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5" />{listing.surface}m²</span>}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground font-sans flex-wrap">
+          {listing.rooms != null && listing.rooms > 0 && (
+            <span className="flex items-center gap-1">
+              <Bed className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {listing.rooms}
+            </span>
+          )}
+          {listing.rooms === 0 && STUDIO_TYPES.includes(listing.type) && (
+            <span className="flex items-center gap-1">
+              <Bed className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              Studio
+            </span>
+          )}
+          {listing.surface != null && listing.surface > 0 && (
+            <span className="flex items-center gap-1">
+              <Maximize className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {listing.surface}m²
+            </span>
+          )}
           <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>
         </div>
         <p className="text-xs text-muted-foreground font-sans">{city}{region ? `, ${region}` : ""}</p>

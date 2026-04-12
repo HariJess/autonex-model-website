@@ -11,7 +11,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Eye, Phone, MessageSquare, Home, Pause, Trash2, Play, Loader2, Plus, AlertCircle } from "lucide-react";
+import { Eye, Phone, MessageSquare, Home, Pause, Trash2, Play, Loader2, Plus, AlertCircle, Coins, Clock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -19,12 +19,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useMemo } from "react";
 import type { Tables } from "@/integrations/supabase/types";
+import { formatAriary } from "@/config/monetization";
 
 type Listing = Tables<"listings">;
 
 const Dashboard = () => {
   const { t } = useTranslation();
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -81,12 +82,89 @@ const Dashboard = () => {
     enabled: !!user && listingIds.length > 0,
   });
 
+  const { data: pendingPurchases = [] } = useQuery({
+    queryKey: ["pending-credit-purchases", user?.id],
+    queryFn: async (): Promise<Tables<"transactions">[]> => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("user_id", user.id)
+        .in("status", ["pending", "under_review"])
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
+
+  const { data: creditTxHistory = [] } = useQuery({
+    queryKey: ["credit-tx-history", user?.id],
+    queryFn: async (): Promise<Tables<"transactions">[]> => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("user_id", user.id)
+        .in("status", ["approved", "rejected", "cancelled", "failed"])
+        .order("created_at", { ascending: false })
+        .limit(8);
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
+
+  const { data: ledgerRows = [] } = useQuery({
+    queryKey: ["my-credits-ledger", user?.id],
+    queryFn: async (): Promise<Tables<"credits_ledger">[]> => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("credits_ledger")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(12);
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
+
+  const { data: activeBoostRows = [] } = useQuery({
+    queryKey: ["my-listing-boosts", user?.id, listingIds],
+    queryFn: async () => {
+      if (!user || listingIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("boosts")
+        .select("listing_id, type, ends_at")
+        .in("listing_id", listingIds)
+        .gte("ends_at", new Date().toISOString());
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+    enabled: !!user && listingIds.length > 0,
+  });
+
+  const boostsByListing = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const row of activeBoostRows) {
+      if (!row.listing_id) continue;
+      const arr = m.get(row.listing_id) ?? [];
+      arr.push(row.type);
+      m.set(row.listing_id, arr);
+    }
+    return m;
+  }, [activeBoostRows]);
+
   const totalViews = myListings.reduce((sum, l) => sum + (l.views_count ?? 0), 0);
   const totalContacts = leadCounts?.contacts ?? 0;
   const totalPhoneReveals = leadCounts?.phoneReveals ?? 0;
   const activeListings = myListings.filter((l) => l.status === "active").length;
+  const creditsBalance = profile?.credits_balance ?? 0;
 
   const stats = [
+    { label: t("dashboard.creditsBalance", "Crédits disponibles"), value: creditsBalance.toLocaleString("fr-FR"), icon: Coins, color: "text-amber-600" },
     { label: t("dashboard.totalViews"), value: totalViews.toLocaleString(), icon: Eye, color: "text-primary" },
     { label: t("dashboard.contacts"), value: String(totalContacts), icon: MessageSquare, color: "text-success" },
     { label: t("dashboard.phoneReveals"), value: String(totalPhoneReveals), icon: Phone, color: "text-accent" },
@@ -96,11 +174,15 @@ const Dashboard = () => {
   const toggleStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const newStatus = status === "active" ? "paused" : "active";
-      const { error } = await supabase.from("listings").update({ status: newStatus as "active" | "paused" }).eq("id", id);
+      const { error } = await supabase
+        .from("listings")
+        .update({ status: newStatus })
+        .eq("id", id);
       if (error) throw new Error(error.message);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-listings"] });
+      queryClient.invalidateQueries({ queryKey: ["my-listings", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-listing-boosts", user?.id] });
       toast.success(t("dashboard.statusUpdated", "Statut mis à jour"));
     },
     onError: (err: Error) => toast.error(err.message),
@@ -132,8 +214,9 @@ const Dashboard = () => {
       if (error) throw new Error(error.message);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-listings"] });
+      queryClient.invalidateQueries({ queryKey: ["my-listings", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["my-lead-counts"] });
+      queryClient.invalidateQueries({ queryKey: ["my-listing-boosts", user?.id] });
       toast.success(t("dashboard.listingDeleted", "Annonce supprimée"));
     },
     onError: (err: Error) => toast.error(err.message),
@@ -144,6 +227,37 @@ const Dashboard = () => {
     paused: t("status.paused", "En pause"),
     draft: t("status.draft", "Brouillon"),
     expired: t("status.expired", "Expirée"),
+    pending_review: t("status.pendingReview", "En modération"),
+    pending_payment: t("status.pendingPayment", "Paiement à confirmer"),
+    pending_payment_verification: t("status.pendingPaymentVerification", "Paiement en vérification"),
+    rejected: t("status.rejected", "Refusée"),
+  };
+
+  const boostLabels: Record<string, string> = {
+    urgent: "Urgent",
+    daily_bump: "Actualisation quotidienne",
+    featured: "Mise en avant",
+    top: "Top annonce",
+    newsletter: "Newsletter",
+    agency_spotlight: "Spotlight agence",
+  };
+
+  const paymentTxLabels: Record<string, string> = {
+    pending: t("dashboard.txStatusPending", "En attente de vérification"),
+    under_review: t("dashboard.txStatusReview", "En cours d’examen"),
+    approved: t("dashboard.txStatusApproved", "Approuvé — crédits ajoutés"),
+    rejected: t("dashboard.txStatusRejected", "Rejeté"),
+    cancelled: t("dashboard.txStatusCancelled", "Annulé"),
+    success: t("dashboard.txStatusSuccess", "Réussi"),
+    failed: t("dashboard.txStatusFailed", "Échoué"),
+  };
+
+  const pendingBoostsLabel = (raw: unknown): string | null => {
+    if (!Array.isArray(raw)) return null;
+    const list = raw
+      .filter((x): x is string => typeof x === "string")
+      .map((x) => boostLabels[x] ?? x);
+    return list.length > 0 ? list.join(", ") : null;
   };
 
   return (
@@ -151,16 +265,25 @@ const Dashboard = () => {
       <Helmet><title>{t("dashboard.title")} — ImmoNex</title></Helmet>
       <Header />
       <div className="container mx-auto px-4 py-8 space-y-8">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <h1 className="font-serif text-3xl font-bold">{t("dashboard.title")}</h1>
-          <Link to="/publier">
-            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-              <Plus className="h-4 w-4 mr-2" /> {t("nav.publish")}
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Link to="/admin/monetisation">
+                <Button variant="outline" size="sm" className="font-sans">
+                  Admin monétisation
+                </Button>
+              </Link>
+            )}
+            <Link to="/publier">
+              <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+                <Plus className="h-4 w-4 mr-2" /> {t("nav.publish")}
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {stats.map((stat) => (
             <Card key={stat.label} className="rounded-2xl">
               <CardContent className="flex items-center gap-4 p-4 md:p-6">
@@ -174,6 +297,101 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="rounded-2xl border-dashed border-primary/25 bg-primary/[0.03]">
+            <CardContent className="p-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <Coins className="h-5 w-5 text-amber-600" />
+                <h2 className="font-serif text-lg font-bold">{t("dashboard.creditsMonetization", "Crédits & packs")}</h2>
+              </div>
+              <p className="text-sm text-muted-foreground font-sans leading-relaxed">
+                {t(
+                  "dashboard.creditsMonetizationDesc",
+                  "Achetez des packs en Ariary (paiement manuel avec justificatif). Les crédits sont ajoutés uniquement après validation par l’équipe — le solde affiché n’inclut pas les paiements en attente.",
+                )}
+              </p>
+              <Link to="/publier">
+                <Button variant="outline" className="w-full font-sans border-primary/30">
+                  {t("dashboard.buyCreditsCta", "Voir les packs et acheter des crédits")}
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl">
+            <CardContent className="p-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <h2 className="font-serif text-lg font-bold">{t("dashboard.pendingPurchases", "Achats en attente")}</h2>
+              </div>
+              {pendingPurchases.length === 0 ? (
+                <p className="text-sm text-muted-foreground font-sans">{t("dashboard.noPendingPurchases", "Aucun paiement en attente de vérification.")}</p>
+              ) : (
+                <ul className="space-y-3">
+                  {pendingPurchases.map((tx) => (
+                    <li key={tx.id} className="rounded-xl border border-border bg-secondary/20 p-3 text-sm font-sans">
+                      <p className="font-medium">{formatAriary(tx.amount_mga)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t("dashboard.txRef", "Réf.")} {tx.reference ?? tx.id.slice(0, 8)} · {tx.method ?? "—"}
+                      </p>
+                      <p className="text-xs text-amber-700 dark:text-amber-500 mt-2">
+                        {t("dashboard.txPendingHonest", "Vérification en cours — les crédits ne sont pas encore disponibles.")}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="rounded-2xl">
+            <CardContent className="p-6 space-y-3">
+              <h2 className="font-serif text-lg font-bold">{t("dashboard.creditDecisions", "Historique achats crédits")}</h2>
+              {creditTxHistory.length === 0 ? (
+                <p className="text-sm text-muted-foreground font-sans">{t("dashboard.noCreditHistory", "Aucun achat traité pour l’instant.")}</p>
+              ) : (
+                <ul className="space-y-2 text-sm font-sans">
+                  {creditTxHistory.map((tx) => (
+                    <li key={tx.id} className="rounded-lg border border-border/80 px-3 py-2">
+                      <p className="font-medium">{formatAriary(tx.amount_mga)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {paymentTxLabels[tx.status ?? ""] ?? tx.status} · {tx.created_at ? new Date(tx.created_at).toLocaleDateString("fr-FR") : ""}
+                      </p>
+                      {tx.status === "rejected" && tx.rejection_reason && (
+                        <p className="text-xs text-destructive mt-1">{tx.rejection_reason}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl">
+            <CardContent className="p-6 space-y-3">
+              <h2 className="font-serif text-lg font-bold">{t("dashboard.creditsLedger", "Mouvements de crédits")}</h2>
+              {ledgerRows.length === 0 ? (
+                <p className="text-sm text-muted-foreground font-sans">{t("dashboard.noLedger", "Aucun mouvement enregistré.")}</p>
+              ) : (
+                <ul className="space-y-2 text-sm font-sans max-h-64 overflow-y-auto">
+                  {ledgerRows.map((row) => (
+                    <li key={row.id} className="flex justify-between gap-2 rounded-lg border border-border/60 px-3 py-1.5">
+                      <span className={row.delta >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-foreground"}>
+                        {row.delta >= 0 ? "+" : ""}
+                        {row.delta}
+                      </span>
+                      <span className="text-xs text-muted-foreground text-right truncate flex-1" title={row.reason ?? ""}>
+                        {row.reason ?? "—"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         <div>
@@ -212,7 +430,14 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {myListings.map((listing) => (
+                    {myListings.map((listing) => {
+                      const boostsLine = pendingBoostsLabel(listing.pending_boost_types);
+                      const activeBoostTypes = boostsByListing.get(listing.id) ?? [];
+                      const activeBoostLine =
+                        activeBoostTypes.length > 0
+                          ? activeBoostTypes.map((x) => boostLabels[x] ?? x).join(", ")
+                          : null;
+                      return (
                       <tr key={listing.id} className="border-b border-border last:border-0">
                         <td className="p-4">
                           <div>
@@ -220,11 +445,30 @@ const Dashboard = () => {
                               {listing.title}
                             </Link>
                             <p className="text-xs text-muted-foreground font-sans">{listing.ville}{listing.quartier ? ` • ${listing.quartier}` : ""}</p>
+                            {listing.status === "pending_review" && boostsLine && (
+                              <p className="text-[11px] text-muted-foreground font-sans mt-0.5">
+                                {t("dashboard.pendingBoosts", "Visibilité après validation")}: {boostsLine}
+                              </p>
+                            )}
+                            {listing.status === "active" && activeBoostLine && (
+                              <p className="text-[11px] text-emerald-800 dark:text-emerald-500 font-sans mt-0.5">
+                                {t("dashboard.activeBoosts", "Boost actif")}: {activeBoostLine}
+                              </p>
+                            )}
                           </div>
                         </td>
                         <td className="p-4 font-sans text-sm hidden sm:table-cell">{formatPrice(listing.price_mga)}</td>
                         <td className="p-4">
-                          <Badge variant={listing.status === "active" ? "default" : "secondary"} className="font-sans text-xs">
+                          <Badge
+                            variant={
+                              listing.status === "active"
+                                ? "default"
+                                : listing.status === "rejected"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                            className="font-sans text-xs"
+                          >
                             {statusLabels[listing.status ?? "draft"] ?? listing.status}
                           </Badge>
                         </td>
@@ -235,7 +479,7 @@ const Dashboard = () => {
                               variant="ghost" size="icon"
                               title={listing.status === "active" ? t("dashboard.pause", "Mettre en pause") : t("dashboard.activate", "Activer")}
                               onClick={() => toggleStatus.mutate({ id: listing.id, status: listing.status ?? "draft" })}
-                              disabled={listing.status === "expired"}
+                              disabled={!["active", "paused"].includes(listing.status ?? "")}
                             >
                               {listing.status === "active" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                             </Button>
@@ -266,7 +510,8 @@ const Dashboard = () => {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>

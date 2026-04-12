@@ -439,6 +439,24 @@ export const villes: Ville[] = [
 ];
 
 export const getVille = (name: string) => villes.find((v) => v.name === name);
+
+/** Default map pin for publish / suggestions: quartier → ville center. */
+export function getSuggestedListingCoordinates(
+  villeName: string,
+  arrName?: string,
+  quartierName?: string
+): { lat: number; lng: number } | null {
+  const v = getVille(villeName);
+  if (!v) return null;
+  if (arrName && quartierName) {
+    const arr = v.arrondissements.find((a) => a.name === arrName);
+    const q = arr?.quartiers.find((x) => x.name === quartierName);
+    if (q?.lat != null && q.lng != null) {
+      return { lat: q.lat, lng: q.lng };
+    }
+  }
+  return { lat: v.lat, lng: v.lng };
+}
 export const getAllQuartiers = (villeName: string) =>
   getVille(villeName)?.arrondissements.flatMap((a) => a.quartiers) ?? [];
 export const villeNames = villes.map((v) => v.name);

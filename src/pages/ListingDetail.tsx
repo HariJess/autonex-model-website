@@ -8,18 +8,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle } from "lucide-react";
+import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useListing, useDbListings } from "@/hooks/useListings";
 import { LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { toast } from "sonner";
+import { isValidListingCoordinates } from "@/lib/mapCoordinates";
+import { toApproximatePublicCoordinates } from "@/lib/mapPrivacy";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  ListingSponsorBlock,
+  ListingRelatedPromoted,
+  ListingPartnerAgencyStrip,
+} from "@/components/monetization/ListingDetailPlacements";
+
+const ListingLocationMap = lazy(() => import("@/components/ListingLocationMap"));
 
 const ListingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { formatPrice, formatPriceSecondary } = useCurrency();
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [selectedImg, setSelectedImg] = useState(0);
@@ -112,7 +124,9 @@ const ListingDetail = () => {
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-destructive mb-4" />
           <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
-          <p className="text-muted-foreground font-sans mb-6">{(fetchError as Error).message}</p>
+          <p className="text-muted-foreground font-sans mb-6">
+            {fetchError instanceof Error ? fetchError.message : String(fetchError)}
+          </p>
           <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
         </div>
         <Footer />
@@ -148,6 +162,45 @@ const ListingDetail = () => {
 
   const transactionLabel = TRANSACTION_LABELS[listing.transaction] ?? listing.transaction;
   const typeLabel = LISTING_TYPE_LABELS[listing.type] ?? listing.type;
+  const addressLine = [listing.ville, listing.arrondissement, listing.quartier, listing.region].filter(Boolean).join(", ");
+  const hasExactCoords =
+    listing.lat != null &&
+    listing.lng != null &&
+    isValidListingCoordinates(listing.lat, listing.lng);
+  const mapPublic =
+    hasExactCoords && listing.lat != null && listing.lng != null
+      ? toApproximatePublicCoordinates(listing.lat, listing.lng, listing.id)
+      : null;
+  const hasApproxMap =
+    mapPublic != null && isValidListingCoordinates(mapPublic.lat, mapPublic.lng);
+  const isOwner = user?.id === listing.owner_id;
+  const ownerStatusHint = (() => {
+    const s = listing.status;
+    if (!isOwner || s === "active") return null;
+    if (s === "pending_review")
+      return t(
+        "listing.ownerPendingReview",
+        "Votre annonce est en cours de modération. Elle ne sera visible publiquement qu’après validation par notre équipe."
+      );
+    if (s === "pending_payment")
+      return t(
+        "listing.ownerPendingPayment",
+        "Paiement ou justificatif en attente de vérification. L’annonce reste hors ligne jusqu’à confirmation."
+      );
+    if (s === "pending_payment_verification")
+      return t(
+        "listing.ownerPendingPaymentVerification",
+        "Votre paiement est en cours de vérification par nos équipes. Les crédits seront attribués après validation du justificatif."
+      );
+    if (s === "rejected")
+      return listing.rejection_reason?.trim()
+        ? `${t("listing.ownerRejectedPrefix", "Annonce refusée")} : ${listing.rejection_reason.trim()}`
+        : t("listing.ownerRejected", "Cette annonce a été refusée. Contactez le support pour plus d’informations.");
+    if (s === "draft") return t("listing.ownerDraft", "Brouillon — terminez la publication depuis votre tableau de bord.");
+    if (s === "paused") return t("listing.ownerPaused", "Annonce en pause — elle n’apparaît pas dans la recherche.");
+    if (s === "expired") return t("listing.ownerExpired", "Annonce expirée.");
+    return t("listing.ownerNonActive", "Cette annonce n’est pas publiée actuellement.");
+  })();
 
   return (
     <>
@@ -162,6 +215,23 @@ const ListingDetail = () => {
           <span className="text-foreground">{listing.title}</span>
         </nav>
 
+        {ownerStatusHint && (
+          <Alert className="mb-6 rounded-2xl border-primary/30 bg-primary/5">
+            <Info className="h-4 w-4" />
+            <AlertTitle className="font-sans">{t("listing.ownerStatusTitle", "Statut de votre annonce")}</AlertTitle>
+            <AlertDescription className="font-sans text-muted-foreground">{ownerStatusHint}</AlertDescription>
+            {listing.pending_boost_types && listing.pending_boost_types.length > 0 && listing.status === "pending_review" && (
+              <AlertDescription className="font-sans text-muted-foreground mt-2">
+                {t(
+                  "listing.pendingBoostsNote",
+                  "Options de visibilité sélectionnées : {{list}} — elles seront appliquées après validation.",
+                  { list: listing.pending_boost_types.join(", ") }
+                )}
+              </AlertDescription>
+            )}
+          </Alert>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <div className="space-y-3">
@@ -171,7 +241,7 @@ const ListingDetail = () => {
               {images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto">
                   {images.map((img, i) => (
-                    <button key={i} onClick={() => setSelectedImg(i)} className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}>
+                    <button key={i} type="button" onClick={() => setSelectedImg(i)} className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}>
                       <img src={img} alt="" className="w-full h-full object-cover" />
                     </button>
                   ))}
@@ -179,20 +249,40 @@ const ListingDetail = () => {
               )}
             </div>
 
+            <ListingSponsorBlock />
+
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Badge variant="outline" className="font-sans">{transactionLabel}</Badge>
                 <Badge variant="outline" className="font-sans capitalize">{typeLabel}</Badge>
                 {listing.badge && (
-                  <Badge className={`font-sans text-xs ${listing.badge === "boost" ? "gradient-primary" : "bg-accent"}`} style={{ color: "#FAFAFA" }}>
-                    {listing.badge === "boost" ? t("listing.boost") : t("listing.favorite")}
+                  <Badge
+                    className={`font-sans text-xs ${
+                      listing.badge === "boost"
+                        ? "gradient-primary"
+                        : listing.badge === "urgent"
+                          ? "bg-destructive"
+                          : "bg-accent"
+                    }`}
+                    style={{ color: "#FAFAFA" }}
+                  >
+                    {listing.badge === "boost"
+                      ? t("listing.boost")
+                      : listing.badge === "urgent"
+                        ? t("listing.urgent", "Urgent")
+                        : t("listing.favorite")}
                   </Badge>
                 )}
               </div>
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{listing.title}</h1>
-              <p className="flex items-center gap-1 text-sm text-muted-foreground font-sans mb-4">
-                <MapPin className="h-4 w-4" />
-                {[listing.ville, listing.arrondissement, listing.quartier, listing.region].filter(Boolean).join(", ")}
+              {listing.internal_ref && isOwner && (
+                <p className="text-xs text-muted-foreground font-sans mb-1">
+                  {t("listing.internalRef", "Réf. interne : {{ref}}", { ref: listing.internal_ref })}
+                </p>
+              )}
+                <p className="flex items-center gap-1 text-sm text-muted-foreground font-sans mb-4">
+                <MapPin className="h-4 w-4 shrink-0" />
+                {addressLine || t("listing.addressUnknown", "Adresse non précisée")}
               </p>
               <p className="text-2xl font-bold text-primary font-sans">{formatPrice(listing.price_mga)}</p>
               <p className="text-sm text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
@@ -217,6 +307,12 @@ const ListingDetail = () => {
                   <div><p className="font-semibold font-sans">{listing.bathrooms}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.bathrooms")}</p></div>
                 </div>
               )}
+              {listing.toilets != null && listing.toilets > 0 && (
+                <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
+                  <Bath className="h-5 w-5 text-primary" />
+                  <div><p className="font-semibold font-sans">{listing.toilets}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.toilets", "Toilettes")}</p></div>
+                </div>
+              )}
             </div>
 
             {listing.description && (
@@ -238,6 +334,89 @@ const ListingDetail = () => {
                 </div>
               </div>
             )}
+
+            {(listing.video_url?.trim() || listing.virtual_tour_url?.trim()) && (
+              <div>
+                <h2 className="font-serif text-xl font-bold mb-3">{t("listing.mediaLinks", "Médias")}</h2>
+                <div className="flex flex-wrap gap-3">
+                  {listing.video_url?.trim() && (
+                    <a
+                      href={listing.video_url.trim()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-sans text-primary hover:underline"
+                    >
+                      <Video className="h-4 w-4 shrink-0" />
+                      {t("listing.videoLink", "Vidéo")}
+                    </a>
+                  )}
+                  {listing.virtual_tour_url?.trim() && (
+                    <a
+                      href={listing.virtual_tour_url.trim()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-sans text-primary hover:underline"
+                    >
+                      <ExternalLink className="h-4 w-4 shrink-0" />
+                      {t("listing.virtualTourLink", "Visite virtuelle")}
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <ListingRelatedPromoted
+              listingId={listing.id}
+              ville={listing.ville}
+              transaction={listing.transaction}
+              type={listing.type}
+            />
+            <ListingPartnerAgencyStrip />
+
+            <section className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+              <div className="p-5 md:p-6 border-b border-border/80 bg-secondary/20">
+                <h2 className="font-serif text-xl font-bold">{t("listing.locationMap", "Localisation")}</h2>
+                <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">
+                  {hasApproxMap
+                    ? t(
+                        "listing.locationApproxDesc",
+                        "Zone approximative sur la carte (l’adresse exacte n’est pas affichée publiquement)."
+                      )
+                    : t("listing.locationNoCoords", "Aucune position carte n’a été enregistrée pour ce bien.")}
+                </p>
+              </div>
+              <div className="p-4 md:p-5">
+                {hasApproxMap && mapPublic ? (
+                  <Suspense
+                    fallback={
+                      <div
+                        className="h-[min(360px,55vh)] min-h-[240px] rounded-2xl bg-muted/40 flex items-center justify-center border border-border"
+                        aria-busy
+                      >
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    }
+                  >
+                    <ListingLocationMap
+                      lat={mapPublic.lat}
+                      lng={mapPublic.lng}
+                      title={listing.title}
+                      addressLine={addressLine || undefined}
+                    />
+                  </Suspense>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-border bg-muted/15 min-h-[200px] flex flex-col items-center justify-center text-center px-6 py-12">
+                    <MapPin className="h-10 w-10 text-muted-foreground/80 mb-3" aria-hidden />
+                    <p className="font-sans text-sm text-foreground max-w-md leading-relaxed">
+                      {t(
+                        "listing.mapFallback",
+                        "La carte n’est pas disponible pour ce bien. L’adresse textuelle ci-dessus reste votre principal repère."
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
 
           <div className="space-y-6">

@@ -1,47 +1,47 @@
+import "@/lib/leafletDefaultIcon";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useMemo } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import type { DisplayListing } from "@/types/listing";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Fix leaflet default marker icons — use bundled fallback
-const defaultIcon = new L.Icon({
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
-L.Marker.prototype.options.icon = defaultIcon;
-
 interface ListingsMapProps {
   listings: DisplayListing[];
   onMarkerClick?: (id: string) => void;
-  hoveredId?: string;
 }
 
-const ListingsMap = ({ listings, onMarkerClick, hoveredId }: ListingsMapProps) => {
+const MADAGASCAR_CENTER: [number, number] = [-18.8792, 47.5079];
+
+const ListingsMap = ({ listings, onMarkerClick }: ListingsMapProps) => {
   const { formatPrice } = useCurrency();
 
-  const mappable = listings.filter((l) => l.lat != null && l.lng != null);
+  const mappable = useMemo(
+    () => listings.filter((l) => l.lat != null && l.lng != null),
+    [listings]
+  );
 
-  const center: [number, number] = mappable.length > 0
-    ? [mappable[0].lat!, mappable[0].lng!]
-    : [-18.8792, 47.5079];
-
-  const bounds = mappable.length > 1
-    ? L.latLngBounds(mappable.map((l) => [l.lat!, l.lng!] as [number, number]))
-    : undefined;
+  const { center, bounds } = useMemo(() => {
+    if (mappable.length === 0) {
+      return { center: MADAGASCAR_CENTER, bounds: undefined as L.LatLngBounds | undefined };
+    }
+    if (mappable.length === 1) {
+      return {
+        center: [mappable[0].lat!, mappable[0].lng!] as [number, number],
+        bounds: undefined as L.LatLngBounds | undefined,
+      };
+    }
+    const b = L.latLngBounds(mappable.map((l) => [l.lat!, l.lng!] as [number, number]));
+    return { center: b.getCenter(), bounds: b };
+  }, [mappable]);
 
   return (
     <MapContainer
       center={center}
-      zoom={6}
+      zoom={mappable.length === 0 ? 6 : mappable.length === 1 ? 13 : undefined}
       bounds={bounds}
-      className="h-full w-full rounded-xl"
-      style={{ minHeight: 400 }}
+      className="h-full w-full rounded-xl z-0"
+      style={{ minHeight: 280 }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

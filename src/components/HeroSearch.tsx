@@ -1,15 +1,18 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Search, MapPin, Euro, Banknote } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
-import { LISTING_TYPES, LISTING_TYPE_LABELS } from "@/types/listing";
+import { LISTING_TYPE_LABELS, LISTING_TYPES_WITHOUT_ROOM_FILTERS } from "@/types/listing";
 import type { ListingType } from "@/types/listing";
+import { searchPathFromFilters } from "@/lib/searchUrl";
+import type { SearchFilters } from "@/types/search";
+import { EMPTY_SEARCH_FILTERS } from "@/types/search";
+import { listingTypesForTransaction } from "@/lib/listingRules";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -26,16 +29,26 @@ const ROOM_OPTIONS = [
   { label: "5+", value: "5" },
 ];
 
-const TYPES_WITHOUT_ROOMS: ListingType[] = ["terrain", "local_commercial", "bureau"];
+const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
 
 const HeroSearch = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
   const [type, setType] = useState("");
+  const heroTypeOptions = useMemo(() => listingTypesForTransaction(transaction), [transaction]);
+
+  const handleTransactionChange = (tr: string) => {
+    setTransaction(tr);
+    setType((prev) => {
+      const allowed = new Set(listingTypesForTransaction(tr));
+      return allowed.has(prev as ListingType) ? prev : "";
+    });
+  };
+
   const handleTypeChange = (v: string) => {
     setType(v);
-    if (TYPES_WITHOUT_ROOMS.includes(v as ListingType)) setRooms("");
+    if (NO_ROOMS_TYPES.has(v)) setRooms("");
   };
   const [ville, setVille] = useState("");
   const [arrondissement, setArrondissement] = useState("");
@@ -46,33 +59,45 @@ const HeroSearch = () => {
   const [rooms, setRooms] = useState("");
   const [desktopLocationOpen, setDesktopLocationOpen] = useState(false);
   const [mobileLocationOpen, setMobileLocationOpen] = useState(false);
-  const [budgetOpen, setBudgetOpen] = useState(false);
+  const [desktopBudgetOpen, setDesktopBudgetOpen] = useState(false);
+  const [mobileBudgetOpen, setMobileBudgetOpen] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
 
-  const showRooms = !TYPES_WITHOUT_ROOMS.includes(type as ListingType);
+  const showRooms = !type || !NO_ROOMS_TYPES.has(type);
+
+  const buildFilters = (): SearchFilters => {
+    const roomNums =
+      rooms !== "" && showRooms
+        ? [parseInt(rooms, 10)].filter((n) => !Number.isNaN(n) && n >= 0 && n <= 99)
+        : [];
+    const allowed = new Set(listingTypesForTransaction(transaction));
+    const types: string[] = type && allowed.has(type as ListingType) ? [type] : [];
+    return {
+      ...EMPTY_SEARCH_FILTERS,
+      transaction: TRANSACTIONS.some((tr) => tr.value === transaction) ? transaction : "vente",
+      types,
+      ville,
+      arrondissement,
+      quartiers,
+      quartierLibre,
+      priceMin,
+      priceMax,
+      rooms: roomNums,
+    };
+  };
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (transaction) params.set("transaction", transaction);
-    if (type) params.set("type", type);
-    if (ville) params.set("ville", ville);
-    if (arrondissement) params.set("arr", arrondissement);
-    if (quartiers.length) params.set("quartiers", quartiers.join(","));
-    if (quartierLibre.trim()) params.set("q", quartierLibre.trim());
-    if (priceMin) params.set("prix_min", String(priceMin));
-    if (priceMax) params.set("prix_max", String(priceMax));
-    if (rooms) params.set("chambres", rooms);
-    navigate(`/recherche?${params.toString()}`);
+    navigate(searchPathFromFilters(buildFilters()));
   };
 
   const locationLabel = ville
     ? quartiers.length > 0
       ? `${ville} — ${quartiers.slice(0, 2).join(", ")}${quartiers.length > 2 ? "..." : ""}`
       : quartierLibre.trim()
-      ? `${ville} — ${quartierLibre.trim()}`
-      : arrondissement
-      ? `${ville}, ${arrondissement}`
-      : ville
+        ? `${ville} — ${quartierLibre.trim()}`
+        : arrondissement
+          ? `${ville}, ${arrondissement}`
+          : ville
     : quartierLibre.trim();
 
   const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency);
@@ -97,13 +122,13 @@ const HeroSearch = () => {
           {t("hero.subtitle")}
         </p>
 
-        {/* Transaction Tabs */}
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-center gap-1 mb-0">
             {TRANSACTIONS.map((tr) => (
               <button
                 key={tr.value}
-                onClick={() => setTransaction(tr.value)}
+                type="button"
+                onClick={() => handleTransactionChange(tr.value)}
                 className={`px-6 py-2.5 rounded-t-xl font-sans font-semibold text-sm transition-all ${
                   transaction === tr.value
                     ? "gradient-primary text-white shadow-lg"
@@ -115,11 +140,8 @@ const HeroSearch = () => {
             ))}
           </div>
 
-          {/* Search Bar */}
           <div className="bg-card rounded-b-2xl rounded-tr-2xl shadow-2xl p-3 md:p-4 -mb-12 relative z-10">
-            {/* Desktop: horizontal */}
             <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border">
-              {/* Type */}
               <div className="flex-1 border-r border-border px-3 py-2">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
                   {t("hero.type")}
@@ -129,17 +151,19 @@ const HeroSearch = () => {
                     <SelectValue placeholder={t("hero.allTypes")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {LISTING_TYPES.map((lt) => (
+                    {heroTypeOptions.map((lt) => (
                       <SelectItem key={lt} value={lt}>{LISTING_TYPE_LABELS[lt]}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Location */}
               <Popover open={desktopLocationOpen} onOpenChange={setDesktopLocationOpen}>
                 <PopoverTrigger asChild>
-                  <button className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors">
+                  <button
+                    type="button"
+                    className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                  >
                     <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
                       {t("hero.location")}
                     </label>
@@ -166,17 +190,19 @@ const HeroSearch = () => {
                 </PopoverContent>
               </Popover>
 
-              {/* Budget */}
-              <Popover open={budgetOpen} onOpenChange={setBudgetOpen}>
+              <Popover open={desktopBudgetOpen} onOpenChange={setDesktopBudgetOpen}>
                 <PopoverTrigger asChild>
-                  <button className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors">
+                  <button
+                    type="button"
+                    className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                  >
                     <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
-                      Budget
+                      {t("search.budget", "Budget")}
                     </label>
                     <div className="flex items-center gap-1.5">
                       <BudgetIcon className="h-3.5 w-3.5 text-accent shrink-0" />
                       <span className={`font-sans text-sm truncate ${budgetLabel ? "text-foreground" : "text-muted-foreground"}`}>
-                        {budgetLabel || "Budget"}
+                        {budgetLabel || t("search.budget", "Budget")}
                       </span>
                     </div>
                   </button>
@@ -188,13 +214,12 @@ const HeroSearch = () => {
                     maxValue={priceMax}
                     onMinChange={setPriceMin}
                     onMaxChange={setPriceMax}
-                    onClose={() => setBudgetOpen(false)}
+                    onClose={() => setDesktopBudgetOpen(false)}
                     onCurrencyChange={setBudgetCurrency}
                   />
                 </PopoverContent>
               </Popover>
 
-              {/* Rooms — hidden for terrain/bureau/local_commercial */}
               {showRooms && (
                 <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
@@ -213,9 +238,9 @@ const HeroSearch = () => {
                 </div>
               )}
 
-              {/* Search Button */}
               <div className="px-2">
                 <Button
+                  type="button"
                   onClick={handleSearch}
                   className="gradient-primary border-0 font-semibold font-sans gap-2 h-12 px-6 rounded-xl"
                   style={{ color: "#FAFAFA" }}
@@ -226,14 +251,13 @@ const HeroSearch = () => {
               </div>
             </div>
 
-            {/* Mobile: vertical */}
             <div className="lg:hidden space-y-3">
               <Select value={type} onValueChange={handleTypeChange}>
                 <SelectTrigger className="font-sans">
                   <SelectValue placeholder={t("hero.type")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {LISTING_TYPES.map((lt) => (
+                  {heroTypeOptions.map((lt) => (
                     <SelectItem key={lt} value={lt}>{LISTING_TYPE_LABELS[lt]}</SelectItem>
                   ))}
                 </SelectContent>
@@ -241,12 +265,12 @@ const HeroSearch = () => {
 
               <Popover open={mobileLocationOpen} onOpenChange={setMobileLocationOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start font-sans text-sm gap-2">
+                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2">
                     <MapPin className="h-4 w-4 text-accent" />
                     {locationLabel || t("hero.location")}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[calc(100vw-2rem)] p-4" align="start">
+                <PopoverContent className="w-[calc(100vw-2rem)] max-w-md p-4" align="start">
                   <LocationSelector
                     selectedVille={ville}
                     selectedArr={arrondissement}
@@ -257,6 +281,26 @@ const HeroSearch = () => {
                     onQuartiersChange={setQuartiers}
                     onQuartierLibreChange={setQuartierLibre}
                     onClose={() => setMobileLocationOpen(false)}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <Popover open={mobileBudgetOpen} onOpenChange={setMobileBudgetOpen}>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2">
+                    <BudgetIcon className="h-4 w-4 text-accent shrink-0" />
+                    {budgetLabel || t("search.budget", "Budget")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[calc(100vw-2rem)] max-w-md p-4" align="start">
+                  <BudgetRangeSlider
+                    transaction={transaction}
+                    minValue={priceMin}
+                    maxValue={priceMax}
+                    onMinChange={setPriceMin}
+                    onMaxChange={setPriceMax}
+                    onClose={() => setMobileBudgetOpen(false)}
+                    onCurrencyChange={setBudgetCurrency}
                   />
                 </PopoverContent>
               </Popover>
@@ -274,24 +318,8 @@ const HeroSearch = () => {
                 </Select>
               )}
 
-              <div className="flex gap-2">
-                <Input
-                  placeholder={t("hero.budgetMin")}
-                  type="number"
-                  value={priceMin || ""}
-                  onChange={(e) => setPriceMin(Number(e.target.value))}
-                  className="font-sans"
-                />
-                <Input
-                  placeholder={t("hero.budgetMax")}
-                  type="number"
-                  value={priceMax || ""}
-                  onChange={(e) => setPriceMax(Number(e.target.value))}
-                  className="font-sans"
-                />
-              </div>
-
               <Button
+                type="button"
                 onClick={handleSearch}
                 className="w-full gradient-primary border-0 font-semibold font-sans gap-2 h-12"
                 style={{ color: "#FAFAFA" }}

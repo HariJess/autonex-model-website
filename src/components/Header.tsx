@@ -1,22 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { User, Menu, X, Globe, LogOut } from "lucide-react";
+import { User, Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import logo from "@/assets/logo.png";
 
 const Header = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { currency, setCurrency } = useCurrency();
-
-  const toggleLang = () => {
-    i18n.changeLanguage(i18n.language === "fr" ? "en" : "fr");
-  };
 
   const toggleCurrency = () => {
     setCurrency(currency === "MGA" ? "EUR" : "MGA");
@@ -45,10 +41,6 @@ const Header = () => {
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          <button onClick={toggleLang} className="flex items-center gap-1 text-sm" style={{ color: "#FAFAFA" }}>
-            <Globe className="h-4 w-4" />
-            {i18n.language === "fr" ? "EN" : "FR"}
-          </button>
           <button onClick={toggleCurrency} className="text-xs font-semibold px-2 py-1 rounded border border-muted-foreground/30" style={{ color: "#FAFAFA" }}>
             {currency}
           </button>
@@ -85,10 +77,6 @@ const Header = () => {
               </Link>
             ))}
             <div className="flex items-center gap-3 pt-2 border-t" style={{ borderColor: "#333" }}>
-              <button onClick={toggleLang} className="text-sm" style={{ color: "#FAFAFA" }}>
-                <Globe className="h-4 w-4 inline mr-1" />
-                {i18n.language === "fr" ? "EN" : "FR"}
-              </button>
               <button onClick={toggleCurrency} className="text-xs font-semibold px-2 py-1 rounded border border-muted-foreground/30" style={{ color: "#FAFAFA" }}>
                 {currency}
               </button>

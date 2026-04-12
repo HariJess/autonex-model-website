@@ -5,29 +5,21 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
-import { Button } from "@/components/ui/button";
 import { ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { useDbListings } from "@/hooks/useListings";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { villes } from "@/data/madagascar-locations";
 import { seedBlogPosts } from "@/data/seed-listings";
+import { BannerSlot } from "@/components/monetization/BannerSlot";
+import { PremiumBillboard } from "@/components/monetization/PremiumBillboard";
+import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
+import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
+import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 
 const Index = () => {
   const { t } = useTranslation();
   const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
-
-  const { data: agencies = [], isLoading: agenciesLoading } = useQuery({
-    queryKey: ["agencies-home"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("agencies")
-        .select("id, name, slug, logo_url, verified")
-        .order("name");
-      if (error) throw new Error(error.message);
-      return data ?? [];
-    },
-  });
 
   const { data: villeCounts = {} } = useQuery({
     queryKey: ["ville-counts"],
@@ -54,10 +46,35 @@ const Index = () => {
 
       <HeroSearch />
 
-      {/* Latest listings — labeled honestly */}
-      <section className="container mx-auto px-4 py-16">
+      {MONETIZATION_PLACEMENTS.homeSponsorStrip && (
+        <section className="container mx-auto px-4 pt-6 pb-2">
+          <BannerSlot enabled />
+        </section>
+      )}
+
+      {MONETIZATION_PLACEMENTS.homeBillboard && <PremiumBillboard className="py-8" enabled />}
+
+      <FeaturedListingsSection
+        enabled={MONETIZATION_PLACEMENTS.homeFeaturedRail}
+        title={t("sections.featured", "À la une")}
+        limit={8}
+      />
+
+      {MONETIZATION_PLACEMENTS.homeNativeMid && (
+        <section className="container mx-auto px-4 py-6">
+          <BannerSlot
+            title="Visibilité native"
+            subtitle="Formats sponsorisés intégrés au flux — moins intrusifs, plus performants pour les annonceurs."
+            ctaLabel="Découvrir les formats"
+            href="/publier"
+          />
+        </section>
+      )}
+
+      {/* Recent feed — complementary to “À la une” */}
+      <section className="container mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Dernières annonces")}</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Récemment publiées")}</h2>
           <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">
             {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
           </Link>
@@ -106,32 +123,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Partner agencies */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">{t("sections.agencies")}</h2>
-        {agenciesLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          </div>
-        ) : agencies.length === 0 ? (
-          <p className="text-center text-muted-foreground font-sans">{t("home.noAgencies", "Aucune agence partenaire pour le moment.")}</p>
-        ) : (
-          <div className="flex flex-wrap justify-center gap-8">
-            {agencies.map((agency) => (
-              <Link key={agency.id} to={`/agence/${agency.slug}`} className="flex flex-col items-center gap-2 group">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border shadow-sm group-hover:shadow-md transition-shadow bg-muted flex items-center justify-center">
-                  {agency.logo_url ? (
-                    <img src={agency.logo_url} alt={agency.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="font-serif text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
-                  )}
-                </div>
-                <span className="text-sm font-sans font-medium text-foreground">{agency.name}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+      <FeaturedAgenciesSection title={t("sections.agencies")} enabled limit={12} />
 
       {/* Blog — uses seed data consistently */}
       <section className="bg-secondary/50 py-16">

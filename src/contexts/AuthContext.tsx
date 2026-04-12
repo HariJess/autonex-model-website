@@ -11,13 +11,29 @@ interface Profile {
   credits_balance: number;
 }
 
+/** Passed to `signUp` → Supabase `raw_user_meta_data` (see `handle_new_user` migration). */
+export interface SignUpMetadata {
+  full_name: string;
+  role: "particulier" | "agence";
+  phone: string;
+  agency_name?: string;
+  agency_address?: string;
+  commercial_contact_name?: string;
+  nif?: string;
+  stat?: string;
+  reg_commerce?: string;
+  agency_logo_url?: string;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
+  /** True when profile.role is `admin` (server still enforces RPC permissions). */
+  isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, metadata: { full_name: string; role: string; phone?: string }) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, metadata: SignUpMetadata) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -36,7 +52,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .select("*")
       .eq("id", userId)
       .single();
-    if (data) setProfile(data as Profile);
+    if (data) {
+      setProfile({
+        ...data,
+        credits_balance: Number(data.credits_balance ?? 0),
+      } as Profile);
+    }
   };
 
   const refreshProfile = async () => {
@@ -72,16 +93,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error: error as Error | null };
   };
 
-  const signUp = async (
-    email: string,
-    password: string,
-    metadata: { full_name: string; role: string; phone?: string }
-  ) => {
+  const signUp = async (email: string, password: string, metadata: SignUpMetadata) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: metadata,
+        data: metadata as Record<string, unknown>,
         emailRedirectTo: window.location.origin,
       },
     });
@@ -93,8 +110,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setProfile(null);
   };
 
+  const isAdmin = profile?.role === "admin";
+
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signIn, signUp, signOut, refreshProfile }}>
+    <AuthContext.Provider
+      value={{ user, session, profile, isAdmin, loading, signIn, signUp, signOut, refreshProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

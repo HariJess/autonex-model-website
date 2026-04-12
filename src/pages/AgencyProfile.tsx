@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useDbListings } from "@/hooks/useListings";
+import { BannerSlot } from "@/components/monetization/BannerSlot";
+import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 
 const AgencyProfile = () => {
   const { slug } = useParams();
@@ -95,6 +97,16 @@ const AgencyProfile = () => {
       <Helmet><title>{agency.name} — ImmoNex</title></Helmet>
       <Header />
       <div className="container mx-auto px-4 py-8">
+        {MONETIZATION_PLACEMENTS.agencyStrip && (
+          <div className="mb-8">
+            <BannerSlot
+              title="Visibilité agence sur ImmoNex"
+              subtitle="Packages marque, spotlight et diffusion multi-villes — contact commercial pour un plan sur mesure."
+              href="/publier"
+              ctaLabel="Booster ma visibilité"
+            />
+          </div>
+        )}
         <div className="bg-card rounded-2xl border border-border p-8 flex flex-col md:flex-row items-center gap-6 mb-8">
           <div className="w-24 h-24 rounded-2xl overflow-hidden border border-border flex-shrink-0 bg-muted flex items-center justify-center">
             {agency.logo_url ? (
