@@ -46,22 +46,28 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
 
   const [draft, setDraft] = useState<LocationSelection>(committed);
 
-  useEffect(() => {
-    if (isApplyMode(props)) {
-      setDraft(props.committed);
-    }
-  }, [
-    isApplyMode(props) ? props.committed.ville : "",
-    isApplyMode(props) ? props.committed.quartiers.join("\u0001") : "",
-    isApplyMode(props) ? props.committed.quartierLibre : "",
-  ]);
+  // Extraction des valeurs pour que React puisse analyser les dépendances correctement
+  const isApply = isApplyMode(props);
+  const committedVille = isApply ? props.committed.ville : "";
+  const committedQuartiersKey = isApply ? props.committed.quartiers.join("\u0001") : "";
+  const committedQuartierLibre = isApply ? props.committed.quartierLibre : "";
 
-  const live = isApplyMode(props) ? draft : props.value;
+  useEffect(() => {
+    if (isApply) {
+      setDraft({
+        ville: committedVille,
+        quartiers: committedQuartiersKey ? committedQuartiersKey.split("\u0001") : [],
+        quartierLibre: committedQuartierLibre,
+      });
+    }
+  }, [isApply, committedVille, committedQuartiersKey, committedQuartierLibre]);
+
+  const live = isApply ? draft : props.value;
 
   const setLive = (next: LocationSelection) => {
-    if (isApplyMode(props)) {
+    if (isApply) {
       setDraft(next);
-    } else {
+    } else if (!isApplyMode(props)) {
       props.onChange(next);
     }
   };
@@ -73,6 +79,8 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
   const toggleExpand = (list: string[], item: string, setter: (v: string[]) => void) => {
     setter(list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
   };
+
+  const quartiersKey = live.quartiers.join("\u0001");
 
   useEffect(() => {
     if (!live.ville) return;
@@ -90,7 +98,7 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
     if (needExpand.length) {
       setExpandedArrs((prev) => [...new Set([...prev, ...needExpand])]);
     }
-  }, [live.ville, live.quartiers.join("\u0001")]);
+  }, [live.ville, live.quartiers, quartiersKey]);
 
   const filteredVilles = useMemo(() => {
     if (!search) return villes;
