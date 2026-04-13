@@ -154,10 +154,17 @@ const Index = () => {
                 <div className="aspect-video overflow-hidden">
                   <img
                     src={post.cover}
-                    alt={post.title}
+                    alt={post.coverAlt}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.dataset.fallbackApplied) {
+                        img.dataset.fallbackApplied = "1";
+                        img.src = "/placeholder.svg";
+                      }
+                    }}
                   />
                 </div>
                 <div className="p-5 space-y-2">
