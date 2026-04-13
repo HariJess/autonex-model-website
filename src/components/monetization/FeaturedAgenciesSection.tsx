@@ -77,7 +77,13 @@ export function FeaturedAgenciesSection({
             <Link key={agency.id} to={`/agence/${agency.slug}`} className="flex flex-col items-center gap-2 group max-w-[100px]">
               <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border shadow-sm group-hover:shadow-md transition-shadow bg-muted flex items-center justify-center">
                 {agency.logo_url ? (
-                  <img src={agency.logo_url} alt={agency.name} className="w-full h-full object-cover" />
+                  <img
+                    src={agency.logo_url}
+                    alt={agency.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 ) : (
                   <span className="font-serif text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
                 )}

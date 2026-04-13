@@ -18,6 +18,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { toApproximatePublicCoordinates } from "@/lib/mapPrivacy";
+import { contactLeadSchema } from "@/lib/validation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ListingSponsorBlock,
@@ -42,6 +43,7 @@ const ListingDetail = () => {
   const [contactMessage, setContactMessage] = useState("");
   const [sending, setSending] = useState(false);
   const viewIncremented = useRef<string | null>(null);
+  const lastContactSubmitAt = useRef(0);
   const contactSectionRef = useRef<HTMLDivElement | null>(null);
 
   const { data: listing, isLoading, error: fetchError } = useListing(id);
@@ -91,17 +93,29 @@ const ListingDetail = () => {
   const handleContact = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!listing) return;
-    if (!contactName.trim() && !contactEmail.trim()) {
-      toast.error(t("listing.contactNameOrEmail", "Veuillez renseigner au moins votre nom ou email"));
+    const now = Date.now();
+    if (now - lastContactSubmitAt.current < 4000) {
+      toast.error(t("listing.contactTooFast", "Veuillez patienter quelques secondes avant de renvoyer."));
+      return;
+    }
+    const parsed = contactLeadSchema.safeParse({
+      name: contactName,
+      email: contactEmail,
+      phone: contactPhone,
+      message: contactMessage,
+    });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? t("common.error"));
       return;
     }
     setSending(true);
+    lastContactSubmitAt.current = now;
     const { error: leadError } = await supabase.from("leads").insert({
       listing_id: listing.id,
-      visitor_name: contactName.trim() || null,
-      visitor_email: contactEmail.trim() || null,
-      visitor_phone: contactPhone.trim() || null,
-      message: contactMessage.trim() || null,
+      visitor_name: parsed.data.name || null,
+      visitor_email: parsed.data.email || null,
+      visitor_phone: parsed.data.phone || null,
+      message: parsed.data.message || null,
       type: "contact_form" as const,
     });
     if (leadError) {

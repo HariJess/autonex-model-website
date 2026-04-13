@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth, type SignUpMetadata } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { agencyFormSchema, loginSchema, optionalMgPhoneSchema, signupCommonSchema } from "@/lib/validation";
 
 /** Compare téléphones / champs pour éviter qu’un numéro soit saisi comme « nom du contact ». */
 function digitsOnly(s: string): string {
@@ -76,8 +77,13 @@ const LoginPage = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsed = loginSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? t("common.error"));
+      return;
+    }
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(parsed.data.email, parsed.data.password);
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -205,13 +211,21 @@ const SignupPage = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error(t("auth.passwordMinLength"));
+    const commonParsed = signupCommonSchema.safeParse({ email, phone, password, passwordConfirm });
+    if (!commonParsed.success) {
+      toast.error(commonParsed.error.issues[0]?.message ?? t("common.error"));
       return;
     }
-    if (password !== passwordConfirm) {
+    if (commonParsed.data.password !== commonParsed.data.passwordConfirm) {
       toast.error(t("auth.passwordMismatch"));
       return;
+    }
+    if (whatsapp.trim()) {
+      const waParsed = optionalMgPhoneSchema.safeParse(whatsapp);
+      if (!waParsed.success) {
+        toast.error(waParsed.error.issues[0]?.message ?? t("common.error"));
+        return;
+      }
     }
     if (role === "particulier") {
       if (!firstName.trim() || !lastName.trim() || !phone.trim()) {
@@ -224,15 +238,15 @@ const SignupPage = () => {
       }
     }
     if (role === "agence") {
-      const missing =
-        !agencyName.trim() ||
-        !phone.trim() ||
-        !agencyAddress.trim() ||
-        !commercialContact.trim() ||
-        !nif.trim() ||
-        !stat.trim() ||
-        !regCommerce.trim();
-      if (missing) {
+      const agencyParsed = agencyFormSchema.safeParse({
+        agencyName,
+        agencyAddress,
+        commercialContact,
+        nif,
+        stat,
+        regCommerce,
+      });
+      if (!agencyParsed.success) {
         toast.error(t("auth.agencyFieldsRequired"));
         return;
       }
@@ -254,7 +268,7 @@ const SignupPage = () => {
       metadata = {
         full_name: particulierFullName,
         role: "particulier",
-        phone: phone.trim(),
+        phone: commonParsed.data.phone,
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         whatsapp_phone: whatsapp.trim() || undefined,
@@ -265,7 +279,7 @@ const SignupPage = () => {
       metadata = {
         full_name: contactName,
         role: "agence",
-        phone: phone.trim(),
+        phone: commonParsed.data.phone,
         agency_name: agencyName.trim(),
         agency_address: agencyAddress.trim(),
         commercial_contact_name: contactName,
@@ -275,7 +289,7 @@ const SignupPage = () => {
         agency_logo_url: agencyLogoUrl.trim() || undefined,
       };
     }
-    const { error } = await signUp(email, password, metadata);
+    const { error } = await signUp(commonParsed.data.email, commonParsed.data.password, metadata);
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -459,11 +473,11 @@ const SignupPage = () => {
             )}
             <div className="space-y-2">
               <Label className="font-sans">{t("auth.password")}</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans" required minLength={6} autoComplete="new-password" />
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans" required minLength={8} autoComplete="new-password" />
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{t("auth.confirmPassword", "Confirmer le mot de passe")}</Label>
-              <Input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} className="font-sans" required minLength={6} autoComplete="new-password" />
+              <Input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} className="font-sans" required minLength={8} autoComplete="new-password" />
             </div>
             {role === "particulier" && (
               <label className="flex items-start gap-2 cursor-pointer font-sans text-sm">

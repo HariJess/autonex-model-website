@@ -618,6 +618,15 @@ const SearchPage = () => {
                         src={listing.images[0] ?? "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"}
                         alt={listing.title}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          if (!img.dataset.fallbackApplied) {
+                            img.dataset.fallbackApplied = "1";
+                            img.src = "/placeholder.svg";
+                          }
+                        }}
                       />
                     </Link>
                     <div className="flex-1 p-4 flex flex-col justify-between min-w-0">

@@ -50,7 +50,13 @@ const AgenciesListPage = () => {
                 className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg transition-all flex items-start gap-4 group">
                 <div className="w-16 h-16 rounded-xl overflow-hidden border border-border flex-shrink-0 bg-muted flex items-center justify-center">
                   {agency.logo_url ? (
-                    <img src={agency.logo_url} alt={agency.name} className="w-full h-full object-cover" />
+                    <img
+                      src={agency.logo_url}
+                      alt={agency.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   ) : (
                     <span className="font-serif text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
                   )}

@@ -33,7 +33,7 @@ const BlogList = () => {
             {posts.map((post) => (
               <Link key={post.id} to={`/conseils/${post.slug}`} className="group rounded-2xl overflow-hidden bg-card border border-border shadow-sm hover:shadow-md transition-all">
                 <div className="aspect-video overflow-hidden">
-                  <img src={post.cover} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <img src={post.cover} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" />
                 </div>
                 <div className="p-5 space-y-2">
                   <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ const BlogArticle = () => {
         </p>
         {post.cover && (
           <div className="rounded-2xl overflow-hidden mb-8 aspect-video">
-            <img src={post.cover} alt={post.title} className="w-full h-full object-cover" />
+            <img src={post.cover} alt={post.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
           </div>
         )}
         <div className="prose prose-lg max-w-none font-sans">

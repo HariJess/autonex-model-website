@@ -60,6 +60,7 @@ const Dashboard = () => {
     },
     enabled: !!user,
     retry: 1,
+    staleTime: 30_000,
   });
 
   const publishedListings = useMemo(() => myListings.filter((l) => l.status !== "draft"), [myListings]);
@@ -82,6 +83,7 @@ const Dashboard = () => {
       return { contacts, phoneReveals };
     },
     enabled: !!user && listingIds.length > 0,
+    staleTime: 20_000,
   });
 
   // Recent leads for display (limited)
@@ -99,6 +101,7 @@ const Dashboard = () => {
       return (data ?? []) as Array<Tables<"leads"> & { listings?: { title: string } | null }>;
     },
     enabled: !!user && listingIds.length > 0,
+    staleTime: 20_000,
   });
 
   const { data: pendingPurchases = [] } = useQuery({
@@ -115,6 +118,7 @@ const Dashboard = () => {
       return data ?? [];
     },
     enabled: !!user,
+    staleTime: 20_000,
   });
 
   const { data: creditTxHistory = [] } = useQuery({
@@ -132,6 +136,7 @@ const Dashboard = () => {
       return data ?? [];
     },
     enabled: !!user,
+    staleTime: 20_000,
   });
 
   const { data: ledgerRows = [] } = useQuery({
@@ -148,6 +153,7 @@ const Dashboard = () => {
       return data ?? [];
     },
     enabled: !!user,
+    staleTime: 20_000,
   });
 
   const { data: activeBoostRows = [] } = useQuery({
@@ -163,6 +169,7 @@ const Dashboard = () => {
       return data ?? [];
     },
     enabled: !!user && listingIds.length > 0,
+    staleTime: 20_000,
   });
 
   const boostsByListing = useMemo(() => {

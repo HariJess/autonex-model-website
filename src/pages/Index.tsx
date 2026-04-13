@@ -19,6 +19,7 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 
 const Index = () => {
   const { t } = useTranslation();
+  const cityImageFallback = "/placeholder.svg";
   const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
 
   const { data: villeCounts = {} } = useQuery({
@@ -109,13 +110,20 @@ const Index = () => {
             {villes.map((ville) => {
               const count = villeCounts[ville.name] ?? 0;
               return (
-                <Link key={ville.name} to={`/recherche?ville=${ville.name}`} className="group relative rounded-2xl overflow-hidden aspect-[3/2]">
+                <Link key={ville.name} to={`/recherche?ville=${encodeURIComponent(ville.name)}`} className="group relative rounded-2xl overflow-hidden aspect-[3/2]">
                   <img
                     src={ville.image}
                     alt={ville.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.dataset.fallbackApplied) {
+                        img.dataset.fallbackApplied = "1";
+                        img.src = cityImageFallback;
+                      }
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
                   <div className="absolute bottom-3 left-3">
