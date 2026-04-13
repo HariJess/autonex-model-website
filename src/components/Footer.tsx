@@ -40,6 +40,18 @@ const Footer = () => {
         <div className="mt-12 pt-6 border-t border-muted-foreground/20 text-center text-sm font-sans opacity-50">
           {t("footer.copyright")}
         </div>
+
+        <div className="mt-4 pt-4 border-t border-muted-foreground/10 text-center text-xs font-sans text-muted-foreground/70">
+          <span>Conçu et développé par </span>
+          <a
+            href="https://www.linkedin.com/company/aplisarlu/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#FAFAFA]/80 hover:text-[#FAFAFA] hover:underline underline-offset-2 transition-colors"
+          >
+            APLI
+          </a>
+        </div>
       </div>
     </footer>
   );
