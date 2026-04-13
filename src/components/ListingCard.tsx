@@ -3,8 +3,11 @@ import { Bed, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { DisplayListing, ListingType } from "@/types/listing";
 import { LISTING_TYPE_LABELS } from "@/types/listing";
+import { prefetchListing } from "@/hooks/useListings";
+import { applyImageFallback } from "@/lib/imageFallback";
 
 const STUDIO_TYPES: ListingType[] = ["appartement", "villa", "maison"];
 
@@ -25,6 +28,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
   );
   const [imgIndex, setImgIndex] = useState(0);
   const { formatPrice, formatPriceSecondary } = useCurrency();
+  const queryClient = useQueryClient();
   const indicatorIndexes = useMemo(() => {
     if (images.length <= 5) return images.map((_, i) => i);
     const start = Math.max(0, Math.min(imgIndex - 2, images.length - 5));
@@ -43,10 +47,20 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
   const city = listing.ville ?? "";
   const region = listing.region ?? "";
 
+  const handlePrefetchDetail = () => {
+    void prefetchListing(queryClient, listing.id);
+  };
+
   return (
     <div className="group rounded-2xl overflow-hidden bg-card border border-border shadow-sm hover:shadow-lg transition-all duration-300">
       {/* Image area — fully clickable */}
-      <Link to={`/annonce/${listing.id}`} className="block relative aspect-[4/3] overflow-hidden">
+      <Link
+        to={`/annonce/${listing.id}`}
+        className="block relative aspect-[4/3] overflow-hidden"
+        onMouseEnter={handlePrefetchDetail}
+        onFocus={handlePrefetchDetail}
+        onTouchStart={handlePrefetchDetail}
+      >
         <img
           src={images[imgIndex]}
           alt={listing.title}
@@ -54,11 +68,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
           loading="lazy"
           decoding="async"
           onError={(e) => {
-            const img = e.currentTarget;
-            if (!img.dataset.fallbackApplied) {
-              img.dataset.fallbackApplied = "1";
-              img.src = LOCAL_PLACEHOLDER;
-            }
+            applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
           }}
         />
         {listing.badge && badgeLabels[listing.badge] && (
@@ -103,18 +113,20 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
               loading="lazy"
               decoding="async"
               onError={(e) => {
-                const img = e.currentTarget;
-                if (!img.dataset.fallbackApplied) {
-                  img.dataset.fallbackApplied = "1";
-                  img.src = LOCAL_PLACEHOLDER;
-                }
+                applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
               }}
             />
           </div>
         )}
       </Link>
 
-      <Link to={`/annonce/${listing.id}`} className="block p-4 max-lg:p-5 space-y-2.5">
+      <Link
+        to={`/annonce/${listing.id}`}
+        className="block p-4 max-lg:p-5 space-y-2.5"
+        onMouseEnter={handlePrefetchDetail}
+        onFocus={handlePrefetchDetail}
+        onTouchStart={handlePrefetchDetail}
+      >
         <div>
           <p className="text-xl max-sm:text-[1.35rem] font-bold text-primary font-sans tracking-tight">{formatPrice(listing.price_mga)}</p>
           <p className="text-xs text-muted-foreground font-sans mt-0.5">{formatPriceSecondary(listing.price_mga)}</p>

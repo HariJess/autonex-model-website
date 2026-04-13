@@ -12,7 +12,7 @@ interface ErrorBoundaryState {
 
 /**
  * ErrorBoundary : attrape les erreurs JavaScript dans l'arbre des composants enfants,
- * logge l'erreur et affiche un fallback au lieu d'un écran blanc.
+ * affiche un fallback au lieu d'un écran blanc.
  */
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -42,7 +42,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <div className="text-6xl">😕</div>
             <h1 className="text-2xl font-semibold">Oups, une erreur est survenue</h1>
             <p className="text-muted-foreground text-sm">
-              Nous sommes desoles pour la gene occasionnee. Vous pouvez reessayer ou revenir a l'accueil.
+              Nous sommes désolés pour la gêne occasionnée. Vous pouvez réessayer ou revenir à l'accueil.
             </p>
             {import.meta.env.DEV && this.state.error && (
               <pre className="text-left text-xs bg-muted p-3 rounded-md overflow-auto max-h-40">
@@ -57,14 +57,14 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition"
                 type="button"
               >
-                Reessayer
+                Réessayer
               </button>
               <button
                 onClick={() => (window.location.href = "/")}
                 className="px-4 py-2 rounded-md border border-border hover:bg-muted transition"
                 type="button"
               >
-                Retour a l'accueil
+                Retour à l'accueil
               </button>
             </div>
           </section>

@@ -16,8 +16,11 @@ export function buildCanonicalUrl(pathname: string, search?: string): string {
 
 export function toAbsoluteUrl(urlOrPath?: string | null): string | undefined {
   if (!urlOrPath) return undefined;
-  if (/^https?:\/\//i.test(urlOrPath)) return urlOrPath;
-  const normalizedPath = urlOrPath.startsWith("/") ? urlOrPath : `/${urlOrPath}`;
+  const normalizedInput = urlOrPath.trim();
+  if (!normalizedInput) return undefined;
+  if (/^https?:\/\//i.test(normalizedInput)) return normalizedInput;
+  if (normalizedInput.startsWith("//")) return `https:${normalizedInput}`;
+  const normalizedPath = normalizedInput.startsWith("/") ? normalizedInput : `/${normalizedInput}`;
   return `${SITE_BASE_URL}${normalizedPath}`;
 }
 

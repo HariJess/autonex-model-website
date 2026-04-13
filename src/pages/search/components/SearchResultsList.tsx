@@ -2,6 +2,9 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { DisplayListing } from "@/types/listing";
+import { applyImageFallback } from "@/lib/imageFallback";
+import { useQueryClient } from "@tanstack/react-query";
+import { prefetchListing } from "@/hooks/useListings";
 
 type SearchResultsListProps = {
   listings: DisplayListing[];
@@ -18,6 +21,9 @@ export function SearchResultsList({
   formatPrice,
   seeListingLabel,
 }: SearchResultsListProps) {
+  const imagePlaceholder = "/placeholder.svg";
+  const queryClient = useQueryClient();
+
   return (
     <div className="space-y-4">
       {listings.map((listing) => (
@@ -25,25 +31,33 @@ export function SearchResultsList({
           key={listing.id}
           className="flex flex-col sm:flex-row bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
         >
-          <Link to={`/annonce/${listing.id}`} className="w-full sm:w-72 h-48 flex-shrink-0 block">
+          <Link
+            to={`/annonce/${listing.id}`}
+            className="w-full sm:w-72 h-48 flex-shrink-0 block"
+            onMouseEnter={() => void prefetchListing(queryClient, listing.id)}
+            onFocus={() => void prefetchListing(queryClient, listing.id)}
+            onTouchStart={() => void prefetchListing(queryClient, listing.id)}
+          >
             <img
-              src={listing.images[0] ?? "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"}
+              src={listing.images[0] ?? imagePlaceholder}
               alt={listing.title}
               className="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
               onError={(e) => {
-                const img = e.currentTarget;
-                if (!img.dataset.fallbackApplied) {
-                  img.dataset.fallbackApplied = "1";
-                  img.src = "/placeholder.svg";
-                }
+                applyImageFallback(e.currentTarget, imagePlaceholder);
               }}
             />
           </Link>
           <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
             <div>
-              <Link to={`/annonce/${listing.id}`} className="block">
+              <Link
+                to={`/annonce/${listing.id}`}
+                className="block"
+                onMouseEnter={() => void prefetchListing(queryClient, listing.id)}
+                onFocus={() => void prefetchListing(queryClient, listing.id)}
+                onTouchStart={() => void prefetchListing(queryClient, listing.id)}
+              >
                 <h2 className="font-serif font-semibold text-lg hover:text-primary transition-colors">{listing.title}</h2>
               </Link>
               {showCloseMatchBadges && (

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import type { DisplayListing, ListingType, TransactionType } from "@/types/listing";
@@ -129,72 +129,89 @@ function mapListingRowToDisplayListing(
   };
 }
 
+async function fetchListingById(id: string | undefined): Promise<DisplayListing | null> {
+  if (!id) return null;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return null;
+  }
+  const { data: listing, error } = await supabase
+    .from("listings")
+    .select(LISTING_SELECT_COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`Erreur de chargement: ${error.message}`);
+  if (!listing) return null;
+
+  const { data: photos } = await supabase
+    .from("listing_photos")
+    .select("url, position")
+    .eq("listing_id", listing.id)
+    .order("position", { ascending: true });
+
+  const { data: profileRow, error: profileRpcError } = await supabase.rpc("get_profile_for_listing_display", {
+    p_owner_id: listing.owner_id,
+  });
+  if (profileRpcError) {
+    throw new Error(`Profil: ${profileRpcError.message}`);
+  }
+  const profile = Array.isArray(profileRow) ? profileRow[0] : profileRow;
+
+  let agencyInfo: { name: string; slug: string; logo_url: string | null; verified: boolean | null } | null = null;
+  if (profile?.agency_id) {
+    const { data } = await supabase
+      .from("agencies")
+      .select("name, slug, logo_url, verified")
+      .eq("id", profile.agency_id)
+      .maybeSingle();
+    agencyInfo = data;
+  }
+
+  let badge: DisplayListing["badge"] = null;
+  const { data: boosts } = await supabase
+    .from("boosts")
+    .select("type")
+    .eq("listing_id", listing.id)
+    .gte("ends_at", new Date().toISOString());
+  const boostTypes = new Set((boosts ?? []).map((b) => b.type));
+  if (boostTypes.has("top")) badge = "boost";
+  else if (boostTypes.has("featured")) badge = "coup_de_coeur";
+  else if (boostTypes.has("urgent")) badge = "urgent";
+
+  return mapListingRowToDisplayListing(listing, {
+    images: photos?.map((p) => p.url) ?? [],
+    badge,
+    ownerName: profile?.full_name ?? null,
+    ownerPhone: null,
+    agencyName: agencyInfo?.name ?? null,
+    agencySlug: agencyInfo?.slug ?? null,
+    agencyLogo: agencyInfo?.logo_url ?? null,
+    agencyVerified: agencyInfo?.verified ?? false,
+  });
+}
+
 /** Fetch a single listing by UUID with photos & owner info */
 export function useListing(id: string | undefined) {
   return useQuery({
     queryKey: ["listing", id],
-    queryFn: async (): Promise<DisplayListing | null> => {
-      if (!id) return null;
-      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-        return null;
-      }
-      const { data: listing, error } = await supabase
-        .from("listings")
-        .select(LISTING_SELECT_COLUMNS)
-        .eq("id", id)
-        .maybeSingle();
-      if (error) throw new Error(`Erreur de chargement: ${error.message}`);
-      if (!listing) return null;
-
-      const { data: photos } = await supabase
-        .from("listing_photos")
-        .select("url, position")
-        .eq("listing_id", listing.id)
-        .order("position", { ascending: true });
-
-      const { data: profileRow, error: profileRpcError } = await supabase.rpc("get_profile_for_listing_display", {
-        p_owner_id: listing.owner_id,
-      });
-      if (profileRpcError) {
-        throw new Error(`Profil: ${profileRpcError.message}`);
-      }
-      const profile = Array.isArray(profileRow) ? profileRow[0] : profileRow;
-
-      let agencyInfo: { name: string; slug: string; logo_url: string | null; verified: boolean | null } | null = null;
-      if (profile?.agency_id) {
-        const { data } = await supabase
-          .from("agencies")
-          .select("name, slug, logo_url, verified")
-          .eq("id", profile.agency_id)
-          .maybeSingle();
-        agencyInfo = data;
-      }
-
-      let badge: DisplayListing["badge"] = null;
-      const { data: boosts } = await supabase
-        .from("boosts")
-        .select("type")
-        .eq("listing_id", listing.id)
-        .gte("ends_at", new Date().toISOString());
-      const boostTypes = new Set((boosts ?? []).map((b) => b.type));
-      if (boostTypes.has("top")) badge = "boost";
-      else if (boostTypes.has("featured")) badge = "coup_de_coeur";
-      else if (boostTypes.has("urgent")) badge = "urgent";
-
-      return mapListingRowToDisplayListing(listing, {
-        images: photos?.map((p) => p.url) ?? [],
-        badge,
-        ownerName: profile?.full_name ?? null,
-        ownerPhone: null,
-        agencyName: agencyInfo?.name ?? null,
-        agencySlug: agencyInfo?.slug ?? null,
-        agencyLogo: agencyInfo?.logo_url ?? null,
-        agencyVerified: agencyInfo?.verified ?? false,
-      });
-    },
+    queryFn: () => fetchListingById(id),
     enabled: !!id,
     retry: 1,
+    staleTime: 60_000,
+    gcTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
   });
+}
+
+export function prefetchListing(queryClient: QueryClient, id: string | undefined): Promise<void> {
+  if (!id) return Promise.resolve();
+  return queryClient
+    .prefetchQuery({
+      queryKey: ["listing", id],
+      queryFn: () => fetchListingById(id),
+      staleTime: 60_000,
+      gcTime: 10 * 60_000,
+    })
+    .then(() => undefined);
 }
 
 export interface ListingsFilters {
@@ -444,6 +461,9 @@ export function useDbListings(filters: ListingsFilters = {}) {
       });
     },
     retry: 1,
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -454,6 +474,20 @@ export function useDbListings(filters: ListingsFilters = {}) {
 export async function fetchActiveListingCountsByVille(villeNames: string[]): Promise<Record<string, number>> {
   const uniqueVilles = Array.from(new Set(villeNames.filter((v) => v.trim().length > 0)));
   if (uniqueVilles.length === 0) return {};
+
+  // Prefer a single aggregated DB call if available, and fallback safely.
+  const { data: rpcData, error: rpcError } = await supabase.rpc("get_active_listing_counts_by_ville", {
+    p_villes: uniqueVilles,
+  });
+  if (!rpcError && Array.isArray(rpcData)) {
+    const counts: Record<string, number> = {};
+    for (const row of rpcData as Array<{ ville?: string | null; count?: number | null }>) {
+      if (typeof row?.ville === "string" && row.ville.trim()) {
+        counts[row.ville] = Number(row.count ?? 0);
+      }
+    }
+    return counts;
+  }
 
   const results = await Promise.all(
     uniqueVilles.map(async (ville) => {

@@ -20,23 +20,21 @@ export function SearchActiveChips({ chips, clearAllLabel, onRemoveChip, onClearA
   return (
     <div className="flex flex-wrap items-center gap-2 mb-4 lg:gap-1.5">
       {chips.map((chip) => (
-        <Badge
+        <button
           key={chip.key}
-          variant="secondary"
-          role="button"
-          tabIndex={0}
-          className="font-sans gap-1.5 cursor-pointer hover:bg-destructive/10 transition-colors touch-manipulation max-lg:min-h-10 max-lg:py-2 max-lg:px-2.5 max-lg:text-sm text-xs"
+          type="button"
+          className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
           onClick={() => onRemoveChip(chip.key)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onRemoveChip(chip.key);
-            }
-          }}
+          aria-label={`Retirer le filtre ${chip.label}`}
         >
-          {chip.label}
-          <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        </Badge>
+          <Badge
+            variant="secondary"
+            className="font-sans gap-1.5 cursor-pointer hover:bg-destructive/10 transition-colors touch-manipulation max-lg:min-h-10 max-lg:py-2 max-lg:px-2.5 max-lg:text-sm text-xs"
+          >
+            {chip.label}
+            <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          </Badge>
+        </button>
       ))}
       <Button
         variant="ghost"

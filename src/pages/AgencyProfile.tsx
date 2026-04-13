@@ -13,6 +13,7 @@ import { useDbListings } from "@/hooks/useListings";
 import { BannerSlot } from "@/components/monetization/BannerSlot";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
+import { applyImageFallback } from "@/lib/imageFallback";
 
 const AgencyProfile = () => {
   const { slug } = useParams();
@@ -31,6 +32,9 @@ const AgencyProfile = () => {
       return data;
     },
     enabled: !!slug,
+    staleTime: 60_000,
+    gcTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: agentIds = [] } = useQuery({
@@ -44,6 +48,9 @@ const AgencyProfile = () => {
       return Array.isArray(data) ? data : [];
     },
     enabled: !!agency?.id,
+    staleTime: 60_000,
+    gcTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: listings = [], isLoading: listingsLoading } = useDbListings(
@@ -146,6 +153,7 @@ const AgencyProfile = () => {
                 className="w-full h-full object-cover"
                 loading="lazy"
                 decoding="async"
+                onError={(e) => applyImageFallback(e.currentTarget)}
               />
             ) : (
               <span className="font-serif text-2xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>

@@ -22,6 +22,7 @@ import { contactLeadSchema } from "@/lib/validation";
 import { getSearchSessionId } from "@/lib/searchSession";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { applyImageFallback } from "@/lib/imageFallback";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
@@ -193,7 +194,7 @@ const ListingDetail = () => {
 
   const images = listing.images.length > 0
     ? listing.images
-    : ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop"];
+    : ["/placeholder.svg"];
 
   const transactionLabel = TRANSACTION_LABELS[listing.transaction] ?? listing.transaction;
   const typeLabel = LISTING_TYPE_LABELS[listing.type] ?? listing.type;
@@ -331,13 +332,26 @@ const ListingDetail = () => {
           <div className="lg:col-span-2 space-y-8">
             <div className="space-y-3">
               <div className="rounded-2xl overflow-hidden aspect-video">
-                <img src={images[selectedImg]} alt={listing.title} className="w-full h-full object-cover" decoding="async" />
+                <img
+                  src={images[selectedImg]}
+                  alt={listing.title}
+                  className="w-full h-full object-cover"
+                  decoding="async"
+                  onError={(e) => applyImageFallback(e.currentTarget)}
+                />
               </div>
               {images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto">
                   {images.map((img, i) => (
                     <button key={i} type="button" onClick={() => setSelectedImg(i)} className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}>
-                      <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                      <img
+                        src={img}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => applyImageFallback(e.currentTarget)}
+                      />
                     </button>
                   ))}
                 </div>
@@ -529,6 +543,7 @@ const ListingDetail = () => {
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
+                      onError={(e) => applyImageFallback(e.currentTarget)}
                     />
                   </div>
                 ) : (

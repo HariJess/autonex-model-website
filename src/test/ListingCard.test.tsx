@@ -2,18 +2,22 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ListingCard from "@/components/ListingCard";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import type { DisplayListing } from "@/types/listing";
 
 function renderCard(listing: DisplayListing) {
+  const queryClient = new QueryClient();
   return render(
     <HelmetProvider>
-      <MemoryRouter>
-        <CurrencyProvider>
-          <ListingCard listing={listing} />
-        </CurrencyProvider>
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <CurrencyProvider>
+            <ListingCard listing={listing} />
+          </CurrencyProvider>
+        </MemoryRouter>
+      </QueryClientProvider>
     </HelmetProvider>
   );
 }

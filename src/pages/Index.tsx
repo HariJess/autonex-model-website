@@ -16,6 +16,7 @@ import { FeaturedListingsSection } from "@/components/monetization/FeaturedListi
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
+import { applyImageFallback } from "@/lib/imageFallback";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -31,7 +32,9 @@ const Index = () => {
   const { data: villeCounts = {} } = useQuery({
     queryKey: ["ville-counts", villes.map((v) => v.name).join("|")],
     queryFn: () => fetchActiveListingCountsByVille(villes.map((v) => v.name)),
-    staleTime: 60_000,
+    staleTime: 5 * 60_000,
+    gcTime: 15 * 60_000,
+    refetchOnWindowFocus: false,
   });
 
   return (
@@ -125,11 +128,7 @@ const Index = () => {
                     loading="lazy"
                     decoding="async"
                     onError={(e) => {
-                      const img = e.currentTarget;
-                      if (!img.dataset.fallbackApplied) {
-                        img.dataset.fallbackApplied = "1";
-                        img.src = cityImageFallback;
-                      }
+                      applyImageFallback(e.currentTarget, cityImageFallback);
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
@@ -166,11 +165,7 @@ const Index = () => {
                     loading="lazy"
                     decoding="async"
                     onError={(e) => {
-                      const img = e.currentTarget;
-                      if (!img.dataset.fallbackApplied) {
-                        img.dataset.fallbackApplied = "1";
-                        img.src = "/placeholder.svg";
-                      }
+                      applyImageFallback(e.currentTarget);
                     }}
                   />
                 </div>
