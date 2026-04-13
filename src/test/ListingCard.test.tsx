@@ -79,7 +79,7 @@ describe("ListingCard", () => {
   it("utilise une image placeholder si aucune photo", () => {
     renderCard(makeListing({ images: [] }));
     const img = screen.getByAltText("Belle villa avec piscine") as HTMLImageElement;
-    expect(img.src).toContain("unsplash.com");
+    expect(img.src).toContain("/placeholder.svg");
   });
 
   it("applique loading='lazy' sur l'image principale", () => {

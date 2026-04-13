@@ -1,0 +1,5 @@
+# SPA fallback for Netlify static hosting
+/* /index.html 200
+
+# For Vercel or other static hosts, configure equivalent rewrite rules
+# so deep links (/annonce/:id, /agence/:slug, etc.) resolve to index.html.

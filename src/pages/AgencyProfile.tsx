@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDbListings } from "@/hooks/useListings";
 import { BannerSlot } from "@/components/monetization/BannerSlot";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
+import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 
 const AgencyProfile = () => {
   const { slug } = useParams();
@@ -91,10 +92,39 @@ const AgencyProfile = () => {
       </>
     );
   }
+  const canonical = buildCanonicalUrl(`/agence/${agency.slug}`);
+  const seoTitle = composePageTitle(`${agency.name} — Agence immobiliere`);
+  const seoDescription = truncateMetaDescription(
+    `${agency.name} : ${agency.bio || "agence immobiliere a Madagascar"} — ${listings.length} annonce${listings.length > 1 ? "s" : ""} active${listings.length > 1 ? "s" : ""}.`,
+  );
+  const seoImage = toAbsoluteUrl(agency.logo_url || "/placeholder.svg");
+  const agencyJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    name: agency.name,
+    url: canonical,
+    logo: seoImage,
+    image: seoImage,
+    description: agency.bio || undefined,
+    telephone: agency.phone || undefined,
+    email: agency.email || undefined,
+  };
 
   return (
     <>
-      <Helmet><title>{agency.name} — ImmoNex</title></Helmet>
+      <Helmet>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:url" content={canonical} />
+        {seoImage && <meta property="og:image" content={seoImage} />}
+        <script type="application/ld+json">
+          {JSON.stringify(agencyJsonLd)}
+        </script>
+      </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-6 md:py-8">
         {MONETIZATION_PLACEMENTS.agencyStrip && (

@@ -20,6 +20,7 @@ import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { toApproximatePublicCoordinates } from "@/lib/mapPrivacy";
 import { contactLeadSchema } from "@/lib/validation";
 import { getSearchSessionId } from "@/lib/searchSession";
+import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ListingSponsorBlock,
@@ -235,10 +236,70 @@ const ListingDetail = () => {
     if (s === "expired") return t("listing.ownerExpired", "Annonce expirée.");
     return t("listing.ownerNonActive", "Cette annonce n’est pas publiée actuellement.");
   })();
+  const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
+  const listingTitle = composePageTitle(listing.title);
+  const listingDescription = truncateMetaDescription(
+    [
+      `${typeLabel} ${transactionLabel} a ${listing.ville || "Madagascar"}`,
+      listing.price_mga ? `${listing.price_mga.toLocaleString("fr-FR")} Ar` : "",
+      listing.description || "",
+    ]
+      .filter(Boolean)
+      .join(" — "),
+  );
+  const seoImage = toAbsoluteUrl(images[0] || "/placeholder.svg");
+  const listingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: listing.title,
+    description: listingDescription,
+    url: canonical,
+    image: seoImage ? [seoImage] : undefined,
+    datePosted: listing.created_at || undefined,
+    address: listing.ville || listing.region
+      ? {
+          "@type": "PostalAddress",
+          addressLocality: listing.ville || undefined,
+          addressRegion: listing.region || undefined,
+          addressCountry: "MG",
+        }
+      : undefined,
+    numberOfRooms: listing.rooms && listing.rooms > 0 ? listing.rooms : undefined,
+    floorSize: listing.surface && listing.surface > 0
+      ? {
+          "@type": "QuantitativeValue",
+          value: listing.surface,
+          unitCode: "MTK",
+        }
+      : undefined,
+    offers: {
+      "@type": "Offer",
+      price: listing.price_mga,
+      priceCurrency: "MGA",
+      availability: listing.status === "active" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url: canonical,
+    },
+  };
 
   return (
     <>
-      <Helmet><title>{listing.title} — ImmoNex</title></Helmet>
+      <Helmet>
+        <title>{listingTitle}</title>
+        <meta name="description" content={listingDescription} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={listingTitle} />
+        <meta property="og:description" content={listingDescription} />
+        <meta property="og:url" content={canonical} />
+        {seoImage && <meta property="og:image" content={seoImage} />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={listingTitle} />
+        <meta name="twitter:description" content={listingDescription} />
+        {seoImage && <meta name="twitter:image" content={seoImage} />}
+        <script type="application/ld+json">
+          {JSON.stringify(listingJsonLd)}
+        </script>
+      </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-5 md:py-6 pb-32 lg:pb-6">
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">

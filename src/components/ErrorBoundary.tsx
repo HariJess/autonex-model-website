@@ -37,12 +37,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background px-4">
-          <div className="max-w-md w-full text-center space-y-4">
+        <main className="min-h-screen flex items-center justify-center bg-background px-4" role="alert" aria-live="assertive">
+          <section className="max-w-md w-full text-center space-y-4">
             <div className="text-6xl">😕</div>
             <h1 className="text-2xl font-semibold">Oups, une erreur est survenue</h1>
             <p className="text-muted-foreground text-sm">
-              Nous sommes désolés pour la gêne occasionnée. L'équipe technique a été notifiée.
+              Nous sommes desoles pour la gene occasionnee. Vous pouvez reessayer ou revenir a l'accueil.
             </p>
             {import.meta.env.DEV && this.state.error && (
               <pre className="text-left text-xs bg-muted p-3 rounded-md overflow-auto max-h-40">
@@ -55,18 +55,20 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               <button
                 onClick={this.handleReset}
                 className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition"
+                type="button"
               >
-                Réessayer
+                Reessayer
               </button>
               <button
                 onClick={() => (window.location.href = "/")}
                 className="px-4 py-2 rounded-md border border-border hover:bg-muted transition"
+                type="button"
               >
-                Retour à l'accueil
+                Retour a l'accueil
               </button>
             </div>
-          </div>
-        </div>
+          </section>
+        </main>
       );
     }
 

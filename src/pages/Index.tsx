@@ -6,9 +6,8 @@ import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
 import { ChevronRight, Loader2, AlertCircle } from "lucide-react";
-import { useDbListings } from "@/hooks/useListings";
+import { fetchActiveListingCountsByVille, useDbListings } from "@/hooks/useListings";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { villes } from "@/data/madagascar-locations";
 import { seedBlogPosts } from "@/data/seed-listings";
 import { BannerSlot } from "@/components/monetization/BannerSlot";
@@ -16,32 +15,40 @@ import { PremiumBillboard } from "@/components/monetization/PremiumBillboard";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
+import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 
 const Index = () => {
   const { t } = useTranslation();
   const cityImageFallback = "/placeholder.svg";
+  const canonical = buildCanonicalUrl("/");
+  const seoTitle = composePageTitle("ImmoNex Madagascar — Portail immobilier N°1");
+  const seoDescription = truncateMetaDescription(
+    "ImmoNex, portail immobilier a Madagascar : annonces de vente et location, agences verifiees et conseils pratiques pour acheter, louer ou investir.",
+  );
+  const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
   const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
 
   const { data: villeCounts = {} } = useQuery({
-    queryKey: ["ville-counts"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("listings")
-        .select("ville")
-        .eq("status", "active");
-      const counts: Record<string, number> = {};
-      data?.forEach((l) => {
-        if (l.ville) counts[l.ville] = (counts[l.ville] ?? 0) + 1;
-      });
-      return counts;
-    },
+    queryKey: ["ville-counts", villes.map((v) => v.name).join("|")],
+    queryFn: () => fetchActiveListingCountsByVille(villes.map((v) => v.name)),
+    staleTime: 60_000,
   });
 
   return (
     <>
       <Helmet>
-        <title>ImmoNex Madagascar — Portail immobilier N°1</title>
-        <meta name="description" content="Trouvez votre futur chez-vous à Madagascar. Vente, location dans toutes les villes." />
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:url" content={canonical} />
+        {seoImage && <meta property="og:image" content={seoImage} />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDescription} />
+        {seoImage && <meta name="twitter:image" content={seoImage} />}
       </Helmet>
       <Header />
 

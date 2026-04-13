@@ -1,6 +1,133 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 import type { DisplayListing, ListingType, TransactionType } from "@/types/listing";
+
+type ListingRowLite = Pick<
+  Tables<"listings">,
+  | "id"
+  | "title"
+  | "description"
+  | "type"
+  | "transaction"
+  | "price_mga"
+  | "price_eur"
+  | "surface"
+  | "rooms"
+  | "bathrooms"
+  | "toilets"
+  | "ville"
+  | "region"
+  | "arrondissement"
+  | "quartier"
+  | "quartier_libre"
+  | "lat"
+  | "lng"
+  | "features"
+  | "status"
+  | "views_count"
+  | "created_at"
+  | "owner_id"
+  | "video_url"
+  | "virtual_tour_url"
+  | "internal_ref"
+  | "is_new_program"
+  | "rejection_reason"
+  | "pending_boost_types"
+>;
+
+const LISTING_SELECT_COLUMNS = [
+  "id",
+  "title",
+  "description",
+  "type",
+  "transaction",
+  "price_mga",
+  "price_eur",
+  "surface",
+  "rooms",
+  "bathrooms",
+  "toilets",
+  "ville",
+  "region",
+  "arrondissement",
+  "quartier",
+  "quartier_libre",
+  "lat",
+  "lng",
+  "features",
+  "status",
+  "views_count",
+  "created_at",
+  "owner_id",
+  "video_url",
+  "virtual_tour_url",
+  "internal_ref",
+  "is_new_program",
+  "rejection_reason",
+  "pending_boost_types",
+].join(",");
+
+function mapListingRowToDisplayListing(
+  listing: ListingRowLite,
+  extras?: {
+    images?: string[];
+    badge?: DisplayListing["badge"];
+    visibilityRankScore?: number;
+    ownerName?: string | null;
+    ownerPhone?: string | null;
+    agencyName?: string | null;
+    agencySlug?: string | null;
+    agencyLogo?: string | null;
+    agencyVerified?: boolean;
+  },
+): DisplayListing {
+  const features = Array.isArray(listing.features) ? (listing.features as string[]) : [];
+  const pendingBoosts = Array.isArray(listing.pending_boost_types)
+    ? (listing.pending_boost_types as unknown[]).filter((x): x is string => typeof x === "string")
+    : [];
+
+  return {
+    id: listing.id,
+    title: listing.title,
+    description: listing.description,
+    type: listing.type as ListingType,
+    transaction: listing.transaction as TransactionType,
+    price_mga: listing.price_mga,
+    price_eur: listing.price_eur ? Number(listing.price_eur) : null,
+    surface: listing.surface,
+    rooms: listing.rooms,
+    bathrooms: listing.bathrooms,
+    toilets: listing.toilets,
+    ville: listing.ville,
+    region: listing.region,
+    arrondissement: listing.arrondissement,
+    quartier: listing.quartier,
+    quartier_libre: listing.quartier_libre,
+    lat: listing.lat != null && listing.lat !== "" ? Number(listing.lat) : null,
+    lng: listing.lng != null && listing.lng !== "" ? Number(listing.lng) : null,
+    features,
+    images: extras?.images ?? [],
+    status: listing.status,
+    views_count: listing.views_count,
+    created_at: listing.created_at,
+    owner_id: listing.owner_id,
+    owner_name: extras?.ownerName ?? null,
+    owner_phone: extras?.ownerPhone ?? null,
+    agency_name: extras?.agencyName ?? null,
+    agency_slug: extras?.agencySlug ?? null,
+    agency_logo: extras?.agencyLogo ?? null,
+    agency_verified: extras?.agencyVerified ?? false,
+    badge: extras?.badge ?? null,
+    visibility_rank_score: extras?.visibilityRankScore,
+    video_url: listing.video_url,
+    virtual_tour_url: listing.virtual_tour_url,
+    internal_ref: listing.internal_ref,
+    is_new_program: listing.is_new_program,
+    rejection_reason: listing.rejection_reason,
+    pending_boost_types: pendingBoosts.length > 0 ? pendingBoosts : undefined,
+  };
+}
 
 /** Fetch a single listing by UUID with photos & owner info */
 export function useListing(id: string | undefined) {
@@ -13,7 +140,7 @@ export function useListing(id: string | undefined) {
       }
       const { data: listing, error } = await supabase
         .from("listings")
-        .select("*")
+        .select(LISTING_SELECT_COLUMNS)
         .eq("id", id)
         .maybeSingle();
       if (error) throw new Error(`Erreur de chargement: ${error.message}`);
@@ -54,50 +181,16 @@ export function useListing(id: string | undefined) {
       else if (boostTypes.has("featured")) badge = "coup_de_coeur";
       else if (boostTypes.has("urgent")) badge = "urgent";
 
-      const features = Array.isArray(listing.features) ? listing.features as string[] : [];
-      const pendingBoosts = Array.isArray(listing.pending_boost_types)
-        ? (listing.pending_boost_types as unknown[]).filter((x): x is string => typeof x === "string")
-        : [];
-
-      return {
-        id: listing.id,
-        title: listing.title,
-        description: listing.description,
-        type: listing.type as ListingType,
-        transaction: listing.transaction as TransactionType,
-        price_mga: listing.price_mga,
-        price_eur: listing.price_eur ? Number(listing.price_eur) : null,
-        surface: listing.surface,
-        rooms: listing.rooms,
-        bathrooms: listing.bathrooms,
-        toilets: listing.toilets,
-        ville: listing.ville,
-        region: listing.region,
-        arrondissement: listing.arrondissement,
-        quartier: listing.quartier,
-        quartier_libre: listing.quartier_libre,
-        lat: listing.lat != null && listing.lat !== "" ? Number(listing.lat) : null,
-        lng: listing.lng != null && listing.lng !== "" ? Number(listing.lng) : null,
-        features,
+      return mapListingRowToDisplayListing(listing, {
         images: photos?.map((p) => p.url) ?? [],
-        status: listing.status,
-        views_count: listing.views_count,
-        created_at: listing.created_at,
-        owner_id: listing.owner_id,
-        owner_name: profile?.full_name ?? null,
-        owner_phone: null,
-        agency_name: agencyInfo?.name ?? null,
-        agency_slug: agencyInfo?.slug ?? null,
-        agency_logo: agencyInfo?.logo_url ?? null,
-        agency_verified: agencyInfo?.verified ?? false,
         badge,
-        video_url: listing.video_url,
-        virtual_tour_url: listing.virtual_tour_url,
-        internal_ref: listing.internal_ref,
-        is_new_program: listing.is_new_program,
-        rejection_reason: listing.rejection_reason,
-        pending_boost_types: pendingBoosts.length > 0 ? pendingBoosts : undefined,
-      };
+        ownerName: profile?.full_name ?? null,
+        ownerPhone: null,
+        agencyName: agencyInfo?.name ?? null,
+        agencySlug: agencyInfo?.slug ?? null,
+        agencyLogo: agencyInfo?.logo_url ?? null,
+        agencyVerified: agencyInfo?.verified ?? false,
+      });
     },
     enabled: !!id,
     retry: 1,
@@ -174,7 +267,7 @@ export function useDbListings(filters: ListingsFilters = {}) {
 
       let query = supabase
         .from("listings")
-        .select("*")
+        .select(LISTING_SELECT_COLUMNS)
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
@@ -342,37 +435,37 @@ export function useDbListings(filters: ListingsFilters = {}) {
       };
 
       return listings.map((listing) => {
-        const features = Array.isArray(listing.features) ? listing.features as string[] : [];
         const tset = typesByListing.get(listing.id) ?? new Set<string>();
-        return {
-          id: listing.id,
-          title: listing.title,
-          description: listing.description,
-          type: listing.type as ListingType,
-          transaction: listing.transaction as TransactionType,
-          price_mga: listing.price_mga,
-          price_eur: listing.price_eur ? Number(listing.price_eur) : null,
-          surface: listing.surface,
-          rooms: listing.rooms,
-          bathrooms: listing.bathrooms,
-          ville: listing.ville,
-          region: listing.region,
-          arrondissement: listing.arrondissement,
-          quartier: listing.quartier,
-          quartier_libre: listing.quartier_libre,
-          lat: listing.lat != null && listing.lat !== "" ? Number(listing.lat) : null,
-          lng: listing.lng != null && listing.lng !== "" ? Number(listing.lng) : null,
-          features,
+        return mapListingRowToDisplayListing(listing, {
           images: photosByListing.get(listing.id) ?? [],
-          status: listing.status,
-          views_count: listing.views_count,
-          created_at: listing.created_at,
-          owner_id: listing.owner_id,
           badge: badgeForTypes(tset),
-          visibility_rank_score: visibilityRankScore(listing, tset),
-        };
+          visibilityRankScore: visibilityRankScore(listing, tset),
+        });
       });
     },
     retry: 1,
   });
+}
+
+/**
+ * Counts active listings by city without downloading full listing rows.
+ * Uses lightweight head-count queries per city as a scalable fallback when no SQL aggregation RPC exists.
+ */
+export async function fetchActiveListingCountsByVille(villeNames: string[]): Promise<Record<string, number>> {
+  const uniqueVilles = Array.from(new Set(villeNames.filter((v) => v.trim().length > 0)));
+  if (uniqueVilles.length === 0) return {};
+
+  const results = await Promise.all(
+    uniqueVilles.map(async (ville) => {
+      const { count, error } = await supabase
+        .from("listings")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active")
+        .eq("ville", ville);
+      if (error) return [ville, 0] as const;
+      return [ville, count ?? 0] as const;
+    }),
+  );
+
+  return Object.fromEntries(results);
 }

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Bed, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { DisplayListing, ListingType } from "@/types/listing";
 import { LISTING_TYPE_LABELS } from "@/types/listing";
 
@@ -16,12 +16,20 @@ interface ListingCardProps {
   matchBadge?: string;
 }
 
-const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop";
+const LOCAL_PLACEHOLDER = "/placeholder.svg";
 
 const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCardProps) => {
-  const images = listing.images.length > 0 ? listing.images : [PLACEHOLDER_IMAGE];
+  const images = useMemo(
+    () => (listing.images.length > 0 ? listing.images : [LOCAL_PLACEHOLDER]),
+    [listing.images],
+  );
   const [imgIndex, setImgIndex] = useState(0);
   const { formatPrice, formatPriceSecondary } = useCurrency();
+  const indicatorIndexes = useMemo(() => {
+    if (images.length <= 5) return images.map((_, i) => i);
+    const start = Math.max(0, Math.min(imgIndex - 2, images.length - 5));
+    return Array.from({ length: 5 }, (_, i) => start + i);
+  }, [images, imgIndex]);
 
   const badgeLabels: Record<string, { label: string; className: string }> = {
     boost: { label: "Boost", className: "gradient-primary" },
@@ -45,6 +53,13 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            const img = e.currentTarget;
+            if (!img.dataset.fallbackApplied) {
+              img.dataset.fallbackApplied = "1";
+              img.src = LOCAL_PLACEHOLDER;
+            }
+          }}
         />
         {listing.badge && badgeLabels[listing.badge] && (
           <div className="absolute top-3 left-3">
@@ -73,10 +88,9 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
             </button>
             {/* Dot indicators */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-              {images.slice(0, 5).map((_, i) => (
-                <span key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === imgIndex ? "bg-white" : "bg-white/50"}`} />
+              {indicatorIndexes.map((idx) => (
+                <span key={idx} className={`w-1.5 h-1.5 rounded-full transition-colors ${idx === imgIndex ? "bg-white" : "bg-white/50"}`} />
               ))}
-              {images.length > 5 && <span className="w-1.5 h-1.5 rounded-full bg-white/50" />}
             </div>
           </>
         )}
@@ -88,6 +102,13 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
               className="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
+              onError={(e) => {
+                const img = e.currentTarget;
+                if (!img.dataset.fallbackApplied) {
+                  img.dataset.fallbackApplied = "1";
+                  img.src = LOCAL_PLACEHOLDER;
+                }
+              }}
             />
           </div>
         )}

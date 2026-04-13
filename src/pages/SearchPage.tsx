@@ -5,15 +5,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, Home, Loader2, AlertCircle, Sparkles } from "lucide-react";
+import { ChevronRight, Home, Loader2, Sparkles } from "lucide-react";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { useDbListings } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { useMemo, useCallback, useState, useEffect, useRef, lazy, Suspense, type ReactNode } from "react";
+import { useMemo, useCallback, useState, useEffect, useRef, lazy, Suspense } from "react";
 import {
   searchStateFromParams,
   searchParamsFromState,
@@ -22,7 +18,6 @@ import type { SearchFilters, SearchSortMode, SearchViewMode } from "@/types/sear
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { SearchTopBanner } from "@/components/monetization/SearchTopBanner";
 import { SidebarPromoSlot } from "@/components/monetization/SidebarPromoSlot";
-import { SponsoredNativeCard } from "@/components/monetization/SponsoredNativeCard";
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { rankSimilarListings } from "@/lib/searchSimilar";
@@ -38,6 +33,14 @@ import {
   matchesSurfaceMaxStrict,
   matchesSurfaceMinStrict,
 } from "@/lib/searchLocationMatch";
+import { buildCanonicalUrl, composePageTitle, truncateMetaDescription } from "@/lib/seo";
+import { SearchToolbar } from "@/pages/search/components/SearchToolbar";
+import { SearchActiveChips } from "@/pages/search/components/SearchActiveChips";
+import { SearchResultsGrid } from "@/pages/search/components/SearchResultsGrid";
+import { SearchResultsList } from "@/pages/search/components/SearchResultsList";
+import { SearchEmptyState } from "@/pages/search/components/SearchEmptyState";
+import { SearchLoadingState } from "@/pages/search/components/SearchLoadingState";
+import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -334,6 +337,44 @@ const SearchPage = () => {
     if (filters.ville) parts.push(`à ${filters.ville}`);
     return parts.join(" ");
   }, [filters, t]);
+  const metaDescription = useMemo(() => {
+    const typePart =
+      filters.types.length === 1
+        ? LISTING_TYPE_LABELS_PLURAL[filters.types[0] as keyof typeof LISTING_TYPE_LABELS_PLURAL] || filters.types[0]
+        : "biens immobiliers";
+    const transactionPart =
+      filters.transaction === "vente"
+        ? "a vendre"
+        : filters.transaction === "location"
+          ? "a louer"
+          : filters.transaction === "location_vacances"
+            ? "en location vacances"
+            : "";
+    const cityPart = filters.ville ? ` a ${filters.ville}` : " a Madagascar";
+    return truncateMetaDescription(
+      `Consultez les ${typePart} ${transactionPart}${cityPart} sur ImmoNex, avec des filtres par prix, surface, quartiers et equipements.`,
+    );
+  }, [filters]);
+  const canonicalSearch = useMemo(() => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("sort");
+    params.delete("view");
+    const qs = params.toString();
+    return buildCanonicalUrl("/recherche", qs ? `?${qs}` : "");
+  }, [searchParams]);
+  const noisyFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.arrondissements.length > 0) count += 1;
+    if (filters.quartiers.length > 0) count += 1;
+    if (filters.quartierLibre.trim()) count += 1;
+    if (filters.priceMin > 0 || filters.priceMax > 0) count += 1;
+    if (filters.surfaceMin > 0 || filters.surfaceMax > 0) count += 1;
+    if (filters.rooms.length > 0) count += 1;
+    if (filters.bathrooms.length > 0) count += 1;
+    if (filters.equipments.length > 0) count += 1;
+    return count;
+  }, [filters]);
+  const robotsContent = noisyFiltersCount >= 4 ? "noindex,follow" : "index,follow";
 
   const errorMessage =
     queryError instanceof Error ? queryError.message : queryError != null ? String(queryError) : "";
@@ -349,8 +390,15 @@ const SearchPage = () => {
     <>
       <Helmet>
         <title>
-          {queryError ? t("search.title", "Recherche") : pageTitle} — ImmoNex
+          {queryError ? composePageTitle(t("search.title", "Recherche")) : composePageTitle(pageTitle)}
         </title>
+        <meta name="description" content={metaDescription} />
+        <link rel="canonical" href={canonicalSearch} />
+        <meta name="robots" content={robotsContent} />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={queryError ? composePageTitle(t("search.title", "Recherche")) : composePageTitle(pageTitle)} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:url" content={canonicalSearch} />
       </Helmet>
       <Header />
 
@@ -400,37 +448,12 @@ const SearchPage = () => {
           )}
         </h1>
 
-        {activeChips.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-4 lg:gap-1.5">
-            {activeChips.map((chip) => (
-              <Badge
-                key={chip.key}
-                variant="secondary"
-                role="button"
-                tabIndex={0}
-                className="font-sans gap-1.5 cursor-pointer hover:bg-destructive/10 transition-colors touch-manipulation max-lg:min-h-10 max-lg:py-2 max-lg:px-2.5 max-lg:text-sm text-xs"
-                onClick={() => removeChip(chip.key)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    removeChip(chip.key);
-                  }
-                }}
-              >
-                {chip.label}
-                <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              </Badge>
-            ))}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs font-sans text-muted-foreground h-6 max-lg:min-h-10 max-lg:px-3 touch-manipulation"
-              onClick={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
-            >
-              {t("common.clearAll", "Effacer tout")}
-            </Button>
-          </div>
-        )}
+        <SearchActiveChips
+          chips={activeChips}
+          clearAllLabel={t("common.clearAll", "Effacer tout")}
+          onRemoveChip={removeChip}
+          onClearAll={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
+        />
       </div>
 
       <div className="container mx-auto px-4 pb-10">
@@ -447,89 +470,34 @@ const SearchPage = () => {
 
           <main className="flex-1 min-w-0">
             <SearchTopBanner />
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border p-3.5">
-              <div className="flex flex-wrap items-center gap-3 min-w-0">
-                <Sheet open={mobileFiltersOpen} onOpenChange={handleMobileSheetOpenChange}>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" size="sm" className="lg:hidden font-sans gap-2 shrink-0 min-h-11 touch-manipulation">
-                      <SlidersHorizontal className="h-4 w-4" />
-                      {t("search.filters")}
-                      {activeFilterCount > 0 && (
-                        <Badge
-                          variant="default"
-                          className="h-5 min-w-5 px-1 flex items-center justify-center text-[10px] gradient-primary border-0"
-                          style={{ color: "#FAFAFA" }}
-                        >
-                          {activeFilterCount}
-                        </Badge>
-                      )}
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent
-                    side="left"
-                    className="flex flex-col w-full sm:max-w-lg p-0 gap-0 h-[100dvh] max-h-[100dvh] overflow-hidden border-l"
-                  >
-                    <FilterSidebar
-                      filters={mobileFilterDraft ?? filters}
-                      onFiltersChange={setMobileFilterDraft}
-                      isMobile
-                      idPrefix="mobile"
-                      onClose={() => handleMobileSheetOpenChange(false)}
-                      onMobileApply={applyMobileFilters}
-                    />
-                  </SheetContent>
-                </Sheet>
-
-                <p className="font-sans text-sm text-muted-foreground leading-snug">
-                  {queryError ? (
-                    <span className="text-destructive font-medium">{t("search.resultsUnavailable", "Résultats indisponibles")}</span>
-                  ) : (
-                    <>
-                      <span className="font-semibold text-foreground">
-                        {sortedExact.length > 0 ? sortedExact.length : displayListings.length}
-                      </span>{" "}
-                      {sortedExact.length === 0 && similarFallbackListings.length > 0
-                        ? t("search.resultsSimilarLabel", "suggestions")
-                        : t("search.results")}
-                    </>
-                  )}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 justify-end w-full sm:w-auto">
-                <div className="flex items-center border border-border rounded-lg overflow-hidden shrink-0">
-                  {(
-                    [
-                      { mode: "grid" as const, icon: LayoutGrid, label: t("search.viewGrid", "Grille") },
-                      { mode: "list" as const, icon: List, label: t("search.viewList", "Liste") },
-                      { mode: "map" as const, icon: MapIcon, label: t("search.viewMap", "Carte") },
-                    ] as const
-                  ).map(({ mode, icon: Icon, label }) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => setViewMode(mode)}
-                      className={`inline-flex items-center justify-center min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
-                      aria-label={label}
-                      aria-pressed={viewMode === mode}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </button>
-                  ))}
-                </div>
-
-                <Select value={sort} onValueChange={(v) => setSort(v as SearchSortMode)}>
-                  <SelectTrigger className="w-full sm:w-40 font-sans text-sm min-w-0 min-h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="recent">{t("search.recent")}</SelectItem>
-                    <SelectItem value="priceAsc">{t("search.priceAsc")}</SelectItem>
-                    <SelectItem value="priceDesc">{t("search.priceDesc")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            <SearchToolbar
+              filters={filters}
+              mobileFilterDraft={mobileFilterDraft}
+              mobileFiltersOpen={mobileFiltersOpen}
+              activeFilterCount={activeFilterCount}
+              queryError={Boolean(queryError)}
+              queryErrorLabel={t("search.resultsUnavailable", "Résultats indisponibles")}
+              resultCount={sortedExact.length > 0 ? sortedExact.length : displayListings.length}
+              resultLabel={
+                sortedExact.length === 0 && similarFallbackListings.length > 0
+                  ? t("search.resultsSimilarLabel", "suggestions")
+                  : t("search.results")
+              }
+              viewMode={viewMode}
+              sort={sort}
+              filtersLabel={t("search.filters")}
+              sortRecentLabel={t("search.recent")}
+              sortPriceAscLabel={t("search.priceAsc")}
+              sortPriceDescLabel={t("search.priceDesc")}
+              viewGridLabel={t("search.viewGrid", "Grille")}
+              viewListLabel={t("search.viewList", "Liste")}
+              viewMapLabel={t("search.viewMap", "Carte")}
+              onOpenMobileFilters={handleMobileSheetOpenChange}
+              onMobileDraftChange={(next) => setMobileFilterDraft(next)}
+              onMobileApply={applyMobileFilters}
+              onSetViewMode={setViewMode}
+              onSetSort={setSort}
+            />
             {sort === "recent" && (
               <p className="text-xs text-muted-foreground font-sans -mt-2 mb-2 max-w-3xl">
                 {t(
@@ -566,20 +534,9 @@ const SearchPage = () => {
               </div>
             )}
 
-            {queryError && !isLoading && (
-              <div className="flex flex-col items-center justify-center py-16 text-center px-2">
-                <AlertCircle className="h-10 w-10 text-destructive mb-3" />
-                <p className="font-serif text-lg text-foreground mb-1">{t("common.error")}</p>
-                <p className="font-sans text-sm text-muted-foreground max-w-md">{errorMessage}</p>
-              </div>
-            )}
+            {queryError && !isLoading && <SearchErrorState title={t("common.error")} message={errorMessage} />}
 
-            {isLoading && (
-              <div className="flex justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
-                <span className="sr-only">{t("common.loading", "Chargement")}</span>
-              </div>
-            )}
+            {isLoading && <SearchLoadingState loadingLabel={t("common.loading", "Chargement")} />}
 
             {showResults && viewMode === "map" && (
               <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[min(600px,70vh)]">
@@ -594,7 +551,7 @@ const SearchPage = () => {
                     <ListingsMap listings={displayListings} onMarkerClick={(id) => navigate(`/annonce/${id}`)} />
                   </Suspense>
                 </div>
-                <div className="w-full lg:w-[42%] overflow-y-auto space-y-3 max-h-[min(520px,55vh)] lg:max-h-none pr-1">
+                <div className="w-full lg:w-[42%] h-auto lg:h-full lg:max-h-full overflow-y-visible lg:overflow-y-auto space-y-3 pr-1 min-h-0">
                   {displayListings.map((listing) => (
                     <ListingCard
                       key={listing.id}
@@ -607,80 +564,21 @@ const SearchPage = () => {
             )}
 
             {showResults && viewMode === "list" && (
-              <div className="space-y-4">
-                {displayListings.map((listing) => (
-                  <div
-                    key={listing.id}
-                    className="flex flex-col sm:flex-row bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    <Link to={`/annonce/${listing.id}`} className="w-full sm:w-72 h-48 flex-shrink-0 block">
-                      <img
-                        src={listing.images[0] ?? "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"}
-                        alt={listing.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => {
-                          const img = e.currentTarget;
-                          if (!img.dataset.fallbackApplied) {
-                            img.dataset.fallbackApplied = "1";
-                            img.src = "/placeholder.svg";
-                          }
-                        }}
-                      />
-                    </Link>
-                    <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
-                      <div>
-                        <Link to={`/annonce/${listing.id}`} className="block">
-                          <h2 className="font-serif font-semibold text-lg hover:text-primary transition-colors">
-                            {listing.title}
-                          </h2>
-                        </Link>
-                        {showCloseMatchBadges && (
-                          <Badge variant="secondary" className="mt-1.5 text-[10px] font-sans font-normal">
-                            {closeMatchLabel(listing)}
-                          </Badge>
-                        )}
-                        <p className="text-sm text-muted-foreground font-sans mt-1 line-clamp-2">{listing.description}</p>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm font-sans text-muted-foreground">
-                          {listing.surface != null && listing.surface > 0 && <span>{listing.surface} m²</span>}
-                          {listing.rooms != null && listing.rooms > 0 && <span>{listing.rooms} ch.</span>}
-                          {listing.rooms === 0 && ["appartement", "villa", "maison"].includes(listing.type) && (
-                            <span>Studio</span>
-                          )}
-                          {listing.bathrooms != null && listing.bathrooms > 0 && <span>{listing.bathrooms} sdb</span>}
-                          <span>{listing.ville}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between mt-3 gap-2">
-                        <span className="font-serif font-bold text-lg text-primary">{formatPrice(listing.price_mga)}</span>
-                        <Button variant="outline" size="sm" className="font-sans shrink-0 min-h-10 touch-manipulation" asChild>
-                          <Link to={`/annonce/${listing.id}`}>{t("search.seeListing", "Voir l’annonce")}</Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <SearchResultsList
+                listings={displayListings}
+                showCloseMatchBadges={showCloseMatchBadges}
+                getCloseMatchLabel={closeMatchLabel}
+                formatPrice={formatPrice}
+                seeListingLabel={t("search.seeListing", "Voir l’annonce")}
+              />
             )}
 
             {showResults && viewMode === "grid" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 max-lg:gap-6">
-                {displayListings.flatMap((listing, index): ReactNode[] => {
-                  const out: ReactNode[] = [];
-                  if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 2) {
-                    out.push(<SponsoredNativeCard key="monetization-sponsored" />);
-                  }
-                  out.push(
-                    <ListingCard
-                      key={listing.id}
-                      listing={listing}
-                      matchBadge={showCloseMatchBadges ? closeMatchLabel(listing) : undefined}
-                    />,
-                  );
-                  return out;
-                })}
-              </div>
+              <SearchResultsGrid
+                listings={displayListings}
+                showCloseMatchBadges={showCloseMatchBadges}
+                getCloseMatchLabel={closeMatchLabel}
+              />
             )}
 
             {showAlsoLikeBlock && (
@@ -700,18 +598,12 @@ const SearchPage = () => {
             )}
 
             {showEmpty && (
-              <div className="text-center py-16 md:py-20 px-2">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                  <Home className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <p className="font-serif text-xl text-foreground mb-2">{t("search.noResults", "Aucune annonce ne correspond")}</p>
-                <p className="font-sans text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                  {t("search.tryDifferentWiden", "Élargissez la ville, le budget ou les quartiers, ou réinitialisez les filtres.")}
-                </p>
-                <Button variant="outline" className="font-sans" onClick={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}>
-                  {t("search.resetFilters", "Réinitialiser les filtres")}
-                </Button>
-              </div>
+              <SearchEmptyState
+                title={t("search.noResults", "Aucune annonce ne correspond")}
+                description={t("search.tryDifferentWiden", "Élargissez la ville, le budget ou les quartiers, ou réinitialisez les filtres.")}
+                resetLabel={t("search.resetFilters", "Réinitialiser les filtres")}
+                onReset={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
+              />
             )}
           </main>
         </div>
