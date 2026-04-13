@@ -60,6 +60,13 @@ const SearchPage = () => {
   /** Draft filters while mobile sheet is open; URL updates only on Appliquer */
   const [mobileFilterDraft, setMobileFilterDraft] = useState<SearchFilters | null>(null);
 
+  // IMPORTANT : filters/sort/viewMode doivent être déclarés AVANT les callbacks qui les utilisent
+  // (sinon ReferenceError "Cannot access 'filters' before initialization" au runtime).
+  const { filters, sort, view: viewMode } = useMemo(
+    () => searchStateFromParams(searchParams),
+    [searchParams]
+  );
+
   const handleMobileSheetOpenChange = useCallback(
     (open: boolean) => {
       setMobileFiltersOpen(open);
@@ -77,11 +84,6 @@ const SearchPage = () => {
     setMobileFiltersOpen(false);
     setMobileFilterDraft(null);
   }, [mobileFilterDraft, filters, updateFilters]);
-
-  const { filters, sort, view: viewMode } = useMemo(
-    () => searchStateFromParams(searchParams),
-    [searchParams]
-  );
 
   const pushSearchState = useCallback(
     (next: { filters?: SearchFilters; sort?: SearchSortMode; view?: SearchViewMode }) => {

@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LocationPicker from "@/components/LocationPicker";
 import PublishLocationMap from "@/components/PublishLocationMap";
+import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,9 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Check, Upload, AlertCircle, Coins, Shield, Sparkles, Loader2, Cloud, FilePlus2 } from "lucide-react";
+import { Check, Upload, AlertCircle, Shield, Loader2, Cloud, FilePlus2 } from "lucide-react";
 import { LISTING_TYPE_LABELS, type ListingType, type TransactionType } from "@/types/listing";
 import { getRegionForVille, getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
@@ -1136,140 +1136,34 @@ const PublishPage = () => {
         )}
 
         {step === 3 && (
-          <div className="space-y-5">
-            <Card className="rounded-2xl border-border">
-              <CardHeader>
-                <CardTitle className="font-serif flex items-center gap-2"><Coins className="h-5 w-5" /> {t("publish.creditsTitle", "Crédits & coût")}</CardTitle>
-                <CardDescription className="font-sans">
-                  {t("publish.yourBalance", "Votre solde")} :{" "}
-                  <strong>{creditsBalancePending ? "…" : creditsBalance}</strong> {t("publish.credits", "crédits")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3 font-sans text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">{t("publish.costPublication", "Publication (modération)")}</span><span>{LISTING_PUBLISH_CREDIT_COST}</span></div>
-                {selectedBoosts.map((b) => (
-                  <div key={b} className="flex justify-between">
-                    <span className="text-muted-foreground">{BOOST_LABELS_FR[b]}</span>
-                    <span>{BOOST_CREDIT_COSTS[b]}</span>
-                  </div>
-                ))}
-                {agencySpotlightActive && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t("publish.agencySpotlight", "Spotlight agence (marque)")}</span>
-                    <span>{AGENCY_SPOTLIGHT_CREDIT_COST}</span>
-                  </div>
-                )}
-                <div className="flex justify-between font-semibold border-t pt-2"><span>Total</span><span>{totalCost}</span></div>
-                {!canPublishWithCredits && (
-                  <div className="space-y-1">
-                    <p className="text-destructive text-sm">{t("publish.needMoreCredits", "Solde insuffisant pour envoyer cette annonce avec les options choisies.")}</p>
-                    <p className="text-xs text-muted-foreground">{t("publish.draftKept", "Votre brouillon reste enregistré : vous pourrez publier après avoir obtenu des crédits.")}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl border-border">
-              <CardHeader>
-                <CardTitle className="font-serif flex items-center gap-2"><Sparkles className="h-5 w-5" /> {t("publish.boostTitle", "Boosts (après validation)")}</CardTitle>
-                <CardDescription className="font-sans">{t("publish.boostHonest", "Les boosts sélectionnés seront pris en compte lors de la mise en ligne par notre équipe, sous réserve de disponibilité.")}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {BOOST_ORDER.map((b) => (
-                  <label key={b} className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 cursor-pointer font-sans text-sm">
-                    <span className="flex items-center gap-2">
-                      <Checkbox checked={selectedBoosts.includes(b)} onCheckedChange={() => toggleBoost(b)} />
-                      <span>{BOOST_LABELS_FR[b]}</span>
-                    </span>
-                    <span className="text-muted-foreground whitespace-nowrap">{BOOST_CREDIT_COSTS[b]} cr.</span>
-                  </label>
-                ))}
-              </CardContent>
-            </Card>
-
-            {profile?.agency_id && (
-              <Card className="rounded-2xl border-border border-dashed border-primary/30">
-                <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-base">{t("publish.agencySpotlightTitle", "Visibilité agence")}</CardTitle>
-                  <CardDescription className="font-sans text-xs">
-                    {t(
-                      "publish.agencySpotlightDesc",
-                      "Renforce la présence de votre marque sur le portail (après validation). Réservé aux comptes agence.",
-                    )}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <label className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 cursor-pointer font-sans text-sm">
-                    <span className="flex items-center gap-2">
-                      <Checkbox checked={agencySpotlight} onCheckedChange={(c) => setAgencySpotlight(c === true)} />
-                      <span>{t("publish.agencySpotlightLabel", "Spotlight agence")}</span>
-                    </span>
-                    <span className="text-muted-foreground">{AGENCY_SPOTLIGHT_CREDIT_COST} cr.</span>
-                  </label>
-                </CardContent>
-              </Card>
-            )}
-
-            <Card className="rounded-2xl border-border">
-              <CardHeader>
-                <CardTitle className="font-serif text-lg">{t("publish.summary", "Récapitulatif")}</CardTitle>
-              </CardHeader>
-              <CardContent className="font-sans text-sm space-y-1 text-muted-foreground">
-                <p><strong className="text-foreground">{title || "—"}</strong></p>
-                <p>{listingType ? LISTING_TYPE_LABELS[listingType as ListingType] : ""} · {transaction} · {ville}</p>
-                <p>
-                  {serverPhotos.length + pendingPhotos.length}{" "}
-                  {t("publish.photoCount", "photo(s)")}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Button
-              type="button"
-              onClick={handlePublish}
-              disabled={publishing || !canPublishWithCredits}
-              className="w-full gradient-primary border-0 font-sans text-lg py-6"
-              style={{ color: "#FAFAFA" }}
-            >
-              {publishing ? t("common.loading") : t("publish.submitForReview", "Envoyer pour modération")}
-            </Button>
-
-            <div className="border-t border-border pt-6 space-y-4">
-              <h3 className="font-serif font-semibold">{t("publish.buyCredits", "Acheter des crédits")}</h3>
-              <p className="text-xs text-muted-foreground font-sans">{t("publish.buyCreditsHint", "Paiement manuel : transmettez le montant puis joignez une preuve. Aucun crédit n’est ajouté avant validation.")}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {creditPacks.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setCreditPackPurchase(p.id)}
-                    className={`rounded-xl border p-3 text-left font-sans text-sm transition-colors ${creditPackPurchase === p.id ? "border-primary ring-1 ring-primary" : "border-border"}`}
-                  >
-                    <p className="font-semibold">{p.name}</p>
-                    <p className="text-muted-foreground">{p.credits_amount} crédits — {formatAriary(p.price_mga)}</p>
-                  </button>
-                ))}
-              </div>
-              <div className="space-y-2">
-                <Label className="font-sans">{t("publish.paymentMethod", "Mode de paiement")}</Label>
-                <Select value={purchasePaymentMethod} onValueChange={setPurchasePaymentMethod}>
-                  <SelectTrigger className="font-sans"><SelectValue placeholder={t("common.select")} /></SelectTrigger>
-                  <SelectContent>
-                    {MANUAL_PAYMENT_METHODS.map((m) => (
-                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="font-sans">{t("publish.proofFile", "Preuve de paiement (fichier)")}</Label>
-                <Input type="file" accept="image/*,.pdf" className="font-sans" onChange={(e) => setProofFile(e.target.files?.[0] ?? null)} />
-              </div>
-              <Button type="button" variant="outline" className="w-full font-sans" disabled={purchaseSubmitting} onClick={submitCreditPurchase}>
-                {purchaseSubmitting ? t("common.loading") : t("publish.submitCreditRequest", "Enregistrer la demande d’achat")}
-              </Button>
-            </div>
-          </div>
+          <PublishStepVisibility
+            creditsBalance={creditsBalance}
+            creditsBalancePending={creditsBalancePending}
+            totalCost={totalCost}
+            canPublishWithCredits={canPublishWithCredits}
+            title={title}
+            listingType={listingType}
+            transaction={transaction}
+            ville={ville}
+            photoCount={serverPhotos.length + pendingPhotos.length}
+            selectedBoosts={selectedBoosts}
+            toggleBoost={toggleBoost}
+            hasAgency={Boolean(profile?.agency_id)}
+            agencySpotlight={agencySpotlight}
+            setAgencySpotlight={setAgencySpotlight}
+            agencySpotlightActive={agencySpotlightActive}
+            publishing={publishing}
+            onPublish={handlePublish}
+            creditPacks={creditPacks}
+            creditPackPurchase={creditPackPurchase}
+            setCreditPackPurchase={setCreditPackPurchase}
+            paymentMethods={MANUAL_PAYMENT_METHODS}
+            purchasePaymentMethod={purchasePaymentMethod}
+            setPurchasePaymentMethod={setPurchasePaymentMethod}
+            onProofFileChange={setProofFile}
+            purchaseSubmitting={purchaseSubmitting}
+            onSubmitCreditPurchase={submitCreditPurchase}
+          />
         )}
 
         <div className="flex justify-between mt-8 gap-3 sm:gap-4 max-sm:flex-col-reverse">
