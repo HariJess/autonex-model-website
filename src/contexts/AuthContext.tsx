@@ -11,7 +11,11 @@ interface Profile {
   credits_balance: number;
 }
 
-/** Passed to `signUp` → Supabase `raw_user_meta_data` (see `handle_new_user` migration). */
+/**
+ * Passed to `signUp` → Supabase `raw_user_meta_data` (see `handle_new_user` migration).
+ * Agence : `commercial_contact_name` est la source attendue pour le nom affiché du profil ;
+ * `full_name` doit être identique (le trigger privilégie `commercial_contact_name` si présent).
+ */
 export interface SignUpMetadata {
   full_name: string;
   role: "particulier" | "agence";
@@ -37,6 +41,8 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  /** OAuth Google — réservé au parcours particulier (profil `particulier`, pas d’agence). */
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, metadata: SignUpMetadata) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -97,6 +103,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error: error as Error | null };
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          prompt: "select_account",
+        },
+      },
+    });
+    return { error: error as Error | null };
+  };
+
   const signUp = async (email: string, password: string, metadata: SignUpMetadata) => {
     const { error } = await supabase.auth.signUp({
       email,
@@ -118,7 +137,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, profile, isAdmin, loading, signIn, signUp, signOut, refreshProfile }}
+      value={{
+        user,
+        session,
+        profile,
+        isAdmin,
+        loading,
+        signIn,
+        signInWithGoogle,
+        signUp,
+        signOut,
+        refreshProfile,
+      }}
     >
       {children}
     </AuthContext.Provider>

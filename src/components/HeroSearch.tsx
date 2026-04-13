@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Search, MapPin, Euro, Banknote } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
 import { LISTING_TYPE_LABELS, LISTING_TYPES_WITHOUT_ROOM_FILTERS } from "@/types/listing";
@@ -51,6 +51,7 @@ const HeroSearch = () => {
     if (NO_ROOMS_TYPES.has(v)) setRooms("");
   };
   const [ville, setVille] = useState("");
+  const [arrondissements, setArrondissements] = useState<string[]>([]);
   const [quartiers, setQuartiers] = useState<string[]>([]);
   const [quartierLibre, setQuartierLibre] = useState("");
   const [priceMin, setPriceMin] = useState(0);
@@ -76,7 +77,7 @@ const HeroSearch = () => {
       transaction: TRANSACTIONS.some((tr) => tr.value === transaction) ? transaction : "vente",
       types,
       ville,
-      arrondissement: "",
+      arrondissements,
       quartiers,
       quartierLibre,
       priceMin,
@@ -89,13 +90,24 @@ const HeroSearch = () => {
     navigate(searchPathFromFilters(buildFilters()));
   };
 
-  const locationLabel = ville
-    ? quartiers.length > 0
-      ? `${ville} — ${quartiers.slice(0, 2).join(", ")}${quartiers.length > 2 ? "..." : ""}`
-      : quartierLibre.trim()
-        ? `${ville} — ${quartierLibre.trim()}`
-        : ville
-    : quartierLibre.trim();
+  const locationLabel = useMemo(() => {
+    if (!ville && !quartierLibre.trim()) return "";
+    if (!ville) return quartierLibre.trim();
+    const tail =
+      quartiers.length > 0
+        ? quartiers.slice(0, 2).join(", ") + (quartiers.length > 2 ? "…" : "")
+        : arrondissements.length > 0
+          ? arrondissements.slice(0, 2).join(", ") + (arrondissements.length > 2 ? "…" : "")
+          : quartierLibre.trim() || "";
+    return tail ? `${ville} — ${tail}` : ville;
+  }, [ville, quartiers, arrondissements, quartierLibre]);
+
+  const onLocationChange = useCallback((v: { ville: string; arrondissements: string[]; quartiers: string[]; quartierLibre: string }) => {
+    setVille(v.ville);
+    setArrondissements(v.arrondissements);
+    setQuartiers(v.quartiers);
+    setQuartierLibre(v.quartierLibre);
+  }, []);
 
   const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency);
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
@@ -174,12 +186,8 @@ const HeroSearch = () => {
                 </PopoverTrigger>
                 <PopoverContent className="w-96 p-4" align="start">
                   <LocationSelector
-                    value={{ ville, quartiers, quartierLibre }}
-                    onChange={(v) => {
-                      setVille(v.ville);
-                      setQuartiers(v.quartiers);
-                      setQuartierLibre(v.quartierLibre);
-                    }}
+                    value={{ ville, arrondissements, quartiers, quartierLibre }}
+                    onChange={onLocationChange}
                     onClose={() => setDesktopLocationOpen(false)}
                   />
                 </PopoverContent>
@@ -267,12 +275,8 @@ const HeroSearch = () => {
                 </PopoverTrigger>
                 <PopoverContent className="w-[calc(100vw-2rem)] max-w-md p-4" align="start">
                   <LocationSelector
-                    value={{ ville, quartiers, quartierLibre }}
-                    onChange={(v) => {
-                      setVille(v.ville);
-                      setQuartiers(v.quartiers);
-                      setQuartierLibre(v.quartierLibre);
-                    }}
+                    value={{ ville, arrondissements, quartiers, quartierLibre }}
+                    onChange={onLocationChange}
                     onClose={() => setMobileLocationOpen(false)}
                   />
                 </PopoverContent>

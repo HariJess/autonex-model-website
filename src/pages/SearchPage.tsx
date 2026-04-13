@@ -27,6 +27,17 @@ import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenc
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { rankSimilarListings } from "@/lib/searchSimilar";
 import { recordSearchAnalytics } from "@/lib/searchAnalytics";
+import type { DisplayListing } from "@/types/listing";
+import {
+  describeCloseMatchKind,
+  matchesBathroomsStrict,
+  matchesLocationSubareas,
+  matchesPriceMaxStrict,
+  matchesPriceMinStrict,
+  matchesRoomsStrict,
+  matchesSurfaceMaxStrict,
+  matchesSurfaceMinStrict,
+} from "@/lib/searchLocationMatch";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -83,7 +94,6 @@ const SearchPage = () => {
     transaction: filters.transaction || undefined,
     types: filters.types.length > 0 ? filters.types : undefined,
     ville: filters.ville || undefined,
-    arrondissement: filters.arrondissement || undefined,
     freeText: qTrim.length >= 1 ? qTrim : undefined,
     priceMin: filters.priceMin || undefined,
     priceMax: filters.priceMax || undefined,
@@ -91,6 +101,7 @@ const SearchPage = () => {
     bathrooms: filters.bathrooms.length > 0 ? filters.bathrooms : undefined,
     surfaceMin: filters.surfaceMin || undefined,
     surfaceMax: filters.surfaceMax || undefined,
+    searchRelaxation: true,
   });
 
   const equippedListings = useMemo(() => {
@@ -102,15 +113,30 @@ const SearchPage = () => {
   }, [dbListings, filters.equipments]);
 
   const exactMatchListings = useMemo(() => {
-    if (filters.quartiers.length === 0) return equippedListings;
-    return equippedListings.filter((l) =>
-      filters.quartiers.some(
-        (qu) =>
-          (l.quartier?.toLowerCase() ?? "").includes(qu.toLowerCase()) ||
-          (l.quartier_libre?.toLowerCase() ?? "").includes(qu.toLowerCase())
-      )
-    );
-  }, [equippedListings, filters.quartiers]);
+    let results = equippedListings;
+    if (filters.ville && (filters.arrondissements.length > 0 || filters.quartiers.length > 0)) {
+      results = results.filter((l) => matchesLocationSubareas(l, filters));
+    }
+    if (filters.priceMin > 0) {
+      results = results.filter((l) => matchesPriceMinStrict(l.price_mga, filters.priceMin));
+    }
+    if (filters.priceMax > 0) {
+      results = results.filter((l) => matchesPriceMaxStrict(l.price_mga, filters.priceMax));
+    }
+    if (filters.surfaceMin > 0) {
+      results = results.filter((l) => matchesSurfaceMinStrict(l.surface, filters.surfaceMin));
+    }
+    if (filters.surfaceMax > 0) {
+      results = results.filter((l) => matchesSurfaceMaxStrict(l.surface, filters.surfaceMax));
+    }
+    if (filters.rooms.length > 0) {
+      results = results.filter((l) => matchesRoomsStrict(l.rooms, filters.rooms));
+    }
+    if (filters.bathrooms.length > 0) {
+      results = results.filter((l) => matchesBathroomsStrict(l.bathrooms, filters.bathrooms));
+    }
+    return results;
+  }, [equippedListings, filters]);
 
   const sortedExact = useMemo(() => {
     const results = [...exactMatchListings];
@@ -133,6 +159,16 @@ const SearchPage = () => {
     return rankSimilarListings(equippedListings, filters, new Set(), 9);
   }, [sortedExact.length, equippedListings, filters]);
 
+  const closeMatchLabel = useCallback(
+    (listing: DisplayListing) => {
+      const kind = describeCloseMatchKind(listing, filters);
+      if (kind === "budget") return t("search.matchHintBudget", "Budget légèrement supérieur");
+      if (kind === "location") return t("search.matchHintZone", "Résultat proche");
+      return t("search.matchHintApprox", "Correspondance approximative");
+    },
+    [filters, t],
+  );
+
   const alsoLikeListings = useMemo(() => {
     if (sortedExact.length < 1 || sortedExact.length > 3) return [];
     const exclude = new Set(sortedExact.map((l) => l.id));
@@ -141,6 +177,8 @@ const SearchPage = () => {
 
   /** Grille / liste / carte : résultats exacts, ou suggestions si aucun exact */
   const displayListings = sortedExact.length > 0 ? sortedExact : similarFallbackListings;
+
+  const showCloseMatchBadges = sortedExact.length === 0 && similarFallbackListings.length > 0;
 
   const analyticsSentRef = useRef<string>("");
   useEffect(() => {
@@ -184,7 +222,7 @@ const SearchPage = () => {
       chips.push({ label: LISTING_TYPE_LABELS[tp as keyof typeof LISTING_TYPE_LABELS] ?? tp, key: `type-${tp}` })
     );
     if (filters.ville) chips.push({ label: filters.ville, key: "ville" });
-    if (filters.arrondissement) chips.push({ label: filters.arrondissement, key: "arr" });
+    filters.arrondissements.forEach((a) => chips.push({ label: a, key: `arr-${a}` }));
     filters.quartiers.forEach((q) => chips.push({ label: q, key: `q-${q}` }));
     if (filters.quartierLibre) chips.push({ label: filters.quartierLibre, key: "quartierLibre" });
     if (filters.priceMin || filters.priceMax) {
@@ -215,11 +253,12 @@ const SearchPage = () => {
     else if (key.startsWith("type-")) newFilters.types = newFilters.types.filter((tp) => tp !== key.slice(5));
     else if (key === "ville") {
       newFilters.ville = "";
-      newFilters.arrondissement = "";
+      newFilters.arrondissements = [];
       newFilters.quartiers = [];
       newFilters.quartierLibre = "";
-    } else if (key === "arr") {
-      newFilters.arrondissement = "";
+    } else if (key.startsWith("arr-")) {
+      const name = key.slice(4);
+      newFilters.arrondissements = newFilters.arrondissements.filter((a) => a !== name);
     } else if (key.startsWith("q-")) newFilters.quartiers = newFilters.quartiers.filter((q) => q !== key.slice(2));
     else if (key === "quartierLibre") newFilters.quartierLibre = "";
     else if (key === "price") {
@@ -518,7 +557,11 @@ const SearchPage = () => {
                 </div>
                 <div className="w-full lg:w-[42%] overflow-y-auto space-y-3 max-h-[min(520px,55vh)] lg:max-h-none pr-1">
                   {displayListings.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} />
+                    <ListingCard
+                      key={listing.id}
+                      listing={listing}
+                      matchBadge={showCloseMatchBadges ? closeMatchLabel(listing) : undefined}
+                    />
                   ))}
                 </div>
               </div>
@@ -545,6 +588,11 @@ const SearchPage = () => {
                             {listing.title}
                           </h2>
                         </Link>
+                        {showCloseMatchBadges && (
+                          <Badge variant="secondary" className="mt-1.5 text-[10px] font-sans font-normal">
+                            {closeMatchLabel(listing)}
+                          </Badge>
+                        )}
                         <p className="text-sm text-muted-foreground font-sans mt-1 line-clamp-2">{listing.description}</p>
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm font-sans text-muted-foreground">
                           {listing.surface != null && listing.surface > 0 && <span>{listing.surface} m²</span>}
@@ -575,7 +623,13 @@ const SearchPage = () => {
                   if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 2) {
                     out.push(<SponsoredNativeCard key="monetization-sponsored" />);
                   }
-                  out.push(<ListingCard key={listing.id} listing={listing} />);
+                  out.push(
+                    <ListingCard
+                      key={listing.id}
+                      listing={listing}
+                      matchBadge={showCloseMatchBadges ? closeMatchLabel(listing) : undefined}
+                    />,
+                  );
                   return out;
                 })}
               </div>

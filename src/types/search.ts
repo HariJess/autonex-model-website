@@ -6,7 +6,8 @@ export interface SearchFilters {
   transaction: string;
   types: string[];
   ville: string;
-  arrondissement: string;
+  /** Full arrondissement labels (e.g. "1er arrondissement"); multi-select; OR with quartiers */
+  arrondissements: string[];
   quartiers: string[];
   quartierLibre: string;
   priceMin: number;
@@ -22,7 +23,7 @@ export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   transaction: "",
   types: [],
   ville: "",
-  arrondissement: "",
+  arrondissements: [],
   quartiers: [],
   quartierLibre: "",
   priceMin: 0,

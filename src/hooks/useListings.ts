@@ -106,7 +106,6 @@ export interface ListingsFilters {
   transaction?: string;
   types?: string[];
   ville?: string;
-  arrondissement?: string;
   /** Free-text search (title, description, quartier, region, etc.) — server-side ilike OR */
   freeText?: string;
   priceMin?: number;
@@ -120,11 +119,48 @@ export interface ListingsFilters {
   ownerIds?: string[];
   /** When set, only these listing IDs (e.g. boosted featured rail). Other filters ignored. */
   listingIds?: string[];
+  /**
+   * Search page only: widen DB filters (price/rooms/surface) so client-side logic can show
+   * strict matches vs. « résultats proches ». Other callers should omit this (strict DB match).
+   */
+  searchRelaxation?: boolean;
 }
 
 /** Strip characters that would break PostgREST `or` / `ilike` filters */
 function sanitizeIlikeTerm(raw: string): string {
   return raw.trim().replace(/[%_,()]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+const CLOSE_MATCH_PRICE_FACTOR = 1.25;
+const CLOSE_MATCH_SURFACE_MAX_FACTOR = 1.15;
+
+/** ±1 chambre (et voisinage « 5+ ») pour élargir la requête SQL */
+function expandRoomsForRelaxedQuery(rooms: number[]): number[] {
+  const out = new Set<number>();
+  for (const r of rooms) {
+    if (r === 5) {
+      for (let i = 4; i <= 20; i++) out.add(i);
+    } else {
+      out.add(Math.max(0, r - 1));
+      out.add(r);
+      out.add(Math.min(99, r + 1));
+    }
+  }
+  return Array.from(out);
+}
+
+function expandBathroomsForRelaxedQuery(bathrooms: number[]): number[] {
+  const out = new Set<number>();
+  for (const b of bathrooms) {
+    if (b === 4) {
+      for (let i = 3; i <= 12; i++) out.add(i);
+    } else {
+      out.add(Math.max(1, b - 1));
+      out.add(b);
+      out.add(Math.min(99, b + 1));
+    }
+  }
+  return Array.from(out);
 }
 
 /** Fetch active listings from Supabase with optional filters */
@@ -141,6 +177,8 @@ export function useDbListings(filters: ListingsFilters = {}) {
         .order("created_at", { ascending: false });
 
       const idsOnly = filters.listingIds && filters.listingIds.length > 0;
+      const relaxed = filters.searchRelaxation === true;
+
       if (idsOnly) {
         query = query.in("id", filters.listingIds!);
       } else {
@@ -152,13 +190,6 @@ export function useDbListings(filters: ListingsFilters = {}) {
         }
         if (filters.ville) {
           query = query.eq("ville", filters.ville);
-        }
-        const arr = filters.arrondissement?.trim();
-        if (arr) {
-          const safe = sanitizeIlikeTerm(arr);
-          if (safe.length > 0) {
-            query = query.ilike("arrondissement", `%${safe}%`);
-          }
         }
         const ft = filters.freeText?.trim();
         if (ft) {
@@ -177,37 +208,70 @@ export function useDbListings(filters: ListingsFilters = {}) {
           query = query.gte("price_mga", filters.priceMin);
         }
         if (filters.priceMax) {
-          query = query.lte("price_mga", filters.priceMax);
+          const cap = relaxed
+            ? Math.ceil(filters.priceMax * CLOSE_MATCH_PRICE_FACTOR)
+            : filters.priceMax;
+          query = query.lte("price_mga", cap);
         }
         if (filters.rooms && filters.rooms.length > 0) {
-          const hasHighEnd = filters.rooms.includes(5);
-          if (hasHighEnd) {
-            const otherRooms = filters.rooms.filter((r) => r < 5);
-            if (otherRooms.length > 0) {
-              query = query.or(`rooms.in.(${otherRooms.join(",")}),rooms.gte.5`);
+          if (relaxed) {
+            const expanded = expandRoomsForRelaxedQuery(filters.rooms);
+            const under5 = [...new Set(expanded.filter((r) => r < 5))].sort((a, b) => a - b);
+            const hasGte5 = expanded.some((r) => r >= 5);
+            if (hasGte5 && under5.length > 0) {
+              query = query.or(`rooms.in.(${under5.join(",")}),rooms.gte.5`);
+            } else if (hasGte5) {
+              query = query.gte("rooms", 4);
             } else {
-              query = query.gte("rooms", 5);
+              query = query.in("rooms", under5);
             }
           } else {
-            query = query.in("rooms", filters.rooms);
+            const hasHighEnd = filters.rooms.includes(5);
+            if (hasHighEnd) {
+              const otherRooms = filters.rooms.filter((r) => r < 5);
+              if (otherRooms.length > 0) {
+                query = query.or(`rooms.in.(${otherRooms.join(",")}),rooms.gte.5`);
+              } else {
+                query = query.gte("rooms", 5);
+              }
+            } else {
+              query = query.in("rooms", filters.rooms);
+            }
           }
         }
         if (filters.bathrooms && filters.bathrooms.length > 0) {
-          const hasPlus = filters.bathrooms.includes(4);
-          const others = filters.bathrooms.filter((b) => b < 4);
-          if (hasPlus && others.length > 0) {
-            query = query.or(`bathrooms.in.(${others.join(",")}),bathrooms.gte.4`);
-          } else if (hasPlus) {
-            query = query.gte("bathrooms", 4);
+          if (relaxed) {
+            const expanded = expandBathroomsForRelaxedQuery(filters.bathrooms);
+            const under4 = [...new Set(expanded.filter((b) => b < 4))].sort((a, b) => a - b);
+            const hasGte4 = expanded.some((b) => b >= 4);
+            if (hasGte4 && under4.length > 0) {
+              query = query.or(`bathrooms.in.(${under4.join(",")}),bathrooms.gte.4`);
+            } else if (hasGte4) {
+              query = query.gte("bathrooms", 3);
+            } else {
+              query = query.in("bathrooms", under4);
+            }
           } else {
-            query = query.in("bathrooms", others);
+            const hasPlus = filters.bathrooms.includes(4);
+            const others = filters.bathrooms.filter((b) => b < 4);
+            if (hasPlus && others.length > 0) {
+              query = query.or(`bathrooms.in.(${others.join(",")}),bathrooms.gte.4`);
+            } else if (hasPlus) {
+              query = query.gte("bathrooms", 4);
+            } else {
+              query = query.in("bathrooms", others);
+            }
           }
         }
         if (filters.surfaceMin) {
-          query = query.gte("surface", filters.surfaceMin);
+          const sm = relaxed ? Math.max(0, Math.floor(filters.surfaceMin * 0.88)) : filters.surfaceMin;
+          query = query.gte("surface", sm);
         }
         if (filters.surfaceMax && filters.surfaceMax > 0) {
-          query = query.lte("surface", filters.surfaceMax);
+          const cap = relaxed
+            ? Math.ceil(filters.surfaceMax * CLOSE_MATCH_SURFACE_MAX_FACTOR)
+            : filters.surfaceMax;
+          query = query.lte("surface", cap);
         }
       }
       if (filters.limit) {

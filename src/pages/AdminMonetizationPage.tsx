@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { formatAriary } from "@/config/monetization";
+import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
 import { Loader2, Check, X } from "lucide-react";
 
 type TxRow = Tables<"transactions">;
@@ -81,6 +82,7 @@ const AdminMonetizationPage = () => {
       queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", buyerId] });
       queryClient.invalidateQueries({ queryKey: ["credit-tx-history", buyerId] });
       queryClient.invalidateQueries({ queryKey: ["my-credits-ledger", buyerId] });
+      invalidateCreditsBalanceQueries(queryClient, buyerId);
       toast.success("Transaction approuvée — crédits crédités une fois.");
     },
     onError: (e: Error) => toast.error(e.message),
@@ -98,6 +100,7 @@ const AdminMonetizationPage = () => {
       queryClient.invalidateQueries({ queryKey: ["admin-pending-credit-tx"] });
       queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", buyerId] });
       queryClient.invalidateQueries({ queryKey: ["credit-tx-history", buyerId] });
+      invalidateCreditsBalanceQueries(queryClient, buyerId);
       setRejectTxId(null);
       setRejectTxReason("");
       toast.success("Transaction rejetée.");
@@ -118,6 +121,7 @@ const AdminMonetizationPage = () => {
       queryClient.invalidateQueries({ queryKey: ["my-listing-boosts", ownerId] });
       queryClient.invalidateQueries({ queryKey: ["featured-boost-listing-ids"] });
       queryClient.invalidateQueries({ queryKey: ["agencies-monetization"] });
+      invalidateCreditsBalanceQueries(queryClient, ownerId);
       toast.success("Annonce publiée — boosts matérialisés.");
     },
     onError: (e: Error) => toast.error(e.message),
@@ -136,6 +140,7 @@ const AdminMonetizationPage = () => {
       queryClient.invalidateQueries({ queryKey: ["my-listings", ownerId] });
       queryClient.invalidateQueries({ queryKey: ["my-credits-ledger", ownerId] });
       queryClient.invalidateQueries({ queryKey: ["credit-tx-history", ownerId] });
+      invalidateCreditsBalanceQueries(queryClient, ownerId);
       setRejectListingId(null);
       setRejectListingReason("");
       toast.success("Annonce refusée — remboursement crédits si applicable.");

@@ -33,8 +33,8 @@ const LocationPicker = ({
   const selectedArr = selectedVille?.arrondissements.find((a) => a.name === arrondissement);
 
   return (
-    <div className={`space-y-3 ${compact ? "" : ""}`}>
-      <div className="space-y-1.5">
+    <div className={`space-y-4 ${compact ? "" : ""}`}>
+      <div className="space-y-2">
         {!compact && <Label className="font-sans text-sm">Ville</Label>}
         <Select value={ville} onValueChange={(v) => { onVilleChange(v); onArrondissementChange(""); onQuartierChange(""); }}>
           <SelectTrigger className="font-sans">
@@ -51,7 +51,7 @@ const LocationPicker = ({
       </div>
 
       {ville && selectedVille && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {!compact && <Label className="font-sans text-sm">Zone / Arrondissement</Label>}
           <Select value={arrondissement} onValueChange={(a) => { onArrondissementChange(a); onQuartierChange(""); }}>
             <SelectTrigger className="font-sans">
@@ -69,7 +69,7 @@ const LocationPicker = ({
       )}
 
       {arrondissement && selectedArr && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {!compact && <Label className="font-sans text-sm">Quartier</Label>}
           <Select value={quartier} onValueChange={onQuartierChange}>
             <SelectTrigger className="font-sans">
@@ -86,8 +86,12 @@ const LocationPicker = ({
         </div>
       )}
 
-      <div className="space-y-1.5">
-        {!compact && <Label className="font-sans text-sm text-muted-foreground">Autre quartier (si absent de la liste)</Label>}
+      <div className={`space-y-2 ${!compact ? "form-surface-muted" : ""}`}>
+        {!compact && (
+          <Label className="font-sans text-sm text-foreground">
+            Autre quartier <span className="font-normal text-muted-foreground">(optionnel)</span>
+          </Label>
+        )}
         <Input
           value={quartierLibre}
           onChange={(e) => onQuartierLibreChange(e.target.value)}

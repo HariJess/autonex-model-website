@@ -138,15 +138,16 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
                 mode="apply"
                 committed={{
                   ville: filters.ville,
+                  arrondissements: filters.arrondissements,
                   quartiers: filters.quartiers,
                   quartierLibre: filters.quartierLibre,
                 }}
                 onCommit={(v) =>
                   update({
                     ville: v.ville,
+                    arrondissements: v.arrondissements,
                     quartiers: v.quartiers,
                     quartierLibre: v.quartierLibre,
-                    arrondissement: "",
                   })
                 }
               />

@@ -37,11 +37,12 @@ function priceTolerance(price: number, min: number, max: number): number {
   let penalty = 0;
   if (min > 0 && price < min) {
     const gap = min - price;
-    penalty += Math.min(gap / Math.max(min, 1), 0.5) * 40;
+    penalty += Math.min(gap / Math.max(min, 1), 0.45) * 35;
   }
   if (max > 0 && price > max) {
     const gap = price - max;
-    penalty += Math.min(gap / Math.max(max, 1), 0.5) * 40;
+    const ratio = gap / Math.max(max, 1);
+    penalty += Math.min(ratio, 0.28) * 52;
   }
   return penalty;
 }
@@ -83,6 +84,17 @@ export function similarListingScore(
   if (filters.ville) {
     if (listing.ville === filters.ville) score += 45;
     else score += 5;
+  }
+
+  if (filters.arrondissements.length > 0 && filters.ville && listing.ville === filters.ville) {
+    const la = (listing.arrondissement ?? "").toLowerCase();
+    for (const an of filters.arrondissements) {
+      const anl = an.toLowerCase();
+      if (la.includes(anl) || anl.includes(la)) {
+        score += 48;
+        break;
+      }
+    }
   }
 
   const lq = (listing.quartier ?? "").toLowerCase();
@@ -141,11 +153,18 @@ export function rankSimilarListings(
 ): DisplayListing[] {
   const userQuartierNames = filters.quartiers;
   const sameArrHints = new Set<string>();
+  const villeData = filters.ville ? getVille(filters.ville) : undefined;
+  if (filters.ville && filters.arrondissements.length > 0) {
+    for (const an of filters.arrondissements) {
+      const arr = villeData?.arrondissements.find((a) => a.name === an);
+      arr?.quartiers.forEach((q) => sameArrHints.add(q.name));
+    }
+  }
   if (filters.ville && userQuartierNames.length > 0) {
     for (const qn of userQuartierNames) {
       const ar = arrondissementForQuartier(filters.ville, qn);
       if (ar) {
-        for (const arr of getVille(filters.ville)?.arrondissements ?? []) {
+        for (const arr of villeData?.arrondissements ?? []) {
           if (arr.name === ar) {
             arr.quartiers.forEach((q) => sameArrHints.add(q.name));
           }

@@ -17,6 +17,7 @@ const ListingDetail = lazy(() => import("./pages/ListingDetail.tsx"));
 const LoginPage = lazy(() => import("./pages/AuthPages.tsx").then(m => ({ default: m.LoginPage })));
 const SignupPage = lazy(() => import("./pages/AuthPages.tsx").then(m => ({ default: m.SignupPage })));
 const ForgotPasswordPage = lazy(() => import("./pages/AuthPages.tsx").then(m => ({ default: m.ForgotPasswordPage })));
+const AuthCallback = lazy(() => import("./pages/AuthCallback.tsx"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const AdminMonetizationPage = lazy(() => import("./pages/AdminMonetizationPage.tsx"));
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/annonce/:id" element={<ListingDetail />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

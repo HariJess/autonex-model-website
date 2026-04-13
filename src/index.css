@@ -39,9 +39,10 @@
     --success: 160 84% 39%;
     --success-foreground: 0 0% 100%;
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 271 91% 65%;
+    /* Bordures de champs plus lisibles (évite le « tout plat » sur fond 98 %) */
+    --border: 220 13% 78%;
+    --input: 220 13% 78%;
+    --ring: 271 91% 55%;
 
     --radius: 1rem;
 
@@ -101,6 +102,16 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  /** Blocs formulaire (publication, filtres) : séparation nette sans lourdeur */
+  .form-surface {
+    @apply rounded-2xl border-2 border-border/95 bg-card p-6 shadow-sm;
+  }
+  .form-surface-muted {
+    @apply rounded-xl border-2 border-border/90 bg-muted/25 p-4 shadow-sm;
   }
 }
 

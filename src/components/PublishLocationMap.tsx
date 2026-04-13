@@ -52,7 +52,7 @@ const PublishLocationMap = ({ lat, lng, onPositionChange }: PublishLocationMapPr
       <MapContainer
         center={[lat, lng]}
         zoom={14}
-        className="h-[280px] md:h-[320px] w-full rounded-xl border border-border z-0"
+        className="h-[280px] md:h-[320px] w-full rounded-xl border-2 border-border/90 shadow-md z-0"
         scrollWheelZoom
       >
         <TileLayer

@@ -12,11 +12,13 @@ interface ListingCardProps {
   listing: DisplayListing;
   agencyName?: string;
   agencyLogo?: string;
+  /** When set (e.g. « résultats proches »), shows a subtle hint under the title */
+  matchBadge?: string;
 }
 
 const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop";
 
-const ListingCard = ({ listing, agencyName, agencyLogo }: ListingCardProps) => {
+const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCardProps) => {
   const images = listing.images.length > 0 ? listing.images : [PLACEHOLDER_IMAGE];
   const [imgIndex, setImgIndex] = useState(0);
   const { formatPrice, formatPriceSecondary } = useCurrency();
@@ -85,6 +87,11 @@ const ListingCard = ({ listing, agencyName, agencyLogo }: ListingCardProps) => {
           <p className="text-xs text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
         <h3 className="font-serif font-semibold text-foreground leading-tight">{listing.title}</h3>
+        {matchBadge && (
+          <p className="text-[11px] font-sans text-muted-foreground border border-border/80 rounded-md px-2 py-0.5 w-fit bg-muted/40">
+            {matchBadge}
+          </p>
+        )}
         <div className="flex items-center gap-3 text-xs text-muted-foreground font-sans flex-wrap">
           {listing.rooms != null && listing.rooms > 0 && (
             <span className="flex items-center gap-1">

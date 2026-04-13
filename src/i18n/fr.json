@@ -243,7 +243,17 @@
     "whatsapp": "WhatsApp (optionnel)",
     "contactConsent": "J’accepte que mes coordonnées soient utilisées pour les échanges liés à mes annonces sur ImmoNex.",
     "contactConsentRequired": "Veuillez accepter l’utilisation de vos coordonnées pour continuer.",
-    "fieldsRequired": "Renseignez prénom, nom et téléphone."
+    "fieldsRequired": "Renseignez prénom, nom et téléphone.",
+    "agencyFieldsRequired": "Pour un compte agence, renseignez le nom, l’adresse, le contact, le téléphone, le NIF, le STAT et le RC.",
+    "contactNameNotPhone": "Le nom du contact commercial ne doit pas être identique au numéro de téléphone. Vérifiez les champs « Contact commercial » et « Téléphone ».",
+    "contactNameNotNumeric": "Indiquez un nom de personne pour le contact commercial (pas uniquement des chiffres).",
+    "continueWithGoogle": "Continuer avec Google",
+    "googleLoginParticulierOnly": "Réservé aux comptes particuliers. Les agences utilisent email et mot de passe.",
+    "googleSignupParticulierOnly": "Compte particulier uniquement — pas d’inscription agence via Google.",
+    "loginKindParticulier": "Particulier",
+    "loginKindAgence": "Agence",
+    "agencyLoginEmailOnly": "Connexion agence : utilisez l’email et le mot de passe de votre compte professionnel.",
+    "orWithEmail": "ou"
   },
   "footer": {
     "about": "À propos",

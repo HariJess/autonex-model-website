@@ -387,6 +387,7 @@ export type Database = {
           bathrooms: number | null
           created_at: string | null
           description: string | null
+          draft_step: number
           expires_at: string | null
           features: Json | null
           id: string
@@ -411,6 +412,7 @@ export type Database = {
           toilets: number | null
           transaction: Database["public"]["Enums"]["transaction_type"]
           type: Database["public"]["Enums"]["listing_type"]
+          updated_at: string | null
           video_url: string | null
           views_count: number | null
           virtual_tour_url: string | null
@@ -421,6 +423,7 @@ export type Database = {
           bathrooms?: number | null
           created_at?: string | null
           description?: string | null
+          draft_step?: number
           expires_at?: string | null
           features?: Json | null
           id?: string
@@ -445,6 +448,7 @@ export type Database = {
           toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           type?: Database["public"]["Enums"]["listing_type"]
+          updated_at?: string | null
           video_url?: string | null
           views_count?: number | null
           virtual_tour_url?: string | null
@@ -455,6 +459,7 @@ export type Database = {
           bathrooms?: number | null
           created_at?: string | null
           description?: string | null
+          draft_step?: number
           expires_at?: string | null
           features?: Json | null
           id?: string
@@ -479,6 +484,7 @@ export type Database = {
           toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           type?: Database["public"]["Enums"]["listing_type"]
+          updated_at?: string | null
           video_url?: string | null
           views_count?: number | null
           virtual_tour_url?: string | null
@@ -676,6 +682,7 @@ export type Database = {
         | "pending_payment_verification"
         | "pending_review"
         | "rejected"
+        | "archived"
       listing_type:
         | "appartement"
         | "villa"
@@ -832,6 +839,7 @@ export const Constants = {
         "pending_payment_verification",
         "pending_review",
         "rejected",
+        "archived",
       ],
       listing_type: [
         "appartement",
