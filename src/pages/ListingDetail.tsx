@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { toApproximatePublicCoordinates } from "@/lib/mapPrivacy";
 import { contactLeadSchema } from "@/lib/validation";
+import { getSearchSessionId } from "@/lib/searchSession";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ListingSponsorBlock,
@@ -53,7 +54,10 @@ const ListingDetail = () => {
     if (listing?.id && viewIncremented.current !== listing.id) {
       viewIncremented.current = listing.id;
       const timer = setTimeout(() => {
-        supabase.rpc("increment_views", { listing_uuid: listing.id }).then(() => {});
+        const sessionId = getSearchSessionId();
+        supabase
+          .rpc("increment_views_public", { p_listing_id: listing.id, p_session_id: sessionId })
+          .then(() => {});
       }, 2000); // 2s delay to filter bots/quick bounces
       return () => clearTimeout(timer);
     }
@@ -70,9 +74,14 @@ const ListingDetail = () => {
 
   const handleRevealPhone = async () => {
     if (!listing) return;
+    if (!user) {
+      toast.error(t("auth.loginRequiredForPhone", "Connectez-vous pour révéler le numéro du propriétaire."));
+      navigate("/login");
+      return;
+    }
     const { error: leadError } = await supabase.from("leads").insert({
       listing_id: listing.id,
-      visitor_name: "Visiteur",
+      visitor_name: user.id,
       type: "phone_reveal" as const,
     });
     if (leadError) {

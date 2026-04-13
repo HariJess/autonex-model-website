@@ -10,6 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 const AgenciesListPage = () => {
   const { t } = useTranslation();
+  const canonical = typeof window !== "undefined"
+    ? `${window.location.origin}/agences`
+    : "https://immonex.mg/agences";
 
   const { data: agencies = [], isLoading, error } = useQuery({
     queryKey: ["agencies-list"],
@@ -25,7 +28,14 @@ const AgenciesListPage = () => {
 
   return (
     <>
-      <Helmet><title>{t("agencies.title")} — ImmoNex</title></Helmet>
+      <Helmet>
+        <title>{t("agencies.title")} — ImmoNex</title>
+        <meta
+          name="description"
+          content="Annuaire des agences immobilières à Madagascar : comparez les agences, consultez leurs annonces et contactez-les directement."
+        />
+        <link rel="canonical" href={canonical} />
+      </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="font-serif text-3xl font-bold mb-8">{t("agencies.pageTitle")}</h1>

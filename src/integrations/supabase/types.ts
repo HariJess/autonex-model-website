@@ -662,6 +662,10 @@ export type Database = {
         Args: Record<string, never>
         Returns: boolean
       }
+      increment_views_public: {
+        Args: { p_listing_id: string; p_session_id?: string | null }
+        Returns: undefined
+      }
       increment_views: { Args: { listing_uuid: string }; Returns: undefined }
     }
     Enums: {

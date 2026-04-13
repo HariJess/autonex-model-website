@@ -17,10 +17,20 @@ const BlogList = () => {
   const { t } = useTranslation();
   const posts = seedBlogPosts;
   const fallbackCover = "/placeholder.svg";
+  const canonical = typeof window !== "undefined"
+    ? `${window.location.origin}/conseils`
+    : "https://immonex.mg/conseils";
 
   return (
     <>
-      <Helmet><title>{t("nav.advice")} — ImmoNex</title></Helmet>
+      <Helmet>
+        <title>{t("nav.advice")} — ImmoNex</title>
+        <meta
+          name="description"
+          content="Conseils immobiliers à Madagascar : achat, location, fiscalité, investissement et guides pratiques pour décider avec méthode."
+        />
+        <link rel="canonical" href={canonical} />
+      </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="font-serif text-3xl font-bold mb-6">{t("nav.advice")}</h1>
