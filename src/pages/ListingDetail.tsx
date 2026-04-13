@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink } from "lucide-react";
+import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +41,7 @@ const ListingDetail = () => {
   const [contactMessage, setContactMessage] = useState("");
   const [sending, setSending] = useState(false);
   const viewIncremented = useRef<string | null>(null);
+  const contactSectionRef = useRef<HTMLDivElement | null>(null);
 
   const { data: listing, isLoading, error: fetchError } = useListing(id);
 
@@ -206,7 +207,7 @@ const ListingDetail = () => {
     <>
       <Helmet><title>{listing.title} — ImmoNex</title></Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 pb-28 lg:pb-6">
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
           <ChevronRight className="h-3 w-3" />
@@ -420,7 +421,11 @@ const ListingDetail = () => {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-card rounded-2xl border border-border p-6 space-y-4 sticky top-20">
+            <div
+              ref={contactSectionRef}
+              id="listing-contact"
+              className="bg-card rounded-2xl border border-border p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
+            >
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
@@ -442,7 +447,7 @@ const ListingDetail = () => {
               <Button
                 onClick={handleRevealPhone}
                 variant={phoneRevealed ? "outline" : "default"}
-                className={`w-full font-sans ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
+                className={`hidden w-full font-sans lg:inline-flex ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
                 style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
               >
                 <Phone className="h-4 w-4 mr-2" />
@@ -482,6 +487,37 @@ const ListingDetail = () => {
           </section>
         )}
       </div>
+
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:hidden pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 px-4"
+        role="region"
+        aria-label={t("listing.contactActions", "Actions de contact")}
+      >
+        <div className="container mx-auto flex gap-2 max-w-lg">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 font-sans min-h-12 touch-manipulation gap-2"
+            onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          >
+            <MessageSquare className="h-4 w-4 shrink-0" />
+            {t("listing.contact")}
+          </Button>
+          <Button
+            type="button"
+            onClick={handleRevealPhone}
+            variant={phoneRevealed ? "outline" : "default"}
+            className={`flex-1 font-sans min-h-12 touch-manipulation gap-2 ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
+            style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
+          >
+            <Phone className="h-4 w-4 shrink-0" />
+            {phoneRevealed
+              ? (listing.owner_phone || t("listing.noPhone", "Non renseigné"))
+              : t("listing.revealPhone")}
+          </Button>
+        </div>
+      </div>
+
       <Footer />
     </>
   );

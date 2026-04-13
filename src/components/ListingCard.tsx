@@ -52,18 +52,18 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i > 0 ? i - 1 : images.length - 1)); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-card/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute left-2 top-1/2 -translate-y-1/2 min-h-10 min-w-10 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
               aria-label="Photo précédente"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i < images.length - 1 ? i + 1 : 0)); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-card/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-10 min-w-10 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
               aria-label="Photo suivante"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-5 w-5" />
             </button>
             {/* Dot indicators */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
@@ -81,12 +81,12 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
         )}
       </Link>
 
-      <Link to={`/annonce/${listing.id}`} className="block p-4 space-y-2">
+      <Link to={`/annonce/${listing.id}`} className="block p-4 max-lg:p-5 space-y-2.5">
         <div>
-          <p className="text-lg font-bold text-primary font-sans">{formatPrice(listing.price_mga)}</p>
-          <p className="text-xs text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
+          <p className="text-xl max-sm:text-[1.35rem] font-bold text-primary font-sans tracking-tight">{formatPrice(listing.price_mga)}</p>
+          <p className="text-xs text-muted-foreground font-sans mt-0.5">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
-        <h3 className="font-serif font-semibold text-foreground leading-tight">{listing.title}</h3>
+        <h3 className="font-serif font-semibold text-base max-lg:text-[1.05rem] text-foreground leading-snug">{listing.title}</h3>
         {matchBadge && (
           <p className="text-[11px] font-sans text-muted-foreground border border-border/80 rounded-md px-2 py-0.5 w-fit bg-muted/40">
             {matchBadge}
@@ -113,7 +113,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
           )}
           <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>
         </div>
-        <p className="text-xs text-muted-foreground font-sans">{city}{region ? `, ${region}` : ""}</p>
+        <p className="text-xs text-muted-foreground font-sans font-medium max-lg:text-[13px]">{city}{region ? `, ${region}` : ""}</p>
       </Link>
     </div>
   );

@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Search, X, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export type LocationSelection = {
   ville: string;
@@ -18,6 +19,12 @@ export type LocationSelection = {
 
 type LocationSelectorBaseProps = {
   onClose?: () => void;
+  /** Larger touch targets & quartier-first layout (e.g. mobile filter sheet) */
+  variant?: "default" | "sheet";
+  /** When true, do not show Appliquer / Réinitialiser (use parent sheet actions) */
+  hideApplyRow?: boolean;
+  /** Skip toast when applying (embedded draft flows) */
+  suppressApplyToast?: boolean;
 };
 
 type LocationSelectorImmediateProps = LocationSelectorBaseProps & {
@@ -47,6 +54,10 @@ function findArrForQuartier(villeName: string, quartierName: string) {
 const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((props, ref) => {
   const { t } = useTranslation();
   const onClose = props.onClose;
+  const variant = props.variant ?? "default";
+  const hideApplyRow = props.hideApplyRow ?? false;
+  const suppressApplyToast = props.suppressApplyToast ?? false;
+  const isSheet = variant === "sheet";
 
   const committed: LocationSelection = isApplyMode(props)
     ? props.committed
@@ -73,6 +84,10 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
   const setLive = (next: LocationSelection) => {
     if (isApply) {
       setDraft(next);
+      /** Parent sheet holds a single draft; sync location immediately (local Apply row hidden). */
+      if (hideApplyRow && isApplyMode(props)) {
+        props.onCommit(next);
+      }
     } else if (!isApplyMode(props)) {
       props.onChange(next);
     }
@@ -236,13 +251,15 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
     e.stopPropagation();
     if (isApplyMode(props)) {
       props.onCommit(draft);
-      toast({
-        title: t("search.locationAppliedTitle", "Localisation appliquée"),
-        description: t(
-          "search.locationAppliedBody",
-          "Les filtres de lieu ont été mis à jour. Les résultats se rechargent.",
-        ),
-      });
+      if (!suppressApplyToast) {
+        toast({
+          title: t("search.locationAppliedTitle", "Localisation appliquée"),
+          description: t(
+            "search.locationAppliedBody",
+            "Les filtres de lieu ont été mis à jour. Les résultats se rechargent.",
+          ),
+        });
+      }
       onClose?.();
     }
   };
@@ -255,60 +272,90 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
     }
   };
 
+  const listScrollClass = isSheet
+    ? "min-h-[180px] max-h-[min(52vh,440px)] sm:max-h-80"
+    : "max-h-64";
+
   return (
     <div ref={ref} className="w-full flex flex-col min-h-0">
       {chips.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3 shrink-0">
+        <div className="flex flex-wrap gap-2 mb-3 shrink-0">
           {chips.map((c) => (
             <Badge
               key={`${c.kind}-${c.label}`}
               variant="secondary"
-              className="font-sans text-xs gap-1 cursor-pointer hover:bg-destructive/10"
+              className={cn(
+                "font-sans gap-1.5 cursor-pointer hover:bg-destructive/10 touch-manipulation",
+                isSheet ? "text-sm py-1.5 px-2.5 min-h-9" : "text-xs",
+              )}
               onClick={() => removeChip(c.label, c.kind)}
             >
               {c.label}
-              <X className="h-3 w-3" />
+              <X className={isSheet ? "h-3.5 w-3.5" : "h-3 w-3"} />
             </Badge>
           ))}
         </div>
       )}
 
-      <div className="relative mb-3 shrink-0">
+      <div className={cn("relative mb-3 shrink-0", isSheet && "mb-4")}>
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <Input
           placeholder={t("search.locationSearchPlaceholder", "Ville, quartier, zone…")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 font-sans text-sm"
+          className={cn("pl-9 font-sans", isSheet ? "min-h-12 text-base" : "text-sm")}
         />
       </div>
 
       {live.ville && quartierSearchHits && (
-        <div className="mb-2 rounded-lg border border-border bg-muted/20 px-2 py-2 shrink-0">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-sans mb-1.5">
-            {t("search.quartierQuickPick", "Quartiers correspondants")}
+        <div
+          className={cn(
+            "mb-3 rounded-xl border border-primary/15 bg-primary/[0.06] shrink-0",
+            isSheet ? "px-3 py-3" : "px-2 py-2",
+          )}
+        >
+          <p className="text-[11px] uppercase tracking-wide text-primary font-sans font-semibold mb-2">
+            {t("search.quartierZonesFirst", "Quartiers & zones")}
           </p>
-          <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto overscroll-contain touch-pan-y">
+          <p className="text-xs text-muted-foreground font-sans mb-2 leading-snug">
+            {t(
+              "search.quartierZonesHint",
+              "Sélectionnez des quartiers précis — le plus courant à Madagascar pour affiner la recherche.",
+            )}
+          </p>
+          <div className="flex flex-col gap-2 max-h-48 overflow-y-auto overscroll-contain touch-pan-y">
             {quartierSearchHits.map(({ arrName, qName }) => (
               <label
                 key={`${arrName}-${qName}`}
-                className="flex items-center gap-1.5 text-xs font-sans cursor-pointer rounded-md border border-border/60 px-2 py-1 hover:bg-muted"
+                className={cn(
+                  "flex items-center gap-3 font-sans cursor-pointer rounded-lg border border-border/70 bg-card/80 px-3 touch-manipulation",
+                  isSheet ? "min-h-12 text-sm py-2" : "text-xs py-1",
+                )}
               >
                 <Checkbox
                   checked={live.quartiers.includes(qName)}
                   onCheckedChange={() => toggleQuartier(qName, live.ville)}
-                  className="h-3.5 w-3.5"
+                  className={isSheet ? "h-4 w-4 shrink-0" : "h-3.5 w-3.5"}
                 />
-                <span>{qName}</span>
-                <span className="text-muted-foreground truncate max-w-[140px]">({arrName})</span>
+                <span className="font-medium text-foreground">{qName}</span>
+                <span className="text-muted-foreground truncate text-xs ml-auto max-w-[45%] text-right">{arrName}</span>
               </label>
             ))}
           </div>
         </div>
       )}
 
+      {isSheet && live.ville && (
+        <p className="text-xs font-semibold font-sans text-foreground mb-2 shrink-0">
+          {t("search.browseByAreaTitle", "Ville complète & arrondissements")}
+        </p>
+      )}
+
       <div
-        className="max-h-64 min-h-0 overflow-y-auto overscroll-contain touch-pan-y pr-1 -mr-1 [scrollbar-gutter:stable]"
+        className={cn(
+          listScrollClass,
+          "min-h-0 overflow-y-auto overscroll-contain touch-pan-y pr-1 -mr-1 [scrollbar-gutter:stable]",
+        )}
         onWheel={(e) => e.stopPropagation()}
       >
         <div className="space-y-0.5 pb-1">
@@ -322,26 +369,28 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
                 <div className="flex items-stretch gap-1">
                   <button
                     type="button"
-                    className={`flex-1 flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-sans hover:bg-muted transition-colors text-left ${
-                      wholeCityActive ? "bg-primary/10 text-primary font-medium" : ""
-                    }`}
+                    className={cn(
+                      "flex-1 flex items-center gap-2 rounded-lg font-sans hover:bg-muted transition-colors text-left touch-manipulation",
+                      isSheet ? "min-h-12 px-3 py-2 text-sm" : "px-2 py-1.5 text-sm",
+                      wholeCityActive ? "bg-primary/10 text-primary font-medium" : "",
+                    )}
                     onClick={() => {
                       handleSelectVille(ville.name);
                       toggleExpand(expandedVilles, ville.name, setExpandedVilles);
                     }}
                   >
                     {isVilleExpanded ? (
-                      <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                      <ChevronDown className="h-4 w-4 shrink-0" />
                     ) : (
-                      <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                      <ChevronRight className="h-4 w-4 shrink-0" />
                     )}
-                    <MapPin className="h-3.5 w-3.5 shrink-0 text-accent" />
+                    <MapPin className="h-4 w-4 shrink-0 text-accent" />
                     <span>{ville.name}</span>
                     <span className="ml-auto text-xs text-muted-foreground">{ville.region}</span>
                   </button>
                 </div>
                 {isVilleExpanded && live.ville === ville.name && (
-                  <p className="text-[10px] text-muted-foreground font-sans px-2 py-1">
+                  <p className={cn("text-muted-foreground font-sans px-2 py-1 leading-snug", isSheet ? "text-xs" : "text-[10px]")}>
                     {t(
                       "search.locationHierarchyHint",
                       "Toute la ville si rien n’est coché en dessous. Cochez un arrondissement entier ou des quartiers précis — cumul possible.",
@@ -358,20 +407,22 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
                       return (
                         <div key={arr.name}>
                           <div
-                            className={`w-full flex items-center gap-2 px-2 py-1 rounded-md text-sm font-sans hover:bg-muted transition-colors ${
-                              wholeArr || hasQuartierPick ? "text-primary font-medium" : "text-muted-foreground"
-                            }`}
+                            className={cn(
+                              "w-full flex items-center gap-2 rounded-md font-sans hover:bg-muted transition-colors touch-manipulation",
+                              isSheet ? "min-h-11 px-2 py-1.5 text-sm" : "px-2 py-1 text-sm",
+                              wholeArr || hasQuartierPick ? "text-primary font-medium" : "text-muted-foreground",
+                            )}
                           >
                             <button
                               type="button"
-                              className="p-0.5 shrink-0 rounded hover:bg-muted-foreground/10"
+                              className={cn("shrink-0 rounded hover:bg-muted-foreground/10", isSheet ? "p-1.5" : "p-0.5")}
                               onClick={() => toggleArrExpand(arr.name)}
                               aria-expanded={isArrExpanded}
                             >
                               {isArrExpanded ? (
-                                <ChevronDown className="h-3 w-3" />
+                                <ChevronDown className={isSheet ? "h-4 w-4" : "h-3 w-3"} />
                               ) : (
-                                <ChevronRight className="h-3 w-3" />
+                                <ChevronRight className={isSheet ? "h-4 w-4" : "h-3 w-3"} />
                               )}
                             </button>
                             <Checkbox
@@ -380,12 +431,12 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
                                 if (!live.ville) return;
                                 toggleWholeArrondissement(arr.name, ville.name);
                               }}
-                              className="h-3.5 w-3.5 shrink-0"
+                              className={isSheet ? "h-4 w-4 shrink-0" : "h-3.5 w-3.5 shrink-0"}
                               disabled={!live.ville || live.ville !== ville.name}
                             />
                             <button
                               type="button"
-                              className="flex-1 text-left text-xs py-0.5"
+                              className={cn("flex-1 text-left", isSheet ? "text-sm py-1" : "text-xs py-0.5")}
                               onClick={() => toggleArrExpand(arr.name)}
                             >
                               {arr.name}
@@ -396,11 +447,14 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
                           </div>
 
                           {isArrExpanded && (
-                            <div className="ml-5 mt-0.5 space-y-0.5 border-l border-border/60 pl-2">
+                            <div className={cn("ml-5 mt-0.5 border-l border-border/60 pl-2", isSheet ? "space-y-1" : "space-y-0.5")}>
                               {arr.quartiers.map((q) => (
                                 <label
                                   key={q.name}
-                                  className="flex items-center gap-2 px-2 py-0.5 rounded text-xs font-sans hover:bg-muted cursor-pointer"
+                                  className={cn(
+                                    "flex items-center gap-2 rounded font-sans hover:bg-muted cursor-pointer touch-manipulation",
+                                    isSheet ? "min-h-11 px-2 py-1.5 text-sm" : "px-2 py-0.5 text-xs",
+                                  )}
                                 >
                                   <Checkbox
                                     checked={live.quartiers.includes(q.name)}
@@ -409,7 +463,7 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
                                       toggleQuartier(q.name, ville.name);
                                     }}
                                     disabled={!live.ville || live.ville !== ville.name}
-                                    className="h-3.5 w-3.5"
+                                    className={isSheet ? "h-4 w-4" : "h-3.5 w-3.5"}
                                   />
                                   {q.name}
                                 </label>
@@ -427,24 +481,24 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
         </div>
       </div>
 
-      <div className="mt-3 pt-3 border-t border-border shrink-0">
-        <label className="text-xs text-muted-foreground font-sans mb-1 block">
+      <div className={cn("mt-3 pt-3 border-t border-border shrink-0", isSheet && "mt-4")}>
+        <label className="text-xs text-muted-foreground font-sans mb-1.5 block">
           {t("search.otherQuartierLabel", "Autre zone (hors liste)")}
         </label>
         <Input
           value={live.quartierLibre}
           onChange={(e) => setLive({ ...live, quartierLibre: e.target.value })}
           placeholder={t("search.otherQuartierPlaceholder", "Ex. : lotissement, zone industrielle…")}
-          className="font-sans text-sm"
+          className={cn("font-sans", isSheet ? "min-h-12 text-base" : "text-sm")}
         />
       </div>
 
-      {isApplyMode(props) && (
+      {isApplyMode(props) && !hideApplyRow && (
         <div className="flex flex-wrap gap-2 mt-4 shrink-0">
-          <Button type="button" className="font-sans flex-1 min-w-[120px]" onClick={handleApply}>
+          <Button type="button" className="font-sans flex-1 min-w-[120px] touch-manipulation min-h-11" onClick={handleApply}>
             {t("search.applyLocation", "Appliquer")}
           </Button>
-          <Button type="button" variant="outline" className="font-sans" onClick={handleResetDraft}>
+          <Button type="button" variant="outline" className="font-sans touch-manipulation min-h-11" onClick={handleResetDraft}>
             {t("search.resetLocationDraft", "Réinitialiser")}
           </Button>
         </div>

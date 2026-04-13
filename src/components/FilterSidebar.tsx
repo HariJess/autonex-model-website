@@ -14,6 +14,7 @@ import { LISTING_TYPES, LISTING_TYPE_LABELS, LISTING_TYPES_WITHOUT_ROOM_FILTERS,
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
+import { cn } from "@/lib/utils";
 
 export type { SearchFilters };
 
@@ -29,11 +30,13 @@ interface FilterSidebarProps {
   onFiltersChange: (f: SearchFilters) => void;
   onClose?: () => void;
   isMobile?: boolean;
+  /** Mobile sheet: commit draft to URL and close */
+  onMobileApply?: () => void;
   /** Prefix radio/checkbox ids when two sidebars mount (desktop + sheet) */
   idPrefix?: string;
 }
 
-const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix = "" }: FilterSidebarProps) => {
+const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileApply, idPrefix = "" }: FilterSidebarProps) => {
   const pid = idPrefix ? `${idPrefix}-` : "";
   const { t } = useTranslation();
 
@@ -49,6 +52,10 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
 
   const resetFilters = () => {
     onFiltersChange({ ...EMPTY_SEARCH_FILTERS });
+  };
+
+  const mobileApply = () => {
+    onMobileApply?.();
   };
 
   const withoutRoomsSet = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
@@ -73,40 +80,25 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
     onFiltersChange({ ...filters, transaction: tr, types });
   };
 
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between px-1 pb-2">
-        <h3 className="font-serif font-bold text-lg">{t("search.filters")}</h3>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="text-xs font-sans text-muted-foreground h-7" onClick={resetFilters}>
-            {t("common.clear", "Effacer")}
-          </Button>
-          {isMobile && onClose && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose} aria-label={t("common.close", "Fermer")}>
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+  const filterBody = (
+      <div className={cn("bg-card rounded-2xl border border-border overflow-hidden", isMobile && "shadow-sm")}>
         <Accordion type="multiple" defaultValue={["transaction", "type", "location", "budget"]} className="w-full">
           <AccordionItem value="transaction" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.transaction", "Transaction")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.transaction", "Transaction")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <RadioGroup value={filters.transaction || "all"} onValueChange={setTransaction}>
-                <div className="flex items-center gap-2 py-0.5">
-                  <RadioGroupItem value="all" id={`${pid}tr-all`} />
-                  <Label htmlFor={`${pid}tr-all`} className="font-sans text-sm cursor-pointer flex-1">{t("search.allTransactions", "Toutes")}</Label>
+                <div className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
+                  <RadioGroupItem value="all" id={`${pid}tr-all`} className={isMobile ? "shrink-0" : undefined} />
+                  <Label htmlFor={`${pid}tr-all`} className="font-sans text-sm cursor-pointer flex-1 py-1">{t("search.allTransactions", "Toutes")}</Label>
                 </div>
                 {[
                   { value: "vente", label: t("transaction.sale", "Vente") },
                   { value: "location", label: t("transaction.rent", "Location") },
                   { value: "location_vacances", label: t("transaction.vacation", "Location vacances") },
                 ].map((opt) => (
-                  <div key={opt.value} className="flex items-center gap-2 py-0.5">
+                  <div key={opt.value} className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
                     <RadioGroupItem value={opt.value} id={`${pid}tr-${opt.value}`} />
-                    <Label htmlFor={`${pid}tr-${opt.value}`} className="font-sans text-sm cursor-pointer flex-1">{opt.label}</Label>
+                    <Label htmlFor={`${pid}tr-${opt.value}`} className="font-sans text-sm cursor-pointer flex-1 py-1">{opt.label}</Label>
                   </div>
                 ))}
               </RadioGroup>
@@ -114,13 +106,14 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
           </AccordionItem>
 
           <AccordionItem value="type" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.propertyType", "Type de bien")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.propertyType", "Type de bien")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
               {typeOptions.map((typeVal) => (
-                <label key={typeVal} className="flex items-center gap-2 py-0.5 cursor-pointer">
+                <label key={typeVal} className={cn("flex items-center gap-3 cursor-pointer touch-manipulation", isMobile ? "min-h-11 py-1" : "py-0.5")}>
                   <Checkbox
                     checked={filters.types.includes(typeVal)}
                     onCheckedChange={() => update({ types: toggleInArray(filters.types, typeVal) })}
+                    className={isMobile ? "h-4 w-4" : undefined}
                   />
                   <span className="font-sans text-sm flex-1">{LISTING_TYPE_LABELS[typeVal]}</span>
                 </label>
@@ -132,10 +125,13 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
           </AccordionItem>
 
           <AccordionItem value="location" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.location", "Localisation")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.location", "Localisation")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <LocationSelector
                 mode="apply"
+                variant={isMobile ? "sheet" : "default"}
+                hideApplyRow={isMobile}
+                suppressApplyToast={isMobile}
                 committed={{
                   ville: filters.ville,
                   arrondissements: filters.arrondissements,
@@ -155,7 +151,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
           </AccordionItem>
 
           <AccordionItem value="budget" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.budget", "Budget")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.budget", "Budget")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <BudgetRangeSlider
                 transaction={filters.transaction}
@@ -168,7 +164,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
           </AccordionItem>
 
           <AccordionItem value="surface" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("search.surface", "Surface (m²)")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.surface", "Surface (m²)")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="space-y-3">
                 <p className="text-xs text-muted-foreground font-sans">
@@ -196,7 +192,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
                     value={filters.surfaceMin || ""}
                     onChange={(e) => update({ surfaceMin: Number(e.target.value) || 0 })}
                     placeholder={t("search.min", "Min")}
-                    className="font-sans text-sm"
+                    className={cn("font-sans text-sm", isMobile && "min-h-12")}
                   />
                   <Input
                     type="number"
@@ -204,7 +200,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
                     value={filters.surfaceMax || ""}
                     onChange={(e) => update({ surfaceMax: Number(e.target.value) || 0 })}
                     placeholder={t("search.max", "Max")}
-                    className="font-sans text-sm"
+                    className={cn("font-sans text-sm", isMobile && "min-h-12")}
                   />
                 </div>
               </div>
@@ -213,16 +209,20 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
 
           {hasResidentialType && (
             <AccordionItem value="rooms" className="border-b border-border px-4">
-              <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("listing.rooms", "Chambres")}</AccordionTrigger>
+              <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.rooms", "Chambres")}</AccordionTrigger>
               <AccordionContent className="pb-3">
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {[{ label: "Studio", value: 0 }, { label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }, { label: "4", value: 4 }, { label: "5+", value: 5 }].map((r) => (
                     <Button
                       key={r.value}
                       type="button"
                       variant="outline"
                       size="sm"
-                      className={`font-sans text-xs h-8 px-3 ${filters.rooms.includes(r.value) ? "border-primary bg-primary/10 text-primary" : ""}`}
+                      className={cn(
+                        "font-sans touch-manipulation",
+                        isMobile ? "min-h-11 px-4 text-sm" : "text-xs h-8 px-3",
+                        filters.rooms.includes(r.value) ? "border-primary bg-primary/10 text-primary" : "",
+                      )}
                       onClick={() => update({ rooms: toggleInNumArray(filters.rooms, r.value) })}
                     >
                       {r.label}
@@ -235,17 +235,21 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
 
           {hasResidentialType && (
             <AccordionItem value="bathrooms" className="border-b border-border px-4">
-              <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("listing.bathrooms", "Salles de bain")}</AccordionTrigger>
+              <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.bathrooms", "Salles de bain")}</AccordionTrigger>
               <AccordionContent className="pb-3">
                 <p className="text-xs text-muted-foreground font-sans mb-2">{t("search.bathroomsHint", "« 4+ » inclut les biens avec au moins 4 salles de bain.")}</p>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {[1, 2, 3, 4].map((b) => (
                     <Button
                       key={b}
                       type="button"
                       variant="outline"
                       size="sm"
-                      className={`font-sans text-xs h-8 px-3 ${filters.bathrooms.includes(b) ? "border-primary bg-primary/10 text-primary" : ""}`}
+                      className={cn(
+                        "font-sans touch-manipulation",
+                        isMobile ? "min-h-11 min-w-[2.75rem] px-3 text-sm" : "text-xs h-8 px-3",
+                        filters.bathrooms.includes(b) ? "border-primary bg-primary/10 text-primary" : "",
+                      )}
                       onClick={() => update({ bathrooms: toggleInNumArray(filters.bathrooms, b) })}
                     >
                       {b}{b === 4 ? "+" : ""}
@@ -257,12 +261,16 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
           )}
 
           <AccordionItem value="equipment" className="border-b border-border px-4">
-            <AccordionTrigger className="font-serif text-sm font-semibold py-3">{t("listing.features", "Équipements")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.features", "Équipements")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
               <p className="text-xs text-muted-foreground font-sans mb-2">{t("search.equipmentHint", "Correspondance sur les équipements renseignés dans l’annonce (recherche souple).")}</p>
               {EQUIPMENTS.map((eq) => (
-                <label key={eq} className="flex items-center gap-2 py-0.5 cursor-pointer">
-                  <Checkbox checked={filters.equipments.includes(eq)} onCheckedChange={() => update({ equipments: toggleInArray(filters.equipments, eq) })} />
+                <label key={eq} className={cn("flex items-center gap-3 cursor-pointer touch-manipulation", isMobile ? "min-h-11 py-1" : "py-0.5")}>
+                  <Checkbox
+                    checked={filters.equipments.includes(eq)}
+                    onCheckedChange={() => update({ equipments: toggleInArray(filters.equipments, eq) })}
+                    className={isMobile ? "h-4 w-4" : undefined}
+                  />
                   <span className="font-sans text-sm">{eq}</span>
                 </label>
               ))}
@@ -271,6 +279,69 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, idPrefix =
 
         </Accordion>
       </div>
+  );
+
+  if (isMobile && onMobileApply) {
+    return (
+      <div className="flex flex-col flex-1 min-h-0 h-full">
+        <div className="shrink-0 px-4 pt-3 pb-3 border-b border-border/80 bg-background">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="font-serif font-bold text-lg leading-tight">{t("search.filters")}</h3>
+              <p className="text-xs text-muted-foreground font-sans mt-1.5 leading-relaxed">
+                {t(
+                  "search.mobileFiltersDraftHint",
+                  "Ajustez vos critères puis appuyez sur Appliquer. Fermer sans appliquer annule les changements.",
+                )}
+              </p>
+            </div>
+            {onClose && (
+              <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0 touch-manipulation -mr-1" onClick={onClose} aria-label={t("common.close", "Fermer")}>
+                <X className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3 touch-pan-y [-webkit-overflow-scrolling:touch]">
+          {filterBody}
+        </div>
+
+        <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-md px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-6px_24px_rgba(0,0,0,0.06)]">
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 min-h-12 font-sans touch-manipulation"
+              onClick={resetFilters}
+            >
+              {t("search.resetAllFilters", "Réinitialiser")}
+            </Button>
+            <Button
+              type="button"
+              className="flex-1 min-h-12 font-sans gradient-primary border-0 touch-manipulation"
+              style={{ color: "#FAFAFA" }}
+              onClick={mobileApply}
+            >
+              {t("search.applyFilters", "Appliquer")}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between px-1 pb-2">
+        <h3 className="font-serif font-bold text-lg">{t("search.filters")}</h3>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="text-xs font-sans text-muted-foreground h-7" onClick={resetFilters}>
+            {t("common.clear", "Effacer")}
+          </Button>
+        </div>
+      </div>
+      {filterBody}
     </div>
   );
 };

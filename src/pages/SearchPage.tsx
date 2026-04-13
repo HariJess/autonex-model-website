@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, Home, Loader2, AlertCircle } from "lucide-react";
+import { SlidersHorizontal, X, LayoutGrid, List, Map as MapIcon, ChevronRight, Home, Loader2, AlertCircle, Sparkles } from "lucide-react";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { useDbListings } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -57,6 +57,26 @@ const SearchPage = () => {
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  /** Draft filters while mobile sheet is open; URL updates only on Appliquer */
+  const [mobileFilterDraft, setMobileFilterDraft] = useState<SearchFilters | null>(null);
+
+  const handleMobileSheetOpenChange = useCallback(
+    (open: boolean) => {
+      setMobileFiltersOpen(open);
+      if (open) {
+        setMobileFilterDraft({ ...filters });
+      } else {
+        setMobileFilterDraft(null);
+      }
+    },
+    [filters],
+  );
+
+  const applyMobileFilters = useCallback(() => {
+    updateFilters(mobileFilterDraft ?? filters);
+    setMobileFiltersOpen(false);
+    setMobileFilterDraft(null);
+  }, [mobileFilterDraft, filters, updateFilters]);
 
   const { filters, sort, view: viewMode } = useMemo(
     () => searchStateFromParams(searchParams),
@@ -379,14 +399,14 @@ const SearchPage = () => {
         </h1>
 
         {activeChips.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-4 lg:gap-1.5">
             {activeChips.map((chip) => (
               <Badge
                 key={chip.key}
                 variant="secondary"
                 role="button"
                 tabIndex={0}
-                className="font-sans text-xs gap-1 cursor-pointer hover:bg-destructive/10 transition-colors"
+                className="font-sans gap-1.5 cursor-pointer hover:bg-destructive/10 transition-colors touch-manipulation max-lg:min-h-10 max-lg:py-2 max-lg:px-2.5 max-lg:text-sm text-xs"
                 onClick={() => removeChip(chip.key)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
@@ -396,13 +416,13 @@ const SearchPage = () => {
                 }}
               >
                 {chip.label}
-                <X className="h-3 w-3" aria-hidden />
+                <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
               </Badge>
             ))}
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs font-sans text-muted-foreground h-6"
+              className="text-xs font-sans text-muted-foreground h-6 max-lg:min-h-10 max-lg:px-3 touch-manipulation"
               onClick={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
             >
               {t("common.clearAll", "Effacer tout")}
@@ -427,9 +447,9 @@ const SearchPage = () => {
             <SearchTopBanner />
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border p-3">
               <div className="flex flex-wrap items-center gap-3 min-w-0">
-                <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+                <Sheet open={mobileFiltersOpen} onOpenChange={handleMobileSheetOpenChange}>
                   <SheetTrigger asChild>
-                    <Button variant="outline" size="sm" className="lg:hidden font-sans gap-2 shrink-0">
+                    <Button variant="outline" size="sm" className="lg:hidden font-sans gap-2 shrink-0 min-h-11 touch-manipulation">
                       <SlidersHorizontal className="h-4 w-4" />
                       {t("search.filters")}
                       {activeFilterCount > 0 && (
@@ -443,13 +463,17 @@ const SearchPage = () => {
                       )}
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="w-full sm:max-w-md p-4 overflow-y-auto">
+                  <SheetContent
+                    side="left"
+                    className="flex flex-col w-full sm:max-w-lg p-0 gap-0 h-[100dvh] max-h-[100dvh] overflow-hidden border-l"
+                  >
                     <FilterSidebar
-                      filters={filters}
-                      onFiltersChange={updateFilters}
+                      filters={mobileFilterDraft ?? filters}
+                      onFiltersChange={setMobileFilterDraft}
                       isMobile
                       idPrefix="mobile"
-                      onClose={() => setMobileFiltersOpen(false)}
+                      onClose={() => handleMobileSheetOpenChange(false)}
+                      onMobileApply={applyMobileFilters}
                     />
                   </SheetContent>
                 </Sheet>
@@ -483,7 +507,7 @@ const SearchPage = () => {
                       key={mode}
                       type="button"
                       onClick={() => setViewMode(mode)}
-                      className={`p-2 transition-colors ${viewMode === mode ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                      className={`inline-flex items-center justify-center min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
                       aria-label={label}
                       aria-pressed={viewMode === mode}
                     >
@@ -514,16 +538,29 @@ const SearchPage = () => {
             )}
 
             {showSimilarBanner && (
-              <div className="mb-4 rounded-xl border border-border bg-muted/30 px-4 py-3">
-                <p className="font-sans text-sm font-medium text-foreground">
-                  {t("search.noExactMatchTitle", "Aucun bien ne correspond exactement à votre recherche.")}
-                </p>
-                <p className="font-sans text-sm text-muted-foreground mt-1">
-                  {t(
-                    "search.similarIntro",
-                    "Voici des biens similaires susceptibles de vous intéresser (même ville, critères assouplis).",
-                  )}
-                </p>
+              <div className="mb-4 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.07] via-muted/30 to-muted/20 px-4 py-4 lg:py-3 shadow-sm">
+                <div className="flex gap-3">
+                  <div className="shrink-0 mt-0.5 rounded-full bg-primary/15 p-2">
+                    <Sparkles className="h-5 w-5 text-primary" aria-hidden />
+                  </div>
+                  <div className="min-w-0 space-y-1.5">
+                    <p className="font-sans text-sm font-semibold text-foreground leading-snug">
+                      {t("search.noExactMatchTitle", "Aucun bien ne correspond exactement à votre recherche.")}
+                    </p>
+                    <p className="font-sans text-sm text-muted-foreground leading-relaxed">
+                      {t(
+                        "search.similarIntro",
+                        "Voici des biens similaires susceptibles de vous intéresser (même ville, critères assouplis).",
+                      )}
+                    </p>
+                    <p className="font-sans text-xs text-muted-foreground/90 pt-0.5">
+                      {t(
+                        "search.similarResultsBadgeHint",
+                        "Chaque carte indique pourquoi le bien est proposé (budget, zone, etc.).",
+                      )}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -617,7 +654,7 @@ const SearchPage = () => {
             )}
 
             {showResults && viewMode === "grid" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 max-lg:gap-6">
                 {displayListings.flatMap((listing, index): ReactNode[] => {
                   const out: ReactNode[] = [];
                   if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 2) {
@@ -636,14 +673,14 @@ const SearchPage = () => {
             )}
 
             {showAlsoLikeBlock && (
-              <div className="mt-8 pt-6 border-t border-border">
-                <h2 className="font-serif text-lg font-semibold mb-3">
+              <div className="mt-8 pt-6 border-t border-border max-lg:mt-10">
+                <h2 className="font-serif text-xl max-lg:font-bold font-semibold mb-2 max-lg:mb-3">
                   {t("search.youMayAlsoLike", "Vous pouvez aussi aimer")}
                 </h2>
-                <p className="font-sans text-xs text-muted-foreground mb-4">
+                <p className="font-sans text-sm text-muted-foreground mb-4 max-lg:leading-relaxed">
                   {t("search.alsoLikeHint", "Autres annonces proches de votre recherche, en complément des résultats ci-dessus.")}
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {alsoLikeListings.map((listing) => (
                     <ListingCard key={`also-${listing.id}`} listing={listing} />
                   ))}

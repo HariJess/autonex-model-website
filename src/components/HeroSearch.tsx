@@ -132,13 +132,13 @@ const HeroSearch = () => {
         </p>
 
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-center gap-1 mb-0">
+          <div className="flex justify-center gap-1 mb-0 max-w-full overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch]">
             {TRANSACTIONS.map((tr) => (
               <button
                 key={tr.value}
                 type="button"
                 onClick={() => handleTransactionChange(tr.value)}
-                className={`px-6 py-2.5 rounded-t-xl font-sans font-semibold text-sm transition-all ${
+                className={`shrink-0 px-3 sm:px-5 py-2.5 rounded-t-xl font-sans font-semibold text-xs sm:text-sm transition-all touch-manipulation min-h-11 ${
                   transaction === tr.value
                     ? "gradient-primary text-white shadow-lg"
                     : "bg-white/20 text-white/80 hover:bg-white/30 backdrop-blur-sm"
@@ -273,7 +273,11 @@ const HeroSearch = () => {
                     {locationLabel || t("hero.location")}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[calc(100vw-2rem)] max-w-md p-4" align="start">
+                <PopoverContent
+                  className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4"
+                  align="start"
+                  sideOffset={8}
+                >
                   <LocationSelector
                     value={{ ville, arrondissements, quartiers, quartierLibre }}
                     onChange={onLocationChange}
@@ -289,7 +293,11 @@ const HeroSearch = () => {
                     {budgetLabel || t("search.budget", "Budget")}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[calc(100vw-2rem)] max-w-md p-4" align="start">
+                <PopoverContent
+                  className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,480px)] overflow-y-auto overscroll-contain p-4"
+                  align="start"
+                  sideOffset={8}
+                >
                   <BudgetRangeSlider
                     transaction={transaction}
                     minValue={priceMin}
@@ -318,7 +326,7 @@ const HeroSearch = () => {
               <Button
                 type="button"
                 onClick={handleSearch}
-                className="w-full gradient-primary border-0 font-semibold font-sans gap-2 h-12"
+                className="w-full gradient-primary border-0 font-semibold font-sans gap-2 h-12 touch-manipulation min-h-12"
                 style={{ color: "#FAFAFA" }}
               >
                 <Search className="h-5 w-5" />

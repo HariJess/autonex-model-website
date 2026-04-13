@@ -63,13 +63,22 @@ const Header = () => {
           )}
         </div>
 
-        <button className="lg:hidden" onClick={() => setMenuOpen(!menuOpen)} style={{ color: "#FAFAFA" }}>
+        <button
+          type="button"
+          className="lg:hidden inline-flex items-center justify-center min-h-11 min-w-11 rounded-md -mr-2 touch-manipulation"
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{ color: "#FAFAFA" }}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-nav"
+          id="mobile-menu-button"
+          aria-label={menuOpen ? t("common.closeMenu", "Fermer le menu") : t("common.openMenu", "Ouvrir le menu")}
+        >
           {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
       {menuOpen && (
-        <div className="lg:hidden border-t" style={{ backgroundColor: "#0A0A0A", borderColor: "#333" }}>
+        <div id="mobile-nav" className="lg:hidden border-t" style={{ backgroundColor: "#0A0A0A", borderColor: "#333" }}>
           <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="text-sm py-2" style={{ color: "#FAFAFA" }}>
