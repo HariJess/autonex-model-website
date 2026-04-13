@@ -97,8 +97,8 @@ const LoginPage = () => {
     <>
       <Helmet><title>{t("auth.login")} — ImmoNex</title></Helmet>
       <Header />
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm space-y-6">
+      <div className="min-h-[70vh] flex items-center justify-center px-4 py-10 md:py-16">
+        <div className="w-full max-w-md bg-card rounded-2xl border border-border p-5 sm:p-8 shadow-sm space-y-6">
           <div className="text-center">
             <h1 className="font-serif text-2xl font-bold">{t("auth.login")}</h1>
           </div>
@@ -106,7 +106,7 @@ const LoginPage = () => {
             <button
               type="button"
               onClick={() => setLoginKind("particulier")}
-              className={`rounded-xl border px-3 py-2 text-sm font-sans transition-colors ${
+              className={`rounded-xl border px-3 py-2.5 min-h-11 text-sm font-sans transition-colors touch-manipulation ${
                 loginKind === "particulier"
                   ? "border-primary ring-1 ring-primary bg-primary/5 font-medium"
                   : "border-border hover:border-primary/40"
@@ -117,7 +117,7 @@ const LoginPage = () => {
             <button
               type="button"
               onClick={() => setLoginKind("agence")}
-              className={`rounded-xl border px-3 py-2 text-sm font-sans transition-colors ${
+              className={`rounded-xl border px-3 py-2.5 min-h-11 text-sm font-sans transition-colors touch-manipulation ${
                 loginKind === "agence"
                   ? "border-primary ring-1 ring-primary bg-primary/5 font-medium"
                   : "border-border hover:border-primary/40"
@@ -132,7 +132,7 @@ const LoginPage = () => {
                 type="button"
                 variant="outline"
                 disabled={loading}
-                className="w-full font-sans gap-2 border-border bg-background hover:bg-muted"
+                className="w-full font-sans gap-2 border-border bg-background hover:bg-muted min-h-11 touch-manipulation"
                 onClick={handleGoogle}
               >
                 <GoogleLogo />
@@ -163,7 +163,7 @@ const LoginPage = () => {
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans" required />
             </div>
             <Link to="/forgot-password" className="text-sm text-primary font-sans hover:underline block">{t("auth.forgotPassword")}</Link>
-            <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+            <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
               {loading ? t("common.loading") : t("auth.login")}
             </Button>
           </form>
@@ -303,8 +303,8 @@ const SignupPage = () => {
     <>
       <Helmet><title>{t("auth.signup")} — ImmoNex</title></Helmet>
       <Header />
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-lg bg-card rounded-2xl border border-border p-8 shadow-sm space-y-6">
+      <div className="min-h-[70vh] flex items-center justify-center px-4 py-10 md:py-16">
+        <div className="w-full max-w-lg bg-card rounded-2xl border border-border p-5 sm:p-8 shadow-sm space-y-6">
           <div className="text-center space-y-1">
             <h1 className="font-serif text-2xl font-bold">{t("auth.signupChooseTitle", "Créer un compte")}</h1>
             <p className="text-sm text-muted-foreground font-sans">
@@ -325,7 +325,7 @@ const SignupPage = () => {
                   setRegCommerce("");
                   setAgencyLogoUrl("");
                 }}
-                className={`rounded-xl border p-4 text-left transition-colors font-sans ${role === "particulier" ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+                className={`rounded-xl border p-4 min-h-16 text-left transition-colors font-sans touch-manipulation ${role === "particulier" ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
               >
                 <p className="font-semibold text-sm">{t("auth.signupParticulierCta", "Compte particulier")}</p>
                 <p className="text-xs text-muted-foreground mt-1">{t("auth.signupParticulierDesc", "Propriétaire ou vendeur indépendant")}</p>
@@ -339,7 +339,7 @@ const SignupPage = () => {
                   setWhatsapp("");
                   setContactConsent(false);
                 }}
-                className={`rounded-xl border p-4 text-left transition-colors font-sans ${role === "agence" ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+                className={`rounded-xl border p-4 min-h-16 text-left transition-colors font-sans touch-manipulation ${role === "agence" ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
               >
                 <p className="font-semibold text-sm">{t("auth.signupProCta", "Professionnel / agence")}</p>
                 <p className="text-xs text-muted-foreground mt-1">{t("auth.signupProDesc", "Agence immobilière ou activité structurée")}</p>
@@ -352,7 +352,7 @@ const SignupPage = () => {
                   type="button"
                   variant="outline"
                   disabled={loading}
-                  className="w-full font-sans gap-2 border-border bg-background hover:bg-muted"
+                  className="w-full font-sans gap-2 border-border bg-background hover:bg-muted min-h-11 touch-manipulation"
                   onClick={handleGoogleSignup}
                 >
                   <GoogleLogo />
@@ -485,7 +485,7 @@ const SignupPage = () => {
                 <span>{t("auth.contactConsent")}</span>
               </label>
             )}
-            <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+            <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
               {loading ? t("common.loading") : t("auth.signup")}
             </Button>
           </form>
@@ -525,8 +525,8 @@ const ForgotPasswordPage = () => {
     <>
       <Helmet><title>{t("auth.forgotPassword")} — ImmoNex</title></Helmet>
       <Header />
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm space-y-6">
+      <div className="min-h-[70vh] flex items-center justify-center px-4 py-10 md:py-16">
+        <div className="w-full max-w-md bg-card rounded-2xl border border-border p-5 sm:p-8 shadow-sm space-y-6">
           <div className="text-center">
             <h1 className="font-serif text-2xl font-bold">{t("auth.forgotPassword")}</h1>
           </div>
@@ -540,7 +540,7 @@ const ForgotPasswordPage = () => {
                 <Label className="font-sans">{t("auth.email")}</Label>
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans" required />
               </div>
-              <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+              <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {loading ? t("common.loading") : t("auth.sendResetLink")}
               </Button>
             </form>

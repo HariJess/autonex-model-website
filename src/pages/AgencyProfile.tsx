@@ -96,7 +96,7 @@ const AgencyProfile = () => {
     <>
       <Helmet><title>{agency.name} — ImmoNex</title></Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 md:py-8">
         {MONETIZATION_PLACEMENTS.agencyStrip && (
           <div className="mb-8">
             <BannerSlot
@@ -107,7 +107,7 @@ const AgencyProfile = () => {
             />
           </div>
         )}
-        <div className="bg-card rounded-2xl border border-border p-8 flex flex-col md:flex-row items-center gap-6 mb-8">
+        <div className="bg-card rounded-2xl border border-border p-5 sm:p-8 flex flex-col md:flex-row items-center gap-5 sm:gap-6 mb-8">
           <div className="w-24 h-24 rounded-2xl overflow-hidden border border-border flex-shrink-0 bg-muted flex items-center justify-center">
             {agency.logo_url ? (
               <img

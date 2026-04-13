@@ -836,7 +836,7 @@ const PublishPage = () => {
     <>
       <Helmet><title>{t("publish.title")} — ImmoNex</title></Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-3xl pb-28 sm:pb-8">
         <div className="flex items-start gap-3 mb-6 rounded-2xl border-2 border-border/90 bg-secondary/40 p-4 shadow-sm">
           <Shield className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground font-sans leading-relaxed">
@@ -909,10 +909,10 @@ const PublishPage = () => {
 
         {(!user || draftHydrated) && (
         <>
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <div className="flex justify-between mb-3 gap-1 overflow-x-auto pb-1">
             {steps.map((s, i) => (
-              <div key={s} className="flex flex-col items-center min-w-[4.5rem]">
+              <div key={s} className="flex flex-col items-center min-w-[4.75rem]">
                 <div
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-sans font-semibold transition-all border-2 ${
                     i === step
@@ -1043,7 +1043,7 @@ const PublishPage = () => {
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="font-sans" rows={6} maxLength={5000} placeholder="Rédigez une description complète en français…" />
               <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
             </div>
-            <div className={`grid ${showRooms ? "grid-cols-2 md:grid-cols-3" : "grid-cols-2"} gap-4`}>
+            <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-4`}>
               <div className="space-y-2">
                 <Label className="font-sans">{t("publish.priceMga", "Prix (Ar)")} *</Label>
                 <Input type="number" value={priceMga} onChange={(e) => setPriceMga(e.target.value)} className="font-sans" min={0} />
@@ -1077,7 +1077,7 @@ const PublishPage = () => {
         {step === 2 && (
           <div className="space-y-5 form-surface">
             <p className="text-sm text-muted-foreground font-sans">{t("publish.mainPhotoFirst", "La première image est la photo principale. Utilisez « Couverture » pour réorganiser.")}</p>
-            <div className="border-2 border-dashed border-border rounded-2xl p-10 text-center">
+            <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center">
               <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
               <input type="file" multiple accept="image/*" onChange={handlePhotoSelect} className="hidden" id="photo-upload" />
               <label htmlFor="photo-upload">
@@ -1085,7 +1085,7 @@ const PublishPage = () => {
               </label>
             </div>
             {(serverPhotos.length > 0 || pendingPhotos.length > 0) && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
                 {serverPhotos.map((ph, i) => (
                   <div key={ph.id} className="relative rounded-xl overflow-hidden border border-border aspect-square group">
                     <img src={ph.url} alt="" className="w-full h-full object-cover" />
@@ -1166,7 +1166,8 @@ const PublishPage = () => {
           />
         )}
 
-        <div className="flex justify-between mt-8 gap-3 sm:gap-4 max-sm:flex-col-reverse">
+        <div className="fixed inset-x-0 bottom-0 z-30 sm:static sm:z-auto border-t border-border bg-background/95 backdrop-blur-md sm:border-0 sm:bg-transparent sm:backdrop-blur-0 px-4 sm:px-0 pt-3 sm:pt-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pb-0">
+        <div className="container mx-auto max-w-3xl sm:max-w-none flex justify-between mt-0 sm:mt-8 gap-3 sm:gap-4 max-sm:flex-col-reverse">
           <Button
             type="button"
             variant="outline"
@@ -1193,6 +1194,7 @@ const PublishPage = () => {
               {t("publish.next")}
             </Button>
           )}
+        </div>
         </div>
         </>
         )}

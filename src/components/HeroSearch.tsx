@@ -113,19 +113,19 @@ const HeroSearch = () => {
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
 
   return (
-    <section className="relative overflow-hidden py-20 lg:py-32">
+    <section className="relative overflow-hidden py-14 sm:py-16 lg:py-32">
       <div className="absolute inset-0 gradient-primary opacity-90" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
 
       <div className="relative container mx-auto px-4 text-center">
         <h1
-          className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight"
+          className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight"
           style={{ color: "#FAFAFA" }}
         >
           {t("hero.title")}
         </h1>
         <p
-          className="text-lg md:text-xl mb-10 font-sans max-w-2xl mx-auto"
+          className="text-base sm:text-lg md:text-xl mb-8 md:mb-10 font-sans max-w-2xl mx-auto"
           style={{ color: "rgba(250,250,250,0.85)" }}
         >
           {t("hero.subtitle")}
@@ -149,7 +149,7 @@ const HeroSearch = () => {
             ))}
           </div>
 
-          <div className="bg-card rounded-b-2xl rounded-tr-2xl shadow-2xl p-3 md:p-4 -mb-12 relative z-10">
+          <div className="bg-card rounded-b-2xl rounded-tr-2xl shadow-2xl p-3 md:p-4 -mb-10 md:-mb-12 relative z-10">
             <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border">
               <div className="flex-1 border-r border-border px-3 py-2">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
@@ -256,7 +256,7 @@ const HeroSearch = () => {
 
             <div className="lg:hidden space-y-3">
               <Select value={type} onValueChange={handleTypeChange}>
-                <SelectTrigger className="font-sans">
+                <SelectTrigger className="font-sans min-h-11">
                   <SelectValue placeholder={t("hero.type")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -268,7 +268,7 @@ const HeroSearch = () => {
 
               <Popover open={mobileLocationOpen} onOpenChange={setMobileLocationOpen}>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2">
+                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation">
                     <MapPin className="h-4 w-4 text-accent" />
                     {locationLabel || t("hero.location")}
                   </Button>
@@ -288,7 +288,7 @@ const HeroSearch = () => {
 
               <Popover open={mobileBudgetOpen} onOpenChange={setMobileBudgetOpen}>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2">
+                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation">
                     <BudgetIcon className="h-4 w-4 text-accent shrink-0" />
                     {budgetLabel || t("search.budget", "Budget")}
                   </Button>
@@ -312,7 +312,7 @@ const HeroSearch = () => {
 
               {showRooms && (
                 <Select value={rooms} onValueChange={setRooms}>
-                  <SelectTrigger className="font-sans">
+                  <SelectTrigger className="font-sans min-h-11">
                     <SelectValue placeholder={t("hero.rooms")} />
                   </SelectTrigger>
                   <SelectContent>

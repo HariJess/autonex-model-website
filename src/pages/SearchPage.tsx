@@ -433,7 +433,7 @@ const SearchPage = () => {
         )}
       </div>
 
-      <div className="container mx-auto px-4 pb-8">
+      <div className="container mx-auto px-4 pb-10">
         <div className="flex gap-6">
           <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <FilterSidebar filters={filters} onFiltersChange={updateFilters} idPrefix="desktop" />
@@ -447,7 +447,7 @@ const SearchPage = () => {
 
           <main className="flex-1 min-w-0">
             <SearchTopBanner />
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border p-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border p-3.5">
               <div className="flex flex-wrap items-center gap-3 min-w-0">
                 <Sheet open={mobileFiltersOpen} onOpenChange={handleMobileSheetOpenChange}>
                   <SheetTrigger asChild>
@@ -480,7 +480,7 @@ const SearchPage = () => {
                   </SheetContent>
                 </Sheet>
 
-                <p className="font-sans text-sm text-muted-foreground">
+                <p className="font-sans text-sm text-muted-foreground leading-snug">
                   {queryError ? (
                     <span className="text-destructive font-medium">{t("search.resultsUnavailable", "Résultats indisponibles")}</span>
                   ) : (
@@ -519,7 +519,7 @@ const SearchPage = () => {
                 </div>
 
                 <Select value={sort} onValueChange={(v) => setSort(v as SearchSortMode)}>
-                  <SelectTrigger className="w-full sm:w-40 font-sans text-sm min-w-0">
+                  <SelectTrigger className="w-full sm:w-40 font-sans text-sm min-w-0 min-h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -654,7 +654,7 @@ const SearchPage = () => {
                       </div>
                       <div className="flex items-center justify-between mt-3 gap-2">
                         <span className="font-serif font-bold text-lg text-primary">{formatPrice(listing.price_mga)}</span>
-                        <Button variant="outline" size="sm" className="font-sans shrink-0" asChild>
+                        <Button variant="outline" size="sm" className="font-sans shrink-0 min-h-10 touch-manipulation" asChild>
                           <Link to={`/annonce/${listing.id}`}>{t("search.seeListing", "Voir l’annonce")}</Link>
                         </Button>
                       </div>

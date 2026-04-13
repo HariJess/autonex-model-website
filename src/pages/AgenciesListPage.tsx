@@ -37,7 +37,7 @@ const AgenciesListPage = () => {
         <link rel="canonical" href={canonical} />
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 md:py-8">
         <h1 className="font-serif text-3xl font-bold mb-8">{t("agencies.pageTitle")}</h1>
 
         {error && (

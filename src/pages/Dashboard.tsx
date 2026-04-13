@@ -611,7 +611,91 @@ const Dashboard = () => {
               </Link>
             </div>
           ) : (
-            <div className="bg-card rounded-2xl border border-border overflow-hidden">
+            <>
+            <div className="space-y-3 md:hidden">
+              {publishedListings.map((listing) => {
+                const boostsLine = pendingBoostsLabel(listing.pending_boost_types);
+                const activeBoostTypes = boostsByListing.get(listing.id) ?? [];
+                const activeBoostLine =
+                  activeBoostTypes.length > 0
+                    ? activeBoostTypes.map((x) => boostLabels[x] ?? x).join(", ")
+                    : null;
+                return (
+                  <Card key={`mobile-${listing.id}`} className="rounded-2xl">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="space-y-1">
+                        <Link to={`/annonce/${listing.id}`} className="font-sans text-sm font-semibold hover:text-primary transition-colors line-clamp-2">
+                          {listing.title}
+                        </Link>
+                        <p className="text-xs text-muted-foreground font-sans">{listing.ville}{listing.quartier ? ` • ${listing.quartier}` : ""}</p>
+                        <p className="text-sm font-sans font-medium">{formatPrice(listing.price_mga)}</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          variant={
+                            listing.status === "active"
+                              ? "default"
+                              : listing.status === "rejected"
+                                ? "destructive"
+                                : "secondary"
+                          }
+                          className="font-sans text-xs"
+                        >
+                          {statusLabels[listing.status ?? "draft"] ?? listing.status}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground font-sans">{listing.views_count ?? 0} vues</span>
+                      </div>
+                      {listing.status === "pending_review" && boostsLine && (
+                        <p className="text-[11px] text-muted-foreground font-sans">
+                          {t("dashboard.pendingBoosts", "Visibilité après validation")}: {boostsLine}
+                        </p>
+                      )}
+                      {listing.status === "active" && activeBoostLine && (
+                        <p className="text-[11px] text-emerald-800 dark:text-emerald-500 font-sans">
+                          {t("dashboard.activeBoosts", "Boost actif")}: {activeBoostLine}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          variant="ghost" size="icon"
+                          title={listing.status === "active" ? t("dashboard.pause", "Mettre en pause") : t("dashboard.activate", "Activer")}
+                          onClick={() => toggleStatus.mutate({ id: listing.id, status: listing.status ?? "draft" })}
+                          disabled={!["active", "paused"].includes(listing.status ?? "")}
+                          className="min-h-10 min-w-10 touch-manipulation"
+                        >
+                          {listing.status === "active" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" title={t("common.delete")} className="min-h-10 min-w-10 touch-manipulation">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="font-serif">{t("dashboard.deleteConfirm", "Supprimer cette annonce ?")}</AlertDialogTitle>
+                              <AlertDialogDescription className="font-sans">
+                                {t("dashboard.deleteDesc", "Cette action est irréversible. L'annonce et toutes ses photos seront définitivement supprimées.")}
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="font-sans">{t("common.cancel")}</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteListing.mutate(listing.id)}
+                                className="bg-destructive text-destructive-foreground font-sans"
+                              >
+                                {t("common.delete")}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            <div className="bg-card rounded-2xl border border-border overflow-hidden hidden md:block">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -710,6 +794,7 @@ const Dashboard = () => {
                 </table>
               </div>
             </div>
+            </>
           )}
         </div>
 

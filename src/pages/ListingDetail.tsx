@@ -240,7 +240,7 @@ const ListingDetail = () => {
     <>
       <Helmet><title>{listing.title} — ImmoNex</title></Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6 pb-28 lg:pb-6">
+      <div className="container mx-auto px-4 py-5 md:py-6 pb-32 lg:pb-6">
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
           <ChevronRight className="h-3 w-3" />
@@ -457,7 +457,7 @@ const ListingDetail = () => {
             <div
               ref={contactSectionRef}
               id="listing-contact"
-              className="bg-card rounded-2xl border border-border p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
+              className="bg-card rounded-2xl border border-border p-5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
             >
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (
@@ -497,10 +497,10 @@ const ListingDetail = () => {
 
               <form onSubmit={handleContact} className="space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact")}</h4>
-                <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans" maxLength={100} />
-                <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans" maxLength={255} />
-                <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans" maxLength={30} />
-                <Textarea placeholder={t("listing.yourMessage", "Votre message...")} value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans" rows={3} maxLength={1000} />
+                <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans min-h-11" maxLength={100} />
+                <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans min-h-11" maxLength={255} />
+                <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans min-h-11" maxLength={30} />
+                <Textarea placeholder={t("listing.yourMessage", "Votre message...")} value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans min-h-24" rows={3} maxLength={1000} />
                 <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
                   {sending ? t("common.loading") : t("common.send")}
                 </Button>

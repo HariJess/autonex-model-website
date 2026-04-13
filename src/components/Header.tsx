@@ -27,9 +27,9 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50" style={{ backgroundColor: "#0A0A0A" }}>
-      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16 sm:h-[4.25rem]">
         <Link to="/" className="flex-shrink-0">
-          <img src={logo} alt="ImmoNex" className="h-12" />
+          <img src={logo} alt="ImmoNex" className="h-10 sm:h-12" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6">
@@ -79,17 +79,17 @@ const Header = () => {
 
       {menuOpen && (
         <div id="mobile-nav" className="lg:hidden border-t" style={{ backgroundColor: "#0A0A0A", borderColor: "#333" }}>
-          <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
+          <div className="container mx-auto px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-3">
             {navLinks.map((link) => (
-              <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="text-sm py-2" style={{ color: "#FAFAFA" }}>
+              <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="text-sm py-2.5 min-h-11 flex items-center touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {link.label}
               </Link>
             ))}
-            <div className="flex items-center gap-3 pt-2 border-t" style={{ borderColor: "#333" }}>
-              <button onClick={toggleCurrency} className="text-xs font-semibold px-2 py-1 rounded border border-muted-foreground/30" style={{ color: "#FAFAFA" }}>
+            <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t" style={{ borderColor: "#333" }}>
+              <button onClick={toggleCurrency} className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {currency}
               </button>
-              <Button onClick={() => { navigate("/publier"); setMenuOpen(false); }} className="gradient-primary border-0 text-sm" style={{ color: "#FAFAFA" }}>
+              <Button onClick={() => { navigate("/publier"); setMenuOpen(false); }} className="gradient-primary border-0 text-sm min-h-10 touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {t("nav.publish")}
               </Button>
               {user ? (

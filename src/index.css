@@ -113,6 +113,14 @@
   .form-surface-muted {
     @apply rounded-xl border-2 border-border/90 bg-muted/25 p-4 shadow-sm;
   }
+  @media (max-width: 640px) {
+    .form-surface {
+      @apply p-4;
+    }
+    .form-surface-muted {
+      @apply p-3.5;
+    }
+  }
 }
 
 @layer utilities {

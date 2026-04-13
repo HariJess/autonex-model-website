@@ -73,7 +73,7 @@ const Index = () => {
       )}
 
       {/* Recent feed — complementary to “À la une” */}
-      <section className="container mx-auto px-4 py-12">
+      <section className="container mx-auto px-4 py-10 md:py-12">
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Récemment publiées")}</h2>
           <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">
@@ -103,7 +103,7 @@ const Index = () => {
       </section>
 
       {/* Cities */}
-      <section className="bg-secondary/50 py-16">
+      <section className="bg-secondary/50 py-12 md:py-16">
         <div className="container mx-auto px-4">
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">{t("sections.cities", "Nos villes")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -140,7 +140,7 @@ const Index = () => {
       <FeaturedAgenciesSection title={t("sections.agencies")} enabled limit={12} />
 
       {/* Blog — uses seed data consistently */}
-      <section className="bg-secondary/50 py-16">
+      <section className="bg-secondary/50 py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.blog")}</h2>

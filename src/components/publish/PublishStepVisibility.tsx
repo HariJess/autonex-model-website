@@ -101,7 +101,7 @@ const PublishStepVisibility = ({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-2">
       <Card className="rounded-2xl border-border">
         <CardHeader>
           <CardTitle className="font-serif flex items-center gap-2">
@@ -173,7 +173,7 @@ const PublishStepVisibility = ({
           {BOOST_ORDER.map((b) => (
             <label
               key={b}
-              className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 cursor-pointer font-sans text-sm"
+              className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-h-12 cursor-pointer font-sans text-sm touch-manipulation"
             >
               <span className="flex items-center gap-2">
                 <Checkbox
@@ -204,7 +204,7 @@ const PublishStepVisibility = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <label className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 cursor-pointer font-sans text-sm">
+            <label className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-h-12 cursor-pointer font-sans text-sm touch-manipulation">
               <span className="flex items-center gap-2">
                 <Checkbox
                   checked={agencySpotlight}
@@ -239,7 +239,7 @@ const PublishStepVisibility = ({
         type="button"
         onClick={onPublish}
         disabled={publishing || !canPublishWithCredits}
-        className="w-full gradient-primary border-0 font-sans text-lg py-6"
+        className="w-full gradient-primary border-0 font-sans text-base sm:text-lg py-6 min-h-12 touch-manipulation"
         style={{ color: "#FAFAFA" }}
       >
         {publishing ? t("common.loading") : t("publish.submitForReview", "Envoyer pour modération")}
@@ -261,7 +261,7 @@ const PublishStepVisibility = ({
               key={p.id}
               type="button"
               onClick={() => setCreditPackPurchase(p.id)}
-              className={`rounded-xl border p-3 text-left font-sans text-sm transition-colors ${
+              className={`rounded-xl border p-3 min-h-14 text-left font-sans text-sm transition-colors touch-manipulation ${
                 creditPackPurchase === p.id ? "border-primary ring-1 ring-primary" : "border-border"
               }`}
             >
@@ -277,7 +277,7 @@ const PublishStepVisibility = ({
             {t("publish.paymentMethod", "Mode de paiement")}
           </Label>
           <Select value={purchasePaymentMethod} onValueChange={setPurchasePaymentMethod}>
-            <SelectTrigger className="font-sans">
+            <SelectTrigger className="font-sans min-h-11">
               <SelectValue placeholder={t("common.select")} />
             </SelectTrigger>
             <SelectContent>
@@ -296,14 +296,14 @@ const PublishStepVisibility = ({
           <Input
             type="file"
             accept="image/*,.pdf"
-            className="font-sans"
+            className="font-sans min-h-11"
             onChange={(e) => onProofFileChange(e.target.files?.[0] ?? null)}
           />
         </div>
         <Button
           type="button"
           variant="outline"
-          className="w-full font-sans"
+          className="w-full font-sans min-h-11 touch-manipulation"
           disabled={purchaseSubmitting}
           onClick={onSubmitCreditPurchase}
         >
