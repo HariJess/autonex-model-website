@@ -1,17 +1,13 @@
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useNavigate } from "react-router-dom";
 import { useAuth, type SignUpMetadata } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { agencyFormSchema, loginSchema, optionalMgPhoneSchema, signupCommonSchema } from "@/lib/validation";
+import { AuthFormShell } from "@/pages/auth/components/AuthFormShell";
+import { LoginForm } from "@/pages/auth/components/LoginForm";
+import { SignupForm } from "@/pages/auth/components/SignupForm";
+import { ForgotPasswordForm } from "@/pages/auth/components/ForgotPasswordForm";
 
 /** Compare téléphones / champs pour éviter qu’un numéro soit saisi comme « nom du contact ». */
 function digitsOnly(s: string): string {
@@ -94,86 +90,35 @@ const LoginPage = () => {
   };
 
   return (
-    <>
-      <Helmet><title>{t("auth.login")} — ImmoNex</title></Helmet>
-      <Header />
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-10 md:py-16">
-        <div className="w-full max-w-md bg-card rounded-2xl border border-border p-5 sm:p-8 shadow-sm space-y-6">
-          <div className="text-center">
-            <h1 className="font-serif text-2xl font-bold">{t("auth.login")}</h1>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setLoginKind("particulier")}
-              className={`rounded-xl border px-3 py-2.5 min-h-11 text-sm font-sans transition-colors touch-manipulation ${
-                loginKind === "particulier"
-                  ? "border-primary ring-1 ring-primary bg-primary/5 font-medium"
-                  : "border-border hover:border-primary/40"
-              }`}
-            >
-              {t("auth.loginKindParticulier", "Particulier")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginKind("agence")}
-              className={`rounded-xl border px-3 py-2.5 min-h-11 text-sm font-sans transition-colors touch-manipulation ${
-                loginKind === "agence"
-                  ? "border-primary ring-1 ring-primary bg-primary/5 font-medium"
-                  : "border-border hover:border-primary/40"
-              }`}
-            >
-              {t("auth.loginKindAgence", "Agence")}
-            </button>
-          </div>
-          {loginKind === "particulier" && (
-            <div className="space-y-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={loading}
-                className="w-full font-sans gap-2 border-border bg-background hover:bg-muted min-h-11 touch-manipulation"
-                onClick={handleGoogle}
-              >
-                <GoogleLogo />
-                {t("auth.continueWithGoogle", "Continuer avec Google")}
-              </Button>
-              <p className="text-xs text-center text-muted-foreground font-sans">
-                {t("auth.googleLoginParticulierOnly", "Réservé aux comptes particuliers. Les agences utilisent email et mot de passe.")}
-              </p>
-              <div className="flex items-center gap-3 py-1">
-                <div className="h-px flex-1 bg-border" />
-                <span className="text-xs text-muted-foreground font-sans">{t("auth.orWithEmail", "ou")}</span>
-                <div className="h-px flex-1 bg-border" />
-              </div>
-            </div>
-          )}
-          {loginKind === "agence" && (
-            <p className="text-xs text-muted-foreground font-sans text-center">
-              {t("auth.agencyLoginEmailOnly", "Connexion agence : utilisez l’email et le mot de passe de votre compte professionnel.")}
-            </p>
-          )}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label className="font-sans">{t("auth.email")}</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans" required />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{t("auth.password")}</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans" required />
-            </div>
-            <Link to="/forgot-password" className="text-sm text-primary font-sans hover:underline block">{t("auth.forgotPassword")}</Link>
-            <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
-              {loading ? t("common.loading") : t("auth.login")}
-            </Button>
-          </form>
-          <p className="text-center text-sm font-sans text-muted-foreground">
-            {t("auth.noAccount")} <Link to="/signup" className="text-primary hover:underline">{t("auth.signup")}</Link>
-          </p>
-        </div>
-      </div>
-      <Footer />
-    </>
+    <AuthFormShell title={t("auth.login")} maxWidthClassName="max-w-md">
+      <LoginForm
+        loginKind={loginKind}
+        email={email}
+        password={password}
+        loading={loading}
+        labels={{
+          login: t("auth.login"),
+          loginKindParticulier: t("auth.loginKindParticulier", "Particulier"),
+          loginKindAgence: t("auth.loginKindAgence", "Agence"),
+          continueWithGoogle: t("auth.continueWithGoogle", "Continuer avec Google"),
+          googleLoginParticulierOnly: t("auth.googleLoginParticulierOnly", "Réservé aux comptes particuliers. Les agences utilisent email et mot de passe."),
+          orWithEmail: t("auth.orWithEmail", "ou"),
+          agencyLoginEmailOnly: t("auth.agencyLoginEmailOnly", "Connexion agence : utilisez l’email et le mot de passe de votre compte professionnel."),
+          email: t("auth.email"),
+          password: t("auth.password"),
+          forgotPassword: t("auth.forgotPassword"),
+          noAccount: t("auth.noAccount"),
+          signup: t("auth.signup"),
+          loading: t("common.loading"),
+        }}
+        googleIcon={<GoogleLogo />}
+        onSetLoginKind={setLoginKind}
+        onGoogle={handleGoogle}
+        onSubmit={handleLogin}
+        onEmailChange={setEmail}
+        onPasswordChange={setPassword}
+      />
+    </AuthFormShell>
   );
 };
 
@@ -300,202 +245,95 @@ const SignupPage = () => {
   };
 
   return (
-    <>
-      <Helmet><title>{t("auth.signup")} — ImmoNex</title></Helmet>
-      <Header />
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-10 md:py-16">
-        <div className="w-full max-w-lg bg-card rounded-2xl border border-border p-5 sm:p-8 shadow-sm space-y-6">
-          <div className="text-center space-y-1">
-            <h1 className="font-serif text-2xl font-bold">{t("auth.signupChooseTitle", "Créer un compte")}</h1>
-            <p className="text-sm text-muted-foreground font-sans">
-              {t("auth.signupSubtitle", "Particulier ou agence : un seul compte, des parcours adaptés.")}
-            </p>
-          </div>
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setRole("particulier");
-                  setAgencyName("");
-                  setAgencyAddress("");
-                  setCommercialContact("");
-                  setNif("");
-                  setStat("");
-                  setRegCommerce("");
-                  setAgencyLogoUrl("");
-                }}
-                className={`rounded-xl border p-4 min-h-16 text-left transition-colors font-sans touch-manipulation ${role === "particulier" ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
-              >
-                <p className="font-semibold text-sm">{t("auth.signupParticulierCta", "Compte particulier")}</p>
-                <p className="text-xs text-muted-foreground mt-1">{t("auth.signupParticulierDesc", "Propriétaire ou vendeur indépendant")}</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setRole("agence");
-                  setFirstName("");
-                  setLastName("");
-                  setWhatsapp("");
-                  setContactConsent(false);
-                }}
-                className={`rounded-xl border p-4 min-h-16 text-left transition-colors font-sans touch-manipulation ${role === "agence" ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
-              >
-                <p className="font-semibold text-sm">{t("auth.signupProCta", "Professionnel / agence")}</p>
-                <p className="text-xs text-muted-foreground mt-1">{t("auth.signupProDesc", "Agence immobilière ou activité structurée")}</p>
-              </button>
-            </div>
-
-            {role === "particulier" && (
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={loading}
-                  className="w-full font-sans gap-2 border-border bg-background hover:bg-muted min-h-11 touch-manipulation"
-                  onClick={handleGoogleSignup}
-                >
-                  <GoogleLogo />
-                  {t("auth.continueWithGoogle", "Continuer avec Google")}
-                </Button>
-                <p className="text-xs text-center text-muted-foreground font-sans">
-                  {t(
-                    "auth.googleSignupParticulierOnly",
-                    "Compte particulier uniquement — pas d’inscription agence via Google.",
-                  )}
-                </p>
-                <div className="flex items-center gap-3 py-1">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="text-xs text-muted-foreground font-sans">{t("auth.orWithEmail", "ou")}</span>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-              </div>
-            )}
-
-            {role === "particulier" ? (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label className="font-sans">{t("auth.firstName", "Prénom")} *</Label>
-                    <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} className="font-sans" required maxLength={80} autoComplete="given-name" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="font-sans">{t("auth.lastName", "Nom")} *</Label>
-                    <Input value={lastName} onChange={(e) => setLastName(e.target.value)} className="font-sans" required maxLength={80} autoComplete="family-name" />
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  <Label className="font-sans">{t("auth.agencyName", "Nom de l’agence")}</Label>
-                  <Input value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className="font-sans" required maxLength={120} />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-sans">{t("auth.commercialContact", "Contact commercial")}</Label>
-                  <Input
-                    value={commercialContact}
-                    onChange={(e) => setCommercialContact(e.target.value)}
-                    className="font-sans"
-                    required
-                    maxLength={100}
-                    autoComplete="name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-sans">{t("auth.agencyAddress", "Adresse du siège")}</Label>
-                  <Textarea
-                    value={agencyAddress}
-                    onChange={(e) => setAgencyAddress(e.target.value)}
-                    className="font-sans min-h-[72px]"
-                    required
-                    maxLength={500}
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="space-y-2">
-                    <Label className="font-sans">NIF</Label>
-                    <Input value={nif} onChange={(e) => setNif(e.target.value)} className="font-sans" required maxLength={64} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="font-sans">STAT</Label>
-                    <Input value={stat} onChange={(e) => setStat(e.target.value)} className="font-sans" required maxLength={64} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="font-sans">RC</Label>
-                    <Input value={regCommerce} onChange={(e) => setRegCommerce(e.target.value)} className="font-sans" required maxLength={64} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-sans">{t("auth.agencyLogoUrl", "Logo (URL, optionnel)")}</Label>
-                  <Input
-                    type="url"
-                    value={agencyLogoUrl}
-                    onChange={(e) => setAgencyLogoUrl(e.target.value)}
-                    className="font-sans"
-                    placeholder="https://"
-                    maxLength={500}
-                  />
-                </div>
-              </>
-            )}
-
-            <div className="space-y-2">
-              <Label className="font-sans">{t("auth.email")}</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans" required maxLength={255} />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{t("auth.phone")} *</Label>
-              <Input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="font-sans"
-                maxLength={30}
-                required
-                autoComplete="tel"
-              />
-              {role === "agence" && (
-                <p className="text-xs text-muted-foreground font-sans">{t("auth.phoneAgencyHint", "Numéro joignable pour les clients.")}</p>
-              )}
-            </div>
-            {role === "particulier" && (
-              <div className="space-y-2">
-                <Label className="font-sans">{t("auth.whatsapp", "WhatsApp (optionnel)")}</Label>
-                <Input
-                  value={whatsapp}
-                  onChange={(e) => setWhatsapp(e.target.value)}
-                  className="font-sans"
-                  maxLength={30}
-                  placeholder="+261 …"
-                  autoComplete="tel"
-                />
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label className="font-sans">{t("auth.password")}</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans" required minLength={8} autoComplete="new-password" />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{t("auth.confirmPassword", "Confirmer le mot de passe")}</Label>
-              <Input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} className="font-sans" required minLength={8} autoComplete="new-password" />
-            </div>
-            {role === "particulier" && (
-              <label className="flex items-start gap-2 cursor-pointer font-sans text-sm">
-                <Checkbox checked={contactConsent} onCheckedChange={(c) => setContactConsent(c === true)} className="mt-0.5" />
-                <span>{t("auth.contactConsent")}</span>
-              </label>
-            )}
-            <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
-              {loading ? t("common.loading") : t("auth.signup")}
-            </Button>
-          </form>
-          <p className="text-center text-sm font-sans text-muted-foreground">
-            {t("auth.hasAccount")} <Link to="/login" className="text-primary hover:underline">{t("auth.login")}</Link>
-          </p>
-        </div>
-      </div>
-      <Footer />
-    </>
+    <AuthFormShell title={t("auth.signup")} maxWidthClassName="max-w-lg">
+      <SignupForm
+        role={role}
+        loading={loading}
+        form={{
+          firstName,
+          lastName,
+          email,
+          phone,
+          whatsapp,
+          password,
+          passwordConfirm,
+          contactConsent,
+          agencyName,
+          agencyAddress,
+          commercialContact,
+          nif,
+          stat,
+          regCommerce,
+          agencyLogoUrl,
+        }}
+        labels={{
+          signupChooseTitle: t("auth.signupChooseTitle", "Créer un compte"),
+          signupSubtitle: t("auth.signupSubtitle", "Particulier ou agence : un seul compte, des parcours adaptés."),
+          signupParticulierCta: t("auth.signupParticulierCta", "Compte particulier"),
+          signupParticulierDesc: t("auth.signupParticulierDesc", "Propriétaire ou vendeur indépendant"),
+          signupProCta: t("auth.signupProCta", "Professionnel / agence"),
+          signupProDesc: t("auth.signupProDesc", "Agence immobilière ou activité structurée"),
+          continueWithGoogle: t("auth.continueWithGoogle", "Continuer avec Google"),
+          googleSignupParticulierOnly: t("auth.googleSignupParticulierOnly", "Compte particulier uniquement — pas d’inscription agence via Google."),
+          orWithEmail: t("auth.orWithEmail", "ou"),
+          firstName: t("auth.firstName", "Prénom"),
+          lastName: t("auth.lastName", "Nom"),
+          agencyName: t("auth.agencyName", "Nom de l’agence"),
+          commercialContact: t("auth.commercialContact", "Contact commercial"),
+          agencyAddress: t("auth.agencyAddress", "Adresse du siège"),
+          agencyLogoUrl: t("auth.agencyLogoUrl", "Logo (URL, optionnel)"),
+          email: t("auth.email"),
+          phone: t("auth.phone"),
+          phoneAgencyHint: t("auth.phoneAgencyHint", "Numéro joignable pour les clients."),
+          whatsapp: t("auth.whatsapp", "WhatsApp (optionnel)"),
+          password: t("auth.password"),
+          confirmPassword: t("auth.confirmPassword", "Confirmer le mot de passe"),
+          contactConsent: t("auth.contactConsent"),
+          signup: t("auth.signup"),
+          loading: t("common.loading"),
+          hasAccount: t("auth.hasAccount"),
+          login: t("auth.login"),
+        }}
+        googleIcon={<GoogleLogo />}
+        onSetRole={setRole}
+        onGoogleSignup={handleGoogleSignup}
+        onSubmit={handleSignup}
+        onFieldChange={(field, value) => {
+          switch (field) {
+            case "firstName": setFirstName(String(value)); break;
+            case "lastName": setLastName(String(value)); break;
+            case "email": setEmail(String(value)); break;
+            case "phone": setPhone(String(value)); break;
+            case "whatsapp": setWhatsapp(String(value)); break;
+            case "password": setPassword(String(value)); break;
+            case "passwordConfirm": setPasswordConfirm(String(value)); break;
+            case "contactConsent": setContactConsent(Boolean(value)); break;
+            case "agencyName": setAgencyName(String(value)); break;
+            case "agencyAddress": setAgencyAddress(String(value)); break;
+            case "commercialContact": setCommercialContact(String(value)); break;
+            case "nif": setNif(String(value)); break;
+            case "stat": setStat(String(value)); break;
+            case "regCommerce": setRegCommerce(String(value)); break;
+            case "agencyLogoUrl": setAgencyLogoUrl(String(value)); break;
+          }
+        }}
+        onSwitchToParticulier={() => {
+          setAgencyName("");
+          setAgencyAddress("");
+          setCommercialContact("");
+          setNif("");
+          setStat("");
+          setRegCommerce("");
+          setAgencyLogoUrl("");
+        }}
+        onSwitchToAgence={() => {
+          setFirstName("");
+          setLastName("");
+          setWhatsapp("");
+          setContactConsent(false);
+        }}
+      />
+    </AuthFormShell>
   );
 };
 
@@ -522,36 +360,24 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <>
-      <Helmet><title>{t("auth.forgotPassword")} — ImmoNex</title></Helmet>
-      <Header />
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-10 md:py-16">
-        <div className="w-full max-w-md bg-card rounded-2xl border border-border p-5 sm:p-8 shadow-sm space-y-6">
-          <div className="text-center">
-            <h1 className="font-serif text-2xl font-bold">{t("auth.forgotPassword")}</h1>
-          </div>
-          {sent ? (
-            <p className="text-center font-sans text-muted-foreground">
-              {t("auth.resetEmailSent")} <strong>{email}</strong>. {t("auth.checkInbox")}
-            </p>
-          ) : (
-            <form onSubmit={handleReset} className="space-y-4">
-              <div className="space-y-2">
-                <Label className="font-sans">{t("auth.email")}</Label>
-                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans" required />
-              </div>
-              <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
-                {loading ? t("common.loading") : t("auth.sendResetLink")}
-              </Button>
-            </form>
-          )}
-          <p className="text-center text-sm font-sans text-muted-foreground">
-            <Link to="/login" className="text-primary hover:underline">{t("auth.backToLogin")}</Link>
-          </p>
-        </div>
-      </div>
-      <Footer />
-    </>
+    <AuthFormShell title={t("auth.forgotPassword")} maxWidthClassName="max-w-md">
+      <ForgotPasswordForm
+        email={email}
+        sent={sent}
+        loading={loading}
+        labels={{
+          forgotPassword: t("auth.forgotPassword"),
+          email: t("auth.email"),
+          sendResetLink: t("auth.sendResetLink"),
+          loading: t("common.loading"),
+          resetEmailSent: t("auth.resetEmailSent"),
+          checkInbox: t("auth.checkInbox"),
+          backToLogin: t("auth.backToLogin"),
+        }}
+        onEmailChange={setEmail}
+        onSubmit={handleReset}
+      />
+    </AuthFormShell>
   );
 };
 
