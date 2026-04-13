@@ -4,19 +4,10 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import LocationPicker from "@/components/LocationPicker";
-import PublishLocationMap from "@/components/PublishLocationMap";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { Check, Upload, AlertCircle, Shield, Loader2, Cloud, FilePlus2 } from "lucide-react";
-import { LISTING_TYPE_LABELS, type ListingType, type TransactionType } from "@/types/listing";
+import { Loader2 } from "lucide-react";
+import { type ListingType, type TransactionType } from "@/types/listing";
 import { getRegionForVille, getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
@@ -61,6 +52,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Json } from "@/integrations/supabase/types";
+import { PublishPageHeader } from "@/pages/publish/components/PublishPageHeader";
+import { PublishProgressSteps } from "@/pages/publish/components/PublishProgressSteps";
+import { PublishStepErrors } from "@/pages/publish/components/PublishStepErrors";
+import { PublishBasicInfoSection } from "@/pages/publish/components/PublishBasicInfoSection";
+import { PublishDetailsSection } from "@/pages/publish/components/PublishDetailsSection";
+import { PublishMediaSection } from "@/pages/publish/components/PublishMediaSection";
+import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
@@ -837,68 +835,28 @@ const PublishPage = () => {
       <Helmet><title>{t("publish.title")} — ImmoNex</title></Helmet>
       <Header />
       <div className="container mx-auto px-4 py-6 md:py-8 max-w-3xl pb-28 sm:pb-8">
-        <div className="flex items-start gap-3 mb-6 rounded-2xl border-2 border-border/90 bg-secondary/40 p-4 shadow-sm">
-          <Shield className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-          <p className="text-sm text-muted-foreground font-sans leading-relaxed">
-            {t(
-              "publish.moderationBanner",
-              "ImmoNex vérifie chaque annonce avant publication. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français."
-            ).replace("{cost}", String(LISTING_PUBLISH_CREDIT_COST))}
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-          <h1 className="font-serif text-3xl font-bold">{t("publish.title")}</h1>
-          {user && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="font-sans shrink-0"
-              onClick={() => navigate("/publier?new=1")}
-            >
-              <FilePlus2 className="h-4 w-4 mr-2" />
-              {t("publish.newListing", "Nouvelle annonce")}
-            </Button>
+        <PublishPageHeader
+          moderationText={t(
+            "publish.moderationBanner",
+            "ImmoNex vérifie chaque annonce avant publication. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français.",
           )}
-        </div>
-
-        {user && draftHydrated && draftListingId && (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6 text-sm font-sans">
-            <span className="inline-flex items-center gap-1.5 text-foreground">
-              {saveStatus === "saving" && (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  {t("publish.saving", "Sauvegarde…")}
-                </>
-              )}
-              {saveStatus === "saved" && (
-                <>
-                  <Cloud className="h-4 w-4 text-primary" />
-                  {t("publish.draftSaved", "Brouillon enregistré")}
-                </>
-              )}
-              {saveStatus === "error" && (
-                <span className="text-destructive">{t("publish.draftSaveFailed", "Échec de la sauvegarde")}</span>
-              )}
-              {saveStatus === "idle" && (
-                <>
-                  <Cloud className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{t("publish.draftAuto", "Brouillon automatique")}</span>
-                </>
-              )}
-            </span>
-            {lastSavedAt && saveStatus !== "saving" && (
-              <span className="text-muted-foreground">
-                {t("publish.lastSaved", "Dernière sauvegarde : {{time}}").replace(
-                  "{{time}}",
-                  new Date(lastSavedAt).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }),
-                )}
-              </span>
-            )}
-            {saveError && <span className="text-destructive text-xs">{saveError}</span>}
-          </div>
-        )}
+          publishCreditCost={LISTING_PUBLISH_CREDIT_COST}
+          title={t("publish.title")}
+          showNewButton={Boolean(user)}
+          newListingLabel={t("publish.newListing", "Nouvelle annonce")}
+          onNewListing={() => navigate("/publier?new=1")}
+          showDraftStatus={Boolean(user && draftHydrated && draftListingId)}
+          saveStatus={saveStatus}
+          lastSavedAt={lastSavedAt}
+          saveError={saveError}
+          labels={{
+            saving: t("publish.saving", "Sauvegarde…"),
+            draftSaved: t("publish.draftSaved", "Brouillon enregistré"),
+            draftSaveFailed: t("publish.draftSaveFailed", "Échec de la sauvegarde"),
+            draftAuto: t("publish.draftAuto", "Brouillon automatique"),
+            lastSaved: t("publish.lastSaved", "Dernière sauvegarde : {{time}}"),
+          }}
+        />
 
         {user && !draftHydrated && (
           <div className="flex items-center justify-center gap-3 py-16 mb-8 text-muted-foreground font-sans">
@@ -909,230 +867,109 @@ const PublishPage = () => {
 
         {(!user || draftHydrated) && (
         <>
-        <div className="mb-6 md:mb-8">
-          <div className="flex justify-between mb-3 gap-1 overflow-x-auto pb-1">
-            {steps.map((s, i) => (
-              <div key={s} className="flex flex-col items-center min-w-[4.75rem]">
-                <div
-                  className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-sans font-semibold transition-all border-2 ${
-                    i === step
-                      ? "gradient-primary border-transparent ring-2 ring-primary/35 ring-offset-2 ring-offset-background text-[#FAFAFA] shadow-md"
-                      : i < step
-                        ? "gradient-primary border-transparent text-[#FAFAFA] shadow-sm"
-                        : "bg-card border-border text-muted-foreground shadow-sm"
-                  }`}
-                >
-                  {i < step ? <Check className="h-4 w-4 text-[#FAFAFA]" strokeWidth={2.5} /> : i + 1}
-                </div>
-                <span
-                  className={`text-[10px] md:text-xs font-sans mt-1.5 text-center max-w-[5.5rem] leading-tight ${
-                    i === step ? "text-foreground font-semibold" : i < step ? "text-primary font-medium" : "text-muted-foreground"
-                  }`}
-                >
-                  {s}
-                </span>
-              </div>
-            ))}
-          </div>
-          <Progress value={progress} className="h-2" />
-        </div>
+        <PublishProgressSteps steps={steps} step={step} progress={progress} />
 
-        {stepErrors.length > 0 && (
-          <div className="mb-4 p-4 bg-destructive/10 border-2 border-destructive/35 rounded-xl shadow-sm">
-            {stepErrors.map((err, i) => (
-              <p key={i} className="text-sm text-destructive font-sans flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 shrink-0" /> {err}
-              </p>
-            ))}
-          </div>
-        )}
+        <PublishStepErrors errors={stepErrors} />
 
         {step === 0 && (
-          <div className="space-y-5 form-surface">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="font-sans">Transaction *</Label>
-                <Select
-                  value={transaction}
-                  onValueChange={(v) => {
-                    setTransaction(v as TransactionType);
-                    setListingType((prev) => {
-                      const allowed = new Set(listingTypesForTransaction(v));
-                      return allowed.has(prev as ListingType) ? prev : "";
-                    });
-                  }}
-                >
-                  <SelectTrigger className="font-sans"><SelectValue placeholder={t("common.select")} /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="vente">{t("search.sale", "Vente")}</SelectItem>
-                    <SelectItem value="location">{t("search.rental", "Location")}</SelectItem>
-                    <SelectItem value="location_vacances">{t("search.vacationRental", "Vacances / courte durée")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="font-sans">{t("publish.propertyType", "Type de bien")} *</Label>
-                <Select value={listingType} onValueChange={(v) => setListingType(v as ListingType)} disabled={!transaction}>
-                  <SelectTrigger className="font-sans"><SelectValue placeholder={t("common.select")} /></SelectTrigger>
-                  <SelectContent>
-                    {typeOptions.map((type) => (
-                      <SelectItem key={type} value={type}>{LISTING_TYPE_LABELS[type]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-4 rounded-xl border-2 border-border/90 bg-muted/30 px-4 py-3.5 shadow-sm">
-              <div className="min-w-0">
-                <p className="font-sans font-semibold text-sm text-foreground">{t("publish.newProgram", "Programme / neuf")}</p>
-                <p className="text-xs text-muted-foreground font-sans mt-0.5">{t("publish.newProgramHint", "Cochez si le bien relève d’un promoteur ou d’un lot neuf.")}</p>
-              </div>
-              <Switch checked={isNewProgram} onCheckedChange={setIsNewProgram} className="shrink-0" />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{t("publish.internalRef", "Référence interne (optionnel)")}</Label>
-              <Input value={internalRef} onChange={(e) => setInternalRef(e.target.value)} className="font-sans" maxLength={80} placeholder="REF-2026-042" />
-            </div>
-            <LocationPicker
-              ville={ville}
-              arrondissement={arrondissement}
-              quartier={quartier}
-              quartierLibre={quartierLibre}
-              onVilleChange={setVille}
-              onArrondissementChange={setArrondissement}
-              onQuartierChange={setQuartier}
-              onQuartierLibreChange={setQuartierLibre}
-            />
-            <div className="border-t-2 border-border/80 pt-6 mt-1">
-              <div className="form-surface-muted space-y-3">
-              <h3 className="font-serif font-semibold text-base text-foreground">{t("publish.mapTitle", "Emplacement approximatif sur la carte")}</h3>
-              <p className="text-xs text-muted-foreground font-sans">{t("publish.mapPublicHint", "La position affichée publiquement sera légèrement décalée pour préserver la confidentialité.")}</p>
-              {!ville ? (
-                <p className="text-sm text-muted-foreground font-sans">{t("publish.mapNeedVille", "Choisissez d’abord une ville.")}</p>
-              ) : pinLat != null && pinLng != null && isValidListingCoordinates(pinLat, pinLng) ? (
-                <PublishLocationMap
-                  key={ville}
-                  lat={pinLat}
-                  lng={pinLng}
-                  onPositionChange={(la, ln) => {
-                    setPinLat(la);
-                    setPinLng(ln);
-                  }}
-                />
-              ) : (
-                <p className="text-sm text-destructive font-sans">
-                  {t(
-                    "publish.mapNoCoordsForCity",
-                    "Impossible de placer la carte pour cette ville. Vérifiez le nom ou contactez le support.",
-                  )}
-                </p>
-              )}
-              </div>
-            </div>
-          </div>
+          <PublishBasicInfoSection
+            transaction={transaction}
+            listingType={listingType}
+            typeOptions={typeOptions}
+            isNewProgram={isNewProgram}
+            internalRef={internalRef}
+            ville={ville}
+            arrondissement={arrondissement}
+            quartier={quartier}
+            quartierLibre={quartierLibre}
+            pinLat={pinLat}
+            pinLng={pinLng}
+            labels={{
+              propertyType: t("publish.propertyType", "Type de bien"),
+              newProgram: t("publish.newProgram", "Programme / neuf"),
+              newProgramHint: t("publish.newProgramHint", "Cochez si le bien relève d’un promoteur ou d’un lot neuf."),
+              internalRef: t("publish.internalRef", "Référence interne (optionnel)"),
+              mapTitle: t("publish.mapTitle", "Emplacement approximatif sur la carte"),
+              mapPublicHint: t("publish.mapPublicHint", "La position affichée publiquement sera légèrement décalée pour préserver la confidentialité."),
+              mapNeedVille: t("publish.mapNeedVille", "Choisissez d’abord une ville."),
+              mapNoCoordsForCity: t("publish.mapNoCoordsForCity", "Impossible de placer la carte pour cette ville. Vérifiez le nom ou contactez le support."),
+              select: t("common.select"),
+              sale: t("search.sale", "Vente"),
+              rental: t("search.rental", "Location"),
+              vacationRental: t("search.vacationRental", "Vacances / courte durée"),
+            }}
+            onTransactionChange={(v) => {
+              setTransaction(v);
+              setListingType((prev) => {
+                const allowed = new Set(listingTypesForTransaction(v));
+                return allowed.has(prev as ListingType) ? prev : "";
+              });
+            }}
+            onListingTypeChange={setListingType}
+            onNewProgramChange={setIsNewProgram}
+            onInternalRefChange={setInternalRef}
+            onVilleChange={setVille}
+            onArrondissementChange={setArrondissement}
+            onQuartierChange={setQuartier}
+            onQuartierLibreChange={setQuartierLibre}
+            onMapPositionChange={(la, ln) => {
+              setPinLat(la);
+              setPinLng(ln);
+            }}
+          />
         )}
 
         {step === 1 && (
-          <div className="space-y-4 form-surface">
-            <div className="space-y-2">
-              <Label className="font-sans">{t("publish.listingTitle", "Titre")} *</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="font-sans" maxLength={120} />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{t("publish.descriptionFr", "Description (français)")} *</Label>
-              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="font-sans" rows={6} maxLength={5000} placeholder="Rédigez une description complète en français…" />
-              <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
-            </div>
-            <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-4`}>
-              <div className="space-y-2">
-                <Label className="font-sans">{t("publish.priceMga", "Prix (Ar)")} *</Label>
-                <Input type="number" value={priceMga} onChange={(e) => setPriceMga(e.target.value)} className="font-sans" min={0} />
-              </div>
-              <div className="space-y-2">
-                <Label className="font-sans">{t("listing.surface")} (m²)</Label>
-                <Input type="number" value={surface} onChange={(e) => setSurface(e.target.value)} className="font-sans" min={0} />
-              </div>
-              {showRooms && (
-                <>
-                  <div className="space-y-2"><Label className="font-sans">{t("listing.rooms")}</Label><Input type="number" value={rooms} onChange={(e) => setRooms(e.target.value)} className="font-sans" min={0} /></div>
-                  <div className="space-y-2"><Label className="font-sans">{t("listing.bathrooms")}</Label><Input type="number" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} className="font-sans" min={0} /></div>
-                  <div className="space-y-2"><Label className="font-sans">{t("publish.toilets", "Toilettes / WC")}</Label><Input type="number" value={toilets} onChange={(e) => setToilets(e.target.value)} className="font-sans" min={0} /></div>
-                </>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{t("listing.features", "Équipements")}</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {LISTING_EQUIPMENT_OPTIONS.map((f) => (
-                  <label key={f} className="flex items-center gap-2 cursor-pointer font-sans text-sm">
-                    <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => toggleFeature(f)} />
-                    {f}
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
+          <PublishDetailsSection
+            showRooms={showRooms}
+            title={title}
+            description={description}
+            priceMga={priceMga}
+            surface={surface}
+            rooms={rooms}
+            bathrooms={bathrooms}
+            toilets={toilets}
+            selectedFeatures={selectedFeatures}
+            equipmentOptions={LISTING_EQUIPMENT_OPTIONS}
+            labels={{
+              listingTitle: t("publish.listingTitle", "Titre"),
+              descriptionFr: t("publish.descriptionFr", "Description (français)"),
+              listingSurface: t("listing.surface"),
+              listingRooms: t("listing.rooms"),
+              listingBathrooms: t("listing.bathrooms"),
+              toilets: t("publish.toilets", "Toilettes / WC"),
+              listingFeatures: t("listing.features", "Équipements"),
+            }}
+            onTitleChange={setTitle}
+            onDescriptionChange={setDescription}
+            onPriceMgaChange={setPriceMga}
+            onSurfaceChange={setSurface}
+            onRoomsChange={setRooms}
+            onBathroomsChange={setBathrooms}
+            onToiletsChange={setToilets}
+            onToggleFeature={toggleFeature}
+          />
         )}
 
         {step === 2 && (
-          <div className="space-y-5 form-surface">
-            <p className="text-sm text-muted-foreground font-sans">{t("publish.mainPhotoFirst", "La première image est la photo principale. Utilisez « Couverture » pour réorganiser.")}</p>
-            <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center">
-              <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-              <input type="file" multiple accept="image/*" onChange={handlePhotoSelect} className="hidden" id="photo-upload" />
-              <label htmlFor="photo-upload">
-                <Button variant="outline" className="font-sans" type="button" asChild><span>{t("publish.chooseFiles", "Choisir des photos")}</span></Button>
-              </label>
-            </div>
-            {(serverPhotos.length > 0 || pendingPhotos.length > 0) && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
-                {serverPhotos.map((ph, i) => (
-                  <div key={ph.id} className="relative rounded-xl overflow-hidden border border-border aspect-square group">
-                    <img src={ph.url} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1 bg-background/80">
-                      {i > 0 && (
-                        <Button type="button" size="sm" variant="secondary" className="text-[10px] h-7 flex-1 font-sans" onClick={() => void makeCoverAtIndex(i)}>
-                          Couverture
-                        </Button>
-                      )}
-                      <Button type="button" size="sm" variant="destructive" className="text-[10px] h-7 font-sans" onClick={() => void removePhotoAt(i)}>
-                        ×
-                      </Button>
-                    </div>
-                    {i === 0 && <span className="absolute top-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-sans">Couverture</span>}
-                  </div>
-                ))}
-                {pendingPhotos.map((p, i) => {
-                  const gi = serverPhotos.length + i;
-                  return (
-                    <div key={`${p.file.name}-${p.file.size}-${i}`} className="relative rounded-xl overflow-hidden border border-border aspect-square group border-dashed">
-                      <img src={p.preview} alt="" className="w-full h-full object-cover opacity-90" />
-                      <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1 bg-background/80">
-                        {gi > 0 && (
-                          <Button type="button" size="sm" variant="secondary" className="text-[10px] h-7 flex-1 font-sans" onClick={() => void makeCoverAtIndex(gi)}>
-                            Couverture
-                          </Button>
-                        )}
-                        <Button type="button" size="sm" variant="destructive" className="text-[10px] h-7 font-sans" onClick={() => void removePhotoAt(gi)}>
-                          ×
-                        </Button>
-                      </div>
-                      {gi === 0 && <span className="absolute top-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-sans">Couverture</span>}
-                      <span className="absolute top-1 right-1 text-[9px] bg-muted px-1 rounded font-sans">{t("publish.localOnly", "Local")}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label className="font-sans">{t("publish.videoUrl", "Lien vidéo (YouTube, etc.) — optionnel")}</Label>
-              <Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} className="font-sans" placeholder="https://" />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{t("publish.tourUrl", "Visite virtuelle (URL) — optionnel")}</Label>
-              <Input value={virtualTourUrl} onChange={(e) => setVirtualTourUrl(e.target.value)} className="font-sans" placeholder="https://" />
-            </div>
-          </div>
+          <PublishMediaSection
+            serverPhotos={serverPhotos}
+            pendingPhotos={pendingPhotos}
+            videoUrl={videoUrl}
+            virtualTourUrl={virtualTourUrl}
+            labels={{
+              mainPhotoFirst: t("publish.mainPhotoFirst", "La première image est la photo principale. Utilisez « Couverture » pour réorganiser."),
+              chooseFiles: t("publish.chooseFiles", "Choisir des photos"),
+              localOnly: t("publish.localOnly", "Local"),
+              videoUrl: t("publish.videoUrl", "Lien vidéo (YouTube, etc.) — optionnel"),
+              tourUrl: t("publish.tourUrl", "Visite virtuelle (URL) — optionnel"),
+            }}
+            onPhotoSelect={handlePhotoSelect}
+            onMakeCoverAtIndex={(i) => void makeCoverAtIndex(i)}
+            onRemovePhotoAt={(i) => void removePhotoAt(i)}
+            onVideoUrlChange={setVideoUrl}
+            onVirtualTourUrlChange={setVirtualTourUrl}
+          />
         )}
 
         {step === 3 && (
@@ -1166,36 +1003,21 @@ const PublishPage = () => {
           />
         )}
 
-        <div className="fixed inset-x-0 bottom-0 z-30 sm:static sm:z-auto border-t border-border bg-background/95 backdrop-blur-md sm:border-0 sm:bg-transparent sm:backdrop-blur-0 px-4 sm:px-0 pt-3 sm:pt-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pb-0">
-        <div className="container mx-auto max-w-3xl sm:max-w-none flex justify-between mt-0 sm:mt-8 gap-3 sm:gap-4 max-sm:flex-col-reverse">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              void (async () => {
-                setStepErrors([]);
-                const prev = Math.max(0, step - 1);
-                await persistDraft(prev);
-                setStep(prev);
-              })();
-            }}
-            disabled={step === 0}
-            className="font-sans min-h-12 touch-manipulation w-full sm:w-auto"
-          >
-            {t("publish.prev")}
-          </Button>
-          {step < 3 && (
-            <Button
-              type="button"
-              onClick={() => void handleNext()}
-              className="gradient-primary border-0 font-sans min-h-12 touch-manipulation w-full sm:w-auto"
-              style={{ color: "#FAFAFA" }}
-            >
-              {t("publish.next")}
-            </Button>
-          )}
-        </div>
-        </div>
+        <PublishStepNav
+          step={step}
+          maxStep={3}
+          prevLabel={t("publish.prev")}
+          nextLabel={t("publish.next")}
+          onPrev={() => {
+            void (async () => {
+              setStepErrors([]);
+              const prev = Math.max(0, step - 1);
+              await persistDraft(prev);
+              setStep(prev);
+            })();
+          }}
+          onNext={() => void handleNext()}
+        />
         </>
         )}
       </div>
