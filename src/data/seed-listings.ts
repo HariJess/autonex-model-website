@@ -113,6 +113,156 @@ export type SeedBlogPost = {
 
 export const seedBlogPosts: SeedBlogPost[] = [
   {
+    id: "b5",
+    slug: "frais-agence-immobiliere-madagascar",
+    title: "Frais d’agence immobilière à Madagascar : qui paie, combien, et à quel moment ?",
+    seoTitle:
+      "Frais d’agence immobilière à Madagascar : qui paie, combien et quand ? (guide pratique 2026)",
+    metaDescription:
+      "Guide clair sur les frais d’agence immobilière à Madagascar : commission vente, frais location, mandat exclusif ou simple, paiement et points à vérifier avant signature.",
+    excerpt:
+      "Honoraires, commission, mandat exclusif, location ou vente : ce guide explique les pratiques observées à Madagascar et ce que vous devez vérifier avant de vous engager.",
+    category: "Marché immobilier",
+    published_at: "2026-04-13",
+    updated_at: "2026-04-13",
+    readingTime: "10 min",
+    cover: "/blog-covers/frais-agence-madagascar.svg",
+    coverAlt: "Documents de contrat immobilier et commission d'agence à Madagascar",
+    tags: [
+      "frais d’agence immobilière Madagascar",
+      "commission agence immobilière Madagascar",
+      "honoraires agence immobilière Madagascar",
+      "frais agence location Madagascar",
+      "frais agence vente Madagascar",
+      "mandat exclusif immobilier Madagascar",
+    ],
+    intro:
+      "À Madagascar, il n’existe pas un tarif unique et officiel qui s’applique à toutes les agences immobilières. En pratique, les frais varient selon l’agence, le type d’opération (vente ou location), le mandat signé et les services réellement fournis. L’objectif de ce guide est simple : vous aider à comprendre qui paie, combien cela peut représenter et à quel moment c’est dû, sans confusion.",
+    sections: [
+      {
+        heading: "À quoi correspondent les frais d’agence ?",
+        paragraphs: [
+          "Les honoraires d’agence ne rémunèrent pas seulement la mise en relation. Selon les dossiers, ils couvrent aussi la préparation commerciale du bien (photos, diffusion d’annonce), les visites, la qualification des acquéreurs ou locataires, la négociation et une partie de l’accompagnement administratif.",
+          "En location, certaines agences incluent aussi la préparation du bail, l’état des lieux et un suivi d’entrée dans les lieux. Le périmètre exact doit toujours être écrit noir sur blanc.",
+        ],
+        bulletsTitle: "Services généralement inclus (selon les agences)",
+        bullets: [
+          "Mise en relation vendeur/bailleur et acquéreur/locataire",
+          "Organisation des visites",
+          "Diffusion et valorisation de l’annonce",
+          "Préqualification des candidats",
+          "Négociation commerciale",
+          "Accompagnement administratif (bail, état des lieux, formalités)",
+        ],
+      },
+      {
+        heading: "Vente : qui paie et combien ?",
+        paragraphs: [
+          "Dans de nombreuses pratiques observées, les frais de vente sont supportés par le vendeur, mais ce n’est pas une règle universelle : cela dépend de la convention de mandat et de la structuration de l’offre.",
+          "Sur le marché malgache, on voit souvent des fourchettes constatées autour de 5% à 10% pour certaines agences. D’autres publient des modèles différenciés (mandat exclusif vs non exclusif), des frais fixes ou des barèmes dégressifs selon le montant de la transaction.",
+        ],
+        checklistTitle: "Ce qu’il faut retenir pour une vente",
+        checklist: [
+          "La commission n’est pas uniforme d’une agence à l’autre",
+          "Le mode de calcul peut être au pourcentage, fixe ou hybride",
+          "Le payeur (vendeur, acquéreur ou partage) doit être explicitement indiqué",
+          "La base de calcul doit être précisée (prix net, prix acte, etc.)",
+        ],
+      },
+      {
+        heading: "Location : quelles pratiques observe-t-on ?",
+        paragraphs: [
+          "En location, les pratiques sont souvent encore plus variées. On peut rencontrer des frais équivalents à un mois de loyer, des fractions de mois, des pourcentages, ou des services facturés séparément selon les cas.",
+          "Il est donc essentiel de vérifier le détail avant signature : montant exact, personne qui paie, date d’exigibilité et liste des prestations incluses.",
+        ],
+        bulletsTitle: "Points à contrôler en location",
+        bullets: [
+          "Montant des frais d’agence",
+          "Qui paie (bailleur, locataire, ou répartition)",
+          "Moment de paiement (signature, entrée, après validation)",
+          "Inclus / non inclus : visites, dossier, bail, état des lieux",
+        ],
+      },
+      {
+        heading: "Mandat exclusif ou non exclusif : pourquoi les frais changent ?",
+        paragraphs: [
+          "Un mandat exclusif signifie qu’une seule agence est missionnée pour commercialiser le bien sur une période donnée. En contrepartie de cette exclusivité, certaines agences appliquent des taux plus compétitifs.",
+          "En mandat non exclusif, plusieurs intermédiaires peuvent intervenir : la concurrence peut accélérer la visibilité, mais certaines agences affichent alors des niveaux de commission plus élevés pour couvrir l’incertitude commerciale.",
+          "On trouve ainsi, dans des exemples publiés, des modèles type 3% en exclusif vs 5% en non exclusif. Ces chiffres restent des exemples observés, pas une norme générale.",
+        ],
+      },
+      {
+        heading: "Ce qu’il faut absolument vérifier avant de signer",
+        checklistTitle: "Checklist contractuelle",
+        checklist: [
+          "Montant exact des honoraires",
+          "Partie qui paie les frais",
+          "Moment précis d’exigibilité",
+          "Services inclus dans les honoraires",
+          "Durée du mandat",
+          "Exclusivité ou non",
+          "Conditions de remboursement (ou non)",
+          "Document écrit clair et signé",
+        ],
+      },
+      {
+        heading: "Peut-on négocier les frais d’agence ?",
+        paragraphs: [
+          "Oui, dans certains cas. La négociation est souvent plus probable sur les actifs de valeur élevée, les biens faciles à commercialiser ou les mandats apportant une forte visibilité à l’agence.",
+          "Mais ce n’est pas automatique : une agence structurée avec un vrai service (qualité de diffusion, tri des candidats, rigueur documentaire, accompagnement jusqu’à la signature) peut justifier des honoraires plus élevés.",
+        ],
+      },
+      {
+        heading: "Comment savoir si les frais sont justifiés ?",
+        bullets: [
+          "Transparence du barème et du contrat",
+          "Qualité des photos et de la diffusion",
+          "Connaissance réelle du marché local",
+          "Capacité à filtrer les visiteurs/candidats",
+          "Niveau d’accompagnement administratif",
+          "Clarté sur les délais et engagements",
+        ],
+        paragraphs: [
+          "Le bon critère n’est pas seulement “le taux le plus bas”, mais le rapport entre coût, sécurité et efficacité de la transaction.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Les frais d’agence sont-ils obligatoires à Madagascar ?",
+        answer:
+          "Ils ne sont pas automatiques par nature : ils résultent d’un accord contractuel avec une agence. Ce qui compte, c’est ce qui est écrit dans le mandat ou la convention.",
+      },
+      {
+        question: "Qui paie les frais d’agence pour une location ?",
+        answer:
+          "Selon les pratiques observées, cela varie : bailleur, locataire ou répartition. Il faut vérifier le contrat avant engagement.",
+      },
+      {
+        question: "Peut-on négocier les honoraires d’une agence immobilière ?",
+        answer:
+          "Oui dans certains dossiers, surtout sur des biens à forte valeur ou des mandats attractifs, mais ce n’est pas systématique.",
+      },
+      {
+        question: "Mandat exclusif ou simple : quelle différence ?",
+        answer:
+          "Le mandat exclusif confie la vente/location à une seule agence pendant une durée donnée ; le simple (non exclusif) permet plusieurs agences. Cela influence souvent la structure de frais.",
+      },
+      {
+        question: "Les visites sont-elles payantes ?",
+        answer:
+          "Selon les agences, les visites peuvent être incluses ou indirectement intégrées dans les honoraires globaux. Vérifiez ce point dans l’offre.",
+      },
+      {
+        question: "Quand les honoraires doivent-ils être payés ?",
+        answer:
+          "Le moment d’exigibilité varie (signature, finalisation, entrée dans les lieux, etc.). Il doit être précisé clairement dans l’accord.",
+      },
+    ],
+    conclusion:
+      "Sur les frais d’agence immobilière à Madagascar, la règle clé est la transparence contractuelle : il n’y a pas de tarif unique valable partout. Comparez les offres, vérifiez les termes écrits et évaluez la qualité de service autant que le pourcentage affiché.",
+  },
+  {
     id: "b1",
     slug: "acheter-terrain-madagascar",
     title: "Acheter un terrain à Madagascar : ce qu'il faut savoir",
