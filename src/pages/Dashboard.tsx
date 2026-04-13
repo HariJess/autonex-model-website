@@ -325,7 +325,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
           {stats.map((stat) => (
             <Card key={stat.label} className="rounded-2xl">
               <CardContent className="flex items-center gap-4 p-4 md:p-6">

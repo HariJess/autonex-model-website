@@ -603,6 +603,7 @@ const PublishPage = () => {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingPhotos.length suffit : on traite par batch, pas à chaque mutation interne
   }, [draftListingId, pendingPhotos.length, user]);
 
   const validateStep = (s: number): string[] => {
@@ -1271,7 +1272,7 @@ const PublishPage = () => {
           </div>
         )}
 
-        <div className="flex justify-between mt-8 gap-4">
+        <div className="flex justify-between mt-8 gap-3 sm:gap-4 max-sm:flex-col-reverse">
           <Button
             type="button"
             variant="outline"
@@ -1284,12 +1285,17 @@ const PublishPage = () => {
               })();
             }}
             disabled={step === 0}
-            className="font-sans"
+            className="font-sans min-h-12 touch-manipulation w-full sm:w-auto"
           >
             {t("publish.prev")}
           </Button>
           {step < 3 && (
-            <Button type="button" onClick={() => void handleNext()} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+            <Button
+              type="button"
+              onClick={() => void handleNext()}
+              className="gradient-primary border-0 font-sans min-h-12 touch-manipulation w-full sm:w-auto"
+              style={{ color: "#FAFAFA" }}
+            >
               {t("publish.next")}
             </Button>
           )}

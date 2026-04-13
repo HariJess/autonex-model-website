@@ -175,6 +175,7 @@ export function rankSimilarListings(
 
   const scored = pool
     .filter((l) => !excludeIds.has(l.id))
+    .filter((l) => !filters.ville || l.ville === filters.ville)
     .map((l) => ({
       l,
       score: similarListingScore(l, filters, { userQuartierNames, sameArrHints }),

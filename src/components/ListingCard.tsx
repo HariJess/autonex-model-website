@@ -39,7 +39,13 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
     <div className="group rounded-2xl overflow-hidden bg-card border border-border shadow-sm hover:shadow-lg transition-all duration-300">
       {/* Image area — fully clickable */}
       <Link to={`/annonce/${listing.id}`} className="block relative aspect-[4/3] overflow-hidden">
-        <img src={images[imgIndex]} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <img
+          src={images[imgIndex]}
+          alt={listing.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          decoding="async"
+        />
         {listing.badge && badgeLabels[listing.badge] && (
           <div className="absolute top-3 left-3">
             <Badge className={`${badgeLabels[listing.badge].className} text-xs font-semibold px-3 py-1`} style={{ color: "#FAFAFA" }}>
@@ -76,7 +82,13 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
         )}
         {displayAgencyLogo && (
           <div className="absolute bottom-3 right-3 w-8 h-8 rounded-full overflow-hidden border-2 border-card shadow-sm">
-            <img src={displayAgencyLogo} alt={displayAgencyName ?? ""} className="w-full h-full object-cover" />
+            <img
+              src={displayAgencyLogo}
+              alt={displayAgencyName ?? ""}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         )}
       </Link>

@@ -36,11 +36,11 @@ const AgencyProfile = () => {
     queryKey: ["agency-agents", agency?.id],
     queryFn: async () => {
       if (!agency?.id) return [];
-      const { data } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("agency_id", agency.id);
-      return data?.map((p) => p.id) ?? [];
+      const { data, error } = await supabase.rpc("list_agency_agent_ids", {
+        p_agency_id: agency.id,
+      });
+      if (error) throw new Error(error.message);
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!agency?.id,
   });
@@ -110,7 +110,13 @@ const AgencyProfile = () => {
         <div className="bg-card rounded-2xl border border-border p-8 flex flex-col md:flex-row items-center gap-6 mb-8">
           <div className="w-24 h-24 rounded-2xl overflow-hidden border border-border flex-shrink-0 bg-muted flex items-center justify-center">
             {agency.logo_url ? (
-              <img src={agency.logo_url} alt={agency.name} className="w-full h-full object-cover" />
+              <img
+                src={agency.logo_url}
+                alt={agency.name}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
             ) : (
               <span className="font-serif text-2xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
             )}

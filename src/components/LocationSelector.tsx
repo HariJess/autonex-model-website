@@ -77,6 +77,7 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
         quartierLibre: committed.quartierLibre,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- committedKey sérialise déjà tous les champs de committed
   }, [isApply, committedKey]);
 
   const live = isApply ? draft : props.value;

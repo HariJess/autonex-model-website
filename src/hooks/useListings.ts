@@ -25,11 +25,13 @@ export function useListing(id: string | undefined) {
         .eq("listing_id", listing.id)
         .order("position", { ascending: true });
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, phone, agency_id")
-        .eq("id", listing.owner_id)
-        .maybeSingle();
+      const { data: profileRow, error: profileRpcError } = await supabase.rpc("get_profile_for_listing_display", {
+        p_owner_id: listing.owner_id,
+      });
+      if (profileRpcError) {
+        throw new Error(`Profil: ${profileRpcError.message}`);
+      }
+      const profile = Array.isArray(profileRow) ? profileRow[0] : profileRow;
 
       let agencyInfo: { name: string; slug: string; logo_url: string | null; verified: boolean | null } | null = null;
       if (profile?.agency_id) {
@@ -83,7 +85,7 @@ export function useListing(id: string | undefined) {
         created_at: listing.created_at,
         owner_id: listing.owner_id,
         owner_name: profile?.full_name ?? null,
-        owner_phone: profile?.phone ?? null,
+        owner_phone: null,
         agency_name: agencyInfo?.name ?? null,
         agency_slug: agencyInfo?.slug ?? null,
         agency_logo: agencyInfo?.logo_url ?? null,

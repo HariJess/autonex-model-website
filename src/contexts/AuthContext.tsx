@@ -8,7 +8,6 @@ interface Profile {
   full_name: string | null;
   phone: string | null;
   agency_id: string | null;
-  credits_balance: number;
 }
 
 /**
@@ -59,14 +58,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("*")
+      .select("id, role, full_name, phone, agency_id")
       .eq("id", userId)
       .single();
     if (data) {
-      setProfile({
-        ...data,
-        credits_balance: Number(data.credits_balance ?? 0),
-      } as Profile);
+      setProfile(data as Profile);
     }
   };
 

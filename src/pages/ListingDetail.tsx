@@ -34,6 +34,7 @@ const ListingDetail = () => {
   const { user } = useAuth();
   const { formatPrice, formatPriceSecondary } = useCurrency();
   const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const [revealedPhone, setRevealedPhone] = useState<string | null>(null);
   const [selectedImg, setSelectedImg] = useState(0);
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -67,7 +68,6 @@ const ListingDetail = () => {
 
   const handleRevealPhone = async () => {
     if (!listing) return;
-    setPhoneRevealed(true);
     const { error: leadError } = await supabase.from("leads").insert({
       listing_id: listing.id,
       visitor_name: "Visiteur",
@@ -75,7 +75,17 @@ const ListingDetail = () => {
     });
     if (leadError) {
       toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
+      return;
     }
+    const { data: phone, error: phoneErr } = await supabase.rpc("get_listing_owner_phone", {
+      p_listing_id: listing.id,
+    });
+    if (phoneErr) {
+      toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
+      return;
+    }
+    setPhoneRevealed(true);
+    setRevealedPhone(typeof phone === "string" ? phone : null);
   };
 
   const handleContact = async (e: React.FormEvent) => {
@@ -237,13 +247,13 @@ const ListingDetail = () => {
           <div className="lg:col-span-2 space-y-8">
             <div className="space-y-3">
               <div className="rounded-2xl overflow-hidden aspect-video">
-                <img src={images[selectedImg]} alt={listing.title} className="w-full h-full object-cover" />
+                <img src={images[selectedImg]} alt={listing.title} className="w-full h-full object-cover" decoding="async" />
               </div>
               {images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto">
                   {images.map((img, i) => (
                     <button key={i} type="button" onClick={() => setSelectedImg(i)} className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}>
-                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     </button>
                   ))}
                 </div>
@@ -429,7 +439,13 @@ const ListingDetail = () => {
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
-                    <img src={listing.agency_logo} alt={listing.agency_name ?? ""} className="w-full h-full object-cover" />
+                    <img
+                      src={listing.agency_logo}
+                      alt={listing.agency_name ?? ""}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 ) : (
                   <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center border border-border">
@@ -452,7 +468,7 @@ const ListingDetail = () => {
               >
                 <Phone className="h-4 w-4 mr-2" />
                 {phoneRevealed
-                  ? (listing.owner_phone || t("listing.noPhone", "Non renseigné"))
+                  ? (revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné"))
                   : t("listing.revealPhone")}
               </Button>
 
@@ -512,7 +528,7 @@ const ListingDetail = () => {
           >
             <Phone className="h-4 w-4 shrink-0" />
             {phoneRevealed
-              ? (listing.owner_phone || t("listing.noPhone", "Non renseigné"))
+              ? (revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné"))
               : t("listing.revealPhone")}
           </Button>
         </div>

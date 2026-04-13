@@ -110,7 +110,13 @@ const Index = () => {
               const count = villeCounts[ville.name] ?? 0;
               return (
                 <Link key={ville.name} to={`/recherche?ville=${ville.name}`} className="group relative rounded-2xl overflow-hidden aspect-[3/2]">
-                  <img src={ville.image} alt={ville.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                  <img
+                    src={ville.image}
+                    alt={ville.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
                   <div className="absolute bottom-3 left-3">
                     <h3 className="font-serif font-bold text-lg" style={{ color: "#FAFAFA" }}>{ville.name}</h3>
@@ -138,7 +144,13 @@ const Index = () => {
             {seedBlogPosts.slice(0, 3).map((post) => (
               <Link key={post.id} to={`/conseils/${post.slug}`} className="group rounded-2xl overflow-hidden bg-card border border-border shadow-sm hover:shadow-md transition-all">
                 <div className="aspect-video overflow-hidden">
-                  <img src={post.cover} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <img
+                    src={post.cover}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="p-5 space-y-2">
                   <span className="text-xs font-sans font-medium text-primary">{post.category}</span>
