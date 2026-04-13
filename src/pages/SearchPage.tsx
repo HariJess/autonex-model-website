@@ -67,24 +67,6 @@ const SearchPage = () => {
     [searchParams]
   );
 
-  const handleMobileSheetOpenChange = useCallback(
-    (open: boolean) => {
-      setMobileFiltersOpen(open);
-      if (open) {
-        setMobileFilterDraft({ ...filters });
-      } else {
-        setMobileFilterDraft(null);
-      }
-    },
-    [filters],
-  );
-
-  const applyMobileFilters = useCallback(() => {
-    updateFilters(mobileFilterDraft ?? filters);
-    setMobileFiltersOpen(false);
-    setMobileFilterDraft(null);
-  }, [mobileFilterDraft, filters, updateFilters]);
-
   const pushSearchState = useCallback(
     (next: { filters?: SearchFilters; sort?: SearchSortMode; view?: SearchViewMode }) => {
       const f = next.filters ?? filters;
@@ -109,6 +91,24 @@ const SearchPage = () => {
     (v: SearchViewMode) => pushSearchState({ view: v }),
     [pushSearchState]
   );
+
+  const handleMobileSheetOpenChange = useCallback(
+    (open: boolean) => {
+      setMobileFiltersOpen(open);
+      if (open) {
+        setMobileFilterDraft({ ...filters });
+      } else {
+        setMobileFilterDraft(null);
+      }
+    },
+    [filters],
+  );
+
+  const applyMobileFilters = useCallback(() => {
+    updateFilters(mobileFilterDraft ?? filters);
+    setMobileFiltersOpen(false);
+    setMobileFilterDraft(null);
+  }, [mobileFilterDraft, filters, updateFilters]);
 
   const qTrim = filters.quartierLibre.trim();
 

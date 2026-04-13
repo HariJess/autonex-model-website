@@ -25,7 +25,7 @@ export const villes: Ville[] = [
     region: "Analamanga",
     lat: -18.8792,
     lng: 47.5079,
-    image: "https://images.unsplash.com/photo-1580746738099-78d6833b3a85?w=800",
+    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800",
     description: "Capitale économique et politique",
     arrondissements: [
       {
