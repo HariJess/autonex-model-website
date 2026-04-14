@@ -314,6 +314,15 @@ export interface ListingsFilters {
   bathrooms?: number[];
   surfaceMin?: number;
   surfaceMax?: number;
+  brands?: string[];
+  modelQuery?: string;
+  yearMin?: number;
+  yearMax?: number;
+  fuels?: string[];
+  transmissions?: string[];
+  drivetrains?: string[];
+  conditions?: string[];
+  sellerTypes?: string[];
   searchText?: string;
   limit?: number;
   ownerIds?: string[];
@@ -445,33 +454,69 @@ export function useDbListings(filters: ListingsFilters = {}) {
             const under4 = [...new Set(expanded.filter((b) => b < 4))].sort((a, b) => a - b);
             const hasGte4 = expanded.some((b) => b >= 4);
             if (hasGte4 && under4.length > 0) {
-              query = query.or(`bathrooms.in.(${under4.join(",")}),bathrooms.gte.4`);
+              query = query.or(
+                `doors.in.(${under4.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${under4.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
+              );
             } else if (hasGte4) {
-              query = query.gte("bathrooms", 3);
+              query = query.or("doors.gte.3,and(doors.is.null,bathrooms.gte.3)");
             } else {
-              query = query.in("bathrooms", under4);
+              query = query.or(
+                `doors.in.(${under4.join(",")}),and(doors.is.null,bathrooms.in.(${under4.join(",")}))`,
+              );
             }
           } else {
             const hasPlus = filters.bathrooms.includes(4);
             const others = filters.bathrooms.filter((b) => b < 4);
             if (hasPlus && others.length > 0) {
-              query = query.or(`bathrooms.in.(${others.join(",")}),bathrooms.gte.4`);
+              query = query.or(
+                `doors.in.(${others.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${others.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
+              );
             } else if (hasPlus) {
-              query = query.gte("bathrooms", 4);
+              query = query.or("doors.gte.4,and(doors.is.null,bathrooms.gte.4)");
             } else {
-              query = query.in("bathrooms", others);
+              query = query.or(
+                `doors.in.(${others.join(",")}),and(doors.is.null,bathrooms.in.(${others.join(",")}))`,
+              );
             }
           }
         }
         if (filters.surfaceMin) {
           const sm = relaxed ? Math.max(0, Math.floor(filters.surfaceMin * 0.88)) : filters.surfaceMin;
-          query = query.gte("surface", sm);
+          query = query.or(`mileage_km.gte.${sm},and(mileage_km.is.null,surface.gte.${sm})`);
         }
         if (filters.surfaceMax && filters.surfaceMax > 0) {
           const cap = relaxed
             ? Math.ceil(filters.surfaceMax * CLOSE_MATCH_SURFACE_MAX_FACTOR)
             : filters.surfaceMax;
-          query = query.lte("surface", cap);
+          query = query.or(`mileage_km.lte.${cap},and(mileage_km.is.null,surface.lte.${cap})`);
+        }
+        if (filters.brands && filters.brands.length > 0) {
+          query = query.in("make", filters.brands);
+        }
+        if (filters.modelQuery && filters.modelQuery.trim()) {
+          const safe = sanitizeIlikeTerm(filters.modelQuery);
+          if (safe) query = query.ilike("model", `%${safe}%`);
+        }
+        if (filters.yearMin && filters.yearMin > 0) {
+          query = query.gte("year", filters.yearMin);
+        }
+        if (filters.yearMax && filters.yearMax > 0) {
+          query = query.lte("year", filters.yearMax);
+        }
+        if (filters.fuels && filters.fuels.length > 0) {
+          query = query.in("fuel", filters.fuels);
+        }
+        if (filters.transmissions && filters.transmissions.length > 0) {
+          query = query.in("transmission_gearbox", filters.transmissions);
+        }
+        if (filters.drivetrains && filters.drivetrains.length > 0) {
+          query = query.in("drivetrain", filters.drivetrains);
+        }
+        if (filters.conditions && filters.conditions.length > 0) {
+          query = query.in("vehicle_condition", filters.conditions);
+        }
+        if (filters.sellerTypes && filters.sellerTypes.length > 0) {
+          query = query.in("seller_type", filters.sellerTypes);
         }
       }
       if (filters.limit) {

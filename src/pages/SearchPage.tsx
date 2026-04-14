@@ -54,6 +54,15 @@ function listingMatchesEquipments(features: string[], required: string[]): boole
   });
 }
 
+function normalizeSearchToken(value: string | null | undefined): string {
+  if (!value) return "";
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 const SearchPage = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -126,6 +135,15 @@ const SearchPage = () => {
     bathrooms: filters.bathrooms.length > 0 ? filters.bathrooms : undefined,
     surfaceMin: filters.surfaceMin || undefined,
     surfaceMax: filters.surfaceMax || undefined,
+    brands: filters.brands.length > 0 ? filters.brands : undefined,
+    modelQuery: filters.modelQuery.trim() || undefined,
+    yearMin: filters.yearMin || undefined,
+    yearMax: filters.yearMax || undefined,
+    fuels: filters.fuels.length > 0 ? filters.fuels : undefined,
+    transmissions: filters.transmissions.length > 0 ? filters.transmissions : undefined,
+    drivetrains: filters.drivetrains.length > 0 ? filters.drivetrains : undefined,
+    conditions: filters.conditions.length > 0 ? filters.conditions : undefined,
+    sellerTypes: filters.sellerTypes.length > 0 ? filters.sellerTypes : undefined,
     searchRelaxation: true,
   });
 
@@ -135,26 +153,32 @@ const SearchPage = () => {
       results = results.filter((l) => listingMatchesEquipments(l.features, filters.equipments));
     }
     if (filters.fuels.length > 0) {
-      results = results.filter((l) => l.vehicle?.fuel && filters.fuels.includes(l.vehicle.fuel));
+      const wanted = new Set(filters.fuels.map((v) => normalizeSearchToken(v)));
+      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.fuel)));
     }
     if (filters.transmissions.length > 0) {
-      results = results.filter((l) => l.vehicle?.transmission && filters.transmissions.includes(l.vehicle.transmission));
+      const wanted = new Set(filters.transmissions.map((v) => normalizeSearchToken(v)));
+      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.transmission)));
     }
     if (filters.drivetrains.length > 0) {
-      results = results.filter((l) => l.vehicle?.drivetrain && filters.drivetrains.includes(l.vehicle.drivetrain));
+      const wanted = new Set(filters.drivetrains.map((v) => normalizeSearchToken(v)));
+      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.drivetrain)));
     }
     if (filters.conditions.length > 0) {
-      results = results.filter((l) => l.vehicle?.condition && filters.conditions.includes(l.vehicle.condition));
+      const wanted = new Set(filters.conditions.map((v) => normalizeSearchToken(v)));
+      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.condition)));
     }
     if (filters.sellerTypes.length > 0) {
-      results = results.filter((l) => l.vehicle?.sellerType && filters.sellerTypes.includes(l.vehicle.sellerType));
+      const wanted = new Set(filters.sellerTypes.map((v) => normalizeSearchToken(v)));
+      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.sellerType)));
     }
     if (filters.brands.length > 0) {
-      results = results.filter((l) => l.vehicle?.make && filters.brands.includes(l.vehicle.make));
+      const wanted = new Set(filters.brands.map((v) => normalizeSearchToken(v)));
+      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.make)));
     }
     if (filters.modelQuery.trim()) {
-      const q = filters.modelQuery.trim().toLowerCase();
-      results = results.filter((l) => (l.vehicle?.model ?? "").toLowerCase().includes(q));
+      const q = normalizeSearchToken(filters.modelQuery);
+      results = results.filter((l) => normalizeSearchToken(l.vehicle?.model).includes(q));
     }
     if (filters.yearMin > 0) {
       results = results.filter((l) => (l.vehicle?.year ?? 0) >= filters.yearMin);
