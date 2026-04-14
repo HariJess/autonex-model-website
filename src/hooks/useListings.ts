@@ -372,6 +372,72 @@ function expandBathroomsForRelaxedQuery(bathrooms: number[]): number[] {
   return Array.from(out);
 }
 
+function visibilityRankScore(listing: ListingRowLite, types: Set<string>, dailyBumpStarts: Map<string, number>): number {
+  const created = new Date(listing.created_at ?? 0).getTime();
+  let tier = 0;
+  if (types.has("top")) tier = 4;
+  else if (types.has("featured")) tier = 3;
+  else if (types.has("daily_bump")) tier = 2;
+  else if (types.has("urgent")) tier = 1;
+  const bumpTs = dailyBumpStarts.get(listing.id);
+  const recency =
+    types.has("daily_bump") && bumpTs != null ? Math.max(created, bumpTs) : created;
+  return tier * 1e15 + recency;
+}
+
+function badgeForTypes(types: Set<string>): DisplayListing["badge"] {
+  if (types.has("top")) return "boost";
+  if (types.has("featured")) return "coup_de_coeur";
+  if (types.has("urgent")) return "urgent";
+  return null;
+}
+
+async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promise<DisplayListing[]> {
+  if (listings.length === 0) return [];
+
+  const listingIds = listings.map((l) => l.id);
+  const { data: allPhotos } = await supabase
+    .from("listing_photos")
+    .select("listing_id, url, position")
+    .in("listing_id", listingIds)
+    .order("position", { ascending: true });
+
+  const photosByListing = new Map<string, string[]>();
+  allPhotos?.forEach((p) => {
+    const arr = photosByListing.get(p.listing_id) ?? [];
+    arr.push(p.url);
+    photosByListing.set(p.listing_id, arr);
+  });
+
+  const { data: allBoosts } = await supabase
+    .from("boosts")
+    .select("listing_id, type, starts_at")
+    .in("listing_id", listingIds)
+    .gte("ends_at", new Date().toISOString());
+
+  const typesByListing = new Map<string, Set<string>>();
+  const dailyBumpStarts = new Map<string, number>();
+  allBoosts?.forEach((b) => {
+    const set = typesByListing.get(b.listing_id) ?? new Set<string>();
+    set.add(b.type);
+    typesByListing.set(b.listing_id, set);
+    if (b.type === "daily_bump" && b.starts_at) {
+      const t = new Date(b.starts_at).getTime();
+      const prev = dailyBumpStarts.get(b.listing_id) ?? 0;
+      if (t > prev) dailyBumpStarts.set(b.listing_id, t);
+    }
+  });
+
+  return listings.map((listing) => {
+    const tset = typesByListing.get(listing.id) ?? new Set<string>();
+    return mapListingRowToDisplayListing(listing, {
+      images: photosByListing.get(listing.id) ?? [],
+      badge: badgeForTypes(tset),
+      visibilityRankScore: visibilityRankScore(listing, tset, dailyBumpStarts),
+    });
+  });
+}
+
 /** Fetch active listings from Supabase with optional filters */
 export function useDbListings(filters: ListingsFilters = {}) {
   return useQuery({
@@ -532,72 +598,7 @@ export function useDbListings(filters: ListingsFilters = {}) {
         throw new Error(`Erreur recherche: ${error.message}`);
       }
       if (!listings || listings.length === 0) return [];
-
-      // Batch-fetch photos
-      const listingIds = listings.map((l) => l.id);
-      const { data: allPhotos } = await supabase
-        .from("listing_photos")
-        .select("listing_id, url, position")
-        .in("listing_id", listingIds)
-        .order("position", { ascending: true });
-
-      const photosByListing = new Map<string, string[]>();
-      allPhotos?.forEach((p) => {
-        const arr = photosByListing.get(p.listing_id) ?? [];
-        arr.push(p.url);
-        photosByListing.set(p.listing_id, arr);
-      });
-
-      // Batch-fetch boosts (starts_at sert au tri « actualisation » / daily_bump)
-      const { data: allBoosts } = await supabase
-        .from("boosts")
-        .select("listing_id, type, starts_at")
-        .in("listing_id", listingIds)
-        .gte("ends_at", new Date().toISOString());
-
-      const typesByListing = new Map<string, Set<string>>();
-      const dailyBumpStarts = new Map<string, number>();
-      allBoosts?.forEach((b) => {
-        const set = typesByListing.get(b.listing_id) ?? new Set<string>();
-        set.add(b.type);
-        typesByListing.set(b.listing_id, set);
-        if (b.type === "daily_bump" && b.starts_at) {
-          const t = new Date(b.starts_at).getTime();
-          const prev = dailyBumpStarts.get(b.listing_id) ?? 0;
-          if (t > prev) dailyBumpStarts.set(b.listing_id, t);
-        }
-      });
-
-      const visibilityRankScore = (
-        listing: (typeof listings)[0],
-        types: Set<string>,
-      ): number => {
-        const created = new Date(listing.created_at ?? 0).getTime();
-        let tier = 0;
-        if (types.has("top")) tier = 4;
-        else if (types.has("featured")) tier = 3;
-        else if (types.has("daily_bump")) tier = 2;
-        else if (types.has("urgent")) tier = 1;
-        const bumpTs = dailyBumpStarts.get(listing.id);
-        const recency =
-          types.has("daily_bump") && bumpTs != null ? Math.max(created, bumpTs) : created;
-        return tier * 1e15 + recency;
-      };
-      const badgeForTypes = (types: Set<string>): DisplayListing["badge"] => {
-        if (types.has("top")) return "boost";
-        if (types.has("featured")) return "coup_de_coeur";
-        if (types.has("urgent")) return "urgent";
-        return null;
-      };
-
-      return listings.map((listing) => {
-        const tset = typesByListing.get(listing.id) ?? new Set<string>();
-        return mapListingRowToDisplayListing(listing, {
-          images: photosByListing.get(listing.id) ?? [],
-          badge: badgeForTypes(tset),
-          visibilityRankScore: visibilityRankScore(listing, tset),
-        });
-      });
+      return enrichListingsWithRelatedData(listings as ListingRowLite[]);
     },
     retry: 1,
     staleTime: 30_000,
