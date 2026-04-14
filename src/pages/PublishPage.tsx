@@ -1072,7 +1072,7 @@ const PublishPage = () => {
     if (isPublishedListingEdit) {
       setPublishing(true);
       try {
-        let nextPhotos = [...serverPhotos];
+        const nextPhotos = [...serverPhotos];
         if (pendingPhotos.length > 0) {
           const batch = [...pendingPhotos];
           setPendingPhotos([]);
