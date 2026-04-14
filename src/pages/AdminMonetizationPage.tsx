@@ -16,6 +16,8 @@ import { Link } from "react-router-dom";
 type TxRow = Tables<"transactions">;
 type ListingRow = Tables<"listings">;
 
+const PENDING_PAYMENT_ACTIONABLE: Tables<"transactions">["status"][] = ["pending", "under_review"];
+const FINAL_PAYMENT_STATES: Tables<"transactions">["status"][] = ["approved", "rejected", "cancelled", "failed", "success"];
 const PENDING_PAYMENT: Tables<"transactions">["status"][] = ["pending", "under_review"];
 
 async function proofSignedUrl(storagePath: string | null): Promise<string | null> {
@@ -43,6 +45,19 @@ const AdminMonetizationPage = () => {
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
       return data ?? [];
+    },
+  });
+
+  const { data: finalizedTxCount = 0 } = useQuery({
+    queryKey: ["admin-credit-tx-finalized-count"],
+    queryFn: async (): Promise<number> => {
+      const { count, error } = await supabase
+        .from("transactions")
+        .select("id", { count: "exact", head: true })
+        .in("status", FINAL_PAYMENT_STATES)
+        .not("credit_pack_id", "is", null);
+      if (error) throw new Error(error.message);
+      return count ?? 0;
     },
   });
 
@@ -77,10 +92,11 @@ const AdminMonetizationPage = () => {
       return data;
     },
     onSuccess: (_data, { buyerId }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-pending-credit-tx"] });
-      queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", buyerId] });
-      queryClient.invalidateQueries({ queryKey: ["credit-tx-history", buyerId] });
-      queryClient.invalidateQueries({ queryKey: ["my-credits-ledger", buyerId] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-pending-credit-tx"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-credit-tx-finalized-count"] });
+      void queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", buyerId] });
+      void queryClient.invalidateQueries({ queryKey: ["credit-tx-history", buyerId] });
+      void queryClient.invalidateQueries({ queryKey: ["my-credits-ledger", buyerId] });
       invalidateCreditsBalanceQueries(queryClient, buyerId);
       toast.success("Transaction approuvée — crédits crédités une fois.");
     },
@@ -96,9 +112,10 @@ const AdminMonetizationPage = () => {
       if (error) throw new Error(error.message);
     },
     onSuccess: (_data, { buyerId }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-pending-credit-tx"] });
-      queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", buyerId] });
-      queryClient.invalidateQueries({ queryKey: ["credit-tx-history", buyerId] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-pending-credit-tx"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-credit-tx-finalized-count"] });
+      void queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", buyerId] });
+      void queryClient.invalidateQueries({ queryKey: ["credit-tx-history", buyerId] });
       invalidateCreditsBalanceQueries(queryClient, buyerId);
       setRejectTxId(null);
       setRejectTxReason("");
@@ -115,11 +132,11 @@ const AdminMonetizationPage = () => {
       if (error) throw new Error(error.message);
     },
     onSuccess: (_data, { ownerId }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-pending-listings"] });
-      queryClient.invalidateQueries({ queryKey: ["my-listings", ownerId] });
-      queryClient.invalidateQueries({ queryKey: ["my-listing-boosts", ownerId] });
-      queryClient.invalidateQueries({ queryKey: ["featured-boost-listing-ids"] });
-      queryClient.invalidateQueries({ queryKey: ["agencies-monetization"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-pending-listings"] });
+      void queryClient.invalidateQueries({ queryKey: ["my-listings", ownerId] });
+      void queryClient.invalidateQueries({ queryKey: ["my-listing-boosts", ownerId] });
+      void queryClient.invalidateQueries({ queryKey: ["featured-boost-listing-ids"] });
+      void queryClient.invalidateQueries({ queryKey: ["agencies-monetization"] });
       invalidateCreditsBalanceQueries(queryClient, ownerId);
       toast.success("Annonce publiée — boosts matérialisés.");
     },
@@ -135,10 +152,10 @@ const AdminMonetizationPage = () => {
       if (error) throw new Error(error.message);
     },
     onSuccess: (_data, { ownerId }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-pending-listings"] });
-      queryClient.invalidateQueries({ queryKey: ["my-listings", ownerId] });
-      queryClient.invalidateQueries({ queryKey: ["my-credits-ledger", ownerId] });
-      queryClient.invalidateQueries({ queryKey: ["credit-tx-history", ownerId] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-pending-listings"] });
+      void queryClient.invalidateQueries({ queryKey: ["my-listings", ownerId] });
+      void queryClient.invalidateQueries({ queryKey: ["my-credits-ledger", ownerId] });
+      void queryClient.invalidateQueries({ queryKey: ["credit-tx-history", ownerId] });
       invalidateCreditsBalanceQueries(queryClient, ownerId);
       setRejectListingId(null);
       setRejectListingReason("");
@@ -169,10 +186,16 @@ const AdminMonetizationPage = () => {
           <CardHeader>
             <CardTitle className="font-serif">Achats de crédits en attente</CardTitle>
             <CardDescription className="font-sans">
-              Statuts concernés : pending, under_review. L’approbation crédite le compte une seule fois.
+              Source de vérité : table `transactions` (demandes de packs avec `credit_pack_id` non nul).
+              États à traiter ici : {PENDING_PAYMENT_ACTIONABLE.join(", ")}.
+              États finalisés (hors file d’action) : {FINAL_PAYMENT_STATES.join(", ")}.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <p className="text-xs text-muted-foreground font-sans">
+              En attente d’action : <span className="font-medium text-foreground">{pendingTx.length}</span> ·
+              Finalisées (historique) : <span className="font-medium text-foreground">{finalizedTxCount}</span>
+            </p>
             {txLoading ? (
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             ) : pendingTx.length === 0 ? (
