@@ -76,7 +76,12 @@ const AgencyProfile = () => {
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-destructive mb-4" />
           <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
-          <p className="text-muted-foreground font-sans mb-6">{(agencyError as Error).message}</p>
+          <p className="text-muted-foreground font-sans mb-6">
+            {t(
+              "agencies.runtimeUnavailable",
+              "Le profil concessionnaire est momentanément indisponible. Veuillez réessayer dans quelques instants.",
+            )}
+          </p>
         </div>
         <Footer />
       </>

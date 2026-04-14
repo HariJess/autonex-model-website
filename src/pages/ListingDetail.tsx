@@ -230,7 +230,10 @@ const ListingDetail = () => {
           <AlertCircle className="h-12 w-12 text-destructive mb-4" />
           <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
           <p className="text-muted-foreground font-sans mb-6">
-            {fetchError instanceof Error ? fetchError.message : String(fetchError)}
+            {t(
+              "listing.runtimeUnavailable",
+              "Cette annonce est momentanément indisponible. Réessayez dans quelques instants.",
+            )}
           </p>
           <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
         </div>

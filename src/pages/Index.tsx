@@ -61,13 +61,13 @@ const Index = () => {
 
       <HeroSearch />
 
-      <section className="container mx-auto px-4 pt-8 pb-1">
+      <section className="container mx-auto px-4 pt-8 pb-2">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {AUTO_TRANSACTION_MODES.map((mode) => (
             <Link
               key={mode.id}
               to={mode.href}
-              className="rounded-2xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-colors p-4"
+              className="rounded-2xl border border-border/80 bg-card hover:border-primary/30 hover:bg-primary/[0.03] transition-colors p-4 shadow-sm"
             >
               <p className="text-sm font-semibold font-sans text-foreground">{mode.label}</p>
               <p className="text-xs text-muted-foreground font-sans mt-1">
@@ -84,12 +84,13 @@ const Index = () => {
       </section>
 
       <section className="container mx-auto px-4 pt-8 pb-2">
-        <div className="rounded-2xl border border-border bg-card p-4 md:p-5">
-          <div className="flex flex-wrap gap-2">
+        <div className="rounded-2xl border border-border/80 bg-card p-4 md:p-5 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-3">Explorer par catégorie</p>
+          <div className="flex flex-wrap gap-2.5">
             {AUTO_DISCOVERY_CATEGORIES.map((label) => (
               <span
                 key={label}
-                className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
+                className="rounded-lg border border-border bg-secondary/35 px-3 py-1.5 text-xs font-semibold text-foreground"
               >
                 {label}
               </span>
@@ -99,28 +100,28 @@ const Index = () => {
       </section>
 
       <section className="container mx-auto px-4 py-6">
-        <div className="rounded-2xl border border-border bg-card p-4 md:p-5">
+        <div className="rounded-2xl border border-border/80 bg-card p-4 md:p-5 shadow-sm">
           <h2 className="font-serif text-xl md:text-2xl font-bold mb-2">Marques populaires</h2>
           <p className="text-sm text-muted-foreground font-sans mb-4">
             Catalogue étendu voitures, utilitaires, premium, import et moto.
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-2">
             {TOP_AUTO_BRANDS.map((brand) => (
               <Link
                 key={brand}
                 to={`/recherche?brand=${encodeURIComponent(brand)}`}
-                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                className="rounded-md border border-border bg-background px-2.5 py-2 text-xs font-semibold text-center text-foreground hover:border-primary/35 hover:text-primary transition-colors"
               >
                 {brand}
               </Link>
             ))}
-            <Link
-              to="/recherche"
-              className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
-            >
-              Autres marques
-            </Link>
           </div>
+          <Link
+            to="/recherche"
+            className="inline-flex mt-4 rounded-md border border-primary/25 bg-primary/[0.08] px-3 py-2 text-xs font-semibold text-primary"
+          >
+            Autres marques
+          </Link>
         </div>
       </section>
 

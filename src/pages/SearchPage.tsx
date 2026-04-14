@@ -445,8 +445,27 @@ const SearchPage = () => {
   }, [filters]);
   const robotsContent = noisyFiltersCount >= 4 ? "noindex,follow" : "index,follow";
 
-  const errorMessage =
-    queryError instanceof Error ? queryError.message : queryError != null ? String(queryError) : "";
+  const errorMessage = useMemo(() => {
+    if (!queryError) return "";
+    const raw = queryError instanceof Error ? queryError.message : String(queryError);
+    const lowered = raw.toLowerCase();
+    if (
+      lowered.includes("schema cache") ||
+      lowered.includes("could not find the table") ||
+      lowered.includes("relation") ||
+      lowered.includes("supabase") ||
+      lowered.includes("public.listings")
+    ) {
+      return t(
+        "search.runtimeDataUnavailable",
+        "Le catalogue est momentanément indisponible. Vous pouvez réessayer dans quelques instants.",
+      );
+    }
+    return t(
+      "search.runtimeGenericError",
+      "Impossible de charger les annonces pour le moment. Vérifiez votre connexion puis réessayez.",
+    );
+  }, [queryError, t]);
 
   const showToolbar = !isLoading;
   const showResults = !isLoading && !queryError && displayListings.length > 0;
@@ -577,9 +596,9 @@ const SearchPage = () => {
             )}
 
             {showSimilarBanner && (
-              <div className="mb-4 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.07] via-muted/30 to-muted/20 px-4 py-4 lg:py-3 shadow-sm">
+              <div className="mb-4 rounded-2xl border border-border/80 bg-card px-4 py-4 lg:py-3 shadow-sm">
                 <div className="flex gap-3">
-                  <div className="shrink-0 mt-0.5 rounded-full bg-primary/15 p-2">
+                  <div className="shrink-0 mt-0.5 rounded-full bg-secondary p-2">
                     <Sparkles className="h-5 w-5 text-primary" aria-hidden />
                   </div>
                   <div className="min-w-0 space-y-1.5">
@@ -603,7 +622,13 @@ const SearchPage = () => {
               </div>
             )}
 
-            {queryError && !isLoading && <SearchErrorState title={t("common.error")} message={errorMessage} />}
+            {queryError && !isLoading && (
+              <SearchErrorState
+                title={t("search.resultsUnavailable", "Résultats indisponibles")}
+                message={errorMessage}
+                onRetry={() => window.location.reload()}
+              />
+            )}
 
             {isLoading && <SearchLoadingState loadingLabel={t("common.loading", "Chargement")} />}
 

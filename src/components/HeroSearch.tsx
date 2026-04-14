@@ -110,9 +110,10 @@ const HeroSearch = () => {
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
 
   return (
-    <section className="relative overflow-hidden py-14 sm:py-16 lg:py-32">
-      <div className="absolute inset-0 gradient-primary opacity-90" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
+    <section className="relative overflow-hidden py-14 sm:py-16 lg:py-28">
+      <div className="absolute inset-0 gradient-primary" />
+      <div className="absolute inset-0 bg-[radial-gradient(1000px_420px_at_50%_-5%,rgba(255,255,255,0.14),transparent)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
 
       <div className="relative container mx-auto px-4 text-center">
         <h1
@@ -122,23 +123,23 @@ const HeroSearch = () => {
           {t("hero.title")}
         </h1>
         <p
-          className="text-base sm:text-lg md:text-xl mb-8 md:mb-10 font-sans max-w-2xl mx-auto"
+          className="text-base sm:text-lg md:text-xl mb-7 md:mb-9 font-sans max-w-2xl mx-auto"
           style={{ color: "rgba(250,250,250,0.85)" }}
         >
           {t("hero.subtitle")}
         </p>
 
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-center gap-1 mb-0 max-w-full overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch]">
+          <div className="flex justify-center gap-1.5 mb-2 max-w-full overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch]">
             {TRANSACTIONS.map((tr) => (
               <button
                 key={tr.value}
                 type="button"
                 onClick={() => handleTransactionChange(tr.value)}
-                className={`shrink-0 px-3 sm:px-5 py-2.5 rounded-t-xl font-sans font-semibold text-xs sm:text-sm transition-all touch-manipulation min-h-11 ${
+                className={`shrink-0 px-3 sm:px-5 py-2.5 rounded-xl font-sans font-semibold text-xs sm:text-sm transition-all touch-manipulation min-h-11 border ${
                   transaction === tr.value
-                    ? "gradient-primary text-white shadow-lg"
-                    : "bg-white/20 text-white/80 hover:bg-white/30 backdrop-blur-sm"
+                    ? "bg-white text-[#0B1C38] border-white shadow-lg"
+                    : "bg-white/10 text-white/90 border-white/20 hover:bg-white/16 backdrop-blur-sm"
                 }`}
               >
                 {t(tr.labelKey)}
@@ -146,8 +147,8 @@ const HeroSearch = () => {
             ))}
           </div>
 
-          <div className="bg-card rounded-b-2xl rounded-tr-2xl shadow-2xl p-3 md:p-4 -mb-10 md:-mb-12 relative z-10">
-            <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border">
+          <div className="bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 -mb-10 md:-mb-12 relative z-10 border border-border/70">
+            <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border/80 overflow-hidden">
               <div className="flex-1 border-r border-border px-3 py-2">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
                   {t("hero.type")}

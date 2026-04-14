@@ -30,7 +30,7 @@
     --muted: 220 30% 94%;
     --muted-foreground: 220 16% 40%;
 
-    --accent: 16 92% 52%;
+    --accent: 210 95% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -57,7 +57,7 @@
 
     --gradient-start: 222 75% 28%;
     --gradient-mid: 222 84% 45%;
-    --gradient-end: 16 92% 52%;
+    --gradient-end: 221 72% 56%;
   }
 
   .dark {
@@ -73,7 +73,7 @@
     --secondary-foreground: 0 0% 98%;
     --muted: 222 24% 16%;
     --muted-foreground: 0 0% 64%;
-    --accent: 16 92% 52%;
+    --accent: 210 95% 58%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -125,10 +125,10 @@
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(135deg, #0F254B, #1D4ED8, #F97316);
+    background: linear-gradient(140deg, #071326, #102b52 48%, #1f4ea6);
   }
   .gradient-text {
-    background: linear-gradient(135deg, #1D4ED8, #F97316);
+    background: linear-gradient(135deg, #1f4ea6, #4f7dd1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

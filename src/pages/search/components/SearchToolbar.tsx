@@ -56,7 +56,7 @@ export function SearchToolbar({
   onSetSort,
 }: SearchToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border p-3.5">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border/80 p-3.5 shadow-sm">
       <div className="flex flex-wrap items-center gap-3 min-w-0">
         <Sheet open={mobileFiltersOpen} onOpenChange={onOpenMobileFilters}>
           <SheetTrigger asChild>
@@ -64,11 +64,7 @@ export function SearchToolbar({
               <SlidersHorizontal className="h-4 w-4" />
               {filtersLabel}
               {activeFilterCount > 0 && (
-                <Badge
-                  variant="default"
-                  className="h-5 min-w-5 px-1 flex items-center justify-center text-[10px] gradient-primary border-0"
-                  style={{ color: "#FAFAFA" }}
-                >
+                <Badge variant="secondary" className="h-5 min-w-5 px-1 flex items-center justify-center text-[10px] border border-border">
                   {activeFilterCount}
                 </Badge>
               )}
@@ -113,7 +109,7 @@ export function SearchToolbar({
               key={mode}
               type="button"
               onClick={() => onSetViewMode(mode)}
-              className={`inline-flex items-center justify-center min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+              className={`inline-flex items-center justify-center min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary/90 text-primary-foreground" : "hover:bg-muted/70"}`}
               aria-label={label}
               aria-pressed={viewMode === mode}
             >
