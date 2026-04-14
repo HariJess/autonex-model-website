@@ -38,14 +38,19 @@ const Index = () => {
         .filter((listing) => {
           const title = listing.title.toLowerCase();
           const drivetrain = listing.vehicle?.drivetrain?.toLowerCase() ?? "";
+          const bodyStyle = listing.vehicle?.bodyStyle?.toLowerCase() ?? "";
           return (
-            listing.type === "villa" ||
-            listing.type === "local_commercial" ||
             drivetrain.includes("4x4") ||
+            bodyStyle.includes("4x4") ||
+            bodyStyle.includes("pickup") ||
+            bodyStyle.includes("pick-up") ||
+            bodyStyle.includes("suv") ||
             title.includes("4x4") ||
             title.includes("pickup") ||
             title.includes("pick-up") ||
-            title.includes("suv")
+            title.includes("suv") ||
+            listing.type === "villa" ||
+            listing.type === "local_commercial"
           );
         })
         .slice(0, 4),
@@ -56,12 +61,18 @@ const Index = () => {
       thematicListings
         .filter((listing) => {
           const title = listing.title.toLowerCase();
+          const bodyStyle = listing.vehicle?.bodyStyle?.toLowerCase() ?? "";
           return (
-            listing.type === "appartement" ||
-            listing.type === "maison" ||
+            bodyStyle.includes("citadine") ||
+            bodyStyle.includes("crossover") ||
+            bodyStyle.includes("berline") ||
+            bodyStyle.includes("hatchback") ||
+            bodyStyle.includes("suv urbain") ||
             title.includes("citadine") ||
             title.includes("urbain") ||
-            title.includes("crossover")
+            title.includes("crossover") ||
+            listing.type === "appartement" ||
+            listing.type === "maison"
           );
         })
         .slice(0, 4),
@@ -72,15 +83,23 @@ const Index = () => {
       thematicListings
         .filter((listing) => {
           const title = listing.title.toLowerCase();
+          const bodyStyle = listing.vehicle?.bodyStyle?.toLowerCase() ?? "";
           return (
-            listing.type === "local_commercial" ||
-            listing.type === "bureau" ||
+            bodyStyle.includes("utilitaire") ||
+            bodyStyle.includes("van") ||
+            bodyStyle.includes("fourgon") ||
+            bodyStyle.includes("minibus") ||
+            bodyStyle.includes("bus") ||
+            bodyStyle.includes("camion") ||
+            listing.vehicle?.rentalMode?.toLowerCase() === "professionnel" ||
             title.includes("utilitaire") ||
             title.includes("van") ||
             title.includes("fourgon") ||
             title.includes("minibus") ||
             title.includes("bus") ||
-            title.includes("camion")
+            title.includes("camion") ||
+            listing.type === "local_commercial" ||
+            listing.type === "bureau"
           );
         })
         .slice(0, 4),
@@ -91,7 +110,13 @@ const Index = () => {
       thematicListings
         .filter((listing) => {
           const fuel = listing.vehicle?.fuel?.toLowerCase() ?? "";
-          return fuel.includes("électrique") || fuel.includes("electrique") || fuel.includes("hybride");
+          return (
+            listing.vehicle?.isElectric === true ||
+            listing.vehicle?.isHybrid === true ||
+            fuel.includes("électrique") ||
+            fuel.includes("electrique") ||
+            fuel.includes("hybride")
+          );
         })
         .slice(0, 4),
     [thematicListings],

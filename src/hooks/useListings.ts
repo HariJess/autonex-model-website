@@ -19,6 +19,25 @@ type ListingRowLite = Pick<
   | "bathrooms"
   | "toilets"
   | "ville"
+  | "availability_status"
+  | "body_style"
+  | "doors"
+  | "drivetrain"
+  | "exterior_color"
+  | "fuel"
+  | "interior_color"
+  | "is_electric"
+  | "is_hybrid"
+  | "make"
+  | "mileage_km"
+  | "model"
+  | "rental_mode"
+  | "seats"
+  | "seller_type"
+  | "transmission_gearbox"
+  | "vehicle_condition"
+  | "whatsapp_phone"
+  | "year"
   | "region"
   | "arrondissement"
   | "quartier"
@@ -51,6 +70,25 @@ const LISTING_SELECT_COLUMNS = [
   "bathrooms",
   "toilets",
   "ville",
+  "availability_status",
+  "body_style",
+  "doors",
+  "drivetrain",
+  "exterior_color",
+  "fuel",
+  "interior_color",
+  "is_electric",
+  "is_hybrid",
+  "make",
+  "mileage_km",
+  "model",
+  "rental_mode",
+  "seats",
+  "seller_type",
+  "transmission_gearbox",
+  "vehicle_condition",
+  "whatsapp_phone",
+  "year",
   "region",
   "arrondissement",
   "quartier",
@@ -103,6 +141,33 @@ function mapListingRowToDisplayListing(
     ? (listing.pending_boost_types as unknown[]).filter((x): x is string => typeof x === "string")
     : [];
 
+  const vehicle = deriveVehicleFromLegacy({
+    title: listing.title,
+    surface: listing.surface,
+    mileageKm: listing.mileage_km,
+    bathrooms: listing.bathrooms,
+    doors: listing.doors,
+    make: listing.make,
+    model: listing.model,
+    year: listing.year,
+    fuel: listing.fuel,
+    transmission: listing.transmission_gearbox,
+    drivetrain: listing.drivetrain,
+    bodyStyle: listing.body_style,
+    rentalMode: listing.rental_mode,
+    seats: listing.seats,
+    exteriorColor: listing.exterior_color,
+    interiorColor: listing.interior_color,
+    availabilityStatus: listing.availability_status,
+    isElectric: listing.is_electric,
+    isHybrid: listing.is_hybrid,
+    vehicleCondition: listing.vehicle_condition,
+    sellerType: listing.seller_type,
+    isNewProgram: listing.is_new_program,
+    features: rawFeatures,
+    agencyName: extras?.agencyName ?? null,
+  });
+
   return {
     id: listing.id,
     title: listing.title,
@@ -130,7 +195,7 @@ function mapListingRowToDisplayListing(
     owner_id: listing.owner_id,
     owner_name: extras?.ownerName ?? null,
     owner_phone: extras?.ownerPhone ?? null,
-    has_whatsapp_contact: extras?.hasWhatsappContact ?? false,
+    has_whatsapp_contact: extras?.hasWhatsappContact ?? Boolean(listing.whatsapp_phone?.trim()),
     agency_name: extras?.agencyName ?? null,
     agency_slug: extras?.agencySlug ?? null,
     agency_logo: extras?.agencyLogo ?? null,
@@ -143,14 +208,7 @@ function mapListingRowToDisplayListing(
     is_new_program: listing.is_new_program,
     rejection_reason: listing.rejection_reason,
     pending_boost_types: pendingBoosts.length > 0 ? pendingBoosts : undefined,
-    vehicle: deriveVehicleFromLegacy({
-      title: listing.title,
-      surface: listing.surface,
-      bathrooms: listing.bathrooms,
-      isNewProgram: listing.is_new_program,
-      features: rawFeatures,
-      agencyName: extras?.agencyName ?? null,
-    }),
+    vehicle,
   };
 }
 
@@ -339,7 +397,7 @@ export function useDbListings(filters: ListingsFilters = {}) {
           if (safe.length >= 1) {
             const p = `%${safe}%`;
             query = query.or(
-              `title.ilike.${p},description.ilike.${p},quartier.ilike.${p},quartier_libre.ilike.${p},region.ilike.${p},ville.ilike.${p}`,
+              `title.ilike.${p},description.ilike.${p},make.ilike.${p},model.ilike.${p},fuel.ilike.${p},body_style.ilike.${p},quartier.ilike.${p},quartier_libre.ilike.${p},region.ilike.${p},ville.ilike.${p}`,
             );
           }
         }

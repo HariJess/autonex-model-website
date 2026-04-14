@@ -2,7 +2,7 @@ import type { DisplayListing } from "@/types/listing";
 import { parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
 
 type VehicleCondition = "neuf" | "occasion" | null;
-type SellerType = "concessionnaire" | "particulier";
+type SellerType = "concessionnaire" | "particulier" | null;
 
 const KNOWN_MAKES = [
   "Toyota", "Nissan", "Hyundai", "Kia", "Honda", "Suzuki", "Mitsubishi", "Mazda", "Subaru",
@@ -39,7 +39,25 @@ function pickFromFeatures(features: string[], candidates: readonly string[]): st
 export function deriveVehicleFromLegacy(input: {
   title: string;
   surface: number | null | undefined;
+  mileageKm?: number | null | undefined;
   bathrooms: number | null | undefined;
+  doors?: number | null | undefined;
+  make?: string | null | undefined;
+  model?: string | null | undefined;
+  year?: number | null | undefined;
+  fuel?: string | null | undefined;
+  transmission?: string | null | undefined;
+  drivetrain?: string | null | undefined;
+  bodyStyle?: string | null | undefined;
+  rentalMode?: string | null | undefined;
+  seats?: number | null | undefined;
+  exteriorColor?: string | null | undefined;
+  interiorColor?: string | null | undefined;
+  availabilityStatus?: string | null | undefined;
+  isElectric?: boolean | null | undefined;
+  isHybrid?: boolean | null | undefined;
+  vehicleCondition?: string | null | undefined;
+  sellerType?: string | null | undefined;
   isNewProgram?: boolean | null | undefined;
   features?: string[] | null | undefined;
   agencyName?: string | null | undefined;
@@ -47,33 +65,59 @@ export function deriveVehicleFromLegacy(input: {
   const features = Array.isArray(input.features) ? input.features : [];
   const tagged = parseVehicleMetaTags(features);
   const parsed = parseMakeModelYear(input.title);
-  const mileageKm = input.surface != null && input.surface > 0 ? input.surface : null;
-  const doors = input.bathrooms != null && input.bathrooms > 0 ? input.bathrooms : null;
+  const mileageKm =
+    input.mileageKm != null && input.mileageKm > 0
+      ? input.mileageKm
+      : input.surface != null && input.surface > 0
+        ? input.surface
+        : null;
+  const doors =
+    input.doors != null && input.doors > 0
+      ? input.doors
+      : input.bathrooms != null && input.bathrooms > 0
+        ? input.bathrooms
+        : null;
   const fuel =
+    input.fuel ??
     tagged.fuel ??
     pickFromFeatures(features, ["Diesel", "Essence", "Hybride", "Électrique", "GPL"]) ??
     null;
   const transmission =
+    input.transmission ??
     tagged.transmission ??
     pickFromFeatures(features, ["Boîte automatique", "Automatique", "Boîte manuelle", "Manuelle"]) ??
     null;
   const drivetrain =
+    input.drivetrain ??
     tagged.drivetrain ??
     pickFromFeatures(features, ["4x4", "4x2", "AWD", "Traction", "Propulsion"]) ??
     null;
   const condition: VehicleCondition =
-    (tagged.condition as VehicleCondition) ?? (input.isNewProgram === true ? "neuf" : mileageKm != null ? "occasion" : null);
-  const sellerType: SellerType = (tagged.sellerType as SellerType) ?? (input.agencyName ? "concessionnaire" : "particulier");
+    (input.vehicleCondition as VehicleCondition) ??
+    (tagged.condition as VehicleCondition) ??
+    (input.isNewProgram === true ? "neuf" : mileageKm != null ? "occasion" : null);
+  const sellerType: SellerType =
+    (input.sellerType as SellerType) ??
+    (tagged.sellerType as SellerType) ??
+    (input.agencyName ? "concessionnaire" : "particulier");
 
   return {
-    make: tagged.make ?? parsed.make,
-    model: tagged.model ?? parsed.model,
-    year: tagged.year ?? parsed.year,
+    make: input.make ?? tagged.make ?? parsed.make,
+    model: input.model ?? tagged.model ?? parsed.model,
+    year: input.year ?? tagged.year ?? parsed.year,
     mileageKm,
     fuel,
-    transmission,
+    transmission: input.transmission ?? transmission,
     drivetrain,
     doors,
+    bodyStyle: input.bodyStyle ?? null,
+    rentalMode: input.rentalMode ?? null,
+    seats: input.seats ?? null,
+    exteriorColor: input.exteriorColor ?? null,
+    interiorColor: input.interiorColor ?? null,
+    availabilityStatus: input.availabilityStatus ?? null,
+    isElectric: input.isElectric === true || (fuel?.toLowerCase().includes("électrique") ?? false) || (fuel?.toLowerCase().includes("electrique") ?? false),
+    isHybrid: input.isHybrid === true || (fuel?.toLowerCase().includes("hybride") ?? false),
     condition,
     sellerType,
   };

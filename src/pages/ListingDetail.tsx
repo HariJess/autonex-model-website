@@ -26,7 +26,16 @@ import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescrip
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
-import { formatVehicleDoors, formatVehicleMileage, formatVehicleVersion } from "@/lib/vehiclePresentation";
+import {
+  formatVehicleDoors,
+  formatVehicleMileage,
+  formatVehicleVersion,
+  getVehicleDisplayTitle,
+  getVehicleHeadline,
+  getVehicleDoorsValue,
+  getVehicleMileageValue,
+  getVehicleVersionValue,
+} from "@/lib/vehiclePresentation";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
@@ -282,10 +291,12 @@ const ListingDetail = () => {
   const hasApproxMap =
     mapPublic != null && isValidListingCoordinates(mapPublic.lat, mapPublic.lng);
   const isOwner = user?.id === listing.owner_id;
-  const versionLabel = formatVehicleVersion(listing.rooms);
-  const mileageLabel = formatVehicleMileage(listing.surface);
-  const doorsLabel = formatVehicleDoors(listing.bathrooms);
-  const vehicleSummary = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year].filter(Boolean).join(" ");
+  const displayTitle = getVehicleDisplayTitle(listing);
+  const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
+  const mileageValue = getVehicleMileageValue(listing);
+  const mileageLabel = formatVehicleMileage(mileageValue);
+  const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
+  const vehicleSummary = getVehicleHeadline(listing);
   const ownerStatusHint = (() => {
     const s = listing.status;
     if (!isOwner || s === "active") return null;
@@ -314,7 +325,7 @@ const ListingDetail = () => {
     return t("listing.ownerNonActive", "Cette annonce n’est pas publiée actuellement.");
   })();
   const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
-  const listingTitle = composePageTitle(listing.title);
+  const listingTitle = composePageTitle(displayTitle);
   const listingDescription = truncateMetaDescription(
     [
       `${typeLabel} ${transactionLabel} a ${listing.ville || "Madagascar"}`,
@@ -328,7 +339,7 @@ const ListingDetail = () => {
   const listingJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: listing.title,
+    name: displayTitle,
     description: listingDescription,
     url: canonical,
     image: seoImage ? [seoImage] : undefined,
@@ -345,10 +356,10 @@ const ListingDetail = () => {
     brand: listing.vehicle?.make ? { "@type": "Brand", name: listing.vehicle.make } : undefined,
     model: listing.vehicle?.model ?? undefined,
     vehicleModelDate: listing.vehicle?.year ?? undefined,
-    mileageFromOdometer: listing.surface && listing.surface > 0
+    mileageFromOdometer: mileageValue && mileageValue > 0
       ? {
           "@type": "QuantitativeValue",
-          value: listing.surface,
+          value: mileageValue,
           unitText: "km",
         }
       : undefined,
@@ -387,7 +398,7 @@ const ListingDetail = () => {
           <ChevronRight className="h-3 w-3" />
           <Link to="/recherche" className="hover:text-primary">{t("search.title")}</Link>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground">{listing.title}</span>
+          <span className="text-foreground">{displayTitle}</span>
         </nav>
 
         {ownerStatusHint && (
@@ -413,7 +424,7 @@ const ListingDetail = () => {
               <div className="rounded-2xl overflow-hidden aspect-video">
                 <img
                   src={images[selectedImg]}
-                  alt={listing.title}
+                  alt={displayTitle}
                   className="w-full h-full object-cover"
                   decoding="async"
                   onError={(e) => applyImageFallback(e.currentTarget)}
@@ -462,7 +473,7 @@ const ListingDetail = () => {
                   </Badge>
                 )}
               </div>
-              <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{listing.title}</h1>
+              <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{displayTitle}</h1>
               {vehicleSummary && (
                 <p className="text-sm text-muted-foreground font-sans mb-1">{vehicleSummary}</p>
               )}
@@ -509,6 +520,16 @@ const ListingDetail = () => {
               {listing.vehicle?.fuel && <Badge variant="secondary" className="font-sans">{listing.vehicle.fuel}</Badge>}
               {listing.vehicle?.transmission && <Badge variant="secondary" className="font-sans">{listing.vehicle.transmission}</Badge>}
               {listing.vehicle?.drivetrain && <Badge variant="secondary" className="font-sans">{listing.vehicle.drivetrain}</Badge>}
+              {listing.vehicle?.bodyStyle && <Badge variant="secondary" className="font-sans">{listing.vehicle.bodyStyle}</Badge>}
+              {listing.vehicle?.rentalMode && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.rentalMode}</Badge>}
+              {listing.vehicle?.seats != null && listing.vehicle.seats > 0 && (
+                <Badge variant="outline" className="font-sans">{listing.vehicle.seats} places</Badge>
+              )}
+              {listing.vehicle?.availabilityStatus && (
+                <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.availabilityStatus}</Badge>
+              )}
+              {listing.vehicle?.isElectric && <Badge variant="secondary" className="font-sans">Électrique</Badge>}
+              {listing.vehicle?.isHybrid && <Badge variant="secondary" className="font-sans">Hybride</Badge>}
               {listing.vehicle?.condition && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.condition}</Badge>}
               {listing.vehicle?.sellerType && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.sellerType}</Badge>}
             </div>

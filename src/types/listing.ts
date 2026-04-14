@@ -108,7 +108,15 @@ export interface DisplayListing {
     transmission: string | null;
     drivetrain: string | null;
     doors: number | null;
+    bodyStyle: string | null;
+    rentalMode: string | null;
+    seats: number | null;
+    exteriorColor: string | null;
+    interiorColor: string | null;
+    availabilityStatus: string | null;
+    isElectric: boolean;
+    isHybrid: boolean;
     condition: "neuf" | "occasion" | null;
-    sellerType: "concessionnaire" | "particulier";
+    sellerType: "concessionnaire" | "particulier" | null;
   };
 }

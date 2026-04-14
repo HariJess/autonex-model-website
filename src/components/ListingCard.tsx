@@ -8,7 +8,14 @@ import type { DisplayListing } from "@/types/listing";
 import { LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { prefetchListing } from "@/hooks/useListings";
 import { applyImageFallback } from "@/lib/imageFallback";
-import { formatVehicleMileage, formatVehicleVersion } from "@/lib/vehiclePresentation";
+import {
+  formatVehicleMileage,
+  formatVehicleVersion,
+  getVehicleDisplayTitle,
+  getVehicleHeadline,
+  getVehicleMileageValue,
+  getVehicleVersionValue,
+} from "@/lib/vehiclePresentation";
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -45,9 +52,10 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
   const displayAgencyLogo = agencyLogo ?? listing.agency_logo;
   const city = listing.ville ?? "";
   const region = listing.region ?? "";
-  const versionLabel = formatVehicleVersion(listing.rooms);
-  const mileageLabel = formatVehicleMileage(listing.surface);
-  const vehicleHeadline = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year].filter(Boolean).join(" ");
+  const displayTitle = getVehicleDisplayTitle(listing);
+  const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
+  const mileageLabel = formatVehicleMileage(getVehicleMileageValue(listing));
+  const vehicleHeadline = getVehicleHeadline(listing);
 
   const handlePrefetchDetail = () => {
     void prefetchListing(queryClient, listing.id);
@@ -65,7 +73,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
       >
         <img
           src={images[imgIndex]}
-          alt={listing.title}
+          alt={displayTitle}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
           decoding="async"
@@ -143,7 +151,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
           <p className="text-xl max-sm:text-[1.35rem] font-bold text-primary font-sans tracking-tight">{formatPrice(listing.price_mga)}</p>
           <p className="text-xs text-muted-foreground font-sans mt-0.5">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
-        <h3 className="font-serif font-semibold text-base max-lg:text-[1.05rem] text-foreground leading-snug">{listing.title}</h3>
+        <h3 className="font-serif font-semibold text-base max-lg:text-[1.05rem] text-foreground leading-snug">{displayTitle}</h3>
         {vehicleHeadline && (
           <p className="text-xs font-sans text-muted-foreground -mt-1">{vehicleHeadline}</p>
         )}
@@ -166,6 +174,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
             </span>
           )}
           <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>
+          {listing.vehicle?.bodyStyle && <span>{listing.vehicle.bodyStyle}</span>}
           {listing.vehicle?.fuel && <span>{listing.vehicle.fuel}</span>}
           {listing.vehicle?.transmission && <span>{listing.vehicle.transmission}</span>}
         </div>

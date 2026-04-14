@@ -5,7 +5,16 @@ import type { DisplayListing } from "@/types/listing";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchListing } from "@/hooks/useListings";
-import { formatVehicleDoors, formatVehicleMileage, formatVehicleVersion } from "@/lib/vehiclePresentation";
+import {
+  formatVehicleDoors,
+  formatVehicleMileage,
+  formatVehicleVersion,
+  getVehicleDisplayTitle,
+  getVehicleHeadline,
+  getVehicleDoorsValue,
+  getVehicleMileageValue,
+  getVehicleVersionValue,
+} from "@/lib/vehiclePresentation";
 
 type SearchResultsListProps = {
   listings: DisplayListing[];
@@ -28,10 +37,11 @@ export function SearchResultsList({
   return (
     <div className="space-y-4">
       {listings.map((listing) => {
-        const mileageLabel = formatVehicleMileage(listing.surface);
-        const versionLabel = formatVehicleVersion(listing.rooms);
-        const doorsLabel = formatVehicleDoors(listing.bathrooms);
-        const vehicleHeadline = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year].filter(Boolean).join(" ");
+        const displayTitle = getVehicleDisplayTitle(listing);
+        const mileageLabel = formatVehicleMileage(getVehicleMileageValue(listing));
+        const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
+        const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
+        const vehicleHeadline = getVehicleHeadline(listing);
         return (
         <div
           key={listing.id}
@@ -46,7 +56,7 @@ export function SearchResultsList({
           >
             <img
               src={listing.images[0] ?? imagePlaceholder}
-              alt={listing.title}
+              alt={displayTitle}
               className="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
@@ -64,7 +74,7 @@ export function SearchResultsList({
                 onFocus={() => void prefetchListing(queryClient, listing.id)}
                 onTouchStart={() => void prefetchListing(queryClient, listing.id)}
               >
-                <h2 className="font-serif font-semibold text-lg hover:text-primary transition-colors">{listing.title}</h2>
+                <h2 className="font-serif font-semibold text-lg hover:text-primary transition-colors">{displayTitle}</h2>
                 {vehicleHeadline && <p className="text-xs text-muted-foreground font-sans mt-1">{vehicleHeadline}</p>}
               </Link>
               {showCloseMatchBadges && (
@@ -79,6 +89,7 @@ export function SearchResultsList({
                 {doorsLabel && <span>{doorsLabel}</span>}
                 {listing.vehicle?.fuel && <span>{listing.vehicle.fuel}</span>}
                 {listing.vehicle?.transmission && <span>{listing.vehicle.transmission}</span>}
+                {listing.vehicle?.bodyStyle && <span>{listing.vehicle.bodyStyle}</span>}
                 <span>{listing.ville}</span>
               </div>
             </div>
