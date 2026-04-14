@@ -1,8 +1,73 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+
+const EMPTY_OPTION = "__empty__";
+
+const FUEL_OPTIONS = [
+  { value: "Essence", label: "Essence" },
+  { value: "Diesel", label: "Diesel" },
+  { value: "Hybride", label: "Hybride" },
+  { value: "Hybride rechargeable", label: "Hybride rechargeable" },
+  { value: "Électrique", label: "Électrique" },
+];
+
+const TRANSMISSION_OPTIONS = [
+  { value: "Boîte manuelle", label: "Manuelle" },
+  { value: "Boîte automatique", label: "Automatique" },
+];
+
+const DRIVETRAIN_OPTIONS = [
+  { value: "4x2", label: "4x2" },
+  { value: "4x4", label: "4x4" },
+  { value: "Traction", label: "Traction" },
+  { value: "Propulsion", label: "Propulsion" },
+  { value: "AWD", label: "AWD" },
+];
+
+const CONDITION_OPTIONS = [
+  { value: "neuf", label: "Neuf" },
+  { value: "occasion", label: "Occasion" },
+];
+
+const SELLER_OPTIONS = [
+  { value: "particulier", label: "Particulier" },
+  { value: "concessionnaire", label: "Concessionnaire" },
+];
+
+const RENTAL_MODE_OPTIONS = [
+  { value: "none", label: "Aucune location" },
+  { value: "short_term", label: "Courte durée" },
+  { value: "long_term", label: "Longue durée" },
+];
+
+const BODY_STYLE_OPTIONS = [
+  { value: "citadine", label: "Citadine" },
+  { value: "berline", label: "Berline" },
+  { value: "suv_4x4", label: "SUV / 4x4" },
+  { value: "crossover", label: "Crossover" },
+  { value: "pick_up", label: "Pick-up" },
+  { value: "coupe", label: "Coupé" },
+  { value: "cabriolet", label: "Cabriolet" },
+  { value: "utilitaire_leger", label: "Utilitaire léger" },
+  { value: "van_fourgon", label: "Van / Fourgon" },
+  { value: "minibus_bus", label: "Minibus / Bus" },
+  { value: "camion", label: "Camion" },
+  { value: "moto", label: "Moto" },
+  { value: "scooter", label: "Scooter" },
+  { value: "quad", label: "Quad" },
+  { value: "buggy", label: "Buggy" },
+];
+
+const AVAILABILITY_OPTIONS = [
+  { value: "disponible", label: "Disponible" },
+  { value: "reserve", label: "Réservé" },
+  { value: "vendu", label: "Vendu" },
+  { value: "en_arrivage", label: "En arrivage" },
+];
 
 type PublishDetailsSectionProps = {
   showRooms: boolean;
@@ -162,7 +227,19 @@ export function PublishDetailsSection({
         </div>
         <div className="space-y-2">
           <Label className="font-sans">État</Label>
-          <Input value={condition} onChange={(e) => onConditionChange(e.target.value)} className="font-sans" placeholder="neuf / occasion / importé" />
+          <Select value={condition || EMPTY_OPTION} onValueChange={(v) => onConditionChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner un état" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {CONDITION_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-3.5 md:gap-4`}>
@@ -194,29 +271,101 @@ export function PublishDetailsSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Carburant</Label>
-          <Input value={fuel} onChange={(e) => onFuelChange(e.target.value)} className="font-sans" placeholder="Essence, Diesel..." />
+          <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => onFuelChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner un carburant" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {FUEL_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Boîte</Label>
-          <Input value={transmission} onChange={(e) => onTransmissionChange(e.target.value)} className="font-sans" placeholder="Manuelle / Automatique" />
+          <Select value={transmission || EMPTY_OPTION} onValueChange={(v) => onTransmissionChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner une boîte" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {TRANSMISSION_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Motricité</Label>
-          <Input value={drivetrain} onChange={(e) => onDrivetrainChange(e.target.value)} className="font-sans" placeholder="4x2 / 4x4 / AWD" />
+          <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => onDrivetrainChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner une motricité" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {DRIVETRAIN_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Type vendeur</Label>
-          <Input value={sellerType} onChange={(e) => onSellerTypeChange(e.target.value)} className="font-sans" placeholder="particulier / concessionnaire" />
+          <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => onSellerTypeChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner un vendeur" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {SELLER_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Carrosserie</Label>
-          <Input value={bodyStyle} onChange={(e) => onBodyStyleChange(e.target.value)} className="font-sans" placeholder="SUV, berline, pick-up..." />
+          <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => onBodyStyleChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner une carrosserie" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {BODY_STYLE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Mode location</Label>
-          <Input value={rentalMode} onChange={(e) => onRentalModeChange(e.target.value)} className="font-sans" placeholder="court terme / longue durée" />
+          <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => onRentalModeChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner un mode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {RENTAL_MODE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Portes</Label>
@@ -238,7 +387,19 @@ export function PublishDetailsSection({
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Disponibilité</Label>
-          <Input value={availabilityStatus} onChange={(e) => onAvailabilityStatusChange(e.target.value)} className="font-sans" placeholder="disponible / réservé" />
+          <Select value={availabilityStatus || EMPTY_OPTION} onValueChange={(v) => onAvailabilityStatusChange(v === EMPTY_OPTION ? "" : v)}>
+            <SelectTrigger className="font-sans">
+              <SelectValue placeholder="Sélectionner une disponibilité" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+              {AVAILABILITY_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">WhatsApp (optionnel)</Label>

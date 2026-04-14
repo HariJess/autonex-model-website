@@ -10,6 +10,31 @@ export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
 
 const LOCAL_KEY_PREFIX = "immonex.publishDraft.v1";
 
+const CONTROLLED_FUEL_VALUES = ["Essence", "Diesel", "Hybride", "Hybride rechargeable", "Électrique"] as const;
+const CONTROLLED_TRANSMISSION_VALUES = ["Boîte manuelle", "Boîte automatique"] as const;
+const CONTROLLED_DRIVETRAIN_VALUES = ["4x2", "4x4", "Traction", "Propulsion", "AWD"] as const;
+const CONTROLLED_CONDITION_VALUES = ["neuf", "occasion"] as const;
+const CONTROLLED_SELLER_VALUES = ["particulier", "concessionnaire"] as const;
+const CONTROLLED_RENTAL_MODE_VALUES = ["none", "short_term", "long_term"] as const;
+const CONTROLLED_BODY_STYLE_VALUES = [
+  "citadine",
+  "berline",
+  "suv_4x4",
+  "crossover",
+  "pick_up",
+  "coupe",
+  "cabriolet",
+  "utilitaire_leger",
+  "van_fourgon",
+  "minibus_bus",
+  "camion",
+  "moto",
+  "scooter",
+  "quad",
+  "buggy",
+] as const;
+const CONTROLLED_AVAILABILITY_VALUES = ["disponible", "reserve", "vendu", "en_arrivage"] as const;
+
 export type LocalPublishBackupV1 = {
   v: 1;
   draftListingId: string;
@@ -251,10 +276,29 @@ export function formToListingUpdate(input: {
   /** When true, title/description can stay short */
   isDraftSave: boolean;
 }): TablesUpdate<"listings"> {
+  const normalizeKey = (value: string): string =>
+    value
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
   const normalizeText = (value: string, max = 120): string | null => {
     const trimmed = value.trim().replace(/\s+/g, " ");
     if (!trimmed) return null;
     return trimmed.slice(0, max);
+  };
+  const normalizeControlledValue = <T extends readonly string[]>(
+    value: string,
+    allowedValues: T,
+    aliasMap?: Record<string, T[number]>,
+  ): T[number] | null => {
+    const raw = value.trim();
+    if (!raw) return null;
+    const direct = allowedValues.find((candidate) => candidate === raw);
+    if (direct) return direct;
+    const key = normalizeKey(raw);
+    if (aliasMap && aliasMap[key]) return aliasMap[key];
+    return null;
   };
   const normalizeInt = (value: string, min: number, max?: number): number | null => {
     const n = Number(value);
@@ -289,16 +333,87 @@ export function formToListingUpdate(input: {
   const doors = normalizeInt(input.vehicleDoors, 0, 8) ?? doorsLegacy;
   const make = normalizeText(input.vehicleMake, 80);
   const model = normalizeText(input.vehicleModel, 100);
-  const fuel = normalizeText(input.vehicleFuel, 60);
-  const transmission = normalizeText(input.vehicleTransmission, 80);
-  const drivetrain = normalizeText(input.vehicleDrivetrain, 80);
-  const condition = normalizeText(input.vehicleCondition, 40);
-  const sellerType = normalizeText(input.vehicleSellerType, 40);
-  const rentalMode = normalizeText(input.vehicleRentalMode, 40);
-  const bodyStyle = normalizeText(input.vehicleBodyStyle, 60);
+  const fuel =
+    normalizeControlledValue(input.vehicleFuel, CONTROLLED_FUEL_VALUES, {
+      essence: "Essence",
+      diesel: "Diesel",
+      hybride: "Hybride",
+      "hybride rechargeable": "Hybride rechargeable",
+      electrique: "Électrique",
+    }) ?? normalizeText(input.vehicleFuel, 60);
+  const transmission =
+    normalizeControlledValue(input.vehicleTransmission, CONTROLLED_TRANSMISSION_VALUES, {
+      manuelle: "Boîte manuelle",
+      "boite manuelle": "Boîte manuelle",
+      automatique: "Boîte automatique",
+      "boite automatique": "Boîte automatique",
+    }) ?? normalizeText(input.vehicleTransmission, 80);
+  const drivetrain =
+    normalizeControlledValue(input.vehicleDrivetrain, CONTROLLED_DRIVETRAIN_VALUES, {
+      traction: "Traction",
+      propulsion: "Propulsion",
+      awd: "AWD",
+      "4x2": "4x2",
+      "4x4": "4x4",
+    }) ?? normalizeText(input.vehicleDrivetrain, 80);
+  const condition =
+    normalizeControlledValue(input.vehicleCondition, CONTROLLED_CONDITION_VALUES, {
+      neuf: "neuf",
+      occasion: "occasion",
+    }) ?? normalizeText(input.vehicleCondition, 40);
+  const sellerType =
+    normalizeControlledValue(input.vehicleSellerType, CONTROLLED_SELLER_VALUES, {
+      particulier: "particulier",
+      concessionnaire: "concessionnaire",
+      agence: "concessionnaire",
+    }) ?? normalizeText(input.vehicleSellerType, 40);
+  const rentalMode =
+    normalizeControlledValue(input.vehicleRentalMode, CONTROLLED_RENTAL_MODE_VALUES, {
+      none: "none",
+      "non applicable": "none",
+      "court terme": "short_term",
+      "courte duree": "short_term",
+      short_term: "short_term",
+      "long terme": "long_term",
+      "longue duree": "long_term",
+      long_term: "long_term",
+    }) ?? normalizeText(input.vehicleRentalMode, 40);
+  const bodyStyle =
+    normalizeControlledValue(input.vehicleBodyStyle, CONTROLLED_BODY_STYLE_VALUES, {
+      citadine: "citadine",
+      berline: "berline",
+      suv: "suv_4x4",
+      "suv 4x4": "suv_4x4",
+      suv_4x4: "suv_4x4",
+      crossover: "crossover",
+      "pick-up": "pick_up",
+      pickup: "pick_up",
+      pick_up: "pick_up",
+      coupe: "coupe",
+      cabriolet: "cabriolet",
+      "utilitaire leger": "utilitaire_leger",
+      utilitaire_leger: "utilitaire_leger",
+      "van fourgon": "van_fourgon",
+      van_fourgon: "van_fourgon",
+      "minibus bus": "minibus_bus",
+      minibus_bus: "minibus_bus",
+      camion: "camion",
+      moto: "moto",
+      scooter: "scooter",
+      quad: "quad",
+      buggy: "buggy",
+    }) ?? normalizeText(input.vehicleBodyStyle, 60);
   const exteriorColor = normalizeText(input.vehicleExteriorColor, 40);
   const interiorColor = normalizeText(input.vehicleInteriorColor, 40);
-  const availabilityStatus = normalizeText(input.vehicleAvailabilityStatus, 40);
+  const availabilityStatus =
+    normalizeControlledValue(input.vehicleAvailabilityStatus, CONTROLLED_AVAILABILITY_VALUES, {
+      disponible: "disponible",
+      reserve: "reserve",
+      "reservé": "reserve",
+      vendu: "vendu",
+      "en arrivage": "en_arrivage",
+      en_arrivage: "en_arrivage",
+    }) ?? normalizeText(input.vehicleAvailabilityStatus, 40);
   const whatsappPhone = normalizeText(input.vehicleWhatsappPhone, 30);
 
   const boostPayload: string[] = [...input.selectedBoosts];
