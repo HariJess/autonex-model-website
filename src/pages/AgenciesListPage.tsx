@@ -12,7 +12,7 @@ const AgenciesListPage = () => {
   const { t } = useTranslation();
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/agences`
-    : "https://immonex.mg/agences";
+    : "https://autonex.mg/agences";
 
   const { data: agencies = [], isLoading, error } = useQuery({
     queryKey: ["agencies-list"],

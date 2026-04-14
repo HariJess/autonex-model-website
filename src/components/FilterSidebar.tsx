@@ -99,8 +99,8 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                 </div>
                 {[
                   { value: "vente", label: t("transaction.sale", "Acheter") },
-                  { value: "location", label: t("transaction.rent", "Vendre") },
-                  { value: "location_vacances", label: t("transaction.vacation", "Location courte durée") },
+                  { value: "location", label: t("transaction.rent", "Louer") },
+                  { value: "location_vacances", label: t("transaction.vacation", "Louer court terme") },
                 ].map((opt) => (
                   <div key={opt.value} className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
                     <RadioGroupItem value={opt.value} id={`${pid}tr-${opt.value}`} />

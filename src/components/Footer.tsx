@@ -17,9 +17,9 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Links 1 */}
+          {/* Automotive links */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-base md:text-lg">{t("footer.realEstate")}</h4>
+            <h4 className="font-semibold text-base md:text-lg">{t("footer.automotive", "Automobile")}</h4>
             <div className="flex flex-col gap-2 text-sm font-sans opacity-70">
               <Link to="/recherche?transaction=vente" className="hover:opacity-100 transition-opacity">{t("nav.buy")}</Link>
               <Link to="/recherche?transaction=location" className="hover:opacity-100 transition-opacity">{t("nav.rent")}</Link>

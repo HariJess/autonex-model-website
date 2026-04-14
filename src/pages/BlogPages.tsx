@@ -19,7 +19,7 @@ const BlogList = () => {
   const fallbackCover = "/placeholder.svg";
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/conseils`
-    : "https://immonex.mg/conseils";
+    : "https://autonex.mg/conseils";
 
   return (
     <>
@@ -87,7 +87,7 @@ const BlogArticle = () => {
   const fallbackCover = "/placeholder.svg";
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/conseils/${slug}`
-    : `https://immonex.mg/conseils/${slug}`;
+    : `https://autonex.mg/conseils/${slug}`;
 
   if (!post) {
     return (

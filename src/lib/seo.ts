@@ -1,4 +1,4 @@
-const DEFAULT_SITE_BASE_URL = "https://immonex.mg";
+const DEFAULT_SITE_BASE_URL = "https://autonex.mg";
 
 function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, "");
