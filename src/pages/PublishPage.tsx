@@ -56,7 +56,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Json } from "@/integrations/supabase/types";
+import type { Json, Tables } from "@/integrations/supabase/types";
 import { PublishPageHeader } from "@/pages/publish/components/PublishPageHeader";
 import { PublishProgressSteps } from "@/pages/publish/components/PublishProgressSteps";
 import { PublishStepErrors } from "@/pages/publish/components/PublishStepErrors";
@@ -174,6 +174,63 @@ const PublishPage = () => {
     },
   });
 
+  const setDraftMode = useCallback(() => {
+    setIsPublishedListingEdit(false);
+    setListingModerationStatus(null);
+    baselineMaterialSnapshotRef.current = "";
+  }, []);
+
+  const applyListingRowToFormState = useCallback((row: Tables<"listings">) => {
+    hydratingRef.current = true;
+    const fs = listingRowToFormState(row);
+    setTransaction(fs.transaction);
+    setListingType(sanitizeListingTypeForTransaction(fs.transaction, fs.listingType));
+    setIsNewProgram(fs.isNewProgram);
+    setInternalRef(fs.internalRef);
+    setVille(fs.ville);
+    setArrondissement(fs.arrondissement);
+    setQuartier(fs.quartier);
+    setQuartierLibre(fs.quartierLibre);
+    setPinLat(fs.pinLat);
+    setPinLng(fs.pinLng);
+    lastAutoVilleRef.current = fs.ville || "";
+    setTitle(fs.title);
+    setDescription(fs.description);
+    setPriceMga(fs.priceMga);
+    setSurface(fs.surface);
+    setRooms(fs.rooms);
+    setBathrooms(fs.bathrooms);
+    setToilets(fs.toilets);
+    setSelectedFeatures(fs.selectedFeatures);
+    const meta = parseVehicleMetaTags(
+      Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
+    );
+    setVehicleMake(fs.vehicleMake || meta.make || "");
+    setVehicleModel(fs.vehicleModel || meta.model || "");
+    setVehicleYear(fs.vehicleYear || (meta.year != null ? String(meta.year) : ""));
+    setVehicleFuel(fs.vehicleFuel || meta.fuel || "");
+    setVehicleTransmission(fs.vehicleTransmission || meta.transmission || "");
+    setVehicleDrivetrain(fs.vehicleDrivetrain || meta.drivetrain || "");
+    setVehicleCondition(fs.vehicleCondition || meta.condition || "");
+    setVehicleSellerType(fs.vehicleSellerType || meta.sellerType || "");
+    setVehicleRentalMode(fs.vehicleRentalMode);
+    setVehicleBodyStyle(fs.vehicleBodyStyle);
+    setVehicleDoors(fs.vehicleDoors);
+    setVehicleSeats(fs.vehicleSeats);
+    setVehicleExteriorColor(fs.vehicleExteriorColor);
+    setVehicleInteriorColor(fs.vehicleInteriorColor);
+    setVehicleAvailabilityStatus(fs.vehicleAvailabilityStatus);
+    setVehicleWhatsappPhone(fs.vehicleWhatsappPhone);
+    setVehicleIsElectric(fs.vehicleIsElectric);
+    setVehicleIsHybrid(fs.vehicleIsHybrid);
+    setVideoUrl(fs.videoUrl);
+    setVirtualTourUrl(fs.virtualTourUrl);
+    setSelectedBoosts(fs.selectedBoosts);
+    setAgencySpotlight(fs.agencySpotlight);
+    setStep(fs.step);
+    setDraftListingId(row.id);
+  }, []);
+
   useEffect(() => {
     refreshProfile();
   }, [refreshProfile]);
@@ -230,9 +287,7 @@ const PublishPage = () => {
         const draftParam = spDraft;
 
         if (wantNew) {
-          setIsPublishedListingEdit(false);
-          setListingModerationStatus(null);
-          baselineMaterialSnapshotRef.current = "";
+          setDraftMode();
           const id = await createDraftListing(user.id);
           if (cancelled) return;
           setDraftListingId(id);
@@ -255,54 +310,7 @@ const PublishPage = () => {
             navigate("/dashboard");
             return;
           }
-          hydratingRef.current = true;
-          const fs = listingRowToFormState(row);
-          setTransaction(fs.transaction);
-          setListingType(sanitizeListingTypeForTransaction(fs.transaction, fs.listingType));
-          setIsNewProgram(fs.isNewProgram);
-          setInternalRef(fs.internalRef);
-          setVille(fs.ville);
-          setArrondissement(fs.arrondissement);
-          setQuartier(fs.quartier);
-          setQuartierLibre(fs.quartierLibre);
-          setPinLat(fs.pinLat);
-          setPinLng(fs.pinLng);
-          lastAutoVilleRef.current = fs.ville || "";
-          setTitle(fs.title);
-          setDescription(fs.description);
-          setPriceMga(fs.priceMga);
-          setSurface(fs.surface);
-          setRooms(fs.rooms);
-          setBathrooms(fs.bathrooms);
-          setToilets(fs.toilets);
-          setSelectedFeatures(fs.selectedFeatures);
-          const meta = parseVehicleMetaTags(
-            Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
-          );
-          setVehicleMake(fs.vehicleMake || meta.make || "");
-          setVehicleModel(fs.vehicleModel || meta.model || "");
-          setVehicleYear(fs.vehicleYear || (meta.year != null ? String(meta.year) : ""));
-          setVehicleFuel(fs.vehicleFuel || meta.fuel || "");
-          setVehicleTransmission(fs.vehicleTransmission || meta.transmission || "");
-          setVehicleDrivetrain(fs.vehicleDrivetrain || meta.drivetrain || "");
-          setVehicleCondition(fs.vehicleCondition || meta.condition || "");
-          setVehicleSellerType(fs.vehicleSellerType || meta.sellerType || "");
-          setVehicleRentalMode(fs.vehicleRentalMode);
-          setVehicleBodyStyle(fs.vehicleBodyStyle);
-          setVehicleDoors(fs.vehicleDoors);
-          setVehicleSeats(fs.vehicleSeats);
-          setVehicleExteriorColor(fs.vehicleExteriorColor);
-          setVehicleInteriorColor(fs.vehicleInteriorColor);
-          setVehicleAvailabilityStatus(fs.vehicleAvailabilityStatus);
-          setVehicleWhatsappPhone(fs.vehicleWhatsappPhone);
-          setVehicleIsElectric(fs.vehicleIsElectric);
-          setVehicleIsHybrid(fs.vehicleIsHybrid);
-          setVideoUrl(fs.videoUrl);
-          setVirtualTourUrl(fs.virtualTourUrl);
-          setSelectedBoosts(fs.selectedBoosts);
-          setAgencySpotlight(fs.agencySpotlight);
-          setStep(fs.step);
-          setDraftListingId(row.id);
+          applyListingRowToFormState(row);
           setIsPublishedListingEdit(true);
           setListingModerationStatus(row.status);
           const photos = await fetchListingPhotos(row.id);
@@ -329,57 +337,8 @@ const PublishPage = () => {
             navigate("/dashboard");
             return;
           }
-          setIsPublishedListingEdit(false);
-          setListingModerationStatus(null);
-          baselineMaterialSnapshotRef.current = "";
-          hydratingRef.current = true;
-          const fs = listingRowToFormState(row);
-          setTransaction(fs.transaction);
-          setListingType(sanitizeListingTypeForTransaction(fs.transaction, fs.listingType));
-          setIsNewProgram(fs.isNewProgram);
-          setInternalRef(fs.internalRef);
-          setVille(fs.ville);
-          setArrondissement(fs.arrondissement);
-          setQuartier(fs.quartier);
-          setQuartierLibre(fs.quartierLibre);
-          setPinLat(fs.pinLat);
-          setPinLng(fs.pinLng);
-          lastAutoVilleRef.current = fs.ville || "";
-          setTitle(fs.title);
-          setDescription(fs.description);
-          setPriceMga(fs.priceMga);
-          setSurface(fs.surface);
-          setRooms(fs.rooms);
-          setBathrooms(fs.bathrooms);
-          setToilets(fs.toilets);
-          setSelectedFeatures(fs.selectedFeatures);
-          const meta = parseVehicleMetaTags(
-            Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
-          );
-          setVehicleMake(fs.vehicleMake || meta.make || "");
-          setVehicleModel(fs.vehicleModel || meta.model || "");
-          setVehicleYear(fs.vehicleYear || (meta.year != null ? String(meta.year) : ""));
-          setVehicleFuel(fs.vehicleFuel || meta.fuel || "");
-          setVehicleTransmission(fs.vehicleTransmission || meta.transmission || "");
-          setVehicleDrivetrain(fs.vehicleDrivetrain || meta.drivetrain || "");
-          setVehicleCondition(fs.vehicleCondition || meta.condition || "");
-          setVehicleSellerType(fs.vehicleSellerType || meta.sellerType || "");
-          setVehicleRentalMode(fs.vehicleRentalMode);
-          setVehicleBodyStyle(fs.vehicleBodyStyle);
-          setVehicleDoors(fs.vehicleDoors);
-          setVehicleSeats(fs.vehicleSeats);
-          setVehicleExteriorColor(fs.vehicleExteriorColor);
-          setVehicleInteriorColor(fs.vehicleInteriorColor);
-          setVehicleAvailabilityStatus(fs.vehicleAvailabilityStatus);
-          setVehicleWhatsappPhone(fs.vehicleWhatsappPhone);
-          setVehicleIsElectric(fs.vehicleIsElectric);
-          setVehicleIsHybrid(fs.vehicleIsHybrid);
-          setVideoUrl(fs.videoUrl);
-          setVirtualTourUrl(fs.virtualTourUrl);
-          setSelectedBoosts(fs.selectedBoosts);
-          setAgencySpotlight(fs.agencySpotlight);
-          setStep(fs.step);
-          setDraftListingId(row.id);
+          setDraftMode();
+          applyListingRowToFormState(row);
           const photos = await fetchListingPhotos(row.id);
           if (cancelled) return;
           setServerPhotos(photos);
@@ -391,9 +350,7 @@ const PublishPage = () => {
           return;
         }
 
-        setIsPublishedListingEdit(false);
-        setListingModerationStatus(null);
-        baselineMaterialSnapshotRef.current = "";
+        setDraftMode();
         const id = await createDraftListing(user.id);
         if (cancelled) return;
         setDraftListingId(id);
@@ -413,7 +370,7 @@ const PublishPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [user?.id, spNew, spDraft, spEdit, navigate, t]);
+  }, [user?.id, spNew, spDraft, spEdit, navigate, t, applyListingRowToFormState, setDraftMode]);
 
   const persistDraft = useCallback(
     async (stepOverride?: number) => {
