@@ -36,6 +36,7 @@ import {
   getVehicleMileageValue,
   getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
+import type { DisplayListing } from "@/types/listing";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
@@ -57,6 +58,84 @@ function cleanSpec(value: string | number | null | undefined): string | null {
   if (value == null) return null;
   const asString = String(value).trim();
   return asString.length > 0 ? asString : null;
+}
+
+function getSellerLabel(listing: DisplayListing, t: (key: string, fallback?: string) => string): string | null {
+  return listing.vehicle?.sellerType === "concessionnaire"
+    ? t("listing.sellerDealer", "Concessionnaire")
+    : listing.vehicle?.sellerType === "particulier"
+      ? t("listing.sellerPrivate", "Particulier")
+      : null;
+}
+
+function buildVehicleSpecRows(listing: DisplayListing, sellerLabel: string | null, mileageLabel: string | null, doorsLabel: string | null) {
+  return [
+    { label: "Marque", value: cleanSpec(listing.vehicle?.make) },
+    { label: "Modèle", value: cleanSpec(listing.vehicle?.model) },
+    { label: "Année", value: cleanSpec(listing.vehicle?.year) },
+    { label: "Kilométrage", value: cleanSpec(mileageLabel) },
+    { label: "Carburant", value: cleanSpec(listing.vehicle?.fuel) },
+    { label: "Boîte", value: cleanSpec(listing.vehicle?.transmission) },
+    { label: "Motricité", value: cleanSpec(listing.vehicle?.drivetrain) },
+    { label: "Portes", value: cleanSpec(doorsLabel) },
+    { label: "Places", value: listing.vehicle?.seats != null && listing.vehicle.seats > 0 ? `${listing.vehicle.seats}` : null },
+    { label: "Carrosserie", value: cleanSpec(listing.vehicle?.bodyStyle) },
+    { label: "État", value: cleanSpec(listing.vehicle?.condition) },
+    { label: "Type vendeur", value: cleanSpec(sellerLabel) },
+    { label: "Couleur ext.", value: cleanSpec(listing.vehicle?.exteriorColor) },
+    { label: "Couleur int.", value: cleanSpec(listing.vehicle?.interiorColor) },
+    { label: "Disponibilité", value: cleanSpec(listing.vehicle?.availabilityStatus) },
+    { label: "Mode location", value: cleanSpec(listing.vehicle?.rentalMode) },
+  ].filter((item) => item.value);
+}
+
+function buildContactTrustHints(
+  listing: DisplayListing,
+  sellerLabel: string | null,
+  t: (key: string, fallback?: string) => string,
+) {
+  return [
+    sellerLabel ? `${t("listing.seller", "Vendeur")} : ${sellerLabel}` : null,
+    listing.vehicle?.availabilityStatus ? `${t("listing.availability", "Disponibilité")} : ${listing.vehicle.availabilityStatus}` : null,
+    listing.has_whatsapp_contact ? t("listing.whatsappReady", "Réponse WhatsApp disponible") : null,
+  ].filter(Boolean);
+}
+
+function getOwnerStatusHint(
+  listing: DisplayListing,
+  isOwner: boolean,
+  t: (key: string, fallback?: string) => string,
+): string | null {
+  const s = listing.status;
+  if (!isOwner || s === "active") return null;
+  if (s === "pending_review")
+    return t(
+      "listing.ownerPendingReview",
+      "Votre annonce est en cours de modération. Elle ne sera visible publiquement qu’après validation par notre équipe."
+    );
+  if (s === "pending_payment")
+    return t(
+      "listing.ownerPendingPayment",
+      "Paiement ou justificatif en attente de vérification. L’annonce reste hors ligne jusqu’à confirmation."
+    );
+  if (s === "pending_payment_verification")
+    return t(
+      "listing.ownerPendingPaymentVerification",
+      "Votre paiement est en cours de vérification par nos équipes. Les crédits seront attribués après validation du justificatif."
+    );
+  if (s === "rejected")
+    return listing.rejection_reason?.trim()
+      ? `${t("listing.ownerRejectedPrefix", "Annonce refusée")} : ${listing.rejection_reason.trim()}`
+      : t("listing.ownerRejected", "Cette annonce a été refusée. Contactez le support pour plus d’informations.");
+  if (s === "draft") return t("listing.ownerDraft", "Brouillon — terminez la publication depuis votre tableau de bord.");
+  if (s === "paused") return t("listing.ownerPaused", "Annonce en pause — elle n’apparaît pas dans la recherche.");
+  if (s === "expired") return t("listing.ownerExpired", "Annonce expirée.");
+  return t("listing.ownerNonActive", "Cette annonce n’est pas publiée actuellement.");
+}
+
+function getDisplayedPhone(phoneRevealed: boolean, revealedPhone: string | null, listing: DisplayListing, t: (key: string, fallback?: string) => string) {
+  if (!phoneRevealed) return t("listing.revealPhone");
+  return revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné");
 }
 
 const ListingDetail = () => {
@@ -303,62 +382,11 @@ const ListingDetail = () => {
   const mileageLabel = formatVehicleMileage(mileageValue);
   const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
   const vehicleSummary = getVehicleHeadline(listing);
-  const sellerLabel =
-    listing.vehicle?.sellerType === "concessionnaire"
-      ? t("listing.sellerDealer", "Concessionnaire")
-      : listing.vehicle?.sellerType === "particulier"
-        ? t("listing.sellerPrivate", "Particulier")
-        : null;
-  const vehicleSpecRows = [
-    { label: "Marque", value: cleanSpec(listing.vehicle?.make) },
-    { label: "Modèle", value: cleanSpec(listing.vehicle?.model) },
-    { label: "Année", value: cleanSpec(listing.vehicle?.year) },
-    { label: "Kilométrage", value: cleanSpec(mileageLabel) },
-    { label: "Carburant", value: cleanSpec(listing.vehicle?.fuel) },
-    { label: "Boîte", value: cleanSpec(listing.vehicle?.transmission) },
-    { label: "Motricité", value: cleanSpec(listing.vehicle?.drivetrain) },
-    { label: "Portes", value: cleanSpec(doorsLabel) },
-    { label: "Places", value: listing.vehicle?.seats != null && listing.vehicle.seats > 0 ? `${listing.vehicle.seats}` : null },
-    { label: "Carrosserie", value: cleanSpec(listing.vehicle?.bodyStyle) },
-    { label: "État", value: cleanSpec(listing.vehicle?.condition) },
-    { label: "Type vendeur", value: cleanSpec(sellerLabel) },
-    { label: "Couleur ext.", value: cleanSpec(listing.vehicle?.exteriorColor) },
-    { label: "Couleur int.", value: cleanSpec(listing.vehicle?.interiorColor) },
-    { label: "Disponibilité", value: cleanSpec(listing.vehicle?.availabilityStatus) },
-    { label: "Mode location", value: cleanSpec(listing.vehicle?.rentalMode) },
-  ].filter((item) => item.value);
-  const contactTrustHints = [
-    sellerLabel ? `${t("listing.seller", "Vendeur")} : ${sellerLabel}` : null,
-    listing.vehicle?.availabilityStatus ? `${t("listing.availability", "Disponibilité")} : ${listing.vehicle.availabilityStatus}` : null,
-    listing.has_whatsapp_contact ? t("listing.whatsappReady", "Réponse WhatsApp disponible") : null,
-  ].filter(Boolean);
-  const ownerStatusHint = (() => {
-    const s = listing.status;
-    if (!isOwner || s === "active") return null;
-    if (s === "pending_review")
-      return t(
-        "listing.ownerPendingReview",
-        "Votre annonce est en cours de modération. Elle ne sera visible publiquement qu’après validation par notre équipe."
-      );
-    if (s === "pending_payment")
-      return t(
-        "listing.ownerPendingPayment",
-        "Paiement ou justificatif en attente de vérification. L’annonce reste hors ligne jusqu’à confirmation."
-      );
-    if (s === "pending_payment_verification")
-      return t(
-        "listing.ownerPendingPaymentVerification",
-        "Votre paiement est en cours de vérification par nos équipes. Les crédits seront attribués après validation du justificatif."
-      );
-    if (s === "rejected")
-      return listing.rejection_reason?.trim()
-        ? `${t("listing.ownerRejectedPrefix", "Annonce refusée")} : ${listing.rejection_reason.trim()}`
-        : t("listing.ownerRejected", "Cette annonce a été refusée. Contactez le support pour plus d’informations.");
-    if (s === "draft") return t("listing.ownerDraft", "Brouillon — terminez la publication depuis votre tableau de bord.");
-    if (s === "paused") return t("listing.ownerPaused", "Annonce en pause — elle n’apparaît pas dans la recherche.");
-    if (s === "expired") return t("listing.ownerExpired", "Annonce expirée.");
-    return t("listing.ownerNonActive", "Cette annonce n’est pas publiée actuellement.");
-  })();
+  const sellerLabel = getSellerLabel(listing, t);
+  const vehicleSpecRows = buildVehicleSpecRows(listing, sellerLabel, mileageLabel, doorsLabel);
+  const contactTrustHints = buildContactTrustHints(listing, sellerLabel, t);
+  const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);
+  const displayedPhone = getDisplayedPhone(phoneRevealed, revealedPhone, listing, t);
   const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
   const listingTitle = composePageTitle(displayTitle);
   const listingDescription = truncateMetaDescription(
@@ -744,9 +772,7 @@ const ListingDetail = () => {
                 style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
               >
                 <Phone className="h-4 w-4 mr-2" />
-                {phoneRevealed
-                  ? (revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné"))
-                  : t("listing.revealPhone")}
+                {displayedPhone}
               </Button>
 
               {listing.has_whatsapp_contact ? (
@@ -818,9 +844,7 @@ const ListingDetail = () => {
               style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
             >
               <Phone className="h-4 w-4 shrink-0" />
-              {phoneRevealed
-                ? (revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné"))
-                : t("listing.revealPhone")}
+              {displayedPhone}
             </Button>
           </div>
           {listing.has_whatsapp_contact ? (
