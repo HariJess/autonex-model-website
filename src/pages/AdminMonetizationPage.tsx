@@ -2,8 +2,6 @@ import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -154,8 +152,7 @@ const AdminMonetizationPage = () => {
       <Helmet>
         <title>Admin — Monétisation — ImmoNex</title>
       </Helmet>
-      <Header />
-      <div className="container mx-auto px-4 py-8 max-w-4xl space-y-10">
+      <div className="max-w-4xl space-y-10">
         <div>
           <h1 className="font-serif text-2xl font-bold">Monétisation (admin)</h1>
           <p className="text-sm text-muted-foreground font-sans mt-1">
@@ -327,7 +324,6 @@ const AdminMonetizationPage = () => {
           </CardContent>
         </Card>
       </div>
-      <Footer />
     </>
   );
 };

@@ -1,8 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, ArrowLeft } from "lucide-react";
@@ -30,12 +28,11 @@ const AdminSearchInsightsPage = () => {
       <Helmet>
         <title>Admin — Recherche — ImmoNex</title>
       </Helmet>
-      <Header />
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="max-w-6xl">
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <Button variant="ghost" size="sm" asChild className="font-sans">
-            <Link to="/dashboard">
-              <ArrowLeft className="h-4 w-4 mr-1" /> Tableau de bord
+            <Link to="/admin/overview">
+              <ArrowLeft className="h-4 w-4 mr-1" /> Vue d’ensemble
             </Link>
           </Button>
           <h1 className="font-serif text-2xl font-bold">Signaux de recherche (aperçu)</h1>
@@ -99,7 +96,6 @@ const AdminSearchInsightsPage = () => {
           </div>
         )}
       </div>
-      <Footer />
     </>
   );
 };

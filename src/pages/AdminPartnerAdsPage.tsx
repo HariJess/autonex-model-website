@@ -4,8 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Upload } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -186,8 +184,7 @@ const AdminPartnerAdsPage = () => {
       <Helmet>
         <title>Admin — Campagnes partenaires — ImmoNex</title>
       </Helmet>
-      <Header />
-      <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
+      <div className="max-w-6xl space-y-8">
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="ghost" size="sm" asChild className="font-sans">
             <Link to="/admin/monetisation">
@@ -389,7 +386,6 @@ const AdminPartnerAdsPage = () => {
           </CardContent>
         </Card>
       </div>
-      <Footer />
     </>
   );
 };

@@ -24,7 +24,7 @@ type Listing = Tables<"listings">;
 
 const Dashboard = () => {
   const { t } = useTranslation();
-  const { user, profile, isAdmin } = useAuth();
+  const { user, profile } = useAuth();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -281,7 +281,6 @@ const Dashboard = () => {
         <DashboardHeader
           title={t("dashboard.title")}
           accountRoleLabel={accountRoleLabel}
-          isAdmin={isAdmin}
           publishLabel={t("nav.publish")}
         />
 

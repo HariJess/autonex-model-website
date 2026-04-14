@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +23,11 @@ const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const AdminMonetizationPage = lazy(() => import("./pages/AdminMonetizationPage.tsx"));
 const AdminSearchInsightsPage = lazy(() => import("./pages/AdminSearchInsightsPage.tsx"));
 const AdminPartnerAdsPage = lazy(() => import("./pages/AdminPartnerAdsPage.tsx"));
+const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.tsx"));
+const AdminLayout = lazy(() => import("./pages/AdminLayout.tsx"));
+const AdminOverviewPage = lazy(() => import("./pages/AdminOverviewPage.tsx"));
+const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage.tsx"));
+const AdminModerationPage = lazy(() => import("./pages/AdminModerationPage.tsx"));
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
@@ -64,9 +69,16 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/admin/monetisation" element={<AdminRoute><AdminMonetizationPage /></AdminRoute>} />
-            <Route path="/admin/recherche" element={<AdminRoute><AdminSearchInsightsPage /></AdminRoute>} />
-            <Route path="/admin/partenaires" element={<AdminRoute><AdminPartnerAdsPage /></AdminRoute>} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+              <Route index element={<Navigate to="/admin/overview" replace />} />
+              <Route path="overview" element={<AdminOverviewPage />} />
+              <Route path="utilisateurs" element={<AdminUsersPage />} />
+              <Route path="moderation" element={<AdminModerationPage />} />
+              <Route path="monetisation" element={<AdminMonetizationPage />} />
+              <Route path="recherche" element={<AdminSearchInsightsPage />} />
+              <Route path="partenaires" element={<AdminPartnerAdsPage />} />
+            </Route>
             <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />
