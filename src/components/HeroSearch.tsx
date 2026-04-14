@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 import { Search, MapPin, Euro, Banknote } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import LocationSelector from "@/components/LocationSelector";
@@ -22,6 +23,7 @@ const TRANSACTIONS = [
 ];
 
 const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
+const HERO_FUEL_OPTIONS = ["Essence", "Diesel", "Hybride", "Électrique"];
 
 const HeroSearch = () => {
   const { t } = useTranslation();
@@ -54,6 +56,9 @@ const HeroSearch = () => {
   const [desktopBudgetOpen, setDesktopBudgetOpen] = useState(false);
   const [mobileBudgetOpen, setMobileBudgetOpen] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
+  const [modelQuery, setModelQuery] = useState("");
+  const [yearMin, setYearMin] = useState(0);
+  const [fuel, setFuel] = useState("");
 
   const showBrand = !type || !NO_ROOMS_TYPES.has(type);
 
@@ -71,15 +76,15 @@ const HeroSearch = () => {
       priceMin,
       priceMax,
       rooms: [],
-      fuels: [],
       transmissions: [],
       drivetrains: [],
       conditions: [],
       sellerTypes: [],
       brands: brand ? [brand] : [],
-      modelQuery: "",
-      yearMin: 0,
+      modelQuery,
+      yearMin,
       yearMax: 0,
+      fuels: fuel ? [fuel] : [],
     };
   };
 
@@ -252,6 +257,50 @@ const HeroSearch = () => {
               </div>
             </div>
 
+            <div className="hidden lg:grid grid-cols-12 gap-2 mt-2 rounded-xl border border-border/70 bg-background/70 p-2">
+              <div className="col-span-6">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                  Modèle
+                </label>
+                <Input
+                  value={modelQuery}
+                  onChange={(e) => setModelQuery(e.target.value)}
+                  placeholder="Ex: RAV4, Hilux, NMAX..."
+                  className="h-9 font-sans text-sm"
+                />
+              </div>
+              <div className="col-span-3">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                  Année min
+                </label>
+                <Input
+                  type="number"
+                  min={1950}
+                  max={2100}
+                  value={yearMin || ""}
+                  onChange={(e) => setYearMin(Number(e.target.value) || 0)}
+                  placeholder="Ex: 2019"
+                  className="h-9 font-sans text-sm"
+                />
+              </div>
+              <div className="col-span-3">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                  Carburant
+                </label>
+                <Select value={fuel || "all"} onValueChange={(v) => setFuel(v === "all" ? "" : v)}>
+                  <SelectTrigger className="h-9 font-sans text-sm">
+                    <SelectValue placeholder="Tous" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous</SelectItem>
+                    {HERO_FUEL_OPTIONS.map((opt) => (
+                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             <div className="lg:hidden space-y-3">
               <Select value={type} onValueChange={handleTypeChange}>
                 <SelectTrigger className="font-sans min-h-11">
@@ -320,6 +369,35 @@ const HeroSearch = () => {
                   </SelectContent>
                 </Select>
               )}
+
+              <Input
+                value={modelQuery}
+                onChange={(e) => setModelQuery(e.target.value)}
+                placeholder="Modèle (ex: RAV4, Hilux...)"
+                className="font-sans min-h-11"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  type="number"
+                  min={1950}
+                  max={2100}
+                  value={yearMin || ""}
+                  onChange={(e) => setYearMin(Number(e.target.value) || 0)}
+                  placeholder="Année min"
+                  className="font-sans min-h-11"
+                />
+                <Select value={fuel || "all"} onValueChange={(v) => setFuel(v === "all" ? "" : v)}>
+                  <SelectTrigger className="font-sans min-h-11">
+                    <SelectValue placeholder="Carburant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous carburants</SelectItem>
+                    {HERO_FUEL_OPTIONS.map((opt) => (
+                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
               <Button
                 type="button"

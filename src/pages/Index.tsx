@@ -21,7 +21,6 @@ import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import {
   AUTO_DISCOVERY_CATEGORIES,
   AUTO_HOMEPAGE_BRANDS,
-  AUTO_TRANSACTION_MODES,
   type AutoDiscoveryCategory,
 } from "@/data/automotiveCatalog";
 
@@ -130,28 +129,62 @@ const Index = () => {
 
       <HeroSearch />
 
-      <section className="container mx-auto px-4 pt-8 pb-2">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {AUTO_TRANSACTION_MODES.map((mode) => (
-            <Link
-              key={mode.id}
-              to={mode.href}
-              className="rounded-2xl border border-border/80 bg-card hover:border-primary/30 hover:bg-primary/[0.03] transition-colors p-4 shadow-sm"
-            >
-              <p className="text-sm font-semibold font-sans text-foreground">{mode.label}</p>
-              <p className="text-xs text-muted-foreground font-sans mt-1">
-                {mode.id === "acheter" && "Explorez le stock actif par marque, budget et ville."}
-                {mode.id === "vendre" && "Publiez rapidement votre véhicule avec un parcours guidé."}
-                {mode.id === "location_courte" && "Trouver des véhicules pour quelques jours ou semaines."}
-                {mode.id === "location_longue" && "Offres dédiées professionnels, long terme et flotte."}
-                {mode.id === "concessionnaires" && "Accédez aux professionnels vérifiés et à leur stock."}
-              </p>
-            </Link>
-          ))}
+      {homeSponsorEnabled && homeSponsorCampaign && (
+        <section className="container mx-auto px-4 pt-6 pb-2">
+          <BannerSlot
+            enabled
+            title={homeSponsorCampaign.advertiser_name}
+            subtitle="Contenu sponsorisé"
+            href={homeSponsorCampaign.destination_url}
+            ctaLabel={homeSponsorCampaign.destination_url ? homeSponsorCampaign.cta_label?.trim() || "Découvrir" : null}
+            imageUrl={homeSponsorCampaign.image_url}
+          />
+        </section>
+      )}
+
+      {MONETIZATION_PLACEMENTS.homeBillboard && <PremiumBillboard className="py-8" enabled />}
+
+      <FeaturedListingsSection
+        enabled={MONETIZATION_PLACEMENTS.homeFeaturedRail}
+        title={t("sections.featured", "À la une")}
+        limit={8}
+      />
+
+      {MONETIZATION_PLACEMENTS.homeNativeMid && (
+        <section className="container mx-auto px-4 py-6">
+          <BannerSlot
+            title="Format partenaire natif"
+            subtitle="Format sponsorisé intégré au flux, réservé aux campagnes partenaires gérées par AutoNex."
+          />
+        </section>
+      )}
+
+      {/* Recent feed — complementary to “À la une” */}
+      <section className="container mx-auto px-4 py-10 md:py-12">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Nouvelles annonces auto")}</h2>
+          <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">
+            {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : listings.length === 0 ? (
+          <p className="text-center text-muted-foreground font-sans py-12">
+            {t("home.noListings", "Aucune annonce auto pour le moment. Soyez le premier à publier un véhicule !")}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {listings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
       </section>
 
-      <section className="container mx-auto px-4 pt-8 pb-3">
+      <section className="container mx-auto px-4 pt-2 pb-3">
         <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6 shadow-sm">
           <div className="mb-5">
             <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-1.5">Catalogue AutoNex</p>
@@ -228,61 +261,6 @@ const Index = () => {
             Autres marques
           </Link>
         </div>
-      </section>
-
-      {homeSponsorEnabled && homeSponsorCampaign && (
-        <section className="container mx-auto px-4 pt-6 pb-2">
-          <BannerSlot
-            enabled
-            title={homeSponsorCampaign.advertiser_name}
-            subtitle="Contenu sponsorisé"
-            href={homeSponsorCampaign.destination_url}
-            ctaLabel={homeSponsorCampaign.destination_url ? homeSponsorCampaign.cta_label?.trim() || "Découvrir" : null}
-            imageUrl={homeSponsorCampaign.image_url}
-          />
-        </section>
-      )}
-
-      {MONETIZATION_PLACEMENTS.homeBillboard && <PremiumBillboard className="py-8" enabled />}
-
-      <FeaturedListingsSection
-        enabled={MONETIZATION_PLACEMENTS.homeFeaturedRail}
-        title={t("sections.featured", "À la une")}
-        limit={8}
-      />
-
-      {MONETIZATION_PLACEMENTS.homeNativeMid && (
-        <section className="container mx-auto px-4 py-6">
-          <BannerSlot
-            title="Format partenaire natif"
-            subtitle="Format sponsorisé intégré au flux, réservé aux campagnes partenaires gérées par AutoNex."
-          />
-        </section>
-      )}
-
-      {/* Recent feed — complementary to “À la une” */}
-      <section className="container mx-auto px-4 py-10 md:py-12">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Nouvelles annonces auto")}</h2>
-          <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">
-            {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : listings.length === 0 ? (
-          <p className="text-center text-muted-foreground font-sans py-12">
-            {t("home.noListings", "Aucune annonce auto pour le moment. Soyez le premier à publier un véhicule !")}
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        )}
       </section>
 
       {/* Cities */}
