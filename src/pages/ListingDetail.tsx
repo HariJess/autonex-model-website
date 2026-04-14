@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,7 @@ import { getSearchSessionId } from "@/lib/searchSession";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { applyImageFallback } from "@/lib/imageFallback";
+import { cn } from "@/lib/utils";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
@@ -31,6 +33,10 @@ import {
 } from "@/components/monetization/ListingDetailPlacements";
 
 const ListingLocationMap = lazy(() => import("@/components/ListingLocationMap"));
+
+/** Outline + hover/focus accents only; brand green is on the FaWhatsapp icon. */
+const LISTING_WHATSAPP_BUTTON_CLASS =
+  "border-emerald-200/85 bg-background text-foreground hover:bg-emerald-50/85 hover:border-emerald-300/95 hover:text-foreground dark:border-emerald-800/50 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600/55 focus-visible:ring-emerald-500/40";
 
 function listingWhatsAppPrefill(title: string): string {
   const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
@@ -638,10 +644,10 @@ const ListingDetail = () => {
                   type="button"
                   onClick={handleWhatsApp}
                   variant="outline"
-                  className="hidden w-full font-sans lg:inline-flex"
+                  className={cn("hidden w-full font-sans lg:inline-flex", LISTING_WHATSAPP_BUTTON_CLASS)}
                   aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
                 >
-                  <MessageSquare className="h-4 w-4 mr-2" />
+                  <FaWhatsapp className="shrink-0 text-[#25D366]" aria-hidden />
                   {t("listing.whatsapp", "WhatsApp")}
                 </Button>
               ) : null}
@@ -712,10 +718,10 @@ const ListingDetail = () => {
               type="button"
               onClick={handleWhatsApp}
               variant="outline"
-              className="w-full font-sans min-h-12 touch-manipulation gap-2"
+              className={cn("w-full font-sans min-h-12 touch-manipulation gap-2", LISTING_WHATSAPP_BUTTON_CLASS)}
               aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
             >
-              <MessageSquare className="h-4 w-4 shrink-0" />
+              <FaWhatsapp className="shrink-0 text-[#25D366]" aria-hidden />
               {t("listing.whatsapp", "WhatsApp")}
             </Button>
           ) : null}
