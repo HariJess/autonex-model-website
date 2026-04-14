@@ -180,7 +180,7 @@ const HeroSearch = () => {
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
                   {t("hero.type")}
                 </label>
-                <Select value={type} onValueChange={handleTypeChange}>
+                <Select value={vehicleType} onValueChange={handleTypeChange}>
                   <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
                     <SelectValue placeholder={t("hero.allTypes")} />
                   </SelectTrigger>
@@ -327,7 +327,7 @@ const HeroSearch = () => {
             </div>
 
             <div className="lg:hidden space-y-2.5">
-              <Select value={type} onValueChange={handleTypeChange}>
+              <Select value={vehicleType} onValueChange={handleTypeChange}>
                 <SelectTrigger className="font-sans min-h-11">
                   <SelectValue placeholder={t("hero.type")} />
                 </SelectTrigger>
