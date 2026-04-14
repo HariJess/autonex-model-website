@@ -74,10 +74,8 @@ const Index = () => {
       {MONETIZATION_PLACEMENTS.homeNativeMid && (
         <section className="container mx-auto px-4 py-6">
           <BannerSlot
-            title="Visibilité native"
-            subtitle="Formats sponsorisés intégrés au flux — moins intrusifs, plus performants pour les annonceurs."
-            ctaLabel="Découvrir les formats"
-            href="/publier"
+            title="Format partenaire natif"
+            subtitle="Format sponsorisé intégré au flux, réservé aux campagnes partenaires gérées par ImmoNex."
           />
         </section>
       )}

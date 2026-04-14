@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { SponsoredPill } from "./MonetizationLabels";
 
@@ -20,15 +19,8 @@ export function PremiumBillboard({ className, enabled = true }: PremiumBillboard
           Billboard premium — votre marque au cœur du portail
         </h3>
         <p className="relative mt-2 text-sm text-muted-foreground font-sans max-w-lg">
-          Emplacement réservé aux campagnes nationales et partenariats. Structure prête pour tracking et rotation.
+          Emplacement réservé aux campagnes partenaires diffusées par l’équipe ImmoNex.
         </p>
-        <Link
-          to="/dashboard"
-          className="relative mt-6 inline-flex rounded-xl gradient-primary px-6 py-2.5 text-sm font-sans font-medium"
-          style={{ color: "#FAFAFA" }}
-        >
-          Demander un média
-        </Link>
       </div>
     </section>
   );

@@ -7,6 +7,8 @@ import {
   totalPublicationCredits,
   formatAriary,
   CREDIT_PACKS_CANONICAL,
+  MONETIZATION_PLACEMENTS,
+  MONETIZATION_SLOT_META,
 } from "@/config/monetization";
 
 describe("totalBoostCredits", () => {
@@ -116,5 +118,19 @@ describe("CREDIT_PACKS_CANONICAL", () => {
   it("les IDs sont uniques", () => {
     const ids = CREDIT_PACKS_CANONICAL.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe("MONETIZATION_SLOT_META", () => {
+  it("couvre toutes les clés de MONETIZATION_PLACEMENTS", () => {
+    const placementKeys = Object.keys(MONETIZATION_PLACEMENTS).sort();
+    const metaKeys = Object.keys(MONETIZATION_SLOT_META).sort();
+    expect(metaKeys).toEqual(placementKeys);
+  });
+
+  it("sépare bien les familles agence/listing et partenaires externes", () => {
+    expect(MONETIZATION_SLOT_META.searchSidebar.family).toBe("agency_listing");
+    expect(MONETIZATION_SLOT_META.homeBillboard.family).toBe("partner_advertising");
+    expect(MONETIZATION_SLOT_META.listingRelatedPromoted.family).toBe("neutral");
   });
 });

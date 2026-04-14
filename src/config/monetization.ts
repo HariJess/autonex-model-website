@@ -90,3 +90,30 @@ export const MONETIZATION_PLACEMENTS = {
   listingRelatedPromoted: true,
   agencyStrip: true,
 } as const;
+
+export type MonetizationPlacementKey = keyof typeof MONETIZATION_PLACEMENTS;
+export type MonetizationSlotFamily = "agency_listing" | "partner_advertising" | "neutral";
+
+/**
+ * Slot taxonomy for public surfaces.
+ * - agency_listing: credit/boost/agency visibility tied to real-estate workflows.
+ * - partner_advertising: external brand campaigns (banks, insurance, brand media).
+ * - neutral: editorial/recommendation blocks (not sold as ads directly).
+ */
+export const MONETIZATION_SLOT_META: Record<
+  MonetizationPlacementKey,
+  { family: MonetizationSlotFamily; label: string }
+> = {
+  homeSponsorStrip: { family: "partner_advertising", label: "Home sponsor strip" },
+  homeBillboard: { family: "partner_advertising", label: "Home billboard" },
+  homeFeaturedRail: { family: "agency_listing", label: "Home featured listings rail" },
+  homeNativeMid: { family: "partner_advertising", label: "Home native partner block" },
+  searchTopBanner: { family: "partner_advertising", label: "Search top banner" },
+  searchSponsoredCard: { family: "partner_advertising", label: "Search sponsored native card" },
+  searchSidebar: { family: "agency_listing", label: "Search sidebar credits upsell" },
+  searchFeaturedAgencies: { family: "agency_listing", label: "Search featured agencies" },
+  listingSponsor: { family: "partner_advertising", label: "Listing sponsor block" },
+  listingPartner: { family: "agency_listing", label: "Listing partner agencies strip" },
+  listingRelatedPromoted: { family: "neutral", label: "Listing related suggestions" },
+  agencyStrip: { family: "agency_listing", label: "Agency visibility strip" },
+};

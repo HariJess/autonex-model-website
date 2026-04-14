@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SponsoredPill } from "./MonetizationLabels";
@@ -25,19 +24,12 @@ export function SponsoredNativeCard({ className, enabled = true }: SponsoredNati
           <Sparkles className="h-4 w-4 text-primary shrink-0" aria-hidden />
         </div>
         <p className="font-serif font-semibold text-lg text-foreground leading-snug">
-          Votre annonce ici
+          Campagne partenaire
         </p>
         <p className="mt-2 text-sm text-muted-foreground font-sans leading-relaxed">
-          Boost, top placement et visibilité homepage. Achetez des crédits et choisissez vos options à la publication.
+          Format natif réservé aux marques et services partenaires sélectionnés par ImmoNex.
         </p>
       </div>
-      <Link
-        to="/publier"
-        className="mt-4 inline-flex items-center justify-center rounded-xl gradient-primary py-3 text-sm font-sans font-medium"
-        style={{ color: "#FAFAFA" }}
-      >
-        Publier ou booster
-      </Link>
     </div>
   );
 }

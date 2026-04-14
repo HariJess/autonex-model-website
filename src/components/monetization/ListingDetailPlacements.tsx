@@ -57,10 +57,8 @@ export function ListingSponsorBlock() {
   return (
     <BannerSlot
       variant="inline"
-      title="Espace professionnel"
-      subtitle="Solutions CRM, visibilité multi-villes et packages agences — structure prête pour partenariats."
-      href="/dashboard"
-      ctaLabel="Découvrir"
+      title="Partenaire du secteur immobilier"
+      subtitle="Espace réservé aux campagnes partenaires diffusées sur ImmoNex."
     />
   );
 }

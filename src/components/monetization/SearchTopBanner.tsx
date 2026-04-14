@@ -9,9 +9,7 @@ export function SearchTopBanner() {
       <BannerSlot
         variant="inline"
         title="Partenaires ImmoNex"
-        subtitle="Emplacement média au-dessus des résultats — idéal pour marques et services immobiliers."
-        href="/dashboard"
-        ctaLabel="En savoir plus"
+        subtitle="Campagnes partenaires sélectionnées par ImmoNex."
       />
     </div>
   );
