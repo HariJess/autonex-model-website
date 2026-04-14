@@ -22,6 +22,10 @@ type VehicleTypeFilterInput = {
   modelQuery?: string;
   fuels?: string[];
 };
+type VehicleTypeResolution = {
+  listingTypes: string[];
+  fuels: string[];
+};
 
 export type AutoDiscoveryCategory = {
   id: string;
@@ -234,6 +238,14 @@ export function getVehicleTypeLabelFromFilters(filters: VehicleTypeFilterInput):
   const id = inferVehicleTypeOptionIdFromFilters(filters);
   if (!id) return null;
   return AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((opt) => opt.id === id)?.label ?? null;
+}
+
+export function resolveVehicleTypeFilters(vehicleTypeIds: string[]): VehicleTypeResolution {
+  if (!vehicleTypeIds.length) return { listingTypes: [], fuels: [] };
+  const selected = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((opt) => vehicleTypeIds.includes(opt.id));
+  const listingTypes = Array.from(new Set(selected.flatMap((opt) => opt.listingTypes ?? [])));
+  const fuels = Array.from(new Set(selected.flatMap((opt) => opt.fuels ?? [])));
+  return { listingTypes, fuels };
 }
 
 export const AUTO_HOMEPAGE_BRANDS: AutoHomepageBrand[] = [

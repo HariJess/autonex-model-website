@@ -4,6 +4,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import type { DisplayListing, ListingType, TransactionType } from "@/types/listing";
 import { deriveVehicleFromLegacy } from "@/lib/vehicleModel";
 import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
+import { resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
 
 type ListingRowLite = Pick<
   Tables<"listings">,
@@ -304,6 +305,7 @@ export function prefetchListing(queryClient: QueryClient, id: string | undefined
 
 export interface ListingsFilters {
   transaction?: string;
+  vehicleTypes?: string[];
   types?: string[];
   ville?: string;
   /** Free-text search (title, description, quartier, region, etc.) — server-side ilike OR */
@@ -457,11 +459,14 @@ export function useDbListings(filters: ListingsFilters = {}) {
       if (idsOnly) {
         query = query.in("id", filters.listingIds!);
       } else {
+        const resolvedVehicleTypeFilters = resolveVehicleTypeFilters(filters.vehicleTypes ?? []);
+        const mergedTypes = Array.from(new Set([...(filters.types ?? []), ...resolvedVehicleTypeFilters.listingTypes]));
+        const mergedFuels = Array.from(new Set([...(filters.fuels ?? []), ...resolvedVehicleTypeFilters.fuels]));
         if (filters.transaction) {
           query = query.eq("transaction", filters.transaction as TransactionType);
         }
-        if (filters.types && filters.types.length > 0) {
-          query = query.in("type", filters.types as ListingType[]);
+        if (mergedTypes.length > 0) {
+          query = query.in("type", mergedTypes as ListingType[]);
         }
         if (filters.ville) {
           query = query.eq("ville", filters.ville);
@@ -569,8 +574,8 @@ export function useDbListings(filters: ListingsFilters = {}) {
         if (filters.yearMax && filters.yearMax > 0) {
           query = query.lte("year", filters.yearMax);
         }
-        if (filters.fuels && filters.fuels.length > 0) {
-          query = query.in("fuel", filters.fuels);
+        if (mergedFuels.length > 0) {
+          query = query.in("fuel", mergedFuels);
         }
         if (filters.transmissions && filters.transmissions.length > 0) {
           query = query.in("transmission_gearbox", filters.transmissions);

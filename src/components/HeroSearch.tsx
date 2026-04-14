@@ -8,13 +8,14 @@ import { Search, MapPin, Euro, Banknote } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
+import { Checkbox } from "@/components/ui/checkbox";
 import { LISTING_TYPES_WITHOUT_ROOM_FILTERS } from "@/types/listing";
 import type { ListingType } from "@/types/listing";
 import { searchPathFromFilters } from "@/lib/searchUrl";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
-import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BRANDS } from "@/data/automotiveCatalog";
+import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BRANDS, resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -36,40 +37,48 @@ const HERO_YEAR_PRESETS = [
   { value: "before-1980", label: "Avant 1980", min: 0, max: 1979 },
 ] as const;
 
+function summarizeSelection(
+  labels: string[],
+  pluralNoun: string,
+  joiner = ", ",
+): string {
+  if (labels.length === 0) return "";
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) {
+    const joined = `${labels[0]}${joiner}${labels[1]}`;
+    return joined.length > 28 ? `2 ${pluralNoun} sélectionnés` : joined;
+  }
+  return `${labels[0]}${joiner}${labels[1]} +${labels.length - 2}`;
+}
+
 const HeroSearch = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
-  const [vehicleType, setVehicleType] = useState("all");
-  const heroTypeOptions = useMemo(
-    () => [{ id: "all", label: "Tous types" }, ...AUTO_SEARCH_VEHICLE_TYPE_OPTIONS],
-    [],
-  );
-  const selectedVehicleType = useMemo(
-    () => heroTypeOptions.find((opt) => opt.id === vehicleType) ?? heroTypeOptions[0],
-    [heroTypeOptions, vehicleType],
-  );
+  const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
+  const heroTypeOptions = useMemo(() => AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, []);
   const allowedListingTypes = useMemo(() => new Set(listingTypesForTransaction(transaction)), [transaction]);
 
   const handleTransactionChange = (tr: string) => {
     setTransaction(tr);
-    setVehicleType((prev) => {
+    setVehicleTypes((prev) => {
       const nextAllowed = new Set(listingTypesForTransaction(tr));
-      const next = heroTypeOptions.find((opt) => opt.id === prev);
-      if (!next?.listingTypes?.length) return prev;
-      const hasCompatibleType = next.listingTypes.some((lt) => nextAllowed.has(lt as ListingType));
-      return hasCompatibleType ? prev : "all";
+      return prev.filter((selectedId) => {
+        const next = heroTypeOptions.find((opt) => opt.id === selectedId);
+        return !next?.listingTypes?.length || next.listingTypes.some((lt) => nextAllowed.has(lt as ListingType));
+      });
     });
   };
-
-  const handleTypeChange = (v: string) => setVehicleType(v);
+  const toggleVehicleType = (id: string) => {
+    setVehicleTypes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
   const [ville, setVille] = useState("");
   const [arrondissements, setArrondissements] = useState<string[]>([]);
   const [quartiers, setQuartiers] = useState<string[]>([]);
   const [quartierLibre, setQuartierLibre] = useState("");
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(0);
-  const [brand, setBrand] = useState("");
+  const [brands, setBrands] = useState<string[]>([]);
   const [desktopLocationOpen, setDesktopLocationOpen] = useState(false);
   const [mobileLocationOpen, setMobileLocationOpen] = useState(false);
   const [desktopBudgetOpen, setDesktopBudgetOpen] = useState(false);
@@ -77,22 +86,38 @@ const HeroSearch = () => {
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
   const [modelQuery, setModelQuery] = useState("");
   const [yearPreset, setYearPreset] = useState<(typeof HERO_YEAR_PRESETS)[number]["value"]>("all");
-  const [fuel, setFuel] = useState("");
+  const [fuels, setFuels] = useState<string[]>([]);
+  const [brandSearch, setBrandSearch] = useState("");
 
-  const showBrand = !(selectedVehicleType.listingTypes ?? []).some((lt) => NO_ROOMS_TYPES.has(lt));
+  const selectedVehicleTypeFilters = useMemo(
+    () => resolveVehicleTypeFilters(vehicleTypes),
+    [vehicleTypes],
+  );
+  const showBrand = !selectedVehicleTypeFilters.listingTypes.some((lt) => NO_ROOMS_TYPES.has(lt));
+  const selectedTypeLabels = heroTypeOptions.filter((opt) => vehicleTypes.includes(opt.id)).map((opt) => opt.label);
+  const typeLabel = vehicleTypes.length === 0
+    ? t("hero.allTypes")
+    : summarizeSelection(selectedTypeLabels, "types");
+  const brandLabel = brands.length === 0
+    ? "Toutes les marques"
+    : summarizeSelection(brands, "marques");
+  const fuelLabel = fuels.length === 0
+    ? "Tous carburants"
+    : summarizeSelection(fuels, "carburants", " + ");
+  const visibleTopBrands = useMemo(() => {
+    const q = brandSearch.trim().toLowerCase();
+    if (!q) return TOP_AUTO_BRANDS;
+    return TOP_AUTO_BRANDS.filter((brand) => brand.toLowerCase().includes(q));
+  }, [brandSearch]);
 
   const buildFilters = (): SearchFilters => {
-    const mappedTypes = (selectedVehicleType.listingTypes ?? []).filter((lt) => allowedListingTypes.has(lt as ListingType));
-    const modelQueryValue = modelQuery.trim() || selectedVehicleType.modelQuery || "";
-    const fuelsValue = fuel
-      ? [fuel]
-      : selectedVehicleType.fuels && selectedVehicleType.fuels.length > 0
-        ? [...selectedVehicleType.fuels]
-        : [];
+    const mappedTypes = selectedVehicleTypeFilters.listingTypes.filter((lt) => allowedListingTypes.has(lt as ListingType));
+    const fuelsValue = Array.from(new Set([...fuels, ...selectedVehicleTypeFilters.fuels]));
     const selectedYearPreset = HERO_YEAR_PRESETS.find((preset) => preset.value === yearPreset) ?? HERO_YEAR_PRESETS[0];
     return {
       ...EMPTY_SEARCH_FILTERS,
       transaction: TRANSACTIONS.some((tr) => tr.value === transaction) ? transaction : "vente",
+      vehicleTypes,
       types: mappedTypes,
       ville,
       arrondissements,
@@ -105,8 +130,8 @@ const HeroSearch = () => {
       drivetrains: [],
       conditions: [],
       sellerTypes: [],
-      brands: brand ? [brand] : [],
-      modelQuery: modelQueryValue,
+      brands,
+      modelQuery: modelQuery.trim(),
       yearMin: selectedYearPreset.min,
       yearMax: selectedYearPreset.max,
       fuels: fuelsValue,
@@ -183,16 +208,29 @@ const HeroSearch = () => {
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
                   {t("hero.type")}
                 </label>
-                <Select value={vehicleType} onValueChange={handleTypeChange}>
-                  <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                    <SelectValue placeholder={t("hero.allTypes")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                  {heroTypeOptions.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left truncate">{typeLabel}</button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 p-3" align="start">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-medium text-muted-foreground">Type de véhicule</p>
+                      {vehicleTypes.length > 0 && (
+                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setVehicleTypes([])}>
+                          Effacer
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+                      {heroTypeOptions.map((option) => (
+                        <label key={option.id} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                          <Checkbox checked={vehicleTypes.includes(option.id)} onCheckedChange={() => toggleVehicleType(option.id)} />
+                          <span>{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <Popover open={desktopLocationOpen} onOpenChange={setDesktopLocationOpen}>
@@ -256,16 +294,35 @@ const HeroSearch = () => {
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
                     Marque
                   </label>
-                  <Select value={brand} onValueChange={setBrand}>
-                    <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                    <SelectValue placeholder="Toutes les marques" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TOP_AUTO_BRANDS.map((b) => (
-                        <SelectItem key={b} value={b}>{b}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button type="button" className="w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left truncate">{brandLabel}</button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-72 p-3" align="start">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-medium text-muted-foreground">Marque</p>
+                      {brands.length > 0 && (
+                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
+                          Effacer
+                        </button>
+                      )}
+                    </div>
+                    <Input
+                      value={brandSearch}
+                      onChange={(e) => setBrandSearch(e.target.value)}
+                      placeholder="Rechercher une marque..."
+                      className="h-8 text-xs mb-2"
+                    />
+                      <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+                        {visibleTopBrands.map((b) => (
+                          <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                            <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
+                            <span>{b}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               )}
 
@@ -315,31 +372,60 @@ const HeroSearch = () => {
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
                   Carburant
                 </label>
-                <Select value={fuel || "all"} onValueChange={(v) => setFuel(v === "all" ? "" : v)}>
-                  <SelectTrigger className="h-9 font-sans text-sm">
-                    <SelectValue placeholder="Tous" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous</SelectItem>
-                    {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
-                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm h-9 truncate">
+                      {fuelLabel}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-3" align="start">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-medium text-muted-foreground">Carburant</p>
+                      {fuels.length > 0 && (
+                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
+                          Effacer
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
+                        <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                          <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
+                          <span>{opt}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
             <div className="lg:hidden space-y-2.5">
-              <Select value={vehicleType} onValueChange={handleTypeChange}>
-                <SelectTrigger className="font-sans min-h-11">
-                  <SelectValue placeholder={t("hero.type")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {heroTypeOptions.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
+                    {typeLabel}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-xs font-medium text-muted-foreground">Type de véhicule</p>
+                    {vehicleTypes.length > 0 && (
+                      <button type="button" className="text-xs text-primary hover:underline" onClick={() => setVehicleTypes([])}>
+                        Effacer
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    {heroTypeOptions.map((option) => (
+                      <label key={option.id} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                        <Checkbox checked={vehicleTypes.includes(option.id)} onCheckedChange={() => toggleVehicleType(option.id)} />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               <Popover open={mobileLocationOpen} onOpenChange={setMobileLocationOpen}>
                 <PopoverTrigger asChild>
@@ -386,16 +472,37 @@ const HeroSearch = () => {
               </Popover>
 
               {showBrand && (
-                <Select value={brand} onValueChange={setBrand}>
-                  <SelectTrigger className="font-sans min-h-11">
-                    <SelectValue placeholder="Marque" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TOP_AUTO_BRANDS.map((b) => (
-                      <SelectItem key={b} value={b}>{b}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
+                      {brandLabel}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-medium text-muted-foreground">Marque</p>
+                      {brands.length > 0 && (
+                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
+                          Effacer
+                        </button>
+                      )}
+                    </div>
+                    <Input
+                      value={brandSearch}
+                      onChange={(e) => setBrandSearch(e.target.value)}
+                      placeholder="Rechercher une marque..."
+                      className="h-9 text-sm mb-2"
+                    />
+                    <div className="space-y-1">
+                      {visibleTopBrands.map((b) => (
+                        <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                          <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
+                          <span>{b}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               )}
 
               <Input
@@ -417,17 +524,31 @@ const HeroSearch = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={fuel || "all"} onValueChange={(v) => setFuel(v === "all" ? "" : v)}>
-                  <SelectTrigger className="font-sans min-h-11">
-                    <SelectValue placeholder="Carburant" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous carburants</SelectItem>
-                    {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
-                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
+                      {fuelLabel}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-medium text-muted-foreground">Carburant</p>
+                      {fuels.length > 0 && (
+                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
+                          Effacer
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
+                        <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                          <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
+                          <span>{opt}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <Button

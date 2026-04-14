@@ -4,6 +4,7 @@
  */
 export interface SearchFilters {
   transaction: string;
+  vehicleTypes: string[];
   types: string[];
   ville: string;
   /** Full arrondissement labels (e.g. "1er arrondissement"); multi-select; OR with quartiers */
@@ -30,6 +31,7 @@ export interface SearchFilters {
 
 export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   transaction: "",
+  vehicleTypes: [],
   types: [],
   ville: "",
   arrondissements: [],

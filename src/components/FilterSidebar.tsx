@@ -23,7 +23,6 @@ import {
   AUTO_SEARCH_FUEL_OPTIONS,
   AUTO_SEARCH_SELLER_OPTIONS,
   AUTO_SEARCH_TRANSMISSION_OPTIONS,
-  inferVehicleTypeOptionIdFromFilters,
 } from "@/data/automotiveCatalog";
 
 export type { SearchFilters };
@@ -53,6 +52,13 @@ const VEHICLE_TYPE_PREVIEW_IDS = new Set([
   "utilitaire_leger",
   "moto",
 ]);
+
+function summarizeTypeSelection(labels: string[]): string {
+  if (labels.length === 0) return "Tous types";
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]}, ${labels[1]}`;
+  return `${labels[0]}, ${labels[1]} +${labels.length - 2}`;
+}
 
 interface FilterSidebarProps {
   filters: SearchFilters;
@@ -103,60 +109,53 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
     () => new Set(listingTypesForTransaction(filters.transaction)),
     [filters.transaction],
   );
-  const selectedVehicleTypeId = useMemo(
-    () =>
-      inferVehicleTypeOptionIdFromFilters({
-        types: filters.types,
-        modelQuery: filters.modelQuery,
-        fuels: filters.fuels,
-      }) ?? "all",
-    [filters.types, filters.modelQuery, filters.fuels],
-  );
+  const selectedVehicleTypeIds = filters.vehicleTypes;
   const defaultOpenSections = useMemo(() => {
     return ["transaction", "type", "location", "budget"];
   }, []);
-  const selectedVehicleTypeOption = useMemo(
-    () => typeOptions.find((opt) => opt.id === selectedVehicleTypeId) ?? null,
-    [typeOptions, selectedVehicleTypeId],
+  const selectedTypesOutsidePreview = useMemo(
+    () => typeOptions.filter((opt) => selectedVehicleTypeIds.includes(opt.id) && !VEHICLE_TYPE_PREVIEW_IDS.has(opt.id)),
+    [typeOptions, selectedVehicleTypeIds],
   );
-  const selectedTypeOutsidePreview =
-    selectedVehicleTypeId !== "all" && !VEHICLE_TYPE_PREVIEW_IDS.has(selectedVehicleTypeId);
+  const selectedVehicleTypeLabels = useMemo(
+    () => typeOptions.filter((opt) => selectedVehicleTypeIds.includes(opt.id)).map((opt) => opt.label),
+    [typeOptions, selectedVehicleTypeIds],
+  );
   const hasHiddenVehicleTypes = typeOptions.some((opt) => !VEHICLE_TYPE_PREVIEW_IDS.has(opt.id));
   const visibleVehicleTypeOptions = useMemo(() => {
     if (showAllVehicleTypes) return typeOptions;
     const preview = typeOptions.filter((opt) => VEHICLE_TYPE_PREVIEW_IDS.has(opt.id));
-    if (selectedTypeOutsidePreview && selectedVehicleTypeOption) {
-      return [...preview, selectedVehicleTypeOption];
+    if (selectedTypesOutsidePreview.length > 0) {
+      return [...preview, ...selectedTypesOutsidePreview];
     }
     return preview;
-  }, [showAllVehicleTypes, typeOptions, selectedTypeOutsidePreview, selectedVehicleTypeOption]);
+  }, [showAllVehicleTypes, typeOptions, selectedTypesOutsidePreview]);
 
   const setTransaction = (v: string) => {
     const tr = v === "all" ? "" : v;
     const allowed = new Set(listingTypesForTransaction(tr));
+    const vehicleTypes = filters.vehicleTypes.filter((vehicleTypeId) => {
+      const option = typeOptions.find((opt) => opt.id === vehicleTypeId);
+      if (!option?.listingTypes?.length) return true;
+      return option.listingTypes.some((tp) => allowed.has(tp as ListingType));
+    });
     const types = filters.types.filter((t) => allowed.has(t as ListingType));
-    onFiltersChange({ ...filters, transaction: tr, types });
+    onFiltersChange({ ...filters, transaction: tr, vehicleTypes, types });
   };
 
-  const setVehicleType = (vehicleTypeId: string) => {
-    if (vehicleTypeId === "all") {
-      onFiltersChange({
-        ...filters,
-        types: [],
-        modelQuery: "",
-        fuels: [],
-      });
-      return;
-    }
-
-    const selectedVehicleType = typeOptions.find((opt) => opt.id === vehicleTypeId);
-    if (!selectedVehicleType) return;
-    const mappedTypes = (selectedVehicleType.listingTypes ?? []).filter((tp) => allowedListingTypes.has(tp as ListingType));
+  const setVehicleTypes = (vehicleTypeIds: string[]) => {
+    const mappedTypes = Array.from(
+      new Set(
+        typeOptions
+          .filter((opt) => vehicleTypeIds.includes(opt.id))
+          .flatMap((opt) => opt.listingTypes ?? [])
+          .filter((tp) => allowedListingTypes.has(tp as ListingType)),
+      ),
+    );
     onFiltersChange({
       ...filters,
+      vehicleTypes: vehicleTypeIds,
       types: mappedTypes,
-      modelQuery: selectedVehicleType.modelQuery ?? "",
-      fuels: selectedVehicleType.fuels ? [...selectedVehicleType.fuels] : [],
     });
   };
 
@@ -188,23 +187,36 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           <AccordionItem value="type" className="border-b border-border px-4">
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.propertyType", "Type de véhicule")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-2">
-              <RadioGroup value={selectedVehicleTypeId} onValueChange={setVehicleType}>
-                <div className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
-                  <RadioGroupItem value="all" id={`${pid}vehicle-type-all`} className={isMobile ? "shrink-0" : undefined} />
-                  <Label htmlFor={`${pid}vehicle-type-all`} className="font-sans text-sm cursor-pointer flex-1 py-1">Tous types</Label>
-                </div>
+              <div className="space-y-1">
+                <label className={cn("flex items-center gap-3 cursor-pointer touch-manipulation", isMobile ? "min-h-11 py-1" : "py-0.5")}>
+                  <Checkbox
+                    checked={selectedVehicleTypeIds.length === 0}
+                    onCheckedChange={() => setVehicleTypes([])}
+                    className={isMobile ? "h-4 w-4" : undefined}
+                  />
+                  <span className="font-sans text-sm flex-1">Tous types</span>
+                </label>
                 {visibleVehicleTypeOptions.map((vehicleTypeOption) => (
-                  <div key={vehicleTypeOption.id} className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
-                    <RadioGroupItem value={vehicleTypeOption.id} id={`${pid}vehicle-type-${vehicleTypeOption.id}`} className={isMobile ? "shrink-0" : undefined} />
-                    <Label htmlFor={`${pid}vehicle-type-${vehicleTypeOption.id}`} className="font-sans text-sm cursor-pointer flex-1 py-1">
-                      {vehicleTypeOption.label}
-                    </Label>
-                  </div>
+                  <label key={vehicleTypeOption.id} className={cn("flex items-center gap-3 cursor-pointer touch-manipulation", isMobile ? "min-h-11 py-1" : "py-0.5")}>
+                    <Checkbox
+                      checked={selectedVehicleTypeIds.includes(vehicleTypeOption.id)}
+                      onCheckedChange={() => {
+                        const next = selectedVehicleTypeIds.includes(vehicleTypeOption.id)
+                          ? selectedVehicleTypeIds.filter((id) => id !== vehicleTypeOption.id)
+                          : [...selectedVehicleTypeIds, vehicleTypeOption.id];
+                        setVehicleTypes(next);
+                      }}
+                      className={isMobile ? "h-4 w-4" : undefined}
+                    />
+                    <span className="font-sans text-sm flex-1">{vehicleTypeOption.label}</span>
+                  </label>
                 ))}
-              </RadioGroup>
-              {!showAllVehicleTypes && selectedTypeOutsidePreview && selectedVehicleTypeOption && (
+              </div>
+              {!showAllVehicleTypes && selectedVehicleTypeLabels.length > 0 && (
                 <p className="text-xs text-muted-foreground font-sans">
-                  Sélection active: {selectedVehicleTypeOption.label}
+                  {selectedVehicleTypeLabels.length >= 3
+                    ? `${selectedVehicleTypeLabels.length} types sélectionnés`
+                    : `Sélection active: ${summarizeTypeSelection(selectedVehicleTypeLabels)}`}
                 </p>
               )}
               {hasHiddenVehicleTypes && (

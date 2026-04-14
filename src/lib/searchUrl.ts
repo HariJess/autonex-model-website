@@ -34,6 +34,7 @@ export function parseTransaction(raw: string | null): string {
 export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
   const transaction = parseTransaction(sp.get("transaction"));
   const rawTypes = sp.get("type")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
+  const vehicleTypes = sp.get("vtype")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
   const allowed = new Set(listingTypesForTransaction(transaction));
   const types = sanitizeListingTypes(rawTypes).filter((t) => allowed.has(t as ListingType));
 
@@ -60,6 +61,7 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
   const arrondissements = arrRaw ? arrRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
   return {
     transaction,
+    vehicleTypes,
     types,
     ville: sp.get("ville")?.trim() ?? "",
     arrondissements,
@@ -87,6 +89,7 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
 export function filtersToSearchParams(f: SearchFilters): URLSearchParams {
   const p = new URLSearchParams();
   if (f.transaction) p.set("transaction", f.transaction);
+  if (f.vehicleTypes.length) p.set("vtype", f.vehicleTypes.join(","));
   if (f.types.length) p.set("type", f.types.join(","));
   if (f.ville) p.set("ville", f.ville);
   if (f.quartiers.length) {
