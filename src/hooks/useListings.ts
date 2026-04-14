@@ -70,6 +70,18 @@ const LISTING_SELECT_COLUMNS = [
   "pending_boost_types",
 ].join(",");
 
+function isCatalogUnavailableErrorMessage(message: string | undefined): boolean {
+  if (!message) return false;
+  const m = message.toLowerCase();
+  return (
+    m.includes("schema cache") ||
+    m.includes("could not find the table") ||
+    m.includes("relation") ||
+    m.includes("public.listings") ||
+    m.includes("does not exist")
+  );
+}
+
 function mapListingRowToDisplayListing(
   listing: ListingRowLite,
   extras?: {
@@ -409,7 +421,13 @@ export function useDbListings(filters: ListingsFilters = {}) {
       }
 
       const { data: listings, error } = await query;
-      if (error) throw new Error(`Erreur recherche: ${error.message}`);
+      if (error) {
+        if (isCatalogUnavailableErrorMessage(error.message)) {
+          console.warn("[catalog] listings table not initialized yet; returning empty catalog");
+          return [];
+        }
+        throw new Error(`Erreur recherche: ${error.message}`);
+      }
       if (!listings || listings.length === 0) return [];
 
       // Batch-fetch photos

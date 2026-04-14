@@ -3,6 +3,14 @@ export type AutoBrandGroup = {
   brands: string[];
 };
 
+export type AutoDiscoveryCategory = {
+  id: string;
+  label: string;
+  href: string;
+  iconKey?: "car" | "suv" | "truck" | "bike" | "van" | "bus" | "new" | "used" | "import" | "rent";
+  description?: string;
+};
+
 export const AUTO_TRANSACTION_MODES = [
   { id: "acheter", label: "Acheter", href: "/recherche?transaction=vente" },
   { id: "vendre", label: "Vendre", href: "/recherche?transaction=location" },
@@ -12,23 +20,23 @@ export const AUTO_TRANSACTION_MODES = [
   { id: "concessionnaires", label: "Concessionnaires", href: "/agences" },
 ] as const;
 
-export const AUTO_DISCOVERY_CATEGORIES = [
-  "Voitures",
-  "SUV / 4x4",
-  "Pick-up",
-  "Berlines",
-  "Citadines",
-  "Motos",
-  "Scooters",
-  "Utilitaires",
-  "Minibus / Bus",
-  "Camions",
-  "Véhicules neufs",
-  "Véhicules d’occasion",
-  "Véhicules importés",
-  "Location courte durée",
-  "Location longue durée",
-] as const;
+export const AUTO_DISCOVERY_CATEGORIES: AutoDiscoveryCategory[] = [
+  { id: "voitures", label: "Voitures", href: "/recherche?type=maison", iconKey: "car", description: "Voitures polyvalentes ville et route" },
+  { id: "suv4x4", label: "SUV / 4x4", href: "/recherche?type=villa", iconKey: "suv", description: "Routes difficiles et usages mixtes" },
+  { id: "pickup", label: "Pick-up", href: "/recherche?type=local_commercial&drive=4x4", iconKey: "truck", description: "Travail, chantier, usage pro" },
+  { id: "berlines", label: "Berlines", href: "/recherche?type=maison&drive=4x2", iconKey: "car", description: "Confort et usage quotidien" },
+  { id: "citadines", label: "Citadines", href: "/recherche?type=appartement", iconKey: "car", description: "Compactes et économiques" },
+  { id: "motos", label: "Motos", href: "/recherche?type=terrain", iconKey: "bike", description: "Route, piste et mobilité rapide" },
+  { id: "scooters", label: "Scooters", href: "/recherche?type=terrain&model=scooter", iconKey: "bike", description: "Trajets urbains agiles" },
+  { id: "utilitaires", label: "Utilitaires", href: "/recherche?type=local_commercial", iconKey: "van", description: "Livraison et logistique" },
+  { id: "minibus", label: "Minibus / Bus", href: "/recherche?type=bureau&model=bus", iconKey: "bus", description: "Transport passagers" },
+  { id: "camions", label: "Camions", href: "/recherche?type=bureau", iconKey: "truck", description: "Poids lourd et transport pro" },
+  { id: "neufs", label: "Véhicules neufs", href: "/recherche?condition=neuf", iconKey: "new", description: "Zéro km et garanties" },
+  { id: "occasion", label: "Véhicules d’occasion", href: "/recherche?condition=occasion", iconKey: "used", description: "Occasions sélectionnées" },
+  { id: "importes", label: "Véhicules importés", href: "/recherche?condition=importe", iconKey: "import", description: "Arrivages import" },
+  { id: "loc-courte", label: "Location courte durée", href: "/recherche?transaction=location_vacances", iconKey: "rent", description: "Jours à quelques semaines" },
+  { id: "loc-longue", label: "Location longue durée", href: "/recherche?transaction=location&rental_term=longue", iconKey: "rent", description: "Long terme et flotte" },
+];
 
 export const AUTO_BRAND_GROUPS: AutoBrandGroup[] = [
   {

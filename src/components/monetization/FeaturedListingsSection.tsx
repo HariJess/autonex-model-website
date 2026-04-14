@@ -50,7 +50,12 @@ export function FeaturedListingsSection({
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : listings.length === 0 ? (
-        <p className="text-center text-muted-foreground font-sans py-8">Aucune annonce à afficher pour le moment.</p>
+        <div className="text-center py-8">
+          <p className="text-muted-foreground font-sans">Aucune annonce à afficher pour le moment.</p>
+          <p className="text-xs text-muted-foreground font-sans mt-2">
+            Le catalogue AutoNex est prêt: publiez le premier véhicule pour lancer la vitrine.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {listings.map((listing) => (

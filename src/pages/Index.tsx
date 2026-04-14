@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
-import { ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { ChevronRight, Loader2, Car, Bike, Truck, BusFront, ShieldCheck, RotateCw, Globe } from "lucide-react";
 import { fetchActiveListingCountsByVille, useDbListings } from "@/hooks/useListings";
 import { useQuery } from "@tanstack/react-query";
 import { villes } from "@/data/madagascar-locations";
@@ -29,7 +29,17 @@ const Index = () => {
     "AutoNex : annonces automobiles à Madagascar — achat, vente, voitures, 4x4, motos et utilitaires.",
   );
   const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
-  const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
+  const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
+  const categoryIcon = (iconKey?: string) => {
+    if (iconKey === "bike") return <Bike className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "truck") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "van") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "bus") return <BusFront className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "new") return <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "used") return <RotateCw className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "import") return <Globe className="h-4 w-4 text-primary" aria-hidden />;
+    return <Car className="h-4 w-4 text-primary" aria-hidden />;
+  };
   const homeSponsorEnabled = MONETIZATION_PLACEMENTS.homeSponsorStrip;
   const { data: homeSponsorCampaign } = usePartnerCampaign("homeSponsorStrip", homeSponsorEnabled);
 
@@ -86,14 +96,21 @@ const Index = () => {
       <section className="container mx-auto px-4 pt-8 pb-2">
         <div className="rounded-2xl border border-border/80 bg-card p-4 md:p-5 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-3">Explorer par catégorie</p>
-          <div className="flex flex-wrap gap-2.5">
-            {AUTO_DISCOVERY_CATEGORIES.map((label) => (
-              <span
-                key={label}
-                className="rounded-lg border border-border bg-secondary/35 px-3 py-1.5 text-xs font-semibold text-foreground"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {AUTO_DISCOVERY_CATEGORIES.map((category) => (
+              <Link
+                key={category.id}
+                to={category.href}
+                className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 hover:border-primary/30 hover:bg-primary/[0.04] transition-colors"
               >
-                {label}
-              </span>
+                <div className="flex items-center gap-2">
+                  {categoryIcon(category.iconKey)}
+                  <span className="text-xs font-semibold text-foreground">{category.label}</span>
+                </div>
+                {category.description && (
+                  <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">{category.description}</p>
+                )}
+              </Link>
             ))}
           </div>
         </div>
@@ -166,11 +183,6 @@ const Index = () => {
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : listingsError ? (
-          <div className="flex flex-col items-center py-12 text-center">
-            <AlertCircle className="h-8 w-8 text-destructive mb-2" />
-            <p className="text-muted-foreground font-sans">{t("common.error")}</p>
           </div>
         ) : listings.length === 0 ? (
           <p className="text-center text-muted-foreground font-sans py-12">
