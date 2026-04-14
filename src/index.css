@@ -21,7 +21,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 10%;
 
-    --primary: 222 88% 56%;
+    --primary: 218 83% 45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 33% 95%;
@@ -30,7 +30,7 @@
     --muted: 220 30% 94%;
     --muted-foreground: 220 16% 40%;
 
-    --accent: 210 95% 58%;
+    --accent: 214 100% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -42,7 +42,7 @@
     /* Bordures de champs plus lisibles (évite le « tout plat » sur fond 98 %) */
     --border: 220 20% 82%;
     --input: 220 20% 82%;
-    --ring: 222 88% 56%;
+    --ring: 218 83% 45%;
 
     --radius: 1rem;
 
@@ -55,9 +55,9 @@
     --sidebar-border: 222 30% 16%;
     --sidebar-ring: 222 88% 56%;
 
-    --gradient-start: 222 75% 28%;
-    --gradient-mid: 222 84% 45%;
-    --gradient-end: 221 72% 56%;
+    --gradient-start: 217 73% 16%;
+    --gradient-mid: 217 81% 31%;
+    --gradient-end: 218 84% 45%;
   }
 
   .dark {
@@ -67,19 +67,19 @@
     --card-foreground: 0 0% 98%;
     --popover: 222 37% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 222 88% 62%;
+    --primary: 218 83% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 222 24% 16%;
     --secondary-foreground: 0 0% 98%;
     --muted: 222 24% 16%;
     --muted-foreground: 0 0% 64%;
-    --accent: 210 95% 58%;
+    --accent: 214 100% 56%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 222 24% 18%;
     --input: 222 24% 18%;
-    --ring: 222 88% 62%;
+    --ring: 218 83% 50%;
     --sidebar-background: 222 50% 7%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 222 88% 62%;
@@ -125,10 +125,10 @@
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(140deg, #071326, #102b52 48%, #1f4ea6);
+    background: linear-gradient(140deg, #061427, #0d2b58 48%, #1256ca);
   }
   .gradient-text {
-    background: linear-gradient(135deg, #1f4ea6, #4f7dd1);
+    background: linear-gradient(135deg, #1256ca, #3f7fe2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

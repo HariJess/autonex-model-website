@@ -396,6 +396,19 @@ export function listingRowToFormState(row: Tables<"listings">): {
   agencySpotlight: boolean;
   step: number;
 } {
+  const isPristineDraft =
+    row.status === "draft" &&
+    row.title === PUBLISH_DRAFT_TITLE_PLACEHOLDER &&
+    !(row.description ?? "").trim() &&
+    (row.price_mga ?? 0) === 0 &&
+    !row.ville &&
+    !row.arrondissement &&
+    !row.quartier &&
+    !row.quartier_libre &&
+    !row.make &&
+    !row.model &&
+    row.year == null;
+
   const rawBoost = row.pending_boost_types;
   const boostList = Array.isArray(rawBoost) ? rawBoost.filter((x): x is string => typeof x === "string") : [];
   const agencySpotlight = boostList.includes("agency_spotlight");
@@ -411,8 +424,8 @@ export function listingRowToFormState(row: Tables<"listings">): {
   const step = row.draft_step ?? 0;
 
   return {
-    transaction: row.transaction as TransactionType,
-    listingType: row.type as ListingType,
+    transaction: isPristineDraft ? "" : (row.transaction as TransactionType),
+    listingType: isPristineDraft ? "" : (row.type as ListingType),
     isNewProgram: Boolean(row.is_new_program),
     internalRef: row.internal_ref ?? "",
     ville: row.ville ?? "",

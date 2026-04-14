@@ -38,7 +38,6 @@ import {
   createDraftListing,
   deleteListingPhotoRow,
   fetchDraftListingForOwner,
-  fetchLatestDraftId,
   fetchListingForOwnerEdit,
   fetchListingPhotos,
   formToListingUpdate,
@@ -215,7 +214,7 @@ const PublishPage = () => {
     };
   }, [pendingPhotos]);
 
-  /** Bootstrap draft listing: ?new=1 forces a fresh draft; ?draft=id resumes; default resumes latest or creates one. */
+  /** Bootstrap draft listing: ?new=1 forces a fresh draft; ?draft=id resumes; default creates a fresh draft. */
   useEffect(() => {
     if (!user?.id) {
       setDraftHydrated(true);
@@ -389,16 +388,6 @@ const PublishPage = () => {
             hydratingRef.current = false;
           });
           setDraftHydrated(true);
-          return;
-        }
-
-        const latestId = await fetchLatestDraftId(user.id);
-        if (cancelled) return;
-        if (latestId) {
-          setIsPublishedListingEdit(false);
-          setListingModerationStatus(null);
-          baselineMaterialSnapshotRef.current = "";
-          navigate(`/publier?draft=${latestId}`, { replace: true });
           return;
         }
 
@@ -1435,7 +1424,7 @@ const PublishPage = () => {
         </title>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6 md:py-8 max-w-3xl pb-28 sm:pb-8">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-3xl pb-36 sm:pb-8">
         <PublishPageHeader
           moderationText={t(
             "publish.moderationBanner",
@@ -1673,7 +1662,9 @@ const PublishPage = () => {
         </>
         )}
       </div>
-      <Footer />
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
     </>
   );
 };
