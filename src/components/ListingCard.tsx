@@ -5,7 +5,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { DisplayListing } from "@/types/listing";
-import { LISTING_TYPE_LABELS } from "@/types/listing";
+import { LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { prefetchListing } from "@/hooks/useListings";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { formatVehicleMileage, formatVehicleVersion } from "@/lib/vehiclePresentation";
@@ -80,6 +80,16 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
             </Badge>
           </div>
         )}
+        <div className="absolute top-3 right-3 flex gap-1.5">
+          <Badge variant="secondary" className="text-[10px] font-sans">
+            {TRANSACTION_LABELS[listing.transaction] ?? listing.transaction}
+          </Badge>
+          {listing.vehicle?.condition && (
+            <Badge variant="outline" className="text-[10px] font-sans capitalize bg-card/85">
+              {listing.vehicle.condition}
+            </Badge>
+          )}
+        </div>
         {images.length > 1 && (
           <>
             <button

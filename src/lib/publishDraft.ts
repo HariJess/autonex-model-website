@@ -4,6 +4,7 @@ import type { ListingType, TransactionType } from "@/types/listing";
 import { getRegionForVille } from "@/data/madagascar-locations";
 import type { PurchasableBoostType } from "@/config/monetization";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
+import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
 
 export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
 
@@ -298,7 +299,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
 
   const featuresRaw = row.features;
   const selectedFeatures = Array.isArray(featuresRaw)
-    ? featuresRaw.filter((x): x is string => typeof x === "string")
+    ? stripVehicleMetaTags(featuresRaw.filter((x): x is string => typeof x === "string"))
     : [];
 
   const step = row.draft_step ?? 0;

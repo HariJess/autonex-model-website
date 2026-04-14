@@ -22,6 +22,10 @@ export interface SearchFilters {
   drivetrains: string[];
   conditions: string[];
   sellerTypes: string[];
+  brands: string[];
+  modelQuery: string;
+  yearMin: number;
+  yearMax: number;
 }
 
 export const EMPTY_SEARCH_FILTERS: SearchFilters = {
@@ -43,6 +47,10 @@ export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   drivetrains: [],
   conditions: [],
   sellerTypes: [],
+  brands: [],
+  modelQuery: "",
+  yearMin: 0,
+  yearMax: 0,
 };
 
 export type SearchSortMode = "recent" | "priceAsc" | "priceDesc";

@@ -13,20 +13,12 @@ import { searchPathFromFilters } from "@/lib/searchUrl";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
+import { TOP_AUTO_BRANDS } from "@/data/automotiveCatalog";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
   { value: "location", labelKey: "nav.rent" },
   { value: "location_vacances", labelKey: "search.vacationRental" },
-];
-
-const ROOM_OPTIONS = [
-  { label: "Toyota", value: "0" },
-  { label: "Nissan", value: "1" },
-  { label: "Hyundai", value: "2" },
-  { label: "Kia", value: "3" },
-  { label: "Suzuki", value: "4" },
-  { label: "Yamaha / Honda", value: "5" },
 ];
 
 const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
@@ -48,7 +40,7 @@ const HeroSearch = () => {
 
   const handleTypeChange = (v: string) => {
     setType(v);
-    if (NO_ROOMS_TYPES.has(v)) setRooms("");
+    if (NO_ROOMS_TYPES.has(v)) setBrand("");
   };
   const [ville, setVille] = useState("");
   const [arrondissements, setArrondissements] = useState<string[]>([]);
@@ -56,20 +48,16 @@ const HeroSearch = () => {
   const [quartierLibre, setQuartierLibre] = useState("");
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(0);
-  const [rooms, setRooms] = useState("");
+  const [brand, setBrand] = useState("");
   const [desktopLocationOpen, setDesktopLocationOpen] = useState(false);
   const [mobileLocationOpen, setMobileLocationOpen] = useState(false);
   const [desktopBudgetOpen, setDesktopBudgetOpen] = useState(false);
   const [mobileBudgetOpen, setMobileBudgetOpen] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
 
-  const showRooms = !type || !NO_ROOMS_TYPES.has(type);
+  const showBrand = !type || !NO_ROOMS_TYPES.has(type);
 
   const buildFilters = (): SearchFilters => {
-    const roomNums =
-      rooms !== "" && showRooms
-        ? [parseInt(rooms, 10)].filter((n) => !Number.isNaN(n) && n >= 0 && n <= 99)
-        : [];
     const allowed = new Set(listingTypesForTransaction(transaction));
     const types: string[] = type && allowed.has(type as ListingType) ? [type] : [];
     return {
@@ -82,7 +70,16 @@ const HeroSearch = () => {
       quartierLibre,
       priceMin,
       priceMax,
-      rooms: roomNums,
+      rooms: [],
+      fuels: [],
+      transmissions: [],
+      drivetrains: [],
+      conditions: [],
+      sellerTypes: [],
+      brands: brand ? [brand] : [],
+      modelQuery: "",
+      yearMin: 0,
+      yearMax: 0,
     };
   };
 
@@ -223,18 +220,18 @@ const HeroSearch = () => {
                 </PopoverContent>
               </Popover>
 
-              {showRooms && (
+              {showBrand && (
                 <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                    {t("hero.rooms")}
+                    Marque
                   </label>
-                  <Select value={rooms} onValueChange={setRooms}>
+                  <Select value={brand} onValueChange={setBrand}>
                     <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                      <SelectValue placeholder={t("hero.allRooms")} />
+                      <SelectValue placeholder="Toutes marques" />
                     </SelectTrigger>
                     <SelectContent>
-                      {ROOM_OPTIONS.map((r) => (
-                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                      {TOP_AUTO_BRANDS.map((b) => (
+                        <SelectItem key={b} value={b}>{b}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -310,14 +307,14 @@ const HeroSearch = () => {
                 </PopoverContent>
               </Popover>
 
-              {showRooms && (
-                <Select value={rooms} onValueChange={setRooms}>
+              {showBrand && (
+                <Select value={brand} onValueChange={setBrand}>
                   <SelectTrigger className="font-sans min-h-11">
-                    <SelectValue placeholder={t("hero.rooms")} />
+                    <SelectValue placeholder="Marque" />
                   </SelectTrigger>
                   <SelectContent>
-                    {ROOM_OPTIONS.map((r) => (
-                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                    {TOP_AUTO_BRANDS.map((b) => (
+                      <SelectItem key={b} value={b}>{b}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

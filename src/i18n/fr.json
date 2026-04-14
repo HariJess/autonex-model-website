@@ -1,7 +1,7 @@
 {
   "nav": {
     "buy": "Acheter",
-    "rent": "Vendre",
+    "rent": "Louer",
     "newProjects": "Nouveautés",
     "agencies": "Concessionnaires",
     "advice": "Conseils auto",
@@ -14,7 +14,7 @@
   },
   "transaction": {
     "sale": "Acheter",
-    "rent": "Location",
+    "rent": "Louer",
     "vacation": "Vacances / courte durée"
   },
   "hero": {
@@ -82,7 +82,7 @@
     "listView": "Liste",
     "transaction": "Transaction",
     "sale": "Acheter",
-    "rental": "Vendre",
+    "rental": "Louer",
     "vacationRental": "Location / courte durée",
     "propertyType": "Type de véhicule",
     "apartment": "Citadine",
@@ -101,7 +101,7 @@
     "beach": "Plage",
     "properties": "Véhicules",
     "forSale": "à acheter",
-    "forRent": "à vendre",
+    "forRent": "à louer",
     "titleVacationPhrase": "— location / courte durée",
     "listingCount": "annonce",
     "noResults": "Aucune annonce ne correspond",

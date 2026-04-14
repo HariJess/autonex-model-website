@@ -66,6 +66,7 @@ import { PublishDetailsSection } from "@/pages/publish/components/PublishDetails
 import { PublishMediaSection } from "@/pages/publish/components/PublishMediaSection";
 import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { buildVehicleMetaTags, parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
@@ -129,6 +130,14 @@ const PublishPage = () => {
   const [bathrooms, setBathrooms] = useState("");
   const [toilets, setToilets] = useState("");
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [vehicleMake, setVehicleMake] = useState("");
+  const [vehicleModel, setVehicleModel] = useState("");
+  const [vehicleYear, setVehicleYear] = useState("");
+  const [vehicleFuel, setVehicleFuel] = useState("");
+  const [vehicleTransmission, setVehicleTransmission] = useState("");
+  const [vehicleDrivetrain, setVehicleDrivetrain] = useState("");
+  const [vehicleCondition, setVehicleCondition] = useState("");
+  const [vehicleSellerType, setVehicleSellerType] = useState("");
 
   const [serverPhotos, setServerPhotos] = useState<ServerPhoto[]>([]);
   /** Photos not yet uploaded (waiting for draft id or queued) */
@@ -258,6 +267,17 @@ const PublishPage = () => {
           setBathrooms(fs.bathrooms);
           setToilets(fs.toilets);
           setSelectedFeatures(fs.selectedFeatures);
+          const meta = parseVehicleMetaTags(
+            Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
+          );
+          setVehicleMake(meta.make ?? "");
+          setVehicleModel(meta.model ?? "");
+          setVehicleYear(meta.year != null ? String(meta.year) : "");
+          setVehicleFuel(meta.fuel ?? "");
+          setVehicleTransmission(meta.transmission ?? "");
+          setVehicleDrivetrain(meta.drivetrain ?? "");
+          setVehicleCondition(meta.condition ?? "");
+          setVehicleSellerType(meta.sellerType ?? "");
           setVideoUrl(fs.videoUrl);
           setVirtualTourUrl(fs.virtualTourUrl);
           setSelectedBoosts(fs.selectedBoosts);
@@ -314,6 +334,17 @@ const PublishPage = () => {
           setBathrooms(fs.bathrooms);
           setToilets(fs.toilets);
           setSelectedFeatures(fs.selectedFeatures);
+          const meta = parseVehicleMetaTags(
+            Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
+          );
+          setVehicleMake(meta.make ?? "");
+          setVehicleModel(meta.model ?? "");
+          setVehicleYear(meta.year != null ? String(meta.year) : "");
+          setVehicleFuel(meta.fuel ?? "");
+          setVehicleTransmission(meta.transmission ?? "");
+          setVehicleDrivetrain(meta.drivetrain ?? "");
+          setVehicleCondition(meta.condition ?? "");
+          setVehicleSellerType(meta.sellerType ?? "");
           setVideoUrl(fs.videoUrl);
           setVirtualTourUrl(fs.virtualTourUrl);
           setSelectedBoosts(fs.selectedBoosts);
@@ -389,7 +420,7 @@ const PublishPage = () => {
           rooms,
           bathrooms,
           toilets,
-          selectedFeatures,
+          selectedFeatures: selectedFeaturesWithVehicleMeta,
           videoUrl,
           virtualTourUrl,
           selectedBoosts,
@@ -420,7 +451,7 @@ const PublishPage = () => {
               rooms,
               bathrooms,
               toilets,
-              selectedFeatures,
+              selectedFeatures: selectedFeaturesWithVehicleMeta,
               videoUrl,
               virtualTourUrl,
             },
@@ -461,7 +492,7 @@ const PublishPage = () => {
             rooms,
             bathrooms,
             toilets,
-            selectedFeatures,
+            selectedFeatures: selectedFeaturesWithVehicleMeta,
             videoUrl,
             virtualTourUrl,
             selectedBoosts,
@@ -495,7 +526,7 @@ const PublishPage = () => {
           rooms,
           bathrooms,
           toilets,
-          selectedFeatures,
+          selectedFeatures: selectedFeaturesWithVehicleMeta,
           videoUrl,
           virtualTourUrl,
           selectedBoosts,
@@ -612,7 +643,7 @@ const PublishPage = () => {
             rooms,
             bathrooms,
             toilets,
-            selectedFeatures,
+            selectedFeatures: selectedFeaturesWithVehicleMeta,
             videoUrl,
             virtualTourUrl,
             selectedBoosts,
@@ -678,6 +709,33 @@ const PublishPage = () => {
   const toggleBoost = (b: PurchasableBoostType) => {
     setSelectedBoosts((prev) => (prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b]));
   };
+
+  const selectedFeaturesWithVehicleMeta = useMemo(
+    () => [
+      ...selectedFeatures,
+      ...buildVehicleMetaTags({
+        make: vehicleMake,
+        model: vehicleModel,
+        year: vehicleYear ? Number(vehicleYear) : null,
+        fuel: vehicleFuel,
+        transmission: vehicleTransmission,
+        drivetrain: vehicleDrivetrain,
+        condition: vehicleCondition,
+        sellerType: vehicleSellerType,
+      }),
+    ],
+    [
+      selectedFeatures,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+    ],
+  );
 
   const makeCoverAtIndex = async (globalIndex: number) => {
     if (!draftListingId || globalIndex <= 0) return;
@@ -877,7 +935,7 @@ const PublishPage = () => {
           rooms,
           bathrooms,
           toilets,
-          selectedFeatures,
+          selectedFeatures: selectedFeaturesWithVehicleMeta,
           videoUrl,
           virtualTourUrl,
           selectedBoosts,
@@ -907,7 +965,7 @@ const PublishPage = () => {
             rooms,
             bathrooms,
             toilets,
-            selectedFeatures,
+            selectedFeatures: selectedFeaturesWithVehicleMeta,
             videoUrl,
             virtualTourUrl,
           },
@@ -1006,7 +1064,7 @@ const PublishPage = () => {
         rooms,
         bathrooms,
         toilets,
-        selectedFeatures,
+        selectedFeatures: selectedFeaturesWithVehicleMeta,
         videoUrl,
         virtualTourUrl,
         selectedBoosts,
@@ -1238,6 +1296,14 @@ const PublishPage = () => {
             rooms={rooms}
             bathrooms={bathrooms}
             toilets={toilets}
+            make={vehicleMake}
+            model={vehicleModel}
+            year={vehicleYear}
+            fuel={vehicleFuel}
+            transmission={vehicleTransmission}
+            drivetrain={vehicleDrivetrain}
+            condition={vehicleCondition}
+            sellerType={vehicleSellerType}
             selectedFeatures={selectedFeatures}
             equipmentOptions={LISTING_EQUIPMENT_OPTIONS}
             labels={{
@@ -1256,6 +1322,14 @@ const PublishPage = () => {
             onRoomsChange={setRooms}
             onBathroomsChange={setBathrooms}
             onToiletsChange={setToilets}
+            onMakeChange={setVehicleMake}
+            onModelChange={setVehicleModel}
+            onYearChange={setVehicleYear}
+            onFuelChange={setVehicleFuel}
+            onTransmissionChange={setVehicleTransmission}
+            onDrivetrainChange={setVehicleDrivetrain}
+            onConditionChange={setVehicleCondition}
+            onSellerTypeChange={setVehicleSellerType}
             onToggleFeature={toggleFeature}
           />
         )}

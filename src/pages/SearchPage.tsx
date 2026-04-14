@@ -149,6 +149,19 @@ const SearchPage = () => {
     if (filters.sellerTypes.length > 0) {
       results = results.filter((l) => l.vehicle?.sellerType && filters.sellerTypes.includes(l.vehicle.sellerType));
     }
+    if (filters.brands.length > 0) {
+      results = results.filter((l) => l.vehicle?.make && filters.brands.includes(l.vehicle.make));
+    }
+    if (filters.modelQuery.trim()) {
+      const q = filters.modelQuery.trim().toLowerCase();
+      results = results.filter((l) => (l.vehicle?.model ?? "").toLowerCase().includes(q));
+    }
+    if (filters.yearMin > 0) {
+      results = results.filter((l) => (l.vehicle?.year ?? 0) >= filters.yearMin);
+    }
+    if (filters.yearMax > 0) {
+      results = results.filter((l) => (l.vehicle?.year ?? 0) <= filters.yearMax);
+    }
     return results;
   }, [
     dbListings,
@@ -158,6 +171,10 @@ const SearchPage = () => {
     filters.drivetrains,
     filters.conditions,
     filters.sellerTypes,
+    filters.brands,
+    filters.modelQuery,
+    filters.yearMin,
+    filters.yearMax,
   ]);
 
   const exactMatchListings = useMemo(() => {
@@ -297,6 +314,11 @@ const SearchPage = () => {
     filters.drivetrains.forEach((d) => chips.push({ label: d, key: `drive-${d}` }));
     filters.conditions.forEach((c) => chips.push({ label: c, key: `condition-${c}` }));
     filters.sellerTypes.forEach((s) => chips.push({ label: s, key: `seller-${s}` }));
+    filters.brands.forEach((b) => chips.push({ label: b, key: `brand-${b}` }));
+    if (filters.modelQuery.trim()) chips.push({ label: `Modèle: ${filters.modelQuery.trim()}`, key: "modelQuery" });
+    if (filters.yearMin > 0 || filters.yearMax > 0) {
+      chips.push({ label: `Année ${filters.yearMin || 0} - ${filters.yearMax || "..."}`, key: "yearRange" });
+    }
     return chips;
   }, [filters]);
 
@@ -328,6 +350,12 @@ const SearchPage = () => {
     else if (key.startsWith("drive-")) newFilters.drivetrains = newFilters.drivetrains.filter((d) => d !== key.slice(6));
     else if (key.startsWith("condition-")) newFilters.conditions = newFilters.conditions.filter((c) => c !== key.slice(10));
     else if (key.startsWith("seller-")) newFilters.sellerTypes = newFilters.sellerTypes.filter((s) => s !== key.slice(7));
+    else if (key.startsWith("brand-")) newFilters.brands = newFilters.brands.filter((b) => b !== key.slice(6));
+    else if (key === "modelQuery") newFilters.modelQuery = "";
+    else if (key === "yearRange") {
+      newFilters.yearMin = 0;
+      newFilters.yearMax = 0;
+    }
     updateFilters(newFilters);
   };
 
@@ -410,6 +438,9 @@ const SearchPage = () => {
     if (filters.drivetrains.length > 0) count += 1;
     if (filters.conditions.length > 0) count += 1;
     if (filters.sellerTypes.length > 0) count += 1;
+    if (filters.brands.length > 0) count += 1;
+    if (filters.modelQuery.trim()) count += 1;
+    if (filters.yearMin > 0 || filters.yearMax > 0) count += 1;
     return count;
   }, [filters]);
   const robotsContent = noisyFiltersCount >= 4 ? "noindex,follow" : "index,follow";

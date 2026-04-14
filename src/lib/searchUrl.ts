@@ -77,6 +77,10 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     drivetrains: sp.get("drive")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
     conditions: sp.get("condition")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
     sellerTypes: sp.get("seller")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    brands: sp.get("brand")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    modelQuery: sp.get("model")?.trim() ?? "",
+    yearMin: parseFiniteNumber(sp.get("year_min")),
+    yearMax: parseFiniteNumber(sp.get("year_max")),
   };
 }
 
@@ -104,6 +108,10 @@ export function filtersToSearchParams(f: SearchFilters): URLSearchParams {
   if (f.drivetrains.length) p.set("drive", f.drivetrains.join(","));
   if (f.conditions.length) p.set("condition", f.conditions.join(","));
   if (f.sellerTypes.length) p.set("seller", f.sellerTypes.join(","));
+  if (f.brands.length) p.set("brand", f.brands.join(","));
+  if (f.modelQuery.trim()) p.set("model", f.modelQuery.trim());
+  if (f.yearMin > 0) p.set("year_min", String(f.yearMin));
+  if (f.yearMax > 0) p.set("year_max", String(f.yearMax));
   return p;
 }
 

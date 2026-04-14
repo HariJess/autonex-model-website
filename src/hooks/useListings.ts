@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import type { DisplayListing, ListingType, TransactionType } from "@/types/listing";
 import { deriveVehicleFromLegacy } from "@/lib/vehicleModel";
+import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
 
 type ListingRowLite = Pick<
   Tables<"listings">,
@@ -84,7 +85,8 @@ function mapListingRowToDisplayListing(
     hasWhatsappContact?: boolean;
   },
 ): DisplayListing {
-  const features = Array.isArray(listing.features) ? (listing.features as string[]) : [];
+  const rawFeatures = Array.isArray(listing.features) ? (listing.features as string[]) : [];
+  const features = stripVehicleMetaTags(rawFeatures);
   const pendingBoosts = Array.isArray(listing.pending_boost_types)
     ? (listing.pending_boost_types as unknown[]).filter((x): x is string => typeof x === "string")
     : [];
@@ -134,7 +136,7 @@ function mapListingRowToDisplayListing(
       surface: listing.surface,
       bathrooms: listing.bathrooms,
       isNewProgram: listing.is_new_program,
-      features,
+      features: rawFeatures,
       agencyName: extras?.agencyName ?? null,
     }),
   };

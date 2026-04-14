@@ -1,4 +1,5 @@
 import type { DisplayListing } from "@/types/listing";
+import { parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
 
 type VehicleCondition = "neuf" | "occasion" | null;
 type SellerType = "concessionnaire" | "particulier";
@@ -44,26 +45,30 @@ export function deriveVehicleFromLegacy(input: {
   agencyName?: string | null | undefined;
 }): NonNullable<DisplayListing["vehicle"]> {
   const features = Array.isArray(input.features) ? input.features : [];
+  const tagged = parseVehicleMetaTags(features);
   const parsed = parseMakeModelYear(input.title);
   const mileageKm = input.surface != null && input.surface > 0 ? input.surface : null;
   const doors = input.bathrooms != null && input.bathrooms > 0 ? input.bathrooms : null;
   const fuel =
+    tagged.fuel ??
     pickFromFeatures(features, ["Diesel", "Essence", "Hybride", "Électrique", "GPL"]) ??
     null;
   const transmission =
+    tagged.transmission ??
     pickFromFeatures(features, ["Boîte automatique", "Automatique", "Boîte manuelle", "Manuelle"]) ??
     null;
   const drivetrain =
+    tagged.drivetrain ??
     pickFromFeatures(features, ["4x4", "4x2", "AWD", "Traction", "Propulsion"]) ??
     null;
   const condition: VehicleCondition =
-    input.isNewProgram === true ? "neuf" : mileageKm != null ? "occasion" : null;
-  const sellerType: SellerType = input.agencyName ? "concessionnaire" : "particulier";
+    (tagged.condition as VehicleCondition) ?? (input.isNewProgram === true ? "neuf" : mileageKm != null ? "occasion" : null);
+  const sellerType: SellerType = (tagged.sellerType as SellerType) ?? (input.agencyName ? "concessionnaire" : "particulier");
 
   return {
-    make: parsed.make,
-    model: parsed.model,
-    year: parsed.year,
+    make: tagged.make ?? parsed.make,
+    model: tagged.model ?? parsed.model,
+    year: tagged.year ?? parsed.year,
     mileageKm,
     fuel,
     transmission,

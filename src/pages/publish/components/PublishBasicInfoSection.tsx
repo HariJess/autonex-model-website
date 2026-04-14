@@ -83,6 +83,9 @@ export function PublishBasicInfoSection({
               <SelectItem value="location_vacances">{labels.vacationRental}</SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-xs text-muted-foreground font-sans">
+            Modes couverts: achat/vente, location courte ou longue durée (via options annonce), import et offre concessionnaire.
+          </p>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.propertyType} *</Label>

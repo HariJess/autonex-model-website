@@ -12,6 +12,14 @@ type PublishDetailsSectionProps = {
   rooms: string;
   bathrooms: string;
   toilets: string;
+  make: string;
+  model: string;
+  year: string;
+  fuel: string;
+  transmission: string;
+  drivetrain: string;
+  condition: string;
+  sellerType: string;
   selectedFeatures: string[];
   equipmentOptions: string[];
   labels: {
@@ -30,6 +38,14 @@ type PublishDetailsSectionProps = {
   onRoomsChange: (value: string) => void;
   onBathroomsChange: (value: string) => void;
   onToiletsChange: (value: string) => void;
+  onMakeChange: (value: string) => void;
+  onModelChange: (value: string) => void;
+  onYearChange: (value: string) => void;
+  onFuelChange: (value: string) => void;
+  onTransmissionChange: (value: string) => void;
+  onDrivetrainChange: (value: string) => void;
+  onConditionChange: (value: string) => void;
+  onSellerTypeChange: (value: string) => void;
   onToggleFeature: (feature: string) => void;
 };
 
@@ -42,6 +58,14 @@ export function PublishDetailsSection({
   rooms,
   bathrooms,
   toilets,
+  make,
+  model,
+  year,
+  fuel,
+  transmission,
+  drivetrain,
+  condition,
+  sellerType,
   selectedFeatures,
   equipmentOptions,
   labels,
@@ -52,6 +76,14 @@ export function PublishDetailsSection({
   onRoomsChange,
   onBathroomsChange,
   onToiletsChange,
+  onMakeChange,
+  onModelChange,
+  onYearChange,
+  onFuelChange,
+  onTransmissionChange,
+  onDrivetrainChange,
+  onConditionChange,
+  onSellerTypeChange,
   onToggleFeature,
 }: PublishDetailsSectionProps) {
   return (
@@ -73,6 +105,24 @@ export function PublishDetailsSection({
         />
         <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
         <p className="text-xs text-muted-foreground font-sans">Incluez de préférence: carburant, boîte, état général et historique d’entretien.</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <Label className="font-sans">Marque *</Label>
+          <Input value={make} onChange={(e) => onMakeChange(e.target.value)} className="font-sans" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Modèle *</Label>
+          <Input value={model} onChange={(e) => onModelChange(e.target.value)} className="font-sans" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Année</Label>
+          <Input type="number" min={1950} max={2100} value={year} onChange={(e) => onYearChange(e.target.value)} className="font-sans" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">État</Label>
+          <Input value={condition} onChange={(e) => onConditionChange(e.target.value)} className="font-sans" placeholder="neuf / occasion / importé" />
+        </div>
       </div>
       <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-4`}>
         <div className="space-y-2">
@@ -99,6 +149,24 @@ export function PublishDetailsSection({
             </div>
           </>
         )}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <Label className="font-sans">Carburant</Label>
+          <Input value={fuel} onChange={(e) => onFuelChange(e.target.value)} className="font-sans" placeholder="Essence, Diesel..." />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Boîte</Label>
+          <Input value={transmission} onChange={(e) => onTransmissionChange(e.target.value)} className="font-sans" placeholder="Manuelle / Automatique" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Motricité</Label>
+          <Input value={drivetrain} onChange={(e) => onDrivetrainChange(e.target.value)} className="font-sans" placeholder="4x2 / 4x4 / AWD" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Type vendeur</Label>
+          <Input value={sellerType} onChange={(e) => onSellerTypeChange(e.target.value)} className="font-sans" placeholder="particulier / concessionnaire" />
+        </div>
       </div>
       <div className="space-y-2">
         <Label className="font-sans">{labels.listingFeatures}</Label>

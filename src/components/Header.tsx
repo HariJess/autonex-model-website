@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import logo from "@/assets/logo.png";
+import { AUTO_TRANSACTION_MODES } from "@/data/automotiveCatalog";
 
 const Header = () => {
   const { t } = useTranslation();
@@ -19,8 +20,11 @@ const Header = () => {
   };
 
   const navLinks = [
-    { label: t("nav.buy"), href: "/recherche?transaction=vente" },
-    { label: t("nav.rent"), href: "/recherche?transaction=location" },
+    { label: AUTO_TRANSACTION_MODES[0].label, href: AUTO_TRANSACTION_MODES[0].href },
+    { label: AUTO_TRANSACTION_MODES[1].label, href: AUTO_TRANSACTION_MODES[1].href },
+    { label: AUTO_TRANSACTION_MODES[2].label, href: AUTO_TRANSACTION_MODES[2].href },
+    { label: AUTO_TRANSACTION_MODES[3].label, href: AUTO_TRANSACTION_MODES[3].href },
+    { label: AUTO_TRANSACTION_MODES[4].label, href: AUTO_TRANSACTION_MODES[4].href },
     { label: t("nav.agencies"), href: "/agences" },
     { label: t("nav.advice"), href: "/conseils" },
   ];

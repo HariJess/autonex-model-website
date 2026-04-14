@@ -15,6 +15,7 @@ import { listingTypesForTransaction } from "@/lib/listingRules";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { cn } from "@/lib/utils";
+import { AUTO_BRAND_GROUPS } from "@/data/automotiveCatalog";
 
 export type { SearchFilters };
 
@@ -126,6 +127,42 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
               {filters.transaction && typeOptions.length < LISTING_TYPES.length && (
                 <p className="text-xs text-muted-foreground font-sans pt-1">{t("search.terrainNotForRent", "Certaines catégories ne sont pas disponibles pour ce type d’annonce.")}</p>
               )}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="brand" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              Marque
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 space-y-2">
+              {AUTO_BRAND_GROUPS.map((group) => (
+                <div key={group.group} className="space-y-1">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-sans">{group.group}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.brands.slice(0, 12).map((brand) => (
+                      <Button
+                        key={brand}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className={cn("text-xs h-8 px-2.5", filters.brands.includes(brand) ? "border-primary bg-primary/10 text-primary" : "")}
+                        onClick={() => update({ brands: toggleInArray(filters.brands, brand) })}
+                      >
+                        {brand}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <Input
+                value={filters.modelQuery}
+                onChange={(e) => update({ modelQuery: e.target.value })}
+                placeholder="Modèle (ex: RAV4, Hilux, NMAX...)"
+                className="font-sans text-sm"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <Input type="number" min={1950} max={2100} value={filters.yearMin || ""} onChange={(e) => update({ yearMin: Number(e.target.value) || 0 })} placeholder="Année min" className="font-sans text-sm" />
+                <Input type="number" min={1950} max={2100} value={filters.yearMax || ""} onChange={(e) => update({ yearMax: Number(e.target.value) || 0 })} placeholder="Année max" className="font-sans text-sm" />
+              </div>
             </AccordionContent>
           </AccordionItem>
 
