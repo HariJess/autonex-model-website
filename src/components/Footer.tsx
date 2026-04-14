@@ -6,12 +6,12 @@ const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer style={{ backgroundColor: '#0A0A0A', color: '#FAFAFA' }}>
+    <footer className="border-t border-white/10" style={{ backgroundColor: "#070D1A", color: "#FAFAFA" }}>
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {/* Brand */}
           <div className="space-y-4">
-            <img src={logo} alt="AutoNex" className="h-10" />
+            <img src={logo} alt="AutoNex" className="h-12 sm:h-14 w-auto" />
             <p className="text-sm opacity-70 font-sans">
               {t("footer.tagline")}
             </p>

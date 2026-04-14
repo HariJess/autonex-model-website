@@ -21,12 +21,12 @@ const TRANSACTIONS = [
 ];
 
 const ROOM_OPTIONS = [
-  { label: "Citadine", value: "0" },
-  { label: "Berline", value: "1" },
-  { label: "SUV / 4x4", value: "2" },
-  { label: "Utilitaire", value: "3" },
-  { label: "Moto", value: "4" },
-  { label: "Premium", value: "5" },
+  { label: "Toyota", value: "0" },
+  { label: "Nissan", value: "1" },
+  { label: "Hyundai", value: "2" },
+  { label: "Kia", value: "3" },
+  { label: "Suzuki", value: "4" },
+  { label: "Yamaha / Honda", value: "5" },
 ];
 
 const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);

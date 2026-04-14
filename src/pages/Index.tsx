@@ -60,6 +60,21 @@ const Index = () => {
 
       <HeroSearch />
 
+      <section className="container mx-auto px-4 pt-8 pb-2">
+        <div className="rounded-2xl border border-border bg-card p-4 md:p-5">
+          <div className="flex flex-wrap gap-2">
+            {["Voitures", "4x4", "Motos", "Utilitaires", "Occasions certifiées", "Concessionnaires"].map((label) => (
+              <span
+                key={label}
+                className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {homeSponsorEnabled && homeSponsorCampaign && (
         <section className="container mx-auto px-4 pt-6 pb-2">
           <BannerSlot
@@ -93,7 +108,7 @@ const Index = () => {
       {/* Recent feed — complementary to “À la une” */}
       <section className="container mx-auto px-4 py-10 md:py-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Récemment publiées")}</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Nouvelles annonces auto")}</h2>
           <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">
             {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
           </Link>
@@ -109,7 +124,7 @@ const Index = () => {
           </div>
         ) : listings.length === 0 ? (
           <p className="text-center text-muted-foreground font-sans py-12">
-            {t("home.noListings", "Aucune annonce pour le moment. Soyez le premier à publier !")}
+            {t("home.noListings", "Aucune annonce auto pour le moment. Soyez le premier à publier un véhicule !")}
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -123,7 +138,7 @@ const Index = () => {
       {/* Cities */}
       <section className="bg-secondary/50 py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">{t("sections.cities", "Nos villes")}</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">{t("sections.cities", "Explorer par ville")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {villes.map((ville) => {
               const count = villeCounts[ville.name] ?? 0;
@@ -142,7 +157,7 @@ const Index = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
                   <div className="absolute bottom-3 left-3">
                     <h3 className="font-serif font-bold text-lg" style={{ color: "#FAFAFA" }}>{ville.name}</h3>
-                    <p className="text-xs font-sans opacity-80" style={{ color: "#FAFAFA" }}>{ville.description} • {count} annonce{count !== 1 ? "s" : ""}</p>
+                    <p className="text-xs font-sans opacity-80" style={{ color: "#FAFAFA" }}>{ville.description} • {count} véhicule{count !== 1 ? "s" : ""}</p>
                   </div>
                 </Link>
               );

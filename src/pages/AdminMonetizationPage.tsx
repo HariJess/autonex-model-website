@@ -167,7 +167,7 @@ const AdminMonetizationPage = () => {
   return (
     <>
       <Helmet>
-        <title>Admin — Monétisation — ImmoNex</title>
+        <title>Admin — Monétisation — AutoNex</title>
       </Helmet>
       <div className="max-w-4xl space-y-10">
         <div>

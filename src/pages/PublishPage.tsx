@@ -774,9 +774,9 @@ const PublishPage = () => {
     switch (s) {
       case 0:
         if (!transaction || !assertValidTransactionType(transaction)) errors.push(t("publish.transactionRequired", "Type de transaction requis"));
-        if (!listingType) errors.push(t("publish.typeRequired", "Type de bien requis"));
+        if (!listingType) errors.push(t("publish.typeRequired", "Type de véhicule requis"));
         if (transaction && listingType && isTerrainRentalForbidden(transaction, listingType)) {
-          errors.push(t("publish.terrainNoRent", "Un terrain ne peut pas être proposé à la location."));
+          errors.push(t("publish.terrainNoRent", "Cette catégorie n’est pas disponible pour ce type d’annonce."));
         }
         if (!ville) errors.push(t("publish.villeRequired", "Ville requise"));
         if (pinLat == null || pinLng == null || !isValidListingCoordinates(pinLat, pinLng)) {
@@ -1194,7 +1194,7 @@ const PublishPage = () => {
             pinLat={pinLat}
             pinLng={pinLng}
             labels={{
-              propertyType: t("publish.propertyType", "Type de bien"),
+              propertyType: t("publish.propertyType", "Type de véhicule"),
               newProgram: t("publish.newProgram", "Programme / neuf"),
               newProgramHint: t("publish.newProgramHint", "Cochez si le bien relève d’un promoteur ou d’un lot neuf."),
               internalRef: t("publish.internalRef", "Référence interne (optionnel)"),

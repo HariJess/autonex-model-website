@@ -30,7 +30,7 @@ function AdminModerationPage() {
   return (
     <>
       <Helmet>
-        <title>Admin — Modération — ImmoNex</title>
+        <title>Admin — Modération — AutoNex</title>
       </Helmet>
       <div className="space-y-5">
         <div>

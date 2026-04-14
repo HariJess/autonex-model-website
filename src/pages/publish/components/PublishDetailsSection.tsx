@@ -78,7 +78,7 @@ export function PublishDetailsSection({
           <Input type="number" value={priceMga} onChange={(e) => onPriceMgaChange(e.target.value)} className="font-sans" min={0} />
         </div>
         <div className="space-y-2">
-          <Label className="font-sans">{labels.listingSurface} (m²)</Label>
+          <Label className="font-sans">{labels.listingSurface} (km)</Label>
           <Input type="number" value={surface} onChange={(e) => onSurfaceChange(e.target.value)} className="font-sans" min={0} />
         </div>
         {showRooms && (

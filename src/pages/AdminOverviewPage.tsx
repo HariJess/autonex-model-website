@@ -83,7 +83,7 @@ function AdminOverviewPage() {
   return (
     <>
       <Helmet>
-        <title>Admin — Vue d’ensemble — ImmoNex</title>
+        <title>Admin — Vue d’ensemble — AutoNex</title>
       </Helmet>
       <div className="space-y-5">
         <div>

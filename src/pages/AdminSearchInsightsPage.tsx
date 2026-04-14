@@ -26,7 +26,7 @@ const AdminSearchInsightsPage = () => {
   return (
     <>
       <Helmet>
-        <title>Admin — Recherche — ImmoNex</title>
+        <title>Admin — Recherche — AutoNex</title>
       </Helmet>
       <div className="max-w-6xl">
         <div className="flex flex-wrap items-center gap-3 mb-6">

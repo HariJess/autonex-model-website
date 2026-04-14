@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
-import { Bed, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
+import { Gauge, CircleDot, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { DisplayListing, ListingType } from "@/types/listing";
+import type { DisplayListing } from "@/types/listing";
 import { LISTING_TYPE_LABELS } from "@/types/listing";
 import { prefetchListing } from "@/hooks/useListings";
 import { applyImageFallback } from "@/lib/imageFallback";
-
-const STUDIO_TYPES: ListingType[] = ["appartement", "villa", "maison"];
+import { formatVehicleMileage, formatVehicleVersion } from "@/lib/vehiclePresentation";
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -46,6 +45,8 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
   const displayAgencyLogo = agencyLogo ?? listing.agency_logo;
   const city = listing.ville ?? "";
   const region = listing.region ?? "";
+  const versionLabel = formatVehicleVersion(listing.rooms);
+  const mileageLabel = formatVehicleMileage(listing.surface);
 
   const handlePrefetchDetail = () => {
     void prefetchListing(queryClient, listing.id);
@@ -138,22 +139,16 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
           </p>
         )}
         <div className="flex items-center gap-3 text-xs text-muted-foreground font-sans flex-wrap">
-          {listing.rooms != null && listing.rooms > 0 && (
+          {versionLabel && (
             <span className="flex items-center gap-1">
-              <Bed className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {listing.rooms}
+              <CircleDot className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {versionLabel}
             </span>
           )}
-          {listing.rooms === 0 && STUDIO_TYPES.includes(listing.type) && (
+          {mileageLabel && (
             <span className="flex items-center gap-1">
-              <Bed className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              Studio
-            </span>
-          )}
-          {listing.surface != null && listing.surface > 0 && (
-            <span className="flex items-center gap-1">
-              <Maximize className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {listing.surface}m²
+              <Gauge className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {mileageLabel}
             </span>
           )}
           <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>

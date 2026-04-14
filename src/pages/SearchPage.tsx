@@ -258,15 +258,15 @@ const SearchPage = () => {
     }
     if (filters.surfaceMin || filters.surfaceMax) {
       chips.push({
-        label: `${filters.surfaceMin || 0} - ${filters.surfaceMax ? filters.surfaceMax + " m²" : "∞"}`,
+        label: `${filters.surfaceMin || 0} - ${filters.surfaceMax ? `${filters.surfaceMax.toLocaleString("fr-FR")} km` : "∞ km"}`,
         key: "surface",
       });
     }
     filters.rooms.forEach((r) =>
-      chips.push({ label: `${r === 0 ? "Studio" : r + " ch."}`, key: `room-${r}` })
+      chips.push({ label: `${r === 0 ? "Base" : `Version ${r}`}`, key: `room-${r}` })
     );
     filters.bathrooms.forEach((b) =>
-      chips.push({ label: `${b}${b === 4 ? "+" : ""} sdb`, key: `bath-${b}` })
+      chips.push({ label: `${b}${b === 4 ? "+" : ""} portes`, key: `bath-${b}` })
     );
     filters.equipments.forEach((e) => chips.push({ label: e, key: `eq-${e}` }));
     return chips;
@@ -463,7 +463,7 @@ const SearchPage = () => {
             <SidebarPromoSlot />
             {MONETIZATION_PLACEMENTS.searchFeaturedAgencies && (
               <div className="mt-6">
-                <FeaturedAgenciesSection title={t("search.partnerAgencies", "Concessionnaires partenaires")} variant="embedded" limit={6} />
+                <FeaturedAgenciesSection title={t("search.partnerAgencies", "Concessionnaires premium")} variant="embedded" limit={6} />
               </div>
             )}
           </aside>

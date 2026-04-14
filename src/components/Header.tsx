@@ -26,10 +26,10 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50" style={{ backgroundColor: "#0A0A0A" }}>
-      <div className="container mx-auto px-4 flex items-center justify-between h-16 sm:h-[4.25rem]">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#070D1A]/95 backdrop-blur-md">
+      <div className="container mx-auto px-4 flex items-center justify-between h-[4.25rem] sm:h-[4.75rem]">
         <Link to="/" className="flex-shrink-0">
-        <img src={logo} alt="AutoNex" className="h-10 sm:h-12" />
+          <img src={logo} alt="AutoNex" className="h-12 sm:h-14 w-auto" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6">
@@ -78,14 +78,14 @@ const Header = () => {
       </div>
 
       {menuOpen && (
-        <div id="mobile-nav" className="lg:hidden border-t" style={{ backgroundColor: "#0A0A0A", borderColor: "#333" }}>
+        <div id="mobile-nav" className="lg:hidden border-t border-white/10 bg-[#070D1A]">
           <div className="container mx-auto px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="text-sm py-2.5 min-h-11 flex items-center touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {link.label}
               </Link>
             ))}
-            <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t" style={{ borderColor: "#333" }}>
+            <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-white/10">
               <button onClick={toggleCurrency} className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {currency}
               </button>

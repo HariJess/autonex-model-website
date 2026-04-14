@@ -53,7 +53,7 @@ function AdminLoginPage() {
   return (
     <>
       <Helmet>
-        <title>Back-office admin — Connexion — ImmoNex</title>
+        <title>Back-office admin — Connexion — AutoNex</title>
       </Helmet>
       <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4 py-10">
         <Card className="w-full max-w-md rounded-2xl">
@@ -63,7 +63,7 @@ function AdminLoginPage() {
             </div>
             <CardTitle className="font-serif text-2xl">Back-office admin</CardTitle>
             <CardDescription className="font-sans">
-              Accès réservé aux administrateurs ImmoNex.
+              Accès réservé aux administrateurs AutoNex.
             </CardDescription>
           </CardHeader>
           <CardContent>

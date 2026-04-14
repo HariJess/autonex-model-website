@@ -182,7 +182,7 @@ const AdminPartnerAdsPage = () => {
   return (
     <>
       <Helmet>
-        <title>Admin — Campagnes partenaires — ImmoNex</title>
+        <title>Admin — Campagnes partenaires — AutoNex</title>
       </Helmet>
       <div className="max-w-6xl space-y-8">
         <div className="flex flex-wrap items-center gap-3">

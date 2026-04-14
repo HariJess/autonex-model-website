@@ -51,7 +51,7 @@ function AdminUsersPage() {
   return (
     <>
       <Helmet>
-        <title>Admin — Utilisateurs — ImmoNex</title>
+        <title>Admin — Utilisateurs — AutoNex</title>
       </Helmet>
       <div className="space-y-4">
         <h1 className="font-serif text-2xl font-bold">Utilisateurs</h1>

@@ -5,6 +5,7 @@ import type { DisplayListing } from "@/types/listing";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchListing } from "@/hooks/useListings";
+import { formatVehicleDoors, formatVehicleMileage, formatVehicleVersion } from "@/lib/vehiclePresentation";
 
 type SearchResultsListProps = {
   listings: DisplayListing[];
@@ -26,7 +27,11 @@ export function SearchResultsList({
 
   return (
     <div className="space-y-4">
-      {listings.map((listing) => (
+      {listings.map((listing) => {
+        const mileageLabel = formatVehicleMileage(listing.surface);
+        const versionLabel = formatVehicleVersion(listing.rooms);
+        const doorsLabel = formatVehicleDoors(listing.bathrooms);
+        return (
         <div
           key={listing.id}
           className="flex flex-col sm:flex-row bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
@@ -67,10 +72,9 @@ export function SearchResultsList({
               )}
               <p className="text-sm text-muted-foreground font-sans mt-1 line-clamp-2">{listing.description}</p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm font-sans text-muted-foreground">
-                {listing.surface != null && listing.surface > 0 && <span>{listing.surface} m²</span>}
-                {listing.rooms != null && listing.rooms > 0 && <span>{listing.rooms} ch.</span>}
-                {listing.rooms === 0 && ["appartement", "villa", "maison"].includes(listing.type) && <span>Studio</span>}
-                {listing.bathrooms != null && listing.bathrooms > 0 && <span>{listing.bathrooms} sdb</span>}
+                {mileageLabel && <span>{mileageLabel}</span>}
+                {versionLabel && <span>{versionLabel}</span>}
+                {doorsLabel && <span>{doorsLabel}</span>}
                 <span>{listing.ville}</span>
               </div>
             </div>
@@ -82,7 +86,8 @@ export function SearchResultsList({
             </div>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

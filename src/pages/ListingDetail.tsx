@@ -26,6 +26,7 @@ import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescrip
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
+import { formatVehicleDoors, formatVehicleMileage, formatVehicleVersion } from "@/lib/vehiclePresentation";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
@@ -278,6 +279,9 @@ const ListingDetail = () => {
   const hasApproxMap =
     mapPublic != null && isValidListingCoordinates(mapPublic.lat, mapPublic.lng);
   const isOwner = user?.id === listing.owner_id;
+  const versionLabel = formatVehicleVersion(listing.rooms);
+  const mileageLabel = formatVehicleMileage(listing.surface);
+  const doorsLabel = formatVehicleDoors(listing.bathrooms);
   const ownerStatusHint = (() => {
     const s = listing.status;
     if (!isOwner || s === "active") return null;
@@ -466,22 +470,22 @@ const ListingDetail = () => {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {listing.rooms != null && listing.rooms > 0 && (
+              {versionLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
                   <Bed className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold font-sans">{listing.rooms}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.rooms")}</p></div>
+                  <div><p className="font-semibold font-sans">{versionLabel}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.rooms")}</p></div>
                 </div>
               )}
-              {listing.surface != null && listing.surface > 0 && (
+              {mileageLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
                   <Maximize className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold font-sans">{listing.surface}m²</p><p className="text-xs text-muted-foreground font-sans">{t("listing.surface")}</p></div>
+                  <div><p className="font-semibold font-sans">{mileageLabel}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.surface")}</p></div>
                 </div>
               )}
-              {listing.bathrooms != null && listing.bathrooms > 0 && (
+              {doorsLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
                   <Bath className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold font-sans">{listing.bathrooms}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.bathrooms")}</p></div>
+                  <div><p className="font-semibold font-sans">{doorsLabel}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.bathrooms")}</p></div>
                 </div>
               )}
               {listing.toilets != null && listing.toilets > 0 && (
