@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
 import { ChevronRight, Loader2, Car, Bike, Truck, BusFront, ShieldCheck, RotateCw, CalendarClock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
@@ -121,6 +122,49 @@ const Index = () => {
         .slice(0, 4),
     [thematicListings],
   );
+  const totalInventory = thematicListings.length;
+  const isZeroInventory = !themedLoading && totalInventory === 0;
+  const isLowInventory = !themedLoading && totalInventory > 0 && totalInventory <= 6;
+  const themedSections = useMemo(
+    () => [
+      {
+        id: "4x4-pickup",
+        title: "4x4 & Pick-up",
+        subtitle: "Terrain, robustesse et usages mixtes route/piste.",
+        linksTo: "/recherche?drive=4x4&type=villa&type=local_commercial",
+        items: fourByFourAndPickup,
+      },
+      {
+        id: "city-urban",
+        title: "Citadines & SUV urbains",
+        subtitle: "Mobilité quotidienne, confort urbain et polyvalence.",
+        linksTo: "/recherche?type=appartement&type=maison&type=villa",
+        items: cityAndUrbanSuv,
+      },
+      {
+        id: "utility-fleet",
+        title: "Utilitaires, Vans & Minibus",
+        subtitle: "Transport pro, logistique et activité passagers.",
+        linksTo: "/recherche?type=local_commercial&type=bureau",
+        items: utilityFleet,
+      },
+      {
+        id: "electric-hybrid",
+        title: "Électriques & hybrides",
+        subtitle: "Motorisations plus efficientes pour vos trajets.",
+        linksTo: "/recherche?fuel=%C3%89lectrique&fuel=Hybride",
+        items: electricHybrid,
+      },
+    ],
+    [fourByFourAndPickup, cityAndUrbanSuv, utilityFleet, electricHybrid],
+  );
+  const themedSectionsToRender = useMemo(() => {
+    if (themedLoading) return themedSections;
+    const nonEmpty = themedSections.filter((section) => section.items.length > 0);
+    if (isZeroInventory) return [];
+    if (isLowInventory) return nonEmpty.slice(0, 2);
+    return nonEmpty;
+  }, [themedLoading, themedSections, isZeroInventory, isLowInventory]);
   const categoryIcon = (iconKey?: string) => {
     if (iconKey === "moto" || iconKey === "scooter") return <Bike className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "pickup" || iconKey === "camion" || iconKey === "utilitaire") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
@@ -174,13 +218,6 @@ const Index = () => {
         <div className="flex justify-center py-8">
           <Loader2 className="h-7 w-7 animate-spin text-primary" />
         </div>
-      ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-border/80 bg-card p-6 text-center">
-          <p className="text-sm font-sans text-muted-foreground">Aucune annonce pour cette sélection pour le moment.</p>
-          <Link to="/publier" className="inline-flex mt-3 text-primary text-sm font-semibold hover:underline">
-            Publier le premier véhicule
-          </Link>
-        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {items.map((listing) => (
@@ -230,9 +267,22 @@ const Index = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : listings.length === 0 ? (
-          <p className="text-center text-muted-foreground font-sans py-12">
-            {t("home.noListings", "Aucune annonce auto pour le moment. Soyez le premier à publier un véhicule !")}
-          </p>
+          <div className="rounded-2xl border border-border/80 bg-card p-6 md:p-8 text-center">
+            <p className="text-base font-serif text-foreground">
+              {t("home.noListings", "Le catalogue AutoNex démarre. Publiez le premier véhicule !")}
+            </p>
+            <p className="text-sm text-muted-foreground font-sans mt-2 leading-relaxed max-w-xl mx-auto">
+              Découvrez déjà la recherche et nos catégories, puis lancez votre première annonce pour activer le marché.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2.5">
+              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+                <Link to="/publier">Publier un véhicule</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/recherche">Explorer la recherche</Link>
+              </Button>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {listings.map((listing) => (
@@ -242,32 +292,27 @@ const Index = () => {
         )}
       </section>
 
-      {renderThematicSection(
-        "4x4 & Pick-up",
-        "Terrain, robustesse et usages mixtes route/piste.",
-        "/recherche?drive=4x4&type=villa&type=local_commercial",
-        fourByFourAndPickup,
+      {themedSectionsToRender.map((section) =>
+        renderThematicSection(section.title, section.subtitle, section.linksTo, section.items),
       )}
 
-      {renderThematicSection(
-        "Citadines & SUV urbains",
-        "Mobilité quotidienne, confort urbain et polyvalence.",
-        "/recherche?type=appartement&type=maison&type=villa",
-        cityAndUrbanSuv,
-      )}
-
-      {renderThematicSection(
-        "Utilitaires, Vans & Minibus",
-        "Transport pro, logistique et activité passagers.",
-        "/recherche?type=local_commercial&type=bureau",
-        utilityFleet,
-      )}
-
-      {renderThematicSection(
-        "Électriques & hybrides",
-        "Motorisations plus efficientes pour vos trajets.",
-        "/recherche?fuel=%C3%89lectrique&fuel=Hybride",
-        electricHybrid,
+      {isLowInventory && themedSectionsToRender.length === 0 && (
+        <section className="container mx-auto px-4 py-5 md:py-6">
+          <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6">
+            <h3 className="font-serif text-lg md:text-xl font-bold text-foreground">Le marché se lance</h3>
+            <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">
+              L’inventaire est encore limité. Publiez votre véhicule ou explorez les recherches pour suivre les nouvelles annonces.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2.5">
+              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+                <Link to="/publier">Publier maintenant</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/recherche">Voir les annonces</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
       )}
 
       <section className="container mx-auto px-4 py-5 md:py-6">
