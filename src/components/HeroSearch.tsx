@@ -24,7 +24,18 @@ const TRANSACTIONS = [
 
 const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
 const HERO_FUEL_OPTIONS = ["Essence", "Diesel", "Hybride", "Électrique"];
-const HERO_YEAR_OPTIONS = Array.from({ length: 27 }, (_, idx) => String(2026 - idx));
+const HERO_YEAR_PRESETS = [
+  { value: "all", label: "Toutes années", min: 0, max: 0 },
+  { value: "2025", label: "2025+", min: 2025, max: 0 },
+  { value: "2020", label: "2020+", min: 2020, max: 0 },
+  { value: "2015", label: "2015+", min: 2015, max: 0 },
+  { value: "2010", label: "2010+", min: 2010, max: 0 },
+  { value: "2005", label: "2005+", min: 2005, max: 0 },
+  { value: "2000", label: "2000+", min: 2000, max: 0 },
+  { value: "1990", label: "1990+", min: 1990, max: 0 },
+  { value: "1980", label: "1980+", min: 1980, max: 0 },
+  { value: "before-1980", label: "Avant 1980", min: 0, max: 1979 },
+] as const;
 
 const HeroSearch = () => {
   const { t } = useTranslation();
@@ -58,7 +69,7 @@ const HeroSearch = () => {
   const [mobileBudgetOpen, setMobileBudgetOpen] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
   const [modelQuery, setModelQuery] = useState("");
-  const [yearMin, setYearMin] = useState(0);
+  const [yearPreset, setYearPreset] = useState<(typeof HERO_YEAR_PRESETS)[number]["value"]>("all");
   const [fuel, setFuel] = useState("");
 
   const showBrand = !type || !NO_ROOMS_TYPES.has(type);
@@ -66,6 +77,7 @@ const HeroSearch = () => {
   const buildFilters = (): SearchFilters => {
     const allowed = new Set(listingTypesForTransaction(transaction));
     const types: string[] = type && allowed.has(type as ListingType) ? [type] : [];
+    const selectedYearPreset = HERO_YEAR_PRESETS.find((preset) => preset.value === yearPreset) ?? HERO_YEAR_PRESETS[0];
     return {
       ...EMPTY_SEARCH_FILTERS,
       transaction: TRANSACTIONS.some((tr) => tr.value === transaction) ? transaction : "vente",
@@ -83,8 +95,8 @@ const HeroSearch = () => {
       sellerTypes: [],
       brands: brand ? [brand] : [],
       modelQuery,
-      yearMin,
-      yearMax: 0,
+      yearMin: selectedYearPreset.min,
+      yearMax: selectedYearPreset.max,
       fuels: fuel ? [fuel] : [],
     };
   };
@@ -274,14 +286,15 @@ const HeroSearch = () => {
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
                   Année
                 </label>
-                <Select value={yearMin ? String(yearMin) : "all"} onValueChange={(v) => setYearMin(v === "all" ? 0 : Number(v))}>
+                <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
                   <SelectTrigger className="h-9 font-sans text-sm">
                     <SelectValue placeholder="Toutes années" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Toutes années</SelectItem>
-                    {HERO_YEAR_OPTIONS.map((year) => (
-                      <SelectItem key={year} value={year}>{year}+</SelectItem>
+                    {HERO_YEAR_PRESETS.map((yearPresetOption) => (
+                      <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
+                        {yearPresetOption.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -380,14 +393,15 @@ const HeroSearch = () => {
                 className="font-sans min-h-11"
               />
               <div className="grid grid-cols-2 gap-2">
-                <Select value={yearMin ? String(yearMin) : "all"} onValueChange={(v) => setYearMin(v === "all" ? 0 : Number(v))}>
+                <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
                   <SelectTrigger className="font-sans min-h-11">
                     <SelectValue placeholder="Année" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Toutes années</SelectItem>
-                    {HERO_YEAR_OPTIONS.map((year) => (
-                      <SelectItem key={year} value={year}>{year}+</SelectItem>
+                    {HERO_YEAR_PRESETS.map((yearPresetOption) => (
+                      <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
+                        {yearPresetOption.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
