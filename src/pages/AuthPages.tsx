@@ -165,12 +165,14 @@ const SignupPage = () => {
       toast.error(t("auth.passwordMismatch"));
       return;
     }
+    let whatsappE164: string | undefined;
     if (whatsapp.trim()) {
       const waParsed = optionalMgPhoneSchema.safeParse(whatsapp);
       if (!waParsed.success) {
         toast.error(waParsed.error.issues[0]?.message ?? t("common.error"));
         return;
       }
+      whatsappE164 = waParsed.data;
     }
     if (role === "particulier") {
       if (!firstName.trim() || !lastName.trim() || !phone.trim()) {
@@ -216,7 +218,7 @@ const SignupPage = () => {
         phone: commonParsed.data.phone,
         first_name: firstName.trim(),
         last_name: lastName.trim(),
-        whatsapp_phone: whatsapp.trim() || undefined,
+        whatsapp_phone: whatsappE164 || undefined,
         contact_consent: true,
       };
     } else {

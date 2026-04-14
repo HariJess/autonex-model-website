@@ -194,7 +194,7 @@ export function SignupForm({
               onChange={(e) => onFieldChange("whatsapp", e.target.value)}
               className="font-sans"
               maxLength={30}
-              placeholder="+261 …"
+              placeholder="+261 … ou +indicatif pays"
               autoComplete="tel"
             />
           </div>
