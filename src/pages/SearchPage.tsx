@@ -514,7 +514,7 @@ const SearchPage = () => {
       </Helmet>
       <Header />
 
-      <div className="container mx-auto px-4 pt-4 pb-2">
+      <div className="container mx-auto px-4 pt-3 md:pt-4 pb-1.5 md:pb-2">
         <nav className="flex flex-wrap items-center gap-1.5 text-sm font-sans text-muted-foreground mb-3" aria-label="Breadcrumb">
           {breadcrumbs.map((bc, i) => (
             <span key={i} className="flex items-center gap-1.5">
@@ -535,10 +535,10 @@ const SearchPage = () => {
           ))}
         </nav>
 
-        <h1 className="font-serif text-xl md:text-2xl font-bold mb-2">
+        <h1 className="font-serif text-lg md:text-2xl font-bold mb-2 leading-snug">
           {queryError ? t("search.title", "Recherche") : pageTitle}{" "}
           {!queryError && (
-            <span className="text-muted-foreground font-normal text-lg">
+            <span className="text-muted-foreground font-normal text-base md:text-lg">
               {sortedExact.length > 0 ? (
                 <>
                   ({sortedExact.length}{" "}
@@ -568,7 +568,7 @@ const SearchPage = () => {
         />
       </div>
 
-      <div className="container mx-auto px-4 pb-10">
+      <div className="container mx-auto px-4 pb-8 md:pb-10">
         <div className="flex gap-6">
           <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <FilterSidebar filters={filters} onFiltersChange={updateFilters} idPrefix="desktop" />
@@ -620,7 +620,7 @@ const SearchPage = () => {
             )}
 
             {showSimilarBanner && (
-              <div className="mb-4 rounded-2xl border border-border/80 bg-card px-4 py-4 lg:py-3 shadow-sm">
+              <div className="mb-4 rounded-2xl border border-border/80 bg-card px-3.5 py-3.5 lg:py-3 shadow-sm">
                 <div className="flex gap-3">
                   <div className="shrink-0 mt-0.5 rounded-full bg-secondary p-2">
                     <Sparkles className="h-5 w-5 text-primary" aria-hidden />
@@ -700,14 +700,14 @@ const SearchPage = () => {
             )}
 
             {showAlsoLikeBlock && (
-              <div className="mt-8 pt-6 border-t border-border max-lg:mt-10">
+              <div className="mt-7 pt-5 border-t border-border max-lg:mt-8">
                 <h2 className="font-serif text-xl max-lg:font-bold font-semibold mb-2 max-lg:mb-3">
                   {t("search.youMayAlsoLike", "Vous pouvez aussi aimer")}
                 </h2>
                 <p className="font-sans text-sm text-muted-foreground mb-4 max-lg:leading-relaxed">
                   {t("search.alsoLikeHint", "Autres annonces proches de votre recherche, en complément des résultats ci-dessus.")}
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                   {alsoLikeListings.map((listing) => (
                     <ListingCard key={`also-${listing.id}`} listing={listing} />
                   ))}

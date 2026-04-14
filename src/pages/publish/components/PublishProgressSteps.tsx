@@ -9,12 +9,12 @@ type PublishProgressStepsProps = {
 
 export function PublishProgressSteps({ steps, step, progress }: PublishProgressStepsProps) {
   return (
-    <div className="mb-6 md:mb-8">
-      <div className="flex justify-between mb-3 gap-1 overflow-x-auto pb-1">
+    <div className="mb-5 md:mb-8">
+      <div className="flex justify-between mb-3 gap-2 overflow-x-auto pb-1.5">
         {steps.map((s, i) => (
-          <div key={s} className="flex flex-col items-center min-w-[4.75rem]">
+          <div key={s} className="flex flex-col items-center min-w-[5.25rem]">
             <div
-              className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-sans font-semibold transition-all border-2 ${
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-sans font-semibold transition-all border-2 ${
                 i === step
                   ? "gradient-primary border-transparent ring-2 ring-primary/35 ring-offset-2 ring-offset-background text-[#FAFAFA] shadow-md"
                   : i < step
@@ -25,7 +25,7 @@ export function PublishProgressSteps({ steps, step, progress }: PublishProgressS
               {i < step ? <Check className="h-4 w-4 text-[#FAFAFA]" strokeWidth={2.5} /> : i + 1}
             </div>
             <span
-              className={`text-[10px] md:text-xs font-sans mt-1.5 text-center max-w-[5.5rem] leading-tight ${
+              className={`text-[10px] md:text-xs font-sans mt-1.5 text-center max-w-[6rem] leading-tight ${
                 i === step ? "text-foreground font-semibold" : i < step ? "text-primary font-medium" : "text-muted-foreground"
               }`}
             >

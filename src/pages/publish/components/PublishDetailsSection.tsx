@@ -128,7 +128,7 @@ export function PublishDetailsSection({
   onToggleFeature,
 }: PublishDetailsSectionProps) {
   return (
-    <div className="space-y-4 form-surface">
+    <div className="space-y-4.5 form-surface">
       <div className="space-y-2">
         <Label className="font-sans">{labels.listingTitle} *</Label>
         <Input value={title} onChange={(e) => onTitleChange(e.target.value)} className="font-sans" maxLength={120} />
@@ -147,7 +147,7 @@ export function PublishDetailsSection({
         <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
         <p className="text-xs text-muted-foreground font-sans">Incluez de préférence: carburant, boîte, état général et historique d’entretien.</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Marque *</Label>
           <Input value={make} onChange={(e) => onMakeChange(e.target.value)} className="font-sans" />
@@ -165,7 +165,7 @@ export function PublishDetailsSection({
           <Input value={condition} onChange={(e) => onConditionChange(e.target.value)} className="font-sans" placeholder="neuf / occasion / importé" />
         </div>
       </div>
-      <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-4`}>
+      <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-3.5 md:gap-4`}>
         <div className="space-y-2">
           <Label className="font-sans">Prix (Ar) *</Label>
           <Input type="number" value={priceMga} onChange={(e) => onPriceMgaChange(e.target.value)} className="font-sans" min={0} />
@@ -191,7 +191,7 @@ export function PublishDetailsSection({
           </>
         )}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Carburant</Label>
           <Input value={fuel} onChange={(e) => onFuelChange(e.target.value)} className="font-sans" placeholder="Essence, Diesel..." />
@@ -209,7 +209,7 @@ export function PublishDetailsSection({
           <Input value={sellerType} onChange={(e) => onSellerTypeChange(e.target.value)} className="font-sans" placeholder="particulier / concessionnaire" />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Carrosserie</Label>
           <Input value={bodyStyle} onChange={(e) => onBodyStyleChange(e.target.value)} className="font-sans" placeholder="SUV, berline, pick-up..." />

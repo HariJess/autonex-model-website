@@ -427,8 +427,8 @@ const ListingDetail = () => {
         </script>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-5 md:py-6 pb-32 lg:pb-6">
-        <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
+      <div className="container mx-auto px-4 py-4 md:py-6 pb-32 lg:pb-6">
+        <nav className="flex items-center gap-2 text-xs md:text-sm font-sans text-muted-foreground mb-4 md:mb-6 overflow-x-auto whitespace-nowrap">
           <Link to="/" className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
           <ChevronRight className="h-3 w-3" />
           <Link to="/recherche" className="hover:text-primary">{t("search.title")}</Link>
@@ -453,9 +453,9 @@ const ListingDetail = () => {
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="space-y-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="lg:col-span-2 space-y-6 md:space-y-8">
+            <div className="space-y-2.5 md:space-y-3">
               <div className="rounded-2xl overflow-hidden aspect-video relative border border-border/70">
                 <img
                   src={images[selectedImg]}
@@ -471,7 +471,7 @@ const ListingDetail = () => {
                 </div>
               </div>
               {images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto">
+                <div className="flex gap-2 overflow-x-auto pb-1">
                   {images.map((img, i) => (
                     <button key={i} type="button" onClick={() => setSelectedImg(i)} className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}>
                       <img
@@ -515,7 +515,7 @@ const ListingDetail = () => {
                   </Badge>
                 )}
               </div>
-              <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{displayTitle}</h1>
+              <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground mb-2">{displayTitle}</h1>
               {vehicleSummary && (
                 <p className="text-sm text-muted-foreground font-sans mb-1">{vehicleSummary}</p>
               )}
@@ -528,11 +528,11 @@ const ListingDetail = () => {
                 <MapPin className="h-4 w-4 shrink-0" />
                 {addressLine || t("listing.addressUnknown", "Adresse non précisée")}
               </p>
-              <p className="text-2xl font-bold text-primary font-sans">{formatPrice(listing.price_mga)}</p>
+              <p className="text-[1.55rem] md:text-2xl font-bold text-primary font-sans">{formatPrice(listing.price_mga)}</p>
               <p className="text-sm text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
               {versionLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
                   <Bed className="h-5 w-5 text-primary" />
@@ -559,12 +559,12 @@ const ListingDetail = () => {
               )}
             </div>
             {vehicleSpecRows.length > 0 && (
-              <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
+              <section className="rounded-2xl border border-border bg-card p-4.5 md:p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CarFront className="h-5 w-5 text-primary" />
                   <h2 className="font-serif text-xl font-bold">{t("listing.vehicleSpecs", "Fiche véhicule")}</h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 md:gap-y-3">
                   {vehicleSpecRows.map((spec) => (
                     <div key={spec.label} className="flex items-start justify-between gap-3 border-b border-border/70 pb-2">
                       <span className="text-sm font-sans text-muted-foreground">{spec.label}</span>
@@ -696,11 +696,11 @@ const ListingDetail = () => {
             </section>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5 md:space-y-6">
             <div
               ref={contactSectionRef}
               id="listing-contact"
-              className="bg-card rounded-2xl border border-border p-5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
+              className="bg-card rounded-2xl border border-border p-4.5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
             >
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (

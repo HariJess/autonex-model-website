@@ -160,13 +160,13 @@ const Index = () => {
     return tokens[iconKey ?? ""] ?? "VN";
   };
   const renderThematicSection = (title: string, subtitle: string, linksTo: string, items: typeof listings) => (
-    <section className="container mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <h3 className="font-serif text-xl md:text-2xl font-bold text-foreground">{title}</h3>
-          <p className="text-sm text-muted-foreground font-sans mt-1">{subtitle}</p>
+    <section className="container mx-auto px-4 py-5 md:py-6">
+      <div className="flex items-start justify-between gap-3 mb-4 md:mb-5">
+        <div className="min-w-0">
+          <h3 className="font-serif text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
+          <p className="text-sm text-muted-foreground font-sans mt-1 leading-relaxed">{subtitle}</p>
         </div>
-        <Link to={linksTo} className="text-primary font-sans text-sm font-medium hover:underline">
+        <Link to={linksTo} className="text-primary font-sans text-sm font-medium hover:underline shrink-0 min-h-10 inline-flex items-center">
           Voir plus
         </Link>
       </div>
@@ -182,7 +182,7 @@ const Index = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {items.map((listing) => (
             <ListingCard key={`${title}-${listing.id}`} listing={listing} />
           ))}
@@ -218,10 +218,10 @@ const Index = () => {
       />
 
       {/* Recent feed — complementary to “À la une” */}
-      <section className="container mx-auto px-4 py-10 md:py-12">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{t("sections.latest", "Nouvelles annonces auto")}</h2>
-          <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">
+      <section className="container mx-auto px-4 py-8 md:py-12">
+        <div className="flex items-start justify-between gap-3 mb-5 md:mb-8">
+          <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">{t("sections.latest", "Nouvelles annonces auto")}</h2>
+          <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline shrink-0 min-h-10">
             {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
@@ -234,7 +234,7 @@ const Index = () => {
             {t("home.noListings", "Aucune annonce auto pour le moment. Soyez le premier à publier un véhicule !")}
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {listings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
@@ -270,15 +270,15 @@ const Index = () => {
         electricHybrid,
       )}
 
-      <section className="container mx-auto px-4 py-6">
-        <div className="rounded-2xl border border-border/70 bg-card/95 p-4 md:p-5">
+      <section className="container mx-auto px-4 py-5 md:py-6">
+        <div className="rounded-2xl border border-border/70 bg-card/95 p-3.5 md:p-5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs uppercase tracking-wide text-muted-foreground font-sans mr-1">Catégories rapides</span>
             {compactCategoryLinks.map((category) => (
               <Link
                 key={category.id}
                 to={category.href}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5 hover:border-primary/35 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-2 min-h-10 hover:border-primary/35 transition-colors"
               >
                 {categoryIcon(category.iconKey)}
                 <span className="text-xs font-semibold text-foreground">{category.label}</span>

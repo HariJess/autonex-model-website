@@ -142,16 +142,16 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
 
       <Link
         to={`/annonce/${listing.id}`}
-        className="block p-4 max-lg:p-5 space-y-2.5"
+        className="block p-4 max-lg:p-4.5 space-y-2"
         onMouseEnter={handlePrefetchDetail}
         onFocus={handlePrefetchDetail}
         onTouchStart={handlePrefetchDetail}
       >
         <div>
-          <p className="text-xl max-sm:text-[1.35rem] font-bold text-primary font-sans tracking-tight">{formatPrice(listing.price_mga)}</p>
+          <p className="text-xl max-sm:text-[1.22rem] font-bold text-primary font-sans tracking-tight">{formatPrice(listing.price_mga)}</p>
           <p className="text-xs text-muted-foreground font-sans mt-0.5">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
-        <h3 className="font-serif font-semibold text-base max-lg:text-[1.05rem] text-foreground leading-snug">{displayTitle}</h3>
+        <h3 className="font-serif font-semibold text-base max-lg:text-[1rem] text-foreground leading-snug line-clamp-2">{displayTitle}</h3>
         {vehicleHeadline && (
           <p className="text-xs font-sans text-muted-foreground -mt-1">{vehicleHeadline}</p>
         )}
@@ -160,7 +160,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
             {matchBadge}
           </p>
         )}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground font-sans flex-wrap">
+        <div className="flex items-center gap-x-3 gap-y-1 text-xs text-muted-foreground font-sans flex-wrap">
           {versionLabel && (
             <span className="flex items-center gap-1">
               <CircleDot className="h-3.5 w-3.5 shrink-0" aria-hidden />

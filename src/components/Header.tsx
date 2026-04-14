@@ -30,9 +30,9 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#070D1A]/95 backdrop-blur-md">
-      <div className="container mx-auto px-4 flex items-center justify-between h-[4.25rem] sm:h-[4.75rem]">
-        <Link to="/" className="flex-shrink-0">
-          <img src={logo} alt="AutoNex" className="h-12 sm:h-14 w-auto" />
+      <div className="container mx-auto px-4 flex items-center justify-between h-[4rem] sm:h-[4.75rem]">
+        <Link to="/" className="flex-shrink-0 min-h-11 flex items-center">
+          <img src={logo} alt="AutoNex" className="h-11 sm:h-14 w-auto" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6">
@@ -68,7 +68,7 @@ const Header = () => {
 
         <button
           type="button"
-          className="lg:hidden inline-flex items-center justify-center min-h-11 min-w-11 rounded-md -mr-2 touch-manipulation"
+          className="lg:hidden inline-flex items-center justify-center min-h-11 min-w-11 rounded-xl -mr-1 touch-manipulation border border-white/15 bg-white/[0.04]"
           onClick={() => setMenuOpen(!menuOpen)}
           style={{ color: "#FAFAFA" }}
           aria-expanded={menuOpen}
@@ -82,13 +82,13 @@ const Header = () => {
 
       {menuOpen && (
         <div id="mobile-nav" className="lg:hidden border-t border-white/10 bg-[#070D1A]">
-          <div className="container mx-auto px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-3">
+          <div className="container mx-auto px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2.5">
             {navLinks.map((link) => (
-              <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="text-sm py-2.5 min-h-11 flex items-center touch-manipulation" style={{ color: "#FAFAFA" }}>
+              <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center touch-manipulation bg-white/[0.02] active:bg-white/[0.08]" style={{ color: "#FAFAFA" }}>
                 {link.label}
               </Link>
             ))}
-            <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-white/10">
+            <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-white/10">
               <button onClick={toggleCurrency} className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {currency}
               </button>
@@ -97,15 +97,15 @@ const Header = () => {
               </Button>
               {user ? (
                 <>
-                  <Button variant="ghost" size="sm" onClick={() => { navigate("/dashboard"); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
+                  <Button variant="ghost" size="sm" className="justify-start min-h-10" onClick={() => { navigate("/dashboard"); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
                     <User className="h-4 w-4 mr-1" /> {t("nav.dashboard")}
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => { signOut(); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
-                    <LogOut className="h-4 w-4" />
+                  <Button variant="ghost" size="sm" className="justify-start min-h-10" onClick={() => { signOut(); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
+                    <LogOut className="h-4 w-4 mr-1" /> {t("nav.logout", "Déconnexion")}
                   </Button>
                 </>
               ) : (
-                <Button variant="ghost" size="sm" onClick={() => { navigate("/login"); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
+                <Button variant="ghost" size="sm" className="justify-start min-h-10 col-span-2" onClick={() => { navigate("/login"); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
                   <User className="h-4 w-4 mr-1" /> {t("nav.login")}
                 </Button>
               )}

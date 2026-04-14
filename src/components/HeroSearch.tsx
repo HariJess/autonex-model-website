@@ -128,20 +128,20 @@ const HeroSearch = () => {
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
 
   return (
-    <section className="relative overflow-hidden py-14 sm:py-16 lg:py-28">
+    <section className="relative overflow-hidden py-10 sm:py-16 lg:py-28">
       <div className="absolute inset-0 gradient-primary" />
       <div className="absolute inset-0 bg-[radial-gradient(1000px_420px_at_50%_-5%,rgba(255,255,255,0.14),transparent)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
 
       <div className="relative container mx-auto px-4 text-center">
         <h1
-          className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight"
+          className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight px-1"
           style={{ color: "#FAFAFA" }}
         >
           {t("hero.title")}
         </h1>
         <p
-          className="text-base sm:text-lg md:text-xl mb-7 md:mb-9 font-sans max-w-2xl mx-auto"
+          className="text-sm sm:text-lg md:text-xl mb-5 md:mb-9 font-sans max-w-2xl mx-auto px-1 leading-relaxed"
           style={{ color: "rgba(250,250,250,0.85)" }}
         >
           {t("hero.subtitle")}
@@ -165,7 +165,7 @@ const HeroSearch = () => {
             ))}
           </div>
 
-          <div className="bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 -mb-10 md:-mb-12 relative z-10 border border-border/70">
+          <div className="bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 -mb-8 md:-mb-12 relative z-10 border border-border/70">
             <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border/80 overflow-hidden">
               <div className="flex-1 border-r border-border px-3 py-2">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
@@ -317,7 +317,7 @@ const HeroSearch = () => {
               </div>
             </div>
 
-            <div className="lg:hidden space-y-3">
+            <div className="lg:hidden space-y-2.5">
               <Select value={type} onValueChange={handleTypeChange}>
                 <SelectTrigger className="font-sans min-h-11">
                   <SelectValue placeholder={t("hero.type")} />
@@ -390,9 +390,9 @@ const HeroSearch = () => {
                 value={modelQuery}
                 onChange={(e) => setModelQuery(e.target.value)}
                 placeholder="Modèle (ex: RAV4, Hilux...)"
-                className="font-sans min-h-11"
+                className="font-sans min-h-11 text-sm"
               />
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
                   <SelectTrigger className="font-sans min-h-11">
                     <SelectValue placeholder="Année" />

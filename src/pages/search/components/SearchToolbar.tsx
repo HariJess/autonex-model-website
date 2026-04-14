@@ -56,7 +56,7 @@ export function SearchToolbar({
   onSetSort,
 }: SearchToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border/80 p-3.5 shadow-sm">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border/80 p-3 sm:p-3.5 shadow-sm">
       <div className="flex flex-wrap items-center gap-3 min-w-0">
         <Sheet open={mobileFiltersOpen} onOpenChange={onOpenMobileFilters}>
           <SheetTrigger asChild>
@@ -96,7 +96,7 @@ export function SearchToolbar({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 justify-end w-full sm:w-auto">
+      <div className="flex flex-wrap items-center gap-2 justify-between sm:justify-end w-full sm:w-auto">
         <div className="flex items-center border border-border rounded-lg overflow-hidden shrink-0">
           {(
             [
@@ -109,7 +109,7 @@ export function SearchToolbar({
               key={mode}
               type="button"
               onClick={() => onSetViewMode(mode)}
-              className={`inline-flex items-center justify-center min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary/90 text-primary-foreground" : "hover:bg-muted/70"}`}
+              className={`inline-flex items-center justify-center min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary/90 text-primary-foreground" : "hover:bg-muted/70 active:bg-muted"}`}
               aria-label={label}
               aria-pressed={viewMode === mode}
             >
@@ -119,7 +119,7 @@ export function SearchToolbar({
         </div>
 
         <Select value={sort} onValueChange={(v) => onSetSort(v as SearchSortMode)}>
-          <SelectTrigger className="w-full sm:w-40 font-sans text-sm min-w-0 min-h-11">
+          <SelectTrigger className="w-[calc(100%-9rem)] sm:w-40 font-sans text-sm min-w-0 min-h-11">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
