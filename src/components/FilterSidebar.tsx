@@ -15,7 +15,14 @@ import { listingTypesForTransaction } from "@/lib/listingRules";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { cn } from "@/lib/utils";
-import { AUTO_BRAND_GROUPS } from "@/data/automotiveCatalog";
+import {
+  AUTO_BRAND_GROUPS,
+  AUTO_SEARCH_CONDITION_OPTIONS,
+  AUTO_SEARCH_DRIVETRAIN_OPTIONS,
+  AUTO_SEARCH_FUEL_OPTIONS,
+  AUTO_SEARCH_SELLER_OPTIONS,
+  AUTO_SEARCH_TRANSMISSION_OPTIONS,
+} from "@/data/automotiveCatalog";
 
 export type { SearchFilters };
 
@@ -25,11 +32,17 @@ const EQUIPMENTS = [
   "Boîte automatique", "Caméra de recul", "Bluetooth", "GPS intégré",
   "Toit ouvrant", "4x4", "Climatisation", "Faible kilométrage",
 ];
-const FUEL_OPTIONS = ["Essence", "Diesel", "Hybride", "Électrique"];
-const GEAR_OPTIONS = ["Boîte manuelle", "Boîte automatique"];
-const DRIVE_OPTIONS = ["4x2", "4x4", "AWD"];
-const CONDITION_OPTIONS = ["neuf", "occasion"];
-const SELLER_OPTIONS = ["concessionnaire", "particulier"];
+const FUEL_OPTIONS = [...AUTO_SEARCH_FUEL_OPTIONS];
+const GEAR_OPTIONS = [...AUTO_SEARCH_TRANSMISSION_OPTIONS];
+const DRIVE_OPTIONS = [...AUTO_SEARCH_DRIVETRAIN_OPTIONS];
+const CONDITION_OPTIONS = AUTO_SEARCH_CONDITION_OPTIONS.map((label) => ({
+  value: label.toLowerCase(),
+  label,
+}));
+const SELLER_OPTIONS = AUTO_SEARCH_SELLER_OPTIONS.map((label) => ({
+  value: label.toLowerCase(),
+  label,
+}));
 
 interface FilterSidebarProps {
   filters: SearchFilters;
@@ -362,7 +375,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           </AccordionItem>
           <AccordionItem value="drive" className="border-b border-border px-4">
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
-              Transmission motrice
+              Motricité
             </AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="flex flex-wrap gap-2">
@@ -389,14 +402,14 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
               <div className="flex flex-wrap gap-2">
                 {CONDITION_OPTIONS.map((opt) => (
                   <Button
-                    key={opt}
+                    key={opt.value}
                     type="button"
                     variant="outline"
                     size="sm"
-                    className={cn("font-sans touch-manipulation capitalize", filters.conditions.includes(opt) ? "border-primary bg-primary/10 text-primary" : "")}
-                    onClick={() => update({ conditions: toggleInArray(filters.conditions, opt) })}
+                    className={cn("font-sans touch-manipulation", filters.conditions.includes(opt.value) ? "border-primary bg-primary/10 text-primary" : "")}
+                    onClick={() => update({ conditions: toggleInArray(filters.conditions, opt.value) })}
                   >
-                    {opt}
+                    {opt.label}
                   </Button>
                 ))}
               </div>
@@ -410,14 +423,14 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
               <div className="flex flex-wrap gap-2">
                 {SELLER_OPTIONS.map((opt) => (
                   <Button
-                    key={opt}
+                    key={opt.value}
                     type="button"
                     variant="outline"
                     size="sm"
-                    className={cn("font-sans touch-manipulation capitalize", filters.sellerTypes.includes(opt) ? "border-primary bg-primary/10 text-primary" : "")}
-                    onClick={() => update({ sellerTypes: toggleInArray(filters.sellerTypes, opt) })}
+                    className={cn("font-sans touch-manipulation", filters.sellerTypes.includes(opt.value) ? "border-primary bg-primary/10 text-primary" : "")}
+                    onClick={() => update({ sellerTypes: toggleInArray(filters.sellerTypes, opt.value) })}
                   >
-                    {opt}
+                    {opt.label}
                   </Button>
                 ))}
               </div>

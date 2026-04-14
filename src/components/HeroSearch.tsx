@@ -8,13 +8,13 @@ import { Search, MapPin, Euro, Banknote } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
-import { LISTING_TYPE_LABELS, LISTING_TYPES_WITHOUT_ROOM_FILTERS } from "@/types/listing";
+import { LISTING_TYPES_WITHOUT_ROOM_FILTERS } from "@/types/listing";
 import type { ListingType } from "@/types/listing";
 import { searchPathFromFilters } from "@/lib/searchUrl";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
-import { TOP_AUTO_BRANDS } from "@/data/automotiveCatalog";
+import { AUTO_HERO_VEHICLE_TYPE_OPTIONS, AUTO_SEARCH_FUEL_OPTIONS, TOP_AUTO_BRANDS } from "@/data/automotiveCatalog";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -23,7 +23,6 @@ const TRANSACTIONS = [
 ];
 
 const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
-const HERO_FUEL_OPTIONS = ["Essence", "Diesel", "Hybride", "Électrique"];
 const HERO_YEAR_PRESETS = [
   { value: "all", label: "Toutes années", min: 0, max: 0 },
   { value: "2025", label: "2025+", min: 2025, max: 0 },
@@ -41,21 +40,26 @@ const HeroSearch = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
-  const [type, setType] = useState("");
-  const heroTypeOptions = useMemo(() => listingTypesForTransaction(transaction), [transaction]);
+  const [vehicleType, setVehicleType] = useState("all");
+  const heroTypeOptions = useMemo(() => AUTO_HERO_VEHICLE_TYPE_OPTIONS, []);
+  const selectedVehicleType = useMemo(
+    () => heroTypeOptions.find((opt) => opt.id === vehicleType) ?? heroTypeOptions[0],
+    [heroTypeOptions, vehicleType],
+  );
+  const allowedListingTypes = useMemo(() => new Set(listingTypesForTransaction(transaction)), [transaction]);
 
   const handleTransactionChange = (tr: string) => {
     setTransaction(tr);
-    setType((prev) => {
-      const allowed = new Set(listingTypesForTransaction(tr));
-      return allowed.has(prev as ListingType) ? prev : "";
+    setVehicleType((prev) => {
+      const nextAllowed = new Set(listingTypesForTransaction(tr));
+      const next = heroTypeOptions.find((opt) => opt.id === prev);
+      if (!next?.listingTypes?.length) return prev;
+      const hasCompatibleType = next.listingTypes.some((lt) => nextAllowed.has(lt as ListingType));
+      return hasCompatibleType ? prev : "all";
     });
   };
 
-  const handleTypeChange = (v: string) => {
-    setType(v);
-    if (NO_ROOMS_TYPES.has(v)) setBrand("");
-  };
+  const handleTypeChange = (v: string) => setVehicleType(v);
   const [ville, setVille] = useState("");
   const [arrondissements, setArrondissements] = useState<string[]>([]);
   const [quartiers, setQuartiers] = useState<string[]>([]);
@@ -72,16 +76,21 @@ const HeroSearch = () => {
   const [yearPreset, setYearPreset] = useState<(typeof HERO_YEAR_PRESETS)[number]["value"]>("all");
   const [fuel, setFuel] = useState("");
 
-  const showBrand = !type || !NO_ROOMS_TYPES.has(type);
+  const showBrand = !(selectedVehicleType.listingTypes ?? []).some((lt) => NO_ROOMS_TYPES.has(lt));
 
   const buildFilters = (): SearchFilters => {
-    const allowed = new Set(listingTypesForTransaction(transaction));
-    const types: string[] = type && allowed.has(type as ListingType) ? [type] : [];
+    const mappedTypes = (selectedVehicleType.listingTypes ?? []).filter((lt) => allowedListingTypes.has(lt as ListingType));
+    const modelQueryValue = modelQuery.trim() || selectedVehicleType.modelQuery || "";
+    const fuelsValue = fuel
+      ? [fuel]
+      : selectedVehicleType.fuels && selectedVehicleType.fuels.length > 0
+        ? [...selectedVehicleType.fuels]
+        : [];
     const selectedYearPreset = HERO_YEAR_PRESETS.find((preset) => preset.value === yearPreset) ?? HERO_YEAR_PRESETS[0];
     return {
       ...EMPTY_SEARCH_FILTERS,
       transaction: TRANSACTIONS.some((tr) => tr.value === transaction) ? transaction : "vente",
-      types,
+      types: mappedTypes,
       ville,
       arrondissements,
       quartiers,
@@ -94,10 +103,10 @@ const HeroSearch = () => {
       conditions: [],
       sellerTypes: [],
       brands: brand ? [brand] : [],
-      modelQuery,
+      modelQuery: modelQueryValue,
       yearMin: selectedYearPreset.min,
       yearMax: selectedYearPreset.max,
-      fuels: fuel ? [fuel] : [],
+      fuels: fuelsValue,
     };
   };
 
@@ -176,8 +185,8 @@ const HeroSearch = () => {
                     <SelectValue placeholder={t("hero.allTypes")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {heroTypeOptions.map((lt) => (
-                      <SelectItem key={lt} value={lt}>{LISTING_TYPE_LABELS[lt]}</SelectItem>
+                  {heroTypeOptions.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -246,7 +255,7 @@ const HeroSearch = () => {
                   </label>
                   <Select value={brand} onValueChange={setBrand}>
                     <SelectTrigger className="border-0 shadow-none p-0 h-7 font-sans text-sm focus:ring-0">
-                      <SelectValue placeholder="Toutes marques" />
+                    <SelectValue placeholder="Toutes les marques" />
                     </SelectTrigger>
                     <SelectContent>
                       {TOP_AUTO_BRANDS.map((b) => (
@@ -309,7 +318,7 @@ const HeroSearch = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous</SelectItem>
-                    {HERO_FUEL_OPTIONS.map((opt) => (
+                    {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
                       <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                     ))}
                   </SelectContent>
@@ -323,8 +332,8 @@ const HeroSearch = () => {
                   <SelectValue placeholder={t("hero.type")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {heroTypeOptions.map((lt) => (
-                    <SelectItem key={lt} value={lt}>{LISTING_TYPE_LABELS[lt]}</SelectItem>
+                  {heroTypeOptions.map((option) => (
+                    <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -389,7 +398,7 @@ const HeroSearch = () => {
               <Input
                 value={modelQuery}
                 onChange={(e) => setModelQuery(e.target.value)}
-                placeholder="Modèle (ex: RAV4, Hilux...)"
+                placeholder="Modèle (ex: RAV4, Hilux, NMAX...)"
                 className="font-sans min-h-11 text-sm"
               />
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -411,7 +420,7 @@ const HeroSearch = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous carburants</SelectItem>
-                    {HERO_FUEL_OPTIONS.map((opt) => (
+                    {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
                       <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                     ))}
                   </SelectContent>

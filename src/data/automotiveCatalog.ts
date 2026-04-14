@@ -3,6 +3,20 @@ export type AutoBrandGroup = {
   brands: string[];
 };
 
+export type HeroVehicleTypeOption = {
+  id: string;
+  label: string;
+  /**
+   * Legacy DB listing type fallback used by current query model.
+   * Multiple values are allowed; they are sanitized later by search rules.
+   */
+  listingTypes?: string[];
+  /** Optional search term fallback for model/body-style-like matching. */
+  modelQuery?: string;
+  /** Optional direct fuel filter for electric/hybrid shortcuts. */
+  fuels?: string[];
+};
+
 export type AutoDiscoveryCategory = {
   id: string;
   label: string;
@@ -79,7 +93,7 @@ export const AUTO_DISCOVERY_CATEGORIES: AutoDiscoveryCategory[] = [
 export const AUTO_BRAND_GROUPS: AutoBrandGroup[] = [
   {
     group: "Marques généralistes",
-    brands: ["Toyota", "Nissan", "Hyundai", "Kia", "Mazda", "Suzuki", "Mitsubishi", "Isuzu", "Ford", "Renault", "Honda", "Subaru", "Volkswagen", "Peugeot", "Citroën", "Chevrolet", "Fiat", "Opel", "Dacia", "Skoda", "SEAT", "Cupra", "Tata", "Mahindra", "MG"],
+    brands: ["Toyota", "Nissan", "Hyundai", "Kia", "Suzuki", "Mitsubishi", "Isuzu", "Mazda", "Ford", "Renault", "Peugeot", "Volkswagen", "Honda", "Dacia", "Citroën", "Chevrolet", "Fiat", "Opel", "Skoda", "SEAT", "Cupra", "Tata", "Mahindra", "MG", "Subaru"],
   },
   {
     group: "Premium & luxe",
@@ -104,23 +118,59 @@ export const TOP_AUTO_BRANDS = [
   "Nissan",
   "Hyundai",
   "Kia",
-  "Mazda",
   "Suzuki",
   "Mitsubishi",
   "Isuzu",
+  "Mazda",
   "Ford",
   "Renault",
-  "Honda",
-  "Subaru",
+  "Peugeot",
   "Volkswagen",
   "Mercedes-Benz",
   "BMW",
   "Audi",
-  "Peugeot",
+  "Honda",
+  "Yamaha",
   "BYD",
   "Chery",
-  "Yamaha",
 ] as const;
+
+export const AUTO_SEARCH_FUEL_OPTIONS = [
+  "Essence",
+  "Diesel",
+  "Hybride",
+  "Hybride rechargeable",
+  "Électrique",
+] as const;
+
+export const AUTO_SEARCH_TRANSMISSION_OPTIONS = ["Boîte manuelle", "Boîte automatique"] as const;
+
+export const AUTO_SEARCH_DRIVETRAIN_OPTIONS = ["4x2", "4x4", "Traction", "Propulsion", "AWD"] as const;
+
+export const AUTO_SEARCH_CONDITION_OPTIONS = ["Neuf", "Occasion"] as const;
+
+export const AUTO_SEARCH_SELLER_OPTIONS = ["Particulier", "Concessionnaire"] as const;
+
+export const AUTO_HERO_VEHICLE_TYPE_OPTIONS: HeroVehicleTypeOption[] = [
+  { id: "all", label: "Tous types" },
+  { id: "citadine", label: "Citadine", listingTypes: ["appartement"], modelQuery: "citadine" },
+  { id: "berline", label: "Berline", listingTypes: ["maison"], modelQuery: "berline" },
+  { id: "suv_4x4", label: "SUV / 4x4", listingTypes: ["villa", "local_commercial"], modelQuery: "suv" },
+  { id: "crossover", label: "Crossover", listingTypes: ["villa"], modelQuery: "crossover" },
+  { id: "pick_up", label: "Pick-up", listingTypes: ["local_commercial"], modelQuery: "pick-up" },
+  { id: "coupe", label: "Coupé", listingTypes: ["maison"], modelQuery: "coupe" },
+  { id: "cabriolet", label: "Cabriolet", listingTypes: ["maison"], modelQuery: "cabriolet" },
+  { id: "utilitaire_leger", label: "Utilitaire léger", listingTypes: ["local_commercial"], modelQuery: "utilitaire" },
+  { id: "van_fourgon", label: "Van / Fourgon", listingTypes: ["local_commercial", "bureau"], modelQuery: "fourgon" },
+  { id: "minibus_bus", label: "Minibus / Bus", listingTypes: ["bureau"], modelQuery: "minibus" },
+  { id: "camion", label: "Camion", listingTypes: ["bureau"], modelQuery: "camion" },
+  { id: "moto", label: "Moto", listingTypes: ["terrain"], modelQuery: "moto" },
+  { id: "scooter", label: "Scooter", listingTypes: ["terrain"], modelQuery: "scooter" },
+  { id: "quad", label: "Quad", listingTypes: ["terrain"], modelQuery: "quad" },
+  { id: "buggy", label: "Buggy", listingTypes: ["terrain"], modelQuery: "buggy" },
+  { id: "electrique", label: "Électrique", fuels: ["Électrique"] },
+  { id: "hybride", label: "Hybride", fuels: ["Hybride", "Hybride rechargeable"] },
+];
 
 export const AUTO_HOMEPAGE_BRANDS: AutoHomepageBrand[] = [
   { id: "toyota", label: "Toyota", href: "/recherche?brand=Toyota" },
