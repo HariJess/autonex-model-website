@@ -24,6 +24,7 @@ const TRANSACTIONS = [
 
 const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
 const HERO_FUEL_OPTIONS = ["Essence", "Diesel", "Hybride", "Électrique"];
+const HERO_YEAR_OPTIONS = Array.from({ length: 27 }, (_, idx) => String(2026 - idx));
 
 const HeroSearch = () => {
   const { t } = useTranslation();
@@ -271,17 +272,19 @@ const HeroSearch = () => {
               </div>
               <div className="col-span-3">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  Année min
+                  Année
                 </label>
-                <Input
-                  type="number"
-                  min={1950}
-                  max={2100}
-                  value={yearMin || ""}
-                  onChange={(e) => setYearMin(Number(e.target.value) || 0)}
-                  placeholder="Ex: 2019"
-                  className="h-9 font-sans text-sm"
-                />
+                <Select value={yearMin ? String(yearMin) : "all"} onValueChange={(v) => setYearMin(v === "all" ? 0 : Number(v))}>
+                  <SelectTrigger className="h-9 font-sans text-sm">
+                    <SelectValue placeholder="Toutes années" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes années</SelectItem>
+                    {HERO_YEAR_OPTIONS.map((year) => (
+                      <SelectItem key={year} value={year}>{year}+</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="col-span-3">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
@@ -377,15 +380,17 @@ const HeroSearch = () => {
                 className="font-sans min-h-11"
               />
               <div className="grid grid-cols-2 gap-2">
-                <Input
-                  type="number"
-                  min={1950}
-                  max={2100}
-                  value={yearMin || ""}
-                  onChange={(e) => setYearMin(Number(e.target.value) || 0)}
-                  placeholder="Année min"
-                  className="font-sans min-h-11"
-                />
+                <Select value={yearMin ? String(yearMin) : "all"} onValueChange={(v) => setYearMin(v === "all" ? 0 : Number(v))}>
+                  <SelectTrigger className="font-sans min-h-11">
+                    <SelectValue placeholder="Année" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes années</SelectItem>
+                    {HERO_YEAR_OPTIONS.map((year) => (
+                      <SelectItem key={year} value={year}>{year}+</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Select value={fuel || "all"} onValueChange={(v) => setFuel(v === "all" ? "" : v)}>
                   <SelectTrigger className="font-sans min-h-11">
                     <SelectValue placeholder="Carburant" />

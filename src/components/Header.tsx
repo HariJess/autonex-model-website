@@ -25,7 +25,6 @@ const Header = () => {
     { label: AUTO_TRANSACTION_MODES[2].label, href: AUTO_TRANSACTION_MODES[2].href },
     { label: AUTO_TRANSACTION_MODES[3].label, href: AUTO_TRANSACTION_MODES[3].href },
     { label: AUTO_TRANSACTION_MODES[4].label, href: AUTO_TRANSACTION_MODES[4].href },
-    { label: t("nav.agencies"), href: "/agences" },
     { label: t("nav.advice"), href: "/conseils" },
   ];
 
