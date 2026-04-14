@@ -7,7 +7,30 @@ export type AutoDiscoveryCategory = {
   id: string;
   label: string;
   href: string;
-  iconKey?: "car" | "suv" | "truck" | "bike" | "van" | "bus" | "new" | "used" | "import" | "rent";
+  iconKey?:
+    | "citadine"
+    | "berline"
+    | "suv"
+    | "crossover"
+    | "pickup"
+    | "coupe"
+    | "cabriolet"
+    | "moto"
+    | "scooter"
+    | "quad"
+    | "buggy"
+    | "utilitaire"
+    | "van"
+    | "bus"
+    | "camion"
+    | "electrique"
+    | "hybride"
+    | "hybride-rechargeable"
+    | "thermique"
+    | "new"
+    | "used"
+    | "rent-short"
+    | "rent-long";
   description?: string;
 };
 
@@ -24,26 +47,33 @@ export const AUTO_TRANSACTION_MODES = [
   { id: "vendre", label: "Vendre", href: "/recherche?transaction=location" },
   { id: "location_courte", label: "Louer court terme", href: "/recherche?transaction=location_vacances" },
   { id: "location_longue", label: "Louer long terme", href: "/recherche?transaction=location&rental_term=longue" },
-  { id: "import", label: "Import", href: "/recherche?condition=neuf&seller=concessionnaire" },
   { id: "concessionnaires", label: "Concessionnaires", href: "/agences" },
 ] as const;
 
 export const AUTO_DISCOVERY_CATEGORIES: AutoDiscoveryCategory[] = [
-  { id: "voitures", label: "Voitures", href: "/recherche?type=maison", iconKey: "car", description: "Voitures polyvalentes ville et route" },
-  { id: "suv4x4", label: "SUV / 4x4", href: "/recherche?type=villa", iconKey: "suv", description: "Routes difficiles et usages mixtes" },
-  { id: "pickup", label: "Pick-up", href: "/recherche?type=local_commercial&drive=4x4", iconKey: "truck", description: "Travail, chantier, usage pro" },
-  { id: "berlines", label: "Berlines", href: "/recherche?type=maison&drive=4x2", iconKey: "car", description: "Confort et usage quotidien" },
-  { id: "citadines", label: "Citadines", href: "/recherche?type=appartement", iconKey: "car", description: "Compactes et économiques" },
-  { id: "motos", label: "Motos", href: "/recherche?type=terrain", iconKey: "bike", description: "Route, piste et mobilité rapide" },
-  { id: "scooters", label: "Scooters", href: "/recherche?type=terrain&model=scooter", iconKey: "bike", description: "Trajets urbains agiles" },
-  { id: "utilitaires", label: "Utilitaires", href: "/recherche?type=local_commercial", iconKey: "van", description: "Livraison et logistique" },
-  { id: "minibus", label: "Minibus / Bus", href: "/recherche?type=bureau&model=bus", iconKey: "bus", description: "Transport passagers" },
-  { id: "camions", label: "Camions", href: "/recherche?type=bureau", iconKey: "truck", description: "Poids lourd et transport pro" },
-  { id: "neufs", label: "Véhicules neufs", href: "/recherche?condition=neuf", iconKey: "new", description: "Zéro km et garanties" },
-  { id: "occasion", label: "Véhicules d’occasion", href: "/recherche?condition=occasion", iconKey: "used", description: "Occasions sélectionnées" },
-  { id: "importes", label: "Véhicules importés", href: "/recherche?condition=importe", iconKey: "import", description: "Arrivages import" },
-  { id: "loc-courte", label: "Location courte durée", href: "/recherche?transaction=location_vacances", iconKey: "rent", description: "Jours à quelques semaines" },
-  { id: "loc-longue", label: "Location longue durée", href: "/recherche?transaction=location&rental_term=longue", iconKey: "rent", description: "Long terme et flotte" },
+  { id: "citadine", label: "Citadine", href: "/recherche?type=appartement", iconKey: "citadine", description: "Compacte, urbaine et agile au quotidien." },
+  { id: "berline", label: "Berline", href: "/recherche?type=maison&drive=4x2", iconKey: "berline", description: "Confort routier et usage familial." },
+  { id: "suv4x4", label: "SUV / 4x4", href: "/recherche?type=villa", iconKey: "suv", description: "Polyvalence route/piste et garde au sol élevée." },
+  { id: "crossover", label: "Crossover", href: "/recherche?type=villa&drive=4x2", iconKey: "crossover", description: "Style SUV, conduite urbaine optimisée." },
+  { id: "pickup", label: "Pick-up", href: "/recherche?type=local_commercial&drive=4x4", iconKey: "pickup", description: "Charge utile et robustesse professionnelle." },
+  { id: "coupe", label: "Coupé", href: "/recherche?type=maison&model=coupe", iconKey: "coupe", description: "Ligne sportive et sensations de conduite." },
+  { id: "cabriolet", label: "Cabriolet", href: "/recherche?type=maison&model=cabriolet", iconKey: "cabriolet", description: "Plaisir de conduite à ciel ouvert." },
+  { id: "moto", label: "Moto", href: "/recherche?type=terrain&model=moto", iconKey: "moto", description: "Route, trail ou sport selon usage." },
+  { id: "scooter", label: "Scooter", href: "/recherche?type=terrain&model=scooter", iconKey: "scooter", description: "Mobilité fluide en ville." },
+  { id: "quad", label: "Quad", href: "/recherche?type=terrain&model=quad", iconKey: "quad", description: "Loisir, piste et exploitation rurale." },
+  { id: "buggy", label: "Buggy", href: "/recherche?type=terrain&model=buggy", iconKey: "buggy", description: "Véhicule léger tout-terrain récréatif." },
+  { id: "utilitaire-leger", label: "Utilitaire léger", href: "/recherche?type=local_commercial", iconKey: "utilitaire", description: "Livraison urbaine et activité artisanale." },
+  { id: "van-fourgon", label: "Van / Fourgon", href: "/recherche?type=local_commercial&model=fourgon", iconKey: "van", description: "Volume de chargement optimisé." },
+  { id: "minibus", label: "Minibus / Bus", href: "/recherche?type=bureau&model=bus", iconKey: "bus", description: "Transport de passagers et navettes." },
+  { id: "camion", label: "Camion", href: "/recherche?type=bureau&model=camion", iconKey: "camion", description: "Poids lourd et transport professionnel." },
+  { id: "electrique", label: "Électrique", href: "/recherche?fuel=%C3%89lectrique", iconKey: "electrique", description: "Motorisation zéro émission locale." },
+  { id: "hybride", label: "Hybride", href: "/recherche?fuel=Hybride", iconKey: "hybride", description: "Équilibre conso et polyvalence." },
+  { id: "hybride-rechargeable", label: "Hybride rechargeable", href: "/recherche?fuel=Hybride%20rechargeable", iconKey: "hybride-rechargeable", description: "Mode électrique + autonomie thermique." },
+  { id: "thermique", label: "Thermique", href: "/recherche?fuel=Essence&fuel=Diesel", iconKey: "thermique", description: "Essence ou diesel selon votre besoin." },
+  { id: "neuf", label: "Neuf", href: "/recherche?condition=neuf", iconKey: "new", description: "Faible kilométrage, garantie et sérénité." },
+  { id: "occasion", label: "Occasion", href: "/recherche?condition=occasion", iconKey: "used", description: "Offres sélectionnées à budget maîtrisé." },
+  { id: "loc-courte", label: "Location courte durée", href: "/recherche?transaction=location_vacances", iconKey: "rent-short", description: "Jours à quelques semaines." },
+  { id: "loc-longue", label: "Location longue durée", href: "/recherche?transaction=location&rental_term=longue", iconKey: "rent-long", description: "Abonnement, flotte et besoins pro." },
 ];
 
 export const AUTO_BRAND_GROUPS: AutoBrandGroup[] = [

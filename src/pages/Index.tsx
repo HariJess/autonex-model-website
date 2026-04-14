@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
-import { ChevronRight, Loader2, Car, Bike, Truck, BusFront, ShieldCheck, RotateCw, Globe, CalendarClock } from "lucide-react";
+import { ChevronRight, Loader2, Car, Bike, Truck, BusFront, ShieldCheck, RotateCw, CalendarClock } from "lucide-react";
 import { fetchActiveListingCountsByVille, useDbListings } from "@/hooks/useListings";
 import { useQuery } from "@tanstack/react-query";
 import { villes } from "@/data/madagascar-locations";
@@ -37,33 +37,67 @@ const Index = () => {
   const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
   const categoryGroups: { id: string; label: string; items: AutoDiscoveryCategory[] }[] = [
     {
-      id: "types",
-      label: "Types de véhicules",
+      id: "carrosseries",
+      label: "Carrosseries principales",
       items: AUTO_DISCOVERY_CATEGORIES.filter((category) =>
-        ["voitures", "suv4x4", "pickup", "berlines", "citadines", "motos", "scooters", "utilitaires", "minibus", "camions"].includes(category.id),
+        ["citadine", "berline", "suv4x4", "crossover", "pickup", "coupe", "cabriolet"].includes(category.id),
       ),
     },
     {
-      id: "state",
-      label: "Neuf, occasion, import",
-      items: AUTO_DISCOVERY_CATEGORIES.filter((category) => ["neufs", "occasion", "importes"].includes(category.id)),
+      id: "deux-roues",
+      label: "Deux-roues et loisirs",
+      items: AUTO_DISCOVERY_CATEGORIES.filter((category) => ["moto", "scooter", "quad", "buggy"].includes(category.id)),
     },
     {
-      id: "rental",
-      label: "Location",
-      items: AUTO_DISCOVERY_CATEGORIES.filter((category) => ["loc-courte", "loc-longue"].includes(category.id)),
+      id: "utilitaires",
+      label: "Utilitaires et transport",
+      items: AUTO_DISCOVERY_CATEGORIES.filter((category) => ["utilitaire-leger", "van-fourgon", "minibus", "camion"].includes(category.id)),
+    },
+    {
+      id: "modes",
+      label: "Energie, etat et mode",
+      items: AUTO_DISCOVERY_CATEGORIES.filter((category) =>
+        ["electrique", "hybride", "hybride-rechargeable", "thermique", "neuf", "occasion", "loc-courte", "loc-longue"].includes(category.id),
+      ),
     },
   ];
   const categoryIcon = (iconKey?: string) => {
-    if (iconKey === "bike") return <Bike className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "truck") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "moto" || iconKey === "scooter") return <Bike className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "pickup" || iconKey === "camion" || iconKey === "utilitaire") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "van") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "bus") return <BusFront className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "new") return <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "used") return <RotateCw className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "import") return <Globe className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "rent") return <CalendarClock className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "rent-short" || iconKey === "rent-long") return <CalendarClock className="h-4 w-4 text-primary" aria-hidden />;
     return <Car className="h-4 w-4 text-primary" aria-hidden />;
+  };
+  const categoryToken = (iconKey?: string) => {
+    const tokens: Record<string, string> = {
+      citadine: "CT",
+      berline: "BR",
+      suv: "SV",
+      crossover: "CR",
+      pickup: "PU",
+      coupe: "CP",
+      cabriolet: "CB",
+      moto: "MT",
+      scooter: "SC",
+      quad: "QD",
+      buggy: "BG",
+      utilitaire: "UL",
+      van: "VF",
+      bus: "MB",
+      camion: "CM",
+      electrique: "EV",
+      hybride: "HY",
+      "hybride-rechargeable": "PHEV",
+      thermique: "TH",
+      new: "N",
+      used: "OCC",
+      "rent-short": "LCD",
+      "rent-long": "LLD",
+    };
+    return tokens[iconKey ?? ""] ?? "VN";
   };
   const homeSponsorEnabled = MONETIZATION_PLACEMENTS.homeSponsorStrip;
   const { data: homeSponsorCampaign } = usePartnerCampaign("homeSponsorStrip", homeSponsorEnabled);
@@ -110,7 +144,6 @@ const Index = () => {
                 {mode.id === "vendre" && "Publiez rapidement votre véhicule avec un parcours guidé."}
                 {mode.id === "location_courte" && "Trouver des véhicules pour quelques jours ou semaines."}
                 {mode.id === "location_longue" && "Offres dédiées professionnels, long terme et flotte."}
-                {mode.id === "import" && "Parcourez les véhicules neufs/importés et spécialistes."}
                 {mode.id === "concessionnaires" && "Accédez aux professionnels vérifiés et à leur stock."}
               </p>
             </Link>
@@ -124,7 +157,7 @@ const Index = () => {
             <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-1.5">Catalogue AutoNex</p>
             <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">Explorer par catégorie</h2>
             <p className="text-sm text-muted-foreground font-sans mt-1">
-              Parcours rapides pour trouver le bon type de véhicule, l’état recherché ou une formule de location.
+              Taxonomie enrichie pour naviguer par carrosserie, deux-roues, utilitaires, énergie et modes d’usage.
             </p>
           </div>
           <div className="space-y-5">
@@ -143,7 +176,12 @@ const Index = () => {
                           {categoryIcon(category.iconKey)}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-foreground leading-tight">{category.label}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold text-foreground leading-tight">{category.label}</p>
+                            <span className="rounded-md border border-border/80 bg-secondary/50 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                              {categoryToken(category.iconKey)}
+                            </span>
+                          </div>
                           {category.description && (
                             <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{category.description}</p>
                           )}
@@ -283,12 +321,12 @@ const Index = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="rounded-2xl border border-border bg-card p-5">
-            <h3 className="font-serif text-xl font-bold">Import & véhicules neufs</h3>
+            <h3 className="font-serif text-xl font-bold">Véhicules neufs & certifiés</h3>
             <p className="text-sm text-muted-foreground font-sans mt-2 mb-4">
-              Comparez les spécialistes import, les arrivages récents et les véhicules zéro km.
+              Comparez les offres récentes, les faibles kilométrages et les annonces sous garanties.
             </p>
             <Link to="/recherche?condition=neuf&seller=concessionnaire" className="text-primary font-sans text-sm font-semibold hover:underline">
-              Voir les offres import/neuf
+              Voir les offres neuf
             </Link>
           </div>
           <div className="rounded-2xl border border-border bg-card p-5">
