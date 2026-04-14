@@ -103,6 +103,11 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
       }) ?? "all",
     [filters.types, filters.modelQuery, filters.fuels],
   );
+  const defaultOpenSections = useMemo(() => {
+    const sections = ["transaction", "location", "budget"];
+    if (selectedVehicleTypeId !== "all") sections.push("type");
+    return sections;
+  }, [selectedVehicleTypeId]);
 
   const setTransaction = (v: string) => {
     const tr = v === "all" ? "" : v;
@@ -135,7 +140,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
 
   const filterBody = (
       <div className={cn("bg-card rounded-2xl border border-border overflow-hidden", isMobile && "shadow-sm")}>
-        <Accordion type="multiple" defaultValue={["transaction", "type", "location", "budget"]} className="w-full">
+        <Accordion type="multiple" defaultValue={defaultOpenSections} className="w-full">
           <AccordionItem value="transaction" className="border-b border-border px-4">
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.transaction", "Transaction")}</AccordionTrigger>
             <AccordionContent className="pb-3">
