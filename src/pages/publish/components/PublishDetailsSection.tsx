@@ -1,6 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
 type PublishDetailsSectionProps = {
@@ -20,6 +21,16 @@ type PublishDetailsSectionProps = {
   drivetrain: string;
   condition: string;
   sellerType: string;
+  rentalMode: string;
+  bodyStyle: string;
+  doors: string;
+  seats: string;
+  exteriorColor: string;
+  interiorColor: string;
+  availabilityStatus: string;
+  whatsappPhone: string;
+  isElectric: boolean;
+  isHybrid: boolean;
   selectedFeatures: string[];
   equipmentOptions: string[];
   labels: {
@@ -46,6 +57,16 @@ type PublishDetailsSectionProps = {
   onDrivetrainChange: (value: string) => void;
   onConditionChange: (value: string) => void;
   onSellerTypeChange: (value: string) => void;
+  onRentalModeChange: (value: string) => void;
+  onBodyStyleChange: (value: string) => void;
+  onDoorsChange: (value: string) => void;
+  onSeatsChange: (value: string) => void;
+  onExteriorColorChange: (value: string) => void;
+  onInteriorColorChange: (value: string) => void;
+  onAvailabilityStatusChange: (value: string) => void;
+  onWhatsappPhoneChange: (value: string) => void;
+  onElectricChange: (value: boolean) => void;
+  onHybridChange: (value: boolean) => void;
   onToggleFeature: (feature: string) => void;
 };
 
@@ -66,6 +87,16 @@ export function PublishDetailsSection({
   drivetrain,
   condition,
   sellerType,
+  rentalMode,
+  bodyStyle,
+  doors,
+  seats,
+  exteriorColor,
+  interiorColor,
+  availabilityStatus,
+  whatsappPhone,
+  isElectric,
+  isHybrid,
   selectedFeatures,
   equipmentOptions,
   labels,
@@ -84,6 +115,16 @@ export function PublishDetailsSection({
   onDrivetrainChange,
   onConditionChange,
   onSellerTypeChange,
+  onRentalModeChange,
+  onBodyStyleChange,
+  onDoorsChange,
+  onSeatsChange,
+  onExteriorColorChange,
+  onInteriorColorChange,
+  onAvailabilityStatusChange,
+  onWhatsappPhoneChange,
+  onElectricChange,
+  onHybridChange,
   onToggleFeature,
 }: PublishDetailsSectionProps) {
   return (
@@ -167,6 +208,52 @@ export function PublishDetailsSection({
           <Label className="font-sans">Type vendeur</Label>
           <Input value={sellerType} onChange={(e) => onSellerTypeChange(e.target.value)} className="font-sans" placeholder="particulier / concessionnaire" />
         </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <Label className="font-sans">Carrosserie</Label>
+          <Input value={bodyStyle} onChange={(e) => onBodyStyleChange(e.target.value)} className="font-sans" placeholder="SUV, berline, pick-up..." />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Mode location</Label>
+          <Input value={rentalMode} onChange={(e) => onRentalModeChange(e.target.value)} className="font-sans" placeholder="court terme / longue durée" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Portes</Label>
+          <Input type="number" min={0} value={doors} onChange={(e) => onDoorsChange(e.target.value)} className="font-sans" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Places</Label>
+          <Input type="number" min={0} value={seats} onChange={(e) => onSeatsChange(e.target.value)} className="font-sans" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <Label className="font-sans">Couleur extérieure</Label>
+          <Input value={exteriorColor} onChange={(e) => onExteriorColorChange(e.target.value)} className="font-sans" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Couleur intérieure</Label>
+          <Input value={interiorColor} onChange={(e) => onInteriorColorChange(e.target.value)} className="font-sans" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Disponibilité</Label>
+          <Input value={availabilityStatus} onChange={(e) => onAvailabilityStatusChange(e.target.value)} className="font-sans" placeholder="disponible / réservé" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">WhatsApp (optionnel)</Label>
+          <Input value={whatsappPhone} onChange={(e) => onWhatsappPhoneChange(e.target.value)} className="font-sans" placeholder="+261..." />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border/70 px-4 py-3">
+        <label className="inline-flex items-center gap-2 font-sans text-sm">
+          <Switch checked={isElectric} onCheckedChange={onElectricChange} />
+          Électrique
+        </label>
+        <label className="inline-flex items-center gap-2 font-sans text-sm">
+          <Switch checked={isHybrid} onCheckedChange={onHybridChange} />
+          Hybride
+        </label>
       </div>
       <div className="space-y-2">
         <Label className="font-sans">{labels.listingFeatures}</Label>

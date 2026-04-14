@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -138,6 +138,16 @@ const PublishPage = () => {
   const [vehicleDrivetrain, setVehicleDrivetrain] = useState("");
   const [vehicleCondition, setVehicleCondition] = useState("");
   const [vehicleSellerType, setVehicleSellerType] = useState("");
+  const [vehicleRentalMode, setVehicleRentalMode] = useState("");
+  const [vehicleBodyStyle, setVehicleBodyStyle] = useState("");
+  const [vehicleDoors, setVehicleDoors] = useState("");
+  const [vehicleSeats, setVehicleSeats] = useState("");
+  const [vehicleExteriorColor, setVehicleExteriorColor] = useState("");
+  const [vehicleInteriorColor, setVehicleInteriorColor] = useState("");
+  const [vehicleAvailabilityStatus, setVehicleAvailabilityStatus] = useState("");
+  const [vehicleWhatsappPhone, setVehicleWhatsappPhone] = useState("");
+  const [vehicleIsElectric, setVehicleIsElectric] = useState(false);
+  const [vehicleIsHybrid, setVehicleIsHybrid] = useState(false);
 
   const [serverPhotos, setServerPhotos] = useState<ServerPhoto[]>([]);
   /** Photos not yet uploaded (waiting for draft id or queued) */
@@ -270,14 +280,24 @@ const PublishPage = () => {
           const meta = parseVehicleMetaTags(
             Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
           );
-          setVehicleMake(meta.make ?? "");
-          setVehicleModel(meta.model ?? "");
-          setVehicleYear(meta.year != null ? String(meta.year) : "");
-          setVehicleFuel(meta.fuel ?? "");
-          setVehicleTransmission(meta.transmission ?? "");
-          setVehicleDrivetrain(meta.drivetrain ?? "");
-          setVehicleCondition(meta.condition ?? "");
-          setVehicleSellerType(meta.sellerType ?? "");
+          setVehicleMake(fs.vehicleMake || meta.make || "");
+          setVehicleModel(fs.vehicleModel || meta.model || "");
+          setVehicleYear(fs.vehicleYear || (meta.year != null ? String(meta.year) : ""));
+          setVehicleFuel(fs.vehicleFuel || meta.fuel || "");
+          setVehicleTransmission(fs.vehicleTransmission || meta.transmission || "");
+          setVehicleDrivetrain(fs.vehicleDrivetrain || meta.drivetrain || "");
+          setVehicleCondition(fs.vehicleCondition || meta.condition || "");
+          setVehicleSellerType(fs.vehicleSellerType || meta.sellerType || "");
+          setVehicleRentalMode(fs.vehicleRentalMode);
+          setVehicleBodyStyle(fs.vehicleBodyStyle);
+          setVehicleDoors(fs.vehicleDoors);
+          setVehicleSeats(fs.vehicleSeats);
+          setVehicleExteriorColor(fs.vehicleExteriorColor);
+          setVehicleInteriorColor(fs.vehicleInteriorColor);
+          setVehicleAvailabilityStatus(fs.vehicleAvailabilityStatus);
+          setVehicleWhatsappPhone(fs.vehicleWhatsappPhone);
+          setVehicleIsElectric(fs.vehicleIsElectric);
+          setVehicleIsHybrid(fs.vehicleIsHybrid);
           setVideoUrl(fs.videoUrl);
           setVirtualTourUrl(fs.virtualTourUrl);
           setSelectedBoosts(fs.selectedBoosts);
@@ -337,14 +357,24 @@ const PublishPage = () => {
           const meta = parseVehicleMetaTags(
             Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
           );
-          setVehicleMake(meta.make ?? "");
-          setVehicleModel(meta.model ?? "");
-          setVehicleYear(meta.year != null ? String(meta.year) : "");
-          setVehicleFuel(meta.fuel ?? "");
-          setVehicleTransmission(meta.transmission ?? "");
-          setVehicleDrivetrain(meta.drivetrain ?? "");
-          setVehicleCondition(meta.condition ?? "");
-          setVehicleSellerType(meta.sellerType ?? "");
+          setVehicleMake(fs.vehicleMake || meta.make || "");
+          setVehicleModel(fs.vehicleModel || meta.model || "");
+          setVehicleYear(fs.vehicleYear || (meta.year != null ? String(meta.year) : ""));
+          setVehicleFuel(fs.vehicleFuel || meta.fuel || "");
+          setVehicleTransmission(fs.vehicleTransmission || meta.transmission || "");
+          setVehicleDrivetrain(fs.vehicleDrivetrain || meta.drivetrain || "");
+          setVehicleCondition(fs.vehicleCondition || meta.condition || "");
+          setVehicleSellerType(fs.vehicleSellerType || meta.sellerType || "");
+          setVehicleRentalMode(fs.vehicleRentalMode);
+          setVehicleBodyStyle(fs.vehicleBodyStyle);
+          setVehicleDoors(fs.vehicleDoors);
+          setVehicleSeats(fs.vehicleSeats);
+          setVehicleExteriorColor(fs.vehicleExteriorColor);
+          setVehicleInteriorColor(fs.vehicleInteriorColor);
+          setVehicleAvailabilityStatus(fs.vehicleAvailabilityStatus);
+          setVehicleWhatsappPhone(fs.vehicleWhatsappPhone);
+          setVehicleIsElectric(fs.vehicleIsElectric);
+          setVehicleIsHybrid(fs.vehicleIsHybrid);
           setVideoUrl(fs.videoUrl);
           setVirtualTourUrl(fs.virtualTourUrl);
           setSelectedBoosts(fs.selectedBoosts);
@@ -420,6 +450,24 @@ const PublishPage = () => {
           rooms,
           bathrooms,
           toilets,
+          vehicleMake,
+          vehicleModel,
+          vehicleYear,
+          vehicleFuel,
+          vehicleTransmission,
+          vehicleDrivetrain,
+          vehicleCondition,
+          vehicleSellerType,
+          vehicleRentalMode,
+          vehicleBodyStyle,
+          vehicleDoors,
+          vehicleSeats,
+          vehicleExteriorColor,
+          vehicleInteriorColor,
+          vehicleAvailabilityStatus,
+          vehicleWhatsappPhone,
+          vehicleIsElectric,
+          vehicleIsHybrid,
           selectedFeatures: selectedFeaturesWithVehicleMeta,
           videoUrl,
           virtualTourUrl,
@@ -451,6 +499,24 @@ const PublishPage = () => {
               rooms,
               bathrooms,
               toilets,
+              vehicleMake,
+              vehicleModel,
+              vehicleYear,
+              vehicleFuel,
+              vehicleTransmission,
+              vehicleDrivetrain,
+              vehicleCondition,
+              vehicleSellerType,
+              vehicleRentalMode,
+              vehicleBodyStyle,
+              vehicleDoors,
+              vehicleSeats,
+              vehicleExteriorColor,
+              vehicleInteriorColor,
+              vehicleAvailabilityStatus,
+              vehicleWhatsappPhone,
+              vehicleIsElectric,
+              vehicleIsHybrid,
               selectedFeatures: selectedFeaturesWithVehicleMeta,
               videoUrl,
               virtualTourUrl,
@@ -492,6 +558,24 @@ const PublishPage = () => {
             rooms,
             bathrooms,
             toilets,
+            vehicleMake,
+            vehicleModel,
+            vehicleYear,
+            vehicleFuel,
+            vehicleTransmission,
+            vehicleDrivetrain,
+            vehicleCondition,
+            vehicleSellerType,
+            vehicleRentalMode,
+            vehicleBodyStyle,
+            vehicleDoors,
+            vehicleSeats,
+            vehicleExteriorColor,
+            vehicleInteriorColor,
+            vehicleAvailabilityStatus,
+            vehicleWhatsappPhone,
+            vehicleIsElectric,
+            vehicleIsHybrid,
             selectedFeatures: selectedFeaturesWithVehicleMeta,
             videoUrl,
             virtualTourUrl,
@@ -526,6 +610,24 @@ const PublishPage = () => {
           rooms,
           bathrooms,
           toilets,
+          vehicleMake,
+          vehicleModel,
+          vehicleYear,
+          vehicleFuel,
+          vehicleTransmission,
+          vehicleDrivetrain,
+          vehicleCondition,
+          vehicleSellerType,
+          vehicleRentalMode,
+          vehicleBodyStyle,
+          vehicleDoors,
+          vehicleSeats,
+          vehicleExteriorColor,
+          vehicleInteriorColor,
+          vehicleAvailabilityStatus,
+          vehicleWhatsappPhone,
+          vehicleIsElectric,
+          vehicleIsHybrid,
           selectedFeatures: selectedFeaturesWithVehicleMeta,
           videoUrl,
           virtualTourUrl,
@@ -564,6 +666,24 @@ const PublishPage = () => {
       rooms,
       bathrooms,
       toilets,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+      vehicleRentalMode,
+      vehicleBodyStyle,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleExteriorColor,
+      vehicleInteriorColor,
+      vehicleAvailabilityStatus,
+      vehicleWhatsappPhone,
+      vehicleIsElectric,
+      vehicleIsHybrid,
       selectedFeatures,
       videoUrl,
       virtualTourUrl,
@@ -606,6 +726,24 @@ const PublishPage = () => {
     rooms,
     bathrooms,
     toilets,
+    vehicleMake,
+    vehicleModel,
+    vehicleYear,
+    vehicleFuel,
+    vehicleTransmission,
+    vehicleDrivetrain,
+    vehicleCondition,
+    vehicleSellerType,
+    vehicleRentalMode,
+    vehicleBodyStyle,
+    vehicleDoors,
+    vehicleSeats,
+    vehicleExteriorColor,
+    vehicleInteriorColor,
+    vehicleAvailabilityStatus,
+    vehicleWhatsappPhone,
+    vehicleIsElectric,
+    vehicleIsHybrid,
     selectedFeatures,
     videoUrl,
     virtualTourUrl,
@@ -643,6 +781,24 @@ const PublishPage = () => {
             rooms,
             bathrooms,
             toilets,
+            vehicleMake,
+            vehicleModel,
+            vehicleYear,
+            vehicleFuel,
+            vehicleTransmission,
+            vehicleDrivetrain,
+            vehicleCondition,
+            vehicleSellerType,
+            vehicleRentalMode,
+            vehicleBodyStyle,
+            vehicleDoors,
+            vehicleSeats,
+            vehicleExteriorColor,
+            vehicleInteriorColor,
+            vehicleAvailabilityStatus,
+            vehicleWhatsappPhone,
+            vehicleIsElectric,
+            vehicleIsHybrid,
             selectedFeatures: selectedFeaturesWithVehicleMeta,
             videoUrl,
             virtualTourUrl,
@@ -682,6 +838,24 @@ const PublishPage = () => {
     rooms,
     bathrooms,
     toilets,
+    vehicleMake,
+    vehicleModel,
+    vehicleYear,
+    vehicleFuel,
+    vehicleTransmission,
+    vehicleDrivetrain,
+    vehicleCondition,
+    vehicleSellerType,
+    vehicleRentalMode,
+    vehicleBodyStyle,
+    vehicleDoors,
+    vehicleSeats,
+    vehicleExteriorColor,
+    vehicleInteriorColor,
+    vehicleAvailabilityStatus,
+    vehicleWhatsappPhone,
+    vehicleIsElectric,
+    vehicleIsHybrid,
     selectedFeatures,
     videoUrl,
     virtualTourUrl,
@@ -736,6 +910,14 @@ const PublishPage = () => {
       vehicleSellerType,
     ],
   );
+
+  useEffect(() => {
+    const autoTitle = [vehicleMake.trim(), vehicleModel.trim(), vehicleYear.trim()].filter(Boolean).join(" ");
+    if (!autoTitle) return;
+    if (title.trim().length === 0) {
+      setTitle(autoTitle.slice(0, 120));
+    }
+  }, [vehicleMake, vehicleModel, vehicleYear, title]);
 
   const makeCoverAtIndex = async (globalIndex: number) => {
     if (!draftListingId || globalIndex <= 0) return;
@@ -846,6 +1028,17 @@ const PublishPage = () => {
         if (description.trim().length < 40) errors.push(t("publish.descFrenchRequired", "Description en français requise (min. 40 caractères)"));
         if (!priceMga || Number(priceMga) <= 0) errors.push(t("publish.priceRequired", "Prix valide requis"));
         if (surface && Number(surface) < 0) errors.push(t("publish.surfaceInvalid", "Surface invalide"));
+        if (vehicleYear) {
+          const y = Number(vehicleYear);
+          const currentYear = new Date().getFullYear() + 1;
+          if (!Number.isFinite(y) || y < 1950 || y > currentYear) {
+            errors.push(t("publish.yearInvalid", "Année invalide"));
+          }
+        }
+        if (vehicleDoors && Number(vehicleDoors) < 0) errors.push(t("publish.doorsInvalid", "Nombre de portes invalide"));
+        if (vehicleSeats && Number(vehicleSeats) < 0) errors.push(t("publish.seatsInvalid", "Nombre de places invalide"));
+        if (!vehicleMake.trim()) errors.push(t("publish.makeRequired", "Marque requise"));
+        if (!vehicleModel.trim()) errors.push(t("publish.modelRequired", "Modèle requis"));
         break;
       case 2:
         if (serverPhotos.length + pendingPhotos.length < 1) {
@@ -935,6 +1128,24 @@ const PublishPage = () => {
           rooms,
           bathrooms,
           toilets,
+          vehicleMake,
+          vehicleModel,
+          vehicleYear,
+          vehicleFuel,
+          vehicleTransmission,
+          vehicleDrivetrain,
+          vehicleCondition,
+          vehicleSellerType,
+          vehicleRentalMode,
+          vehicleBodyStyle,
+          vehicleDoors,
+          vehicleSeats,
+          vehicleExteriorColor,
+          vehicleInteriorColor,
+          vehicleAvailabilityStatus,
+          vehicleWhatsappPhone,
+          vehicleIsElectric,
+          vehicleIsHybrid,
           selectedFeatures: selectedFeaturesWithVehicleMeta,
           videoUrl,
           virtualTourUrl,
@@ -965,6 +1176,24 @@ const PublishPage = () => {
             rooms,
             bathrooms,
             toilets,
+              vehicleMake,
+              vehicleModel,
+              vehicleYear,
+              vehicleFuel,
+              vehicleTransmission,
+              vehicleDrivetrain,
+              vehicleCondition,
+              vehicleSellerType,
+              vehicleRentalMode,
+              vehicleBodyStyle,
+              vehicleDoors,
+              vehicleSeats,
+              vehicleExteriorColor,
+              vehicleInteriorColor,
+              vehicleAvailabilityStatus,
+              vehicleWhatsappPhone,
+              vehicleIsElectric,
+              vehicleIsHybrid,
             selectedFeatures: selectedFeaturesWithVehicleMeta,
             videoUrl,
             virtualTourUrl,
@@ -1064,6 +1293,24 @@ const PublishPage = () => {
         rooms,
         bathrooms,
         toilets,
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        vehicleFuel,
+        vehicleTransmission,
+        vehicleDrivetrain,
+        vehicleCondition,
+        vehicleSellerType,
+        vehicleRentalMode,
+        vehicleBodyStyle,
+        vehicleDoors,
+        vehicleSeats,
+        vehicleExteriorColor,
+        vehicleInteriorColor,
+        vehicleAvailabilityStatus,
+        vehicleWhatsappPhone,
+        vehicleIsElectric,
+        vehicleIsHybrid,
         selectedFeatures: selectedFeaturesWithVehicleMeta,
         videoUrl,
         virtualTourUrl,
@@ -1304,6 +1551,16 @@ const PublishPage = () => {
             drivetrain={vehicleDrivetrain}
             condition={vehicleCondition}
             sellerType={vehicleSellerType}
+            rentalMode={vehicleRentalMode}
+            bodyStyle={vehicleBodyStyle}
+            doors={vehicleDoors}
+            seats={vehicleSeats}
+            exteriorColor={vehicleExteriorColor}
+            interiorColor={vehicleInteriorColor}
+            availabilityStatus={vehicleAvailabilityStatus}
+            whatsappPhone={vehicleWhatsappPhone}
+            isElectric={vehicleIsElectric}
+            isHybrid={vehicleIsHybrid}
             selectedFeatures={selectedFeatures}
             equipmentOptions={LISTING_EQUIPMENT_OPTIONS}
             labels={{
@@ -1330,6 +1587,16 @@ const PublishPage = () => {
             onDrivetrainChange={setVehicleDrivetrain}
             onConditionChange={setVehicleCondition}
             onSellerTypeChange={setVehicleSellerType}
+            onRentalModeChange={setVehicleRentalMode}
+            onBodyStyleChange={setVehicleBodyStyle}
+            onDoorsChange={setVehicleDoors}
+            onSeatsChange={setVehicleSeats}
+            onExteriorColorChange={setVehicleExteriorColor}
+            onInteriorColorChange={setVehicleInteriorColor}
+            onAvailabilityStatusChange={setVehicleAvailabilityStatus}
+            onWhatsappPhoneChange={setVehicleWhatsappPhone}
+            onElectricChange={setVehicleIsElectric}
+            onHybridChange={setVehicleIsHybrid}
             onToggleFeature={toggleFeature}
           />
         )}

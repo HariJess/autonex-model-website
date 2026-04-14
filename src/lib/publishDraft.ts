@@ -32,6 +32,24 @@ export type LocalPublishBackupV1 = {
   rooms: string;
   bathrooms: string;
   toilets: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: string;
+  vehicleFuel: string;
+  vehicleTransmission: string;
+  vehicleDrivetrain: string;
+  vehicleCondition: string;
+  vehicleSellerType: string;
+  vehicleRentalMode: string;
+  vehicleBodyStyle: string;
+  vehicleDoors: string;
+  vehicleSeats: string;
+  vehicleExteriorColor: string;
+  vehicleInteriorColor: string;
+  vehicleAvailabilityStatus: string;
+  vehicleWhatsappPhone: string;
+  vehicleIsElectric: boolean;
+  vehicleIsHybrid: boolean;
   selectedFeatures: string[];
   videoUrl: string;
   virtualTourUrl: string;
@@ -206,6 +224,24 @@ export function formToListingUpdate(input: {
   rooms: string;
   bathrooms: string;
   toilets: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: string;
+  vehicleFuel: string;
+  vehicleTransmission: string;
+  vehicleDrivetrain: string;
+  vehicleCondition: string;
+  vehicleSellerType: string;
+  vehicleRentalMode: string;
+  vehicleBodyStyle: string;
+  vehicleDoors: string;
+  vehicleSeats: string;
+  vehicleExteriorColor: string;
+  vehicleInteriorColor: string;
+  vehicleAvailabilityStatus: string;
+  vehicleWhatsappPhone: string;
+  vehicleIsElectric: boolean;
+  vehicleIsHybrid: boolean;
   selectedFeatures: string[];
   videoUrl: string;
   virtualTourUrl: string;
@@ -215,6 +251,19 @@ export function formToListingUpdate(input: {
   /** When true, title/description can stay short */
   isDraftSave: boolean;
 }): TablesUpdate<"listings"> {
+  const normalizeText = (value: string, max = 120): string | null => {
+    const trimmed = value.trim().replace(/\s+/g, " ");
+    if (!trimmed) return null;
+    return trimmed.slice(0, max);
+  };
+  const normalizeInt = (value: string, min: number, max?: number): number | null => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    const intVal = Math.floor(n);
+    if (intVal < min) return null;
+    if (typeof max === "number" && intVal > max) return null;
+    return intVal;
+  };
   const tx = effectiveTransaction(input.transaction);
   const lt = effectiveListingType(input.listingType);
   const showRooms = showRoomsForType(lt);
@@ -231,6 +280,26 @@ export function formToListingUpdate(input: {
   const titleTrim = input.title.trim();
   const titleOut =
     titleTrim.length > 0 ? titleTrim.slice(0, 120) : PUBLISH_DRAFT_TITLE_PLACEHOLDER;
+  const currentYear = new Date().getFullYear() + 1;
+  const mileageKm = normalizeInt(input.surface, 0);
+  const versionOrTrim = normalizeInt(input.rooms, 0);
+  const doorsLegacy = normalizeInt(input.bathrooms, 0);
+  const seats = normalizeInt(input.toilets, 0);
+  const year = normalizeInt(input.vehicleYear, 1950, currentYear);
+  const doors = normalizeInt(input.vehicleDoors, 0, 8) ?? doorsLegacy;
+  const make = normalizeText(input.vehicleMake, 80);
+  const model = normalizeText(input.vehicleModel, 100);
+  const fuel = normalizeText(input.vehicleFuel, 60);
+  const transmission = normalizeText(input.vehicleTransmission, 80);
+  const drivetrain = normalizeText(input.vehicleDrivetrain, 80);
+  const condition = normalizeText(input.vehicleCondition, 40);
+  const sellerType = normalizeText(input.vehicleSellerType, 40);
+  const rentalMode = normalizeText(input.vehicleRentalMode, 40);
+  const bodyStyle = normalizeText(input.vehicleBodyStyle, 60);
+  const exteriorColor = normalizeText(input.vehicleExteriorColor, 40);
+  const interiorColor = normalizeText(input.vehicleInteriorColor, 40);
+  const availabilityStatus = normalizeText(input.vehicleAvailabilityStatus, 40);
+  const whatsappPhone = normalizeText(input.vehicleWhatsappPhone, 30);
 
   const boostPayload: string[] = [...input.selectedBoosts];
   if (input.agencySpotlight) boostPayload.push("agency_spotlight");
@@ -244,10 +313,29 @@ export function formToListingUpdate(input: {
     transaction: tx,
     price_mga: priceNum,
     price_eur: priceNum > 0 ? Math.round((priceNum / 5050) * 100) / 100 : 0,
-    surface: input.surface ? Number(input.surface) || null : null,
-    rooms: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,
-    bathrooms: showRooms ? (input.bathrooms ? Number(input.bathrooms) || null : null) : null,
-    toilets: showRooms && input.toilets ? Number(input.toilets) || null : null,
+    surface: mileageKm,
+    rooms: showRooms ? versionOrTrim : null,
+    bathrooms: showRooms ? doorsLegacy : null,
+    toilets: showRooms ? seats : null,
+    make,
+    model,
+    year,
+    mileage_km: mileageKm,
+    fuel,
+    transmission_gearbox: transmission,
+    drivetrain,
+    doors,
+    vehicle_condition: condition,
+    seller_type: sellerType,
+    rental_mode: rentalMode,
+    body_style: bodyStyle,
+    seats,
+    exterior_color: exteriorColor,
+    interior_color: interiorColor,
+    availability_status: availabilityStatus,
+    whatsapp_phone: whatsappPhone,
+    is_electric: input.vehicleIsElectric,
+    is_hybrid: input.vehicleIsHybrid,
     ville: input.ville || null,
     arrondissement: input.arrondissement || null,
     quartier: input.quartier || null,
@@ -283,6 +371,24 @@ export function listingRowToFormState(row: Tables<"listings">): {
   rooms: string;
   bathrooms: string;
   toilets: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: string;
+  vehicleFuel: string;
+  vehicleTransmission: string;
+  vehicleDrivetrain: string;
+  vehicleCondition: string;
+  vehicleSellerType: string;
+  vehicleRentalMode: string;
+  vehicleBodyStyle: string;
+  vehicleDoors: string;
+  vehicleSeats: string;
+  vehicleExteriorColor: string;
+  vehicleInteriorColor: string;
+  vehicleAvailabilityStatus: string;
+  vehicleWhatsappPhone: string;
+  vehicleIsElectric: boolean;
+  vehicleIsHybrid: boolean;
   selectedFeatures: string[];
   videoUrl: string;
   virtualTourUrl: string;
@@ -322,6 +428,24 @@ export function listingRowToFormState(row: Tables<"listings">): {
     rooms: row.rooms != null ? String(row.rooms) : "",
     bathrooms: row.bathrooms != null ? String(row.bathrooms) : "",
     toilets: row.toilets != null ? String(row.toilets) : "",
+    vehicleMake: row.make ?? "",
+    vehicleModel: row.model ?? "",
+    vehicleYear: row.year != null ? String(row.year) : "",
+    vehicleFuel: row.fuel ?? "",
+    vehicleTransmission: row.transmission_gearbox ?? "",
+    vehicleDrivetrain: row.drivetrain ?? "",
+    vehicleCondition: row.vehicle_condition ?? "",
+    vehicleSellerType: row.seller_type ?? "",
+    vehicleRentalMode: row.rental_mode ?? "",
+    vehicleBodyStyle: row.body_style ?? "",
+    vehicleDoors: row.doors != null ? String(row.doors) : "",
+    vehicleSeats: row.seats != null ? String(row.seats) : "",
+    vehicleExteriorColor: row.exterior_color ?? "",
+    vehicleInteriorColor: row.interior_color ?? "",
+    vehicleAvailabilityStatus: row.availability_status ?? "",
+    vehicleWhatsappPhone: row.whatsapp_phone ?? "",
+    vehicleIsElectric: row.is_electric === true,
+    vehicleIsHybrid: row.is_hybrid === true,
     selectedFeatures,
     videoUrl: row.video_url ?? "",
     virtualTourUrl: row.virtual_tour_url ?? "",
@@ -387,6 +511,24 @@ export type PublishFormFieldsForSnapshot = {
   rooms: string;
   bathrooms: string;
   toilets: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: string;
+  vehicleFuel: string;
+  vehicleTransmission: string;
+  vehicleDrivetrain: string;
+  vehicleCondition: string;
+  vehicleSellerType: string;
+  vehicleRentalMode: string;
+  vehicleBodyStyle: string;
+  vehicleDoors: string;
+  vehicleSeats: string;
+  vehicleExteriorColor: string;
+  vehicleInteriorColor: string;
+  vehicleAvailabilityStatus: string;
+  vehicleWhatsappPhone: string;
+  vehicleIsElectric: boolean;
+  vehicleIsHybrid: boolean;
   selectedFeatures: string[];
   videoUrl: string;
   virtualTourUrl: string;
@@ -426,6 +568,25 @@ export function buildListingMaterialSnapshotFromRow(
     rooms: row.rooms ?? null,
     bathrooms: row.bathrooms ?? null,
     toilets: row.toilets ?? null,
+    make: (row.make ?? "").trim(),
+    model: (row.model ?? "").trim(),
+    year: row.year ?? null,
+    mileage_km: row.mileage_km ?? null,
+    fuel: (row.fuel ?? "").trim(),
+    transmission_gearbox: (row.transmission_gearbox ?? "").trim(),
+    drivetrain: (row.drivetrain ?? "").trim(),
+    doors: row.doors ?? null,
+    vehicle_condition: (row.vehicle_condition ?? "").trim(),
+    seller_type: (row.seller_type ?? "").trim(),
+    rental_mode: (row.rental_mode ?? "").trim(),
+    body_style: (row.body_style ?? "").trim(),
+    seats: row.seats ?? null,
+    exterior_color: (row.exterior_color ?? "").trim(),
+    interior_color: (row.interior_color ?? "").trim(),
+    availability_status: (row.availability_status ?? "").trim(),
+    whatsapp_phone: (row.whatsapp_phone ?? "").trim(),
+    is_electric: row.is_electric === true,
+    is_hybrid: row.is_hybrid === true,
     features,
     video_url: (row.video_url ?? "").trim(),
     virtual_tour_url: (row.virtual_tour_url ?? "").trim(),
@@ -468,6 +629,25 @@ export function buildListingMaterialSnapshotFromForm(
     rooms: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,
     bathrooms: showRooms ? (input.bathrooms ? Number(input.bathrooms) || null : null) : null,
     toilets: showRooms && input.toilets ? Number(input.toilets) || null : null,
+    make: input.vehicleMake.trim(),
+    model: input.vehicleModel.trim(),
+    year: input.vehicleYear ? Number(input.vehicleYear) || null : null,
+    mileage_km: input.surface ? Number(input.surface) || null : null,
+    fuel: input.vehicleFuel.trim(),
+    transmission_gearbox: input.vehicleTransmission.trim(),
+    drivetrain: input.vehicleDrivetrain.trim(),
+    doors: input.vehicleDoors ? Number(input.vehicleDoors) || null : null,
+    vehicle_condition: input.vehicleCondition.trim(),
+    seller_type: input.vehicleSellerType.trim(),
+    rental_mode: input.vehicleRentalMode.trim(),
+    body_style: input.vehicleBodyStyle.trim(),
+    seats: input.vehicleSeats ? Number(input.vehicleSeats) || null : null,
+    exterior_color: input.vehicleExteriorColor.trim(),
+    interior_color: input.vehicleInteriorColor.trim(),
+    availability_status: input.vehicleAvailabilityStatus.trim(),
+    whatsapp_phone: input.vehicleWhatsappPhone.trim(),
+    is_electric: input.vehicleIsElectric,
+    is_hybrid: input.vehicleIsHybrid,
     features,
     video_url: input.videoUrl.trim(),
     virtual_tour_url: input.virtualTourUrl.trim(),
