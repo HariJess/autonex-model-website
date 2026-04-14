@@ -25,56 +25,36 @@ export const seedAgencies = [
 ];
 
 export const seedListings: SeedListing[] = [
-  // Analamanga - Antananarivo
   { id: "l1", title: "Toyota RAV4 2021 — très bon état à Ivandry", description: "SUV 4x4 essence, entretien suivi, intérieur cuir, caméra de recul et écran tactile. Véhicule prêt à rouler.", type: "villa", transaction: "vente", price_mga: 350000000, surface: 68000, rooms: 3, bathrooms: 5, region: "Analamanga", city: "Antananarivo", lat: -18.8872, lng: 47.5342, features: ["Boîte automatique", "Caméra de recul", "Bluetooth", "4x4", "Climatisation"], images: ["https://images.unsplash.com/photo-1549924231-f129b911e442?w=800", "https://images.unsplash.com/photo-1493238792000-8113da705763?w=800"], agency_id: "ag1", badge: "boost" },
   { id: "l2", title: "Land Cruiser Prado 2020 — version premium", description: "4x4 robuste pour route et piste, historique d’entretien disponible, sellerie cuir et aides à la conduite.", type: "villa", transaction: "vente", price_mga: 1200000000, surface: 54000, rooms: 5, bathrooms: 5, region: "Analamanga", city: "Antananarivo", lat: -18.8985, lng: 47.5456, features: ["4x4", "GPS intégré", "Toit ouvrant", "Caméra 360", "Faible kilométrage"], images: ["https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800", "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"], agency_id: "ag1", badge: "coup_de_coeur" },
   { id: "l3", title: "Mitsubishi Canter utilitaire — disponible immédiatement", description: "Camion léger idéal livraison urbaine et inter-ville. Châssis sain, moteur révisé, documents à jour.", type: "bureau", transaction: "location", price_mga: 8500000, surface: 121000, rooms: 1, bathrooms: 2, region: "Analamanga", city: "Antananarivo", lat: -18.8950, lng: 47.5215, features: ["Utilitaire", "Faible consommation", "Direction assistée", "Entretien à jour"], images: ["https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800", "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800"], agency_id: "ag2" },
-  // Vakinankaratra - Antsirabe
   { id: "l4", title: "Hyundai Tucson 2019 — excellent rapport qualité/prix", description: "SUV confortable, motorisation fiable, parfait pour trajets quotidiens et longs déplacements à Madagascar.", type: "villa", transaction: "vente", price_mga: 280000000, surface: 79000, rooms: 4, bathrooms: 5, region: "Vakinankaratra", city: "Antsirabe", lat: -19.8659, lng: 47.0333, features: ["Boîte automatique", "Climatisation", "Bluetooth", "Capteurs de stationnement"], images: ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800", "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800"], agency_id: "ag2", badge: "nouveau" },
   { id: "l5", title: "Suzuki Swift 2018 — citadine économique", description: "Voiture compacte, idéale ville, faible consommation, direction souple et entretien régulier.", type: "appartement", transaction: "location", price_mga: 1500000, surface: 93000, rooms: 2, bathrooms: 4, region: "Vakinankaratra", city: "Antsirabe", lat: -19.8700, lng: 47.0300, features: ["Faible consommation", "Climatisation", "Bluetooth"], images: ["https://images.unsplash.com/photo-1592853598064-65e05f3f6af1?w=800"], agency_id: "ag2" },
-  // DIANA - Nosy Be
   { id: "l6", title: "Ford Ranger 4x4 — prêt pour routes difficiles", description: "Pick-up robuste, capacité de chargement élevée, idéal chantier, entreprise ou usage mixte.", type: "local_commercial", transaction: "vente", price_mga: 2500000000, surface: 46000, rooms: 4, bathrooms: 4, region: "DIANA", city: "Nosy Be", lat: -13.3167, lng: 48.2667, features: ["4x4", "Double cabine", "Caméra de recul", "Climatisation"], images: ["https://images.unsplash.com/photo-1597007030739-6d2e2d7baf0f?w=800", "https://images.unsplash.com/photo-1551830820-330a71b99659?w=800"], agency_id: "ag3", badge: "coup_de_coeur" },
   { id: "l7", title: "Yamaha NMAX 155 — scooter urbain récent", description: "Scooter confortable pour ville, faible entretien, consommation maîtrisée, parfait déplacements quotidiens.", type: "terrain", transaction: "location_vacances", price_mga: 250000, surface: 18000, rooms: 2, bathrooms: 2, region: "DIANA", city: "Nosy Be", lat: -13.3980, lng: 48.1980, features: ["Injection", "Frein ABS", "Faible consommation"], images: ["https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800"], agency_id: "ag3" },
   { id: "l8", title: "Kawasaki KLX 250 — trail polyvalent", description: "Moto fiable pour ville et piste, suspension rehaussée, entretien récent, papiers en règle.", type: "terrain", transaction: "vente", price_mga: 180000000, surface: 26000, rooms: 3, bathrooms: 0, region: "DIANA", city: "Antsiranana", lat: -12.2795, lng: 49.2913, features: ["Trail", "Suspension renforcée", "Pneus mixtes"], images: ["https://images.unsplash.com/photo-1558981403-c5f9891c8a2e?w=800"], agency_id: "ag3", badge: "boost" },
-  // Analanjirofo - Sainte-Marie
-  { id: "l9", title: "Lodge bord de mer Sainte-Marie", description: "Ensemble de 6 bungalows sur la côte est de l'île Sainte-Marie. Activité hôtelière rentable.", type: "local_commercial", transaction: "vente", price_mga: 1800000000, surface: 500, rooms: 6, bathrooms: 6, region: "Analanjirofo", city: "Sainte-Marie", lat: -17.0833, lng: 49.85, features: ["Bord de mer", "Restaurant", "Kayaks", "Générateur"], images: ["https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800", "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800"], agency_id: "ag3" },
-  // Atsimo-Andrefana - Toliara
-  { id: "l10", title: "Villa bord de plage Ifaty", description: "Belle villa à Ifaty face au lagon. Idéale pour résidence secondaire ou hébergement touristique.", type: "villa", transaction: "vente", price_mga: 650000000, surface: 180, rooms: 3, bathrooms: 2, region: "Atsimo-Andrefana", city: "Toliara", lat: -23.15, lng: 43.62, features: ["Plage", "Terrasse", "Panneau solaire", "Citerne d'eau"], images: ["https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800"], agency_id: "ag1", badge: "nouveau" },
-  { id: "l11", title: "Local commercial centre Toliara", description: "Local commercial sur l'avenue principale. Fort passage piéton. Idéal commerce ou bureau.", type: "local_commercial", transaction: "location", price_mga: 3500000, surface: 120, rooms: 1, bathrooms: 1, region: "Atsimo-Andrefana", city: "Toliara", lat: -23.3516, lng: 43.6854, features: ["Vitrine", "Climatisation", "Stockage"], images: ["https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800"], agency_id: "ag1" },
-  // Boeny - Mahajanga
-  { id: "l12", title: "Appartement vue mer Mahajanga", description: "T3 avec terrasse face à la Corniche. Coucher de soleil spectaculaire chaque soir.", type: "appartement", transaction: "vente", price_mga: 280000000, surface: 85, rooms: 3, bathrooms: 1, region: "Boeny", city: "Mahajanga", lat: -15.7167, lng: 46.3167, features: ["Vue mer", "Terrasse", "Parking", "Gardien"], images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"], agency_id: "ag2", badge: "boost" },
-  { id: "l13", title: "Villa avec jardin Grand Pavois", description: "Villa familiale dans le quartier Grand Pavois. Jardin clôturé, proche plage et restaurants.", type: "villa", transaction: "location", price_mga: 4500000, surface: 160, rooms: 4, bathrooms: 2, region: "Boeny", city: "Mahajanga", lat: -15.7200, lng: 46.3200, features: ["Jardin", "Garage", "Groupe électrogène", "Forage"], images: ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800"], agency_id: "ag2" },
-  // Atsinanana - Toamasina
-  { id: "l14", title: "Entrepôt zone portuaire Toamasina", description: "Entrepôt de 800m² dans la zone industrielle proche du port. Accès conteneurs facile.", type: "local_commercial", transaction: "location", price_mga: 12000000, surface: 800, rooms: 1, bathrooms: 1, region: "Atsinanana", city: "Toamasina", lat: -18.1443, lng: 49.3958, features: ["Quai de chargement", "Sécurité 24h", "Grande hauteur sous plafond"], images: ["https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800"], agency_id: "ag1" },
-  { id: "l15", title: "Appartement T2 boulevard Joffre", description: "Appartement rénové sur le boulevard principal. Proche port, banques et commerces.", type: "appartement", transaction: "vente", price_mga: 150000000, surface: 65, rooms: 2, bathrooms: 1, region: "Atsinanana", city: "Toamasina", lat: -18.1500, lng: 49.4000, features: ["Rénové", "Climatisation", "Proche port"], images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800"], agency_id: "ag1" },
-  // Haute Matsiatra - Fianarantsoa
-  { id: "l16", title: "Maison haute-ville Fianarantsoa", description: "Maison de caractère dans la vieille ville. Architecture traditionnelle, vue sur les rizières.", type: "villa", transaction: "vente", price_mga: 180000000, surface: 150, rooms: 3, bathrooms: 1, region: "Haute Matsiatra", city: "Fianarantsoa", lat: -21.4425, lng: 47.0856, features: ["Vue rizières", "Cour intérieure", "Proche cathédrale"], images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800"], agency_id: "ag2" },
-  // SAVA
-  { id: "l17", title: "Plantation de vanille Sambava", description: "Exploitation de vanille de 5 hectares. Production certifiée, infrastructure de séchage. Investissement rentable.", type: "terrain", transaction: "vente", price_mga: 800000000, surface: 50000, rooms: 0, bathrooms: 0, region: "SAVA", city: "Sambava", lat: -14.2667, lng: 50.1667, features: ["Plantation active", "Infrastructure", "Personnel formé", "Certification"], images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800"], agency_id: "ag1" },
-  { id: "l18", title: "Maison de maître Antalaha", description: "Grande maison coloniale à Antalaha, cœur de la région vanille. Potentiel chambres d'hôtes.", type: "villa", transaction: "vente", price_mga: 350000000, surface: 300, rooms: 6, bathrooms: 3, region: "SAVA", city: "Antalaha", lat: -14.9, lng: 50.28, features: ["Colonial", "Grand terrain", "Dépendances", "Proche centre"], images: ["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800"], agency_id: "ag1" },
-  // Alaotra-Mangoro
-  { id: "l19", title: "Terrain agricole Ambatondrazaka", description: "Terrain rizicole de 10 hectares dans le grenier à riz de Madagascar. Irrigation assurée.", type: "terrain", transaction: "vente", price_mga: 200000000, surface: 100000, rooms: 0, bathrooms: 0, region: "Alaotra-Mangoro", city: "Ambatondrazaka", lat: -17.83, lng: 48.42, features: ["Irrigué", "Accès route", "Titre foncier", "Sol fertile"], images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800"], agency_id: "ag2" },
-  { id: "l20", title: "Maison Moramanga proche gare", description: "Maison rénovée proche de la gare et de la RN2. Idéal pour commerce ou habitation.", type: "villa", transaction: "vente", price_mga: 120000000, surface: 100, rooms: 3, bathrooms: 1, region: "Alaotra-Mangoro", city: "Moramanga", lat: -18.95, lng: 48.22, features: ["Proche gare", "RN2", "Rénovée", "Cour"], images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800"], agency_id: "ag2" },
-  // Menabe - Morondava
-  { id: "l21", title: "Lodge Allée des Baobabs", description: "Écolodge de charme à proximité de l'Allée des Baobabs. 4 bungalows, restaurant, excellent taux d'occupation.", type: "local_commercial", transaction: "vente", price_mga: 1500000000, surface: 400, rooms: 4, bathrooms: 4, region: "Menabe", city: "Morondava", lat: -20.2833, lng: 44.2833, features: ["Proche Baobabs", "Restaurant", "Panneaux solaires", "Forage"], images: ["https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800"], agency_id: "ag3", badge: "coup_de_coeur" },
-  // Anosy - Fort-Dauphin
-  { id: "l22", title: "Villa Libanona Fort-Dauphin", description: "Villa avec vue sur la baie de Libanona. Proche des plus belles plages du sud.", type: "villa", transaction: "location_vacances", price_mga: 350000, surface: 120, rooms: 3, bathrooms: 2, region: "Anosy", city: "Tôlanaro (Fort-Dauphin)", lat: -25.0314, lng: 46.9825, features: ["Vue mer", "Terrasse", "Climatisation", "Parking"], images: ["https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800"], agency_id: "ag1" },
-  // Itasy
-  { id: "l23", title: "Terrain lac Itasy", description: "Beau terrain au bord du lac Itasy. Cadre naturel exceptionnel, idéal projet éco-tourisme.", type: "terrain", transaction: "vente", price_mga: 80000000, surface: 5000, rooms: 0, bathrooms: 0, region: "Itasy", city: "Miarinarivo", lat: -19.0, lng: 46.9, features: ["Bord de lac", "Vue", "Accès route", "Calme"], images: ["https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800"], agency_id: "ag2" },
-  // Sofia
-  { id: "l24", title: "Maison Antsohihy centre", description: "Maison en dur au centre-ville d'Antsohihy. Proche marché et services administratifs.", type: "villa", transaction: "vente", price_mga: 95000000, surface: 110, rooms: 3, bathrooms: 1, region: "Sofia", city: "Antsohihy", lat: -14.88, lng: 47.99, features: ["Centre-ville", "Titre foncier", "Eau courante"], images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800"], agency_id: "ag1" },
-  // Boeny
-  { id: "l25", title: "Terrain bord de mer Katsepy", description: "Grand terrain en front de mer à Katsepy, face à Mahajanga. Projet hôtelier ou résidentiel.", type: "terrain", transaction: "vente", price_mga: 450000000, surface: 8000, rooms: 0, bathrooms: 0, region: "Boeny", city: "Mahajanga", lat: -15.76, lng: 46.27, features: ["Front de mer", "Grande superficie", "Vue canal Mozambique"], images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800"], agency_id: "ag3", badge: "nouveau" },
-  // Amoron'i Mania
-  { id: "l26", title: "Maison artisanale Ambositra", description: "Maison traditionnelle Zafimaniry à Ambositra, capitale de l'artisanat. Boiseries sculptées d'exception.", type: "villa", transaction: "vente", price_mga: 160000000, surface: 140, rooms: 3, bathrooms: 1, region: "Amoron'i Mania", city: "Ambositra", lat: -20.53, lng: 47.24, features: ["Boiseries", "Artisanat", "Jardin", "Centre-ville"], images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800"], agency_id: "ag2" },
-  // Betsiboka
-  { id: "l27", title: "Propriété Maevatanana", description: "Grande propriété avec terrain agricole. Climat chaud, sols fertiles pour cultures tropicales.", type: "terrain", transaction: "vente", price_mga: 110000000, surface: 15000, rooms: 0, bathrooms: 0, region: "Betsiboka", city: "Maevatanana", lat: -16.95, lng: 46.83, features: ["Sol fertile", "Eau disponible", "Accès RN4"], images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800"], agency_id: "ag1" },
-  // Ihorombe
-  { id: "l28", title: "Ranch Ihosy", description: "Propriété de 20 hectares adaptée à l'élevage de zébus. Pâturages naturels, point d'eau.", type: "terrain", transaction: "vente", price_mga: 300000000, surface: 200000, rooms: 0, bathrooms: 0, region: "Ihorombe", city: "Ihosy", lat: -22.4, lng: 46.12, features: ["Pâturages", "Point d'eau", "Clôturé", "Accès route"], images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800"], agency_id: "ag1" },
-  // Vatovavy
-  { id: "l29", title: "Maison coloniale Mananjary", description: "Ancienne demeure coloniale à Mananjary. Potentiel de rénovation, grand terrain, proche canal.", type: "villa", transaction: "vente", price_mga: 130000000, surface: 200, rooms: 4, bathrooms: 2, region: "Vatovavy", city: "Mananjary", lat: -21.22, lng: 48.34, features: ["Colonial", "Grand terrain", "Proche canal", "À rénover"], images: ["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800"], agency_id: "ag2" },
-  // Analamanga - more
-  { id: "l30", title: "Duplex luxe Ivandry", description: "Magnifique duplex de 180m² dans résidence haut standing. Piscine commune, salle de sport, sécurité.", type: "appartement", transaction: "location", price_mga: 6500000, surface: 180, rooms: 4, bathrooms: 3, region: "Analamanga", city: "Antananarivo", lat: -18.885, lng: 47.530, features: ["Duplex", "Piscine", "Salle de sport", "Sécurité 24h", "Standing"], images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800", "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800"], agency_id: "ag1", badge: "boost" },
+  { id: "l9", title: "Peugeot Boxer 2020 — utilitaire grand volume", description: "Fourgon spacieux, idéal logistique et livraisons inter-villes. Très bon état général.", type: "local_commercial", transaction: "vente", price_mga: 420000000, surface: 89000, rooms: 2, bathrooms: 2, region: "Analanjirofo", city: "Sainte-Marie", lat: -17.0833, lng: 49.85, features: ["Grand volume", "Porte latérale", "Climatisation cabine"], images: ["https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800"], agency_id: "ag3" },
+  { id: "l10", title: "Nissan Navara 2019 — pick-up double cabine", description: "Pick-up polyvalent pour travail et usage personnel. Moteur fiable, carnet d’entretien disponible.", type: "local_commercial", transaction: "vente", price_mga: 650000000, surface: 74000, rooms: 3, bathrooms: 4, region: "Atsimo-Andrefana", city: "Toliara", lat: -23.15, lng: 43.62, features: ["Double cabine", "4x4", "Caméra de recul"], images: ["https://images.unsplash.com/photo-1551830820-330a71b99659?w=800"], agency_id: "ag1", badge: "nouveau" },
+  { id: "l11", title: "Renault Duster 2018 — SUV économique", description: "SUV compact, adapté aux routes malgaches, bonne garde au sol et entretien simple.", type: "villa", transaction: "location", price_mga: 3500000, surface: 102000, rooms: 2, bathrooms: 4, region: "Atsimo-Andrefana", city: "Toliara", lat: -23.3516, lng: 43.6854, features: ["SUV", "Climatisation", "Faible consommation"], images: ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800"], agency_id: "ag1" },
+  { id: "l12", title: "Honda Civic 2020 — berline élégante", description: "Berline confortable avec intérieur premium, motorisation sobre et très bon comportement routier.", type: "maison", transaction: "vente", price_mga: 280000000, surface: 61000, rooms: 3, bathrooms: 4, region: "Boeny", city: "Mahajanga", lat: -15.7167, lng: 46.3167, features: ["Boîte automatique", "Bluetooth", "Caméra de recul"], images: ["https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"], agency_id: "ag2", badge: "boost" },
+  { id: "l13", title: "Mazda CX-5 2019 — SUV familial", description: "SUV spacieux, confortable en ville et sur route, idéal pour une famille active.", type: "villa", transaction: "location", price_mga: 4500000, surface: 83000, rooms: 3, bathrooms: 5, region: "Boeny", city: "Mahajanga", lat: -15.7200, lng: 46.3200, features: ["SUV", "Toit ouvrant", "GPS intégré"], images: ["https://images.unsplash.com/photo-1493238792000-8113da705763?w=800"], agency_id: "ag2" },
+  { id: "l14", title: "Isuzu NPR — camion de distribution", description: "Camion léger robuste pour distribution urbaine et périurbaine.", type: "bureau", transaction: "location", price_mga: 12000000, surface: 140000, rooms: 2, bathrooms: 2, region: "Atsinanana", city: "Toamasina", lat: -18.1443, lng: 49.3958, features: ["Grande capacité", "Cabine simple", "Entretien suivi"], images: ["https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800"], agency_id: "ag1" },
+  { id: "l15", title: "Kia Rio 2019 — fiable et économique", description: "Citadine fiable avec coût d’usage maîtrisé, parfaite pour les trajets quotidiens.", type: "appartement", transaction: "vente", price_mga: 150000000, surface: 88000, rooms: 2, bathrooms: 4, region: "Atsinanana", city: "Toamasina", lat: -18.1500, lng: 49.4000, features: ["Faible consommation", "Bluetooth", "Airbags"], images: ["https://images.unsplash.com/photo-1592853598064-65e05f3f6af1?w=800"], agency_id: "ag1" },
+  { id: "l16", title: "Subaru Forester 2017 — 4x4 polyvalent", description: "Véhicule polyvalent, sécurité renforcée et excellente tenue de route.", type: "villa", transaction: "vente", price_mga: 180000000, surface: 112000, rooms: 2, bathrooms: 5, region: "Haute Matsiatra", city: "Fianarantsoa", lat: -21.4425, lng: 47.0856, features: ["4x4", "ABS", "Aide en côte"], images: ["https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800"], agency_id: "ag2" },
+  { id: "l17", title: "Yamaha YBR 125 — moto économique", description: "Moto légère, idéale pour trajets urbains, entretien facile et pièces accessibles.", type: "terrain", transaction: "vente", price_mga: 80000000, surface: 22000, rooms: 1, bathrooms: 0, region: "SAVA", city: "Sambava", lat: -14.2667, lng: 50.1667, features: ["Faible consommation", "Frein à disque", "Injection"], images: ["https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800"], agency_id: "ag1" },
+  { id: "l18", title: "Honda CR-V 2018 — SUV confortable", description: "SUV fiable et spacieux, idéal ville et routes nationales.", type: "villa", transaction: "vente", price_mga: 350000000, surface: 97000, rooms: 3, bathrooms: 5, region: "SAVA", city: "Antalaha", lat: -14.9, lng: 50.28, features: ["SUV", "Climatisation", "Caméra de recul"], images: ["https://images.unsplash.com/photo-1493238792000-8113da705763?w=800"], agency_id: "ag1" },
+  { id: "l19", title: "Mercedes Sprinter — minibus 16 places", description: "Minibus pour transport voyageurs, bon état mécanique, prêt pour activité professionnelle.", type: "bureau", transaction: "vente", price_mga: 200000000, surface: 210000, rooms: 4, bathrooms: 2, region: "Alaotra-Mangoro", city: "Ambatondrazaka", lat: -17.83, lng: 48.42, features: ["16 places", "Climatisation", "Entretien régulier"], images: ["https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=800"], agency_id: "ag2" },
+  { id: "l20", title: "Toyota Hilux 2017 — pick-up robuste", description: "Pick-up robuste et fiable pour usage mixte professionnel/personnel.", type: "local_commercial", transaction: "vente", price_mga: 120000000, surface: 135000, rooms: 2, bathrooms: 4, region: "Alaotra-Mangoro", city: "Moramanga", lat: -18.95, lng: 48.22, features: ["4x4", "Double cabine", "Charge utile élevée"], images: ["https://images.unsplash.com/photo-1597007030739-6d2e2d7baf0f?w=800"], agency_id: "ag2" },
+  { id: "l21", title: "BMW X3 2020 — SUV premium", description: "SUV premium avec finition haut de gamme, conduite confortable et performante.", type: "villa", transaction: "vente", price_mga: 1500000000, surface: 42000, rooms: 5, bathrooms: 5, region: "Menabe", city: "Morondava", lat: -20.2833, lng: 44.2833, features: ["Premium", "Toit panoramique", "Aides à la conduite"], images: ["https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800"], agency_id: "ag3", badge: "coup_de_coeur" },
+  { id: "l22", title: "Quad Polaris 570 — loisirs et pistes", description: "Quad polyvalent, performant sur pistes, idéal tourisme et activités de loisir.", type: "terrain", transaction: "location_vacances", price_mga: 350000, surface: 9000, rooms: 3, bathrooms: 0, region: "Anosy", city: "Tôlanaro (Fort-Dauphin)", lat: -25.0314, lng: 46.9825, features: ["Quad", "Suspension renforcée", "Pneus off-road"], images: ["https://images.unsplash.com/photo-1469285994282-454ceb49e63d?w=800"], agency_id: "ag1" },
+  { id: "l23", title: "Dacia Sandero 2019 — budget malin", description: "Voiture compacte accessible et économique, idéale premier achat.", type: "appartement", transaction: "vente", price_mga: 80000000, surface: 101000, rooms: 1, bathrooms: 4, region: "Itasy", city: "Miarinarivo", lat: -19.0, lng: 46.9, features: ["Faible coût d’entretien", "Bluetooth", "ABS"], images: ["https://images.unsplash.com/photo-1592853598064-65e05f3f6af1?w=800"], agency_id: "ag2" },
+  { id: "l24", title: "Nissan Sunny 2016 — berline fiable", description: "Berline simple et fiable, idéale pour usage quotidien et taxi premium.", type: "maison", transaction: "vente", price_mga: 95000000, surface: 142000, rooms: 1, bathrooms: 4, region: "Sofia", city: "Antsohihy", lat: -14.88, lng: 47.99, features: ["Faible consommation", "Direction assistée", "Climatisation"], images: ["https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"], agency_id: "ag1" },
+  { id: "l25", title: "Toyota Coaster — bus touristique", description: "Bus moyen format pour activité touristique et transport privé.", type: "bureau", transaction: "vente", price_mga: 450000000, surface: 275000, rooms: 4, bathrooms: 2, region: "Boeny", city: "Mahajanga", lat: -15.76, lng: 46.27, features: ["Grande capacité", "Confort passagers", "Climatisation"], images: ["https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=800"], agency_id: "ag3", badge: "nouveau" },
+  { id: "l26", title: "KTM Duke 200 — look sportif", description: "Moto nerveuse et agile, idéale en ville et pour escapades week-end.", type: "terrain", transaction: "vente", price_mga: 160000000, surface: 18000, rooms: 4, bathrooms: 0, region: "Amoron'i Mania", city: "Ambositra", lat: -20.53, lng: 47.24, features: ["Sport", "ABS", "Injection"], images: ["https://images.unsplash.com/photo-1558981403-c5f9891c8a2e?w=800"], agency_id: "ag2" },
+  { id: "l27", title: "Iveco Daily — utilitaire long", description: "Utilitaire long châssis pour transport de marchandises.", type: "local_commercial", transaction: "vente", price_mga: 110000000, surface: 198000, rooms: 2, bathrooms: 2, region: "Betsiboka", city: "Maevatanana", lat: -16.95, lng: 46.83, features: ["Long châssis", "Charge utile", "Entretien récent"], images: ["https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800"], agency_id: "ag1" },
+  { id: "l28", title: "Suzuki Jimny 2015 — compact 4x4", description: "Petit 4x4 agile pour route et piste, idéal régions enclavées.", type: "villa", transaction: "vente", price_mga: 300000000, surface: 128000, rooms: 2, bathrooms: 3, region: "Ihorombe", city: "Ihosy", lat: -22.4, lng: 46.12, features: ["4x4", "Format compact", "Fiabilité"], images: ["https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800"], agency_id: "ag1" },
+  { id: "l29", title: "Volkswagen Polo 2017 — citadine dynamique", description: "Citadine dynamique, bonne tenue de route et finition soignée.", type: "appartement", transaction: "vente", price_mga: 130000000, surface: 96000, rooms: 2, bathrooms: 4, region: "Vatovavy", city: "Mananjary", lat: -21.22, lng: 48.34, features: ["Bluetooth", "Climatisation", "Direction assistée"], images: ["https://images.unsplash.com/photo-1592853598064-65e05f3f6af1?w=800"], agency_id: "ag2" },
+  { id: "l30", title: "Audi Q5 2021 — SUV haut de gamme", description: "SUV premium récent, équipements complets et faible kilométrage.", type: "villa", transaction: "location", price_mga: 6500000, surface: 39000, rooms: 5, bathrooms: 5, region: "Analamanga", city: "Antananarivo", lat: -18.885, lng: 47.530, features: ["Premium", "Toit panoramique", "Caméra 360", "GPS"], images: ["https://images.unsplash.com/photo-1493238792000-8113da705763?w=800", "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"], agency_id: "ag1", badge: "boost" },
 ];
 
 export type SeedBlogSection = {
@@ -113,550 +93,158 @@ export type SeedBlogPost = {
 
 export const seedBlogPosts: SeedBlogPost[] = [
   {
-    id: "b5",
-    slug: "frais-agence-immobiliere-madagascar",
-    title: "Achat de voiture à Madagascar : budget, documents et points à vérifier",
-    seoTitle:
-      "Achat de voiture à Madagascar : budget, documents et vérifications clés (guide pratique 2026)",
-    metaDescription:
-      "Guide clair pour acheter une voiture à Madagascar : budget global, documents à contrôler, essai, historique et vérifications avant achat.",
-    excerpt:
-      "Prix affiché, frais annexes, contrôle technique et papiers : ce guide vous aide à sécuriser votre achat automobile à Madagascar.",
+    id: "b1",
+    slug: "acheter-voiture-occasion-madagascar-checklist-2026",
+    title: "Acheter une voiture d’occasion à Madagascar : checklist complète 2026",
+    seoTitle: "Acheter une voiture d’occasion à Madagascar : checklist complète 2026",
+    metaDescription: "Vérifiez les documents, l’historique, l’état mécanique et le coût total avant d’acheter un véhicule d’occasion à Madagascar.",
+    excerpt: "Une méthode claire pour éviter les mauvaises surprises et acheter un véhicule fiable au bon prix.",
     category: "Achat auto",
     published_at: "2026-04-13",
     updated_at: "2026-04-13",
-    readingTime: "10 min",
-    cover: "/blog-covers/frais-agence-madagascar.jpg",
-    coverAlt: "Achat de voiture à Madagascar",
-    tags: [
-      "frais d’agence immobilière Madagascar",
-      "commission agence immobilière Madagascar",
-      "honoraires agence immobilière Madagascar",
-      "frais agence location Madagascar",
-      "frais agence vente Madagascar",
-      "mandat exclusif immobilier Madagascar",
-    ],
-    intro:
-      "À Madagascar, il n’existe pas un tarif unique et officiel qui s’applique à toutes les agences immobilières. En pratique, les frais varient selon l’agence, le type d’opération (vente ou location), le mandat signé et les services réellement fournis. L’objectif de ce guide est simple : vous aider à comprendre qui paie, combien cela peut représenter et à quel moment c’est dû, sans confusion.",
+    readingTime: "8 min",
+    cover: "/blog-covers/location-antananarivo.jpg",
+    coverAlt: "Inspection d’une voiture d’occasion",
+    tags: ["voiture occasion madagascar", "checklist achat auto", "documents véhicule"],
+    intro: "Avant d’acheter un véhicule d’occasion, prenez le temps de vérifier la mécanique, les papiers et le coût global. Cette checklist vous aide à décider en confiance.",
     sections: [
       {
-        heading: "À quoi correspondent les frais d’agence ?",
+        heading: "Les points à contrôler avant l’essai",
         paragraphs: [
-          "Les honoraires d’agence ne rémunèrent pas seulement la mise en relation. Selon les dossiers, ils couvrent aussi la préparation commerciale du bien (photos, diffusion d’annonce), les visites, la qualification des acquéreurs ou locataires, la négociation et une partie de l’accompagnement administratif.",
-          "En location, certaines agences incluent aussi la préparation du bail, l’état des lieux et un suivi d’entrée dans les lieux. Le périmètre exact doit toujours être écrit noir sur blanc.",
+          "Commencez par l’état extérieur, l’alignement des panneaux, l’usure des pneus et l’état de la carrosserie.",
+          "À l’intérieur, vérifiez les équipements essentiels : climatisation, tableau de bord, éclairage, multimédia et commandes.",
         ],
-        bulletsTitle: "Services généralement inclus (selon les agences)",
+        bulletsTitle: "Contrôles rapides",
         bullets: [
-          "Mise en relation vendeur/bailleur et acquéreur/locataire",
-          "Organisation des visites",
-          "Diffusion et valorisation de l’annonce",
-          "Préqualification des candidats",
-          "Négociation commerciale",
-          "Accompagnement administratif (bail, état des lieux, formalités)",
+          "Carrosserie et corrosion",
+          "Pneumatiques et freins",
+          "Direction et suspensions",
+          "Système électrique",
         ],
       },
       {
-        heading: "Vente : qui paie et combien ?",
-        paragraphs: [
-          "Dans de nombreuses pratiques observées, les frais de vente sont supportés par le vendeur, mais ce n’est pas une règle universelle : cela dépend de la convention de mandat et de la structuration de l’offre.",
-          "Sur le marché malgache, on voit souvent des fourchettes constatées autour de 5% à 10% pour certaines agences. D’autres publient des modèles différenciés (mandat exclusif vs non exclusif), des frais fixes ou des barèmes dégressifs selon le montant de la transaction.",
-        ],
-        checklistTitle: "Ce qu’il faut retenir pour une vente",
+        heading: "Documents à demander",
+        checklistTitle: "Checklist documents",
         checklist: [
-          "La commission n’est pas uniforme d’une agence à l’autre",
-          "Le mode de calcul peut être au pourcentage, fixe ou hybride",
-          "Le payeur (vendeur, acquéreur ou partage) doit être explicitement indiqué",
-          "La base de calcul doit être précisée (prix net, prix acte, etc.)",
-        ],
-      },
-      {
-        heading: "Location : quelles pratiques observe-t-on ?",
-        paragraphs: [
-          "En location, les pratiques sont souvent encore plus variées. On peut rencontrer des frais équivalents à un mois de loyer, des fractions de mois, des pourcentages, ou des services facturés séparément selon les cas.",
-          "Il est donc essentiel de vérifier le détail avant signature : montant exact, personne qui paie, date d’exigibilité et liste des prestations incluses.",
-        ],
-        bulletsTitle: "Points à contrôler en location",
-        bullets: [
-          "Montant des frais d’agence",
-          "Qui paie (bailleur, locataire, ou répartition)",
-          "Moment de paiement (signature, entrée, après validation)",
-          "Inclus / non inclus : visites, dossier, bail, état des lieux",
-        ],
-      },
-      {
-        heading: "Mandat exclusif ou non exclusif : pourquoi les frais changent ?",
-        paragraphs: [
-          "Un mandat exclusif signifie qu’une seule agence est missionnée pour commercialiser le bien sur une période donnée. En contrepartie de cette exclusivité, certaines agences appliquent des taux plus compétitifs.",
-          "En mandat non exclusif, plusieurs intermédiaires peuvent intervenir : la concurrence peut accélérer la visibilité, mais certaines agences affichent alors des niveaux de commission plus élevés pour couvrir l’incertitude commerciale.",
-          "On trouve ainsi, dans des exemples publiés, des modèles type 3% en exclusif vs 5% en non exclusif. Ces chiffres restent des exemples observés, pas une norme générale.",
-        ],
-      },
-      {
-        heading: "Ce qu’il faut absolument vérifier avant de signer",
-        checklistTitle: "Checklist contractuelle",
-        checklist: [
-          "Montant exact des honoraires",
-          "Partie qui paie les frais",
-          "Moment précis d’exigibilité",
-          "Services inclus dans les honoraires",
-          "Durée du mandat",
-          "Exclusivité ou non",
-          "Conditions de remboursement (ou non)",
-          "Document écrit clair et signé",
-        ],
-      },
-      {
-        heading: "Peut-on négocier les frais d’agence ?",
-        paragraphs: [
-          "Oui, dans certains cas. La négociation est souvent plus probable sur les actifs de valeur élevée, les biens faciles à commercialiser ou les mandats apportant une forte visibilité à l’agence.",
-          "Mais ce n’est pas automatique : une agence structurée avec un vrai service (qualité de diffusion, tri des candidats, rigueur documentaire, accompagnement jusqu’à la signature) peut justifier des honoraires plus élevés.",
-        ],
-      },
-      {
-        heading: "Comment savoir si les frais sont justifiés ?",
-        bullets: [
-          "Transparence du barème et du contrat",
-          "Qualité des photos et de la diffusion",
-          "Connaissance réelle du marché local",
-          "Capacité à filtrer les visiteurs/candidats",
-          "Niveau d’accompagnement administratif",
-          "Clarté sur les délais et engagements",
-        ],
-        paragraphs: [
-          "Le bon critère n’est pas seulement “le taux le plus bas”, mais le rapport entre coût, sécurité et efficacité de la transaction.",
+          "Carte grise / certificat d’immatriculation",
+          "Pièce d’identité du vendeur",
+          "Historique d’entretien",
+          "Preuve de non-opposition si applicable",
         ],
       },
     ],
     faq: [
-      {
-        question: "Les frais d’agence sont-ils obligatoires à Madagascar ?",
-        answer:
-          "Ils ne sont pas automatiques par nature : ils résultent d’un accord contractuel avec une agence. Ce qui compte, c’est ce qui est écrit dans le mandat ou la convention.",
-      },
-      {
-        question: "Qui paie les frais d’agence pour une location ?",
-        answer:
-          "Selon les pratiques observées, cela varie : bailleur, locataire ou répartition. Il faut vérifier le contrat avant engagement.",
-      },
-      {
-        question: "Peut-on négocier les honoraires d’une agence immobilière ?",
-        answer:
-          "Oui dans certains dossiers, surtout sur des biens à forte valeur ou des mandats attractifs, mais ce n’est pas systématique.",
-      },
-      {
-        question: "Mandat exclusif ou simple : quelle différence ?",
-        answer:
-          "Le mandat exclusif confie la vente/location à une seule agence pendant une durée donnée ; le simple (non exclusif) permet plusieurs agences. Cela influence souvent la structure de frais.",
-      },
-      {
-        question: "Les visites sont-elles payantes ?",
-        answer:
-          "Selon les agences, les visites peuvent être incluses ou indirectement intégrées dans les honoraires globaux. Vérifiez ce point dans l’offre.",
-      },
-      {
-        question: "Quand les honoraires doivent-ils être payés ?",
-        answer:
-          "Le moment d’exigibilité varie (signature, finalisation, entrée dans les lieux, etc.). Il doit être précisé clairement dans l’accord.",
-      },
+      { question: "Faut-il faire un essai routier ?", answer: "Oui, c’est indispensable pour détecter bruits, vibrations et comportement moteur/freinage." },
+      { question: "Dois-je vérifier le coût d’assurance avant achat ?", answer: "Oui, cela change fortement le coût total annuel de possession." },
     ],
-    conclusion:
-      "Sur les frais d’agence immobilière à Madagascar, la règle clé est la transparence contractuelle : il n’y a pas de tarif unique valable partout. Comparez les offres, vérifiez les termes écrits et évaluez la qualité de service autant que le pourcentage affiché.",
-  },
-  {
-    id: "b1",
-    slug: "acheter-terrain-madagascar",
-    title: "Voiture d’occasion à Madagascar : checklist avant de signer",
-    seoTitle: "Voiture d’occasion à Madagascar : guide pratique 2026 (contrôles, documents, pièges)",
-    metaDescription:
-      "Guide complet pour acheter une voiture d’occasion à Madagascar : contrôles mécaniques, documents, historique, prix et checklist acheteur.",
-    excerpt:
-      "Avant de signer, sécurisez votre achat auto avec une méthode claire : contrôles techniques, documents et coûts à anticiper.",
-    category: "Occasion",
-    published_at: "2026-03-15",
-    updated_at: "2026-04-13",
-    readingTime: "12 min",
-    cover: "/blog-covers/terrain-madagascar.jpg",
-    coverAlt: "Voiture d’occasion à Madagascar",
-    tags: ["terrain", "achat", "cadastre", "mutation", "notaire", "immobilier madagascar"],
-    intro:
-      "Acheter un terrain à Madagascar peut être une excellente décision patrimoniale, à condition de respecter une discipline stricte de vérification. Dans la pratique, la plupart des litiges viennent d’un contrôle documentaire insuffisant ou d’un enchaînement d’étapes mal exécuté. Ce guide vous donne une feuille de route concrète pour avancer avec méthode.",
-    sections: [
-      {
-        heading: "Pourquoi les achats de terrain tournent parfois mal",
-        paragraphs: [
-          "Le risque n’est pas seulement “juridique” au sens abstrait : il est opérationnel. Un dossier incomplet, un certificat ancien, une incohérence entre le vendeur et le titre ou un retard de formalisation peut suffire à bloquer votre projet plusieurs mois.",
-          "À Madagascar, il faut raisonner en séquence : vérifier, formaliser, enregistrer, puis muter. Sauter une étape pour aller plus vite revient souvent à déplacer le problème vers l’aval, quand il est plus coûteux à corriger.",
-        ],
-        bulletsTitle: "Les causes les plus fréquentes de blocage",
-        bullets: [
-          "CSJ obsolète ou non demandé avant la signature",
-          "Absence de cohérence entre le titre, le vendeur et la parcelle réellement vendue",
-          "Acte de vente incomplet ou imprécis sur la désignation du bien",
-          "Enregistrement tardif et mutation non finalisée",
-        ],
-      },
-      {
-        heading: "Documents à vérifier avant toute signature",
-        paragraphs: [
-          "Commencez par le Certificat de Situation Juridique (CSJ) et assurez-vous qu’il est récent. C’est la base pour confirmer la situation du bien au moment de l’opération.",
-          "Vérifiez ensuite le titre et les éléments cadastraux, puis demandez la prescription d’urbanisme / autorisation de transaction lorsque le cas l’exige. L’objectif est d’éliminer les ambiguïtés avant l’acte.",
-        ],
-        checklistTitle: "Checklist documentaire minimale",
-        checklist: [
-          "CSJ récent",
-          "Titre foncier et identité du titulaire concordants",
-          "Références cadastrales cohérentes avec la parcelle visitée",
-          "Prescription d’urbanisme / autorisation de transaction (si applicable)",
-          "Pièces d’identité des parties et pouvoirs valides",
-        ],
-      },
-      {
-        heading: "Processus officiel étape par étape (vente entre particuliers)",
-        paragraphs: [
-          "1) Vérifications préalables : CSJ, titre/cadastre, capacité des parties. 2) Prescription d’urbanisme / autorisation de transaction : dans certains guides pratiques, le délai indicatif observé est d’environ 2 jours.",
-          "3) Acte de vente : formalisation écrite complète (désignation du bien, prix, parties, modalités). Délai indicatif observé dans certains parcours : environ 48 heures. 4) Enregistrement : souvent autour de 5 jours dans des parcours standards.",
-          "5) Mutation / changement de propriétaire : c’est une étape indispensable, et non un “détail administratif”. Tant qu’elle n’est pas finalisée, votre sécurité juridique reste incomplète.",
-        ],
-      },
-      {
-        heading: "Frais et budget : comment raisonner sans mauvaise surprise",
-        paragraphs: [
-          "Les montants exacts varient selon la nature du bien, la zone, l’acte et le cadre fiscal des parties. Dans certains guides de référence sur l’achat de terrain, on retrouve à titre indicatif : acte de vente autour de 2,5%, enregistrement autour de 5% pour l’acheteur et 5% pour le vendeur.",
-          "Utilisez ces repères comme des ordres de grandeur et validez toujours les montants actualisés avec votre notaire / professionnel local avant signature.",
-        ],
-        checklistTitle: "Budget à préparer en amont",
-        checklist: [
-          "Prix du terrain",
-          "Frais d’acte",
-          "Droits d’enregistrement",
-          "Frais administratifs de mutation",
-          "Marge de sécurité pour délai et imprévus",
-        ],
-      },
-      {
-        heading: "Erreurs à éviter absolument",
-        bullets: [
-          "Signer sur la base de copies non vérifiées",
-          "Payer sans traçabilité claire et sans acte prêt",
-          "Reporter l’enregistrement et la mutation à “plus tard”",
-          "Confondre vitesse de négociation et sécurité juridique",
-        ],
-      },
-    ],
-    faq: [
-      {
-        question: "Le CSJ est-il vraiment indispensable avant achat ?",
-        answer:
-          "Oui, c’est l’un des documents clés pour valider la situation juridique du bien au moment de la vente.",
-      },
-      {
-        question: "La mutation peut-elle être faite plus tard ?",
-        answer:
-          "Techniquement, certains dossiers prennent du temps, mais la mutation ne doit pas être négligée : elle sécurise réellement votre propriété.",
-      },
-      {
-        question: "Les pourcentages de frais sont-ils fixes ?",
-        answer:
-          "Non. Les chiffres cités sont des repères indicatifs observés dans des guides pratiques. Vérifiez systématiquement les conditions en vigueur.",
-      },
-    ],
-    conclusion:
-      "Un achat terrain réussi à Madagascar repose sur une logique simple : vérifiez d’abord, formalisez proprement, enregistrez sans délai, puis finalisez la mutation. Cette rigueur protège votre investissement bien mieux qu’une négociation “rapide”.",
+    conclusion: "Un achat réussi repose sur trois piliers : contrôle technique, documents complets et budget global réaliste.",
   },
   {
     id: "b2",
-    slug: "fiscalite-immobiliere-madagascar-2026",
-    title: "Financement auto à Madagascar en 2026",
-    seoTitle: "Financement auto à Madagascar en 2026 : crédit, apport, assurance et points de vigilance",
-    metaDescription:
-      "Comprendre le financement automobile à Madagascar en 2026 : apport, mensualités, assurance, coûts cachés et budget réaliste.",
-    excerpt:
-      "Un guide pratique pour anticiper le coût total d’un véhicule sans confusion : crédit, assurance, entretien et vérifications clés avant engagement.",
+    slug: "financement-auto-madagascar-2026",
+    title: "Financement auto à Madagascar : comment bien calculer son budget",
+    seoTitle: "Financement auto à Madagascar : budget, crédit et coûts cachés",
+    metaDescription: "Comparez apport, mensualités, assurance et entretien pour choisir un financement auto adapté à votre situation.",
+    excerpt: "Crédit auto, apport et charges réelles : les repères essentiels avant de vous engager.",
     category: "Financement",
-    published_at: "2026-02-28",
+    published_at: "2026-03-28",
     updated_at: "2026-04-13",
-    readingTime: "11 min",
+    readingTime: "7 min",
     cover: "/blog-covers/fiscalite-madagascar.jpg",
-    coverAlt: "Financement auto à Madagascar",
-    tags: ["fiscalité", "IFT", "IFPB", "location", "revente", "DGI"],
-    intro:
-      "La fiscalité immobilière influence directement la rentabilité d’un bien. Le bon réflexe est de raisonner en cycle de vie : achat, détention, location éventuelle, puis revente ou transmission. Ce guide vous donne un cadre clair pour budgéter et éviter les mauvaises surprises.",
+    coverAlt: "Calcul du budget auto",
+    tags: ["financement auto", "budget voiture", "crédit automobile"],
+    intro: "Un bon financement auto ne se résume pas à une mensualité faible. Il faut intégrer assurance, entretien et marge de sécurité.",
     sections: [
       {
-        heading: "Les taxes à connaître lors de l’achat",
+        heading: "Construire un budget réaliste",
         paragraphs: [
-          "Au moment d’acheter, la fiscalité ne se limite pas au prix affiché. Selon la nature de l’acte et le statut des parties, des droits et frais s’ajoutent.",
-          "Le plus important n’est pas d’apprendre une liste théorique, mais de demander un chiffrage écrit prévisionnel avant de signer.",
+          "Calculez le budget total mensuel : mensualité éventuelle, carburant, assurance, entretien et imprévus.",
+          "Prévoyez une réserve pour les réparations non planifiées, surtout pour les véhicules d’occasion.",
         ],
-      },
-      {
-        heading: "Les taxes en phase de détention",
-        paragraphs: [
-          "Deux repères sont fréquemment cités dans le cadre local : l’IFT (Impôt foncier sur les terrains), souvent présenté autour de 1% de la valeur vénale du terrain, et l’IFPB (Impôt foncier sur la propriété bâtie), souvent évoqué dans une fourchette d’environ 5% à 10% de la valeur locative.",
-          "Ces repères restent indicatifs : selon la commune, la qualification du bien et les textes applicables, le résultat concret peut varier.",
-        ],
-        bulletsTitle: "Ce qu’il faut vérifier pour chaque bien",
-        bullets: [
-          "Base de calcul retenue localement",
-          "Périodicité de déclaration et échéances",
-          "Éventuelles exonérations/abattements applicables",
-          "Situation fiscale antérieure du bien",
-        ],
-      },
-      {
-        heading: "Si vous mettez le bien en location",
-        paragraphs: [
-          "La mise en location crée des obligations de suivi : loyers déclarés, justificatifs, cohérence entre bail et encaissements. Votre rentabilité nette dépend autant de la fiscalité que du taux d’occupation.",
-          "Un loyer “élevé” sans maîtrise des charges, vacance et fiscalité peut produire un rendement réel inférieur à un bien plus modeste mais mieux géré.",
-        ],
-      },
-      {
-        heading: "Avant revente ou transfert : anticiper au lieu de subir",
-        paragraphs: [
-          "La sortie (revente, cession, transfert) est souvent sous-estimée. Pourtant, c’est là que des écarts de fiscalité ou de formalisation peuvent réduire fortement la marge.",
-          "Préparez cette étape en amont avec vos pièces à jour et un scénario chiffré conservateur.",
-        ],
-        checklistTitle: "Documents à demander / consolider",
+        checklistTitle: "Postes à inclure",
         checklist: [
-          "Justificatifs fiscaux récents",
-          "Pièces de propriété et historique d’actes",
-          "Éléments de valorisation du bien",
-          "Estimation de fiscalité de sortie par professionnel",
-        ],
-      },
-      {
-        heading: "Exemples de logique budgétaire (pratique)",
-        bullets: [
-          "Scénario prudent : loyers modérés + vacance partielle + fiscalité haute",
-          "Scénario médian : occupation stable + fiscalité conforme au budget",
-          "Scénario optimiste : bonne occupation + maîtrise des charges",
-        ],
-        paragraphs: [
-          "Comparer ces scénarios avant achat aide à éviter des projections trop optimistes.",
+          "Mensualité / apport",
+          "Assurance",
+          "Entretien régulier",
+          "Pneus et batterie",
         ],
       },
     ],
     faq: [
-      {
-        question: "Les taux IFT/IFPB sont-ils identiques partout ?",
-        answer:
-          "Non, ce sont des repères indicatifs utiles. Le traitement réel dépend du cadre applicable et des autorités compétentes.",
-      },
-      {
-        question: "Peut-on boucler une transaction sans conseil fiscal local ?",
-        answer:
-          "C’est fortement déconseillé. Une validation DGI / notaire / comptable réduit fortement le risque d’erreur coûteuse.",
-      },
-      {
-        question: "La fiscalité est-elle secondaire face au prix d’achat ?",
-        answer:
-          "Non. Sur la durée, elle peut modifier significativement la rentabilité nette d’un investissement.",
-      },
+      { question: "Quel apport minimum viser ?", answer: "Plus l’apport est élevé, plus la mensualité et le coût total du crédit diminuent." },
     ],
-    conclusion:
-      "En immobilier, la fiscalité n’est pas un détail administratif. C’est un facteur de performance et de sécurité. Restez prudent sur les chiffres “généraux” et validez toujours votre cas concret avant engagement.",
+    conclusion: "Choisissez un véhicule que vous pouvez assumer sur la durée, pas seulement à l’achat.",
   },
   {
     id: "b3",
-    slug: "investir-nosy-be-guide-complet",
-    title: "Investir à Nosy Be : guide complet",
-    seoTitle: "Investir à Nosy Be : analyse 2026 (demande, risques, stratégie locative)",
-    metaDescription:
-      "Guide complet pour investir à Nosy Be : dynamique touristique 2025, potentiel locatif, saisonnalité, risques, due diligence et stratégie long terme.",
-    excerpt:
-      "Nosy Be attire les investisseurs, mais la performance dépend d’une vraie analyse locale : demande, saisonnalité, contraintes d’exploitation et gestion du risque.",
-    category: "Investir",
-    published_at: "2026-01-20",
+    slug: "entretien-voiture-madagascar-astuces",
+    title: "Entretien auto à Madagascar : 10 réflexes pour garder votre véhicule fiable",
+    seoTitle: "Entretien auto à Madagascar : 10 réflexes pratiques",
+    metaDescription: "Bons réflexes d’entretien pour prolonger la durée de vie de votre voiture et réduire les pannes imprévues.",
+    excerpt: "Des gestes simples pour préserver performance, sécurité et valeur de revente.",
+    category: "Conseils auto",
+    published_at: "2026-03-05",
     updated_at: "2026-04-13",
-    readingTime: "13 min",
-    cover: "/blog-covers/nosy-be-investissement.jpg",
-    coverAlt: "Investissement immobilier à Nosy Be",
-    tags: ["nosy be", "investissement", "location saisonnière", "tourisme", "rendement"],
-    intro:
-      "Nosy Be n’est pas seulement une destination “carte postale”. C’est un micro-marché immobilier tiré par le tourisme, avec des opportunités réelles mais aussi des risques spécifiques. Investir efficacement suppose de traiter l’île comme un actif économique, pas comme une promesse abstraite.",
+    readingTime: "6 min",
+    cover: "/blog-covers/terrain-madagascar.jpg",
+    coverAlt: "Entretien de véhicule",
+    tags: ["entretien voiture", "conseils auto", "fiabilité"],
+    intro: "Un entretien régulier coûte moins cher qu’une panne majeure. Voici les priorités à suivre toute l’année.",
     sections: [
       {
-        heading: "Pourquoi Nosy Be attire les investisseurs",
-        paragraphs: [
-          "Les données de trafic et d’arrivées confirment une dynamique positive. Sur janvier-août 2025, les arrivées autour de 79 659 (vs 64 095 en 2024) et les mouvements passagers autour de 160 188 (vs 132 832) traduisent une montée de la demande.",
-          "Des rapports locaux mentionnent également un volume d’environ 264 604 passagers en 2025 et une progression d’environ +13% des arrivées touristiques versus 2024. Le poids des clientèles internationales (notamment italienne et française) est un facteur structurant.",
-        ],
-      },
-      {
-        heading: "Ce qui soutient vraiment la demande locative",
-        bulletsTitle: "Drivers clés",
+        heading: "Les vérifications essentielles",
         bullets: [
-          "Attractivité touristique internationale",
-          "Durées de séjour variables selon saison",
-          "Demande de biens meublés bien situés",
-          "Recherche d’expériences premium et de services",
-        ],
-        paragraphs: [
-          "Le rendement dépend souvent plus de la qualité d’exploitation (gestion, entretien, commercialisation) que du simple achat du bien.",
-        ],
-      },
-      {
-        heading: "Quels actifs privilégier selon votre stratégie",
-        paragraphs: [
-          "Pour la location saisonnière, privilégiez les biens lisibles commercialement : accès, état, équipements, qualité visuelle, facilité de maintenance.",
-          "Pour une stratégie plus défensive, un mix partiel avec location longue durée peut lisser la saisonnalité et stabiliser les revenus.",
-        ],
-      },
-      {
-        heading: "Risques à ne pas sous-estimer",
-        bullets: [
-          "Saisonnalité et variabilité du taux d’occupation",
-          "Dépendance forte au trafic aérien et au contexte touristique",
-          "Pression sur services/infrastructure selon zones",
-          "Risque opérationnel (gestion, maintenance, vacance)",
-        ],
-        paragraphs: [
-          "Un projet rentable sur tableur peut devenir fragile si ces paramètres sont ignorés.",
-        ],
-      },
-      {
-        heading: "Évaluer un bien à Nosy Be : méthode de due diligence",
-        checklistTitle: "Checklist investisseur",
-        checklist: [
-          "Documents de propriété et situation juridique à jour",
-          "Historique locatif (si disponible) et saisonnalité réelle",
-          "Coûts d’exploitation (entretien, personnel, commercialisation)",
-          "Scénario prudent de remplissage et de prix moyen",
-          "Plan de sortie (revente, repositionnement, long terme)",
-        ],
-      },
-      {
-        heading: "Saisonnier vs long terme : choisir sans dogme",
-        paragraphs: [
-          "Le saisonnier peut offrir un meilleur revenu brut, mais avec plus de volatilité et d’intensité opérationnelle. Le long terme réduit le turnover et simplifie la gestion.",
-          "Beaucoup d’investisseurs performants utilisent une stratégie hybride selon la localisation, la saison et le profil de bien.",
+          "Niveau d’huile moteur",
+          "Liquide de refroidissement",
+          "Pression des pneus",
+          "État des freins",
+          "Éclairage complet",
         ],
       },
     ],
     faq: [
-      {
-        question: "Nosy Be est-il automatiquement rentable ?",
-        answer:
-          "Non. Le marché est attractif, mais la performance dépend de l’actif, de la gestion et de votre discipline financière.",
-      },
-      {
-        question: "Faut-il viser uniquement la location courte durée ?",
-        answer:
-          "Pas forcément. Une approche mixte peut améliorer la résilience du projet selon votre tolérance au risque.",
-      },
-      {
-        question: "Quelle est l’erreur la plus fréquente ?",
-        answer:
-          "Surpayer un bien en supposant une occupation élevée constante sans scénario prudent d’exploitation.",
-      },
+      { question: "Tous les combien faire une vidange ?", answer: "Suivez le carnet d’entretien du constructeur et adaptez selon votre usage." },
     ],
-    conclusion:
-      "Nosy Be peut être un excellent terrain d’investissement, à condition d’être piloté comme un actif professionnel : hypothèses réalistes, contrôle des coûts, gestion opérationnelle solide et stratégie claire selon la saison.",
+    conclusion: "Un véhicule suivi régulièrement reste plus sûr, plus économique et se revend mieux.",
   },
   {
     id: "b4",
-    slug: "louer-antananarivo-quartiers-prix",
-    title: "Louer à Antananarivo : quartiers et prix",
-    seoTitle: "Louer à Antananarivo : quartiers, loyers observés et checklist locataire",
-    metaDescription:
-      "Guide pratique pour louer à Antananarivo : profils de quartiers (Ivandry, Ambatobe, Ankorondrano, Ivato…), loyers observés et vérifications avant bail.",
-    excerpt:
-      "Un guide concret pour choisir votre quartier à Antananarivo selon votre style de vie, votre budget et vos contraintes de mobilité, avec loyers observés sur les annonces.",
-    category: "Louer",
-    published_at: "2026-01-05",
+    slug: "choisir-4x4-madagascar-guide",
+    title: "Comment choisir un 4x4 à Madagascar : guide terrain",
+    seoTitle: "Choisir un 4x4 à Madagascar : guide terrain et budget",
+    metaDescription: "Critères techniques et budgétaires pour choisir un 4x4 adapté aux routes de Madagascar.",
+    excerpt: "Transmission, garde au sol, entretien et disponibilité des pièces : les clés d’un bon choix.",
+    category: "4x4 & utilitaires",
+    published_at: "2026-02-10",
     updated_at: "2026-04-13",
-    readingTime: "12 min",
-    cover: "/blog-covers/location-antananarivo.jpg",
-    coverAlt: "Location immobilière à Antananarivo",
-    tags: ["location antananarivo", "quartiers", "loyers", "ivandry", "ambatobe"],
-    intro:
-      "Louer à Antananarivo ne se résume pas à “trouver un bon prix”. Le quartier influence votre qualité de vie, votre sécurité perçue, votre temps de trajet et vos coûts indirects. Ce guide vous aide à comparer intelligemment les zones clés avec des loyers observés sur les annonces.",
+    readingTime: "9 min",
+    cover: "/blog-covers/nosy-be-investissement.jpg",
+    coverAlt: "4x4 sur route",
+    tags: ["4x4 madagascar", "suv", "utilitaire"],
+    intro: "Le bon 4x4 dépend de votre usage réel : ville, route nationale, piste ou activité professionnelle.",
     sections: [
       {
-        heading: "Comment choisir un quartier avant de regarder le prix",
+        heading: "Critères techniques prioritaires",
+        paragraphs: [
+          "Privilégiez une bonne garde au sol, une transmission adaptée et des pièces disponibles localement.",
+          "Vérifiez la consommation réelle et la qualité du réseau d’entretien dans votre région.",
+        ],
+        bulletsTitle: "Priorités achat 4x4",
         bullets: [
-          "Temps de trajet quotidien réel (heures de pointe)",
-          "Accès aux services (écoles, commerces, santé)",
-          "Niveau de bruit et circulation",
-          "Sécurité perçue et type d’immeuble/résidence",
-        ],
-        paragraphs: [
-          "Commencez par définir vos non-négociables. Le loyer “moins cher” devient vite coûteux si la localisation dégrade fortement votre quotidien.",
-        ],
-      },
-      {
-        heading: "Profils de quartiers clés à Antananarivo",
-        paragraphs: [
-          "Ivandry, Ambatobe, Ankorondrano et certains secteurs comme Androhibe ou Ankerana sont souvent recherchés pour leur équilibre entre accessibilité, services et image résidentielle/professionnelle.",
-          "Des zones comme Ivato, Nanisana ou Talatamaty peuvent proposer des points d’entrée plus accessibles selon le type de bien et l’état du marché.",
-        ],
-        bulletsTitle: "Lecture rapide par zone",
-        bullets: [
-          "Ivandry / Ambatobe : demande premium, loyers plus élevés",
-          "Ankorondrano : pratique pour profils actifs/pro",
-          "Androhibe / Ankerana : secteurs attractifs mais hétérogènes",
-          "Ivato / Talatamaty / Nanisana : options plus abordables selon offre",
-        ],
-      },
-      {
-        heading: "Loyers observés (annonces) : comment les interpréter",
-        paragraphs: [
-          "Les montants ci-dessous sont des observations de marché sur les annonces, pas des statistiques officielles. Début 2026, on observe des entrées à quelques centaines d’euros/mois dans des secteurs plus accessibles, et des niveaux pouvant monter vers 900 € à 1 800 €+ pour des villas ou grands biens mieux situés.",
-          "La dispersion est forte selon : surface réelle, état du bien, sécurité de la résidence, ameublement, équipements et accès.",
-        ],
-        checklistTitle: "Pour comparer deux loyers correctement",
-        checklist: [
-          "Inclure charges, sécurité, parking, internet",
-          "Comparer l’état réel et non uniquement les photos",
-          "Vérifier la durée minimale et clauses de révision",
-          "Évaluer le coût transport/temps au quotidien",
-        ],
-      },
-      {
-        heading: "Avant de signer un bail : points de contrôle",
-        bullets: [
-          "État des lieux précis (photos + écrit)",
-          "Dépôt de garantie et conditions de restitution",
-          "Qui paie quoi (charges, maintenance, réparations)",
-          "Conditions de sortie et préavis",
-        ],
-      },
-      {
-        heading: "Meublé vs non meublé : quel arbitrage ?",
-        paragraphs: [
-          "Le meublé facilite une installation rapide mais coûte souvent plus cher et peut inclure des standards très variables.",
-          "Le non meublé offre parfois un meilleur équilibre long terme si vous prévoyez une installation durable.",
-        ],
-      },
-      {
-        heading: "Checklist locataire (version terrain)",
-        checklist: [
-          "Visiter à deux horaires différents (jour + fin de journée)",
-          "Tester eau, électricité, réseau mobile/internet",
-          "Demander les charges réelles des 3 derniers mois",
-          "Confirmer le montant total d’entrée (loyer + dépôt + frais)",
-          "Relire toutes les clauses avant signature",
+          "Transmission adaptée",
+          "Garde au sol",
+          "Coût des pièces",
+          "Historique d’entretien",
         ],
       },
     ],
     faq: [
       {
-        question: "Les loyers indiqués sont-ils des moyennes officielles ?",
+        question: "Faut-il forcément un 4x4 permanent ?",
         answer:
-          "Non, ce sont des fourchettes observées sur les annonces. Elles servent de repère pratique, pas de référence statistique officielle.",
-      },
-      {
-        question: "Quel quartier choisir pour un budget serré ?",
-        answer:
-          "Regardez en priorité les secteurs à entrée plus basse (selon l’offre du moment), tout en vérifiant transport, sécurité et charges.",
-      },
-      {
-        question: "Faut-il privilégier uniquement les quartiers premium ?",
-        answer:
-          "Pas nécessairement. Le bon choix est celui qui équilibre budget, confort quotidien et contraintes de mobilité.",
+          "Pas toujours. Choisissez selon vos trajets réels et votre budget d’usage.",
       },
     ],
-    conclusion:
-      "Pour bien louer à Antananarivo, comparez d’abord les quartiers selon votre vie réelle, puis négociez le prix avec une grille de lecture complète (charges, état, accès, sécurité). C’est ce qui fait la différence entre “logement trouvé” et “location réussie”.",
+    conclusion: "Un 4x4 pertinent est celui qui répond à votre usage quotidien avec un coût d’entretien soutenable.",
   },
 ];

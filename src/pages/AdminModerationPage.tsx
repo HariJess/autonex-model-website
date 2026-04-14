@@ -79,7 +79,7 @@ function AdminModerationPage() {
                       {l.type} · {l.transaction} · {l.ville ?? "Ville non renseignée"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Propriétaire: {l.owner_id}
+                      Vendeur: {l.owner_id}
                       {Array.isArray(l.pending_boost_types) && l.pending_boost_types.length > 0
                         ? ` · Boosts demandés: ${JSON.stringify(l.pending_boost_types)}`
                         : ""}

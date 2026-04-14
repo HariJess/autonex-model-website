@@ -284,7 +284,7 @@ const AdminMonetizationPage = () => {
                   <li key={l.id} className="rounded-xl border border-border p-4 space-y-2 font-sans text-sm">
                     <p className="font-medium">{l.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {l.ville} · {l.publication_credits_charged ?? "—"} cr. prélevés · Propriétaire {l.owner_id}
+                      {l.ville} · {l.publication_credits_charged ?? "—"} cr. prélevés · Vendeur {l.owner_id}
                     </p>
                     <p className="text-xs">
                       Boosts demandés :{" "}

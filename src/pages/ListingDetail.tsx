@@ -323,7 +323,7 @@ const ListingDetail = () => {
   const seoImage = toAbsoluteUrl(images[0] || "/placeholder.svg");
   const listingJsonLd = {
     "@context": "https://schema.org",
-    "@type": "RealEstateListing",
+    "@type": "Product",
     name: listing.title,
     description: listingDescription,
     url: canonical,
@@ -337,12 +337,12 @@ const ListingDetail = () => {
           addressCountry: "MG",
         }
       : undefined,
-    numberOfRooms: listing.rooms && listing.rooms > 0 ? listing.rooms : undefined,
-    floorSize: listing.surface && listing.surface > 0
+    category: typeLabel,
+    mileageFromOdometer: listing.surface && listing.surface > 0
       ? {
           "@type": "QuantitativeValue",
           value: listing.surface,
-          unitCode: "MTK",
+          unitText: "km",
         }
       : undefined,
     offers: {
@@ -626,7 +626,7 @@ const ListingDetail = () => {
                   </div>
                 )}
                 <div>
-                  <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Propriétaire")}</h3>
+                  <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Vendeur")}</h3>
                   {listing.agency_verified && <Badge variant="secondary" className="text-xs font-sans">{t("listing.verified", "Vérifié")}</Badge>}
                 </div>
               </div>

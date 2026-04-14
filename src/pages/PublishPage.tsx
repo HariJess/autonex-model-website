@@ -105,7 +105,7 @@ const PublishPage = () => {
 
   const steps = [
     t("publish.stepMain", "Informations principales"),
-    t("publish.stepDetails", "Détails du bien"),
+    t("publish.stepDetails", "Détails du véhicule"),
     t("publish.stepMedia", "Médias"),
     t("publish.stepVisibility", "Visibilité & envoi"),
   ];
@@ -1195,8 +1195,8 @@ const PublishPage = () => {
             pinLng={pinLng}
             labels={{
               propertyType: t("publish.propertyType", "Type de véhicule"),
-              newProgram: t("publish.newProgram", "Programme / neuf"),
-              newProgramHint: t("publish.newProgramHint", "Cochez si le bien relève d’un promoteur ou d’un lot neuf."),
+              newProgram: t("publish.newProgram", "Véhicule neuf / import"),
+              newProgramHint: t("publish.newProgramHint", "Cochez si l’annonce concerne un véhicule neuf ou récemment importé."),
               internalRef: t("publish.internalRef", "Référence interne (optionnel)"),
               mapTitle: t("publish.mapTitle", "Emplacement approximatif sur la carte"),
               mapPublicHint: t("publish.mapPublicHint", "La position affichée publiquement sera légèrement décalée pour préserver la confidentialité."),

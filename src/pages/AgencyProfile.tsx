@@ -107,7 +107,7 @@ const AgencyProfile = () => {
   const seoImage = toAbsoluteUrl(agency.logo_url || "/placeholder.svg");
   const agencyJsonLd = {
     "@context": "https://schema.org",
-    "@type": "RealEstateAgent",
+    "@type": "AutoDealer",
     name: agency.name,
     url: canonical,
     logo: seoImage,
