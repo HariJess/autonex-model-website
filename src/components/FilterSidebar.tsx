@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,7 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider from "@/components/BudgetRangeSlider";
 import { X } from "lucide-react";
-import { LISTING_TYPES, LISTING_TYPE_LABELS, LISTING_TYPES_WITHOUT_ROOM_FILTERS, type ListingType } from "@/types/listing";
+import { LISTING_TYPES, LISTING_TYPES_WITHOUT_ROOM_FILTERS, type ListingType } from "@/types/listing";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
@@ -45,6 +45,14 @@ const SELLER_OPTIONS = AUTO_SEARCH_SELLER_OPTIONS.map((label) => ({
   value: label.toLowerCase(),
   label,
 }));
+const VEHICLE_TYPE_PREVIEW_IDS = new Set([
+  "citadine",
+  "berline",
+  "suv_4x4",
+  "pick_up",
+  "utilitaire_leger",
+  "moto",
+]);
 
 interface FilterSidebarProps {
   filters: SearchFilters;
@@ -60,6 +68,7 @@ interface FilterSidebarProps {
 const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileApply, idPrefix = "" }: FilterSidebarProps) => {
   const pid = idPrefix ? `${idPrefix}-` : "";
   const { t } = useTranslation();
+  const [showAllVehicleTypes, setShowAllVehicleTypes] = useState(false);
 
   const update = (partial: Partial<SearchFilters>) => {
     onFiltersChange({ ...filters, ...partial });
@@ -104,10 +113,23 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
     [filters.types, filters.modelQuery, filters.fuels],
   );
   const defaultOpenSections = useMemo(() => {
-    const sections = ["transaction", "location", "budget"];
-    if (selectedVehicleTypeId !== "all") sections.push("type");
-    return sections;
-  }, [selectedVehicleTypeId]);
+    return ["transaction", "type", "location", "budget"];
+  }, []);
+  const selectedVehicleTypeOption = useMemo(
+    () => typeOptions.find((opt) => opt.id === selectedVehicleTypeId) ?? null,
+    [typeOptions, selectedVehicleTypeId],
+  );
+  const selectedTypeOutsidePreview =
+    selectedVehicleTypeId !== "all" && !VEHICLE_TYPE_PREVIEW_IDS.has(selectedVehicleTypeId);
+  const hasHiddenVehicleTypes = typeOptions.some((opt) => !VEHICLE_TYPE_PREVIEW_IDS.has(opt.id));
+  const visibleVehicleTypeOptions = useMemo(() => {
+    if (showAllVehicleTypes) return typeOptions;
+    const preview = typeOptions.filter((opt) => VEHICLE_TYPE_PREVIEW_IDS.has(opt.id));
+    if (selectedTypeOutsidePreview && selectedVehicleTypeOption) {
+      return [...preview, selectedVehicleTypeOption];
+    }
+    return preview;
+  }, [showAllVehicleTypes, typeOptions, selectedTypeOutsidePreview, selectedVehicleTypeOption]);
 
   const setTransaction = (v: string) => {
     const tr = v === "all" ? "" : v;
@@ -165,13 +187,13 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
 
           <AccordionItem value="type" className="border-b border-border px-4">
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.propertyType", "Type de véhicule")}</AccordionTrigger>
-            <AccordionContent className="pb-3 space-y-1">
+            <AccordionContent className="pb-3 space-y-2">
               <RadioGroup value={selectedVehicleTypeId} onValueChange={setVehicleType}>
                 <div className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
                   <RadioGroupItem value="all" id={`${pid}vehicle-type-all`} className={isMobile ? "shrink-0" : undefined} />
                   <Label htmlFor={`${pid}vehicle-type-all`} className="font-sans text-sm cursor-pointer flex-1 py-1">Tous types</Label>
                 </div>
-                {typeOptions.map((vehicleTypeOption) => (
+                {visibleVehicleTypeOptions.map((vehicleTypeOption) => (
                   <div key={vehicleTypeOption.id} className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
                     <RadioGroupItem value={vehicleTypeOption.id} id={`${pid}vehicle-type-${vehicleTypeOption.id}`} className={isMobile ? "shrink-0" : undefined} />
                     <Label htmlFor={`${pid}vehicle-type-${vehicleTypeOption.id}`} className="font-sans text-sm cursor-pointer flex-1 py-1">
@@ -180,6 +202,22 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                   </div>
                 ))}
               </RadioGroup>
+              {!showAllVehicleTypes && selectedTypeOutsidePreview && selectedVehicleTypeOption && (
+                <p className="text-xs text-muted-foreground font-sans">
+                  Sélection active: {selectedVehicleTypeOption.label}
+                </p>
+              )}
+              {hasHiddenVehicleTypes && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-1 font-sans text-xs text-primary hover:text-primary"
+                  onClick={() => setShowAllVehicleTypes((prev) => !prev)}
+                >
+                  {showAllVehicleTypes ? "Voir moins" : "Voir plus"}
+                </Button>
+              )}
               {filters.transaction && typeOptions.length < LISTING_TYPES.length && (
                 <p className="text-xs text-muted-foreground font-sans pt-1">{t("search.terrainNotForRent", "Certaines catégories ne sont pas disponibles pour ce type d’annonce.")}</p>
               )}
