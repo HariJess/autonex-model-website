@@ -16,12 +16,14 @@ import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { cn } from "@/lib/utils";
 import {
+  AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
   AUTO_BRAND_GROUPS,
   AUTO_SEARCH_CONDITION_OPTIONS,
   AUTO_SEARCH_DRIVETRAIN_OPTIONS,
   AUTO_SEARCH_FUEL_OPTIONS,
   AUTO_SEARCH_SELLER_OPTIONS,
   AUTO_SEARCH_TRANSMISSION_OPTIONS,
+  inferVehicleTypeOptionIdFromFilters,
 } from "@/data/automotiveCatalog";
 
 export type { SearchFilters };
@@ -87,9 +89,19 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
       ? SURFACE_SLIDER_MAX
       : Math.min(filters.surfaceMax, SURFACE_SLIDER_MAX);
 
-  const typeOptions = useMemo(
-    () => listingTypesForTransaction(filters.transaction),
-    [filters.transaction]
+  const typeOptions = useMemo(() => AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, []);
+  const allowedListingTypes = useMemo(
+    () => new Set(listingTypesForTransaction(filters.transaction)),
+    [filters.transaction],
+  );
+  const selectedVehicleTypeId = useMemo(
+    () =>
+      inferVehicleTypeOptionIdFromFilters({
+        types: filters.types,
+        modelQuery: filters.modelQuery,
+        fuels: filters.fuels,
+      }) ?? "all",
+    [filters.types, filters.modelQuery, filters.fuels],
   );
 
   const setTransaction = (v: string) => {
@@ -97,6 +109,28 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
     const allowed = new Set(listingTypesForTransaction(tr));
     const types = filters.types.filter((t) => allowed.has(t as ListingType));
     onFiltersChange({ ...filters, transaction: tr, types });
+  };
+
+  const setVehicleType = (vehicleTypeId: string) => {
+    if (vehicleTypeId === "all") {
+      onFiltersChange({
+        ...filters,
+        types: [],
+        modelQuery: "",
+        fuels: [],
+      });
+      return;
+    }
+
+    const selectedVehicleType = typeOptions.find((opt) => opt.id === vehicleTypeId);
+    if (!selectedVehicleType) return;
+    const mappedTypes = (selectedVehicleType.listingTypes ?? []).filter((tp) => allowedListingTypes.has(tp as ListingType));
+    onFiltersChange({
+      ...filters,
+      types: mappedTypes,
+      modelQuery: selectedVehicleType.modelQuery ?? "",
+      fuels: selectedVehicleType.fuels ? [...selectedVehicleType.fuels] : [],
+    });
   };
 
   const filterBody = (
@@ -127,16 +161,20 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           <AccordionItem value="type" className="border-b border-border px-4">
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.propertyType", "Type de véhicule")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
-              {typeOptions.map((typeVal) => (
-                <label key={typeVal} className={cn("flex items-center gap-3 cursor-pointer touch-manipulation", isMobile ? "min-h-11 py-1" : "py-0.5")}>
-                  <Checkbox
-                    checked={filters.types.includes(typeVal)}
-                    onCheckedChange={() => update({ types: toggleInArray(filters.types, typeVal) })}
-                    className={isMobile ? "h-4 w-4" : undefined}
-                  />
-                  <span className="font-sans text-sm flex-1">{LISTING_TYPE_LABELS[typeVal]}</span>
-                </label>
-              ))}
+              <RadioGroup value={selectedVehicleTypeId} onValueChange={setVehicleType}>
+                <div className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
+                  <RadioGroupItem value="all" id={`${pid}vehicle-type-all`} className={isMobile ? "shrink-0" : undefined} />
+                  <Label htmlFor={`${pid}vehicle-type-all`} className="font-sans text-sm cursor-pointer flex-1 py-1">Tous types</Label>
+                </div>
+                {typeOptions.map((vehicleTypeOption) => (
+                  <div key={vehicleTypeOption.id} className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
+                    <RadioGroupItem value={vehicleTypeOption.id} id={`${pid}vehicle-type-${vehicleTypeOption.id}`} className={isMobile ? "shrink-0" : undefined} />
+                    <Label htmlFor={`${pid}vehicle-type-${vehicleTypeOption.id}`} className="font-sans text-sm cursor-pointer flex-1 py-1">
+                      {vehicleTypeOption.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
               {filters.transaction && typeOptions.length < LISTING_TYPES.length && (
                 <p className="text-xs text-muted-foreground font-sans pt-1">{t("search.terrainNotForRent", "Certaines catégories ne sont pas disponibles pour ce type d’annonce.")}</p>
               )}

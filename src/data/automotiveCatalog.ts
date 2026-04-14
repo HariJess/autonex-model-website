@@ -17,6 +17,12 @@ export type HeroVehicleTypeOption = {
   fuels?: string[];
 };
 
+type VehicleTypeFilterInput = {
+  types?: string[];
+  modelQuery?: string;
+  fuels?: string[];
+};
+
 export type AutoDiscoveryCategory = {
   id: string;
   label: string;
@@ -151,8 +157,7 @@ export const AUTO_SEARCH_CONDITION_OPTIONS = ["Neuf", "Occasion"] as const;
 
 export const AUTO_SEARCH_SELLER_OPTIONS = ["Particulier", "Concessionnaire"] as const;
 
-export const AUTO_HERO_VEHICLE_TYPE_OPTIONS: HeroVehicleTypeOption[] = [
-  { id: "all", label: "Tous types" },
+export const AUTO_SEARCH_VEHICLE_TYPE_OPTIONS: HeroVehicleTypeOption[] = [
   { id: "citadine", label: "Citadine", listingTypes: ["appartement"], modelQuery: "citadine" },
   { id: "berline", label: "Berline", listingTypes: ["maison"], modelQuery: "berline" },
   { id: "suv_4x4", label: "SUV / 4x4", listingTypes: ["villa", "local_commercial"], modelQuery: "suv" },
@@ -171,6 +176,65 @@ export const AUTO_HERO_VEHICLE_TYPE_OPTIONS: HeroVehicleTypeOption[] = [
   { id: "electrique", label: "Électrique", fuels: ["Électrique"] },
   { id: "hybride", label: "Hybride", fuels: ["Hybride", "Hybride rechargeable"] },
 ];
+
+export const AUTO_HERO_VEHICLE_TYPE_OPTIONS: HeroVehicleTypeOption[] = [
+  { id: "all", label: "Tous types" },
+  ...AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
+];
+
+const normalizeVehicleToken = (value: string | null | undefined): string =>
+  (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+const hasTokenMatch = (needle: string, haystack: string) =>
+  normalizeVehicleToken(haystack).includes(normalizeVehicleToken(needle));
+
+export function inferVehicleTypeOptionIdFromFilters({
+  types = [],
+  modelQuery = "",
+  fuels = [],
+}: VehicleTypeFilterInput): string | null {
+  if (fuels.length > 0) {
+    const wanted = new Set(fuels.map((v) => normalizeVehicleToken(v)));
+    const fuelMatch = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find(
+      (opt) => opt.fuels && opt.fuels.some((fuel) => wanted.has(normalizeVehicleToken(fuel))),
+    );
+    if (fuelMatch) return fuelMatch.id;
+  }
+
+  const normalizedModelQuery = normalizeVehicleToken(modelQuery);
+  if (normalizedModelQuery) {
+    const modelMatch = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find(
+      (opt) => opt.modelQuery && hasTokenMatch(opt.modelQuery, normalizedModelQuery),
+    );
+    if (modelMatch) return modelMatch.id;
+  }
+
+  if (types.length > 0) {
+    const wanted = new Set(types);
+    const exactTypeMatch = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((opt) => {
+      if (!opt.listingTypes?.length) return false;
+      return opt.listingTypes.length === wanted.size && opt.listingTypes.every((tp) => wanted.has(tp));
+    });
+    if (exactTypeMatch) return exactTypeMatch.id;
+
+    const partialTypeMatch = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find(
+      (opt) => opt.listingTypes && opt.listingTypes.some((tp) => wanted.has(tp)),
+    );
+    if (partialTypeMatch) return partialTypeMatch.id;
+  }
+
+  return null;
+}
+
+export function getVehicleTypeLabelFromFilters(filters: VehicleTypeFilterInput): string | null {
+  const id = inferVehicleTypeOptionIdFromFilters(filters);
+  if (!id) return null;
+  return AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((opt) => opt.id === id)?.label ?? null;
+}
 
 export const AUTO_HOMEPAGE_BRANDS: AutoHomepageBrand[] = [
   { id: "toyota", label: "Toyota", href: "/recherche?brand=Toyota" },

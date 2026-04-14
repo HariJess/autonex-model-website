@@ -41,6 +41,7 @@ import { SearchResultsList } from "@/pages/search/components/SearchResultsList";
 import { SearchEmptyState } from "@/pages/search/components/SearchEmptyState";
 import { SearchLoadingState } from "@/pages/search/components/SearchLoadingState";
 import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
+import { getVehicleTypeLabelFromFilters } from "@/data/automotiveCatalog";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -307,9 +308,18 @@ const SearchPage = () => {
         key: "transaction",
       });
     }
-    filters.types.forEach((tp) =>
-      chips.push({ label: LISTING_TYPE_LABELS[tp as keyof typeof LISTING_TYPE_LABELS] ?? tp, key: `type-${tp}` })
-    );
+    const vehicleTypeLabel = getVehicleTypeLabelFromFilters({
+      types: filters.types,
+      modelQuery: filters.modelQuery,
+      fuels: filters.fuels,
+    });
+    if (vehicleTypeLabel) {
+      chips.push({ label: vehicleTypeLabel, key: "vehicleType" });
+    } else {
+      filters.types.forEach((tp) =>
+        chips.push({ label: LISTING_TYPE_LABELS[tp as keyof typeof LISTING_TYPE_LABELS] ?? tp, key: `type-${tp}` }),
+      );
+    }
     if (filters.ville) chips.push({ label: filters.ville, key: "ville" });
     filters.arrondissements.forEach((a) => chips.push({ label: a, key: `arr-${a}` }));
     filters.quartiers.forEach((q) => chips.push({ label: q, key: `q-${q}` }));
@@ -339,7 +349,7 @@ const SearchPage = () => {
     filters.conditions.forEach((c) => chips.push({ label: c, key: `condition-${c}` }));
     filters.sellerTypes.forEach((s) => chips.push({ label: s, key: `seller-${s}` }));
     filters.brands.forEach((b) => chips.push({ label: b, key: `brand-${b}` }));
-    if (filters.modelQuery.trim()) chips.push({ label: `Modèle: ${filters.modelQuery.trim()}`, key: "modelQuery" });
+    if (filters.modelQuery.trim() && !vehicleTypeLabel) chips.push({ label: `Modèle: ${filters.modelQuery.trim()}`, key: "modelQuery" });
     if (filters.yearMin > 0 || filters.yearMax > 0) {
       chips.push({ label: `Année ${filters.yearMin || 0} - ${filters.yearMax || "..."}`, key: "yearRange" });
     }
@@ -349,6 +359,11 @@ const SearchPage = () => {
   const removeChip = (key: string) => {
     const newFilters = { ...filters };
     if (key === "transaction") newFilters.transaction = "";
+    else if (key === "vehicleType") {
+      newFilters.types = [];
+      newFilters.modelQuery = "";
+      newFilters.fuels = [];
+    }
     else if (key.startsWith("type-")) newFilters.types = newFilters.types.filter((tp) => tp !== key.slice(5));
     else if (key === "ville") {
       newFilters.ville = "";

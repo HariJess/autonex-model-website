@@ -14,7 +14,7 @@ import { searchPathFromFilters } from "@/lib/searchUrl";
 import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
-import { AUTO_HERO_VEHICLE_TYPE_OPTIONS, AUTO_SEARCH_FUEL_OPTIONS, TOP_AUTO_BRANDS } from "@/data/automotiveCatalog";
+import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BRANDS } from "@/data/automotiveCatalog";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -41,7 +41,10 @@ const HeroSearch = () => {
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
   const [vehicleType, setVehicleType] = useState("all");
-  const heroTypeOptions = useMemo(() => AUTO_HERO_VEHICLE_TYPE_OPTIONS, []);
+  const heroTypeOptions = useMemo(
+    () => [{ id: "all", label: "Tous types" }, ...AUTO_SEARCH_VEHICLE_TYPE_OPTIONS],
+    [],
+  );
   const selectedVehicleType = useMemo(
     () => heroTypeOptions.find((opt) => opt.id === vehicleType) ?? heroTypeOptions[0],
     [heroTypeOptions, vehicleType],
