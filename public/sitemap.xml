@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://immonex.mg/</loc>
+    <loc>https://autonex.mg/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/recherche</loc>
+    <loc>https://autonex.mg/recherche</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/agences</loc>
+    <loc>https://autonex.mg/agences</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/conseils</loc>
+    <loc>https://autonex.mg/conseils</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/conseils/acheter-terrain-madagascar</loc>
+    <loc>https://autonex.mg/conseils/acheter-terrain-madagascar</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/conseils/fiscalite-immobiliere-madagascar-2026</loc>
+    <loc>https://autonex.mg/conseils/fiscalite-immobiliere-madagascar-2026</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/conseils/investir-nosy-be-guide-complet</loc>
+    <loc>https://autonex.mg/conseils/investir-nosy-be-guide-complet</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/conseils/louer-antananarivo-quartiers-prix</loc>
+    <loc>https://autonex.mg/conseils/louer-antananarivo-quartiers-prix</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://immonex.mg/conseils/frais-agence-immobiliere-madagascar</loc>
+    <loc>https://autonex.mg/conseils/frais-agence-immobiliere-madagascar</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

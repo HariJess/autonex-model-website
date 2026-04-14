@@ -1,6 +1,6 @@
-# ImmoNex Madagascar
+# AutoNex Madagascar
 
-ImmoNex is a real-estate marketplace for Madagascar: property listings (sale, rent, vacation), agencies, and a credit-based monetization layer (publication, boosts, agency spotlight).
+AutoNex is an automotive marketplace for Madagascar: vehicle listings (achat, location, courte duree), concessionnaires, and a credit-based monetization layer (publication, boosts, agency spotlight).
 
 ## Stack
 

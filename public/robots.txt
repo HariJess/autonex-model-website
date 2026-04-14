@@ -12,4 +12,4 @@ Disallow: /signup
 Disallow: /forgot-password
 Disallow: /reset-password
 
-Sitemap: https://immonex.mg/sitemap.xml
+Sitemap: https://autonex.mg/sitemap.xml
