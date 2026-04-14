@@ -61,7 +61,12 @@
     "messageSent": "Message envoyé !",
     "phoneRevealError": "Impossible d'enregistrer la demande",
     "contactNameOrEmail": "Veuillez renseigner au moins votre nom ou email",
-    "viewAgencyListings": "Voir toutes les annonces de {{name}}"
+    "viewAgencyListings": "Voir toutes les annonces de {{name}}",
+    "whatsapp": "WhatsApp",
+    "whatsappAria": "Contacter l’annonceur via WhatsApp",
+    "whatsappUnavailable": "Numéro WhatsApp indisponible pour cette annonce.",
+    "contactTooFast": "Veuillez patienter quelques secondes avant de renvoyer.",
+    "contactActions": "Actions de contact"
   },
   "search": {
     "title": "Résultats de recherche",
@@ -253,7 +258,8 @@
     "loginKindParticulier": "Particulier",
     "loginKindAgence": "Agence",
     "agencyLoginEmailOnly": "Connexion agence : utilisez l’email et le mot de passe de votre compte professionnel.",
-    "orWithEmail": "ou"
+    "orWithEmail": "ou",
+    "loginRequiredForListingContact": "Connectez-vous pour contacter l’annonceur."
   },
   "footer": {
     "about": "À propos",

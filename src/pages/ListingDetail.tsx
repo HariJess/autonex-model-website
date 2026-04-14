@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { toApproximatePublicCoordinates } from "@/lib/mapPrivacy";
 import { contactLeadSchema } from "@/lib/validation";
+import { buildWhatsAppUrl } from "@/lib/whatsappUrl";
 import { getSearchSessionId } from "@/lib/searchSession";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -31,11 +32,17 @@ import {
 
 const ListingLocationMap = lazy(() => import("@/components/ListingLocationMap"));
 
+function listingWhatsAppPrefill(title: string): string {
+  const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
+  return `Bonjour, je vous contacte au sujet de votre annonce sur ImmoNex « ${short} ».`;
+}
+
 const ListingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { formatPrice, formatPriceSecondary } = useCurrency();
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [revealedPhone, setRevealedPhone] = useState<string | null>(null);
@@ -47,7 +54,15 @@ const ListingDetail = () => {
   const [sending, setSending] = useState(false);
   const viewIncremented = useRef<string | null>(null);
   const lastContactSubmitAt = useRef(0);
+  const lastWhatsAppAt = useRef(0);
   const contactSectionRef = useRef<HTMLDivElement | null>(null);
+
+  const loginForContact = () => {
+    toast.error(
+      t("auth.loginRequiredForListingContact", "Connectez-vous pour contacter l’annonceur."),
+    );
+    navigate("/login", { state: { from: `${location.pathname}${location.search}` } });
+  };
 
   const { data: listing, isLoading, error: fetchError } = useListing(id);
 
@@ -77,8 +92,7 @@ const ListingDetail = () => {
   const handleRevealPhone = async () => {
     if (!listing) return;
     if (!user) {
-      toast.error(t("auth.loginRequiredForPhone", "Connectez-vous pour révéler le numéro du propriétaire."));
-      navigate("/login");
+      loginForContact();
       return;
     }
     const { error: leadError } = await supabase.from("leads").insert({
@@ -104,6 +118,10 @@ const ListingDetail = () => {
   const handleContact = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!listing) return;
+    if (!user) {
+      loginForContact();
+      return;
+    }
     const now = Date.now();
     if (now - lastContactSubmitAt.current < 4000) {
       toast.error(t("listing.contactTooFast", "Veuillez patienter quelques secondes avant de renvoyer."));
@@ -139,6 +157,50 @@ const ListingDetail = () => {
       setContactMessage("");
     }
     setSending(false);
+  };
+
+  const handleWhatsApp = async () => {
+    if (!listing?.has_whatsapp_contact) return;
+    if (!user) {
+      loginForContact();
+      return;
+    }
+    const now = Date.now();
+    if (now - lastWhatsAppAt.current < 4000) {
+      toast.error(t("listing.contactTooFast", "Veuillez patienter quelques secondes avant de renvoyer."));
+      return;
+    }
+    const skipLead = user.id === listing.owner_id || isAdmin;
+    if (!skipLead) {
+      const { error: leadError } = await supabase.from("leads").insert({
+        listing_id: listing.id,
+        visitor_name: user.id,
+        type: "whatsapp" as const,
+      });
+      if (leadError) {
+        toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
+        return;
+      }
+    }
+    const { data: phoneRaw, error: phoneErr } = await supabase.rpc("get_listing_whatsapp_phone", {
+      p_listing_id: listing.id,
+    });
+    if (phoneErr) {
+      toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
+      return;
+    }
+    const phone = typeof phoneRaw === "string" ? phoneRaw : null;
+    if (!phone?.trim()) {
+      toast.error(t("listing.whatsappUnavailable", "Numéro WhatsApp indisponible pour cette annonce."));
+      return;
+    }
+    const url = buildWhatsAppUrl(phone, listingWhatsAppPrefill(listing.title));
+    if (!url) {
+      toast.error(t("listing.whatsappUnavailable", "Numéro WhatsApp indisponible pour cette annonce."));
+      return;
+    }
+    lastWhatsAppAt.current = now;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   if (isLoading) {
@@ -571,6 +633,19 @@ const ListingDetail = () => {
                   : t("listing.revealPhone")}
               </Button>
 
+              {listing.has_whatsapp_contact ? (
+                <Button
+                  type="button"
+                  onClick={handleWhatsApp}
+                  variant="outline"
+                  className="hidden w-full font-sans lg:inline-flex"
+                  aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  {t("listing.whatsapp", "WhatsApp")}
+                </Button>
+              ) : null}
+
               <form onSubmit={handleContact} className="space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact")}</h4>
                 <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans min-h-11" maxLength={100} />
@@ -608,28 +683,42 @@ const ListingDetail = () => {
         role="region"
         aria-label={t("listing.contactActions", "Actions de contact")}
       >
-        <div className="container mx-auto flex gap-2 max-w-lg">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1 font-sans min-h-12 touch-manipulation gap-2"
-            onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-          >
-            <MessageSquare className="h-4 w-4 shrink-0" />
-            {t("listing.contact")}
-          </Button>
-          <Button
-            type="button"
-            onClick={handleRevealPhone}
-            variant={phoneRevealed ? "outline" : "default"}
-            className={`flex-1 font-sans min-h-12 touch-manipulation gap-2 ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
-            style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
-          >
-            <Phone className="h-4 w-4 shrink-0" />
-            {phoneRevealed
-              ? (revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné"))
-              : t("listing.revealPhone")}
-          </Button>
+        <div className="container mx-auto max-w-lg flex flex-col gap-2">
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 font-sans min-h-12 touch-manipulation gap-2"
+              onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              <MessageSquare className="h-4 w-4 shrink-0" />
+              {t("listing.contact")}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleRevealPhone}
+              variant={phoneRevealed ? "outline" : "default"}
+              className={`flex-1 font-sans min-h-12 touch-manipulation gap-2 ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
+              style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
+            >
+              <Phone className="h-4 w-4 shrink-0" />
+              {phoneRevealed
+                ? (revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné"))
+                : t("listing.revealPhone")}
+            </Button>
+          </div>
+          {listing.has_whatsapp_contact ? (
+            <Button
+              type="button"
+              onClick={handleWhatsApp}
+              variant="outline"
+              className="w-full font-sans min-h-12 touch-manipulation gap-2"
+              aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
+            >
+              <MessageSquare className="h-4 w-4 shrink-0" />
+              {t("listing.whatsapp", "WhatsApp")}
+            </Button>
+          ) : null}
         </div>
       </div>
 

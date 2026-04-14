@@ -78,6 +78,8 @@ export interface DisplayListing {
   // optional display fields
   owner_name?: string | null;
   owner_phone?: string | null;
+  /** True when agency or owner has a phone on file (WhatsApp CTA). */
+  has_whatsapp_contact?: boolean;
   agency_name?: string | null;
   agency_slug?: string | null;
   agency_logo?: string | null;

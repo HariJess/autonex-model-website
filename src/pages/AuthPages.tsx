@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth, type SignUpMetadata } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { agencyFormSchema, loginSchema, optionalMgPhoneSchema, signupCommonSchema } from "@/lib/validation";
@@ -55,6 +55,7 @@ function GoogleLogo() {
 const LoginPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn, signInWithGoogle } = useAuth();
   const [loginKind, setLoginKind] = useState<"particulier" | "agence">("particulier");
   const [email, setEmail] = useState("");
@@ -85,7 +86,8 @@ const LoginPage = () => {
       toast.error(error.message);
     } else {
       toast.success(t("auth.loginSuccess"));
-      navigate("/dashboard");
+      const from = (location.state as { from?: string } | null)?.from;
+      navigate(typeof from === "string" && from.startsWith("/") ? from : "/dashboard");
     }
   };
 

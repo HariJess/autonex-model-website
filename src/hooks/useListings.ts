@@ -80,6 +80,7 @@ function mapListingRowToDisplayListing(
     agencySlug?: string | null;
     agencyLogo?: string | null;
     agencyVerified?: boolean;
+    hasWhatsappContact?: boolean;
   },
 ): DisplayListing {
   const features = Array.isArray(listing.features) ? (listing.features as string[]) : [];
@@ -114,6 +115,7 @@ function mapListingRowToDisplayListing(
     owner_id: listing.owner_id,
     owner_name: extras?.ownerName ?? null,
     owner_phone: extras?.ownerPhone ?? null,
+    has_whatsapp_contact: extras?.hasWhatsappContact ?? false,
     agency_name: extras?.agencyName ?? null,
     agency_slug: extras?.agencySlug ?? null,
     agency_logo: extras?.agencyLogo ?? null,
@@ -177,11 +179,16 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
   else if (boostTypes.has("featured")) badge = "coup_de_coeur";
   else if (boostTypes.has("urgent")) badge = "urgent";
 
+  const { data: hasWhatsappRaw, error: hasWhatsappErr } = await supabase.rpc("listing_has_whatsapp_contact", {
+    p_listing_id: listing.id,
+  });
+
   return mapListingRowToDisplayListing(listing, {
     images: photos?.map((p) => p.url) ?? [],
     badge,
     ownerName: profile?.full_name ?? null,
     ownerPhone: null,
+    hasWhatsappContact: !hasWhatsappErr && hasWhatsappRaw === true,
     agencyName: agencyInfo?.name ?? null,
     agencySlug: agencyInfo?.slug ?? null,
     agencyLogo: agencyInfo?.logo_url ?? null,

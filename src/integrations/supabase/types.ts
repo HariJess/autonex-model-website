@@ -667,6 +667,14 @@ export type Database = {
         Returns: undefined
       }
       increment_views: { Args: { listing_uuid: string }; Returns: undefined }
+      listing_has_whatsapp_contact: {
+        Args: { p_listing_id: string }
+        Returns: boolean
+      }
+      get_listing_whatsapp_phone: {
+        Args: { p_listing_id: string }
+        Returns: string | null
+      }
     }
     Enums: {
       boost_type:
