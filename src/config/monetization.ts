@@ -27,6 +27,23 @@ export const BOOST_LABELS_FR: Record<PurchasableBoostType, string> = {
   top: "Top annonce",
 };
 
+/** Duration in days — must match `purchase_listing_boosts` and `admin_approve_listing_moderation` SQL. */
+export const BOOST_DURATION_DAYS: Record<PurchasableBoostType, number> = {
+  urgent: 14,
+  daily_bump: 7,
+  featured: 14,
+  top: 7,
+};
+
+/** Short French copy: what the boost changes for visibility (dashboard / purchase dialog). */
+export const BOOST_VISIBILITY_FR: Record<PurchasableBoostType, string> = {
+  urgent:
+    "Badge « Urgent » sur la carte et la fiche : votre annonce se distingue tout de suite.",
+  daily_bump: "Remonte régulièrement votre annonce dans les listes pour rester visible.",
+  featured: "Mise en avant visuelle (emplacements premium) pour plus de clics.",
+  top: "Priorité maximale dans les résultats pendant la durée du boost.",
+};
+
 /** Agency-level visibility (agencies only); billed at publish like boosts. */
 export const AGENCY_SPOTLIGHT_CREDIT_COST = 120;
 

@@ -675,6 +675,10 @@ export type Database = {
         Args: { p_listing_id: string }
         Returns: string | null
       }
+      purchase_listing_boosts: {
+        Args: { p_listing_id: string; p_boost_types: string[] }
+        Returns: Json
+      }
     }
     Enums: {
       boost_type:

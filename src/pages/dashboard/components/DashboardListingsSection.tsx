@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AlertCircle, Home, Loader2, Pause, Pencil, Play, Trash2 } from "lucide-react";
+import { AlertCircle, Home, Loader2, Pause, Pencil, Play, Sparkles, Trash2 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 import { isEditablePublishedListingStatus } from "@/lib/publishDraft";
+import {
+  formatBoostEndDateFr,
+  isListingEligibleForPostPublishBoost,
+  type ListingBoostPartition,
+} from "@/lib/listingBoosts";
+import { DashboardBoostPurchaseDialog } from "@/pages/dashboard/components/DashboardBoostPurchaseDialog";
 
 type Listing = Tables<"listings">;
 
@@ -27,7 +34,10 @@ type DashboardListingsSectionProps = {
   formatPrice: (price: number) => string;
   statusLabels: Record<string, string>;
   boostLabels: Record<string, string>;
-  boostsByListing: Map<string, string[]>;
+  listingBoostPartitions: Map<string, ListingBoostPartition>;
+  creditsBalance: number;
+  creditsBalancePending: boolean;
+  userId: string | undefined;
   pendingBoostsLabel: (raw: unknown) => string | null;
   labels: {
     noListings: string;
@@ -37,6 +47,9 @@ type DashboardListingsSectionProps = {
     delete: string;
     pendingBoosts: string;
     activeBoosts: string;
+    expiredBoosts: string;
+    boostListing: string;
+    boostPendingReviewNote: string;
     listing: string;
     price: string;
     status: string;
@@ -57,6 +70,54 @@ function statusVariant(status: string | null) {
   return "secondary" as const;
 }
 
+function ListingBoostNotes({
+  listing,
+  partition,
+  boostLabels,
+  pendingBoostsLabel,
+  labels,
+}: {
+  listing: Listing;
+  partition: ListingBoostPartition | undefined;
+  boostLabels: Record<string, string>;
+  pendingBoostsLabel: (raw: unknown) => string | null;
+  labels: DashboardListingsSectionProps["labels"];
+}) {
+  const boostsLine = pendingBoostsLabel(listing.pending_boost_types);
+  const showPublishedBoostBlock = listing.status === "active" || listing.status === "paused";
+
+  return (
+    <>
+      {listing.status === "pending_review" && boostsLine && (
+        <p className="text-[11px] text-muted-foreground font-sans mt-0.5">
+          <span className="font-medium text-foreground/90">{labels.pendingBoosts} :</span> {boostsLine}
+        </p>
+      )}
+      {listing.status === "pending_review" && (
+        <p className="text-[11px] text-muted-foreground font-sans mt-0.5 leading-snug">{labels.boostPendingReviewNote}</p>
+      )}
+      {showPublishedBoostBlock && partition && partition.active.length > 0 && (
+        <div className="mt-0.5 space-y-0.5">
+          <p className="text-[11px] font-medium text-emerald-900 dark:text-emerald-400 font-sans">{labels.activeBoosts}</p>
+          {partition.active.map((b) => (
+            <p key={`${b.type}-${b.ends_at}`} className="text-[11px] text-emerald-800 dark:text-emerald-500 font-sans">
+              {boostLabels[b.type] ?? b.type} — actif jusqu’au {formatBoostEndDateFr(b.ends_at)}
+            </p>
+          ))}
+        </div>
+      )}
+      {showPublishedBoostBlock && partition && partition.expired.length > 0 && (
+        <p className="text-[11px] text-muted-foreground font-sans mt-0.5 leading-snug">
+          <span className="font-medium">{labels.expiredBoosts} :</span>{" "}
+          {partition.expired
+            .map((b) => `${boostLabels[b.type] ?? b.type} (fin ${formatBoostEndDateFr(b.ends_at)})`)
+            .join(" · ")}
+        </p>
+      )}
+    </>
+  );
+}
+
 export function DashboardListingsSection({
   title,
   listingsLoading,
@@ -65,12 +126,17 @@ export function DashboardListingsSection({
   formatPrice,
   statusLabels,
   boostLabels,
-  boostsByListing,
+  listingBoostPartitions,
+  creditsBalance,
+  creditsBalancePending,
+  userId,
   pendingBoostsLabel,
   labels,
   onToggleStatus,
   onDelete,
 }: DashboardListingsSectionProps) {
+  const [boostDialogListing, setBoostDialogListing] = useState<Listing | null>(null);
+
   return (
     <div>
       <h2 className="font-serif text-xl font-bold mb-4">{title}</h2>
@@ -100,9 +166,7 @@ export function DashboardListingsSection({
         <>
           <div className="space-y-3 md:hidden">
             {publishedListings.map((listing) => {
-              const boostsLine = pendingBoostsLabel(listing.pending_boost_types);
-              const activeBoostTypes = boostsByListing.get(listing.id) ?? [];
-              const activeBoostLine = activeBoostTypes.length > 0 ? activeBoostTypes.map((x) => boostLabels[x] ?? x).join(", ") : null;
+              const partition = listingBoostPartitions.get(listing.id);
               return (
                 <Card key={`mobile-${listing.id}`} className="rounded-2xl">
                   <CardContent className="p-4 space-y-3">
@@ -122,17 +186,25 @@ export function DashboardListingsSection({
                       </Badge>
                       <span className="text-xs text-muted-foreground font-sans">{listing.views_count ?? 0} vues</span>
                     </div>
-                    {listing.status === "pending_review" && boostsLine && (
-                      <p className="text-[11px] text-muted-foreground font-sans">
-                        {labels.pendingBoosts}: {boostsLine}
-                      </p>
-                    )}
-                    {listing.status === "active" && activeBoostLine && (
-                      <p className="text-[11px] text-emerald-800 dark:text-emerald-500 font-sans">
-                        {labels.activeBoosts}: {activeBoostLine}
-                      </p>
-                    )}
+                    <ListingBoostNotes
+                      listing={listing}
+                      partition={partition}
+                      boostLabels={boostLabels}
+                      pendingBoostsLabel={pendingBoostsLabel}
+                      labels={labels}
+                    />
                     <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                      {isListingEligibleForPostPublishBoost(listing.status) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="font-sans touch-manipulation h-9 px-2 border-amber-600/40 text-amber-900 dark:text-amber-200"
+                          onClick={() => setBoostDialogListing(listing)}
+                        >
+                          <Sparkles className="h-3.5 w-3.5 mr-1 shrink-0" />
+                          {labels.boostListing}
+                        </Button>
+                      )}
                       {isEditablePublishedListingStatus(listing.status) && (
                         <Button variant="outline" size="sm" className="font-sans touch-manipulation h-9 px-2" asChild>
                           <Link to={`/publier?edit=${listing.id}`}>
@@ -191,9 +263,7 @@ export function DashboardListingsSection({
                 </thead>
                 <tbody>
                   {publishedListings.map((listing) => {
-                    const boostsLine = pendingBoostsLabel(listing.pending_boost_types);
-                    const activeBoostTypes = boostsByListing.get(listing.id) ?? [];
-                    const activeBoostLine = activeBoostTypes.length > 0 ? activeBoostTypes.map((x) => boostLabels[x] ?? x).join(", ") : null;
+                    const partition = listingBoostPartitions.get(listing.id);
                     return (
                       <tr key={listing.id} className="border-b border-border last:border-0">
                         <td className="p-4">
@@ -205,16 +275,13 @@ export function DashboardListingsSection({
                               {listing.ville}
                               {listing.quartier ? ` • ${listing.quartier}` : ""}
                             </p>
-                            {listing.status === "pending_review" && boostsLine && (
-                              <p className="text-[11px] text-muted-foreground font-sans mt-0.5">
-                                {labels.pendingBoosts}: {boostsLine}
-                              </p>
-                            )}
-                            {listing.status === "active" && activeBoostLine && (
-                              <p className="text-[11px] text-emerald-800 dark:text-emerald-500 font-sans mt-0.5">
-                                {labels.activeBoosts}: {activeBoostLine}
-                              </p>
-                            )}
+                            <ListingBoostNotes
+                              listing={listing}
+                              partition={partition}
+                              boostLabels={boostLabels}
+                              pendingBoostsLabel={pendingBoostsLabel}
+                              labels={labels}
+                            />
                           </div>
                         </td>
                         <td className="p-4 font-sans text-sm hidden sm:table-cell">{formatPrice(listing.price_mga)}</td>
@@ -226,6 +293,17 @@ export function DashboardListingsSection({
                         <td className="p-4 font-sans text-sm hidden md:table-cell">{listing.views_count ?? 0}</td>
                         <td className="p-4">
                           <div className="flex items-center gap-1 flex-wrap">
+                            {isListingEligibleForPostPublishBoost(listing.status) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="font-sans h-8 px-2 border-amber-600/40 text-amber-900 dark:text-amber-200"
+                                onClick={() => setBoostDialogListing(listing)}
+                              >
+                                <Sparkles className="h-3.5 w-3.5 mr-1 shrink-0" />
+                                {labels.boostListing}
+                              </Button>
+                            )}
                             {isEditablePublishedListingStatus(listing.status) && (
                               <Button variant="outline" size="sm" className="font-sans h-8 px-2" asChild>
                                 <Link to={`/publier?edit=${listing.id}`}>
@@ -273,7 +351,18 @@ export function DashboardListingsSection({
           </div>
         </>
       )}
+
+      <DashboardBoostPurchaseDialog
+        listing={boostDialogListing}
+        open={boostDialogListing !== null}
+        onOpenChange={(open) => {
+          if (!open) setBoostDialogListing(null);
+        }}
+        partition={boostDialogListing ? listingBoostPartitions.get(boostDialogListing.id) : undefined}
+        creditsBalance={creditsBalance}
+        creditsBalancePending={creditsBalancePending}
+        userId={userId}
+      />
     </div>
   );
 }
-

@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { useMemo } from "react";
 import type { Tables } from "@/integrations/supabase/types";
 import { useCreditsBalance } from "@/hooks/useCreditsBalance";
+import { BOOST_LABELS_FR } from "@/config/monetization";
+import { partitionBoostRowsByListing } from "@/lib/listingBoosts";
 import { DashboardHeader } from "@/pages/dashboard/components/DashboardHeader";
 import { DashboardStatsCards } from "@/pages/dashboard/components/DashboardStatsCards";
 import { DashboardDraftListingsSection } from "@/pages/dashboard/components/DashboardDraftListingsSection";
@@ -136,15 +138,14 @@ const Dashboard = () => {
     staleTime: 20_000,
   });
 
-  const { data: activeBoostRows = [] } = useQuery({
+  const { data: myListingBoostRows = [] } = useQuery({
     queryKey: ["my-listing-boosts", user?.id, listingIds],
     queryFn: async () => {
       if (!user || listingIds.length === 0) return [];
       const { data, error } = await supabase
         .from("boosts")
         .select("listing_id, type, ends_at")
-        .in("listing_id", listingIds)
-        .gte("ends_at", new Date().toISOString());
+        .in("listing_id", listingIds);
       if (error) throw new Error(error.message);
       return data ?? [];
     },
@@ -152,16 +153,10 @@ const Dashboard = () => {
     staleTime: 20_000,
   });
 
-  const boostsByListing = useMemo(() => {
-    const m = new Map<string, string[]>();
-    for (const row of activeBoostRows) {
-      if (!row.listing_id) continue;
-      const arr = m.get(row.listing_id) ?? [];
-      arr.push(row.type);
-      m.set(row.listing_id, arr);
-    }
-    return m;
-  }, [activeBoostRows]);
+  const listingBoostPartitions = useMemo(
+    () => partitionBoostRowsByListing(myListingBoostRows, new Date()),
+    [myListingBoostRows],
+  );
 
   const totalViews = publishedListings.reduce((sum, l) => sum + (l.views_count ?? 0), 0);
   const totalContacts = leadCounts?.contacts ?? 0;
@@ -245,10 +240,7 @@ const Dashboard = () => {
   };
 
   const boostLabels: Record<string, string> = {
-    urgent: "Urgent",
-    daily_bump: "Actualisation quotidienne",
-    featured: "Mise en avant",
-    top: "Top annonce",
+    ...BOOST_LABELS_FR,
     newsletter: "Newsletter",
     agency_spotlight: "Spotlight agence",
   };
@@ -347,7 +339,10 @@ const Dashboard = () => {
           formatPrice={formatPrice}
           statusLabels={statusLabels}
           boostLabels={boostLabels}
-          boostsByListing={boostsByListing}
+          listingBoostPartitions={listingBoostPartitions}
+          creditsBalance={creditsFromLedger}
+          creditsBalancePending={creditsBalancePending}
+          userId={user?.id}
           pendingBoostsLabel={pendingBoostsLabel}
           labels={{
             noListings: t("dashboard.noListings", "Aucune annonce. Publiez votre première annonce !"),
@@ -356,7 +351,13 @@ const Dashboard = () => {
             activate: t("dashboard.activate", "Activer"),
             delete: t("common.delete"),
             pendingBoosts: t("dashboard.pendingBoosts", "Visibilité après validation"),
-            activeBoosts: t("dashboard.activeBoosts", "Boost actif"),
+            activeBoosts: t("dashboard.activeBoosts", "Boosts actifs"),
+            expiredBoosts: t("dashboard.expiredBoosts", "Boosts expirés"),
+            boostListing: t("dashboard.boostListing", "Booster"),
+            boostPendingReviewNote: t(
+              "dashboard.boostPendingReviewNote",
+              "Les boosts « après publication » seront disponibles une fois l’annonce validée. Les options payées à l’envoi restent en attente ci-dessus.",
+            ),
             listing: t("dashboard.listing", "Annonce"),
             price: t("dashboard.price", "Prix"),
             status: t("dashboard.status", "Statut"),
