@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare } from "lucide-react";
+import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare, CarFront } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,6 +51,12 @@ const LISTING_WHATSAPP_BUTTON_CLASS =
 function listingWhatsAppPrefill(title: string): string {
   const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
   return `Bonjour, je vous contacte au sujet de votre annonce sur AutoNex « ${short} ».`;
+}
+
+function cleanSpec(value: string | number | null | undefined): string | null {
+  if (value == null) return null;
+  const asString = String(value).trim();
+  return asString.length > 0 ? asString : null;
 }
 
 const ListingDetail = () => {
@@ -297,6 +303,35 @@ const ListingDetail = () => {
   const mileageLabel = formatVehicleMileage(mileageValue);
   const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
   const vehicleSummary = getVehicleHeadline(listing);
+  const sellerLabel =
+    listing.vehicle?.sellerType === "concessionnaire"
+      ? t("listing.sellerDealer", "Concessionnaire")
+      : listing.vehicle?.sellerType === "particulier"
+        ? t("listing.sellerPrivate", "Particulier")
+        : null;
+  const vehicleSpecRows = [
+    { label: "Marque", value: cleanSpec(listing.vehicle?.make) },
+    { label: "Modèle", value: cleanSpec(listing.vehicle?.model) },
+    { label: "Année", value: cleanSpec(listing.vehicle?.year) },
+    { label: "Kilométrage", value: cleanSpec(mileageLabel) },
+    { label: "Carburant", value: cleanSpec(listing.vehicle?.fuel) },
+    { label: "Boîte", value: cleanSpec(listing.vehicle?.transmission) },
+    { label: "Motricité", value: cleanSpec(listing.vehicle?.drivetrain) },
+    { label: "Portes", value: cleanSpec(doorsLabel) },
+    { label: "Places", value: listing.vehicle?.seats != null && listing.vehicle.seats > 0 ? `${listing.vehicle.seats}` : null },
+    { label: "Carrosserie", value: cleanSpec(listing.vehicle?.bodyStyle) },
+    { label: "État", value: cleanSpec(listing.vehicle?.condition) },
+    { label: "Type vendeur", value: cleanSpec(sellerLabel) },
+    { label: "Couleur ext.", value: cleanSpec(listing.vehicle?.exteriorColor) },
+    { label: "Couleur int.", value: cleanSpec(listing.vehicle?.interiorColor) },
+    { label: "Disponibilité", value: cleanSpec(listing.vehicle?.availabilityStatus) },
+    { label: "Mode location", value: cleanSpec(listing.vehicle?.rentalMode) },
+  ].filter((item) => item.value);
+  const contactTrustHints = [
+    sellerLabel ? `${t("listing.seller", "Vendeur")} : ${sellerLabel}` : null,
+    listing.vehicle?.availabilityStatus ? `${t("listing.availability", "Disponibilité")} : ${listing.vehicle.availabilityStatus}` : null,
+    listing.has_whatsapp_contact ? t("listing.whatsappReady", "Réponse WhatsApp disponible") : null,
+  ].filter(Boolean);
   const ownerStatusHint = (() => {
     const s = listing.status;
     if (!isOwner || s === "active") return null;
@@ -421,7 +456,7 @@ const ListingDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <div className="space-y-3">
-              <div className="rounded-2xl overflow-hidden aspect-video">
+              <div className="rounded-2xl overflow-hidden aspect-video relative border border-border/70">
                 <img
                   src={images[selectedImg]}
                   alt={displayTitle}
@@ -429,6 +464,11 @@ const ListingDetail = () => {
                   decoding="async"
                   onError={(e) => applyImageFallback(e.currentTarget)}
                 />
+                <div className="absolute left-3 bottom-3">
+                  <Badge variant="secondary" className="font-sans text-xs bg-card/90">
+                    {selectedImg + 1}/{images.length}
+                  </Badge>
+                </div>
               </div>
               {images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto">
@@ -454,6 +494,8 @@ const ListingDetail = () => {
               <div className="flex items-center gap-3 mb-2">
                 <Badge variant="outline" className="font-sans">{transactionLabel}</Badge>
                 <Badge variant="outline" className="font-sans capitalize">{typeLabel}</Badge>
+                {listing.vehicle?.isElectric && <Badge variant="secondary" className="font-sans">Électrique</Badge>}
+                {listing.vehicle?.isHybrid && <Badge variant="secondary" className="font-sans">Hybride</Badge>}
                 {listing.badge && (
                   <Badge
                     className={`font-sans text-xs ${
@@ -516,6 +558,22 @@ const ListingDetail = () => {
                 </div>
               )}
             </div>
+            {vehicleSpecRows.length > 0 && (
+              <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <CarFront className="h-5 w-5 text-primary" />
+                  <h2 className="font-serif text-xl font-bold">{t("listing.vehicleSpecs", "Fiche véhicule")}</h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  {vehicleSpecRows.map((spec) => (
+                    <div key={spec.label} className="flex items-start justify-between gap-3 border-b border-border/70 pb-2">
+                      <span className="text-sm font-sans text-muted-foreground">{spec.label}</span>
+                      <span className="text-sm font-sans font-semibold text-foreground text-right capitalize">{spec.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
             <div className="flex flex-wrap gap-2">
               {listing.vehicle?.fuel && <Badge variant="secondary" className="font-sans">{listing.vehicle.fuel}</Badge>}
               {listing.vehicle?.transmission && <Badge variant="secondary" className="font-sans">{listing.vehicle.transmission}</Badge>}
@@ -665,9 +723,19 @@ const ListingDetail = () => {
                 )}
                 <div>
                   <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Vendeur")}</h3>
-                  {listing.agency_verified && <Badge variant="secondary" className="text-xs font-sans">{t("listing.verified", "Vérifié")}</Badge>}
+                  <div className="flex items-center gap-2 mt-1">
+                    {sellerLabel && <Badge variant="outline" className="text-xs font-sans">{sellerLabel}</Badge>}
+                    {listing.agency_verified && <Badge variant="secondary" className="text-xs font-sans">{t("listing.verified", "Vérifié")}</Badge>}
+                  </div>
                 </div>
               </div>
+              {contactTrustHints.length > 0 && (
+                <div className="rounded-xl border border-border/80 bg-secondary/25 px-3 py-2.5">
+                  {contactTrustHints.map((hint) => (
+                    <p key={hint} className="text-xs font-sans text-muted-foreground leading-relaxed">• {hint}</p>
+                  ))}
+                </div>
+              )}
 
               <Button
                 onClick={handleRevealPhone}
