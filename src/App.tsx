@@ -22,6 +22,7 @@ const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const AdminMonetizationPage = lazy(() => import("./pages/AdminMonetizationPage.tsx"));
 const AdminSearchInsightsPage = lazy(() => import("./pages/AdminSearchInsightsPage.tsx"));
+const AdminPartnerAdsPage = lazy(() => import("./pages/AdminPartnerAdsPage.tsx"));
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/admin/monetisation" element={<AdminRoute><AdminMonetizationPage /></AdminRoute>} />
             <Route path="/admin/recherche" element={<AdminRoute><AdminSearchInsightsPage /></AdminRoute>} />
+            <Route path="/admin/partenaires" element={<AdminRoute><AdminPartnerAdsPage /></AdminRoute>} />
             <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />

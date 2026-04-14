@@ -13,6 +13,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { formatAriary } from "@/config/monetization";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
 import { Loader2, Check, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type TxRow = Tables<"transactions">;
 type ListingRow = Tables<"listings">;
@@ -160,6 +161,11 @@ const AdminMonetizationPage = () => {
           <p className="text-sm text-muted-foreground font-sans mt-1">
             Validation des achats de crédits et modération des annonces en attente. Les actions sont idempotentes côté serveur.
           </p>
+          <div className="mt-3">
+            <Button variant="outline" size="sm" className="font-sans" asChild>
+              <Link to="/admin/partenaires">Gérer les campagnes partenaires</Link>
+            </Button>
+          </div>
         </div>
 
         <Card className="rounded-2xl">

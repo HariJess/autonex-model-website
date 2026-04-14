@@ -7,6 +7,7 @@ import { FeaturedAgenciesSection } from "./FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { SponsoredPill } from "./MonetizationLabels";
 import type { ListingType, TransactionType } from "@/types/listing";
+import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 
 interface RelatedPromotedProps {
   listingId: string;
@@ -53,12 +54,17 @@ export function ListingRelatedPromoted({ listingId, ville, transaction, type }: 
 }
 
 export function ListingSponsorBlock() {
-  if (!MONETIZATION_PLACEMENTS.listingSponsor) return null;
+  const enabled = MONETIZATION_PLACEMENTS.listingSponsor;
+  const { data: campaign } = usePartnerCampaign("listingSponsor", enabled);
+  if (!enabled || !campaign) return null;
   return (
     <BannerSlot
       variant="inline"
-      title="Partenaire du secteur immobilier"
-      subtitle="Espace réservé aux campagnes partenaires diffusées sur ImmoNex."
+      title={campaign.advertiser_name}
+      subtitle="Contenu sponsorisé"
+      href={campaign.destination_url}
+      ctaLabel={campaign.destination_url ? campaign.cta_label?.trim() || "Découvrir" : null}
+      imageUrl={campaign.image_url}
     />
   );
 }

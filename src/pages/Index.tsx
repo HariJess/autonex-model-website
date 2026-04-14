@@ -17,6 +17,7 @@ import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenc
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { applyImageFallback } from "@/lib/imageFallback";
+import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -28,6 +29,8 @@ const Index = () => {
   );
   const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
   const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
+  const homeSponsorEnabled = MONETIZATION_PLACEMENTS.homeSponsorStrip;
+  const { data: homeSponsorCampaign } = usePartnerCampaign("homeSponsorStrip", homeSponsorEnabled);
 
   const { data: villeCounts = {} } = useQuery({
     queryKey: ["ville-counts", villes.map((v) => v.name).join("|")],
@@ -57,9 +60,16 @@ const Index = () => {
 
       <HeroSearch />
 
-      {MONETIZATION_PLACEMENTS.homeSponsorStrip && (
+      {homeSponsorEnabled && homeSponsorCampaign && (
         <section className="container mx-auto px-4 pt-6 pb-2">
-          <BannerSlot enabled />
+          <BannerSlot
+            enabled
+            title={homeSponsorCampaign.advertiser_name}
+            subtitle="Contenu sponsorisé"
+            href={homeSponsorCampaign.destination_url}
+            ctaLabel={homeSponsorCampaign.destination_url ? homeSponsorCampaign.cta_label?.trim() || "Découvrir" : null}
+            imageUrl={homeSponsorCampaign.image_url}
+          />
         </section>
       )}
 

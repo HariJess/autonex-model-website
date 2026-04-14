@@ -527,6 +527,71 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_ad_campaigns: {
+        Row: {
+          advertiser_name: string
+          created_at: string
+          created_by: string | null
+          cta_label: string | null
+          destination_url: string | null
+          ends_at: string | null
+          id: string
+          image_url: string
+          internal_description: string | null
+          internal_title: string
+          is_active: boolean
+          media_type: string
+          placement_key: string
+          priority: number
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          advertiser_name: string
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          destination_url?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url: string
+          internal_description?: string | null
+          internal_title: string
+          is_active?: boolean
+          media_type?: string
+          placement_key: string
+          priority?: number
+          starts_at?: string
+          updated_at?: string
+        }
+        Update: {
+          advertiser_name?: string
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          destination_url?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string
+          internal_description?: string | null
+          internal_title?: string
+          is_active?: boolean
+          media_type?: string
+          placement_key?: string
+          priority?: number
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_ad_campaigns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           agency_id: string | null
@@ -674,6 +739,18 @@ export type Database = {
       get_listing_whatsapp_phone: {
         Args: { p_listing_id: string }
         Returns: string | null
+      }
+      get_active_partner_campaign: {
+        Args: { p_placement_key: string }
+        Returns: {
+          advertiser_name: string
+          cta_label: string | null
+          destination_url: string | null
+          id: string
+          image_url: string
+          media_type: string
+          placement_key: string
+        }[]
       }
       purchase_listing_boosts: {
         Args: { p_listing_id: string; p_boost_types: string[] }

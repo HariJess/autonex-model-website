@@ -34,6 +34,11 @@ export function DashboardHeader({
                 Signaux recherche
               </Button>
             </Link>
+            <Link to="/admin/partenaires">
+              <Button variant="outline" size="sm" className="font-sans">
+                Ads partenaires
+              </Button>
+            </Link>
           </>
         )}
         <Link to="/publier">
