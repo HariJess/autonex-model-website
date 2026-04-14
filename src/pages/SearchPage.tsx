@@ -134,8 +134,31 @@ const SearchPage = () => {
     if (filters.equipments.length > 0) {
       results = results.filter((l) => listingMatchesEquipments(l.features, filters.equipments));
     }
+    if (filters.fuels.length > 0) {
+      results = results.filter((l) => l.vehicle?.fuel && filters.fuels.includes(l.vehicle.fuel));
+    }
+    if (filters.transmissions.length > 0) {
+      results = results.filter((l) => l.vehicle?.transmission && filters.transmissions.includes(l.vehicle.transmission));
+    }
+    if (filters.drivetrains.length > 0) {
+      results = results.filter((l) => l.vehicle?.drivetrain && filters.drivetrains.includes(l.vehicle.drivetrain));
+    }
+    if (filters.conditions.length > 0) {
+      results = results.filter((l) => l.vehicle?.condition && filters.conditions.includes(l.vehicle.condition));
+    }
+    if (filters.sellerTypes.length > 0) {
+      results = results.filter((l) => l.vehicle?.sellerType && filters.sellerTypes.includes(l.vehicle.sellerType));
+    }
     return results;
-  }, [dbListings, filters.equipments]);
+  }, [
+    dbListings,
+    filters.equipments,
+    filters.fuels,
+    filters.transmissions,
+    filters.drivetrains,
+    filters.conditions,
+    filters.sellerTypes,
+  ]);
 
   const exactMatchListings = useMemo(() => {
     let results = equippedListings;
@@ -269,6 +292,11 @@ const SearchPage = () => {
       chips.push({ label: `${b}${b === 4 ? "+" : ""} portes`, key: `bath-${b}` })
     );
     filters.equipments.forEach((e) => chips.push({ label: e, key: `eq-${e}` }));
+    filters.fuels.forEach((f) => chips.push({ label: f, key: `fuel-${f}` }));
+    filters.transmissions.forEach((g) => chips.push({ label: g, key: `gear-${g}` }));
+    filters.drivetrains.forEach((d) => chips.push({ label: d, key: `drive-${d}` }));
+    filters.conditions.forEach((c) => chips.push({ label: c, key: `condition-${c}` }));
+    filters.sellerTypes.forEach((s) => chips.push({ label: s, key: `seller-${s}` }));
     return chips;
   }, [filters]);
 
@@ -295,6 +323,11 @@ const SearchPage = () => {
     } else if (key.startsWith("room-")) newFilters.rooms = newFilters.rooms.filter((r) => r !== Number(key.slice(5)));
     else if (key.startsWith("bath-")) newFilters.bathrooms = newFilters.bathrooms.filter((b) => b !== Number(key.slice(5)));
     else if (key.startsWith("eq-")) newFilters.equipments = newFilters.equipments.filter((e) => e !== key.slice(3));
+    else if (key.startsWith("fuel-")) newFilters.fuels = newFilters.fuels.filter((f) => f !== key.slice(5));
+    else if (key.startsWith("gear-")) newFilters.transmissions = newFilters.transmissions.filter((g) => g !== key.slice(5));
+    else if (key.startsWith("drive-")) newFilters.drivetrains = newFilters.drivetrains.filter((d) => d !== key.slice(6));
+    else if (key.startsWith("condition-")) newFilters.conditions = newFilters.conditions.filter((c) => c !== key.slice(10));
+    else if (key.startsWith("seller-")) newFilters.sellerTypes = newFilters.sellerTypes.filter((s) => s !== key.slice(7));
     updateFilters(newFilters);
   };
 
@@ -372,6 +405,11 @@ const SearchPage = () => {
     if (filters.rooms.length > 0) count += 1;
     if (filters.bathrooms.length > 0) count += 1;
     if (filters.equipments.length > 0) count += 1;
+    if (filters.fuels.length > 0) count += 1;
+    if (filters.transmissions.length > 0) count += 1;
+    if (filters.drivetrains.length > 0) count += 1;
+    if (filters.conditions.length > 0) count += 1;
+    if (filters.sellerTypes.length > 0) count += 1;
     return count;
   }, [filters]);
   const robotsContent = noisyFiltersCount >= 4 ? "noindex,follow" : "index,follow";

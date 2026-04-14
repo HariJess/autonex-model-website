@@ -59,6 +59,7 @@ export function PublishDetailsSection({
       <div className="space-y-2">
         <Label className="font-sans">{labels.listingTitle} *</Label>
         <Input value={title} onChange={(e) => onTitleChange(e.target.value)} className="font-sans" maxLength={120} />
+        <p className="text-xs text-muted-foreground font-sans">Exemple: Toyota RAV4 2021 — automatique, 68 000 km</p>
       </div>
       <div className="space-y-2">
         <Label className="font-sans">{labels.descriptionFr} *</Label>
@@ -71,6 +72,7 @@ export function PublishDetailsSection({
           placeholder="Rédigez une description complète en français…"
         />
         <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
+        <p className="text-xs text-muted-foreground font-sans">Incluez de préférence: carburant, boîte, état général et historique d’entretien.</p>
       </div>
       <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-4`}>
         <div className="space-y-2">
@@ -85,11 +87,11 @@ export function PublishDetailsSection({
           <>
             <div className="space-y-2">
               <Label className="font-sans">{labels.listingRooms}</Label>
-              <Input type="number" value={rooms} onChange={(e) => onRoomsChange(e.target.value)} className="font-sans" min={0} />
+              <Input type="number" value={rooms} onChange={(e) => onRoomsChange(e.target.value)} className="font-sans" min={0} placeholder="0=Base, 1=Confort..." />
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{labels.listingBathrooms}</Label>
-              <Input type="number" value={bathrooms} onChange={(e) => onBathroomsChange(e.target.value)} className="font-sans" min={0} />
+              <Input type="number" value={bathrooms} onChange={(e) => onBathroomsChange(e.target.value)} className="font-sans" min={0} placeholder="Nombre de portes" />
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{labels.toilets}</Label>

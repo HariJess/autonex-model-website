@@ -1243,10 +1243,10 @@ const PublishPage = () => {
             labels={{
               listingTitle: t("publish.listingTitle", "Titre"),
               descriptionFr: t("publish.descriptionFr", "Description (français)"),
-              listingSurface: t("listing.surface"),
-              listingRooms: t("listing.rooms"),
-              listingBathrooms: t("listing.bathrooms"),
-              toilets: t("publish.toilets", "Toilettes / WC"),
+              listingSurface: t("listing.surface", "Kilométrage"),
+              listingRooms: t("listing.rooms", "Version / finition"),
+              listingBathrooms: t("listing.bathrooms", "Portes"),
+              toilets: t("publish.toilets", "Places / capacité (optionnel)"),
               listingFeatures: t("listing.features", "Équipements"),
             }}
             onTitleChange={setTitle}

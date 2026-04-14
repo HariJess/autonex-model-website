@@ -31,6 +31,7 @@ export function SearchResultsList({
         const mileageLabel = formatVehicleMileage(listing.surface);
         const versionLabel = formatVehicleVersion(listing.rooms);
         const doorsLabel = formatVehicleDoors(listing.bathrooms);
+        const vehicleHeadline = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year].filter(Boolean).join(" ");
         return (
         <div
           key={listing.id}
@@ -64,6 +65,7 @@ export function SearchResultsList({
                 onTouchStart={() => void prefetchListing(queryClient, listing.id)}
               >
                 <h2 className="font-serif font-semibold text-lg hover:text-primary transition-colors">{listing.title}</h2>
+                {vehicleHeadline && <p className="text-xs text-muted-foreground font-sans mt-1">{vehicleHeadline}</p>}
               </Link>
               {showCloseMatchBadges && (
                 <Badge variant="secondary" className="mt-1.5 text-[10px] font-sans font-normal">
@@ -75,6 +77,8 @@ export function SearchResultsList({
                 {mileageLabel && <span>{mileageLabel}</span>}
                 {versionLabel && <span>{versionLabel}</span>}
                 {doorsLabel && <span>{doorsLabel}</span>}
+                {listing.vehicle?.fuel && <span>{listing.vehicle.fuel}</span>}
+                {listing.vehicle?.transmission && <span>{listing.vehicle.transmission}</span>}
                 <span>{listing.ville}</span>
               </div>
             </div>

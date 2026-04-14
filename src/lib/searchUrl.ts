@@ -72,6 +72,11 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     rooms,
     bathrooms,
     equipments: sp.get("equip")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    fuels: sp.get("fuel")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    transmissions: sp.get("gear")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    drivetrains: sp.get("drive")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    conditions: sp.get("condition")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    sellerTypes: sp.get("seller")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
   };
 }
 
@@ -94,6 +99,11 @@ export function filtersToSearchParams(f: SearchFilters): URLSearchParams {
   if (f.rooms.length) p.set("chambres", f.rooms.join(","));
   if (f.bathrooms.length) p.set("sdb", f.bathrooms.join(","));
   if (f.equipments.length) p.set("equip", f.equipments.join(","));
+  if (f.fuels.length) p.set("fuel", f.fuels.join(","));
+  if (f.transmissions.length) p.set("gear", f.transmissions.join(","));
+  if (f.drivetrains.length) p.set("drive", f.drivetrains.join(","));
+  if (f.conditions.length) p.set("condition", f.conditions.join(","));
+  if (f.sellerTypes.length) p.set("seller", f.sellerTypes.join(","));
   return p;
 }
 

@@ -2,6 +2,7 @@ import { useQuery, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import type { DisplayListing, ListingType, TransactionType } from "@/types/listing";
+import { deriveVehicleFromLegacy } from "@/lib/vehicleModel";
 
 type ListingRowLite = Pick<
   Tables<"listings">,
@@ -128,6 +129,14 @@ function mapListingRowToDisplayListing(
     is_new_program: listing.is_new_program,
     rejection_reason: listing.rejection_reason,
     pending_boost_types: pendingBoosts.length > 0 ? pendingBoosts : undefined,
+    vehicle: deriveVehicleFromLegacy({
+      title: listing.title,
+      surface: listing.surface,
+      bathrooms: listing.bathrooms,
+      isNewProgram: listing.is_new_program,
+      features,
+      agencyName: extras?.agencyName ?? null,
+    }),
   };
 }
 

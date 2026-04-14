@@ -47,6 +47,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
   const region = listing.region ?? "";
   const versionLabel = formatVehicleVersion(listing.rooms);
   const mileageLabel = formatVehicleMileage(listing.surface);
+  const vehicleHeadline = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year].filter(Boolean).join(" ");
 
   const handlePrefetchDetail = () => {
     void prefetchListing(queryClient, listing.id);
@@ -133,6 +134,9 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
           <p className="text-xs text-muted-foreground font-sans mt-0.5">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
         <h3 className="font-serif font-semibold text-base max-lg:text-[1.05rem] text-foreground leading-snug">{listing.title}</h3>
+        {vehicleHeadline && (
+          <p className="text-xs font-sans text-muted-foreground -mt-1">{vehicleHeadline}</p>
+        )}
         {matchBadge && (
           <p className="text-[11px] font-sans text-muted-foreground border border-border/80 rounded-md px-2 py-0.5 w-fit bg-muted/40">
             {matchBadge}
@@ -152,6 +156,8 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
             </span>
           )}
           <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>
+          {listing.vehicle?.fuel && <span>{listing.vehicle.fuel}</span>}
+          {listing.vehicle?.transmission && <span>{listing.vehicle.transmission}</span>}
         </div>
         <p className="text-xs text-muted-foreground font-sans font-medium max-lg:text-[13px]">{city}{region ? `, ${region}` : ""}</p>
       </Link>

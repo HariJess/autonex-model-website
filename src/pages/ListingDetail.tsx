@@ -282,6 +282,7 @@ const ListingDetail = () => {
   const versionLabel = formatVehicleVersion(listing.rooms);
   const mileageLabel = formatVehicleMileage(listing.surface);
   const doorsLabel = formatVehicleDoors(listing.bathrooms);
+  const vehicleSummary = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year].filter(Boolean).join(" ");
   const ownerStatusHint = (() => {
     const s = listing.status;
     if (!isOwner || s === "active") return null;
@@ -338,6 +339,9 @@ const ListingDetail = () => {
         }
       : undefined,
     category: typeLabel,
+    brand: listing.vehicle?.make ? { "@type": "Brand", name: listing.vehicle.make } : undefined,
+    model: listing.vehicle?.model ?? undefined,
+    vehicleModelDate: listing.vehicle?.year ?? undefined,
     mileageFromOdometer: listing.surface && listing.surface > 0
       ? {
           "@type": "QuantitativeValue",
@@ -456,6 +460,9 @@ const ListingDetail = () => {
                 )}
               </div>
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{listing.title}</h1>
+              {vehicleSummary && (
+                <p className="text-sm text-muted-foreground font-sans mb-1">{vehicleSummary}</p>
+              )}
               {listing.internal_ref && isOwner && (
                 <p className="text-xs text-muted-foreground font-sans mb-1">
                   {t("listing.internalRef", "Réf. interne : {{ref}}", { ref: listing.internal_ref })}
@@ -494,6 +501,13 @@ const ListingDetail = () => {
                   <div><p className="font-semibold font-sans">{listing.toilets}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.toilets", "Toilettes")}</p></div>
                 </div>
               )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {listing.vehicle?.fuel && <Badge variant="secondary" className="font-sans">{listing.vehicle.fuel}</Badge>}
+              {listing.vehicle?.transmission && <Badge variant="secondary" className="font-sans">{listing.vehicle.transmission}</Badge>}
+              {listing.vehicle?.drivetrain && <Badge variant="secondary" className="font-sans">{listing.vehicle.drivetrain}</Badge>}
+              {listing.vehicle?.condition && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.condition}</Badge>}
+              {listing.vehicle?.sellerType && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.sellerType}</Badge>}
             </div>
 
             {listing.description && (

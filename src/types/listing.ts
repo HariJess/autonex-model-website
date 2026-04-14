@@ -98,4 +98,17 @@ export interface DisplayListing {
    * with listing creation / bump recency. Higher = shown first.
    */
   visibility_rank_score?: number;
+  /** Frontend vehicle-native view model derived from legacy listing fields. */
+  vehicle?: {
+    make: string | null;
+    model: string | null;
+    year: number | null;
+    mileageKm: number | null;
+    fuel: string | null;
+    transmission: string | null;
+    drivetrain: string | null;
+    doors: number | null;
+    condition: "neuf" | "occasion" | null;
+    sellerType: "concessionnaire" | "particulier";
+  };
 }

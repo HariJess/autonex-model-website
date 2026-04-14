@@ -24,6 +24,11 @@ const EQUIPMENTS = [
   "Boîte automatique", "Caméra de recul", "Bluetooth", "GPS intégré",
   "Toit ouvrant", "4x4", "Climatisation", "Faible kilométrage",
 ];
+const FUEL_OPTIONS = ["Essence", "Diesel", "Hybride", "Électrique"];
+const GEAR_OPTIONS = ["Boîte manuelle", "Boîte automatique"];
+const DRIVE_OPTIONS = ["4x2", "4x4", "AWD"];
+const CONDITION_OPTIONS = ["neuf", "occasion"];
+const SELLER_OPTIONS = ["concessionnaire", "particulier"];
 
 interface FilterSidebarProps {
   filters: SearchFilters;
@@ -274,6 +279,111 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                   <span className="font-sans text-sm">{eq}</span>
                 </label>
               ))}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="fuel" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              Carburant
+            </AccordionTrigger>
+            <AccordionContent className="pb-3">
+              <div className="flex flex-wrap gap-2">
+                {FUEL_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn("font-sans touch-manipulation", filters.fuels.includes(opt) ? "border-primary bg-primary/10 text-primary" : "")}
+                    onClick={() => update({ fuels: toggleInArray(filters.fuels, opt) })}
+                  >
+                    {opt}
+                  </Button>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="gear" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              Boîte
+            </AccordionTrigger>
+            <AccordionContent className="pb-3">
+              <div className="flex flex-wrap gap-2">
+                {GEAR_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn("font-sans touch-manipulation", filters.transmissions.includes(opt) ? "border-primary bg-primary/10 text-primary" : "")}
+                    onClick={() => update({ transmissions: toggleInArray(filters.transmissions, opt) })}
+                  >
+                    {opt}
+                  </Button>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="drive" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              Transmission motrice
+            </AccordionTrigger>
+            <AccordionContent className="pb-3">
+              <div className="flex flex-wrap gap-2">
+                {DRIVE_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn("font-sans touch-manipulation", filters.drivetrains.includes(opt) ? "border-primary bg-primary/10 text-primary" : "")}
+                    onClick={() => update({ drivetrains: toggleInArray(filters.drivetrains, opt) })}
+                  >
+                    {opt}
+                  </Button>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="condition" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              État
+            </AccordionTrigger>
+            <AccordionContent className="pb-3">
+              <div className="flex flex-wrap gap-2">
+                {CONDITION_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn("font-sans touch-manipulation capitalize", filters.conditions.includes(opt) ? "border-primary bg-primary/10 text-primary" : "")}
+                    onClick={() => update({ conditions: toggleInArray(filters.conditions, opt) })}
+                  >
+                    {opt}
+                  </Button>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="seller" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              Vendeur
+            </AccordionTrigger>
+            <AccordionContent className="pb-3">
+              <div className="flex flex-wrap gap-2">
+                {SELLER_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn("font-sans touch-manipulation capitalize", filters.sellerTypes.includes(opt) ? "border-primary bg-primary/10 text-primary" : "")}
+                    onClick={() => update({ sellerTypes: toggleInArray(filters.sellerTypes, opt) })}
+                  >
+                    {opt}
+                  </Button>
+                ))}
+              </div>
             </AccordionContent>
           </AccordionItem>
 

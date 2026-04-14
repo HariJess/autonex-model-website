@@ -17,6 +17,11 @@ export interface SearchFilters {
   rooms: number[];
   bathrooms: number[];
   equipments: string[];
+  fuels: string[];
+  transmissions: string[];
+  drivetrains: string[];
+  conditions: string[];
+  sellerTypes: string[];
 }
 
 export const EMPTY_SEARCH_FILTERS: SearchFilters = {
@@ -33,6 +38,11 @@ export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   rooms: [],
   bathrooms: [],
   equipments: [],
+  fuels: [],
+  transmissions: [],
+  drivetrains: [],
+  conditions: [],
+  sellerTypes: [],
 };
 
 export type SearchSortMode = "recent" | "priceAsc" | "priceDesc";
