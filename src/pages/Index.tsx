@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
-import { ChevronRight, Loader2, Car, Bike, Truck, BusFront, ShieldCheck, RotateCw, Globe } from "lucide-react";
+import { ChevronRight, Loader2, Car, Bike, Truck, BusFront, ShieldCheck, RotateCw, Globe, CalendarClock } from "lucide-react";
 import { fetchActiveListingCountsByVille, useDbListings } from "@/hooks/useListings";
 import { useQuery } from "@tanstack/react-query";
 import { villes } from "@/data/madagascar-locations";
@@ -18,7 +18,12 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
-import { AUTO_DISCOVERY_CATEGORIES, AUTO_TRANSACTION_MODES, TOP_AUTO_BRANDS } from "@/data/automotiveCatalog";
+import {
+  AUTO_DISCOVERY_CATEGORIES,
+  AUTO_HOMEPAGE_BRANDS,
+  AUTO_TRANSACTION_MODES,
+  type AutoDiscoveryCategory,
+} from "@/data/automotiveCatalog";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -30,6 +35,25 @@ const Index = () => {
   );
   const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
   const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
+  const categoryGroups: { id: string; label: string; items: AutoDiscoveryCategory[] }[] = [
+    {
+      id: "types",
+      label: "Types de véhicules",
+      items: AUTO_DISCOVERY_CATEGORIES.filter((category) =>
+        ["voitures", "suv4x4", "pickup", "berlines", "citadines", "motos", "scooters", "utilitaires", "minibus", "camions"].includes(category.id),
+      ),
+    },
+    {
+      id: "state",
+      label: "Neuf, occasion, import",
+      items: AUTO_DISCOVERY_CATEGORIES.filter((category) => ["neufs", "occasion", "importes"].includes(category.id)),
+    },
+    {
+      id: "rental",
+      label: "Location",
+      items: AUTO_DISCOVERY_CATEGORIES.filter((category) => ["loc-courte", "loc-longue"].includes(category.id)),
+    },
+  ];
   const categoryIcon = (iconKey?: string) => {
     if (iconKey === "bike") return <Bike className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "truck") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
@@ -38,6 +62,7 @@ const Index = () => {
     if (iconKey === "new") return <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "used") return <RotateCw className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "import") return <Globe className="h-4 w-4 text-primary" aria-hidden />;
+    if (iconKey === "rent") return <CalendarClock className="h-4 w-4 text-primary" aria-hidden />;
     return <Car className="h-4 w-4 text-primary" aria-hidden />;
   };
   const homeSponsorEnabled = MONETIZATION_PLACEMENTS.homeSponsorStrip;
@@ -93,49 +118,74 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 pt-8 pb-2">
-        <div className="rounded-2xl border border-border/80 bg-card p-4 md:p-5 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-3">Explorer par catégorie</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            {AUTO_DISCOVERY_CATEGORIES.map((category) => (
-              <Link
-                key={category.id}
-                to={category.href}
-                className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 hover:border-primary/30 hover:bg-primary/[0.04] transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  {categoryIcon(category.iconKey)}
-                  <span className="text-xs font-semibold text-foreground">{category.label}</span>
+      <section className="container mx-auto px-4 pt-8 pb-3">
+        <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6 shadow-sm">
+          <div className="mb-5">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-1.5">Catalogue AutoNex</p>
+            <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">Explorer par catégorie</h2>
+            <p className="text-sm text-muted-foreground font-sans mt-1">
+              Parcours rapides pour trouver le bon type de véhicule, l’état recherché ou une formule de location.
+            </p>
+          </div>
+          <div className="space-y-5">
+            {categoryGroups.map((group) => (
+              <div key={group.id}>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-2.5">{group.label}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                  {group.items.map((category) => (
+                    <Link
+                      key={category.id}
+                      to={category.href}
+                      className="group rounded-xl border border-border/80 bg-background/60 px-4 py-3 hover:border-primary/35 hover:bg-primary/[0.045] transition-all"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg border border-border/80 bg-secondary/45 group-hover:border-primary/35 group-hover:bg-primary/[0.08] transition-colors">
+                          {categoryIcon(category.iconKey)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-foreground leading-tight">{category.label}</p>
+                          {category.description && (
+                            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{category.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                {category.description && (
-                  <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">{category.description}</p>
-                )}
-              </Link>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="container mx-auto px-4 py-6">
-        <div className="rounded-2xl border border-border/80 bg-card p-4 md:p-5 shadow-sm">
-          <h2 className="font-serif text-xl md:text-2xl font-bold mb-2">Marques populaires</h2>
-          <p className="text-sm text-muted-foreground font-sans mb-4">
-            Catalogue étendu voitures, utilitaires, premium, import et moto.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-2">
-            {TOP_AUTO_BRANDS.map((brand) => (
+      <section className="container mx-auto px-4 py-5">
+        <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6 shadow-sm">
+          <div className="mb-5">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-sans mb-1.5">Marques</p>
+            <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">Explorer par marque</h2>
+            <p className="text-sm text-muted-foreground font-sans mt-1">
+              Une sélection de marques populaires à Madagascar, prête pour intégration de logos officiels.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            {AUTO_HOMEPAGE_BRANDS.map((brand) => (
               <Link
-                key={brand}
-                to={`/recherche?brand=${encodeURIComponent(brand)}`}
-                className="rounded-md border border-border bg-background px-2.5 py-2 text-xs font-semibold text-center text-foreground hover:border-primary/35 hover:text-primary transition-colors"
+                key={brand.id}
+                to={brand.href}
+                className="group rounded-xl border border-border/80 bg-background/60 p-3 hover:border-primary/35 hover:bg-primary/[0.04] transition-all"
               >
-                {brand}
+                <div className="rounded-lg border border-dashed border-border bg-secondary/40 px-2 py-3 text-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground group-hover:border-primary/30 group-hover:text-primary transition-colors">
+                  {brand.logoAsset ? "Logo" : "Logo slot"}
+                </div>
+                <p className="mt-2 text-sm font-semibold text-foreground text-center group-hover:text-primary transition-colors">
+                  {brand.label}
+                </p>
               </Link>
             ))}
           </div>
           <Link
             to="/recherche"
-            className="inline-flex mt-4 rounded-md border border-primary/25 bg-primary/[0.08] px-3 py-2 text-xs font-semibold text-primary"
+            className="inline-flex mt-5 rounded-lg border border-primary/25 bg-primary/[0.08] px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/[0.12] transition-colors"
           >
             Autres marques
           </Link>

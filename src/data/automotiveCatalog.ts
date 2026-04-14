@@ -11,6 +11,14 @@ export type AutoDiscoveryCategory = {
   description?: string;
 };
 
+export type AutoHomepageBrand = {
+  id: string;
+  label: string;
+  href: string;
+  /** Optional future brand-logo asset path in /public (e.g. /brands/toyota.svg). */
+  logoAsset?: string;
+};
+
 export const AUTO_TRANSACTION_MODES = [
   { id: "acheter", label: "Acheter", href: "/recherche?transaction=vente" },
   { id: "vendre", label: "Vendre", href: "/recherche?transaction=location" },
@@ -83,3 +91,27 @@ export const TOP_AUTO_BRANDS = [
   "Chery",
   "Yamaha",
 ] as const;
+
+export const AUTO_HOMEPAGE_BRANDS: AutoHomepageBrand[] = [
+  { id: "toyota", label: "Toyota", href: "/recherche?brand=Toyota" },
+  { id: "nissan", label: "Nissan", href: "/recherche?brand=Nissan" },
+  { id: "hyundai", label: "Hyundai", href: "/recherche?brand=Hyundai" },
+  { id: "kia", label: "Kia", href: "/recherche?brand=Kia" },
+  { id: "mazda", label: "Mazda", href: "/recherche?brand=Mazda" },
+  { id: "suzuki", label: "Suzuki", href: "/recherche?brand=Suzuki" },
+  { id: "mitsubishi", label: "Mitsubishi", href: "/recherche?brand=Mitsubishi" },
+  { id: "isuzu", label: "Isuzu", href: "/recherche?brand=Isuzu" },
+  { id: "ford", label: "Ford", href: "/recherche?brand=Ford" },
+  { id: "renault", label: "Renault", href: "/recherche?brand=Renault" },
+  { id: "honda", label: "Honda", href: "/recherche?brand=Honda" },
+  { id: "subaru", label: "Subaru", href: "/recherche?brand=Subaru" },
+  { id: "volkswagen", label: "Volkswagen", href: "/recherche?brand=Volkswagen" },
+  { id: "mercedes-benz", label: "Mercedes-Benz", href: "/recherche?brand=Mercedes-Benz" },
+  { id: "bmw", label: "BMW", href: "/recherche?brand=BMW" },
+  { id: "audi", label: "Audi", href: "/recherche?brand=Audi" },
+  { id: "peugeot", label: "Peugeot", href: "/recherche?brand=Peugeot" },
+  { id: "citroen", label: "Citroën", href: "/recherche?brand=Citro%C3%ABn" },
+  { id: "byd", label: "BYD", href: "/recherche?brand=BYD" },
+  { id: "chery", label: "Chery", href: "/recherche?brand=Chery" },
+  { id: "yamaha", label: "Yamaha", href: "/recherche?brand=Yamaha" },
+];
