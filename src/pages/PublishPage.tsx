@@ -39,12 +39,18 @@ import {
   deleteListingPhotoRow,
   fetchDraftListingForOwner,
   fetchLatestDraftId,
+  fetchListingForOwnerEdit,
   fetchListingPhotos,
   formToListingUpdate,
+  buildListingMaterialSnapshotFromForm,
+  buildListingMaterialSnapshotFromRow,
   listingRowToFormState,
+  omitBoostFieldsFromListingPatch,
   saveDraftListing,
   saveLocalPublishBackup,
   setPhotoCoverFirst,
+  shouldSendPublishedListingToReview,
+  updateOwnerListing,
   uploadListingPhoto,
   type ServerPhoto,
 } from "@/lib/publishDraft";
@@ -59,8 +65,11 @@ import { PublishBasicInfoSection } from "@/pages/publish/components/PublishBasic
 import { PublishDetailsSection } from "@/pages/publish/components/PublishDetailsSection";
 import { PublishMediaSection } from "@/pages/publish/components/PublishMediaSection";
 import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
+
+const LISTING_ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const MANUAL_PAYMENT_METHODS = [
   { id: "bank_transfer" as const, name: "Virement bancaire" },
@@ -75,6 +84,7 @@ const PublishPage = () => {
   const [searchParams] = useSearchParams();
   const spNew = searchParams.get("new");
   const spDraft = searchParams.get("draft");
+  const spEdit = searchParams.get("edit");
   const { user, profile, refreshProfile } = useAuth();
   const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
@@ -87,6 +97,11 @@ const PublishPage = () => {
   const [saveError, setSaveError] = useState<string | null>(null);
   const hydratingRef = useRef(false);
   const serverPhotosRef = useRef<ServerPhoto[]>([]);
+  /** Mode édition d’annonce déjà publiée / hors brouillon (?edit=uuid). */
+  const [isPublishedListingEdit, setIsPublishedListingEdit] = useState(false);
+  /** Statut courant côté modération (passe à pending_review après changement matériel). */
+  const [listingModerationStatus, setListingModerationStatus] = useState<string | null>(null);
+  const baselineMaterialSnapshotRef = useRef<string>("");
 
   const steps = [
     t("publish.stepMain", "Informations principales"),
@@ -197,11 +212,72 @@ const PublishPage = () => {
         const draftParam = spDraft;
 
         if (wantNew) {
+          setIsPublishedListingEdit(false);
+          setListingModerationStatus(null);
+          baselineMaterialSnapshotRef.current = "";
           const id = await createDraftListing(user.id);
           if (cancelled) return;
           setDraftListingId(id);
           navigate(`/publier?draft=${id}`, { replace: true });
           setStep(0);
+          setDraftHydrated(true);
+          return;
+        }
+
+        if (spEdit) {
+          if (!LISTING_ID_UUID_RE.test(spEdit)) {
+            toast.error(t("publish.editInvalidId", "Lien de modification invalide."));
+            navigate("/dashboard");
+            return;
+          }
+          const row = await fetchListingForOwnerEdit(spEdit, user.id);
+          if (cancelled) return;
+          if (!row) {
+            toast.error(t("publish.editNotFound", "Annonce introuvable ou non modifiable."));
+            navigate("/dashboard");
+            return;
+          }
+          hydratingRef.current = true;
+          const fs = listingRowToFormState(row);
+          setTransaction(fs.transaction);
+          setListingType(sanitizeListingTypeForTransaction(fs.transaction, fs.listingType));
+          setIsNewProgram(fs.isNewProgram);
+          setInternalRef(fs.internalRef);
+          setVille(fs.ville);
+          setArrondissement(fs.arrondissement);
+          setQuartier(fs.quartier);
+          setQuartierLibre(fs.quartierLibre);
+          setPinLat(fs.pinLat);
+          setPinLng(fs.pinLng);
+          lastAutoVilleRef.current = fs.ville || "";
+          setTitle(fs.title);
+          setDescription(fs.description);
+          setPriceMga(fs.priceMga);
+          setSurface(fs.surface);
+          setRooms(fs.rooms);
+          setBathrooms(fs.bathrooms);
+          setToilets(fs.toilets);
+          setSelectedFeatures(fs.selectedFeatures);
+          setVideoUrl(fs.videoUrl);
+          setVirtualTourUrl(fs.virtualTourUrl);
+          setSelectedBoosts(fs.selectedBoosts);
+          setAgencySpotlight(fs.agencySpotlight);
+          setStep(fs.step);
+          setDraftListingId(row.id);
+          setIsPublishedListingEdit(true);
+          setListingModerationStatus(row.status);
+          const photos = await fetchListingPhotos(row.id);
+          if (cancelled) return;
+          setServerPhotos(photos);
+          baselineMaterialSnapshotRef.current = buildListingMaterialSnapshotFromRow(
+            row,
+            photos.map((p) => p.id),
+          );
+          setLastSavedAt(row.updated_at ?? row.created_at ?? null);
+          navigate(`/publier?edit=${row.id}`, { replace: true });
+          queueMicrotask(() => {
+            hydratingRef.current = false;
+          });
           setDraftHydrated(true);
           return;
         }
@@ -214,6 +290,9 @@ const PublishPage = () => {
             navigate("/dashboard");
             return;
           }
+          setIsPublishedListingEdit(false);
+          setListingModerationStatus(null);
+          baselineMaterialSnapshotRef.current = "";
           hydratingRef.current = true;
           const fs = listingRowToFormState(row);
           setTransaction(fs.transaction);
@@ -255,10 +334,16 @@ const PublishPage = () => {
         const latestId = await fetchLatestDraftId(user.id);
         if (cancelled) return;
         if (latestId) {
+          setIsPublishedListingEdit(false);
+          setListingModerationStatus(null);
+          baselineMaterialSnapshotRef.current = "";
           navigate(`/publier?draft=${latestId}`, { replace: true });
           return;
         }
 
+        setIsPublishedListingEdit(false);
+        setListingModerationStatus(null);
+        baselineMaterialSnapshotRef.current = "";
         const id = await createDraftListing(user.id);
         if (cancelled) return;
         setDraftListingId(id);
@@ -278,7 +363,7 @@ const PublishPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [user?.id, spNew, spDraft, navigate, t]);
+  }, [user?.id, spNew, spDraft, spEdit, navigate, t]);
 
   const persistDraft = useCallback(
     async (stepOverride?: number) => {
@@ -286,7 +371,7 @@ const PublishPage = () => {
       try {
         setSaveStatus("saving");
         setSaveError(null);
-        const patch = formToListingUpdate({
+        const patchBase = formToListingUpdate({
           transaction,
           listingType,
           isNewProgram,
@@ -312,7 +397,82 @@ const PublishPage = () => {
           draftStep: stepOverride ?? step,
           isDraftSave: true,
         });
-        const { updatedAt } = await saveDraftListing(draftListingId, patch);
+
+        if (isPublishedListingEdit) {
+          const patch = omitBoostFieldsFromListingPatch(patchBase);
+          const photoIdsOrdered = serverPhotosRef.current.map((p) => p.id);
+          const currentSnap = buildListingMaterialSnapshotFromForm(
+            {
+              transaction,
+              listingType,
+              isNewProgram,
+              internalRef,
+              ville,
+              arrondissement,
+              quartier,
+              quartierLibre,
+              pinLat,
+              pinLng,
+              title,
+              description,
+              priceMga,
+              surface,
+              rooms,
+              bathrooms,
+              toilets,
+              selectedFeatures,
+              videoUrl,
+              virtualTourUrl,
+            },
+            photoIdsOrdered,
+            pendingPhotos.length,
+          );
+          const toReview = shouldSendPublishedListingToReview({
+            moderationStatus: listingModerationStatus,
+            baselineSnapshot: baselineMaterialSnapshotRef.current,
+            currentSnapshot: currentSnap,
+          });
+          const { updatedAt } = await updateOwnerListing(
+            draftListingId,
+            user.id,
+            toReview ? { ...patch, status: "pending_review" } : patch,
+          );
+          if (toReview) setListingModerationStatus("pending_review");
+          baselineMaterialSnapshotRef.current = currentSnap;
+          setLastSavedAt(updatedAt);
+          setSaveStatus("saved");
+          saveLocalPublishBackup(user.id, draftListingId, {
+            draftListingId,
+            step: stepOverride ?? step,
+            transaction,
+            listingType,
+            isNewProgram,
+            internalRef,
+            ville,
+            arrondissement,
+            quartier,
+            quartierLibre,
+            pinLat,
+            pinLng,
+            title,
+            description,
+            priceMga,
+            surface,
+            rooms,
+            bathrooms,
+            toilets,
+            selectedFeatures,
+            videoUrl,
+            virtualTourUrl,
+            selectedBoosts,
+            agencySpotlight,
+          });
+          await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
+          await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
+          return;
+        }
+
+        const { updatedAt } = await saveDraftListing(draftListingId, patchBase);
         setLastSavedAt(updatedAt);
         setSaveStatus("saved");
         saveLocalPublishBackup(user.id, draftListingId, {
@@ -353,6 +513,9 @@ const PublishPage = () => {
       user?.id,
       draftListingId,
       draftHydrated,
+      isPublishedListingEdit,
+      listingModerationStatus,
+      pendingPhotos.length,
       transaction,
       listingType,
       isNewProgram,
@@ -387,12 +550,14 @@ const PublishPage = () => {
 
   useEffect(() => {
     if (!draftHydrated || !draftListingId || !user?.id) return;
+    if (isPublishedListingEdit) return;
     debouncedPersist();
   }, [
     debouncedPersist,
     draftHydrated,
     draftListingId,
     user?.id,
+    isPublishedListingEdit,
     transaction,
     listingType,
     isNewProgram,
@@ -663,6 +828,134 @@ const PublishPage = () => {
       toast.error(t("publish.noDraft", "Brouillon introuvable — rechargez la page."));
       return;
     }
+
+    if (isPublishedListingEdit) {
+      setPublishing(true);
+      try {
+        let nextPhotos = [...serverPhotos];
+        if (pendingPhotos.length > 0) {
+          const batch = [...pendingPhotos];
+          setPendingPhotos([]);
+          batch.forEach((p) => URL.revokeObjectURL(p.preview));
+          for (const { file } of batch) {
+            const pos = nextPhotos.length;
+            const ph = await uploadListingPhoto(draftListingId, file, pos);
+            nextPhotos.push(ph);
+          }
+          setServerPhotos(nextPhotos);
+          serverPhotosRef.current = nextPhotos;
+        }
+
+        let finalLat: number | null = null;
+        let finalLng: number | null = null;
+        if (pinLat != null && pinLng != null && isValidListingCoordinates(pinLat, pinLng)) {
+          finalLat = Number(pinLat.toFixed(7));
+          finalLng = Number(pinLng.toFixed(7));
+        } else {
+          const fallback = getSuggestedListingCoordinates(ville, arrondissement || undefined, quartier || undefined);
+          if (fallback) {
+            finalLat = Number(fallback.lat.toFixed(7));
+            finalLng = Number(fallback.lng.toFixed(7));
+          }
+        }
+
+        const patchBase = formToListingUpdate({
+          transaction,
+          listingType,
+          isNewProgram,
+          internalRef,
+          ville,
+          arrondissement,
+          quartier,
+          quartierLibre,
+          pinLat: finalLat,
+          pinLng: finalLng,
+          title,
+          description,
+          priceMga,
+          surface,
+          rooms,
+          bathrooms,
+          toilets,
+          selectedFeatures,
+          videoUrl,
+          virtualTourUrl,
+          selectedBoosts,
+          agencySpotlight,
+          draftStep: step,
+          isDraftSave: false,
+        });
+        const patch = omitBoostFieldsFromListingPatch(patchBase);
+
+        const photoIdsOrdered = nextPhotos.map((p) => p.id);
+        const currentSnap = buildListingMaterialSnapshotFromForm(
+          {
+            transaction,
+            listingType,
+            isNewProgram,
+            internalRef,
+            ville,
+            arrondissement,
+            quartier,
+            quartierLibre,
+            pinLat: finalLat,
+            pinLng: finalLng,
+            title,
+            description,
+            priceMga,
+            surface,
+            rooms,
+            bathrooms,
+            toilets,
+            selectedFeatures,
+            videoUrl,
+            virtualTourUrl,
+          },
+          photoIdsOrdered,
+          0,
+        );
+        const toReview = shouldSendPublishedListingToReview({
+          moderationStatus: listingModerationStatus,
+          baselineSnapshot: baselineMaterialSnapshotRef.current,
+          currentSnapshot: currentSnap,
+        });
+
+        const { error: upErr } = await supabase
+          .from("listings")
+          .update({
+            ...patch,
+            description: description.trim(),
+            ...(toReview ? { status: "pending_review" } : {}),
+          })
+          .eq("id", draftListingId)
+          .eq("owner_id", user.id);
+
+        if (upErr) throw new Error(upErr.message);
+
+        if (toReview) setListingModerationStatus("pending_review");
+        baselineMaterialSnapshotRef.current = currentSnap;
+
+        await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
+        await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
+        clearLocalPublishBackup(user.id, draftListingId);
+        toast.success(
+          toReview
+            ? t(
+                "publish.editSuccessReview",
+                "Modifications enregistrées. L’annonce repasse en vérification avant republication.",
+              )
+            : t("publish.editSuccess", "Modifications enregistrées."),
+        );
+        navigate("/dashboard");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : t("publish.error", "Erreur lors de la publication");
+        toast.error(message);
+      } finally {
+        setPublishing(false);
+      }
+      return;
+    }
+
     if (!canPublishWithCredits) {
       toast.error(t("publish.insufficientCredits", "Crédits insuffisants — achetez un pack ou choisissez moins d’options boost."));
       return;
@@ -681,7 +974,6 @@ const PublishPage = () => {
         }
       }
 
-      const region = getRegionForVille(ville);
       const priceNum = Number(priceMga) || 0;
       let finalLat: number | null = null;
       let finalLng: number | null = null;
@@ -832,7 +1124,11 @@ const PublishPage = () => {
 
   return (
     <>
-      <Helmet><title>{t("publish.title")} — ImmoNex</title></Helmet>
+      <Helmet>
+        <title>
+          {(isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title"))} — ImmoNex
+        </title>
+      </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-6 md:py-8 max-w-3xl pb-28 sm:pb-8">
         <PublishPageHeader
@@ -841,7 +1137,7 @@ const PublishPage = () => {
             "ImmoNex vérifie chaque annonce avant publication. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français.",
           )}
           publishCreditCost={LISTING_PUBLISH_CREDIT_COST}
-          title={t("publish.title")}
+          title={isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title")}
           showNewButton={Boolean(user)}
           newListingLabel={t("publish.newListing", "Nouvelle annonce")}
           onNewListing={() => navigate("/publier?new=1")}
@@ -861,7 +1157,9 @@ const PublishPage = () => {
         {user && !draftHydrated && (
           <div className="flex items-center justify-center gap-3 py-16 mb-8 text-muted-foreground font-sans">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            {t("publish.loadingDraft", "Chargement du brouillon…")}
+            {spEdit
+              ? t("publish.loadingEdit", "Chargement de l’annonce…")
+              : t("publish.loadingDraft", "Chargement du brouillon…")}
           </div>
         )}
 
@@ -870,6 +1168,17 @@ const PublishPage = () => {
         <PublishProgressSteps steps={steps} step={step} progress={progress} />
 
         <PublishStepErrors errors={stepErrors} />
+
+        {isPublishedListingEdit && (
+          <Alert className="mb-6 rounded-2xl border-border bg-secondary/30">
+            <AlertDescription className="font-sans text-sm text-foreground leading-relaxed">
+              {t(
+                "publish.editBanner",
+                "Vous modifiez une annonce existante. Les changements sont enregistrés sur la même fiche. Si l’annonce était en ligne et que le contenu change, elle repassera en vérification avant d’être à nouveau visible publiquement.",
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
 
         {step === 0 && (
           <PublishBasicInfoSection
@@ -974,10 +1283,12 @@ const PublishPage = () => {
 
         {step === 3 && (
           <PublishStepVisibility
+            editMode={isPublishedListingEdit}
+            editSubmitLabel={t("publish.editSave", "Enregistrer les modifications")}
             creditsBalance={creditsBalance}
             creditsBalancePending={creditsBalancePending}
-            totalCost={totalCost}
-            canPublishWithCredits={canPublishWithCredits}
+            totalCost={isPublishedListingEdit ? 0 : totalCost}
+            canPublishWithCredits={isPublishedListingEdit || canPublishWithCredits}
             title={title}
             listingType={listingType}
             transaction={transaction}

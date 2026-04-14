@@ -24,6 +24,10 @@ type ManualPaymentMethod = {
 };
 
 export type PublishStepVisibilityProps = {
+  /** Édition d’annonce existante : pas de débit de crédits, boosts non modifiables. */
+  editMode?: boolean;
+  editSubmitLabel?: string;
+  editModeCreditsHint?: string;
   // Crédits + état
   creditsBalance: number;
   creditsBalancePending: boolean;
@@ -71,6 +75,9 @@ export type PublishStepVisibilityProps = {
  * restent dans PublishPage.tsx. Ce composant reçoit ses données et callbacks via props.
  */
 const PublishStepVisibility = ({
+  editMode = false,
+  editSubmitLabel,
+  editModeCreditsHint,
   creditsBalance,
   creditsBalancePending,
   totalCost,
@@ -99,6 +106,7 @@ const PublishStepVisibility = ({
   onSubmitCreditPurchase,
 }: PublishStepVisibilityProps) => {
   const { t } = useTranslation();
+  const publishAllowed = editMode || canPublishWithCredits;
 
   return (
     <div className="space-y-5 pb-2">
@@ -108,51 +116,72 @@ const PublishStepVisibility = ({
             <Coins className="h-5 w-5" /> {t("publish.creditsTitle", "Crédits & coût")}
           </CardTitle>
           <CardDescription className="font-sans">
-            {t("publish.yourBalance", "Votre solde")} :{" "}
-            <strong>{creditsBalancePending ? "…" : creditsBalance}</strong>{" "}
-            {t("publish.credits", "crédits")}
+            {editMode ? (
+              editModeCreditsHint ??
+              t(
+                "publish.editCreditsHint",
+                "Modification : aucun crédit supplémentaire n’est débité. Les options de visibilité payantes ne sont pas modifiables ici.",
+              )
+            ) : (
+              <>
+                {t("publish.yourBalance", "Votre solde")} :{" "}
+                <strong>{creditsBalancePending ? "…" : creditsBalance}</strong>{" "}
+                {t("publish.credits", "crédits")}
+              </>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 font-sans text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">
-              {t("publish.costPublication", "Publication (modération)")}
-            </span>
-            <span>{LISTING_PUBLISH_CREDIT_COST}</span>
-          </div>
-          {selectedBoosts.map((b) => (
-            <div key={b} className="flex justify-between">
-              <span className="text-muted-foreground">{BOOST_LABELS_FR[b]}</span>
-              <span>{BOOST_CREDIT_COSTS[b]}</span>
-            </div>
-          ))}
-          {agencySpotlightActive && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t("publish.agencySpotlight", "Spotlight agence (marque)")}
-              </span>
-              <span>{AGENCY_SPOTLIGHT_CREDIT_COST}</span>
-            </div>
-          )}
-          <div className="flex justify-between font-semibold border-t pt-2">
-            <span>Total</span>
-            <span>{totalCost}</span>
-          </div>
-          {!canPublishWithCredits && (
-            <div className="space-y-1">
-              <p className="text-destructive text-sm">
-                {t(
-                  "publish.needMoreCredits",
-                  "Solde insuffisant pour envoyer cette annonce avec les options choisies.",
-                )}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {t(
-                  "publish.draftKept",
-                  "Votre brouillon reste enregistré : vous pourrez publier après avoir obtenu des crédits.",
-                )}
-              </p>
-            </div>
+          {editMode ? (
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {t(
+                "publish.editCostFree",
+                "Enregistrer vos changements est gratuit. Si l’annonce était en ligne, elle repassera en vérification lorsque le contenu aura changé.",
+              )}
+            </p>
+          ) : (
+            <>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t("publish.costPublication", "Publication (modération)")}
+                </span>
+                <span>{LISTING_PUBLISH_CREDIT_COST}</span>
+              </div>
+              {selectedBoosts.map((b) => (
+                <div key={b} className="flex justify-between">
+                  <span className="text-muted-foreground">{BOOST_LABELS_FR[b]}</span>
+                  <span>{BOOST_CREDIT_COSTS[b]}</span>
+                </div>
+              ))}
+              {agencySpotlightActive && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {t("publish.agencySpotlight", "Spotlight agence (marque)")}
+                  </span>
+                  <span>{AGENCY_SPOTLIGHT_CREDIT_COST}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-semibold border-t pt-2">
+                <span>Total</span>
+                <span>{totalCost}</span>
+              </div>
+              {!canPublishWithCredits && (
+                <div className="space-y-1">
+                  <p className="text-destructive text-sm">
+                    {t(
+                      "publish.needMoreCredits",
+                      "Solde insuffisant pour envoyer cette annonce avec les options choisies.",
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t(
+                      "publish.draftKept",
+                      "Votre brouillon reste enregistré : vous pourrez publier après avoir obtenu des crédits.",
+                    )}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
@@ -173,11 +202,14 @@ const PublishStepVisibility = ({
           {BOOST_ORDER.map((b) => (
             <label
               key={b}
-              className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-h-12 cursor-pointer font-sans text-sm touch-manipulation"
+              className={`flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-h-12 font-sans text-sm touch-manipulation ${
+                editMode ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+              }`}
             >
               <span className="flex items-center gap-2">
                 <Checkbox
                   checked={selectedBoosts.includes(b)}
+                  disabled={editMode}
                   onCheckedChange={() => toggleBoost(b)}
                 />
                 <span>{BOOST_LABELS_FR[b]}</span>
@@ -204,10 +236,15 @@ const PublishStepVisibility = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <label className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-h-12 cursor-pointer font-sans text-sm touch-manipulation">
+            <label
+              className={`flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-h-12 font-sans text-sm touch-manipulation ${
+                editMode ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+              }`}
+            >
               <span className="flex items-center gap-2">
                 <Checkbox
                   checked={agencySpotlight}
+                  disabled={editMode}
                   onCheckedChange={(c) => setAgencySpotlight(c === true)}
                 />
                 <span>{t("publish.agencySpotlightLabel", "Spotlight agence")}</span>
@@ -238,13 +275,18 @@ const PublishStepVisibility = ({
       <Button
         type="button"
         onClick={onPublish}
-        disabled={publishing || !canPublishWithCredits}
+        disabled={publishing || !publishAllowed}
         className="w-full gradient-primary border-0 font-sans text-base sm:text-lg py-6 min-h-12 touch-manipulation"
         style={{ color: "#FAFAFA" }}
       >
-        {publishing ? t("common.loading") : t("publish.submitForReview", "Envoyer pour modération")}
+        {publishing
+          ? t("common.loading")
+          : editMode
+            ? (editSubmitLabel ?? t("publish.editSave", "Enregistrer les modifications"))
+            : t("publish.submitForReview", "Envoyer pour modération")}
       </Button>
 
+      {!editMode && (
       <div className="border-t border-border pt-6 space-y-4">
         <h3 className="font-serif font-semibold">
           {t("publish.buyCredits", "Acheter des crédits")}
@@ -312,6 +354,7 @@ const PublishStepVisibility = ({
             : t("publish.submitCreditRequest", "Enregistrer la demande d'achat")}
         </Button>
       </div>
+      )}
     </div>
   );
 };

@@ -13,8 +13,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AlertCircle, Home, Loader2, Pause, Play, Trash2 } from "lucide-react";
+import { AlertCircle, Home, Loader2, Pause, Pencil, Play, Trash2 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import { isEditablePublishedListingStatus } from "@/lib/publishDraft";
 
 type Listing = Tables<"listings">;
 
@@ -44,6 +45,7 @@ type DashboardListingsSectionProps = {
     deleteConfirm: string;
     deleteDesc: string;
     cancel: string;
+    edit: string;
   };
   onToggleStatus: (id: string, status: string) => void;
   onDelete: (id: string) => void;
@@ -130,7 +132,15 @@ export function DashboardListingsSection({
                         {labels.activeBoosts}: {activeBoostLine}
                       </p>
                     )}
-                    <div className="flex items-center justify-end gap-1.5">
+                    <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                      {isEditablePublishedListingStatus(listing.status) && (
+                        <Button variant="outline" size="sm" className="font-sans touch-manipulation h-9 px-2" asChild>
+                          <Link to={`/publier?edit=${listing.id}`}>
+                            <Pencil className="h-3.5 w-3.5 mr-1 shrink-0" />
+                            {labels.edit}
+                          </Link>
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -215,7 +225,15 @@ export function DashboardListingsSection({
                         </td>
                         <td className="p-4 font-sans text-sm hidden md:table-cell">{listing.views_count ?? 0}</td>
                         <td className="p-4">
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {isEditablePublishedListingStatus(listing.status) && (
+                              <Button variant="outline" size="sm" className="font-sans h-8 px-2" asChild>
+                                <Link to={`/publier?edit=${listing.id}`}>
+                                  <Pencil className="h-3.5 w-3.5 mr-1 shrink-0" />
+                                  {labels.edit}
+                                </Link>
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="icon"

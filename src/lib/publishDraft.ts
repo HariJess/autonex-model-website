@@ -87,6 +87,19 @@ export function storagePathFromListingPhotoUrl(publicUrl: string): string | null
   }
 }
 
+/** Statuts modifiables via /publier?edit= (hors brouillon — ceux-ci utilisent ?draft=). */
+export const EDITABLE_PUBLISHED_LISTING_STATUSES = [
+  "active",
+  "paused",
+  "pending_review",
+  "rejected",
+  "expired",
+] as const satisfies readonly (Tables<"listings">["status"])[];
+
+export function isEditablePublishedListingStatus(status: string | null | undefined): boolean {
+  return (EDITABLE_PUBLISHED_LISTING_STATUSES as readonly string[]).includes(status ?? "");
+}
+
 export async function fetchDraftListingForOwner(
   listingId: string,
   ownerId: string,
@@ -97,6 +110,22 @@ export async function fetchDraftListingForOwner(
     .eq("id", listingId)
     .eq("owner_id", ownerId)
     .eq("status", "draft")
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+/** Annonce déjà créée (non brouillon) — propriétaire uniquement. */
+export async function fetchListingForOwnerEdit(
+  listingId: string,
+  ownerId: string,
+): Promise<Tables<"listings"> | null> {
+  const { data, error } = await supabase
+    .from("listings")
+    .select("*")
+    .eq("id", listingId)
+    .eq("owner_id", ownerId)
+    .in("status", [...EDITABLE_PUBLISHED_LISTING_STATUSES])
     .maybeSingle();
   if (error) throw new Error(error.message);
   return data;
@@ -314,6 +343,155 @@ export async function saveDraftListing(
     .single();
   if (error) throw new Error(error.message);
   return { updatedAt: data.updated_at ?? new Date().toISOString() };
+}
+
+/** Mise à jour par le propriétaire sans filtre de statut (mode édition). */
+export async function updateOwnerListing(
+  listingId: string,
+  ownerId: string,
+  patch: TablesUpdate<"listings">,
+): Promise<{ updatedAt: string }> {
+  const { data, error } = await supabase
+    .from("listings")
+    .update(patch)
+    .eq("id", listingId)
+    .eq("owner_id", ownerId)
+    .select("updated_at")
+    .single();
+  if (error) throw new Error(error.message);
+  return { updatedAt: data.updated_at ?? new Date().toISOString() };
+}
+
+/** Retire les champs boosts du patch pour ne pas les réécraser en mode édition. */
+export function omitBoostFieldsFromListingPatch(patch: TablesUpdate<"listings">): TablesUpdate<"listings"> {
+  const { pending_boost_types: _pb, ...rest } = patch;
+  return rest;
+}
+
+export type PublishFormFieldsForSnapshot = {
+  transaction: TransactionType | "";
+  listingType: ListingType | "";
+  isNewProgram: boolean;
+  internalRef: string;
+  ville: string;
+  arrondissement: string;
+  quartier: string;
+  quartierLibre: string;
+  pinLat: number | null;
+  pinLng: number | null;
+  title: string;
+  description: string;
+  priceMga: string;
+  surface: string;
+  rooms: string;
+  bathrooms: string;
+  toilets: string;
+  selectedFeatures: string[];
+  videoUrl: string;
+  virtualTourUrl: string;
+};
+
+/** Snapshot stable pour détecter un changement « matériel » (contenu, prix, médias, etc.). */
+export function buildListingMaterialSnapshotFromRow(
+  row: Tables<"listings">,
+  /** Identifiants photos dans l’ordre d’affichage (couverture en premier). */
+  photoIdsInOrder: string[],
+): string {
+  const featuresRaw = row.features;
+  const features = Array.isArray(featuresRaw)
+    ? featuresRaw.filter((x): x is string => typeof x === "string").slice().sort()
+    : [];
+  const lat =
+    row.lat != null && row.lat !== ""
+      ? Number(row.lat).toFixed(7)
+      : null;
+  const lng =
+    row.lng != null && row.lng !== ""
+      ? Number(row.lng).toFixed(7)
+      : null;
+  return JSON.stringify({
+    title: (row.title ?? "").trim(),
+    description: (row.description ?? "").trim(),
+    price_mga: row.price_mga ?? 0,
+    transaction: row.transaction,
+    type: row.type,
+    ville: (row.ville ?? "").trim(),
+    arrondissement: (row.arrondissement ?? "").trim(),
+    quartier: (row.quartier ?? "").trim(),
+    quartier_libre: (row.quartier_libre ?? "").trim(),
+    lat,
+    lng,
+    surface: row.surface ?? null,
+    rooms: row.rooms ?? null,
+    bathrooms: row.bathrooms ?? null,
+    toilets: row.toilets ?? null,
+    features,
+    video_url: (row.video_url ?? "").trim(),
+    virtual_tour_url: (row.virtual_tour_url ?? "").trim(),
+    internal_ref: (row.internal_ref ?? "").trim(),
+    is_new_program: Boolean(row.is_new_program),
+    photos: photoIdsInOrder.join(","),
+  });
+}
+
+export function buildListingMaterialSnapshotFromForm(
+  input: PublishFormFieldsForSnapshot,
+  /** Identifiants photos serveur dans l’ordre courant (couverture en premier). */
+  photoIdsInOrder: string[],
+  pendingPhotoCount: number,
+): string {
+  const tx = effectiveTransaction(input.transaction);
+  const lt = effectiveListingType(input.listingType);
+  const showRooms = showRoomsForType(lt);
+  const priceNum = Math.max(0, Math.floor(Number(input.priceMga) || 0));
+  let finalLat: string | null = null;
+  let finalLng: string | null = null;
+  if (input.pinLat != null && input.pinLng != null && isValidListingCoordinates(input.pinLat, input.pinLng)) {
+    finalLat = input.pinLat.toFixed(7);
+    finalLng = input.pinLng.toFixed(7);
+  }
+  const features = input.selectedFeatures.slice().sort();
+  return JSON.stringify({
+    title: input.title.trim(),
+    description: input.description.trim(),
+    price_mga: priceNum,
+    transaction: tx,
+    type: lt,
+    ville: input.ville.trim(),
+    arrondissement: input.arrondissement.trim(),
+    quartier: input.quartier.trim(),
+    quartier_libre: input.quartierLibre.trim(),
+    lat: finalLat,
+    lng: finalLng,
+    surface: input.surface ? Number(input.surface) || null : null,
+    rooms: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,
+    bathrooms: showRooms ? (input.bathrooms ? Number(input.bathrooms) || null : null) : null,
+    toilets: showRooms && input.toilets ? Number(input.toilets) || null : null,
+    features,
+    video_url: input.videoUrl.trim(),
+    virtual_tour_url: input.virtualTourUrl.trim(),
+    internal_ref: input.internalRef.trim(),
+    is_new_program: input.isNewProgram,
+    photos: photoIdsInOrder.join(","),
+    pending_photo_count: pendingPhotoCount,
+  });
+}
+
+/** Si vrai, l’annonce doit repasser en modération avant d’être publique à nouveau. */
+export function shouldSendPublishedListingToReview(params: {
+  moderationStatus: string | null | undefined;
+  baselineSnapshot: string;
+  currentSnapshot: string;
+}): boolean {
+  if (params.baselineSnapshot === params.currentSnapshot) return false;
+  const s = params.moderationStatus ?? "";
+  return (
+    s === "active" ||
+    s === "paused" ||
+    s === "pending_review" ||
+    s === "rejected" ||
+    s === "expired"
+  );
 }
 
 export async function uploadListingPhoto(listingId: string, file: File, position: number): Promise<ServerPhoto> {

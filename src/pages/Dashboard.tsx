@@ -365,6 +365,7 @@ const Dashboard = () => {
             deleteConfirm: t("dashboard.deleteConfirm", "Supprimer cette annonce ?"),
             deleteDesc: t("dashboard.deleteDesc", "Cette action est irréversible. L'annonce et toutes ses photos seront définitivement supprimées."),
             cancel: t("common.cancel"),
+            edit: t("dashboard.editListing", "Modifier"),
           }}
           onToggleStatus={(id, status) => toggleStatus.mutate({ id, status })}
           onDelete={(id) => deleteListing.mutate(id)}
