@@ -274,7 +274,7 @@ const Dashboard = () => {
   return (
     <>
       <Helmet>
-        <title>{t("dashboard.title")} — ImmoNex</title>
+        <title>{t("dashboard.title")} — AutoNex</title>
       </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-8 space-y-8">

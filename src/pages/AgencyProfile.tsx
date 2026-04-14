@@ -100,9 +100,9 @@ const AgencyProfile = () => {
     );
   }
   const canonical = buildCanonicalUrl(`/agence/${agency.slug}`);
-  const seoTitle = composePageTitle(`${agency.name} — Agence immobiliere`);
+  const seoTitle = composePageTitle(`${agency.name} — Concessionnaire automobile`);
   const seoDescription = truncateMetaDescription(
-    `${agency.name} : ${agency.bio || "agence immobiliere a Madagascar"} — ${listings.length} annonce${listings.length > 1 ? "s" : ""} active${listings.length > 1 ? "s" : ""}.`,
+    `${agency.name} : ${agency.bio || "concessionnaire automobile a Madagascar"} — ${listings.length} annonce${listings.length > 1 ? "s" : ""} active${listings.length > 1 ? "s" : ""}.`,
   );
   const seoImage = toAbsoluteUrl(agency.logo_url || "/placeholder.svg");
   const agencyJsonLd = {
@@ -137,7 +137,7 @@ const AgencyProfile = () => {
         {MONETIZATION_PLACEMENTS.agencyStrip && (
           <div className="mb-8">
             <BannerSlot
-              title="Visibilité agence sur ImmoNex"
+              title="Visibilité concessionnaire sur AutoNex"
               subtitle="Packages marque, spotlight et diffusion multi-villes — contact commercial pour un plan sur mesure."
               href="/publier"
               ctaLabel="Booster ma visibilité"

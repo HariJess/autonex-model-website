@@ -19,9 +19,9 @@ export interface SeedListing {
 }
 
 export const seedAgencies = [
-  { id: "ag1", name: "Ofim Madagascar", slug: "ofim-madagascar", bio: "Leader de l'immobilier à Madagascar depuis 2005. Plus de 500 biens en portefeuille.", logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=100&h=100&fit=crop", verified: true },
-  { id: "ag2", name: "Immobilier.mg", slug: "immobilier-mg", bio: "Votre partenaire immobilier de confiance sur toute l'île. Vente, location et gestion locative.", logo: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&h=100&fit=crop", verified: true },
-  { id: "ag3", name: "Nosy Be Properties", slug: "nosy-be-properties", bio: "Spécialiste de l'immobilier touristique et résidentiel à Nosy Be et les îles.", logo: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=100&h=100&fit=crop", verified: true },
+  { id: "ag1", name: "AutoCenter Madagascar", slug: "ofim-madagascar", bio: "Concessionnaire automobile à Madagascar. Véhicules neufs, occasions certifiées et accompagnement complet.", logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=100&h=100&fit=crop", verified: true },
+  { id: "ag2", name: "Drive Plus MG", slug: "immobilier-mg", bio: "Votre partenaire auto de confiance sur toute l'île. Achat, vente, reprise et financement.", logo: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&h=100&fit=crop", verified: true },
+  { id: "ag3", name: "Nosy Be Motors", slug: "nosy-be-properties", bio: "Spécialiste des véhicules premium, 4x4 et utilitaires à Nosy Be et dans les îles.", logo: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=100&h=100&fit=crop", verified: true },
 ];
 
 export const seedListings: SeedListing[] = [
@@ -115,19 +115,19 @@ export const seedBlogPosts: SeedBlogPost[] = [
   {
     id: "b5",
     slug: "frais-agence-immobiliere-madagascar",
-    title: "Frais d’agence immobilière à Madagascar : qui paie, combien, et à quel moment ?",
+    title: "Achat de voiture à Madagascar : budget, documents et points à vérifier",
     seoTitle:
-      "Frais d’agence immobilière à Madagascar : qui paie, combien et quand ? (guide pratique 2026)",
+      "Achat de voiture à Madagascar : budget, documents et vérifications clés (guide pratique 2026)",
     metaDescription:
-      "Guide clair sur les frais d’agence immobilière à Madagascar : commission vente, frais location, mandat exclusif ou simple, paiement et points à vérifier avant signature.",
+      "Guide clair pour acheter une voiture à Madagascar : budget global, documents à contrôler, essai, historique et vérifications avant achat.",
     excerpt:
-      "Honoraires, commission, mandat exclusif, location ou vente : ce guide explique les pratiques observées à Madagascar et ce que vous devez vérifier avant de vous engager.",
-    category: "Marché immobilier",
+      "Prix affiché, frais annexes, contrôle technique et papiers : ce guide vous aide à sécuriser votre achat automobile à Madagascar.",
+    category: "Achat auto",
     published_at: "2026-04-13",
     updated_at: "2026-04-13",
     readingTime: "10 min",
     cover: "/blog-covers/frais-agence-madagascar.jpg",
-    coverAlt: "Frais d’agence immobilière à Madagascar",
+    coverAlt: "Achat de voiture à Madagascar",
     tags: [
       "frais d’agence immobilière Madagascar",
       "commission agence immobilière Madagascar",
@@ -265,18 +265,18 @@ export const seedBlogPosts: SeedBlogPost[] = [
   {
     id: "b1",
     slug: "acheter-terrain-madagascar",
-    title: "Acheter un terrain à Madagascar : ce qu'il faut savoir",
-    seoTitle: "Acheter un terrain à Madagascar : guide pratique 2026 (étapes, frais, pièges)",
+    title: "Voiture d’occasion à Madagascar : checklist avant de signer",
+    seoTitle: "Voiture d’occasion à Madagascar : guide pratique 2026 (contrôles, documents, pièges)",
     metaDescription:
-      "Guide complet pour acheter un terrain à Madagascar : CSJ, vérifications cadastrales, acte de vente, enregistrement, mutation, budget et checklist acheteur.",
+      "Guide complet pour acheter une voiture d’occasion à Madagascar : contrôles mécaniques, documents, historique, prix et checklist acheteur.",
     excerpt:
-      "Avant de signer, sécurisez votre achat avec une méthode claire : documents à vérifier, étapes officielles, coûts à anticiper et erreurs fréquentes à éviter.",
-    category: "Acheter",
+      "Avant de signer, sécurisez votre achat auto avec une méthode claire : contrôles techniques, documents et coûts à anticiper.",
+    category: "Occasion",
     published_at: "2026-03-15",
     updated_at: "2026-04-13",
     readingTime: "12 min",
     cover: "/blog-covers/terrain-madagascar.jpg",
-    coverAlt: "Achat immobilier à Madagascar",
+    coverAlt: "Voiture d’occasion à Madagascar",
     tags: ["terrain", "achat", "cadastre", "mutation", "notaire", "immobilier madagascar"],
     intro:
       "Acheter un terrain à Madagascar peut être une excellente décision patrimoniale, à condition de respecter une discipline stricte de vérification. Dans la pratique, la plupart des litiges viennent d’un contrôle documentaire insuffisant ou d’un enchaînement d’étapes mal exécuté. Ce guide vous donne une feuille de route concrète pour avancer avec méthode.",
@@ -366,18 +366,18 @@ export const seedBlogPosts: SeedBlogPost[] = [
   {
     id: "b2",
     slug: "fiscalite-immobiliere-madagascar-2026",
-    title: "Fiscalité immobilière à Madagascar 2026",
-    seoTitle: "Fiscalité immobilière à Madagascar 2026 : impôts, taxes et points de vigilance",
+    title: "Financement auto à Madagascar en 2026",
+    seoTitle: "Financement auto à Madagascar en 2026 : crédit, apport, assurance et points de vigilance",
     metaDescription:
-      "Comprendre la fiscalité immobilière à Madagascar en 2026 : IFT, IFPB, location, détention, revente, documents à vérifier et logique de budget.",
+      "Comprendre le financement automobile à Madagascar en 2026 : apport, mensualités, assurance, coûts cachés et budget réaliste.",
     excerpt:
-      "Un guide pratique pour anticiper les taxes immobilières à Madagascar sans confusion : achat, détention, location, revente et vérifications clés avant transaction.",
-    category: "Fiscalité",
+      "Un guide pratique pour anticiper le coût total d’un véhicule sans confusion : crédit, assurance, entretien et vérifications clés avant engagement.",
+    category: "Financement",
     published_at: "2026-02-28",
     updated_at: "2026-04-13",
     readingTime: "11 min",
     cover: "/blog-covers/fiscalite-madagascar.jpg",
-    coverAlt: "Fiscalité immobilière à Madagascar",
+    coverAlt: "Financement auto à Madagascar",
     tags: ["fiscalité", "IFT", "IFPB", "location", "revente", "DGI"],
     intro:
       "La fiscalité immobilière influence directement la rentabilité d’un bien. Le bon réflexe est de raisonner en cycle de vie : achat, détention, location éventuelle, puis revente ou transmission. Ce guide vous donne un cadre clair pour budgéter et éviter les mauvaises surprises.",

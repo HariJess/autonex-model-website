@@ -27,7 +27,7 @@ export function SponsoredNativeCard({ className, enabled = true }: SponsoredNati
           Campagne partenaire
         </p>
         <p className="mt-2 text-sm text-muted-foreground font-sans leading-relaxed">
-          Format natif réservé aux marques et services partenaires sélectionnés par ImmoNex.
+          Format natif réservé aux marques et services partenaires sélectionnés par AutoNex.
         </p>
       </div>
     </div>

@@ -29,10 +29,10 @@ const AgenciesListPage = () => {
   return (
     <>
       <Helmet>
-        <title>{t("agencies.title")} — ImmoNex</title>
+        <title>{t("agencies.title")} — AutoNex</title>
         <meta
           name="description"
-          content="Annuaire des agences immobilières à Madagascar : comparez les agences, consultez leurs annonces et contactez-les directement."
+          content="Annuaire des concessionnaires à Madagascar : comparez les professionnels, consultez leurs annonces et contactez-les directement."
         />
         <link rel="canonical" href={canonical} />
       </Helmet>

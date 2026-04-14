@@ -74,7 +74,7 @@ const AuthCallback = () => {
   return (
     <>
       <Helmet>
-        <title>Connexion — ImmoNex</title>
+        <title>Connexion — AutoNex</title>
       </Helmet>
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-4">
         {!error ? (

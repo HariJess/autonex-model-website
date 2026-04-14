@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {/* Brand */}
           <div className="space-y-4">
-            <img src={logo} alt="ImmoNex" className="h-10" />
+            <img src={logo} alt="AutoNex" className="h-10" />
             <p className="text-sm opacity-70 font-sans">
               {t("footer.tagline")}
             </p>

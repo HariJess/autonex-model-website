@@ -40,7 +40,7 @@ const LISTING_WHATSAPP_BUTTON_CLASS =
 
 function listingWhatsAppPrefill(title: string): string {
   const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
-  return `Bonjour, je vous contacte au sujet de votre annonce sur ImmoNex « ${short} ».`;
+  return `Bonjour, je vous contacte au sujet de votre annonce sur AutoNex « ${short} ».`;
 }
 
 const ListingDetail = () => {

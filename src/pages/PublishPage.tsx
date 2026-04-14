@@ -1126,7 +1126,7 @@ const PublishPage = () => {
     <>
       <Helmet>
         <title>
-          {(isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title"))} — ImmoNex
+          {(isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title"))} — AutoNex
         </title>
       </Helmet>
       <Header />
@@ -1134,7 +1134,7 @@ const PublishPage = () => {
         <PublishPageHeader
           moderationText={t(
             "publish.moderationBanner",
-            "ImmoNex vérifie chaque annonce avant publication. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français.",
+            "AutoNex vérifie chaque annonce avant publication. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français.",
           )}
           publishCreditCost={LISTING_PUBLISH_CREDIT_COST}
           title={isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title")}

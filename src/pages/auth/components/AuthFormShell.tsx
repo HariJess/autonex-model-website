@@ -13,7 +13,7 @@ export function AuthFormShell({ title, maxWidthClassName, children }: AuthFormSh
   return (
     <>
       <Helmet>
-        <title>{title} — ImmoNex</title>
+        <title>{title} — AutoNex</title>
       </Helmet>
       <Header />
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-10 md:py-16">

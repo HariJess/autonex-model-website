@@ -13,7 +13,7 @@ interface FeaturedAgenciesSectionProps {
 }
 
 export function FeaturedAgenciesSection({
-  title = "Agences partenaires",
+  title = "Concessionnaires partenaires",
   enabled = true,
   limit = 12,
   variant = "page",
@@ -70,7 +70,7 @@ export function FeaturedAgenciesSection({
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       ) : agencies.length === 0 ? (
-        <p className="text-center text-muted-foreground font-sans">Les agences inscrites apparaîtront ici.</p>
+        <p className="text-center text-muted-foreground font-sans">Les concessionnaires inscrits apparaîtront ici.</p>
       ) : (
         <div className="flex flex-wrap justify-center gap-8 md:gap-10">
           {agencies.map((agency) => (

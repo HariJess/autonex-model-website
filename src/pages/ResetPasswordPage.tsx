@@ -57,7 +57,7 @@ const ResetPasswordPage = () => {
 
   return (
     <>
-      <Helmet><title>{t("auth.resetPassword")} — ImmoNex</title></Helmet>
+      <Helmet><title>{t("auth.resetPassword")} — AutoNex</title></Helmet>
       <Header />
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm space-y-6">

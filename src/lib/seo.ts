@@ -31,5 +31,5 @@ export function truncateMetaDescription(input: string, maxLength = 160): string 
 }
 
 export function composePageTitle(pageTitle: string): string {
-  return `${pageTitle} — ImmoNex`;
+  return `${pageTitle} — AutoNex`;
 }

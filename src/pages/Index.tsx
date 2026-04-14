@@ -15,7 +15,7 @@ import { PremiumBillboard } from "@/components/monetization/PremiumBillboard";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
-import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
+import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 
@@ -23,9 +23,9 @@ const Index = () => {
   const { t } = useTranslation();
   const cityImageFallback = "/placeholder.svg";
   const canonical = buildCanonicalUrl("/");
-  const seoTitle = composePageTitle("ImmoNex Madagascar — Portail immobilier N°1");
+  const seoTitle = "AutoNex — Automobile à Madagascar";
   const seoDescription = truncateMetaDescription(
-    "ImmoNex, portail immobilier a Madagascar : annonces de vente et location, agences verifiees et conseils pratiques pour acheter, louer ou investir.",
+    "AutoNex : annonces automobiles à Madagascar — achat, vente, voitures, 4x4, motos et utilitaires.",
   );
   const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
   const { data: listings = [], isLoading, error: listingsError } = useDbListings({ limit: 8 });
@@ -85,7 +85,7 @@ const Index = () => {
         <section className="container mx-auto px-4 py-6">
           <BannerSlot
             title="Format partenaire natif"
-            subtitle="Format sponsorisé intégré au flux, réservé aux campagnes partenaires gérées par ImmoNex."
+            subtitle="Format sponsorisé intégré au flux, réservé aux campagnes partenaires gérées par AutoNex."
           />
         </section>
       )}

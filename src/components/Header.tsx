@@ -29,7 +29,7 @@ const Header = () => {
     <header className="sticky top-0 z-50" style={{ backgroundColor: "#0A0A0A" }}>
       <div className="container mx-auto px-4 flex items-center justify-between h-16 sm:h-[4.25rem]">
         <Link to="/" className="flex-shrink-0">
-          <img src={logo} alt="ImmoNex" className="h-10 sm:h-12" />
+        <img src={logo} alt="AutoNex" className="h-10 sm:h-12" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6">

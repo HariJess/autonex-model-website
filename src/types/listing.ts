@@ -21,30 +21,30 @@ export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly ListingType[] = [
 ] as const;
 
 export const LISTING_TYPE_LABELS: Record<ListingType, string> = {
-  appartement: "Appartement",
-  villa: "Villa",
-  maison: "Maison",
-  terrain: "Terrain",
-  local_commercial: "Local commercial",
-  bureau: "Bureau",
+  appartement: "Citadine",
+  villa: "SUV / 4x4",
+  maison: "Berline",
+  terrain: "Moto",
+  local_commercial: "Utilitaire",
+  bureau: "Camion",
 };
 
 export const LISTING_TYPE_LABELS_PLURAL: Record<ListingType, string> = {
-  appartement: "Appartements",
-  villa: "Villas",
-  maison: "Maisons",
-  terrain: "Terrains",
-  local_commercial: "Locaux commerciaux",
-  bureau: "Bureaux",
+  appartement: "Citadines",
+  villa: "SUV / 4x4",
+  maison: "Berlines",
+  terrain: "Motos",
+  local_commercial: "Utilitaires",
+  bureau: "Camions",
 };
 
 export const TRANSACTION_TYPES = ["vente", "location", "location_vacances"] as const;
 export type TransactionType = (typeof TRANSACTION_TYPES)[number];
 
 export const TRANSACTION_LABELS: Record<TransactionType, string> = {
-  vente: "Vente",
-  location: "Location",
-  location_vacances: "Vacances / courte durée",
+  vente: "Acheter",
+  location: "Vendre",
+  location_vacances: "Location / courte durée",
 };
 
 /**

@@ -24,10 +24,10 @@ const BlogList = () => {
   return (
     <>
       <Helmet>
-        <title>{t("nav.advice")} — ImmoNex</title>
+        <title>{t("nav.advice")} — AutoNex</title>
         <meta
           name="description"
-          content="Conseils immobiliers à Madagascar : achat, location, fiscalité, investissement et guides pratiques pour décider avec méthode."
+          content="Conseils auto à Madagascar : achat, vente, entretien, financement et guides pratiques pour choisir votre véhicule."
         />
         <link rel="canonical" href={canonical} />
       </Helmet>
@@ -109,7 +109,7 @@ const BlogArticle = () => {
   return (
     <>
       <Helmet>
-        <title>{post.seoTitle} — ImmoNex</title>
+        <title>{post.seoTitle} — AutoNex</title>
         <meta name="description" content={post.metaDescription} />
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="article" />
@@ -131,8 +131,8 @@ const BlogArticle = () => {
             datePublished: post.published_at,
             dateModified: post.updated_at,
             mainEntityOfPage: canonical,
-            author: { "@type": "Organization", name: "ImmoNex" },
-            publisher: { "@type": "Organization", name: "ImmoNex" },
+            author: { "@type": "Organization", name: "AutoNex" },
+            publisher: { "@type": "Organization", name: "AutoNex" },
             keywords: post.tags.join(", "),
           })}
         </script>

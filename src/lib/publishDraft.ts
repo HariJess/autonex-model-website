@@ -5,7 +5,7 @@ import { getRegionForVille } from "@/data/madagascar-locations";
 import type { PurchasableBoostType } from "@/config/monetization";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 
-export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — ImmoNex";
+export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
 
 const LOCAL_KEY_PREFIX = "immonex.publishDraft.v1";
 

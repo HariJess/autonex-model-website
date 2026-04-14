@@ -328,7 +328,7 @@ const SearchPage = () => {
     if (filters.types.length === 1) {
       parts.push(LISTING_TYPE_LABELS_PLURAL[filters.types[0] as keyof typeof LISTING_TYPE_LABELS_PLURAL] || filters.types[0]);
     } else {
-      parts.push(t("search.properties", "Biens immobiliers"));
+      parts.push(t("search.properties", "Véhicules"));
     }
     if (filters.transaction === "vente") parts.push(t("search.forSale", "à vendre"));
     else if (filters.transaction === "location") parts.push(t("search.forRent", "à louer"));
@@ -341,7 +341,7 @@ const SearchPage = () => {
     const typePart =
       filters.types.length === 1
         ? LISTING_TYPE_LABELS_PLURAL[filters.types[0] as keyof typeof LISTING_TYPE_LABELS_PLURAL] || filters.types[0]
-        : "biens immobiliers";
+        : "vehicules";
     const transactionPart =
       filters.transaction === "vente"
         ? "a vendre"
@@ -352,7 +352,7 @@ const SearchPage = () => {
             : "";
     const cityPart = filters.ville ? ` a ${filters.ville}` : " a Madagascar";
     return truncateMetaDescription(
-      `Consultez les ${typePart} ${transactionPart}${cityPart} sur ImmoNex, avec des filtres par prix, surface, quartiers et equipements.`,
+      `Consultez les ${typePart} ${transactionPart}${cityPart} sur AutoNex, avec des filtres par prix, budget et localisation.`,
     );
   }, [filters]);
   const canonicalSearch = useMemo(() => {
@@ -463,7 +463,7 @@ const SearchPage = () => {
             <SidebarPromoSlot />
             {MONETIZATION_PLACEMENTS.searchFeaturedAgencies && (
               <div className="mt-6">
-                <FeaturedAgenciesSection title={t("search.partnerAgencies", "Agences partenaires")} variant="embedded" limit={6} />
+                <FeaturedAgenciesSection title={t("search.partnerAgencies", "Concessionnaires partenaires")} variant="embedded" limit={6} />
               </div>
             )}
           </aside>
@@ -515,18 +515,18 @@ const SearchPage = () => {
                   </div>
                   <div className="min-w-0 space-y-1.5">
                     <p className="font-sans text-sm font-semibold text-foreground leading-snug">
-                      {t("search.noExactMatchTitle", "Aucun bien ne correspond exactement à votre recherche.")}
+                      {t("search.noExactMatchTitle", "Aucun véhicule ne correspond exactement à votre recherche.")}
                     </p>
                     <p className="font-sans text-sm text-muted-foreground leading-relaxed">
                       {t(
                         "search.similarIntro",
-                        "Voici des biens similaires susceptibles de vous intéresser (même ville, critères assouplis).",
+                        "Voici des véhicules similaires susceptibles de vous intéresser (même ville, critères assouplis).",
                       )}
                     </p>
                     <p className="font-sans text-xs text-muted-foreground/90 pt-0.5">
                       {t(
                         "search.similarResultsBadgeHint",
-                        "Chaque carte indique pourquoi le bien est proposé (budget, zone, etc.).",
+                        "Chaque carte indique pourquoi le véhicule est proposé (budget, zone, etc.).",
                       )}
                     </p>
                   </div>
