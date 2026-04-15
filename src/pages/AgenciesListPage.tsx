@@ -39,7 +39,10 @@ const AgenciesListPage = () => {
       </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-6 md:py-8">
-        <h1 className="font-serif text-3xl font-bold mb-8">{t("agencies.pageTitle")}</h1>
+        <h1 className="font-serif text-3xl font-bold mb-2">Concessionnaires AutoNex</h1>
+        <p className="text-sm md:text-base text-muted-foreground font-sans mb-8">
+          Retrouvez nos partenaires officiels et les concessionnaires presents sur la plateforme.
+        </p>
 
         {error && (
           <div className="flex items-center gap-2 text-destructive mb-4">
@@ -56,10 +59,13 @@ const AgenciesListPage = () => {
           <div className="space-y-8">
             {PARTNER_DEALERS.length > 0 && (
               <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
-                <div className="flex items-center justify-between gap-3 mb-4">
-                  <h2 className="font-serif text-xl font-bold">Concessionnaires partenaires</h2>
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <h2 className="font-serif text-xl font-bold">Partenaires officiels AutoNex</h2>
                   <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>
                 </div>
+                <p className="text-sm text-muted-foreground font-sans mb-4">
+                  Des concessionnaires selectionnes et mis en avant par AutoNex.
+                </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {PARTNER_DEALERS.map((dealer) => (
                     <Link
@@ -88,10 +94,13 @@ const AgenciesListPage = () => {
             )}
 
             <section>
-              <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.pageTitle")}</h2>
+              <h2 className="font-serif text-xl font-bold mb-1">Annuaire des concessionnaires</h2>
+              <p className="text-sm text-muted-foreground font-sans mb-4">
+                Tous les concessionnaires references sur AutoNex.
+              </p>
               {agencies.length === 0 ? (
                 <p className="text-center text-muted-foreground font-sans py-8">
-                  {t("agencies.noDirectoryAgencies", "Aucun concessionnaire inscrit dans l'annuaire pour le moment.")}
+                  {t("agencies.noDirectoryAgencies", "Aucun concessionnaire inscrit dans l’annuaire pour le moment.")}
                 </p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
