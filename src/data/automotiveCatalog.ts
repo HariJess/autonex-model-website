@@ -68,7 +68,7 @@ export type AutoHomepageBrand = {
 
 export const AUTO_TRANSACTION_MODES = [
   { id: "acheter", label: "Acheter", href: "/recherche?transaction=vente" },
-  { id: "vendre", label: "Vendre", href: "/recherche?transaction=location" },
+  { id: "louer", label: "Louer", href: "/recherche?transaction=location" },
   { id: "location_courte", label: "Louer court terme", href: "/recherche?transaction=location_vacances" },
   { id: "location_longue", label: "Louer long terme", href: "/recherche?transaction=location&rental_term=longue" },
   { id: "concessionnaires", label: "Concessionnaires", href: "/agences" },

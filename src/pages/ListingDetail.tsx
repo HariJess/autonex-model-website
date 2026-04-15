@@ -26,6 +26,7 @@ import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescrip
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
+import BrandLogo from "@/components/BrandLogo";
 import {
   formatVehicleDoors,
   formatVehicleMileage,
@@ -36,6 +37,7 @@ import {
   getVehicleMileageValue,
   getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
+import { sanitizeListingEquipment } from "@/data/listing-equipment";
 import type { DisplayListing } from "@/types/listing";
 import {
   ListingSponsorBlock,
@@ -387,6 +389,7 @@ const ListingDetail = () => {
   const contactTrustHints = buildContactTrustHints(listing, sellerLabel, t);
   const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);
   const displayedPhone = getDisplayedPhone(phoneRevealed, revealedPhone, listing, t);
+  const listingFeatureBadges = sanitizeListingEquipment(listing.features);
   const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
   const listingTitle = composePageTitle(displayTitle);
   const listingDescription = truncateMetaDescription(
@@ -547,6 +550,17 @@ const ListingDetail = () => {
               {vehicleSummary && (
                 <p className="text-sm text-muted-foreground font-sans mb-1">{vehicleSummary}</p>
               )}
+              {listing.vehicle?.make && (
+                <div className="mb-3 inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card px-2.5 py-1.5">
+                  <BrandLogo
+                    brand={listing.vehicle.make}
+                    className="h-8 w-12 rounded-md bg-background"
+                    imgClassName="max-h-5"
+                    showFallbackLabel={false}
+                  />
+                  <span className="text-xs font-medium font-sans text-muted-foreground">Marque: {listing.vehicle.make}</span>
+                </div>
+              )}
               {listing.internal_ref && isOwner && (
                 <p className="text-xs text-muted-foreground font-sans mb-1">
                   {t("listing.internalRef", "Réf. interne : {{ref}}", { ref: listing.internal_ref })}
@@ -627,11 +641,11 @@ const ListingDetail = () => {
               </div>
             )}
 
-            {listing.features.length > 0 && (
+            {listingFeatureBadges.length > 0 && (
               <div>
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
                 <div className="grid grid-cols-2 gap-2">
-                  {listing.features.map((f) => (
+                  {listingFeatureBadges.map((f) => (
                     <div key={f} className="flex items-center gap-2 text-sm font-sans">
                       <Check className="h-4 w-4 text-success" /> {f}
                     </div>

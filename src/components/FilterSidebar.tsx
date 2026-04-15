@@ -24,6 +24,7 @@ import {
   AUTO_SEARCH_SELLER_OPTIONS,
   AUTO_SEARCH_TRANSMISSION_OPTIONS,
 } from "@/data/automotiveCatalog";
+import BrandLogo from "@/components/BrandLogo";
 
 export type { SearchFilters };
 
@@ -250,9 +251,18 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                         type="button"
                         variant="outline"
                         size="sm"
-                        className={cn("text-xs h-8 px-2.5", filters.brands.includes(brand) ? "border-primary bg-primary/10 text-primary" : "")}
+                        className={cn(
+                          "h-8 gap-1.5 px-2.5 text-xs",
+                          filters.brands.includes(brand) ? "border-primary bg-primary/10 text-primary" : "",
+                        )}
                         onClick={() => update({ brands: toggleInArray(filters.brands, brand) })}
                       >
+                        <BrandLogo
+                          brand={brand}
+                          className="h-6 w-8 rounded-sm bg-background"
+                          imgClassName="max-h-4"
+                          labelClassName="text-[9px]"
+                        />
                         {brand}
                       </Button>
                     ))}

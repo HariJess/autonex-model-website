@@ -107,6 +107,14 @@ const PublishStepVisibility = ({
 }: PublishStepVisibilityProps) => {
   const { t } = useTranslation();
   const publishAllowed = editMode || canPublishWithCredits;
+  const transactionLabel =
+    transaction === "vente"
+      ? "Vendre"
+      : transaction === "location"
+        ? "Louer"
+        : transaction === "location_vacances"
+          ? "Location courte durée"
+          : "—";
 
   return (
     <div className="space-y-5 pb-2">
@@ -264,7 +272,7 @@ const PublishStepVisibility = ({
         <CardContent className="font-sans text-sm space-y-1 text-muted-foreground">
           <p><strong className="text-foreground">{title || "—"}</strong></p>
           <p>
-            {listingType ? LISTING_TYPE_LABELS[listingType as ListingType] : ""} · {transaction} · {ville}
+            {listingType ? LISTING_TYPE_LABELS[listingType as ListingType] : ""} · {transactionLabel} · {ville}
           </p>
           <p>
             {photoCount} {t("publish.photoCount", "photo(s)")}

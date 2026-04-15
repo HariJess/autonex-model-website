@@ -4,14 +4,14 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { ListingType, TransactionType } from "@/types/listing";
-import { LISTING_TYPE_LABELS } from "@/types/listing";
+import type { TransactionType } from "@/types/listing";
+import type { HeroVehicleTypeOption } from "@/data/automotiveCatalog";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 
 type PublishBasicInfoSectionProps = {
   transaction: TransactionType | "";
-  listingType: ListingType | "";
-  typeOptions: ListingType[];
+  vehicleTypeId: string;
+  vehicleTypeOptions: HeroVehicleTypeOption[];
   isNewProgram: boolean;
   internalRef: string;
   ville: string;
@@ -30,12 +30,13 @@ type PublishBasicInfoSectionProps = {
     mapNeedVille: string;
     mapNoCoordsForCity: string;
     select: string;
-    sale: string;
-    rental: string;
-    vacationRental: string;
+    sell: string;
+    rent: string;
+    shortTermRental: string;
+    transactionHint: string;
   };
   onTransactionChange: (value: TransactionType) => void;
-  onListingTypeChange: (value: ListingType) => void;
+  onVehicleTypeChange: (value: string) => void;
   onNewProgramChange: (value: boolean) => void;
   onInternalRefChange: (value: string) => void;
   onVilleChange: (value: string) => void;
@@ -47,8 +48,8 @@ type PublishBasicInfoSectionProps = {
 
 export function PublishBasicInfoSection({
   transaction,
-  listingType,
-  typeOptions,
+  vehicleTypeId,
+  vehicleTypeOptions,
   isNewProgram,
   internalRef,
   ville,
@@ -59,7 +60,7 @@ export function PublishBasicInfoSection({
   pinLng,
   labels,
   onTransactionChange,
-  onListingTypeChange,
+  onVehicleTypeChange,
   onNewProgramChange,
   onInternalRefChange,
   onVilleChange,
@@ -72,31 +73,29 @@ export function PublishBasicInfoSection({
     <div className="space-y-5 form-surface">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="font-sans">Transaction *</Label>
+          <Label className="font-sans">Type de transaction *</Label>
           <Select value={transaction} onValueChange={(v) => onTransactionChange(v as TransactionType)}>
             <SelectTrigger className="font-sans">
               <SelectValue placeholder={labels.select} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="vente">{labels.sale}</SelectItem>
-              <SelectItem value="location">{labels.rental}</SelectItem>
-              <SelectItem value="location_vacances">{labels.vacationRental}</SelectItem>
+              <SelectItem value="vente">{labels.sell}</SelectItem>
+              <SelectItem value="location">{labels.rent}</SelectItem>
+              <SelectItem value="location_vacances">{labels.shortTermRental}</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground font-sans">
-            Modes couverts: achat/vente, location courte ou longue durée (via options annonce), import et offre concessionnaire.
-          </p>
+          <p className="text-xs text-muted-foreground font-sans">{labels.transactionHint}</p>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.propertyType} *</Label>
-          <Select value={listingType} onValueChange={(v) => onListingTypeChange(v as ListingType)} disabled={!transaction}>
+          <Select value={vehicleTypeId} onValueChange={onVehicleTypeChange} disabled={!transaction}>
             <SelectTrigger className="font-sans">
               <SelectValue placeholder={labels.select} />
             </SelectTrigger>
             <SelectContent>
-              {typeOptions.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {LISTING_TYPE_LABELS[type]}
+              {vehicleTypeOptions.map((typeOption) => (
+                <SelectItem key={typeOption.id} value={typeOption.id}>
+                  {typeOption.label}
                 </SelectItem>
               ))}
             </SelectContent>

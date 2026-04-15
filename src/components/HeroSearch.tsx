@@ -16,6 +16,7 @@ import type { SearchFilters } from "@/types/search";
 import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BRANDS, resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
+import BrandLogo from "@/components/BrandLogo";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -317,6 +318,12 @@ const HeroSearch = () => {
                         {visibleTopBrands.map((b) => (
                           <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
                             <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
+                            <BrandLogo
+                              brand={b}
+                              className="h-7 w-10 rounded-md bg-background"
+                              imgClassName="max-h-4"
+                              labelClassName="text-[10px]"
+                            />
                             <span>{b}</span>
                           </label>
                         ))}
@@ -497,6 +504,12 @@ const HeroSearch = () => {
                       {visibleTopBrands.map((b) => (
                         <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
                           <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
+                          <BrandLogo
+                            brand={b}
+                            className="h-8 w-12 rounded-md bg-background"
+                            imgClassName="max-h-5"
+                            labelClassName="text-[10px]"
+                          />
                           <span>{b}</span>
                         </label>
                       ))}

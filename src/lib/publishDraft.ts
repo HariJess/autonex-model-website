@@ -32,6 +32,8 @@ const CONTROLLED_BODY_STYLE_VALUES = [
   "scooter",
   "quad",
   "buggy",
+  "electrique",
+  "hybride",
 ] as const;
 const CONTROLLED_AVAILABILITY_VALUES = ["disponible", "reserve", "vendu", "en_arrivage"] as const;
 
@@ -402,6 +404,8 @@ export function formToListingUpdate(input: {
       scooter: "scooter",
       quad: "quad",
       buggy: "buggy",
+      electrique: "electrique",
+      hybride: "hybride",
     }) ?? normalizeText(input.vehicleBodyStyle, 60);
   const exteriorColor = normalizeText(input.vehicleExteriorColor, 40);
   const interiorColor = normalizeText(input.vehicleInteriorColor, 40);

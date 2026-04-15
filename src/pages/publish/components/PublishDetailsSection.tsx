@@ -60,6 +60,8 @@ const BODY_STYLE_OPTIONS = [
   { value: "scooter", label: "Scooter" },
   { value: "quad", label: "Quad" },
   { value: "buggy", label: "Buggy" },
+  { value: "electrique", label: "Électrique" },
+  { value: "hybride", label: "Hybride" },
 ];
 
 const AVAILABILITY_OPTIONS = [

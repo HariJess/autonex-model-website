@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { type ListingType, type TransactionType } from "@/types/listing";
 import { getRegionForVille, getSuggestedListingCoordinates } from "@/data/madagascar-locations";
-import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
+import { LISTING_EQUIPMENT_OPTIONS, sanitizeListingEquipment } from "@/data/listing-equipment";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import {
   listingTypesForTransaction,
@@ -66,6 +66,10 @@ import { PublishMediaSection } from "@/pages/publish/components/PublishMediaSect
 import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { buildVehicleMetaTags, parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
+import {
+  AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
+  inferVehicleTypeOptionIdFromFilters,
+} from "@/data/automotiveCatalog";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
@@ -164,6 +168,27 @@ const PublishPage = () => {
 
   const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
   const typeOptions = listingTypesForTransaction(transaction);
+  const publishVehicleTypeOptions = useMemo(() => {
+    const allowed = new Set(typeOptions);
+    return AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((option) => {
+      if (!option.listingTypes?.length) return true;
+      return option.listingTypes.some((listingTypeOption) => allowed.has(listingTypeOption as ListingType));
+    });
+  }, [typeOptions]);
+  const selectedPublishVehicleTypeId = useMemo(() => {
+    if (vehicleBodyStyle && publishVehicleTypeOptions.some((opt) => opt.id === vehicleBodyStyle)) {
+      return vehicleBodyStyle;
+    }
+    const inferred = inferVehicleTypeOptionIdFromFilters({
+      types: listingType ? [listingType] : [],
+      modelQuery: vehicleBodyStyle,
+      fuels: vehicleFuel ? [vehicleFuel] : [],
+    });
+    if (inferred && publishVehicleTypeOptions.some((opt) => opt.id === inferred)) {
+      return inferred;
+    }
+    return "";
+  }, [vehicleBodyStyle, publishVehicleTypeOptions, listingType, vehicleFuel]);
 
   const { data: creditPacks = [] } = useQuery({
     queryKey: ["credit-packs"],
@@ -201,7 +226,7 @@ const PublishPage = () => {
     setRooms(fs.rooms);
     setBathrooms(fs.bathrooms);
     setToilets(fs.toilets);
-    setSelectedFeatures(fs.selectedFeatures);
+    setSelectedFeatures(sanitizeListingEquipment(fs.selectedFeatures));
     const meta = parseVehicleMetaTags(
       Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
     );
@@ -823,6 +848,7 @@ const PublishPage = () => {
   const canPublishWithCredits = !creditsBalancePending && creditsBalance >= totalCost;
 
   const toggleFeature = (f: string) => {
+    if (!LISTING_EQUIPMENT_OPTIONS.includes(f)) return;
     setSelectedFeatures((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
   };
 
@@ -832,7 +858,7 @@ const PublishPage = () => {
 
   const selectedFeaturesWithVehicleMeta = useMemo(
     () => [
-      ...selectedFeatures,
+      ...sanitizeListingEquipment(selectedFeatures),
       ...buildVehicleMetaTags({
         make: vehicleMake,
         model: vehicleModel,
@@ -1434,8 +1460,8 @@ const PublishPage = () => {
         {step === 0 && (
           <PublishBasicInfoSection
             transaction={transaction}
-            listingType={listingType}
-            typeOptions={typeOptions}
+            vehicleTypeId={selectedPublishVehicleTypeId}
+            vehicleTypeOptions={publishVehicleTypeOptions}
             isNewProgram={isNewProgram}
             internalRef={internalRef}
             ville={ville}
@@ -1454,9 +1480,10 @@ const PublishPage = () => {
               mapNeedVille: t("publish.mapNeedVille", "Choisissez d’abord une ville."),
               mapNoCoordsForCity: t("publish.mapNoCoordsForCity", "Impossible de placer la carte pour cette ville. Vérifiez le nom ou contactez le support."),
               select: t("common.select"),
-              sale: t("search.sale", "Vente"),
-              rental: t("search.rental", "Location"),
-              vacationRental: t("search.vacationRental", "Vacances / courte durée"),
+              sell: "Vendre",
+              rent: "Louer",
+              shortTermRental: "Location courte durée",
+              transactionHint: "Définissez le mode de commercialisation de votre annonce (vente, location, ou courte durée).",
             }}
             onTransactionChange={(v) => {
               setTransaction(v);
@@ -1464,8 +1491,36 @@ const PublishPage = () => {
                 const allowed = new Set(listingTypesForTransaction(v));
                 return allowed.has(prev as ListingType) ? prev : "";
               });
+              setVehicleBodyStyle((prev) => {
+                if (!prev) return prev;
+                const nextOptions = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((option) => {
+                  if (!option.listingTypes?.length) return true;
+                  const allowed = new Set(listingTypesForTransaction(v));
+                  return option.listingTypes.some((listingTypeOption) => allowed.has(listingTypeOption as ListingType));
+                });
+                return nextOptions.some((option) => option.id === prev) ? prev : "";
+              });
             }}
-            onListingTypeChange={setListingType}
+            onVehicleTypeChange={(vehicleTypeId) => {
+              const option = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((entry) => entry.id === vehicleTypeId);
+              const allowed = new Set(typeOptions);
+              const mappedType =
+                option?.listingTypes?.find((entry) => allowed.has(entry as ListingType)) ?? null;
+
+              setVehicleBodyStyle(vehicleTypeId);
+              if (mappedType) {
+                setListingType(mappedType as ListingType);
+              } else if (!listingType) {
+                setListingType(typeOptions[0] ?? "");
+              }
+              if (option?.fuels?.length) {
+                setVehicleFuel(option.fuels[0]);
+                const isElectric = option.fuels.includes("Électrique");
+                const isHybrid = option.fuels.some((fuelOption) => fuelOption.includes("Hybride"));
+                setVehicleIsElectric(isElectric);
+                setVehicleIsHybrid(isHybrid);
+              }
+            }}
             onNewProgramChange={setIsNewProgram}
             onInternalRefChange={setInternalRef}
             onVilleChange={setVille}

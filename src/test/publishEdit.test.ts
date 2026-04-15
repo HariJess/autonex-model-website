@@ -23,7 +23,7 @@ const baseForm = {
   rooms: "3",
   bathrooms: "2",
   toilets: "",
-  selectedFeatures: ["Balcon", "Parking"],
+  selectedFeatures: ["Bluetooth", "Camera de recul"],
   videoUrl: "",
   virtualTourUrl: "",
 };

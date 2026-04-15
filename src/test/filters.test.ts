@@ -60,7 +60,7 @@ describe("Filter URL serialization", () => {
       priceMin: 1000000,
       priceMax: 50000000,
       rooms: [2, 3],
-      equipments: ["Piscine"],
+      equipments: ["Bluetooth"],
     };
 
     const params = filtersToParams(original);
@@ -72,7 +72,7 @@ describe("Filter URL serialization", () => {
     expect(restored.priceMin).toBe(1000000);
     expect(restored.priceMax).toBe(50000000);
     expect(restored.rooms).toEqual([2, 3]);
-    expect(restored.equipments).toEqual(["Piscine"]);
+    expect(restored.equipments).toEqual(["Bluetooth"]);
   });
 
   it("handles empty filters", () => {
