@@ -35,7 +35,7 @@ const LocationPicker = ({
   return (
     <div className={`space-y-4 ${compact ? "" : ""}`}>
       <div className="space-y-2">
-        {!compact && <Label className="font-sans text-sm">Ville</Label>}
+        {!compact && <Label className="font-sans text-sm">Ville *</Label>}
         <Select value={ville} onValueChange={(v) => { onVilleChange(v); onArrondissementChange(""); onQuartierChange(""); }}>
           <SelectTrigger className="font-sans">
             <SelectValue placeholder="Choisir une ville" />

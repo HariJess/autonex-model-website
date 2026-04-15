@@ -39,10 +39,10 @@
     "viewAll": "Voir tout"
   },
   "listing": {
-    "rooms": "version",
-    "surface": "kilométrage",
-    "bathrooms": "portes",
-    "parking": "parking",
+    "rooms": "Version",
+    "surface": "Kilométrage",
+    "bathrooms": "Portes",
+    "parking": "Parking",
     "description": "Description",
     "features": "Caractéristiques",
     "contact": "Contacter le vendeur",

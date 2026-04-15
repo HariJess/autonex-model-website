@@ -5,7 +5,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { DisplayListing } from "@/types/listing";
-import { LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
+import { LISTING_TYPE_LABELS } from "@/types/listing";
 import { prefetchListing } from "@/hooks/useListings";
 import { applyImageFallback } from "@/lib/imageFallback";
 import {
@@ -16,6 +16,8 @@ import {
   getVehicleMileageValue,
   getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
+import BrandLogo from "@/components/BrandLogo";
+import { resolveBrandAsset } from "@/data/brandAssets";
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -56,6 +58,16 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
   const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
   const mileageLabel = formatVehicleMileage(getVehicleMileageValue(listing));
   const vehicleHeadline = getVehicleHeadline(listing);
+  const displayBrand = listing.vehicle?.make || displayTitle;
+  const displayBrandAsset = resolveBrandAsset(displayBrand);
+  const transactionBadgeLabel =
+    listing.transaction === "vente"
+      ? "Vente"
+      : listing.transaction === "location"
+        ? "Location"
+        : listing.transaction === "location_vacances"
+          ? "Location courte durée"
+          : listing.transaction;
 
   const handlePrefetchDetail = () => {
     void prefetchListing(queryClient, listing.id);
@@ -81,8 +93,18 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
             applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
           }}
         />
-        {listing.badge && badgeLabels[listing.badge] && (
+        {displayBrandAsset?.logoPath && (
           <div className="absolute top-3 left-3">
+            <BrandLogo
+              brand={displayBrand}
+              className="h-8 w-12 rounded-md border border-border/80 bg-card/92 shadow-sm backdrop-blur-[2px]"
+              imgClassName="max-h-5"
+              showFallbackLabel={false}
+            />
+          </div>
+        )}
+        {listing.badge && badgeLabels[listing.badge] && (
+          <div className={`absolute left-3 ${displayBrandAsset?.logoPath ? "top-12" : "top-3"}`}>
             <Badge className={`${badgeLabels[listing.badge].className} text-xs font-semibold px-3 py-1`} style={{ color: "#FAFAFA" }}>
               {badgeLabels[listing.badge].label}
             </Badge>
@@ -90,7 +112,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
         )}
         <div className="absolute top-3 right-3 flex gap-1.5">
           <Badge variant="secondary" className="text-[10px] font-sans">
-            {TRANSACTION_LABELS[listing.transaction] ?? listing.transaction}
+            {transactionBadgeLabel}
           </Badge>
           {listing.vehicle?.condition && (
             <Badge variant="outline" className="text-[10px] font-sans capitalize bg-card/85">

@@ -27,6 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
 import BrandLogo from "@/components/BrandLogo";
+import { resolveBrandAsset } from "@/data/brandAssets";
 import {
   formatVehicleDoors,
   formatVehicleMileage,
@@ -37,7 +38,7 @@ import {
   getVehicleMileageValue,
   getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
-import { sanitizeListingEquipment } from "@/data/listing-equipment";
+import { sanitizeListingEquipment, extractCustomFeatures } from "@/data/listing-equipment";
 import type { DisplayListing } from "@/types/listing";
 import {
   ListingSponsorBlock,
@@ -364,7 +365,14 @@ const ListingDetail = () => {
     ? listing.images
     : ["/placeholder.svg"];
 
-  const transactionLabel = TRANSACTION_LABELS[listing.transaction] ?? listing.transaction;
+  const transactionLabel =
+    listing.transaction === "vente"
+      ? "Vente"
+      : listing.transaction === "location"
+        ? "Location"
+        : listing.transaction === "location_vacances"
+          ? "Location courte durée"
+          : TRANSACTION_LABELS[listing.transaction] ?? listing.transaction;
   const typeLabel = LISTING_TYPE_LABELS[listing.type] ?? listing.type;
   const addressLine = [listing.ville, listing.arrondissement, listing.quartier, listing.region].filter(Boolean).join(", ");
   const hasExactCoords =
@@ -389,7 +397,10 @@ const ListingDetail = () => {
   const contactTrustHints = buildContactTrustHints(listing, sellerLabel, t);
   const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);
   const displayedPhone = getDisplayedPhone(phoneRevealed, revealedPhone, listing, t);
+  const displayBrand = cleanSpec(listing.vehicle?.make) ?? cleanSpec(displayTitle);
+  const displayBrandAsset = resolveBrandAsset(displayBrand);
   const listingFeatureBadges = sanitizeListingEquipment(listing.features);
+  const customFeatureBadges = extractCustomFeatures(listing.features);
   const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
   const listingTitle = composePageTitle(displayTitle);
   const listingDescription = truncateMetaDescription(
@@ -550,15 +561,15 @@ const ListingDetail = () => {
               {vehicleSummary && (
                 <p className="text-sm text-muted-foreground font-sans mb-1">{vehicleSummary}</p>
               )}
-              {listing.vehicle?.make && (
+              {displayBrand && (
                 <div className="mb-3 inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card px-2.5 py-1.5">
                   <BrandLogo
-                    brand={listing.vehicle.make}
+                    brand={displayBrand}
                     className="h-8 w-12 rounded-md bg-background"
                     imgClassName="max-h-5"
-                    showFallbackLabel={false}
+                    showFallbackLabel={!displayBrandAsset?.logoPath}
                   />
-                  <span className="text-xs font-medium font-sans text-muted-foreground">Marque: {listing.vehicle.make}</span>
+                  <span className="text-xs font-medium font-sans text-muted-foreground">Marque: {displayBrand}</span>
                 </div>
               )}
               {listing.internal_ref && isOwner && (
@@ -631,7 +642,7 @@ const ListingDetail = () => {
               {listing.vehicle?.isElectric && <Badge variant="secondary" className="font-sans">Électrique</Badge>}
               {listing.vehicle?.isHybrid && <Badge variant="secondary" className="font-sans">Hybride</Badge>}
               {listing.vehicle?.condition && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.condition}</Badge>}
-              {listing.vehicle?.sellerType && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.sellerType}</Badge>}
+              {sellerLabel && <Badge variant="outline" className="font-sans">{sellerLabel}</Badge>}
             </div>
 
             {listing.description && (
@@ -641,12 +652,17 @@ const ListingDetail = () => {
               </div>
             )}
 
-            {listingFeatureBadges.length > 0 && (
+            {(listingFeatureBadges.length > 0 || customFeatureBadges.length > 0) && (
               <div>
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
                 <div className="grid grid-cols-2 gap-2">
                   {listingFeatureBadges.map((f) => (
                     <div key={f} className="flex items-center gap-2 text-sm font-sans">
+                      <Check className="h-4 w-4 text-success" /> {f}
+                    </div>
+                  ))}
+                  {customFeatureBadges.map((f) => (
+                    <div key={`custom-${f}`} className="flex items-center gap-2 text-sm font-sans">
                       <Check className="h-4 w-4 text-success" /> {f}
                     </div>
                   ))}

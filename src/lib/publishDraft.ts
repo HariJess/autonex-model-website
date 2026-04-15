@@ -211,6 +211,7 @@ export async function createDraftListing(ownerId: string): Promise<string> {
     price_eur: 0,
     status: "draft",
     draft_step: 0,
+    seller_type: null,
     features: [] as unknown as Json,
     pending_boost_types: [] as unknown as Json,
   };
@@ -567,7 +568,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
     vehicleTransmission: row.transmission_gearbox ?? "",
     vehicleDrivetrain: row.drivetrain ?? "",
     vehicleCondition: row.vehicle_condition ?? "",
-    vehicleSellerType: row.seller_type ?? "",
+    vehicleSellerType: isPristineDraft ? "" : (row.seller_type ?? ""),
     vehicleRentalMode: row.rental_mode ?? "",
     vehicleBodyStyle: row.body_style ?? "",
     vehicleDoors: row.doors != null ? String(row.doors) : "",

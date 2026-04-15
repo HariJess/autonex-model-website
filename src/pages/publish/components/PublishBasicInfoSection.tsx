@@ -113,6 +113,13 @@ export function PublishBasicInfoSection({
         <Label className="font-sans">{labels.internalRef}</Label>
         <Input value={internalRef} onChange={(e) => onInternalRefChange(e.target.value)} className="font-sans" maxLength={80} placeholder="REF-2026-042" />
       </div>
+      <div className="space-y-3 rounded-xl border border-border/80 bg-muted/20 px-4 py-4">
+        <div>
+          <p className="font-serif font-semibold text-sm text-foreground">Localisation de l'annonce *</p>
+          <p className="text-xs text-muted-foreground font-sans mt-1">
+            La ville et un point sur carte sont requis pour publier.
+          </p>
+        </div>
       <LocationPicker
         ville={ville}
         arrondissement={arrondissement}
@@ -123,9 +130,10 @@ export function PublishBasicInfoSection({
         onQuartierChange={onQuartierChange}
         onQuartierLibreChange={onQuartierLibreChange}
       />
+      </div>
       <div className="border-t-2 border-border/80 pt-6 mt-1">
         <div className="form-surface-muted space-y-3">
-          <h3 className="font-serif font-semibold text-base text-foreground">{labels.mapTitle}</h3>
+          <h3 className="font-serif font-semibold text-base text-foreground">{labels.mapTitle} *</h3>
           <p className="text-xs text-muted-foreground font-sans">{labels.mapPublicHint}</p>
           {!ville ? (
             <p className="text-sm text-muted-foreground font-sans">{labels.mapNeedVille}</p>

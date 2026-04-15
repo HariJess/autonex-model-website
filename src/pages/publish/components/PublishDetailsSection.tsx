@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { AUTO_BRANDS } from "@/data/automotiveCatalog";
 
 const EMPTY_OPTION = "__empty__";
 
@@ -71,6 +72,23 @@ const AVAILABILITY_OPTIONS = [
   { value: "en_arrivage", label: "En arrivage" },
 ];
 
+const BRAND_MODEL_HINTS: Record<string, string[]> = {
+  Toyota: ["Hilux", "RAV4", "Land Cruiser", "Corolla", "Yaris"],
+  Nissan: ["Navara", "Patrol", "X-Trail", "Qashqai", "Sunny"],
+  Hyundai: ["Tucson", "Santa Fe", "i10", "i20", "Creta"],
+  Kia: ["Sportage", "Sorento", "Picanto", "Seltos"],
+  Suzuki: ["Swift", "Vitara", "Jimny", "Ertiga"],
+  Mitsubishi: ["L200", "Pajero", "Outlander"],
+  Ford: ["Ranger", "Everest", "Focus"],
+  Renault: ["Duster", "Kwid", "Clio"],
+  Peugeot: ["208", "3008", "Boxer"],
+  Volkswagen: ["Polo", "Golf", "Amarok", "Tiguan"],
+  "Mercedes-Benz": ["C-Class", "E-Class", "GLC", "Sprinter"],
+  BMW: ["X3", "X5", "320i"],
+  Audi: ["A3", "A4", "Q5"],
+  Honda: ["CR-V", "Civic", "HR-V"],
+};
+
 type PublishDetailsSectionProps = {
   showRooms: boolean;
   title: string;
@@ -99,6 +117,7 @@ type PublishDetailsSectionProps = {
   isElectric: boolean;
   isHybrid: boolean;
   selectedFeatures: string[];
+  customFeaturesInput: string;
   equipmentOptions: string[];
   labels: {
     listingTitle: string;
@@ -135,6 +154,7 @@ type PublishDetailsSectionProps = {
   onElectricChange: (value: boolean) => void;
   onHybridChange: (value: boolean) => void;
   onToggleFeature: (feature: string) => void;
+  onCustomFeaturesInputChange: (value: string) => void;
 };
 
 export function PublishDetailsSection({
@@ -165,6 +185,7 @@ export function PublishDetailsSection({
   isElectric,
   isHybrid,
   selectedFeatures,
+  customFeaturesInput,
   equipmentOptions,
   labels,
   onTitleChange,
@@ -193,7 +214,10 @@ export function PublishDetailsSection({
   onElectricChange,
   onHybridChange,
   onToggleFeature,
+  onCustomFeaturesInputChange,
 }: PublishDetailsSectionProps) {
+  const modelSuggestions = BRAND_MODEL_HINTS[make] ?? [];
+
   return (
     <div className="space-y-4.5 form-surface">
       <div className="space-y-2">
@@ -214,14 +238,43 @@ export function PublishDetailsSection({
         <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
         <p className="text-xs text-muted-foreground font-sans">Incluez de préférence: carburant, boîte, état général et historique d’entretien.</p>
       </div>
+      <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
+        <div>
+          <p className="font-serif font-semibold text-sm">Identite vehicule</p>
+          <p className="text-xs text-muted-foreground font-sans mt-1">
+            Choisissez une marque connue AutoNex, puis precisez le modele.
+          </p>
+        </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Marque *</Label>
-          <Input value={make} onChange={(e) => onMakeChange(e.target.value)} className="font-sans" />
+          <Input
+            list="publish-brand-options"
+            value={make}
+            onChange={(e) => onMakeChange(e.target.value)}
+            className="font-sans"
+            placeholder="Ex: Toyota, Nissan, Hyundai..."
+          />
+          <datalist id="publish-brand-options">
+            {AUTO_BRANDS.map((brand) => (
+              <option key={brand} value={brand} />
+            ))}
+          </datalist>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Modèle *</Label>
-          <Input value={model} onChange={(e) => onModelChange(e.target.value)} className="font-sans" />
+          <Input
+            list="publish-model-hints"
+            value={model}
+            onChange={(e) => onModelChange(e.target.value)}
+            className="font-sans"
+            placeholder={make ? `Modele ${make}` : "Ex: RAV4, Hilux, Ranger..."}
+          />
+          <datalist id="publish-model-hints">
+            {modelSuggestions.map((modelHint) => (
+              <option key={modelHint} value={modelHint} />
+            ))}
+          </datalist>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Année</Label>
@@ -244,7 +297,10 @@ export function PublishDetailsSection({
           </Select>
         </div>
       </div>
-      <div className={`grid ${showRooms ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-3.5 md:gap-4`}>
+      </section>
+      <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
+        <p className="font-serif font-semibold text-sm">Prix et usage</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Prix (Ar) *</Label>
           <Input type="number" value={priceMga} onChange={(e) => onPriceMgaChange(e.target.value)} className="font-sans" min={0} />
@@ -253,23 +309,16 @@ export function PublishDetailsSection({
           <Label className="font-sans">{labels.listingSurface} (km)</Label>
           <Input type="number" value={surface} onChange={(e) => onSurfaceChange(e.target.value)} className="font-sans" min={0} />
         </div>
-        {showRooms && (
-          <>
-            <div className="space-y-2">
-              <Label className="font-sans">{labels.listingRooms}</Label>
-              <Input type="number" value={rooms} onChange={(e) => onRoomsChange(e.target.value)} className="font-sans" min={0} placeholder="0=Base, 1=Confort..." />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{labels.listingBathrooms}</Label>
-              <Input type="number" value={bathrooms} onChange={(e) => onBathroomsChange(e.target.value)} className="font-sans" min={0} placeholder="Nombre de portes" />
-            </div>
-            <div className="space-y-2">
-              <Label className="font-sans">{labels.toilets}</Label>
-              <Input type="number" value={toilets} onChange={(e) => onToiletsChange(e.target.value)} className="font-sans" min={0} />
-            </div>
-          </>
-        )}
+        <div className="space-y-2">
+          <Label className="font-sans">Portes</Label>
+          <Input type="number" min={0} value={doors} onChange={(e) => onDoorsChange(e.target.value)} className="font-sans" />
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">Places</Label>
+          <Input type="number" min={0} value={seats} onChange={(e) => onSeatsChange(e.target.value)} className="font-sans" />
+        </div>
       </div>
+      </section>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Carburant</Label>
@@ -336,7 +385,7 @@ export function PublishDetailsSection({
           </Select>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3.5 md:gap-4">
         <div className="space-y-2">
           <Label className="font-sans">Carrosserie</Label>
           <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => onBodyStyleChange(v === EMPTY_OPTION ? "" : v)}>
@@ -368,14 +417,6 @@ export function PublishDetailsSection({
               ))}
             </SelectContent>
           </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Portes</Label>
-          <Input type="number" min={0} value={doors} onChange={(e) => onDoorsChange(e.target.value)} className="font-sans" />
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Places</Label>
-          <Input type="number" min={0} value={seats} onChange={(e) => onSeatsChange(e.target.value)} className="font-sans" />
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -428,6 +469,19 @@ export function PublishDetailsSection({
             </label>
           ))}
         </div>
+      </div>
+      <div className="space-y-2">
+        <Label className="font-sans">Autres caractéristiques (optionnel)</Label>
+        <Textarea
+          value={customFeaturesInput}
+          onChange={(e) => onCustomFeaturesInputChange(e.target.value)}
+          className="font-sans"
+          rows={3}
+          placeholder="Ex: Suspension adaptative, sieges ventiles, affichage tete haute..."
+        />
+        <p className="text-xs text-muted-foreground font-sans">
+          Séparez les éléments par des virgules pour ajouter plusieurs caractéristiques.
+        </p>
       </div>
     </div>
   );

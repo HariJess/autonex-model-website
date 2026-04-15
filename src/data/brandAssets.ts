@@ -78,5 +78,21 @@ for (const asset of BRAND_ASSETS) {
 
 export function resolveBrandAsset(brandOrId: string | null | undefined): BrandAsset | null {
   if (!brandOrId) return null;
-  return brandAssetLookup.get(normalizeBrandToken(brandOrId)) ?? null;
+  const normalized = normalizeBrandToken(brandOrId);
+  const direct = brandAssetLookup.get(normalized);
+  if (direct) return direct;
+
+  const tokens = normalized.split(" ").filter(Boolean);
+  for (const token of tokens) {
+    const single = brandAssetLookup.get(token);
+    if (single) return single;
+  }
+
+  for (let i = 0; i < tokens.length - 1; i += 1) {
+    const pair = `${tokens[i]} ${tokens[i + 1]}`;
+    const paired = brandAssetLookup.get(pair);
+    if (paired) return paired;
+  }
+
+  return null;
 }

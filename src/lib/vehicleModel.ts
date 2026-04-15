@@ -96,10 +96,12 @@ export function deriveVehicleFromLegacy(input: {
     (input.vehicleCondition as VehicleCondition) ??
     (tagged.condition as VehicleCondition) ??
     (input.isNewProgram === true ? "neuf" : mileageKm != null ? "occasion" : null);
+  const explicitSellerType =
+    (input.sellerType as SellerType) ?? (tagged.sellerType as SellerType) ?? null;
   const sellerType: SellerType =
-    (input.sellerType as SellerType) ??
-    (tagged.sellerType as SellerType) ??
-    (input.agencyName ? "concessionnaire" : "particulier");
+    explicitSellerType === "concessionnaire" && !input.agencyName
+      ? "particulier"
+      : explicitSellerType ?? (input.agencyName ? "concessionnaire" : "particulier");
 
   return {
     make: input.make ?? tagged.make ?? parsed.make,

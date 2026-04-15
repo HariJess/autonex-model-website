@@ -9,7 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { type ListingType, type TransactionType } from "@/types/listing";
 import { getRegionForVille, getSuggestedListingCoordinates } from "@/data/madagascar-locations";
-import { LISTING_EQUIPMENT_OPTIONS, sanitizeListingEquipment } from "@/data/listing-equipment";
+import {
+  LISTING_EQUIPMENT_OPTIONS,
+  sanitizeListingEquipment,
+  parseCustomFeaturesInput,
+  encodeCustomFeature,
+  extractCustomFeatures,
+} from "@/data/listing-equipment";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import {
   listingTypesForTransaction,
@@ -133,6 +139,7 @@ const PublishPage = () => {
   const [bathrooms, setBathrooms] = useState("");
   const [toilets, setToilets] = useState("");
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [customFeaturesInput, setCustomFeaturesInput] = useState("");
   const [vehicleMake, setVehicleMake] = useState("");
   const [vehicleModel, setVehicleModel] = useState("");
   const [vehicleYear, setVehicleYear] = useState("");
@@ -227,6 +234,11 @@ const PublishPage = () => {
     setBathrooms(fs.bathrooms);
     setToilets(fs.toilets);
     setSelectedFeatures(sanitizeListingEquipment(fs.selectedFeatures));
+    setCustomFeaturesInput(
+      extractCustomFeatures(
+        Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
+      ).join(", "),
+    );
     const meta = parseVehicleMetaTags(
       Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
     );
@@ -263,6 +275,20 @@ const PublishPage = () => {
   useEffect(() => {
     if (!profile?.agency_id) setAgencySpotlight(false);
   }, [profile?.agency_id]);
+
+  useEffect(() => {
+    if (!draftHydrated) return;
+    if (!profile) return;
+    const inferredSellerType =
+      profile.role === "agence" || profile.agency_id ? "concessionnaire" : "particulier";
+    if (
+      vehicleSellerType &&
+      (vehicleSellerType === "particulier" || vehicleSellerType === "concessionnaire")
+    ) {
+      return;
+    }
+    setVehicleSellerType(inferredSellerType);
+  }, [draftHydrated, profile, vehicleSellerType]);
 
   /** Centre-ville suggéré uniquement quand la ville change — pas à chaque arrondissement/quartier (évite d’écraser la position choisie sur la carte). */
   const lastAutoVilleRef = useRef<string>("");
@@ -716,6 +742,7 @@ const PublishPage = () => {
     vehicleIsElectric,
     vehicleIsHybrid,
     selectedFeatures,
+    customFeaturesInput,
     videoUrl,
     virtualTourUrl,
     selectedBoosts,
@@ -859,6 +886,7 @@ const PublishPage = () => {
   const selectedFeaturesWithVehicleMeta = useMemo(
     () => [
       ...sanitizeListingEquipment(selectedFeatures),
+      ...parseCustomFeaturesInput(customFeaturesInput).map((feature) => encodeCustomFeature(feature)),
       ...buildVehicleMetaTags({
         make: vehicleMake,
         model: vehicleModel,
@@ -872,6 +900,7 @@ const PublishPage = () => {
     ],
     [
       selectedFeatures,
+      customFeaturesInput,
       vehicleMake,
       vehicleModel,
       vehicleYear,
@@ -1563,6 +1592,7 @@ const PublishPage = () => {
             isElectric={vehicleIsElectric}
             isHybrid={vehicleIsHybrid}
             selectedFeatures={selectedFeatures}
+            customFeaturesInput={customFeaturesInput}
             equipmentOptions={LISTING_EQUIPMENT_OPTIONS}
             labels={{
               listingTitle: t("publish.listingTitle", "Titre"),
@@ -1590,8 +1620,14 @@ const PublishPage = () => {
             onSellerTypeChange={setVehicleSellerType}
             onRentalModeChange={setVehicleRentalMode}
             onBodyStyleChange={setVehicleBodyStyle}
-            onDoorsChange={setVehicleDoors}
-            onSeatsChange={setVehicleSeats}
+            onDoorsChange={(value) => {
+              setVehicleDoors(value);
+              setBathrooms(value);
+            }}
+            onSeatsChange={(value) => {
+              setVehicleSeats(value);
+              setToilets(value);
+            }}
             onExteriorColorChange={setVehicleExteriorColor}
             onInteriorColorChange={setVehicleInteriorColor}
             onAvailabilityStatusChange={setVehicleAvailabilityStatus}
@@ -1599,6 +1635,7 @@ const PublishPage = () => {
             onElectricChange={setVehicleIsElectric}
             onHybridChange={setVehicleIsHybrid}
             onToggleFeature={toggleFeature}
+            onCustomFeaturesInputChange={setCustomFeaturesInput}
           />
         )}
 
