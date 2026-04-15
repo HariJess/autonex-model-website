@@ -65,14 +65,14 @@ describe("ListingCard", () => {
     expect(screen.getByText(/Toamasina/)).toBeInTheDocument();
   });
 
-  it("affiche la surface quand définie", () => {
+  it("affiche le kilométrage quand défini", () => {
     renderCard(makeListing({ surface: 200 }));
-    expect(screen.getByText(/200m²/)).toBeInTheDocument();
+    expect(screen.getByText(/200 km/)).toBeInTheDocument();
   });
 
-  it("affiche 'Studio' pour un appartement 0 chambre", () => {
+  it("affiche 'Base' pour un appartement 0 chambre", () => {
     renderCard(makeListing({ type: "appartement", rooms: 0 }));
-    expect(screen.getByText(/Studio/i)).toBeInTheDocument();
+    expect(screen.getByText(/Base/i)).toBeInTheDocument();
   });
 
   it("n'affiche pas 'Studio' pour un terrain", () => {
