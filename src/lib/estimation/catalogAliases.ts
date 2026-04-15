@@ -1,5 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * @deprecated Not part of current Estimation runtime flow.
+ *
+ * Alias loading remains as supporting logic for DB catalog maintenance paths.
+ * Visible Estimation UI selectors currently rely on curated UI catalog only.
+ */
 function normalize(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
 }

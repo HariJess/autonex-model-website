@@ -1,7 +1,14 @@
 import type { VehicleCatalogEntry } from "@/lib/estimation/vehicleCatalog";
 
-// Broad embedded fallback catalog to keep the estimation form operational
-// even when DB catalog tables are unavailable.
+/**
+ * @deprecated Legacy broad catalog snapshot.
+ *
+ * This file is intentionally not used by the current Estimation runtime path.
+ * Visible estimation catalog source of truth is:
+ * - src/data/vehicleUiCatalog.ts
+ *
+ * Keep this only as historical/supporting reference while DB tooling evolves.
+ */
 export const LARGE_VEHICLE_CATALOG: VehicleCatalogEntry[] = [
   { make: "Toyota", models: ["Agya", "Auris", "Avanza", "Camry", "Corolla", "Fortuner", "Hiace", "Hilux", "Land Cruiser", "Prado", "RAV4", "Rush", "Yaris"] },
   { make: "Nissan", models: ["Almera", "Juke", "Micra", "Navara", "Patrol", "Qashqai", "Sentra", "Terrano", "X-Trail"] },

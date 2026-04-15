@@ -3,6 +3,16 @@ export type VehicleUiCatalogEntry = {
   models: string[];
 };
 
+/**
+ * Authoritative visible catalog for Estimation UI make/model selectors.
+ *
+ * This is the single runtime source of truth for visible user selection.
+ * It must stay curated (passenger-vehicle focused) and UX-safe.
+ *
+ * Notes:
+ * - Do not replace this directly with raw imported manufacturer feeds.
+ * - DB catalog tables/scripts remain supporting infrastructure for maintenance/enrichment.
+ */
 export const VEHICLE_UI_CATALOG: VehicleUiCatalogEntry[] = [
   { make: "Acura", models: ["ILX", "Integra", "MDX", "NSX", "RDX", "RLX", "TLX", "ZDX"] },
   { make: "Alfa Romeo", models: ["4C", "Giulia", "Giulietta", "Stelvio", "Tonale"] },

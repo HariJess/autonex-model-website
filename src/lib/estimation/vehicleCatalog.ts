@@ -1,4 +1,8 @@
 import { VEHICLE_UI_CATALOG } from "@/data/vehicleUiCatalog";
+import {
+  ESTIMATION_UI_CATALOG_RUNTIME_SOURCE,
+  ESTIMATION_UI_CATALOG_SOURCE,
+} from "@/lib/estimation/catalogArchitecture";
 
 export type VehicleCatalogEntry = {
   make: string;
@@ -7,7 +11,7 @@ export type VehicleCatalogEntry = {
 
 export type VehicleCatalogLoadResult = {
   entries: VehicleCatalogEntry[];
-  source: "ui-curated";
+  source: typeof ESTIMATION_UI_CATALOG_RUNTIME_SOURCE;
   makesCount: number;
   modelsCount: number;
 };
@@ -17,6 +21,8 @@ function normalizeName(value: string): string {
 }
 
 export async function loadVehicleCatalog(): Promise<VehicleCatalogLoadResult> {
+  // Runtime contract: estimation UI reads only from curated UI catalog source.
+  // Raw DB/import catalogs are intentionally excluded from visible selection.
   const entries = VEHICLE_UI_CATALOG
     .map((entry) => ({
       make: normalizeName(entry.make),
@@ -29,8 +35,13 @@ export async function loadVehicleCatalog(): Promise<VehicleCatalogLoadResult> {
   const modelsCount = entries.reduce((acc, entry) => acc + entry.models.length, 0);
   return {
     entries,
-    source: "ui-curated",
+    source: ESTIMATION_UI_CATALOG_RUNTIME_SOURCE,
     makesCount: entries.length,
     modelsCount,
   };
 }
+
+export const VEHICLE_CATALOG_RUNTIME_NOTES = {
+  visibleSource: ESTIMATION_UI_CATALOG_SOURCE,
+  dbRole: "supporting-tooling-only",
+} as const;
