@@ -176,6 +176,7 @@ const PublishPage = () => {
   const exitBypassRef = useRef(false);
   const lastPersistedFingerprintRef = useRef("");
   const fingerprintInitializedRef = useRef(false);
+  const pendingUploadInFlightRef = useRef(false);
 
   const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
   const typeOptions = listingTypesForTransaction(transaction);
@@ -1113,22 +1114,56 @@ const PublishPage = () => {
     }
   };
 
+  const flushPendingPhotosToServer = useCallback(async (): Promise<{ uploaded: number; failed: number }> => {
+    if (!draftListingId || pendingPhotos.length === 0) return { uploaded: 0, failed: 0 };
+    if (pendingUploadInFlightRef.current) return { uploaded: 0, failed: 0 };
+
+    pendingUploadInFlightRef.current = true;
+    const batch = [...pendingPhotos];
+    const successPreviews = new Set<string>();
+    let failed = 0;
+    let nextPosition = serverPhotosRef.current.length;
+
+    try {
+      for (const row of batch) {
+        try {
+          const photo = await uploadListingPhoto(draftListingId, row.file, nextPosition);
+          nextPosition += 1;
+          successPreviews.add(row.preview);
+          serverPhotosRef.current = [...serverPhotosRef.current, photo];
+          setServerPhotos((prev) => [...prev, photo]);
+        } catch {
+          failed += 1;
+        }
+      }
+    } finally {
+      setPendingPhotos((prev) => prev.filter((row) => !successPreviews.has(row.preview)));
+      successPreviews.forEach((preview) => URL.revokeObjectURL(preview));
+      pendingUploadInFlightRef.current = false;
+    }
+
+    return { uploaded: successPreviews.size, failed };
+  }, [draftListingId, pendingPhotos]);
+
   const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !user) return;
+    if (!e.target.files) return;
     const files = Array.from(e.target.files).slice(0, 10);
-    if (!draftListingId) {
+    if (!draftListingId || !user) {
       setPendingPhotos((prev) => [
         ...prev,
         ...files.map((file) => ({ file, preview: URL.createObjectURL(file) })),
       ]);
       return;
     }
+    let nextPosition = serverPhotosRef.current.length;
     for (const file of files) {
       try {
-        const pos = serverPhotosRef.current.length;
-        const ph = await uploadListingPhoto(draftListingId, file, pos);
+        const ph = await uploadListingPhoto(draftListingId, file, nextPosition);
+        nextPosition += 1;
+        serverPhotosRef.current = [...serverPhotosRef.current, ph];
         setServerPhotos((s) => [...s, ph]);
       } catch (err) {
+        setPendingPhotos((prev) => [...prev, { file, preview: URL.createObjectURL(file) }]);
         toast.error(err instanceof Error ? err.message : "Upload impossible");
       }
     }
@@ -1159,26 +1194,15 @@ const PublishPage = () => {
     if (!draftListingId || pendingPhotos.length === 0 || !user) return;
     let cancelled = false;
     (async () => {
-      const batch = [...pendingPhotos];
-      setPendingPhotos([]);
-      batch.forEach((p) => URL.revokeObjectURL(p.preview));
-      for (const { file } of batch) {
-        if (cancelled) break;
-        try {
-          const pos = serverPhotosRef.current.length;
-          const ph = await uploadListingPhoto(draftListingId, file, pos);
-          if (cancelled) break;
-          setServerPhotos((s) => [...s, ph]);
-        } catch (e) {
-          toast.error(e instanceof Error ? e.message : "Upload impossible");
-        }
+      const { failed } = await flushPendingPhotosToServer();
+      if (!cancelled && failed > 0) {
+        toast.error(t("publish.uploadRetryNeeded", "Certaines photos n'ont pas pu être envoyées. Réessayez."));
       }
     })();
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingPhotos.length suffit : on traite par batch, pas à chaque mutation interne
-  }, [draftListingId, pendingPhotos.length, user]);
+  }, [draftListingId, pendingPhotos.length, user, flushPendingPhotosToServer, t]);
 
   const validateStep = (s: number): string[] => {
     const errors: string[] = [];
@@ -1254,19 +1278,13 @@ const PublishPage = () => {
     if (isPublishedListingEdit) {
       setPublishing(true);
       try {
-        const nextPhotos = [...serverPhotos];
         if (pendingPhotos.length > 0) {
-          const batch = [...pendingPhotos];
-          setPendingPhotos([]);
-          batch.forEach((p) => URL.revokeObjectURL(p.preview));
-          for (const { file } of batch) {
-            const pos = nextPhotos.length;
-            const ph = await uploadListingPhoto(draftListingId, file, pos);
-            nextPhotos.push(ph);
+          const { failed } = await flushPendingPhotosToServer();
+          if (failed > 0) {
+            throw new Error(t("publish.uploadRetryNeeded", "Certaines photos n'ont pas pu être envoyées. Réessayez."));
           }
-          setServerPhotos(nextPhotos);
-          serverPhotosRef.current = nextPhotos;
         }
+        const nextPhotos = serverPhotosRef.current;
 
         let finalLat: number | null = null;
         let finalLng: number | null = null;
@@ -1423,13 +1441,9 @@ const PublishPage = () => {
     setPublishing(true);
     try {
       if (pendingPhotos.length > 0 && draftListingId) {
-        const batch = [...pendingPhotos];
-        setPendingPhotos([]);
-        batch.forEach((p) => URL.revokeObjectURL(p.preview));
-        for (const { file } of batch) {
-          const pos = serverPhotosRef.current.length;
-          const ph = await uploadListingPhoto(draftListingId, file, pos);
-          setServerPhotos((s) => [...s, ph]);
+        const { failed } = await flushPendingPhotosToServer();
+        if (failed > 0) {
+          throw new Error(t("publish.uploadRetryNeeded", "Certaines photos n'ont pas pu être envoyées. Réessayez."));
         }
       }
 
