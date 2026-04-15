@@ -689,37 +689,45 @@ const VehicleEstimationPage = () => {
           <section className="space-y-6 md:space-y-7">
             <Card className={`relative overflow-hidden rounded-3xl border-0 shadow-2xl ${ESTIMATION_PALETTE.hero}`}>
               <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-              <CardContent className="p-7 md:p-9">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+              <CardContent className="p-7 md:p-10">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <Badge variant="outline" className="font-sans normal-case border-background/30 bg-background/10 text-background">
-                    Rapport d'estimation AutoNex
+                    Rapport de valorisation AutoNex
                   </Badge>
                   <Badge className={confidenceBadgeClass(result.output.confidenceLabel)}>
                     Confiance {result.output.confidenceLabel === "high" ? "élevée" : result.output.confidenceLabel === "medium" ? "moyenne" : "faible"}
                   </Badge>
                 </div>
-                <div className="mt-5 grid gap-4 md:grid-cols-[1.55fr_0.95fr] md:items-end">
-                  <div>
-                    <p className="font-sans text-xs uppercase tracking-wide text-background/70">Valeur estimée</p>
-                    <h2 className={`mt-1 ${ESTIMATION_TYPO.valueHero}`}>
+
+                <div className="mt-6 grid gap-5 md:grid-cols-[1.7fr_0.9fr] md:items-end">
+                  <div className="space-y-3">
+                    <p className="font-sans text-xs uppercase tracking-[0.14em] text-background/70">Valeur de marché estimée</p>
+                    <h2 className={`leading-[0.95] ${ESTIMATION_TYPO.valueHero}`}>
                       {formatAriary(result.output.adjustedPrice)}
                     </h2>
-                    <div className="mt-3 inline-flex rounded-full border border-background/25 bg-background/10 px-3 py-1.5">
-                      <p className="font-sans text-xs text-background/80">
-                        Fourchette : {formatAriary(result.output.lowRangePrice)} - {formatAriary(result.output.highRangePrice)}
+                    <div className="inline-flex rounded-full border border-background/30 bg-background/12 px-4 py-2">
+                      <p className="font-sans text-xs text-background/85">
+                        Fourchette de valorisation : {formatAriary(result.output.lowRangePrice)} - {formatAriary(result.output.highRangePrice)}
                       </p>
                     </div>
-                    <p className="mt-2 font-sans text-xs text-background/60">
-                      Estimation orientée décision, basée sur les caractéristiques déclarées de votre véhicule.
+                    <p className="max-w-2xl font-sans text-sm text-background/70">
+                      Un repère premium pour décider sereinement de votre stratégie de vente.
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-background/20 bg-background/10 p-5 backdrop-blur-sm shadow-inner">
-                    <p className="font-sans text-xs text-background/70">Score de confiance</p>
-                    <p className="mt-1 font-serif text-4xl">{result.output.confidenceScore}/100</p>
-                    <p className="mt-1 font-sans text-xs text-background/65">Niveau de robustesse de l'évaluation.</p>
+
+                  <div className="rounded-2xl border border-background/25 bg-background/12 p-5 backdrop-blur-sm shadow-inner">
+                    <p className="font-sans text-xs uppercase tracking-wide text-background/70">Indice de confiance</p>
+                    <div className="mt-2 flex items-end gap-2">
+                      <p className="font-serif text-4xl leading-none">{result.output.confidenceScore}</p>
+                      <p className="pb-1 font-sans text-sm text-background/70">/100</p>
+                    </div>
+                    <p className="mt-2 font-sans text-xs text-background/70">
+                      Niveau de fiabilité de cette estimation selon les données disponibles.
+                    </p>
                     <div className="mt-3 h-1.5 w-full rounded-full bg-background/20">
                       <div
-                        className="h-full rounded-full bg-background/90"
+                        className="h-full rounded-full bg-background/90 transition-all duration-500 ease-out"
                         style={{ width: `${Math.max(8, Math.min(100, result.output.confidenceScore))}%` }}
                       />
                     </div>
@@ -727,25 +735,27 @@ const VehicleEstimationPage = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
-              <CardContent className="grid grid-cols-1 gap-4 divide-y divide-border/60 p-5 md:grid-cols-4 md:divide-x md:divide-y-0 md:p-6">
-                <div className="md:px-1">
-                  <p className="text-xs font-sans text-muted-foreground">Prix conseillé d'annonce</p>
-                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.recommendedListingPrice)}</p>
-                </div>
-                <div className="md:px-3">
-                  <p className="text-xs font-sans text-muted-foreground">Prix vente rapide</p>
-                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.quickSalePrice)}</p>
-                </div>
-                <div className="md:px-3">
-                  <p className="text-xs font-sans text-muted-foreground">Base de marché</p>
-                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.marketBasePrice)}</p>
-                </div>
-                <div className="md:px-3">
-                  <p className="text-xs font-sans text-muted-foreground">Niveau global</p>
-                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>
-                    {result.output.confidenceLabel === "high" ? "Élevé" : result.output.confidenceLabel === "medium" ? "Moyen" : "Prudent"}
-                  </p>
+            <Card className={`rounded-2xl border border-border/70 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
+              <CardContent className="p-4 md:p-5">
+                <div className="grid grid-cols-1 gap-2 rounded-xl bg-background/65 p-3 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/60 md:p-0">
+                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
+                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.recommendedListingPrice)}</p>
+                  </div>
+                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix de vente rapide</p>
+                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.quickSalePrice)}</p>
+                  </div>
+                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Base marché</p>
+                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.marketBasePrice)}</p>
+                  </div>
+                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
+                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>
+                      {result.output.confidenceLabel === "high" ? "Élevé" : result.output.confidenceLabel === "medium" ? "Moyen" : "Prudent"}
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
