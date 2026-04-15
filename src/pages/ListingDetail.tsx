@@ -193,7 +193,7 @@ const ListingDetail = () => {
     ville: listing?.ville ?? undefined,
     types: listing?.type ? [listing.type] : undefined,
     transaction: listing?.transaction ?? undefined,
-    limit: 5,
+    limit: listing ? 5 : 0,
   });
   const filteredSimilar = similar.filter((l) => l.id !== listing?.id).slice(0, 4);
 
@@ -201,6 +201,11 @@ const ListingDetail = () => {
     if (!listing) return;
     if (!user) {
       loginForContact();
+      return;
+    }
+    if (user.id === listing.owner_id || isAdmin) {
+      setPhoneRevealed(true);
+      setRevealedPhone(listing.owner_phone ?? null);
       return;
     }
     const { error: leadError } = await supabase.from("leads").insert({
@@ -247,24 +252,29 @@ const ListingDetail = () => {
     }
     setSending(true);
     lastContactSubmitAt.current = now;
-    const { error: leadError } = await supabase.from("leads").insert({
-      listing_id: listing.id,
-      visitor_name: parsed.data.name || null,
-      visitor_email: parsed.data.email || null,
-      visitor_phone: parsed.data.phone || null,
-      message: parsed.data.message || null,
-      type: "contact_form" as const,
-    });
-    if (leadError) {
-      toast.error(leadError.message);
-    } else {
-      toast.success(t("listing.messageSent", "Message envoyé !"));
-      setContactName("");
-      setContactEmail("");
-      setContactPhone("");
-      setContactMessage("");
+    try {
+      const { error: leadError } = await supabase.from("leads").insert({
+        listing_id: listing.id,
+        visitor_name: parsed.data.name || null,
+        visitor_email: parsed.data.email || null,
+        visitor_phone: parsed.data.phone || null,
+        message: parsed.data.message || null,
+        type: "contact_form" as const,
+      });
+      if (leadError) {
+        toast.error(leadError.message);
+      } else {
+        toast.success(t("listing.messageSent", "Message envoyé !"));
+        setContactName("");
+        setContactEmail("");
+        setContactPhone("");
+        setContactMessage("");
+      }
+    } catch {
+      toast.error(t("listing.contactSendError", "Impossible d'envoyer votre message pour le moment."));
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   };
 
   const handleWhatsApp = async () => {
@@ -369,6 +379,11 @@ const ListingDetail = () => {
     ? listing.images
     : ["/placeholder.svg"];
   const hasMultipleImages = images.length > 1;
+
+  useEffect(() => {
+    if (selectedImg < images.length) return;
+    setSelectedImg(0);
+  }, [images.length, selectedImg]);
 
   const goToPreviousImage = () => {
     if (!hasMultipleImages) return;
