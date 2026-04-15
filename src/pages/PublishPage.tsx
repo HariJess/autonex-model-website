@@ -273,6 +273,35 @@ const PublishPage = () => {
     setDraftListingId(row.id);
   }, []);
 
+  const selectedFeaturesWithVehicleMeta = useMemo(
+    () => [
+      ...sanitizeListingEquipment(selectedFeatures),
+      ...parseCustomFeaturesInput(customFeaturesInput).map((feature) => encodeCustomFeature(feature)),
+      ...buildVehicleMetaTags({
+        make: vehicleMake,
+        model: vehicleModel,
+        year: vehicleYear ? Number(vehicleYear) : null,
+        fuel: vehicleFuel,
+        transmission: vehicleTransmission,
+        drivetrain: vehicleDrivetrain,
+        condition: vehicleCondition,
+        sellerType: vehicleSellerType,
+      }),
+    ],
+    [
+      selectedFeatures,
+      customFeaturesInput,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+    ],
+  );
+
   const progressFingerprint = useMemo(
     () =>
       JSON.stringify({
@@ -1053,35 +1082,6 @@ const PublishPage = () => {
   const toggleBoost = (b: PurchasableBoostType) => {
     setSelectedBoosts((prev) => (prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b]));
   };
-
-  const selectedFeaturesWithVehicleMeta = useMemo(
-    () => [
-      ...sanitizeListingEquipment(selectedFeatures),
-      ...parseCustomFeaturesInput(customFeaturesInput).map((feature) => encodeCustomFeature(feature)),
-      ...buildVehicleMetaTags({
-        make: vehicleMake,
-        model: vehicleModel,
-        year: vehicleYear ? Number(vehicleYear) : null,
-        fuel: vehicleFuel,
-        transmission: vehicleTransmission,
-        drivetrain: vehicleDrivetrain,
-        condition: vehicleCondition,
-        sellerType: vehicleSellerType,
-      }),
-    ],
-    [
-      selectedFeatures,
-      customFeaturesInput,
-      vehicleMake,
-      vehicleModel,
-      vehicleYear,
-      vehicleFuel,
-      vehicleTransmission,
-      vehicleDrivetrain,
-      vehicleCondition,
-      vehicleSellerType,
-    ],
-  );
 
   useEffect(() => {
     const autoTitle = [vehicleMake.trim(), vehicleModel.trim(), vehicleYear.trim()].filter(Boolean).join(" ");
