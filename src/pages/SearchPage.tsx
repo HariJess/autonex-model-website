@@ -42,6 +42,7 @@ import { SearchEmptyState } from "@/pages/search/components/SearchEmptyState";
 import { SearchLoadingState } from "@/pages/search/components/SearchLoadingState";
 import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
+import { listingTypesForTransaction } from "@/lib/listingRules";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -80,6 +81,40 @@ const SearchPage = () => {
     [searchParams]
   );
 
+  const vehicleTypeOptionMap = useMemo(
+    () => new Map(AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.map((option) => [option.id, option])),
+    [],
+  );
+
+  const normalizeFiltersForSearch = useCallback(
+    (incoming: SearchFilters): SearchFilters => {
+      const allowedListingTypes = new Set(listingTypesForTransaction(incoming.transaction));
+      const validVehicleTypes = incoming.vehicleTypes.filter((id) => vehicleTypeOptionMap.has(id));
+      const mappedTypesFromVehicleType = Array.from(
+        new Set(
+          validVehicleTypes
+            .flatMap((id) => vehicleTypeOptionMap.get(id)?.listingTypes ?? [])
+            .filter((type) => allowedListingTypes.has(type as keyof typeof LISTING_TYPE_LABELS)),
+        ),
+      );
+      const explicitValidTypes = incoming.types.filter((type) =>
+        allowedListingTypes.has(type as keyof typeof LISTING_TYPE_LABELS),
+      );
+
+      // Keep legacy explicit `type` URLs when no vehicle type is selected,
+      // but always prioritize mapped types when `vehicleTypes` is active.
+      const nextTypes =
+        validVehicleTypes.length > 0 ? mappedTypesFromVehicleType : explicitValidTypes;
+
+      return {
+        ...incoming,
+        vehicleTypes: validVehicleTypes,
+        types: nextTypes,
+      };
+    },
+    [vehicleTypeOptionMap],
+  );
+
   const pushSearchState = useCallback(
     (next: { filters?: SearchFilters; sort?: SearchSortMode; view?: SearchViewMode }) => {
       const f = next.filters ?? filters;
@@ -91,8 +126,9 @@ const SearchPage = () => {
   );
 
   const updateFilters = useCallback(
-    (newFilters: SearchFilters) => pushSearchState({ filters: newFilters }),
-    [pushSearchState]
+    (newFilters: SearchFilters) =>
+      pushSearchState({ filters: normalizeFiltersForSearch(newFilters) }),
+    [pushSearchState, normalizeFiltersForSearch]
   );
 
   const setSort = useCallback(

@@ -597,8 +597,7 @@ export function useDbListings(filters: ListingsFilters = {}) {
       const { data: listings, error } = await query;
       if (error) {
         if (isCatalogUnavailableErrorMessage(error.message)) {
-          console.warn("[catalog] listings table not initialized yet; returning empty catalog");
-          return [];
+          throw new Error(`Catalogue indisponible: ${error.message}`);
         }
         throw new Error(`Erreur recherche: ${error.message}`);
       }
