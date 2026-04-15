@@ -820,6 +820,364 @@ export type Database = {
           },
         ]
       }
+      vehicle_catalog_aliases: {
+        Row: {
+          alias: string
+          alias_normalized: string
+          canonical_id: string
+          created_at: string
+          entity_type: string
+          id: string
+          source: string
+        }
+        Insert: {
+          alias: string
+          alias_normalized: string
+          canonical_id: string
+          created_at?: string
+          entity_type: string
+          id?: string
+          source?: string
+        }
+        Update: {
+          alias?: string
+          alias_normalized?: string
+          canonical_id?: string
+          created_at?: string
+          entity_type?: string
+          id?: string
+          source?: string
+        }
+        Relationships: []
+      }
+      vehicle_catalog_makes: {
+        Row: {
+          created_at: string
+          external_make_id: string | null
+          external_source: string
+          id: string
+          is_active: boolean
+          name: string
+          normalized_name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          external_make_id?: string | null
+          external_source?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          normalized_name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          external_make_id?: string | null
+          external_source?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          normalized_name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vehicle_catalog_models: {
+        Row: {
+          body_type_hint: string | null
+          created_at: string
+          external_model_id: string | null
+          external_source: string
+          id: string
+          is_active: boolean
+          make_id: string
+          name: string
+          normalized_name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+          year_end: number | null
+          year_start: number | null
+        }
+        Insert: {
+          body_type_hint?: string | null
+          created_at?: string
+          external_model_id?: string | null
+          external_source?: string
+          id?: string
+          is_active?: boolean
+          make_id: string
+          name: string
+          normalized_name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Update: {
+          body_type_hint?: string | null
+          created_at?: string
+          external_model_id?: string | null
+          external_source?: string
+          id?: string
+          is_active?: boolean
+          make_id?: string
+          name?: string
+          normalized_name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_catalog_models_make_id_fkey"
+            columns: ["make_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_catalog_makes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_estimation_events: {
+        Row: {
+          created_at: string
+          estimation_request_id: string
+          event_type: string
+          id: string
+          metadata: Json
+        }
+        Insert: {
+          created_at?: string
+          estimation_request_id: string
+          event_type: string
+          id?: string
+          metadata?: Json
+        }
+        Update: {
+          created_at?: string
+          estimation_request_id?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_estimation_events_estimation_request_id_fkey"
+            columns: ["estimation_request_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_estimation_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_estimation_requests: {
+        Row: {
+          accident_declared: boolean
+          body_type: string
+          city: string
+          condition_label: string
+          created_at: string
+          fuel_type: string
+          id: string
+          maintenance_level: string
+          make_id: string | null
+          make_name_snapshot: string
+          mileage: number
+          model_id: string | null
+          model_name_snapshot: string
+          owner_count_label: string
+          raw_payload: Json
+          transmission_type: string
+          usage_type: string
+          user_id: string | null
+          year: number
+        }
+        Insert: {
+          accident_declared?: boolean
+          body_type: string
+          city: string
+          condition_label: string
+          created_at?: string
+          fuel_type: string
+          id?: string
+          maintenance_level: string
+          make_id?: string | null
+          make_name_snapshot: string
+          mileage: number
+          model_id?: string | null
+          model_name_snapshot: string
+          owner_count_label: string
+          raw_payload?: Json
+          transmission_type: string
+          usage_type: string
+          user_id?: string | null
+          year: number
+        }
+        Update: {
+          accident_declared?: boolean
+          body_type?: string
+          city?: string
+          condition_label?: string
+          created_at?: string
+          fuel_type?: string
+          id?: string
+          maintenance_level?: string
+          make_id?: string | null
+          make_name_snapshot?: string
+          mileage?: number
+          model_id?: string | null
+          model_name_snapshot?: string
+          owner_count_label?: string
+          raw_payload?: Json
+          transmission_type?: string
+          usage_type?: string
+          user_id?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_estimation_requests_make_id_fkey"
+            columns: ["make_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_makes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_estimation_requests_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_estimation_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_estimation_results: {
+        Row: {
+          adjusted_price: number
+          calculation_payload: Json
+          comparables_used_count: number
+          confidence_label: string
+          confidence_score: number
+          created_at: string
+          estimation_request_id: string
+          high_range_price: number
+          id: string
+          low_range_price: number
+          market_base_price: number
+          negative_factors: Json
+          positive_factors: Json
+          quick_sale_price: number
+          recommended_listing_price: number
+        }
+        Insert: {
+          adjusted_price: number
+          calculation_payload?: Json
+          comparables_used_count?: number
+          confidence_label: string
+          confidence_score: number
+          created_at?: string
+          estimation_request_id: string
+          high_range_price: number
+          id?: string
+          low_range_price: number
+          market_base_price: number
+          negative_factors?: Json
+          positive_factors?: Json
+          quick_sale_price: number
+          recommended_listing_price: number
+        }
+        Update: {
+          adjusted_price?: number
+          calculation_payload?: Json
+          comparables_used_count?: number
+          confidence_label?: string
+          confidence_score?: number
+          created_at?: string
+          estimation_request_id?: string
+          high_range_price?: number
+          id?: string
+          low_range_price?: number
+          market_base_price?: number
+          negative_factors?: Json
+          positive_factors?: Json
+          quick_sale_price?: number
+          recommended_listing_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_estimation_results_estimation_request_id_fkey"
+            columns: ["estimation_request_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_estimation_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_price_reference_profiles: {
+        Row: {
+          annual_depreciation_rate: number
+          baseline_price_mga: number
+          baseline_year: number
+          body_type: string
+          created_at: string
+          expected_km_per_year: number
+          fuel_type: string | null
+          id: string
+          is_active: boolean
+          make_name: string
+          model_name: string
+          popularity_score: number | null
+          transmission_type: string | null
+        }
+        Insert: {
+          annual_depreciation_rate?: number
+          baseline_price_mga: number
+          baseline_year: number
+          body_type: string
+          created_at?: string
+          expected_km_per_year?: number
+          fuel_type?: string | null
+          id?: string
+          is_active?: boolean
+          make_name: string
+          model_name: string
+          popularity_score?: number | null
+          transmission_type?: string | null
+        }
+        Update: {
+          annual_depreciation_rate?: number
+          baseline_price_mga?: number
+          baseline_year?: number
+          body_type?: string
+          created_at?: string
+          expected_km_per_year?: number
+          fuel_type?: string | null
+          id?: string
+          is_active?: boolean
+          make_name?: string
+          model_name?: string
+          popularity_score?: number | null
+          transmission_type?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

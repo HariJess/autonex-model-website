@@ -23,8 +23,8 @@ export async function insertEstimationRequest(input: EstimationInput, userId: st
   };
 
   const { data, error } = await supabase
-    .from("vehicle_estimation_requests" as never)
-    .insert(payload as never)
+    .from("vehicle_estimation_requests")
+    .insert(payload)
     .select("id")
     .single();
   if (error) throw new Error(error.message);
@@ -52,8 +52,8 @@ export async function insertEstimationResult(
   };
 
   const { data, error } = await supabase
-    .from("vehicle_estimation_results" as never)
-    .insert(payload as never)
+    .from("vehicle_estimation_results")
+    .insert(payload)
     .select("id")
     .single();
   if (error) throw new Error(error.message);
@@ -70,12 +70,12 @@ export async function insertEstimationEvent(
     | "viewed_similar_listings",
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const { error } = await supabase.from("vehicle_estimation_events" as never).insert(
+  const { error } = await supabase.from("vehicle_estimation_events").insert(
     {
       estimation_request_id: estimationRequestId,
       event_type: eventType,
       metadata: metadata ?? {},
-    } as never,
+    },
   );
   if (error) throw new Error(error.message);
 }

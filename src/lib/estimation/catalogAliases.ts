@@ -11,9 +11,9 @@ export type CatalogAliasMaps = {
 
 export async function loadCatalogAliases(): Promise<CatalogAliasMaps> {
   const [makesRes, modelsRes, aliasesRes] = await Promise.all([
-    supabase.from("vehicle_catalog_makes" as never).select("id,name"),
-    supabase.from("vehicle_catalog_models" as never).select("id,make_id,name"),
-    supabase.from("vehicle_catalog_aliases" as never).select("entity_type,canonical_id,alias,alias_normalized"),
+    supabase.from("vehicle_catalog_makes").select("id,name"),
+    supabase.from("vehicle_catalog_models").select("id,make_id,name"),
+    supabase.from("vehicle_catalog_aliases").select("entity_type,canonical_id,alias,alias_normalized"),
   ]);
 
   const makeById = new Map<string, string>();

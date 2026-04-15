@@ -44,7 +44,7 @@ export async function findReferenceProfile(
   input: EstimationInput,
 ): Promise<VehiclePriceReferenceProfile | null> {
   const { data, error } = await supabase
-    .from("vehicle_price_reference_profiles" as never)
+    .from("vehicle_price_reference_profiles")
     .select(
       "id,make_name,model_name,body_type,fuel_type,transmission_type,baseline_year,baseline_price_mga,annual_depreciation_rate,expected_km_per_year,popularity_score,is_active",
     )
