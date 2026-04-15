@@ -321,6 +321,13 @@ const ListingDetail = () => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  useEffect(() => {
+    if (!listing) return;
+    const imageCount = listing.images.length > 0 ? listing.images.length : 1;
+    if (selectedImg < imageCount) return;
+    setSelectedImg(0);
+  }, [listing, selectedImg]);
+
   if (isLoading) {
     return (
       <>
@@ -379,11 +386,6 @@ const ListingDetail = () => {
     ? listing.images
     : ["/placeholder.svg"];
   const hasMultipleImages = images.length > 1;
-
-  useEffect(() => {
-    if (selectedImg < images.length) return;
-    setSelectedImg(0);
-  }, [images.length, selectedImg]);
 
   const goToPreviousImage = () => {
     if (!hasMultipleImages) return;
