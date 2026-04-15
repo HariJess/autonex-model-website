@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Maximize, Phone, ChevronRight, ChevronLeft, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare, CarFront } from "lucide-react";
+import { CarFront, DoorOpen, Gauge, Phone, Users, ChevronRight, ChevronLeft, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -637,29 +637,41 @@ const ListingDetail = () => {
               <p className="text-sm text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
               {versionLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
-                  <Bed className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold font-sans">{versionLabel}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.rooms")}</p></div>
+                  <CarFront className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-semibold font-sans">{versionLabel}</p>
+                    <p className="text-xs text-muted-foreground font-sans">Version / finition</p>
+                  </div>
                 </div>
               )}
               {mileageLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
-                  <Maximize className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold font-sans">{mileageLabel}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.surface")}</p></div>
+                  <Gauge className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-semibold font-sans">{mileageLabel}</p>
+                    <p className="text-xs text-muted-foreground font-sans">Kilométrage</p>
+                  </div>
                 </div>
               )}
               {doorsLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
-                  <Bath className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold font-sans">{doorsLabel}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.bathrooms")}</p></div>
+                  <DoorOpen className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-semibold font-sans">{doorsLabel}</p>
+                    <p className="text-xs text-muted-foreground font-sans">Portes</p>
+                  </div>
                 </div>
               )}
-              {listing.toilets != null && listing.toilets > 0 && (
+              {listing.vehicle?.seats != null && listing.vehicle.seats > 0 && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
-                  <Bath className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold font-sans">{listing.toilets}</p><p className="text-xs text-muted-foreground font-sans">{t("listing.toilets", "Toilettes")}</p></div>
+                  <Users className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-semibold font-sans">{listing.vehicle.seats}</p>
+                    <p className="text-xs text-muted-foreground font-sans">Places</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -769,7 +781,7 @@ const ListingDetail = () => {
                         "listing.locationApproxDesc",
                         "Zone approximative sur la carte (l’adresse exacte n’est pas affichée publiquement)."
                       )
-                    : t("listing.locationNoCoords", "Aucune position carte n’a été enregistrée pour ce bien.")}
+                    : t("listing.locationNoCoords", "Aucune position carte n’a été enregistrée pour ce véhicule.")}
                 </p>
               </div>
               <div className="p-4 md:p-5">
@@ -797,7 +809,7 @@ const ListingDetail = () => {
                     <p className="font-sans text-sm text-foreground max-w-md leading-relaxed">
                       {t(
                         "listing.mapFallback",
-                        "La carte n’est pas disponible pour ce bien. L’adresse textuelle ci-dessus reste votre principal repère."
+                        "La carte n’est pas disponible pour ce véhicule. L’adresse textuelle ci-dessus reste votre principal repère."
                       )}
                     </p>
                   </div>
