@@ -267,10 +267,10 @@ const VehicleEstimationPage = () => {
                   </Badge>
                   <div className="space-y-3">
                     <h1 className={ESTIMATION_TYPO.h1}>
-                      Estimez la valeur de votre vehicule
+                      Estimez la valeur de votre véhicule
                     </h1>
                     <p className={`${ESTIMATION_TYPO.body} max-w-2xl md:text-base`}>
-                      Obtenez en quelques étapes une estimation de marché claire, intelligente et adaptée à votre voiture.
+                      En quelques étapes, obtenez une estimation claire, crédible et directement utile avant publication.
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -299,35 +299,36 @@ const VehicleEstimationPage = () => {
                   </div>
                 </div>
                 <div className={`rounded-2xl border bg-background/85 p-5 md:p-6 ${ESTIMATION_PALETTE.surface}`}>
-                  <p className={ESTIMATION_TYPO.label}>Ce que vous obtenez</p>
+                  <p className={ESTIMATION_TYPO.label}>Pourquoi c'est utile</p>
                   <div className="mt-4 space-y-3">
                     <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                       <TrendingUp className="mt-0.5 h-4 w-4 text-primary" />
                       <div>
                         <p className="font-sans text-sm font-medium">Fourchette de marché</p>
-                        <p className="font-sans text-xs text-muted-foreground">Une base credible pour decider de votre prix.</p>
+                        <p className="font-sans text-xs text-muted-foreground">Une base crédible pour décider de votre positionnement prix.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                       <Gauge className="mt-0.5 h-4 w-4 text-primary" />
                       <div>
                         <p className="font-sans text-sm font-medium">Niveau de confiance</p>
-                        <p className="font-sans text-xs text-muted-foreground">Une lecture claire de la robustesse des données.</p>
+                        <p className="font-sans text-xs text-muted-foreground">Une lecture immédiate de la solidité de l'évaluation.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                       <Target className="mt-0.5 h-4 w-4 text-primary" />
                       <div>
                         <p className="font-sans text-sm font-medium">Prix conseillé de publication</p>
-                        <p className="font-sans text-xs text-muted-foreground">Pret a publier rapidement sur AutoNex.</p>
+                        <p className="font-sans text-xs text-muted-foreground">Prêt à être utilisé pour publier rapidement sur AutoNex.</p>
                       </div>
                     </div>
-                  </div>
-                  <div className="mt-4 rounded-xl border border-primary/20 bg-primary/[0.05] p-4">
-                    <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Apercu de rapport</p>
-                    <p className="mt-1 font-serif text-2xl tracking-tight">26 400 000 Ar</p>
-                    <p className="font-sans text-xs text-muted-foreground">Fourchette : 24 100 000 - 28 900 000 Ar</p>
-                    <p className="mt-2 font-sans text-xs text-muted-foreground">Confiance: moyenne</p>
+                    <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
+                      <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
+                      <div>
+                        <p className="font-sans text-sm font-medium">Prêt pour la suite</p>
+                        <p className="font-sans text-xs text-muted-foreground">Après l'estimation, vous pouvez publier votre véhicule avec un prix recommandé.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
