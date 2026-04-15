@@ -253,7 +253,7 @@ const VehicleEstimationPage = () => {
         <link rel="canonical" href={canonical} />
       </Helmet>
       <Header />
-      <main className="container mx-auto max-w-6xl px-4 py-10 md:py-14">
+      <main className="container mx-auto max-w-6xl px-4 py-8 md:py-14">
         <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-64 max-w-5xl bg-gradient-to-r from-primary/15 via-transparent to-primary/15 blur-3xl" />
         {screen === "landing" && (
           <section className="space-y-8 md:space-y-10">
@@ -337,10 +337,10 @@ const VehicleEstimationPage = () => {
             <div className="grid gap-4 md:grid-cols-3">
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-lg">Comment ca fonctionne</CardTitle>
+                  <CardTitle className="font-serif text-lg">Comment ça fonctionne</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm text-muted-foreground">
-                  Decrivez votre vehicule, precisez son etat, puis recevez un rapport d'estimation structure en quelques secondes.
+                  Décrivez votre véhicule, précisez son état, puis recevez un rapport d'estimation structuré en quelques secondes.
                 </CardContent>
               </Card>
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
@@ -370,7 +370,7 @@ const VehicleEstimationPage = () => {
               <p className="font-sans text-xs text-muted-foreground">Étape {currentStepIndex} sur 3</p>
             </div>
 
-            <div className="grid grid-cols-3 items-end gap-3">
+            <div className="grid grid-cols-3 items-end gap-2 md:gap-3">
               {STEP_META.map((step, index) => {
                 const stepNumber = index + 1;
                 const isActive = step.id === screen;
@@ -388,7 +388,7 @@ const VehicleEstimationPage = () => {
                         }`}
                       />
                       <p
-                        className={`font-sans text-sm transition-colors duration-200 md:text-[15px] ${
+                        className={`font-sans text-xs transition-colors duration-200 sm:text-sm md:text-[15px] ${
                           isActive
                             ? "font-semibold text-primary"
                             : isDone
@@ -445,14 +445,14 @@ const VehicleEstimationPage = () => {
                 {!catalogLoading && makeOptions.length === 0 && (
                   <div className="md:col-span-2 rounded-lg border border-amber-400/30 bg-amber-100/30 p-3">
                     <p className="font-sans text-sm text-amber-900">
-                      Le catalogue visible n'est pas disponible. Verifiez la configuration UI du catalogue.
+                      Le catalogue visible n'est pas disponible. Vérifiez la configuration UI du catalogue.
                     </p>
                   </div>
                 )}
                 {!catalogLoading && catalogPayload?.source === "ui-curated" && (
                   <div className="md:col-span-2 rounded-lg border border-border/70 bg-secondary/20 p-3">
                     <p className="font-sans text-xs text-muted-foreground">
-                      Catalogue visible propre charge (source UI curatee).
+                      Catalogue visible chargé (source UI curatée).
                     </p>
                   </div>
                 )}
@@ -461,9 +461,9 @@ const VehicleEstimationPage = () => {
                   <VehicleCatalogCombobox
                     value={form.makeName}
                     options={makeOptions}
-                    placeholder="Selectionner une marque"
+                    placeholder="Sélectionner une marque"
                     searchPlaceholder="Rechercher une marque..."
-                    emptyLabel="Aucune marque trouvee"
+                    emptyLabel="Aucune marque trouvée"
                     disabled={catalogLoading || makeOptions.length === 0}
                     onSelect={(value) => setForm((prev) => ({ ...prev, makeName: value, modelName: "" }))}
                   />
@@ -481,7 +481,7 @@ const VehicleEstimationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="year">Annee</Label>
+                  <Label htmlFor="year">Année</Label>
                   <Input
                     id="year"
                     type="number"
@@ -537,14 +537,14 @@ const VehicleEstimationPage = () => {
                   </Select>
                 </div>
                   </div>
-                  <div className="rounded-xl border border-border/60 bg-secondary/10 p-4">
+                  <div className="rounded-xl border border-border/60 bg-secondary/10 p-4 md:p-5">
                     <p className="font-sans text-xs uppercase tracking-wide text-muted-foreground">Conseil de saisie</p>
                     <p className="mt-1 font-sans text-sm text-muted-foreground">
                       Plus les informations sont précises, plus l'estimation sera resserrée et directement actionnable.
                     </p>
                   </div>
                 </div>
-                <aside className={`rounded-2xl border bg-gradient-to-b p-5 shadow-sm lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
+                <aside className={`rounded-2xl border bg-gradient-to-b p-4 shadow-sm sm:p-5 lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
                   <p className={ESTIMATION_TYPO.label}>Pourquoi ces informations ?</p>
                   <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Une estimation plus juste</h3>
                   <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
@@ -566,12 +566,12 @@ const VehicleEstimationPage = () => {
                   </div>
                 </aside>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-5">
-                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} px-5`}>Retour</Button>
+              <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto`}>Retour</Button>
                 <Button
                   disabled={!canSubmit}
                   onClick={() => setScreen("condition")}
-                  className={`${ESTIMATION_UI.primaryCta} min-w-[150px]`}
+                  className={`${ESTIMATION_UI.primaryCta} w-full min-w-[150px] sm:w-auto`}
                 >
                   Continuer
                   <ChevronRight className="ml-1 h-4 w-4" />
@@ -654,7 +654,7 @@ const VehicleEstimationPage = () => {
                 </div>
                 <aside className={`rounded-2xl border bg-gradient-to-b p-5 shadow-sm lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
                   <p className={ESTIMATION_TYPO.label}>Confiance du rapport</p>
-                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Precision renforcee</h3>
+                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Précision renforcée</h3>
                   <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
                     L'état, l'entretien et l'usage permettent d'ajuster la valeur avec plus de justesse.
                   </p>
@@ -665,9 +665,9 @@ const VehicleEstimationPage = () => {
                 </aside>
               </div>
 
-              <div className="flex flex-wrap justify-between gap-2 border-t border-border/60 pt-4">
-                <Button variant="outline" onClick={() => setScreen("vehicle")} className={ESTIMATION_UI.secondaryCta}>Retour</Button>
-                <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className={ESTIMATION_UI.secondaryCta}>
+              <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-4 sm:flex-row sm:justify-between">
+                <Button variant="outline" onClick={() => setScreen("vehicle")} className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto`}>Retour</Button>
+                <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className={`${ESTIMATION_UI.primaryCta} w-full sm:w-auto`}>
                   {runMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -938,8 +938,8 @@ const VehicleEstimationPage = () => {
                     </p>
                   </div>
                 </div>
-                <div className="mt-5 flex flex-wrap items-center gap-2.5">
-                  <Button onClick={() => void publishFromEstimation()} size="lg" className={ESTIMATION_UI.primaryCta}>
+                <div className="mt-5 grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
+                  <Button onClick={() => void publishFromEstimation()} size="lg" className={`${ESTIMATION_UI.primaryCta} w-full sm:w-auto`}>
                     Publier cette voiture sur AutoNex
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -955,11 +955,11 @@ const VehicleEstimationPage = () => {
                       }
                       setScreen("vehicle");
                     }}
-                    className={ESTIMATION_UI.secondaryCta}
+                    className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto`}
                   >
                     Affiner l'estimation
                   </Button>
-                  <Button variant="ghost" onClick={() => navigate("/recherche")} className={ESTIMATION_UI.secondaryCta}>
+                  <Button variant="ghost" onClick={() => navigate("/recherche")} className={`${ESTIMATION_UI.secondaryCta} w-full justify-start sm:w-auto sm:justify-center`}>
                     Comparer avec des annonces similaires
                   </Button>
                   <Button
@@ -968,7 +968,7 @@ const VehicleEstimationPage = () => {
                       setResult(null);
                       setScreen("vehicle");
                     }}
-                    className={ESTIMATION_UI.secondaryCta}
+                    className={`${ESTIMATION_UI.secondaryCta} w-full justify-start sm:w-auto sm:justify-center`}
                   >
                     Refaire une estimation
                   </Button>
