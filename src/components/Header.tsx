@@ -50,6 +50,7 @@ const Header = () => {
     location.pathname.startsWith("/agence/") ||
     location.pathname.startsWith("/concessionnaires/");
   const isAdviceActive = location.pathname === "/conseils" || location.pathname.startsWith("/conseils/");
+  const isEstimationActive = location.pathname === "/estimation";
 
   const openDesktopRentMenu = () => {
     if (desktopCloseTimeoutRef.current != null) {
@@ -175,6 +176,9 @@ const Header = () => {
               </Link>
             );
           })}
+          <Link to="/estimation" className={navLinkClass(isEstimationActive)}>
+            Estimation
+          </Link>
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
@@ -265,6 +269,14 @@ const Header = () => {
               style={{ color: "#FAFAFA" }}
             >
               {dealersMode.label}
+            </Link>
+            <Link
+              to="/estimation"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center touch-manipulation bg-white/[0.02] active:bg-white/[0.08]"
+              style={{ color: "#FAFAFA" }}
+            >
+              Estimation
             </Link>
             <Link
               to="/conseils"

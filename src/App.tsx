@@ -31,6 +31,7 @@ const AdminModerationPage = lazy(() => import("./pages/AdminModerationPage.tsx")
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
+const VehicleEstimationPage = lazy(() => import("./pages/VehicleEstimationPage.tsx"));
 const BlogList = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogList })));
 const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogArticle })));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/concessionnaires/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />
+            <Route path="/estimation" element={<VehicleEstimationPage />} />
             <Route path="/conseils" element={<BlogList />} />
             <Route path="/conseils/:slug" element={<BlogArticle />} />
             <Route path="*" element={<NotFound />} />

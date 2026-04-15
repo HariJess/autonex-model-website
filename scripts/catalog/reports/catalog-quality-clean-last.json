@@ -1,0 +1,622 @@
+{
+  "cleanedAt": "2026-04-15T13:46:45.868Z",
+  "targetMakes": [
+    "mazda",
+    "toyota",
+    "bmw",
+    "nissan",
+    "suzuki",
+    "hyundai",
+    "kia",
+    "mercedes-benz",
+    "ford",
+    "peugeot",
+    "renault",
+    "mitsubishi"
+  ],
+  "deactivatedCount": 0,
+  "renamedCount": 202,
+  "deactivatedPreview": [],
+  "renamedPreview": [
+    {
+      "make": "suzuki",
+      "from": "Vl1500l/vl1500bl/vl1500tl/vl1500btl",
+      "to": "Vl1500l/Vl1500bl/Vl1500tl/Vl1500btl"
+    },
+    {
+      "make": "bmw",
+      "from": "S 1000 Rr",
+      "to": "S 1000 RR"
+    },
+    {
+      "make": "bmw",
+      "from": "F 700 Gs",
+      "to": "F 700 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "1m",
+      "to": "1M"
+    },
+    {
+      "make": "suzuki",
+      "from": "Dl650xal/dl650aal/dl650al",
+      "to": "Dl650xal/Dl650aal/Dl650al"
+    },
+    {
+      "make": "suzuki",
+      "from": "Lt-f400f/lt-f400fc",
+      "to": "Lt-F400f/LT-F400fc"
+    },
+    {
+      "make": "bmw",
+      "from": "528i",
+      "to": "528I"
+    },
+    {
+      "make": "bmw",
+      "from": "535i",
+      "to": "535I"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1200 St",
+      "to": "R 1200 ST"
+    },
+    {
+      "make": "bmw",
+      "from": "128i",
+      "to": "128I"
+    },
+    {
+      "make": "bmw",
+      "from": "135i",
+      "to": "135I"
+    },
+    {
+      "make": "bmw",
+      "from": "328i",
+      "to": "328I"
+    },
+    {
+      "make": "bmw",
+      "from": "335d",
+      "to": "335D"
+    },
+    {
+      "make": "bmw",
+      "from": "435i",
+      "to": "435I"
+    },
+    {
+      "make": "bmw",
+      "from": "M 1000 Rr",
+      "to": "M 1000 RR"
+    },
+    {
+      "make": "nissan",
+      "from": "Kicks Mpv",
+      "to": "Kicks MPV"
+    },
+    {
+      "make": "nissan",
+      "from": "Ariya Mpv",
+      "to": "Ariya MPV"
+    },
+    {
+      "make": "toyota",
+      "from": "Scion Fr-s",
+      "to": "Scion Fr-S"
+    },
+    {
+      "make": "toyota",
+      "from": "Fj Cruiser",
+      "to": "FJ Cruiser"
+    },
+    {
+      "make": "toyota",
+      "from": "Gr Corolla",
+      "to": "GR Corolla"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Gla-Class",
+      "to": "GLA-Class"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Slr Mclaren",
+      "to": "SLR Mclaren"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Amg Gt",
+      "to": "AMG GT"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Glc-Class",
+      "to": "GLC-Class"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Gle-Class",
+      "to": "GLE-Class"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Gls-Class",
+      "to": "GLS-Class"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Eqs-class Sedan",
+      "to": "Eqs-Class Sedan"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Eqe-class Sedan",
+      "to": "Eqe-Class Sedan"
+    },
+    {
+      "make": "mercedes-benz",
+      "from": "Eqe-class Suv",
+      "to": "Eqe-Class SUV"
+    },
+    {
+      "make": "bmw",
+      "from": "335i",
+      "to": "335I"
+    },
+    {
+      "make": "bmw",
+      "from": "550i",
+      "to": "550I"
+    },
+    {
+      "make": "bmw",
+      "from": "740i",
+      "to": "740I"
+    },
+    {
+      "make": "bmw",
+      "from": "750i",
+      "to": "750I"
+    },
+    {
+      "make": "bmw",
+      "from": "640i",
+      "to": "640I"
+    },
+    {
+      "make": "bmw",
+      "from": "650i",
+      "to": "650I"
+    },
+    {
+      "make": "bmw",
+      "from": "F 800 St",
+      "to": "F 800 ST"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1200 Gs",
+      "to": "R 1200 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1200 Rt",
+      "to": "R 1200 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "K 1300 Gt",
+      "to": "K 1300 GT"
+    },
+    {
+      "make": "bmw",
+      "from": "F 650 Gs",
+      "to": "F 650 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "G 650 Gs",
+      "to": "G 650 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 900 Rt",
+      "to": "R 900 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "K 1600 Gt",
+      "to": "K 1600 GT"
+    },
+    {
+      "make": "bmw",
+      "from": "F 800 Gt",
+      "to": "F 800 GT"
+    },
+    {
+      "make": "bmw",
+      "from": "C 650 Gt",
+      "to": "C 650 GT"
+    },
+    {
+      "make": "bmw",
+      "from": "228i",
+      "to": "228I"
+    },
+    {
+      "make": "bmw",
+      "from": "320i",
+      "to": "320I"
+    },
+    {
+      "make": "bmw",
+      "from": "328d",
+      "to": "328D"
+    },
+    {
+      "make": "bmw",
+      "from": "428i",
+      "to": "428I"
+    },
+    {
+      "make": "bmw",
+      "from": "535d",
+      "to": "535D"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1150 Gs",
+      "to": "R 1150 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "K 1200 Gt",
+      "to": "K 1200 GT"
+    },
+    {
+      "make": "bmw",
+      "from": "525i",
+      "to": "525I"
+    },
+    {
+      "make": "bmw",
+      "from": "530i",
+      "to": "530I"
+    },
+    {
+      "make": "bmw",
+      "from": "325i",
+      "to": "325I"
+    },
+    {
+      "make": "bmw",
+      "from": "330i",
+      "to": "330I"
+    },
+    {
+      "make": "bmw",
+      "from": "760i",
+      "to": "760I"
+    },
+    {
+      "make": "bmw",
+      "from": "545i",
+      "to": "545I"
+    },
+    {
+      "make": "bmw",
+      "from": "745i",
+      "to": "745I"
+    },
+    {
+      "make": "bmw",
+      "from": "R 100 Rt",
+      "to": "R 100 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1100 Rs",
+      "to": "R 1100 RS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1100 Gs",
+      "to": "R 1100 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1100 Rt",
+      "to": "R 1100 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "K 1200 Rs",
+      "to": "K 1200 RS"
+    },
+    {
+      "make": "bmw",
+      "from": "F 650 Cs",
+      "to": "F 650 CS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1150 Rs",
+      "to": "R 1150 RS"
+    },
+    {
+      "make": "bmw",
+      "from": "318i",
+      "to": "318I"
+    },
+    {
+      "make": "bmw",
+      "from": "540i",
+      "to": "540I"
+    },
+    {
+      "make": "bmw",
+      "from": "323i",
+      "to": "323I"
+    },
+    {
+      "make": "bmw",
+      "from": "645i",
+      "to": "645I"
+    },
+    {
+      "make": "bmw",
+      "from": "340i",
+      "to": "340I"
+    },
+    {
+      "make": "bmw",
+      "from": "330e",
+      "to": "330E"
+    },
+    {
+      "make": "bmw",
+      "from": "S 1000 Xr",
+      "to": "S 1000 XR"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1200 Rs",
+      "to": "R 1200 RS"
+    },
+    {
+      "make": "bmw",
+      "from": "735i",
+      "to": "735I"
+    },
+    {
+      "make": "bmw",
+      "from": "850i",
+      "to": "850I"
+    },
+    {
+      "make": "bmw",
+      "from": "325/325e",
+      "to": "325/325E"
+    },
+    {
+      "make": "bmw",
+      "from": "535i/535is",
+      "to": "535I/535is"
+    },
+    {
+      "make": "bmw",
+      "from": "528e",
+      "to": "528E"
+    },
+    {
+      "make": "bmw",
+      "from": "325i/325is",
+      "to": "325I/325is"
+    },
+    {
+      "make": "bmw",
+      "from": "230i",
+      "to": "230I"
+    },
+    {
+      "make": "bmw",
+      "from": "430i",
+      "to": "430I"
+    },
+    {
+      "make": "bmw",
+      "from": "440i",
+      "to": "440I"
+    },
+    {
+      "make": "bmw",
+      "from": "740e",
+      "to": "740E"
+    },
+    {
+      "make": "bmw",
+      "from": "533i",
+      "to": "533I"
+    },
+    {
+      "make": "bmw",
+      "from": "733i",
+      "to": "733I"
+    },
+    {
+      "make": "bmw",
+      "from": "K 100 Rs",
+      "to": "K 100 RS"
+    },
+    {
+      "make": "bmw",
+      "from": "K 100 Rt",
+      "to": "K 100 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "R 80 Rt",
+      "to": "R 80 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "R 80 Gs",
+      "to": "R 80 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 65 Ls",
+      "to": "R 65 LS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 80 St",
+      "to": "R 80 ST"
+    },
+    {
+      "make": "bmw",
+      "from": "R 100 Cs",
+      "to": "R 100 CS"
+    },
+    {
+      "make": "bmw",
+      "from": "730i",
+      "to": "730I"
+    },
+    {
+      "make": "bmw",
+      "from": "540d",
+      "to": "540D"
+    },
+    {
+      "make": "bmw",
+      "from": "530e",
+      "to": "530E"
+    },
+    {
+      "make": "bmw",
+      "from": "745e",
+      "to": "745E"
+    },
+    {
+      "make": "bmw",
+      "from": "840i",
+      "to": "840I"
+    },
+    {
+      "make": "bmw",
+      "from": "G 310 Gs",
+      "to": "G 310 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "C 400 Gt",
+      "to": "C 400 GT"
+    },
+    {
+      "make": "bmw",
+      "from": "F 750 Gs",
+      "to": "F 750 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "F 850 Gs",
+      "to": "F 850 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1250 Gs",
+      "to": "R 1250 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1250 Rt",
+      "to": "R 1250 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1250 Rs",
+      "to": "R 1250 RS"
+    },
+    {
+      "make": "bmw",
+      "from": "Ce 04",
+      "to": "CE 04"
+    },
+    {
+      "make": "bmw",
+      "from": "Xm",
+      "to": "XM"
+    },
+    {
+      "make": "bmw",
+      "from": "750e",
+      "to": "750E"
+    },
+    {
+      "make": "bmw",
+      "from": "Ce 02",
+      "to": "CE 02"
+    },
+    {
+      "make": "bmw",
+      "from": "F 900 Gs Adventure",
+      "to": "F 900 GS Adventure"
+    },
+    {
+      "make": "bmw",
+      "from": "F 900 Xr",
+      "to": "F 900 XR"
+    },
+    {
+      "make": "bmw",
+      "from": "M 1000 Xr",
+      "to": "M 1000 XR"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1250 Gs Adventure",
+      "to": "R 1250 GS Adventure"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1300 Gs",
+      "to": "R 1300 GS"
+    },
+    {
+      "make": "bmw",
+      "from": "550e",
+      "to": "550E"
+    },
+    {
+      "make": "bmw",
+      "from": "F 900 Gs-p",
+      "to": "F 900 GS-P"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1300 Gs Adventure",
+      "to": "R 1300 GS Adventure"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1300 Rt",
+      "to": "R 1300 RT"
+    },
+    {
+      "make": "bmw",
+      "from": "R 1300 Rs",
+      "to": "R 1300 RS"
+    },
+    {
+      "make": "bmw",
+      "from": "R 12 G/s",
+      "to": "R 12 G/S"
+    }
+  ]
+}

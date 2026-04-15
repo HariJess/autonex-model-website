@@ -10,7 +10,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "catalog:import:vpic": "node ./scripts/catalog/import-vpic-catalog.mjs",
+    "catalog:enrich:fueleconomy": "node ./scripts/catalog/enrich-fueleconomy-catalog.mjs",
+    "catalog:report": "node ./scripts/catalog/catalog-report.mjs",
+    "catalog:clean:quality": "node ./scripts/catalog/clean-catalog-quality.mjs",
+    "catalog:canonicalize:display": "node ./scripts/catalog/canonicalize-display-targeted.mjs",
+    "catalog:overrides:apply": "node ./scripts/catalog/apply-manual-overrides.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
