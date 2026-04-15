@@ -364,18 +364,18 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen !== "landing" && (
-          <div className="mb-7 rounded-xl border border-border/50 bg-background/85 p-3 md:mb-9">
-            <div className="mb-2 flex items-center justify-between px-1">
-              <p className="font-sans text-xs uppercase tracking-wide text-muted-foreground">Progression</p>
+          <div className="mb-6 rounded-2xl border border-border/40 bg-background/80 px-3 py-2.5 md:mb-8 md:px-4 md:py-3">
+            <div className="mb-2.5 flex items-center justify-between">
+              <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-muted-foreground">Progression</p>
               <p className="font-sans text-xs text-muted-foreground">Étape {currentStepIndex} / 3</p>
             </div>
-            <div className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-muted/80">
+            <div className="mb-2.5 h-1 w-full overflow-hidden rounded-full bg-muted/70">
               <div
-                className="h-full rounded-full bg-primary transition-all"
+                className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
                 style={{ width: `${Math.max(8, (currentStepIndex / 3) * 100)}%` }}
               />
             </div>
-            <div className="grid gap-2 md:grid-cols-3">
+            <div className="grid gap-1.5 md:grid-cols-3">
               {STEP_META.map((step, index) => {
                 const stepNumber = index + 1;
                 const isActive = step.id === screen;
@@ -383,29 +383,31 @@ const VehicleEstimationPage = () => {
                 return (
                   <div
                     key={step.id}
-                    className={`rounded-md px-2.5 py-2 transition ${
+                    className={`rounded-lg px-2.5 py-1.5 transition-all duration-200 ${
                       isActive
-                        ? "bg-primary/5"
+                        ? "bg-primary/10"
                         : isDone
-                          ? "bg-emerald-50/50"
-                          : "bg-transparent"
+                          ? "bg-emerald-50/60"
+                          : "bg-transparent opacity-75"
                     }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span
-                        className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium ${
+                        className={`inline-flex h-4.5 w-4.5 items-center justify-center rounded-full text-[10px] font-medium ${
                           isActive
                             ? "bg-primary text-primary-foreground"
                             : isDone
                               ? "bg-emerald-600 text-white"
-                              : "bg-muted text-muted-foreground"
+                              : "bg-muted text-muted-foreground/90"
                         }`}
                       >
                         {stepNumber}
                       </span>
-                      <p className={`font-sans text-xs font-medium ${isActive ? "text-primary" : ""}`}>{step.label}</p>
+                      <p className={`font-sans text-[11px] font-medium ${isActive ? "text-primary" : isDone ? "text-emerald-800" : "text-muted-foreground"}`}>
+                        {step.label}
+                      </p>
                     </div>
-                    <p className="mt-0.5 font-sans text-[10px] text-muted-foreground">{step.helper}</p>
+                    <p className="mt-0.5 pl-6 font-sans text-[10px] text-muted-foreground/90">{step.helper}</p>
                   </div>
                 );
               })}
