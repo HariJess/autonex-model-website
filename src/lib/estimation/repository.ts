@@ -74,7 +74,7 @@ export async function insertEstimationEvent(
     {
       estimation_request_id: estimationRequestId,
       event_type: eventType,
-      metadata: metadata ?? null,
+      metadata: metadata ?? {},
     } as never,
   );
   if (error) throw new Error(error.message);

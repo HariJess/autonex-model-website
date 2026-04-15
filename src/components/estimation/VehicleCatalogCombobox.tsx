@@ -58,22 +58,28 @@ export default function VehicleCatalogCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between border-2 border-input bg-card px-3 font-normal"
+          className="h-11 w-full justify-between rounded-xl border border-border/70 bg-background px-3 font-normal shadow-sm transition hover:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/30"
           disabled={disabled}
         >
           <span className="truncate text-left">{selected || placeholder}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-60" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+      <PopoverContent className="w-[--radix-popover-trigger-width] rounded-xl border-border/70 p-0 shadow-lg" align="start">
         <Command>
-          <CommandInput placeholder={searchPlaceholder} value={query} onValueChange={setQuery} />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={query}
+            onValueChange={setQuery}
+            className="font-sans"
+          />
           <CommandList>
             <CommandEmpty>{emptyLabel}</CommandEmpty>
             {filteredOptions.map((option) => (
               <CommandItem
                 key={option}
                 value={option}
+                className="transition-colors duration-150 ease-out"
                 onSelect={() => {
                   onSelect(option);
                   setQuery("");

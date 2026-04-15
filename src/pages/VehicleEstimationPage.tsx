@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AlertCircle, ArrowRight, CarFront, CheckCircle2, ChevronRight, Loader2, ShieldCheck } from "lucide-react";
+import { AlertCircle, ArrowRight, CarFront, CheckCircle2, ChevronRight, Gauge, Loader2, ShieldCheck, Sparkles, Target, TrendingUp } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +53,62 @@ function confidenceBadgeClass(label: "high" | "medium" | "low"): string {
   if (label === "medium") return "bg-amber-500 text-black";
   return "bg-destructive text-white";
 }
+
+const STEP_META = [
+  { id: "vehicle", label: "Véhicule", helper: "Informations principales" },
+  { id: "condition", label: "État", helper: "Historique et usage" },
+  { id: "result", label: "Résultat", helper: "Rapport estimatif" },
+] as const;
+
+const MADAGASCAR_LOCATION_OPTIONS = [
+  "Antananarivo",
+  "Toamasina",
+  "Antsirabe",
+  "Fianarantsoa",
+  "Mahajanga",
+  "Toliara",
+  "Antsiranana",
+  "Nosy Be",
+  "Sainte-Marie",
+  "Morondava",
+  "Tolagnaro",
+  "Sambava",
+  "Ambatondrazaka",
+  "Ambositra",
+  "Manakara",
+] as const;
+
+// Palette lock (4 tones): navy, primary, neutral surface, amber state.
+const ESTIMATION_PALETTE = {
+  hero: "bg-gradient-to-br from-[#071226] via-[#0D1E3E] to-[#1A3560] text-background",
+  surface: "bg-card/95 border-border/60",
+  subtle: "bg-secondary/15 border-border/60",
+  accent: "border-primary/30 bg-primary/[0.08]",
+} as const;
+
+// Typography lock: fixed scale/weight/leading for this feature.
+const ESTIMATION_TYPO = {
+  display: "font-serif tracking-tight leading-[1.05]",
+  h1: "font-serif text-4xl md:text-6xl tracking-tight leading-[1.05]",
+  h2: "font-serif text-3xl md:text-4xl tracking-tight",
+  h3: "font-serif text-xl md:text-2xl",
+  valueHero: "font-serif text-5xl md:text-7xl tracking-tight leading-[0.98]",
+  valueMetric: "font-serif text-2xl",
+  body: "font-sans text-sm leading-relaxed text-muted-foreground",
+  label: "font-sans text-xs uppercase tracking-wide text-muted-foreground",
+  caption: "font-sans text-xs text-muted-foreground",
+} as const;
+
+const ESTIMATION_UI = {
+  sectionCard:
+    "rounded-3xl border-border/60 bg-card/95 shadow-md transition-all duration-300 ease-out hover:shadow-lg",
+  inputLike:
+    "h-11 rounded-xl border border-border/70 bg-background shadow-sm transition-all duration-200 ease-out focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/20",
+  primaryCta:
+    "rounded-xl px-8 font-sans shadow-lg transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:shadow-md",
+  secondaryCta:
+    "rounded-xl font-sans transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0",
+} as const;
 
 const VehicleEstimationPage = () => {
   const navigate = useNavigate();
@@ -127,7 +183,7 @@ const VehicleEstimationPage = () => {
   const vehicleStepErrors = useMemo(() => {
     const errors: string[] = [];
     if (!form.makeName.trim()) errors.push("La marque est obligatoire.");
-    if (!form.modelName.trim()) errors.push("Le modele est obligatoire.");
+    if (!form.modelName.trim()) errors.push("Le modèle est obligatoire.");
     if (!Number.isFinite(form.year) || form.year < 1950 || form.year > currentYear) {
       errors.push("L'annee doit etre comprise entre 1950 et l'annee en cours.");
     }
@@ -142,6 +198,8 @@ const VehicleEstimationPage = () => {
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/estimation`
     : "https://autonex.mg/estimation";
+  const currentStepIndex =
+    screen === "landing" ? 0 : screen === "vehicle" ? 1 : screen === "condition" ? 2 : 3;
 
   const publishFromEstimation = async () => {
     if (!result) return;
@@ -169,76 +227,135 @@ const VehicleEstimationPage = () => {
     });
   };
 
+  const trackEstimationEvent = async (
+    requestId: string,
+    eventType:
+      | "clicked_publish_after_estimation"
+      | "clicked_refine_estimation"
+      | "viewed_similar_listings",
+    metadata?: Record<string, unknown>,
+  ) => {
+    try {
+      await insertEstimationEvent(requestId, eventType, metadata ?? {});
+    } catch {
+      // Analytics events are non-blocking by design.
+    }
+  };
+
   return (
     <>
       <Helmet>
         <title>Estimation AutoNex - Estimez la valeur de votre voiture</title>
         <meta
           name="description"
-          content="Particulier ou professionnel, obtenez une estimation de marche de votre vehicule a Madagascar avant de le vendre, meme sans annonce AutoNex."
+          content="Particulier ou professionnel, obtenez une estimation de marché de votre véhicule à Madagascar avant de le vendre, même sans annonce AutoNex."
         />
         <link rel="canonical" href={canonical} />
       </Helmet>
       <Header />
-      <main className="container mx-auto px-4 py-6 md:py-8">
+      <main className="container mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-64 max-w-5xl bg-gradient-to-r from-primary/15 via-transparent to-primary/15 blur-3xl" />
         {screen === "landing" && (
-          <section className="space-y-6">
-            <Card className="rounded-2xl">
-              <CardHeader>
-                <Badge variant="outline" className="w-fit font-sans normal-case">Estimation de marche</Badge>
-                <CardTitle className="font-serif text-3xl md:text-4xl">Estimez la valeur de votre voiture</CardTitle>
-                <p className="text-muted-foreground font-sans text-sm md:text-base max-w-3xl">
-                  Estimez la valeur de marche de votre voiture, meme si elle n'est pas encore en vente sur AutoNex.
-                </p>
-                <p className="text-xs font-sans text-muted-foreground max-w-3xl">
-                  Aucune annonce AutoNex n'est necessaire pour demarrer.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="rounded-xl border border-border/80 bg-secondary/15 p-4">
-                    <p className="font-sans text-sm font-semibold">Fourchette estimee</p>
-                    <p className="font-sans text-xs text-muted-foreground mt-1">Jamais un prix exact absolu.</p>
+          <section className="space-y-8 md:space-y-10">
+            <Card className={`relative overflow-hidden rounded-3xl shadow-md transition-all duration-500 ease-out hover:shadow-xl ${ESTIMATION_PALETTE.surface}`}>
+              <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+              <CardContent className="grid gap-8 p-7 md:grid-cols-[1.4fr_1fr] md:p-11">
+                <div className="space-y-6">
+                  <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">
+                    Outil de valorisation AutoNex
+                  </Badge>
+                  <div className="space-y-3">
+                    <h1 className={ESTIMATION_TYPO.h1}>
+                      Estimez la valeur de votre vehicule
+                    </h1>
+                    <p className={`${ESTIMATION_TYPO.body} max-w-2xl md:text-base`}>
+                      Obtenez en quelques étapes une estimation de marché claire, intelligente et adaptée à votre voiture.
+                    </p>
                   </div>
-                  <div className="rounded-xl border border-border/80 bg-secondary/15 p-4">
-                    <p className="font-sans text-sm font-semibold">Niveau de confiance</p>
-                    <p className="font-sans text-xs text-muted-foreground mt-1">Indicateur clair selon les donnees trouvees.</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="font-sans normal-case">Rapide</Badge>
+                    <Badge variant="secondary" className="font-sans normal-case">Transparent</Badge>
+                    <Badge variant="secondary" className="font-sans normal-case">Utile avant publication</Badge>
+                    <Badge variant="secondary" className="font-sans normal-case">Pensé pour Madagascar</Badge>
                   </div>
-                  <div className="rounded-xl border border-border/80 bg-secondary/15 p-4">
-                    <p className="font-sans text-sm font-semibold">Comparables recents</p>
-                    <p className="font-sans text-xs text-muted-foreground mt-1">Annonces AutoNex similaires en enrichissement, si disponibles.</p>
+                  <div className="flex flex-wrap gap-3 pt-1">
+                    <Button
+                      onClick={() => setScreen("vehicle")}
+                      size="lg"
+                      className="rounded-xl px-6 font-sans shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
+                    >
+                      Commencer l'estimation
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="rounded-xl px-5 font-sans transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+                      onClick={() => navigate("/recherche")}
+                    >
+                      Explorer les annonces
+                    </Button>
                   </div>
                 </div>
-                <Button onClick={() => setScreen("vehicle")} className="font-sans">
-                  Commencer l'estimation
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <div className={`rounded-2xl border bg-background/85 p-5 md:p-6 ${ESTIMATION_PALETTE.surface}`}>
+                  <p className={ESTIMATION_TYPO.label}>Ce que vous obtenez</p>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
+                      <TrendingUp className="mt-0.5 h-4 w-4 text-primary" />
+                      <div>
+                        <p className="font-sans text-sm font-medium">Fourchette de marché</p>
+                        <p className="font-sans text-xs text-muted-foreground">Une base credible pour decider de votre prix.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
+                      <Gauge className="mt-0.5 h-4 w-4 text-primary" />
+                      <div>
+                        <p className="font-sans text-sm font-medium">Niveau de confiance</p>
+                        <p className="font-sans text-xs text-muted-foreground">Une lecture claire de la robustesse des données.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
+                      <Target className="mt-0.5 h-4 w-4 text-primary" />
+                      <div>
+                        <p className="font-sans text-sm font-medium">Prix conseillé de publication</p>
+                        <p className="font-sans text-xs text-muted-foreground">Pret a publier rapidement sur AutoNex.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 rounded-xl border border-primary/20 bg-primary/[0.05] p-4">
+                    <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Apercu de rapport</p>
+                    <p className="mt-1 font-serif text-2xl tracking-tight">26 400 000 Ar</p>
+                    <p className="font-sans text-xs text-muted-foreground">Fourchette : 24 100 000 - 28 900 000 Ar</p>
+                    <p className="mt-2 font-sans text-xs text-muted-foreground">Confiance: moyenne</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="rounded-2xl">
-                <CardHeader>
-                  <CardTitle className="font-serif text-lg">Comment ca marche ?</CardTitle>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-serif text-lg">Comment ca fonctionne</CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-muted-foreground font-sans">
-                  Nous calculons d'abord une estimation indicative a partir de votre vehicule, puis nous l'enrichissons avec des annonces similaires AutoNex si elles existent.
+                <CardContent className="font-sans text-sm text-muted-foreground">
+                  Decrivez votre vehicule, precisez son etat, puis recevez un rapport d'estimation structure en quelques secondes.
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl">
-                <CardHeader>
-                  <CardTitle className="font-serif text-lg">Pourquoi ce n'est pas officiel ?</CardTitle>
+              <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-serif text-lg">Fiable et transparent</CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-muted-foreground font-sans">
-                  Cette estimation est indicative et ne remplace ni expertise mecanique, ni valeur douaniere, ni prix garanti.
+                <CardContent className="font-sans text-sm text-muted-foreground">
+                  L'outil combine profils de référence et signaux de marché. Chaque estimation inclut sa fourchette et son niveau de confiance.
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl">
-                <CardHeader>
-                  <CardTitle className="font-serif text-lg">Facteurs de prix</CardTitle>
+              <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-serif text-lg">Pensé pour convertir</CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-muted-foreground font-sans">
-                  Kilometrage, etat, entretien, nombre de proprietaires, usage, et signaux du marche local.
+                <CardContent className="font-sans text-sm text-muted-foreground">
+                  Une fois la valeur obtenue, vous pouvez publier votre véhicule immédiatement avec un prix conseillé.
                 </CardContent>
               </Card>
             </div>
@@ -246,21 +363,67 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen !== "landing" && (
-          <div className="mb-4 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <span className={screen === "vehicle" ? "text-primary" : ""}>Vehicule</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className={screen === "condition" ? "text-primary" : ""}>Etat</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className={screen === "result" ? "text-primary" : ""}>Resultat</span>
+          <div className="mb-7 rounded-xl border border-border/50 bg-background/85 p-3 md:mb-9">
+            <div className="mb-2 flex items-center justify-between px-1">
+              <p className="font-sans text-xs uppercase tracking-wide text-muted-foreground">Progression</p>
+              <p className="font-sans text-xs text-muted-foreground">Étape {currentStepIndex} / 3</p>
+            </div>
+            <div className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-muted/80">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${Math.max(8, (currentStepIndex / 3) * 100)}%` }}
+              />
+            </div>
+            <div className="grid gap-2 md:grid-cols-3">
+              {STEP_META.map((step, index) => {
+                const stepNumber = index + 1;
+                const isActive = step.id === screen;
+                const isDone = currentStepIndex > stepNumber;
+                return (
+                  <div
+                    key={step.id}
+                    className={`rounded-md px-2.5 py-2 transition ${
+                      isActive
+                        ? "bg-primary/5"
+                        : isDone
+                          ? "bg-emerald-50/50"
+                          : "bg-transparent"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium ${
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : isDone
+                              ? "bg-emerald-600 text-white"
+                              : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {stepNumber}
+                      </span>
+                      <p className={`font-sans text-xs font-medium ${isActive ? "text-primary" : ""}`}>{step.label}</p>
+                    </div>
+                    <p className="mt-0.5 font-sans text-[10px] text-muted-foreground">{step.helper}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
         {screen === "vehicle" && (
-          <Card className="rounded-2xl">
+          <Card className={ESTIMATION_UI.sectionCard}>
             <CardHeader>
-              <CardTitle className="font-serif text-2xl">Etape 1 - Identite du vehicule</CardTitle>
+              <div className="space-y-2">
+                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">Étape 1</Badge>
+                <CardTitle className={ESTIMATION_TYPO.h2}>Identité du véhicule</CardTitle>
+                <p className={ESTIMATION_TYPO.body}>
+                  Renseignez les informations essentielles. Nous transformons ces données en une valorisation claire et actionnable.
+                </p>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-6">
               {vehicleStepErrors.length > 0 && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
                   {vehicleStepErrors.map((error) => (
@@ -268,7 +431,8 @@ const VehicleEstimationPage = () => {
                   ))}
                 </div>
               )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_0.7fr]">
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 {!catalogLoading && makeOptions.length === 0 && (
                   <div className="md:col-span-2 rounded-lg border border-amber-400/30 bg-amber-100/30 p-3">
                     <p className="font-sans text-sm text-amber-900">
@@ -296,13 +460,13 @@ const VehicleEstimationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="model">Modele</Label>
+                  <Label htmlFor="model">Modèle</Label>
                   <VehicleCatalogCombobox
                     value={form.modelName}
                     options={modelOptions}
-                    placeholder={form.makeName ? "Selectionner un modele" : "Choisissez d'abord une marque"}
-                    searchPlaceholder="Rechercher un modele..."
-                    emptyLabel={form.makeName ? "Aucun modele trouve pour cette marque" : "Selectionnez une marque"}
+                    placeholder={form.makeName ? "Sélectionner un modèle" : "Choisissez d'abord une marque"}
+                    searchPlaceholder="Rechercher un modèle..."
+                    emptyLabel={form.makeName ? "Aucun modèle trouvé pour cette marque" : "Sélectionnez une marque"}
                     disabled={!form.makeName.trim()}
                     onSelect={(value) => setForm((prev) => ({ ...prev, modelName: value }))}
                   />
@@ -315,55 +479,78 @@ const VehicleEstimationPage = () => {
                     min={1950}
                     max={currentYear}
                     value={form.year}
+                    className={ESTIMATION_UI.inputLike}
                     onChange={(e) => setForm((prev) => ({ ...prev, year: Number(e.target.value) }))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">Ville / Region</Label>
-                  <Input
-                    id="city"
+                  <Label htmlFor="city">Ville / Région</Label>
+                  <VehicleCatalogCombobox
                     value={form.city}
-                    onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
-                    placeholder="Ex: Antananarivo"
+                    options={[...MADAGASCAR_LOCATION_OPTIONS]}
+                    placeholder="Sélectionner une ville / région"
+                    searchPlaceholder="Rechercher une ville / région..."
+                    emptyLabel="Aucune ville trouvée"
+                    onSelect={(value) => setForm((prev) => ({ ...prev, city: value }))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="mileage">Kilometrage (km)</Label>
+                  <Label htmlFor="mileage">Kilométrage (km)</Label>
                   <Input
                     id="mileage"
                     type="number"
                     min={0}
                     max={1500000}
                     value={form.mileage}
+                    className={ESTIMATION_UI.inputLike}
                     onChange={(e) => setForm((prev) => ({ ...prev, mileage: Number(e.target.value) }))}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Carburant</Label>
                   <Select value={form.fuelType} onValueChange={(value) => setForm((prev) => ({ ...prev, fuelType: value as EstimationInput["fuelType"] }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_FUEL_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Boite</Label>
+                  <Label>Boîte</Label>
                   <Select value={form.transmissionType} onValueChange={(value) => setForm((prev) => ({ ...prev, transmissionType: value as EstimationInput["transmissionType"] }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_TRANSMISSION_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Carrosserie</Label>
                   <Select value={form.bodyType} onValueChange={(value) => setForm((prev) => ({ ...prev, bodyType: value as EstimationInput["bodyType"] }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_BODY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
+                </div>
+                <aside className={`rounded-2xl border bg-gradient-to-b p-5 shadow-sm lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
+                  <p className={ESTIMATION_TYPO.label}>Pourquoi ces informations ?</p>
+                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Une estimation mieux orientée</h3>
+                  <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
+                    Marque, modèle, kilométrage et configuration technique créent la base de valorisation la plus pertinente.
+                  </p>
+                  <div className="mt-4 space-y-2">
+                    <div className="rounded-lg border border-border/60 bg-background/80 p-3">
+                      <p className="font-sans text-xs font-medium">Étape rapide</p>
+                      <p className="font-sans text-xs text-muted-foreground">Moins de 2 minutes pour compléter.</p>
+                    </div>
+                    <div className="rounded-lg border border-border/60 bg-background/80 p-3">
+                      <p className="font-sans text-xs font-medium">Resultat actionnable</p>
+                      <p className="font-sans text-xs text-muted-foreground">Prix conseillé + fourchette claire.</p>
+                    </div>
+                  </div>
+                </aside>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" onClick={() => setScreen("landing")} className="font-sans">Retour</Button>
-                <Button disabled={!canSubmit} onClick={() => setScreen("condition")} className="font-sans">
+              <div className="flex flex-wrap justify-between gap-2 border-t border-border/60 pt-4">
+                <Button variant="outline" onClick={() => setScreen("landing")} className={ESTIMATION_UI.secondaryCta}>Retour</Button>
+                <Button disabled={!canSubmit} onClick={() => setScreen("condition")} className={ESTIMATION_UI.secondaryCta}>
                   Continuer
+                  <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -371,46 +558,54 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen === "condition" && (
-          <Card className="rounded-2xl">
+          <Card className={ESTIMATION_UI.sectionCard}>
             <CardHeader>
-              <CardTitle className="font-serif text-2xl">Etape 2 - Etat et historique</CardTitle>
+              <div className="space-y-2">
+                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">Étape 2</Badge>
+                <CardTitle className={ESTIMATION_TYPO.h2}>État et historique</CardTitle>
+                <p className={ESTIMATION_TYPO.body}>
+                  Affinez la valorisation avec le contexte d'usage pour obtenir un rapport plus juste.
+                </p>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_0.7fr]">
+                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Etat general</Label>
+                  <Label>État général</Label>
                   <Select value={form.conditionLabel} onValueChange={(value) => setForm((prev) => ({ ...prev, conditionLabel: value as EstimationInput["conditionLabel"] }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_CONDITION_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Entretien suivi</Label>
                   <Select value={form.maintenanceLevel} onValueChange={(value) => setForm((prev) => ({ ...prev, maintenanceLevel: value as EstimationInput["maintenanceLevel"] }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_MAINTENANCE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Nombre de proprietaires</Label>
+                  <Label>Nombre de propriétaires</Label>
                   <Select value={form.ownerCountLabel} onValueChange={(value) => setForm((prev) => ({ ...prev, ownerCountLabel: value as EstimationInput["ownerCountLabel"] }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_OWNER_COUNT_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Usage</Label>
                   <Select value={form.usageType} onValueChange={(value) => setForm((prev) => ({ ...prev, usageType: value as EstimationInput["usageType"] }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_USAGE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border/80 p-4 flex items-center justify-between gap-3">
+              <div className="rounded-xl border border-border/80 p-4 flex items-center justify-between gap-3 bg-background">
                 <div>
-                  <p className="font-sans text-sm font-medium">Accident declare</p>
-                  <p className="font-sans text-xs text-muted-foreground">Impacte le prix estime.</p>
+                  <p className="font-sans text-sm font-medium">Accident déclaré</p>
+                  <p className="font-sans text-xs text-muted-foreground">Impacte le prix estimé.</p>
                 </div>
                 <Button
                   type="button"
@@ -423,15 +618,32 @@ const VehicleEstimationPage = () => {
               </div>
 
               <div className="rounded-xl border border-dashed border-border/80 bg-secondary/15 p-4">
-                <p className="font-sans text-sm font-medium">Ajouter plus de details pour ameliorer la precision</p>
+                <p className="font-sans text-sm font-medium">Conseil AutoNex</p>
                 <p className="font-sans text-xs text-muted-foreground mt-1">
-                  Cette option sera enrichie dans les prochaines versions (photos, historique detaille, VIN).
+                  Soyez le plus precis possible : cela renforce la credibilite de l'estimation.
                 </p>
+                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>Le rapport reste disponible même avec des données partielles.</span>
+                </div>
+              </div>
+                </div>
+                <aside className={`rounded-2xl border bg-gradient-to-b p-5 shadow-sm lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
+                  <p className={ESTIMATION_TYPO.label}>Confiance du rapport</p>
+                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Precision renforcee</h3>
+                  <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
+                    L'état, l'entretien et l'usage permettent d'ajuster la valeur avec plus de justesse.
+                  </p>
+                  <div className="mt-4 rounded-lg border border-border/60 bg-background/80 p-3">
+                    <p className="font-sans text-xs font-medium">Conseil pratique</p>
+                    <p className="font-sans text-xs text-muted-foreground">Si vous hésitez, choisissez l'option la plus prudente.</p>
+                  </div>
+                </aside>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" onClick={() => setScreen("vehicle")} className="font-sans">Retour</Button>
-                <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className="font-sans">
+              <div className="flex flex-wrap justify-between gap-2 border-t border-border/60 pt-4">
+                <Button variant="outline" onClick={() => setScreen("vehicle")} className={ESTIMATION_UI.secondaryCta}>Retour</Button>
+                <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className={ESTIMATION_UI.secondaryCta}>
                   {runMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -455,58 +667,100 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen === "result" && result && (
-          <section className="space-y-4">
-            <Card className="rounded-2xl">
-              <CardHeader>
+          <section className="space-y-6 md:space-y-7">
+            <Card className={`relative overflow-hidden rounded-3xl border-0 shadow-2xl ${ESTIMATION_PALETTE.hero}`}>
+              <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+              <CardContent className="p-7 md:p-9">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="font-sans normal-case">Estimation indicative</Badge>
+                  <Badge variant="outline" className="font-sans normal-case border-background/30 bg-background/10 text-background">
+                    Rapport d'estimation AutoNex
+                  </Badge>
                   <Badge className={confidenceBadgeClass(result.output.confidenceLabel)}>
-                    Confiance {result.output.confidenceLabel === "high" ? "elevee" : result.output.confidenceLabel === "medium" ? "moyenne" : "faible"}
+                    Confiance {result.output.confidenceLabel === "high" ? "élevée" : result.output.confidenceLabel === "medium" ? "moyenne" : "faible"}
                   </Badge>
                 </div>
-                <CardTitle className="font-serif text-3xl">Votre estimation: {formatAriary(result.output.adjustedPrice)}</CardTitle>
-                <p className="font-sans text-sm text-muted-foreground">
-                  Fourchette estimee: {formatAriary(result.output.lowRangePrice)} - {formatAriary(result.output.highRangePrice)}
-                </p>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="rounded-xl border border-border/80 p-4">
-                  <p className="text-xs font-sans text-muted-foreground">Prix conseille d'annonce</p>
-                  <p className="font-serif text-xl mt-1">{formatAriary(result.output.recommendedListingPrice)}</p>
+                <div className="mt-5 grid gap-4 md:grid-cols-[1.55fr_0.95fr] md:items-end">
+                  <div>
+                    <p className="font-sans text-xs uppercase tracking-wide text-background/70">Valeur estimée</p>
+                    <h2 className={`mt-1 ${ESTIMATION_TYPO.valueHero}`}>
+                      {formatAriary(result.output.adjustedPrice)}
+                    </h2>
+                    <div className="mt-3 inline-flex rounded-full border border-background/25 bg-background/10 px-3 py-1.5">
+                      <p className="font-sans text-xs text-background/80">
+                        Fourchette : {formatAriary(result.output.lowRangePrice)} - {formatAriary(result.output.highRangePrice)}
+                      </p>
+                    </div>
+                    <p className="mt-2 font-sans text-xs text-background/60">
+                      Estimation orientée décision, basée sur les caractéristiques déclarées de votre véhicule.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-background/20 bg-background/10 p-5 backdrop-blur-sm shadow-inner">
+                    <p className="font-sans text-xs text-background/70">Score de confiance</p>
+                    <p className="mt-1 font-serif text-4xl">{result.output.confidenceScore}/100</p>
+                    <p className="mt-1 font-sans text-xs text-background/65">Niveau de robustesse de l'évaluation.</p>
+                    <div className="mt-3 h-1.5 w-full rounded-full bg-background/20">
+                      <div
+                        className="h-full rounded-full bg-background/90"
+                        style={{ width: `${Math.max(8, Math.min(100, result.output.confidenceScore))}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="rounded-xl border border-border/80 p-4">
-                  <p className="text-xs font-sans text-muted-foreground">Vente rapide</p>
-                  <p className="font-serif text-xl mt-1">{formatAriary(result.output.quickSalePrice)}</p>
+              </CardContent>
+            </Card>
+            <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
+              <CardContent className="grid grid-cols-1 gap-4 divide-y divide-border/60 p-5 md:grid-cols-4 md:divide-x md:divide-y-0 md:p-6">
+                <div className="md:px-1">
+                  <p className="text-xs font-sans text-muted-foreground">Prix conseillé d'annonce</p>
+                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.recommendedListingPrice)}</p>
                 </div>
-                <div className="rounded-xl border border-border/80 p-4">
-                  <p className="text-xs font-sans text-muted-foreground">Score de confiance</p>
-                  <p className="font-serif text-xl mt-1">{result.output.confidenceScore}/100</p>
+                <div className="md:px-3">
+                  <p className="text-xs font-sans text-muted-foreground">Prix vente rapide</p>
+                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.quickSalePrice)}</p>
+                </div>
+                <div className="md:px-3">
+                  <p className="text-xs font-sans text-muted-foreground">Base de marché</p>
+                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.marketBasePrice)}</p>
+                </div>
+                <div className="md:px-3">
+                  <p className="text-xs font-sans text-muted-foreground">Niveau global</p>
+                  <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>
+                    {result.output.confidenceLabel === "high" ? "Élevé" : result.output.confidenceLabel === "medium" ? "Moyen" : "Prudent"}
+                  </p>
                 </div>
               </CardContent>
             </Card>
 
             {(result.output.confidenceLabel === "low" || !result.output.hasComparables) && (
-              <div className="rounded-xl border border-amber-400/40 bg-amber-100/60 px-4 py-3 text-sm font-sans text-amber-900 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 mt-0.5" />
-                {result.output.estimationNote ??
-                  "Nous avons peu de vehicules comparables pour ce modele. L'estimation reste indicative."}
+              <div className="rounded-2xl border border-amber-400/40 bg-amber-100/50 px-4 py-4 text-sm font-sans text-amber-900">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Estimation indicative</p>
+                    <p className="mt-1 text-xs md:text-sm">
+                      {result.output.estimationNote ??
+                        "Les données disponibles pour ce modèle sont plus limitées ; la fourchette est donc volontairement plus large."}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
             {!result.output.usedReferenceProfile && (
               <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
-                Nous avons identifie votre vehicule, mais les donnees de marche disponibles pour ce modele sont plus limitees.
-                L'estimation fournie reste indicative et la fourchette est plus large.
+                Votre véhicule est bien reconnu. Les données comparables étant plus rares pour ce profil,
+                la fourchette est volontairement plus prudente.
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="rounded-2xl">
+              <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader>
                   <CardTitle className="font-serif text-xl flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-success" /> Facteurs positifs</CardTitle>
+                  <p className="font-sans text-xs text-muted-foreground">Elements qui soutiennent la valeur de votre vehicule.</p>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {result.output.positiveFactors.length === 0 ? (
-                    <p className="text-sm text-muted-foreground font-sans">Aucun facteur majeur de surcote detecte.</p>
+                    <p className="rounded-lg bg-secondary/20 p-3 text-sm text-muted-foreground font-sans">Aucun facteur majeur de surcote détecté à ce stade.</p>
                   ) : (
                     result.output.positiveFactors.map((factor) => (
                       <Badge key={factor} variant="secondary" className="mr-2 mb-2 font-sans normal-case">{factor}</Badge>
@@ -514,13 +768,14 @@ const VehicleEstimationPage = () => {
                   )}
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl">
+              <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader>
-                  <CardTitle className="font-serif text-xl flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-destructive" /> Facteurs de decote</CardTitle>
+                  <CardTitle className="font-serif text-xl flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-destructive" /> Facteurs de décote</CardTitle>
+                  <p className="font-sans text-xs text-muted-foreground">Points à surveiller pour optimiser votre prix de mise en vente.</p>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {result.output.negativeFactors.length === 0 ? (
-                    <p className="text-sm text-muted-foreground font-sans">Aucun facteur penalisant majeur detecte.</p>
+                    <p className="rounded-lg bg-secondary/20 p-3 text-sm text-muted-foreground font-sans">Aucun facteur pénalisant majeur détecté.</p>
                   ) : (
                     result.output.negativeFactors.map((factor) => (
                       <Badge key={factor} variant="outline" className="mr-2 mb-2 font-sans normal-case">{factor}</Badge>
@@ -530,15 +785,25 @@ const VehicleEstimationPage = () => {
               </Card>
             </div>
 
-            <Card className="rounded-2xl">
+            <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
               <CardHeader>
-                <CardTitle className="font-serif text-xl">Annonces AutoNex similaires (si disponibles)</CardTitle>
+                <CardTitle className="font-serif text-xl">Annonces AutoNex similaires</CardTitle>
+                <p className="font-sans text-xs text-muted-foreground">
+                  {result.output.comparables.length > 0
+                    ? `${result.output.comparables.length} annonce(s) utile(s) pour comparer votre positionnement.`
+                    : "Aucune annonce strictement comparable pour l'instant."}
+                </p>
               </CardHeader>
               <CardContent>
                 {result.output.comparables.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-border bg-secondary/15 p-5 text-center">
+                  <div className="rounded-2xl border border-dashed border-border bg-secondary/15 p-7 text-center">
+                    <p className="font-serif text-lg">Comparaison en cours d'enrichissement</p>
                     <p className="font-sans text-sm text-muted-foreground">
-                      Nous n'avons pas encore assez d'annonces similaires sur AutoNex pour ce modele, mais voici une estimation indicative basee sur les caracteristiques de votre vehicule.
+                      Nous n'avons pas encore suffisamment d'annonces strictement comparables pour ce modèle.
+                      Votre estimation reste pleinement exploitable pour decider de votre positionnement.
+                    </p>
+                    <p className="mt-2 font-sans text-xs text-muted-foreground">
+                      Publier sur AutoNex vous permet aussi d'enrichir vos repères de marche.
                     </p>
                   </div>
                 ) : (
@@ -547,8 +812,12 @@ const VehicleEstimationPage = () => {
                       <Link
                         key={item.listingId}
                         to={`/annonce/${item.listingId}`}
-                        onClick={() => void insertEstimationEvent(result.requestId, "viewed_similar_listings", { listingId: item.listingId })}
-                        className="rounded-xl border border-border/80 p-3 hover:border-primary/40 transition"
+                        onClick={() =>
+                          void trackEstimationEvent(result.requestId, "viewed_similar_listings", {
+                            listingId: item.listingId,
+                          })
+                        }
+                        className="rounded-xl border border-border/80 p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
                       >
                         <div className="aspect-[4/3] rounded-md overflow-hidden bg-muted mb-2">
                           {item.imageUrl ? (
@@ -567,48 +836,59 @@ const VehicleEstimationPage = () => {
               </CardContent>
             </Card>
 
+            <Card className={`rounded-2xl bg-gradient-to-r shadow-md ${ESTIMATION_PALETTE.accent}`}>
+              <CardContent className="p-6 md:p-7">
+                <p className="font-serif text-xl">Prêt à passer à l'action ?</p>
+                <p className="mt-1 font-sans text-sm text-muted-foreground">
+                  Utilisez cette estimation pour publier votre annonce avec un prix cohérent et attractif.
+                </p>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Button onClick={() => void publishFromEstimation()} size="lg" className={ESTIMATION_UI.primaryCta}>
+                    Publier cette voiture sur AutoNex
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      if (result) {
+                        try {
+                          await insertEstimationEvent(result.requestId, "clicked_refine_estimation");
+                        } catch {
+                          // Non-blocking analytics
+                        }
+                      }
+                      setScreen("vehicle");
+                    }}
+                    className={ESTIMATION_UI.secondaryCta}
+                  >
+                    Affiner l'estimation
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate("/recherche")} className={ESTIMATION_UI.secondaryCta}>
+                    Comparer avec des annonces similaires
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setResult(null);
+                      setScreen("vehicle");
+                    }}
+                    className={ESTIMATION_UI.secondaryCta}
+                  >
+                    Refaire une estimation
+                  </Button>
+                </div>
+                <p className="mt-3 font-sans text-xs text-muted-foreground">
+                  Conseil : publier avec le prix conseillé accélère souvent les premiers contacts qualifiés.
+                </p>
+              </CardContent>
+            </Card>
             <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans text-muted-foreground">
-              Cette estimation est une indication de marche basee sur les donnees disponibles sur AutoNex. Elle ne constitue ni
-              une valeur officielle, ni une expertise mecanique, ni un prix garanti.
+              Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle,
+              ni une expertise mécanique, ni un prix garanti.
             </div>
             <p className="text-xs text-muted-foreground font-sans">
-              Vous pouvez utiliser cette estimation pour decider si vous souhaitez vendre maintenant ou publier une annonce sur AutoNex.
+              Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.
             </p>
-
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => void publishFromEstimation()} className="font-sans">
-                Publier cette voiture avec ce prix conseille
-              </Button>
-              <Button
-                variant="outline"
-                onClick={async () => {
-                  if (result) {
-                    try {
-                      await insertEstimationEvent(result.requestId, "clicked_refine_estimation");
-                    } catch {
-                      // Non-blocking analytics
-                    }
-                  }
-                  setScreen("vehicle");
-                }}
-                className="font-sans"
-              >
-                Affiner l'estimation
-              </Button>
-              <Button variant="ghost" onClick={() => navigate("/recherche")} className="font-sans">
-                Comparer avec des annonces similaires
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setResult(null);
-                  setScreen("vehicle");
-                }}
-                className="font-sans"
-              >
-                Refaire une estimation
-              </Button>
-            </div>
           </section>
         )}
       </main>
