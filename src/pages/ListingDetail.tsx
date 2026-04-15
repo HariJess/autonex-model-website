@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Maximize, Phone, ChevronRight, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare, CarFront } from "lucide-react";
+import { Bed, Bath, Maximize, Phone, ChevronRight, ChevronLeft, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare, CarFront } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,6 +51,10 @@ const ListingLocationMap = lazy(() => import("@/components/ListingLocationMap"))
 /** Outline + hover/focus accents only; brand green is on the FaWhatsapp icon. */
 const LISTING_WHATSAPP_BUTTON_CLASS =
   "border-emerald-200/85 bg-background text-foreground hover:bg-emerald-50/85 hover:border-emerald-300/95 hover:text-foreground dark:border-emerald-800/50 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600/55 focus-visible:ring-emerald-500/40";
+const LISTING_DETAIL_BADGE_CLASS =
+  "inline-flex min-h-8 items-center rounded-full border border-border/75 bg-card px-3 py-1 text-xs font-medium leading-none tracking-[0.01em] text-foreground shadow-sm whitespace-nowrap";
+const LISTING_DETAIL_BADGE_SUBTLE_CLASS =
+  "inline-flex min-h-8 items-center rounded-full border border-border/60 bg-secondary/45 px-3 py-1 text-xs font-medium leading-none tracking-[0.01em] text-foreground whitespace-nowrap";
 
 function listingWhatsAppPrefill(title: string): string {
   const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
@@ -364,6 +368,17 @@ const ListingDetail = () => {
   const images = listing.images.length > 0
     ? listing.images
     : ["/placeholder.svg"];
+  const hasMultipleImages = images.length > 1;
+
+  const goToPreviousImage = () => {
+    if (!hasMultipleImages) return;
+    setSelectedImg((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const goToNextImage = () => {
+    if (!hasMultipleImages) return;
+    setSelectedImg((prev) => (prev + 1) % images.length);
+  };
 
   const transactionLabel =
     listing.transaction === "vente"
@@ -506,6 +521,26 @@ const ListingDetail = () => {
                   decoding="async"
                   onError={(e) => applyImageFallback(e.currentTarget)}
                 />
+                {hasMultipleImages && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={goToPreviousImage}
+                      className="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/75 bg-card/90 text-foreground shadow-md backdrop-blur-sm transition hover:bg-card md:left-3 md:h-9 md:w-9"
+                      aria-label={t("listing.galleryPrev", "Image précédente")}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={goToNextImage}
+                      className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/75 bg-card/90 text-foreground shadow-md backdrop-blur-sm transition hover:bg-card md:right-3 md:h-9 md:w-9"
+                      aria-label={t("listing.galleryNext", "Image suivante")}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
                 <div className="absolute left-3 bottom-3">
                   <Badge variant="secondary" className="font-sans text-xs bg-card/90">
                     {selectedImg + 1}/{images.length}
@@ -534,10 +569,10 @@ const ListingDetail = () => {
 
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Badge variant="outline" className="font-sans">{transactionLabel}</Badge>
-                <Badge variant="outline" className="font-sans capitalize">{typeLabel}</Badge>
-                {listing.vehicle?.isElectric && <Badge variant="secondary" className="font-sans">Électrique</Badge>}
-                {listing.vehicle?.isHybrid && <Badge variant="secondary" className="font-sans">Hybride</Badge>}
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{transactionLabel}</Badge>
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{typeLabel}</Badge>
+                {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Électrique</Badge>}
+                {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Hybride</Badge>}
                 {listing.badge && (
                   <Badge
                     className={`font-sans text-xs ${
@@ -627,22 +662,22 @@ const ListingDetail = () => {
                 </div>
               </section>
             )}
-            <div className="flex flex-wrap gap-2">
-              {listing.vehicle?.fuel && <Badge variant="secondary" className="font-sans">{listing.vehicle.fuel}</Badge>}
-              {listing.vehicle?.transmission && <Badge variant="secondary" className="font-sans">{listing.vehicle.transmission}</Badge>}
-              {listing.vehicle?.drivetrain && <Badge variant="secondary" className="font-sans">{listing.vehicle.drivetrain}</Badge>}
-              {listing.vehicle?.bodyStyle && <Badge variant="secondary" className="font-sans">{listing.vehicle.bodyStyle}</Badge>}
-              {listing.vehicle?.rentalMode && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.rentalMode}</Badge>}
+            <div className="flex flex-wrap items-center gap-2.5">
+              {listing.vehicle?.fuel && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.fuel}</Badge>}
+              {listing.vehicle?.transmission && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.transmission}</Badge>}
+              {listing.vehicle?.drivetrain && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.drivetrain}</Badge>}
+              {listing.vehicle?.bodyStyle && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.bodyStyle}</Badge>}
+              {listing.vehicle?.rentalMode && <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.rentalMode}</Badge>}
               {listing.vehicle?.seats != null && listing.vehicle.seats > 0 && (
-                <Badge variant="outline" className="font-sans">{listing.vehicle.seats} places</Badge>
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.seats} places</Badge>
               )}
               {listing.vehicle?.availabilityStatus && (
-                <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.availabilityStatus}</Badge>
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.availabilityStatus}</Badge>
               )}
-              {listing.vehicle?.isElectric && <Badge variant="secondary" className="font-sans">Électrique</Badge>}
-              {listing.vehicle?.isHybrid && <Badge variant="secondary" className="font-sans">Hybride</Badge>}
-              {listing.vehicle?.condition && <Badge variant="outline" className="font-sans capitalize">{listing.vehicle.condition}</Badge>}
-              {sellerLabel && <Badge variant="outline" className="font-sans">{sellerLabel}</Badge>}
+              {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Électrique</Badge>}
+              {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Hybride</Badge>}
+              {listing.vehicle?.condition && <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.condition}</Badge>}
+              {sellerLabel && <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{sellerLabel}</Badge>}
             </div>
 
             {listing.description && (
