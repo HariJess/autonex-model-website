@@ -81,6 +81,7 @@ const App = () => (
             </Route>
             <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
             <Route path="/agence/:slug" element={<AgencyProfile />} />
+            <Route path="/concessionnaires/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />
             <Route path="/conseils" element={<BlogList />} />
             <Route path="/conseils/:slug" element={<BlogArticle />} />

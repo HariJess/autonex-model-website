@@ -42,6 +42,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   clearLocalPublishBackup,
   createDraftListing,
+  deleteDraftListingForOwner,
   deleteListingPhotoRow,
   fetchDraftListingForOwner,
   fetchListingForOwnerEdit,
@@ -101,7 +102,7 @@ const PublishPage = () => {
   const [stepErrors, setStepErrors] = useState<string[]>([]);
   const [draftListingId, setDraftListingId] = useState<string | null>(null);
   const [draftHydrated, setDraftHydrated] = useState(false);
-  const [draftBootLoading, setDraftBootLoading] = useState(false);
+  const [, setDraftBootLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -172,6 +173,9 @@ const PublishPage = () => {
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [purchaseSubmitting, setPurchaseSubmitting] = useState(false);
+  const exitBypassRef = useRef(false);
+  const lastPersistedFingerprintRef = useRef("");
+  const fingerprintInitializedRef = useRef(false);
 
   const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
   const typeOptions = listingTypesForTransaction(transaction);
@@ -268,6 +272,135 @@ const PublishPage = () => {
     setDraftListingId(row.id);
   }, []);
 
+  const progressFingerprint = useMemo(
+    () =>
+      JSON.stringify({
+        step,
+        transaction,
+        listingType,
+        isNewProgram,
+        internalRef: internalRef.trim(),
+        ville: ville.trim(),
+        arrondissement: arrondissement.trim(),
+        quartier: quartier.trim(),
+        quartierLibre: quartierLibre.trim(),
+        pinLat,
+        pinLng,
+        title: title.trim(),
+        description: description.trim(),
+        priceMga: priceMga.trim(),
+        surface: surface.trim(),
+        rooms: rooms.trim(),
+        bathrooms: bathrooms.trim(),
+        toilets: toilets.trim(),
+        vehicleMake: vehicleMake.trim(),
+        vehicleModel: vehicleModel.trim(),
+        vehicleYear: vehicleYear.trim(),
+        vehicleFuel: vehicleFuel.trim(),
+        vehicleTransmission: vehicleTransmission.trim(),
+        vehicleDrivetrain: vehicleDrivetrain.trim(),
+        vehicleCondition: vehicleCondition.trim(),
+        vehicleSellerType: vehicleSellerType.trim(),
+        vehicleRentalMode: vehicleRentalMode.trim(),
+        vehicleBodyStyle: vehicleBodyStyle.trim(),
+        vehicleDoors: vehicleDoors.trim(),
+        vehicleSeats: vehicleSeats.trim(),
+        vehicleExteriorColor: vehicleExteriorColor.trim(),
+        vehicleInteriorColor: vehicleInteriorColor.trim(),
+        vehicleAvailabilityStatus: vehicleAvailabilityStatus.trim(),
+        vehicleWhatsappPhone: vehicleWhatsappPhone.trim(),
+        vehicleIsElectric,
+        vehicleIsHybrid,
+        selectedFeatures: [...selectedFeatures].sort(),
+        customFeaturesInput: customFeaturesInput.trim(),
+        videoUrl: videoUrl.trim(),
+        virtualTourUrl: virtualTourUrl.trim(),
+        selectedBoosts: [...selectedBoosts].sort(),
+        agencySpotlight,
+        serverPhotoIds: serverPhotos.map((p) => p.id),
+        pendingPhotoCount: pendingPhotos.length,
+      }),
+    [
+      step,
+      transaction,
+      listingType,
+      isNewProgram,
+      internalRef,
+      ville,
+      arrondissement,
+      quartier,
+      quartierLibre,
+      pinLat,
+      pinLng,
+      title,
+      description,
+      priceMga,
+      surface,
+      rooms,
+      bathrooms,
+      toilets,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+      vehicleRentalMode,
+      vehicleBodyStyle,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleExteriorColor,
+      vehicleInteriorColor,
+      vehicleAvailabilityStatus,
+      vehicleWhatsappPhone,
+      vehicleIsElectric,
+      vehicleIsHybrid,
+      selectedFeatures,
+      customFeaturesInput,
+      videoUrl,
+      virtualTourUrl,
+      selectedBoosts,
+      agencySpotlight,
+      serverPhotos,
+      pendingPhotos.length,
+    ],
+  );
+
+  const hasMeaningfulDraftProgress = useMemo(() => {
+    const hasLocation = Boolean(ville.trim()) || (pinLat != null && pinLng != null);
+    return (
+      title.trim().length >= 4 ||
+      description.trim().length >= 12 ||
+      Number(priceMga) > 0 ||
+      hasLocation ||
+      vehicleMake.trim().length > 0 ||
+      vehicleModel.trim().length > 0 ||
+      vehicleYear.trim().length > 0 ||
+      serverPhotos.length + pendingPhotos.length > 0 ||
+      selectedFeatures.length > 0 ||
+      customFeaturesInput.trim().length > 0
+    );
+  }, [
+    title,
+    description,
+    priceMga,
+    ville,
+    pinLat,
+    pinLng,
+    vehicleMake,
+    vehicleModel,
+    vehicleYear,
+    serverPhotos.length,
+    pendingPhotos.length,
+    selectedFeatures.length,
+    customFeaturesInput,
+  ]);
+
+  const hasUnsavedMeaningfulChanges =
+    hasMeaningfulDraftProgress && progressFingerprint !== lastPersistedFingerprintRef.current;
+
   useEffect(() => {
     refreshProfile();
   }, [refreshProfile]);
@@ -333,6 +466,8 @@ const PublishPage = () => {
     const run = async () => {
       setDraftBootLoading(true);
       setSaveError(null);
+      exitBypassRef.current = false;
+      fingerprintInitializedRef.current = false;
       try {
         const wantNew = spNew === "1";
         const draftParam = spDraft;
@@ -425,7 +560,7 @@ const PublishPage = () => {
 
   const persistDraft = useCallback(
     async (stepOverride?: number) => {
-      if (!user?.id || !draftListingId || !draftHydrated) return;
+      if (!user?.id || !draftListingId || !draftHydrated) return false;
       try {
         setSaveStatus("saving");
         setSaveError(null);
@@ -535,6 +670,7 @@ const PublishPage = () => {
           baselineMaterialSnapshotRef.current = currentSnap;
           setLastSavedAt(updatedAt);
           setSaveStatus("saved");
+          lastPersistedFingerprintRef.current = progressFingerprint;
           saveLocalPublishBackup(user.id, draftListingId, {
             draftListingId,
             step: stepOverride ?? step,
@@ -581,12 +717,13 @@ const PublishPage = () => {
           });
           await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
           await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
-          return;
+          return true;
         }
 
         const { updatedAt } = await saveDraftListing(draftListingId, patchBase);
         setLastSavedAt(updatedAt);
         setSaveStatus("saved");
+        lastPersistedFingerprintRef.current = progressFingerprint;
         saveLocalPublishBackup(user.id, draftListingId, {
           draftListingId,
           step: stepOverride ?? step,
@@ -632,11 +769,13 @@ const PublishPage = () => {
           agencySpotlight,
         });
         await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
+        return true;
       } catch (e) {
         setSaveStatus("error");
         const msg = e instanceof Error ? e.message : "Erreur";
         setSaveError(msg);
         toast.error(t("publish.draftSaveError", "Sauvegarde impossible : {{msg}}").replace("{{msg}}", msg));
+        return false;
       }
     },
     [
@@ -687,6 +826,7 @@ const PublishPage = () => {
       selectedBoosts,
       agencySpotlight,
       step,
+      progressFingerprint,
       queryClient,
       t,
     ],
@@ -751,12 +891,23 @@ const PublishPage = () => {
   ]);
 
   useEffect(() => {
+    if (!draftHydrated || !draftListingId || !user?.id) return;
+    if (fingerprintInitializedRef.current) return;
+    lastPersistedFingerprintRef.current = progressFingerprint;
+    fingerprintInitializedRef.current = true;
+  }, [draftHydrated, draftListingId, user?.id, progressFingerprint]);
+
+  useEffect(() => {
     const onVis = () => {
       if (document.visibilityState === "hidden" && draftListingId && user?.id) {
         void persistDraft();
       }
     };
-    const onBeforeUnload = () => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedMeaningfulChanges) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
       if (draftListingId && user?.id) {
         try {
           saveLocalPublishBackup(user.id, draftListingId, {
@@ -817,6 +968,7 @@ const PublishPage = () => {
   }, [
     draftListingId,
     user?.id,
+    hasUnsavedMeaningfulChanges,
     persistDraft,
     step,
     transaction,
@@ -860,6 +1012,23 @@ const PublishPage = () => {
     selectedBoosts,
     agencySpotlight,
   ]);
+
+  const deleteCurrentDraft = useCallback(async () => {
+    if (!user?.id || !draftListingId || isPublishedListingEdit) return true;
+    await deleteDraftListingForOwner(draftListingId, user.id);
+    clearLocalPublishBackup(user.id, draftListingId);
+    await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
+    return true;
+  }, [user?.id, draftListingId, isPublishedListingEdit, queryClient]);
+
+  useEffect(() => {
+    return () => {
+      if (exitBypassRef.current) return;
+      if (!user?.id || !draftListingId || isPublishedListingEdit) return;
+      if (hasMeaningfulDraftProgress) return;
+      void deleteCurrentDraft();
+    };
+  }, [user?.id, draftListingId, isPublishedListingEdit, hasMeaningfulDraftProgress, deleteCurrentDraft]);
 
   useEffect(() => {
     if (listingType && !TYPES_WITH_ROOMS.includes(listingType as ListingType)) {
@@ -1226,6 +1395,7 @@ const PublishPage = () => {
         await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
         await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
         clearLocalPublishBackup(user.id, draftListingId);
+        exitBypassRef.current = true;
         toast.success(
           toReview
             ? t(
@@ -1356,6 +1526,7 @@ const PublishPage = () => {
 
       await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
       clearLocalPublishBackup(user.id, draftListingId);
+      exitBypassRef.current = true;
       toast.success(
         t(
           "publish.successModeration",

@@ -220,6 +220,33 @@ export async function createDraftListing(ownerId: string): Promise<string> {
   return data.id;
 }
 
+export async function deleteDraftListingForOwner(listingId: string, ownerId: string): Promise<void> {
+  const { data: photos, error: photosError } = await supabase
+    .from("listing_photos")
+    .select("id, url")
+    .eq("listing_id", listingId);
+  if (photosError) throw new Error(photosError.message);
+
+  if (photos && photos.length > 0) {
+    const paths = photos
+      .map((p) => storagePathFromListingPhotoUrl(p.url))
+      .filter((path): path is string => Boolean(path));
+    if (paths.length > 0) {
+      await supabase.storage.from("listing-photos").remove(paths);
+    }
+    const { error: deletePhotosError } = await supabase.from("listing_photos").delete().eq("listing_id", listingId);
+    if (deletePhotosError) throw new Error(deletePhotosError.message);
+  }
+
+  const { error: deleteListingError } = await supabase
+    .from("listings")
+    .delete()
+    .eq("id", listingId)
+    .eq("owner_id", ownerId)
+    .eq("status", "draft");
+  if (deleteListingError) throw new Error(deleteListingError.message);
+}
+
 function effectiveTransaction(t: TransactionType | ""): TransactionType {
   return t || "vente";
 }

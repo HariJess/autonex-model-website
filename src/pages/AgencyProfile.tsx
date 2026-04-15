@@ -14,10 +14,12 @@ import { BannerSlot } from "@/components/monetization/BannerSlot";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { applyImageFallback } from "@/lib/imageFallback";
+import { getPartnerDealerBySlug } from "@/data/agencies";
 
 const AgencyProfile = () => {
   const { slug } = useParams();
   const { t } = useTranslation();
+  const partnerDealer = getPartnerDealerBySlug(slug);
 
   const { data: agency, isLoading: agencyLoading, error: agencyError } = useQuery({
     queryKey: ["agency", slug],
@@ -31,7 +33,7 @@ const AgencyProfile = () => {
       if (error) throw new Error(error.message);
       return data;
     },
-    enabled: !!slug,
+    enabled: !!slug && !partnerDealer,
     staleTime: 60_000,
     gcTime: 10 * 60_000,
     refetchOnWindowFocus: false,
@@ -54,10 +56,16 @@ const AgencyProfile = () => {
   });
 
   const { data: listings = [], isLoading: listingsLoading } = useDbListings(
-    agentIds.length > 0 ? { ownerIds: agentIds } : { ownerIds: ["__none__"] }
+    agency?.id
+      ? (agentIds.length > 0 ? { ownerIds: agentIds } : { ownerIds: ["__none__"] })
+      : partnerDealer
+        ? (partnerDealer.listingOwnerIds && partnerDealer.listingOwnerIds.length > 0
+            ? { ownerIds: partnerDealer.listingOwnerIds, limit: 24 }
+            : { ownerIds: ["__none__"] })
+        : { ownerIds: ["__none__"] }
   );
 
-  if (agencyLoading) {
+  if (agencyLoading && !partnerDealer) {
     return (
       <>
         <Header />
@@ -88,7 +96,7 @@ const AgencyProfile = () => {
     );
   }
 
-  if (!agency) {
+  if (!agency && !partnerDealer) {
     return (
       <>
         <Header />
@@ -104,22 +112,28 @@ const AgencyProfile = () => {
       </>
     );
   }
-  const canonical = buildCanonicalUrl(`/agence/${agency.slug}`);
-  const seoTitle = composePageTitle(`${agency.name} — Concessionnaire automobile`);
+  const displayName = partnerDealer?.name ?? agency?.name ?? "";
+  const displayBio = partnerDealer?.description ?? agency?.bio ?? "";
+  const displayPhone = partnerDealer?.phone ?? agency?.phone ?? null;
+  const displayLogo = partnerDealer?.logoPath ?? agency?.logo_url ?? "/placeholder.svg";
+  const displayLocation = partnerDealer ? `${partnerDealer.city}, ${partnerDealer.area}` : null;
+  const displayVerified = partnerDealer?.isPartner === true || agency?.verified === true;
+  const canonical = buildCanonicalUrl(partnerDealer ? `/concessionnaires/${partnerDealer.slug}` : `/agence/${agency?.slug}`);
+  const seoTitle = composePageTitle(`${displayName} — Concessionnaire automobile`);
   const seoDescription = truncateMetaDescription(
-    `${agency.name} : ${agency.bio || "concessionnaire automobile a Madagascar"} — ${listings.length} annonce${listings.length > 1 ? "s" : ""} active${listings.length > 1 ? "s" : ""}.`,
+    `${displayName} : ${displayBio || "concessionnaire automobile a Madagascar"} — ${listings.length} annonce${listings.length > 1 ? "s" : ""} active${listings.length > 1 ? "s" : ""}.`,
   );
-  const seoImage = toAbsoluteUrl(agency.logo_url || "/placeholder.svg");
+  const seoImage = toAbsoluteUrl(displayLogo);
   const agencyJsonLd = {
     "@context": "https://schema.org",
     "@type": "AutoDealer",
-    name: agency.name,
+    name: displayName,
     url: canonical,
     logo: seoImage,
     image: seoImage,
-    description: agency.bio || undefined,
-    telephone: agency.phone || undefined,
-    email: agency.email || undefined,
+    description: displayBio || undefined,
+    telephone: displayPhone || undefined,
+    email: agency?.email || undefined,
   };
 
   return (
@@ -150,45 +164,63 @@ const AgencyProfile = () => {
           </div>
         )}
         <div className="bg-card rounded-2xl border border-border p-5 sm:p-8 flex flex-col md:flex-row items-center gap-5 sm:gap-6 mb-8">
-          <div className="w-24 h-24 rounded-2xl overflow-hidden border border-border flex-shrink-0 bg-muted flex items-center justify-center">
-            {agency.logo_url ? (
+          <div className="w-24 h-24 rounded-2xl overflow-hidden border border-border/80 flex-shrink-0 bg-secondary/20 p-3 shadow-sm flex items-center justify-center">
+            {displayLogo ? (
               <img
-                src={agency.logo_url}
-                alt={agency.name}
-                className="w-full h-full object-cover"
+                src={displayLogo}
+                alt={displayName}
+                className="w-full h-full object-contain object-center"
                 loading="lazy"
                 decoding="async"
                 onError={(e) => applyImageFallback(e.currentTarget)}
               />
             ) : (
-              <span className="font-serif text-2xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
+              <span className="font-serif text-2xl font-bold text-muted-foreground">{displayName.charAt(0)}</span>
             )}
           </div>
           <div className="flex-1 text-center md:text-left">
             <div className="flex items-center gap-2 justify-center md:justify-start">
-              <h1 className="font-serif text-2xl font-bold">{agency.name}</h1>
-              {agency.verified && <Badge className="bg-success font-sans text-xs" style={{ color: "#FAFAFA" }}>{t("listing.verified")}</Badge>}
+              <h1 className="font-serif text-2xl font-bold">{displayName}</h1>
+              {displayVerified && <Badge className="bg-success font-sans text-xs" style={{ color: "#FAFAFA" }}>{t("listing.verified")}</Badge>}
+              {partnerDealer && <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>}
             </div>
-            <p className="text-muted-foreground font-sans mt-2">{agency.bio || t("agencies.noDescription")}</p>
-            {agency.phone && <p className="text-sm font-sans text-muted-foreground mt-2">📞 {agency.phone}</p>}
-            {agency.email && <p className="text-sm font-sans text-muted-foreground">✉️ {agency.email}</p>}
+            {displayLocation && <p className="text-sm font-sans text-muted-foreground mt-2">📍 {displayLocation}</p>}
+            <p className="text-muted-foreground font-sans mt-2">{displayBio || t("agencies.noDescription")}</p>
+            {displayPhone && <p className="text-sm font-sans text-muted-foreground mt-2">📞 {displayPhone}</p>}
+            {agency?.email && <p className="text-sm font-sans text-muted-foreground">✉️ {agency.email}</p>}
+            {partnerDealer && (
+              <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
+                {partnerDealer.brands.map((brand) => (
+                  <Badge key={brand} variant="outline" className="font-sans text-xs">{brand}</Badge>
+                ))}
+              </div>
+            )}
             <p className="text-sm font-sans text-primary mt-1">
               {t("agencies.activeListings", { count: listings.length })}
             </p>
           </div>
         </div>
 
-        <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.listingsOf", { name: agency.name })}</h2>
+        <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.listingsOf", { name: displayName })}</h2>
         {listingsLoading ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : listings.length === 0 ? (
-          <p className="text-muted-foreground font-sans py-8 text-center">{t("agencies.noListings")}</p>
+          <div className="rounded-2xl border border-dashed border-border bg-secondary/15 px-6 py-10 text-center">
+            <p className="font-serif text-lg text-foreground">
+              {partnerDealer ? "Aucun vehicule actif pour le moment." : t("agencies.noListings")}
+            </p>
+            {partnerDealer && (
+              <p className="text-sm text-muted-foreground font-sans mt-2">
+                Le stock de {displayName} apparaitra ici des que des annonces seront explicitement liees a cette concession.
+              </p>
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {listings.map((l) => (
-              <ListingCard key={l.id} listing={l} agencyName={agency.name} agencyLogo={agency.logo_url ?? undefined} />
+              <ListingCard key={l.id} listing={l} agencyName={displayName} agencyLogo={displayLogo ?? undefined} />
             ))}
           </div>
         )}
