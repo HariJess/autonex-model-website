@@ -416,17 +416,17 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen === "vehicle" && (
-          <Card className={ESTIMATION_UI.sectionCard}>
-            <CardHeader>
-              <div className="space-y-2">
-                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">Étape 1</Badge>
+          <Card className={`${ESTIMATION_UI.sectionCard} overflow-hidden`}>
+            <CardHeader className="border-b border-border/50 pb-5">
+              <div className="space-y-3">
+                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 px-2.5 py-0.5 font-sans normal-case text-primary">Étape 1</Badge>
                 <CardTitle className={ESTIMATION_TYPO.h2}>Identité du véhicule</CardTitle>
                 <p className={ESTIMATION_TYPO.body}>
-                  Renseignez les informations essentielles. Nous transformons ces données en une valorisation claire et actionnable.
+                  Renseignez les informations clés du véhicule pour établir une base d'estimation fiable et exploitable.
                 </p>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-7 pt-6">
               {vehicleStepErrors.length > 0 && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
                   {vehicleStepErrors.map((error) => (
@@ -434,8 +434,9 @@ const VehicleEstimationPage = () => {
                   ))}
                 </div>
               )}
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_0.7fr]">
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.55fr_0.65fr]">
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 {!catalogLoading && makeOptions.length === 0 && (
                   <div className="md:col-span-2 rounded-lg border border-amber-400/30 bg-amber-100/30 p-3">
                     <p className="font-sans text-sm text-amber-900">
@@ -530,28 +531,43 @@ const VehicleEstimationPage = () => {
                     <SelectContent>{ESTIMATION_BODY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-secondary/10 p-4">
+                    <p className="font-sans text-xs uppercase tracking-wide text-muted-foreground">Conseil de saisie</p>
+                    <p className="mt-1 font-sans text-sm text-muted-foreground">
+                      Plus les informations sont précises, plus l'estimation sera resserrée et directement actionnable.
+                    </p>
+                  </div>
                 </div>
                 <aside className={`rounded-2xl border bg-gradient-to-b p-5 shadow-sm lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
                   <p className={ESTIMATION_TYPO.label}>Pourquoi ces informations ?</p>
-                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Une estimation mieux orientée</h3>
+                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Une estimation plus juste</h3>
                   <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
-                    Marque, modèle, kilométrage et configuration technique créent la base de valorisation la plus pertinente.
+                    Marque, modèle, année et kilométrage constituent le socle de valorisation le plus pertinent pour votre véhicule.
                   </p>
-                  <div className="mt-4 space-y-2">
+                  <div className="mt-4 space-y-2.5">
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
                       <p className="font-sans text-xs font-medium">Étape rapide</p>
-                      <p className="font-sans text-xs text-muted-foreground">Moins de 2 minutes pour compléter.</p>
+                      <p className="font-sans text-xs text-muted-foreground">Moins de 2 minutes pour compléter les éléments essentiels.</p>
                     </div>
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
                       <p className="font-sans text-xs font-medium">Resultat actionnable</p>
-                      <p className="font-sans text-xs text-muted-foreground">Prix conseillé + fourchette claire.</p>
+                      <p className="font-sans text-xs text-muted-foreground">Prix conseillé, fourchette et niveau de confiance immédiats.</p>
+                    </div>
+                    <div className="rounded-lg border border-border/60 bg-background/80 p-3">
+                      <p className="font-sans text-xs font-medium">Prêt pour la suite</p>
+                      <p className="font-sans text-xs text-muted-foreground">Vous pourrez publier ensuite sur AutoNex avec un cap prix clair.</p>
                     </div>
                   </div>
                 </aside>
               </div>
-              <div className="flex flex-wrap justify-between gap-2 border-t border-border/60 pt-4">
-                <Button variant="outline" onClick={() => setScreen("landing")} className={ESTIMATION_UI.secondaryCta}>Retour</Button>
-                <Button disabled={!canSubmit} onClick={() => setScreen("condition")} className={ESTIMATION_UI.secondaryCta}>
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-5">
+                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} px-5`}>Retour</Button>
+                <Button
+                  disabled={!canSubmit}
+                  onClick={() => setScreen("condition")}
+                  className={`${ESTIMATION_UI.primaryCta} min-w-[150px]`}
+                >
                   Continuer
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
