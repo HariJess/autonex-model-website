@@ -364,53 +364,58 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen !== "landing" && (
-          <div className="mb-6 rounded-2xl border border-border/40 bg-background/80 px-3 py-2.5 md:mb-8 md:px-4 md:py-3">
-            <div className="mb-2.5 flex items-center justify-between">
-              <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-muted-foreground">Progression</p>
-              <p className="font-sans text-xs text-muted-foreground">Étape {currentStepIndex} / 3</p>
+          <div className="mb-6 rounded-2xl border border-border/45 bg-background/85 px-3 py-3 md:mb-8 md:px-5 md:py-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="font-sans text-[10px] uppercase tracking-[0.14em] text-muted-foreground">PROGRESSION</p>
+              <p className="font-sans text-xs text-muted-foreground">Étape {currentStepIndex} sur 3</p>
             </div>
-            <div className="mb-2.5 h-1 w-full overflow-hidden rounded-full bg-muted/70">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
-                style={{ width: `${Math.max(8, (currentStepIndex / 3) * 100)}%` }}
-              />
-            </div>
-            <div className="grid gap-1.5 md:grid-cols-3">
+
+            <div className="grid grid-cols-3 items-end gap-3">
               {STEP_META.map((step, index) => {
                 const stepNumber = index + 1;
                 const isActive = step.id === screen;
                 const isDone = currentStepIndex > stepNumber;
                 return (
-                  <div
-                    key={step.id}
-                    className={`rounded-lg px-2.5 py-1.5 transition-all duration-200 ${
-                      isActive
-                        ? "bg-primary/10"
-                        : isDone
-                          ? "bg-emerald-50/60"
-                          : "bg-transparent opacity-75"
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5">
+                  <div key={step.id} className="space-y-1.5">
+                    <div className="flex items-center gap-2">
                       <span
-                        className={`inline-flex h-4.5 w-4.5 items-center justify-center rounded-full text-[10px] font-medium ${
+                        className={`h-1.5 w-1.5 rounded-full transition-colors duration-200 ${
                           isActive
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-primary"
                             : isDone
-                              ? "bg-emerald-600 text-white"
-                              : "bg-muted text-muted-foreground/90"
+                              ? "bg-foreground/55"
+                              : "bg-muted-foreground/35"
+                        }`}
+                      />
+                      <p
+                        className={`font-sans text-sm transition-colors duration-200 md:text-[15px] ${
+                          isActive
+                            ? "font-semibold text-primary"
+                            : isDone
+                              ? "font-medium text-foreground/90"
+                              : "font-medium text-muted-foreground/75"
                         }`}
                       >
-                        {stepNumber}
-                      </span>
-                      <p className={`font-sans text-[11px] font-medium ${isActive ? "text-primary" : isDone ? "text-emerald-800" : "text-muted-foreground"}`}>
                         {step.label}
                       </p>
                     </div>
-                    <p className="mt-0.5 pl-6 font-sans text-[10px] text-muted-foreground/90">{step.helper}</p>
+                    <div className="h-[2px] w-full rounded-full bg-border/45">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ease-out ${
+                          isActive ? "w-full bg-primary/70" : isDone ? "w-full bg-foreground/35" : "w-0 bg-transparent"
+                        }`}
+                      />
+                    </div>
                   </div>
                 );
               })}
+            </div>
+
+            <div className="mt-3 h-px w-full overflow-hidden rounded-full bg-border/45">
+              <div
+                className="h-full bg-primary/35 transition-all duration-300 ease-out"
+                style={{ width: `${Math.max(8, (currentStepIndex / 3) * 100)}%` }}
+              />
             </div>
           </div>
         )}
@@ -781,62 +786,111 @@ const VehicleEstimationPage = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
-                <CardHeader>
-                  <CardTitle className="font-serif text-xl flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-success" /> Facteurs positifs</CardTitle>
-                  <p className="font-sans text-xs text-muted-foreground">Elements qui soutiennent la valeur de votre vehicule.</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.05fr_0.95fr]">
+              <Card className={`rounded-2xl border border-emerald-300/25 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-serif text-xl flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-success" />
+                    Facteurs qui renforcent la valeur
+                  </CardTitle>
+                  <p className="font-sans text-xs text-muted-foreground">
+                    Points favorables identifiés dans le profil déclaré de votre véhicule.
+                  </p>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   {result.output.positiveFactors.length === 0 ? (
-                    <p className="rounded-lg bg-secondary/20 p-3 text-sm text-muted-foreground font-sans">Aucun facteur majeur de surcote détecté à ce stade.</p>
+                    <div className="rounded-xl border border-emerald-200/30 bg-emerald-500/5 p-3">
+                      <p className="text-sm font-sans text-muted-foreground">
+                        Aucun levier majeur de surcote n'est détecté pour l'instant, mais votre positionnement reste cohérent.
+                      </p>
+                    </div>
                   ) : (
-                    result.output.positiveFactors.map((factor) => (
-                      <Badge key={factor} variant="secondary" className="mr-2 mb-2 font-sans normal-case">{factor}</Badge>
-                    ))
+                    <div className="flex flex-wrap gap-2">
+                      {result.output.positiveFactors.map((factor) => (
+                        <Badge
+                          key={factor}
+                          variant="secondary"
+                          className="rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 font-sans normal-case text-foreground"
+                        >
+                          {factor}
+                        </Badge>
+                      ))}
+                    </div>
                   )}
+                  <p className="text-xs font-sans text-muted-foreground">
+                    Ces éléments soutiennent votre prix conseillé et renforcent l'attractivité de l'annonce.
+                  </p>
                 </CardContent>
               </Card>
-              <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
-                <CardHeader>
-                  <CardTitle className="font-serif text-xl flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-destructive" /> Facteurs de décote</CardTitle>
-                  <p className="font-sans text-xs text-muted-foreground">Points à surveiller pour optimiser votre prix de mise en vente.</p>
+
+              <Card className={`rounded-2xl border border-destructive/20 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-serif text-xl flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-destructive" />
+                    Points de vigilance prix
+                  </CardTitle>
+                  <p className="font-sans text-xs text-muted-foreground">
+                    Aspects qui peuvent élargir la négociation ou peser sur la valeur perçue.
+                  </p>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   {result.output.negativeFactors.length === 0 ? (
-                    <p className="rounded-lg bg-secondary/20 p-3 text-sm text-muted-foreground font-sans">Aucun facteur pénalisant majeur détecté.</p>
+                    <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3">
+                      <p className="text-sm font-sans text-muted-foreground">
+                        Aucun facteur de décote marqué n'est relevé à ce stade.
+                      </p>
+                    </div>
                   ) : (
-                    result.output.negativeFactors.map((factor) => (
-                      <Badge key={factor} variant="outline" className="mr-2 mb-2 font-sans normal-case">{factor}</Badge>
-                    ))
+                    <div className="flex flex-wrap gap-2">
+                      {result.output.negativeFactors.map((factor) => (
+                        <Badge
+                          key={factor}
+                          variant="outline"
+                          className="rounded-full border-destructive/35 px-3 py-1 font-sans normal-case"
+                        >
+                          {factor}
+                        </Badge>
+                      ))}
+                    </div>
                   )}
+                  <p className="text-xs font-sans text-muted-foreground">
+                    Les adresser dans votre annonce permet souvent de sécuriser des contacts plus qualifiés.
+                  </p>
                 </CardContent>
               </Card>
             </div>
 
             <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
               <CardHeader>
-                <CardTitle className="font-serif text-xl">Annonces AutoNex similaires</CardTitle>
+                <CardTitle className="font-serif text-xl flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Annonces AutoNex similaires
+                </CardTitle>
                 <p className="font-sans text-xs text-muted-foreground">
                   {result.output.comparables.length > 0
-                    ? `${result.output.comparables.length} annonce(s) utile(s) pour comparer votre positionnement.`
-                    : "Aucune annonce strictement comparable pour l'instant."}
+                    ? `${result.output.comparables.length} repère(s) marché pour situer votre prix de mise en vente.`
+                    : "Repères comparables en cours de consolidation pour ce modèle."}
                 </p>
               </CardHeader>
               <CardContent>
                 {result.output.comparables.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-border bg-secondary/15 p-7 text-center">
-                    <p className="font-serif text-lg">Comparaison en cours d'enrichissement</p>
-                    <p className="font-sans text-sm text-muted-foreground">
-                      Nous n'avons pas encore suffisamment d'annonces strictement comparables pour ce modèle.
-                      Votre estimation reste pleinement exploitable pour decider de votre positionnement.
-                    </p>
-                    <p className="mt-2 font-sans text-xs text-muted-foreground">
-                      Publier sur AutoNex vous permet aussi d'enrichir vos repères de marche.
-                    </p>
+                  <div className="rounded-2xl border border-dashed border-border/80 bg-gradient-to-br from-secondary/20 to-background p-7">
+                    <div className="mx-auto max-w-2xl text-center">
+                      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                      </div>
+                      <p className="font-serif text-lg">Comparaison marché bientôt enrichie</p>
+                      <p className="mt-2 font-sans text-sm text-muted-foreground">
+                        Nous n'avons pas encore assez d'annonces strictement comparables sur ce profil.
+                        Votre estimation reste néanmoins un repère solide pour préparer une publication.
+                      </p>
+                      <p className="mt-2 font-sans text-xs text-muted-foreground">
+                        Dès que davantage d'annonces similaires sont disponibles, la comparaison devient plus fine.
+                      </p>
+                    </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {result.output.comparables.map((item) => (
                       <Link
                         key={item.listingId}
@@ -846,7 +900,7 @@ const VehicleEstimationPage = () => {
                             listingId: item.listingId,
                           })
                         }
-                        className="rounded-xl border border-border/80 p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                        className="group rounded-xl border border-border/80 bg-background/70 p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
                       >
                         <div className="aspect-[4/3] rounded-md overflow-hidden bg-muted mb-2">
                           {item.imageUrl ? (
@@ -856,8 +910,13 @@ const VehicleEstimationPage = () => {
                           )}
                         </div>
                         <p className="font-sans text-sm font-semibold line-clamp-2">{item.title}</p>
-                        <p className="font-serif text-base mt-1">{formatAriary(item.price)}</p>
-                        <p className="font-sans text-xs text-muted-foreground mt-1">{item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}</p>
+                        <p className="mt-1 font-serif text-base">{formatAriary(item.price)}</p>
+                        <p className="mt-1 font-sans text-xs text-muted-foreground">
+                          {item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}
+                        </p>
+                        <p className="mt-2 inline-flex items-center text-[11px] font-sans text-primary/90 transition-colors group-hover:text-primary">
+                          Voir l'annonce <ChevronRight className="ml-1 h-3 w-3" />
+                        </p>
                       </Link>
                     ))}
                   </div>
@@ -865,13 +924,21 @@ const VehicleEstimationPage = () => {
               </CardContent>
             </Card>
 
-            <Card className={`rounded-2xl bg-gradient-to-r shadow-md ${ESTIMATION_PALETTE.accent}`}>
-              <CardContent className="p-6 md:p-7">
-                <p className="font-serif text-xl">Prêt à passer à l'action ?</p>
-                <p className="mt-1 font-sans text-sm text-muted-foreground">
-                  Utilisez cette estimation pour publier votre annonce avec un prix cohérent et attractif.
-                </p>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Card className={`rounded-2xl border border-primary/15 bg-gradient-to-r shadow-md ${ESTIMATION_PALETTE.accent}`}>
+              <CardContent className="p-6 md:p-8">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-wide text-muted-foreground">
+                      <Target className="h-3.5 w-3.5" />
+                      Prochaine meilleure action
+                    </p>
+                    <p className="mt-2 font-serif text-2xl">Transformez cette estimation en annonce performante</p>
+                    <p className="mt-2 max-w-2xl font-sans text-sm text-muted-foreground">
+                      Publiez avec un prix clair, crédible et cohérent avec le marché pour accélérer vos premiers contacts qualifiés.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-5 flex flex-wrap items-center gap-2.5">
                   <Button onClick={() => void publishFromEstimation()} size="lg" className={ESTIMATION_UI.primaryCta}>
                     Publier cette voiture sur AutoNex
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -906,8 +973,8 @@ const VehicleEstimationPage = () => {
                     Refaire une estimation
                   </Button>
                 </div>
-                <p className="mt-3 font-sans text-xs text-muted-foreground">
-                  Conseil : publier avec le prix conseillé accélère souvent les premiers contacts qualifiés.
+                <p className="mt-4 font-sans text-xs text-muted-foreground">
+                  Conseil AutoNex : un prix d'annonce aligné sur cette fourchette améliore généralement la qualité des prises de contact.
                 </p>
               </CardContent>
             </Card>
