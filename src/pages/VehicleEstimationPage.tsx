@@ -141,7 +141,7 @@ const VehicleEstimationPage = () => {
     queryFn: loadVehicleCatalog,
     staleTime: Infinity,
   });
-  const vehicleCatalog = catalogPayload?.entries ?? [];
+  const vehicleCatalog = useMemo(() => catalogPayload?.entries ?? [], [catalogPayload]);
 
   const makeOptions = useMemo(() => {
     return vehicleCatalog.map((entry) => entry.make);
