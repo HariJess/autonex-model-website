@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { CarFront, DoorOpen, Gauge, Phone, Users, ChevronRight, ChevronLeft, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare } from "lucide-react";
+import { CarFront, DoorOpen, Gauge, Phone, Users, ChevronRight, ChevronLeft, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare, ShieldCheck } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -529,8 +529,73 @@ const ListingDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2 space-y-6 md:space-y-8">
+            <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 p-4.5 md:p-6">
+              <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{transactionLabel}</Badge>
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{typeLabel}</Badge>
+                {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Électrique</Badge>}
+                {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Hybride</Badge>}
+                {listing.badge && (
+                  <Badge
+                    className={`font-sans text-xs ${
+                      listing.badge === "boost"
+                        ? "gradient-primary"
+                        : listing.badge === "urgent"
+                          ? "bg-destructive"
+                          : "bg-accent"
+                    }`}
+                    style={{ color: "#FAFAFA" }}
+                  >
+                    {listing.badge === "boost"
+                      ? t("listing.boost")
+                      : listing.badge === "urgent"
+                        ? t("listing.urgent", "Urgent")
+                        : t("listing.favorite")}
+                  </Badge>
+                )}
+              </div>
+              <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground">{displayTitle}</h1>
+              {vehicleSummary && (
+                <p className="mt-1.5 text-sm text-muted-foreground font-sans">{vehicleSummary}</p>
+              )}
+              {displayBrand && (
+                <div className="mt-3 inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card px-2.5 py-1.5">
+                  <BrandLogo
+                    brand={displayBrand}
+                    className="h-8 w-12 rounded-md bg-background"
+                    imgClassName="max-h-5"
+                    showFallbackLabel={!displayBrandAsset?.logoPath}
+                  />
+                  <span className="text-xs font-medium font-sans text-muted-foreground">Marque: {displayBrand}</span>
+                </div>
+              )}
+              {listing.internal_ref && isOwner && (
+                <p className="mt-2 text-xs text-muted-foreground font-sans">
+                  {t("listing.internalRef", "Réf. interne : {{ref}}", { ref: listing.internal_ref })}
+                </p>
+              )}
+              <p className="mt-2.5 flex items-center gap-1 text-sm text-muted-foreground font-sans">
+                <MapPin className="h-4 w-4 shrink-0" />
+                {addressLine || t("listing.addressUnknown", "Adresse non précisée")}
+              </p>
+              <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <p className="text-[1.65rem] md:text-[2rem] font-bold text-primary font-sans leading-tight">{formatPrice(listing.price_mga)}</p>
+                  <p className="text-sm text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  className="gradient-primary border-0 font-sans min-h-11 px-5"
+                  style={{ color: "#FAFAFA" }}
+                >
+                  {t("listing.contactSeller", "Contacter le vendeur")}
+                </Button>
+              </div>
+            </section>
+
             <div className="space-y-2.5 md:space-y-3">
-              <div className="rounded-2xl overflow-hidden aspect-video relative border border-border/70">
+              <div className="rounded-2xl overflow-hidden aspect-video relative border border-border/70 shadow-sm">
                 <img
                   src={images[selectedImg]}
                   alt={displayTitle}
@@ -583,59 +648,6 @@ const ListingDetail = () => {
             </div>
 
             <ListingSponsorBlock />
-
-            <div>
-              <div className="flex flex-wrap items-center gap-2.5 mb-2">
-                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{transactionLabel}</Badge>
-                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{typeLabel}</Badge>
-                {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Électrique</Badge>}
-                {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Hybride</Badge>}
-                {listing.badge && (
-                  <Badge
-                    className={`font-sans text-xs ${
-                      listing.badge === "boost"
-                        ? "gradient-primary"
-                        : listing.badge === "urgent"
-                          ? "bg-destructive"
-                          : "bg-accent"
-                    }`}
-                    style={{ color: "#FAFAFA" }}
-                  >
-                    {listing.badge === "boost"
-                      ? t("listing.boost")
-                      : listing.badge === "urgent"
-                        ? t("listing.urgent", "Urgent")
-                        : t("listing.favorite")}
-                  </Badge>
-                )}
-              </div>
-              <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground mb-2">{displayTitle}</h1>
-              {vehicleSummary && (
-                <p className="text-sm text-muted-foreground font-sans mb-1">{vehicleSummary}</p>
-              )}
-              {displayBrand && (
-                <div className="mb-3 inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card px-2.5 py-1.5">
-                  <BrandLogo
-                    brand={displayBrand}
-                    className="h-8 w-12 rounded-md bg-background"
-                    imgClassName="max-h-5"
-                    showFallbackLabel={!displayBrandAsset?.logoPath}
-                  />
-                  <span className="text-xs font-medium font-sans text-muted-foreground">Marque: {displayBrand}</span>
-                </div>
-              )}
-              {listing.internal_ref && isOwner && (
-                <p className="text-xs text-muted-foreground font-sans mb-1">
-                  {t("listing.internalRef", "Réf. interne : {{ref}}", { ref: listing.internal_ref })}
-                </p>
-              )}
-                <p className="flex items-center gap-1 text-sm text-muted-foreground font-sans mb-4">
-                <MapPin className="h-4 w-4 shrink-0" />
-                {addressLine || t("listing.addressUnknown", "Adresse non précisée")}
-              </p>
-              <p className="text-[1.55rem] md:text-2xl font-bold text-primary font-sans">{formatPrice(listing.price_mga)}</p>
-              <p className="text-sm text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
-            </div>
 
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
               {versionLabel && (
@@ -691,33 +703,16 @@ const ListingDetail = () => {
                 </div>
               </section>
             )}
-            <div className="flex flex-wrap items-center gap-2.5">
-              {listing.vehicle?.fuel && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.fuel}</Badge>}
-              {listing.vehicle?.transmission && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.transmission}</Badge>}
-              {listing.vehicle?.drivetrain && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.drivetrain}</Badge>}
-              {listing.vehicle?.bodyStyle && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{listing.vehicle.bodyStyle}</Badge>}
-              {listing.vehicle?.rentalMode && <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.rentalMode}</Badge>}
-              {listing.vehicle?.seats != null && listing.vehicle.seats > 0 && (
-                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.seats} places</Badge>
-              )}
-              {listing.vehicle?.availabilityStatus && (
-                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.availabilityStatus}</Badge>
-              )}
-              {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Électrique</Badge>}
-              {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Hybride</Badge>}
-              {listing.vehicle?.condition && <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{listing.vehicle.condition}</Badge>}
-              {sellerLabel && <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{sellerLabel}</Badge>}
-            </div>
 
             {listing.description && (
-              <div>
+              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.description")}</h2>
                 <p className="font-sans text-muted-foreground leading-relaxed whitespace-pre-line">{listing.description}</p>
-              </div>
+              </section>
             )}
 
             {(listingFeatureBadges.length > 0 || customFeatureBadges.length > 0) && (
-              <div>
+              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
                 <div className="grid grid-cols-2 gap-2">
                   {listingFeatureBadges.map((f) => (
@@ -731,7 +726,7 @@ const ListingDetail = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {(listing.video_url?.trim() || listing.virtual_tour_url?.trim()) && (
@@ -822,8 +817,9 @@ const ListingDetail = () => {
             <div
               ref={contactSectionRef}
               id="listing-contact"
-              className="bg-card rounded-2xl border border-border p-4.5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
+              className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4.5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
             >
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Contact prioritaire</p>
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
@@ -844,6 +840,7 @@ const ListingDetail = () => {
                   </div>
                 )}
                 <div>
+                  <p className="font-sans text-xs text-muted-foreground">{t("listing.seller", "Vendeur")}</p>
                   <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Vendeur")}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {sellerLabel && <Badge variant="outline" className="text-xs font-sans">{sellerLabel}</Badge>}
@@ -854,36 +851,44 @@ const ListingDetail = () => {
               {contactTrustHints.length > 0 && (
                 <div className="rounded-xl border border-border/80 bg-secondary/25 px-3 py-2.5">
                   {contactTrustHints.map((hint) => (
-                    <p key={hint} className="text-xs font-sans text-muted-foreground leading-relaxed">• {hint}</p>
+                    <p key={hint} className="inline-flex items-center gap-1.5 text-xs font-sans text-muted-foreground leading-relaxed mr-2">
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                      {hint}
+                    </p>
                   ))}
                 </div>
               )}
 
-              <Button
-                onClick={handleRevealPhone}
-                variant={phoneRevealed ? "outline" : "default"}
-                className={`hidden w-full font-sans lg:inline-flex ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
-                style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
-              >
-                <Phone className="h-4 w-4 mr-2" />
-                {displayedPhone}
-              </Button>
-
-              {listing.has_whatsapp_contact ? (
+              <div className="hidden lg:grid grid-cols-1 gap-2">
                 <Button
                   type="button"
-                  onClick={handleWhatsApp}
-                  variant="outline"
-                  className={cn("hidden w-full font-sans lg:inline-flex", LISTING_WHATSAPP_BUTTON_CLASS)}
-                  aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
+                  onClick={handleRevealPhone}
+                  variant={phoneRevealed ? "outline" : "default"}
+                  className={`w-full font-sans ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
+                  style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
                 >
-                  <FaWhatsapp className="shrink-0 text-[#25D366]" aria-hidden />
-                  {t("listing.whatsapp", "WhatsApp")}
+                  <Phone className="h-4 w-4 mr-2" />
+                  {displayedPhone}
                 </Button>
-              ) : null}
+                {listing.has_whatsapp_contact ? (
+                  <Button
+                    type="button"
+                    onClick={handleWhatsApp}
+                    variant="outline"
+                    className={cn("w-full font-sans", LISTING_WHATSAPP_BUTTON_CLASS)}
+                    aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
+                  >
+                    <FaWhatsapp className="shrink-0 text-[#25D366]" aria-hidden />
+                    {t("listing.whatsapp", "WhatsApp")}
+                  </Button>
+                ) : null}
+              </div>
 
               <form onSubmit={handleContact} className="space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact")}</h4>
+                <p className="text-xs font-sans text-muted-foreground">
+                  {t("listing.contactHint", "Présentez votre besoin clairement pour recevoir une réponse plus rapide.")}
+                </p>
                 <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans min-h-11" maxLength={100} />
                 <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans min-h-11" maxLength={255} />
                 <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans min-h-11" maxLength={30} />
