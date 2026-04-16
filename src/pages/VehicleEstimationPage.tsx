@@ -25,6 +25,7 @@ import {
 } from "@/lib/estimation/constants";
 import { runVehicleEstimation } from "@/lib/estimation/api";
 import { insertEstimationEvent } from "@/lib/estimation/repository";
+import { buildEstimationPresentation, confidenceLabelFr } from "@/lib/estimation/presentation";
 import { loadVehicleCatalog } from "@/lib/estimation/vehicleCatalog";
 import VehicleCatalogCombobox from "@/components/estimation/VehicleCatalogCombobox";
 import type { EstimationInput, EstimationRunResult } from "@/types/estimation";
@@ -52,32 +53,6 @@ function confidenceBadgeClass(label: "high" | "medium" | "low"): string {
   if (label === "high") return "bg-success text-white";
   if (label === "medium") return "bg-amber-500 text-black";
   return "bg-destructive text-white";
-}
-
-function claimModeLabel(claimMode: EstimationRunResult["outputV2"]["modeGovernance"]["claimMode"]): string {
-  if (claimMode === "ALLOW_STRONG_MARKET_CLAIM") return "Analyse marché robuste";
-  if (claimMode === "ALLOW_LIMITED_MARKET_CLAIM") return "Analyse marché qualifiée";
-  if (claimMode === "INDICATIVE_REFERENCE_CLAIM_ONLY") return "Estimation indicative assistée";
-  return "Estimation indicative exploratoire";
-}
-
-function claimModeMessage(claimMode: EstimationRunResult["outputV2"]["modeGovernance"]["claimMode"]): string {
-  if (claimMode === "ALLOW_STRONG_MARKET_CLAIM") {
-    return "Estimation principalement appuyée sur des comparables solides du marché AutoNex.";
-  }
-  if (claimMode === "ALLOW_LIMITED_MARKET_CLAIM") {
-    return "Estimation guidée par le marché, avec un niveau de prudence supplémentaire.";
-  }
-  if (claimMode === "INDICATIVE_REFERENCE_CLAIM_ONLY") {
-    return "Estimation indicative appuyée par des références et un signal marché partiel.";
-  }
-  return "Estimation indicative en contexte de données marché encore insuffisantes.";
-}
-
-function confidenceLabelFr(label: "high" | "medium" | "low"): string {
-  if (label === "high") return "élevée";
-  if (label === "medium") return "moyenne";
-  return "prudente";
 }
 
 const STEP_META = [
@@ -229,12 +204,13 @@ const VehicleEstimationPage = () => {
   const effectiveUiGovernance = v2?.uiGovernance;
   const effectiveInsights = v2?.insights;
   const effectiveEvidence = v2?.evidence;
+  const presentation = result ? buildEstimationPresentation(result) : null;
   const hideExactConfidence = Boolean(effectiveUiGovernance?.shouldHideExactConfidenceScore);
   const deEmphasizePrecision = Boolean(effectiveUiGovernance?.shouldDeEmphasizePrecision);
-  const confidenceDisplayValue = hideExactConfidence ? null : (effectiveConfidence?.confidenceScore ?? result?.output.confidenceScore ?? null);
-  const confidenceBand = effectiveConfidence?.confidenceBand ?? result?.output.confidenceLabel ?? "low";
-  const topClaimLabel = effectiveMode ? claimModeLabel(effectiveMode.claimMode) : "Rapport de valorisation AutoNex";
-  const topClaimMessage = effectiveMode ? claimModeMessage(effectiveMode.claimMode) : "Repère de valorisation pour préparer votre mise en vente.";
+  const confidenceDisplayValue = presentation?.confidenceDisplayValue ?? (hideExactConfidence ? null : (effectiveConfidence?.confidenceScore ?? result?.output.confidenceScore ?? null));
+  const confidenceBand = presentation?.confidenceBand ?? effectiveConfidence?.confidenceBand ?? result?.output.confidenceLabel ?? "low";
+  const topClaimLabel = presentation?.claimLabel ?? "Rapport de valorisation AutoNex";
+  const topClaimMessage = presentation?.claimMessage ?? "Repère de valorisation pour préparer votre mise en vente.";
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/estimation`
     : "https://autonex.mg/estimation";
@@ -753,7 +729,7 @@ const VehicleEstimationPage = () => {
                     </h2>
                     <div className="inline-flex w-full md:w-auto rounded-2xl border border-background/30 bg-background/12 px-4 py-2">
                       <p className="font-sans text-xs text-background/85 leading-relaxed">
-                        Fourchette de valorisation ({effectiveMode?.rangeWidthMode === "tight" ? "resserrée" : effectiveMode?.rangeWidthMode === "standard" ? "équilibrée" : "prudente"}) : {formatAriary(effectiveValues?.lowEstimate ?? result.output.lowRangePrice)} - {formatAriary(effectiveValues?.highEstimate ?? result.output.highRangePrice)}
+                        Fourchette de valorisation ({presentation?.rangeToneLabel ?? "prudente"}) : {formatAriary(effectiveValues?.lowEstimate ?? result.output.lowRangePrice)} - {formatAriary(effectiveValues?.highEstimate ?? result.output.highRangePrice)}
                       </p>
                     </div>
                     <p className="max-w-2xl font-sans text-sm text-background/70">
@@ -806,20 +782,14 @@ const VehicleEstimationPage = () => {
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
                     <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>
-                      {effectiveTier?.tier === "A_STRONG_MARKET"
-                        ? "Robuste"
-                        : effectiveTier?.tier === "B_MODERATE_MARKET"
-                          ? "Qualifié"
-                          : effectiveTier?.tier === "C_REFERENCE_ASSISTED"
-                            ? "Indicatif"
-                            : "Prudent"}
+                      {presentation?.summaryLevel ?? "Prudent"}
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {(effectiveUiGovernance?.mustShowIndicativeLabel || result.output.confidenceLabel === "low" || !result.output.hasComparables) && (
+            {(presentation?.indicativeRequired || confidenceBand === "low" || (v2?.comparables.length ?? result.output.comparables.length) === 0) && (
               <div className="rounded-2xl border border-amber-400/40 bg-amber-100/50 px-4 py-4 text-sm font-sans text-amber-900">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 mt-0.5" />
@@ -1057,7 +1027,7 @@ const VehicleEstimationPage = () => {
                   </Button>
                 </div>
                 <p className="mt-4 font-sans text-xs text-muted-foreground">
-                  Conseil AutoNex : un prix aligné sur la fourchette ({deEmphasizePrecision ? "approche prudente recommandée" : "niveau de précision courant"}) améliore généralement la qualité des prises de contact.
+                  Conseil AutoNex : un prix aligné sur la fourchette ({presentation?.precisionCaution ? "approche prudente recommandée" : "niveau de précision courant"}) améliore généralement la qualité des prises de contact.
                 </p>
               </CardContent>
             </Card>
