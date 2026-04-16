@@ -23,6 +23,7 @@ export function SearchResultsGrid({ listings, showCloseMatchBadges, getCloseMatc
             key={listing.id}
             listing={listing}
             matchBadge={showCloseMatchBadges ? getCloseMatchLabel(listing) : undefined}
+            variant="search"
           />,
         );
         return out;

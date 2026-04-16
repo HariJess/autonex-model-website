@@ -25,11 +25,12 @@ interface ListingCardProps {
   agencyLogo?: string;
   /** When set (e.g. « résultats proches »), shows a subtle hint under the title */
   matchBadge?: string;
+  variant?: "default" | "search";
 }
 
 const LOCAL_PLACEHOLDER = "/placeholder.svg";
 
-const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCardProps) => {
+const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default" }: ListingCardProps) => {
   const images = useMemo(
     () => (listing.images.length > 0 ? listing.images : [LOCAL_PLACEHOLDER]),
     [listing.images],
@@ -68,13 +69,20 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
         : listing.transaction === "location_vacances"
           ? "Location courte durée"
           : listing.transaction;
+  const isSearchVariant = variant === "search";
 
   const handlePrefetchDetail = () => {
     void prefetchListing(queryClient, listing.id);
   };
 
   return (
-    <div className="group rounded-2xl overflow-hidden bg-card border border-border shadow-sm hover:shadow-lg transition-all duration-300">
+    <div
+      className={`group rounded-2xl overflow-hidden border shadow-sm transition-all duration-300 ${
+        isSearchVariant
+          ? "bg-gradient-to-br from-card via-card to-secondary/20 border-border/70 hover:-translate-y-0.5 hover:shadow-xl"
+          : "bg-card border-border hover:shadow-lg"
+      }`}
+    >
       {/* Image area — fully clickable */}
       <Link
         to={`/annonce/${listing.id}`}
@@ -86,7 +94,9 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
         <img
           src={images[imgIndex]}
           alt={displayTitle}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className={`w-full h-full object-cover transition-transform duration-500 ${
+            isSearchVariant ? "group-hover:scale-[1.045]" : "group-hover:scale-105"
+          }`}
           loading="lazy"
           decoding="async"
           onError={(e) => {
@@ -111,10 +121,10 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
           </div>
         )}
         <div className="absolute top-3 right-3 flex gap-1.5">
-          <Badge variant="secondary" className="text-[10px] font-sans">
+          <Badge variant="secondary" className="text-[10px] font-sans bg-card/90 border border-border/50">
             {transactionBadgeLabel}
           </Badge>
-          {listing.vehicle?.condition && (
+          {!isSearchVariant && listing.vehicle?.condition && (
             <Badge variant="outline" className="text-[10px] font-sans capitalize bg-card/85">
               {listing.vehicle.condition}
             </Badge>
@@ -164,25 +174,29 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
 
       <Link
         to={`/annonce/${listing.id}`}
-        className="block p-4 max-lg:p-4.5 space-y-2"
+        className={`block p-4 max-lg:p-4.5 space-y-2 ${isSearchVariant ? "md:p-4.5" : ""}`}
         onMouseEnter={handlePrefetchDetail}
         onFocus={handlePrefetchDetail}
         onTouchStart={handlePrefetchDetail}
       >
-        <div>
-          <p className="text-xl max-sm:text-[1.22rem] font-bold text-primary font-sans tracking-tight">{formatPrice(listing.price_mga)}</p>
-          <p className="text-xs text-muted-foreground font-sans mt-0.5">{formatPriceSecondary(listing.price_mga)}</p>
+        <div className={isSearchVariant ? "space-y-0.5" : ""}>
+          <p className={`font-sans tracking-tight text-primary ${isSearchVariant ? "text-[1.35rem] font-semibold leading-none" : "text-xl max-sm:text-[1.22rem] font-bold"}`}>
+            {formatPrice(listing.price_mga)}
+          </p>
+          <p className="text-xs text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
-        <h3 className="font-serif font-semibold text-base max-lg:text-[1rem] text-foreground leading-snug line-clamp-2">{displayTitle}</h3>
+        <h3 className={`font-serif text-foreground leading-snug line-clamp-2 ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>
+          {displayTitle}
+        </h3>
         {vehicleHeadline && (
-          <p className="text-xs font-sans text-muted-foreground -mt-1">{vehicleHeadline}</p>
+          <p className="text-xs font-sans text-muted-foreground -mt-1 line-clamp-1">{vehicleHeadline}</p>
         )}
         {matchBadge && (
-          <p className="text-[11px] font-sans text-muted-foreground border border-border/80 rounded-md px-2 py-0.5 w-fit bg-muted/40">
+          <p className="text-[11px] font-sans text-muted-foreground border border-border/70 rounded-md px-2 py-0.5 w-fit bg-background/80">
             {matchBadge}
           </p>
         )}
-        <div className="flex items-center gap-x-3 gap-y-1 text-xs text-muted-foreground font-sans flex-wrap">
+        <div className={`flex items-center gap-x-3 gap-y-1 text-xs text-muted-foreground font-sans flex-wrap ${isSearchVariant ? "pt-0.5" : ""}`}>
           {versionLabel && (
             <span className="flex items-center gap-1">
               <CircleDot className="h-3.5 w-3.5 shrink-0" aria-hidden />
@@ -195,12 +209,21 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge }: ListingCar
               {mileageLabel}
             </span>
           )}
-          <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>
-          {listing.vehicle?.bodyStyle && <span>{listing.vehicle.bodyStyle}</span>}
+          {!isSearchVariant && <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>}
           {listing.vehicle?.fuel && <span>{listing.vehicle.fuel}</span>}
           {listing.vehicle?.transmission && <span>{listing.vehicle.transmission}</span>}
         </div>
-        <p className="text-xs text-muted-foreground font-sans font-medium max-lg:text-[13px]">{city}{region ? `, ${region}` : ""}</p>
+        <div className="flex items-center justify-between border-t border-border/55 pt-2.5">
+          <p className="text-xs text-muted-foreground font-sans font-medium max-lg:text-[13px]">
+            {city}
+            {region ? `, ${region}` : ""}
+          </p>
+          {isSearchVariant && listing.vehicle?.condition && (
+            <span className="text-[11px] capitalize font-sans text-foreground/85 rounded-md border border-border/60 bg-background/75 px-2 py-0.5">
+              {listing.vehicle.condition}
+            </span>
+          )}
+        </div>
       </Link>
     </div>
   );
