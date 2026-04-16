@@ -711,8 +711,8 @@ const VehicleEstimationPage = () => {
                     <h2 className={`leading-[0.95] ${ESTIMATION_TYPO.valueHero}`}>
                       {formatAriary(result.output.adjustedPrice)}
                     </h2>
-                    <div className="inline-flex rounded-full border border-background/30 bg-background/12 px-4 py-2">
-                      <p className="font-sans text-xs text-background/85">
+                    <div className="inline-flex w-full md:w-auto rounded-2xl border border-background/30 bg-background/12 px-4 py-2">
+                      <p className="font-sans text-xs text-background/85 leading-relaxed">
                         Fourchette de valorisation : {formatAriary(result.output.lowRangePrice)} - {formatAriary(result.output.highRangePrice)}
                       </p>
                     </div>

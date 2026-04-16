@@ -585,7 +585,7 @@ const ListingDetail = () => {
             <ListingSponsorBlock />
 
             <div>
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex flex-wrap items-center gap-2.5 mb-2">
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{transactionLabel}</Badge>
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{typeLabel}</Badge>
                 {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Électrique</Badge>}
@@ -934,11 +934,11 @@ const ListingDetail = () => {
               type="button"
               onClick={handleRevealPhone}
               variant={phoneRevealed ? "outline" : "default"}
-              className={`flex-1 font-sans min-h-12 touch-manipulation gap-2 ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
+              className={`flex-1 min-w-0 font-sans text-xs sm:text-sm min-h-12 touch-manipulation gap-2 ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
               style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
             >
               <Phone className="h-4 w-4 shrink-0" />
-              {displayedPhone}
+              <span className="truncate">{displayedPhone}</span>
             </Button>
           </div>
           {listing.has_whatsapp_contact ? (

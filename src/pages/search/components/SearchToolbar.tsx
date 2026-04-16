@@ -96,7 +96,7 @@ export function SearchToolbar({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 justify-between sm:justify-end w-full sm:w-auto">
+      <div className="flex items-center gap-2 justify-between sm:justify-end w-full sm:w-auto">
         <div className="flex items-center border border-border rounded-lg overflow-hidden shrink-0">
           {(
             [
@@ -119,7 +119,7 @@ export function SearchToolbar({
         </div>
 
         <Select value={sort} onValueChange={(v) => onSetSort(v as SearchSortMode)}>
-          <SelectTrigger className="w-[calc(100%-9rem)] sm:w-40 font-sans text-sm min-w-0 min-h-11">
+          <SelectTrigger className="flex-1 sm:flex-none sm:w-40 font-sans text-sm min-w-[9rem] min-h-11">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
