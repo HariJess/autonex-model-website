@@ -13,6 +13,10 @@ function confidenceBadgeClass(label: "high" | "medium" | "low"): string {
   return "bg-destructive text-white";
 }
 
+function formatAriaryGroups(value: number): string[] {
+  return Math.max(0, Math.round(value)).toLocaleString("fr-FR").split(/\s+/u).filter(Boolean);
+}
+
 type Props = {
   result: EstimationRunResult;
   presentation: EstimationPresentation;
@@ -39,6 +43,7 @@ export default function EstimationResultReport({
   const insights = v2.insights;
   const comparables = v2.comparables;
   const showIndicative = presentation.indicativeRequired || presentation.confidenceBand === "low" || comparables.length === 0;
+  const estimatedGroups = formatAriaryGroups(values.estimatedValue);
 
   return (
     <section className="space-y-6 md:space-y-7" aria-label="Rapport d'estimation AutoNex">
@@ -54,35 +59,56 @@ export default function EstimationResultReport({
               Confiance {confidenceLabelFr(presentation.confidenceBand)}
             </Badge>
           </div>
-          <div className="mt-6 grid gap-5 md:grid-cols-[1.7fr_0.9fr] md:items-end">
-            <div className="space-y-3">
-              <p className="font-sans text-xs uppercase tracking-[0.14em] text-background/70">Valeur de marché estimée</p>
-              <h2 className="font-serif text-5xl md:text-7xl tracking-tight leading-[0.98]">{formatAriary(values.estimatedValue)}</h2>
-              <div className="inline-flex w-full md:w-auto rounded-2xl border border-background/30 bg-background/12 px-4 py-2">
-                <p className="font-sans text-xs text-background/85 leading-relaxed">
-                  Fourchette de valorisation ({presentation.rangeToneLabel}) : {formatAriary(values.lowEstimate)} - {formatAriary(values.highEstimate)}
+          <div className="mt-7 grid gap-5 md:grid-cols-[1.55fr_0.95fr] md:items-end">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <p className="font-sans text-[11px] uppercase tracking-[0.16em] text-background/65">Valeur de marché estimée</p>
+                <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
+                  <h2 className="font-serif text-5xl leading-[0.94] text-white md:text-7xl">
+                    <span className="inline-flex flex-wrap items-end gap-x-3">
+                      {estimatedGroups.map((group, index) => (
+                        <span key={`estimated-group-${index}`} className="tabular-nums tracking-tight">
+                          {group}
+                        </span>
+                      ))}
+                    </span>
+                  </h2>
+                  <span className="pb-1 font-sans text-base font-semibold text-background/75 md:text-lg">Ar</span>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-background/30 bg-background/12 px-4 py-3">
+                <p className="font-sans text-[11px] uppercase tracking-wide text-background/60">Fourchette de valorisation ({presentation.rangeToneLabel})</p>
+                <p className="mt-1 font-sans text-sm font-medium text-background/90 md:text-base">
+                  {formatAriary(values.lowEstimate)} <span className="px-1.5 text-background/55">-</span> {formatAriary(values.highEstimate)}
                 </p>
               </div>
-              <p className="max-w-2xl font-sans text-sm text-background/70">{presentation.claimMessage}</p>
+
+              <p className="max-w-2xl font-sans text-sm leading-relaxed text-background/72">{presentation.claimMessage}</p>
             </div>
-            <div className="rounded-2xl border border-background/25 bg-background/12 p-5 backdrop-blur-sm shadow-inner">
-              <p className="font-sans text-xs uppercase tracking-wide text-background/70">Indice de confiance</p>
-              <div className="mt-2 flex items-end gap-2">
+            <div className="rounded-2xl border border-background/30 bg-background/[0.14] p-5 backdrop-blur-sm shadow-inner">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-sans text-[11px] uppercase tracking-[0.12em] text-background/65">Indice de confiance</p>
+                <Badge variant="outline" className="border-background/30 bg-background/10 text-[10px] font-sans normal-case text-background/85">
+                  {presentation.summaryLevel}
+                </Badge>
+              </div>
+              <div className="mt-3 flex items-end gap-2">
                 {presentation.showExactConfidence ? (
                   <>
-                    <p className="font-serif text-4xl leading-none">{presentation.confidenceDisplayValue}</p>
-                    <p className="pb-1 font-sans text-sm text-background/70">/100</p>
+                    <p className="font-serif text-5xl leading-none tabular-nums">{presentation.confidenceDisplayValue}</p>
+                    <p className="pb-1 font-sans text-sm text-background/68">/100</p>
                   </>
                 ) : (
-                  <p className="font-serif text-2xl leading-none">Affichage prudent</p>
+                  <p className="font-serif text-2xl leading-none text-background/90">Affichage prudent</p>
                 )}
               </div>
-              <p className="mt-2 font-sans text-xs text-background/70">
+              <p className="mt-2 font-sans text-xs leading-relaxed text-background/68">
                 {!presentation.showExactConfidence
                   ? "Le score exact est volontairement dé-emphasé pour rester cohérent avec le niveau d'évidence disponible."
                   : presentation.confidenceInterpretation}
               </p>
-              <div className="mt-3 h-1.5 w-full rounded-full bg-background/20">
+              <div className="mt-4 h-1.5 w-full rounded-full bg-background/20">
                 <div className="h-full rounded-full bg-background/90 transition-all duration-500 ease-out" style={{ width: `${Math.max(8, Math.min(100, confidence.confidenceScore))}%` }} />
               </div>
             </div>
