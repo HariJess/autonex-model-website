@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AlertCircle, ArrowRight, CarFront, CheckCircle2, ChevronRight, Gauge, Loader2, ShieldCheck, Sparkles, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronRight, Gauge, Loader2, Sparkles, Target, TrendingUp } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
@@ -25,9 +25,10 @@ import {
 } from "@/lib/estimation/constants";
 import { runVehicleEstimation } from "@/lib/estimation/api";
 import { insertEstimationEvent } from "@/lib/estimation/repository";
-import { buildEstimationPresentation, confidenceLabelFr } from "@/lib/estimation/presentation";
+import { buildEstimationPresentation } from "@/lib/estimation/presentation";
 import { loadVehicleCatalog } from "@/lib/estimation/vehicleCatalog";
 import VehicleCatalogCombobox from "@/components/estimation/VehicleCatalogCombobox";
+import EstimationResultReport from "@/components/estimation/EstimationResultReport";
 import type { EstimationInput, EstimationRunResult } from "@/types/estimation";
 
 const ESTIMATION_DRAFT_KEY = "autonex:estimation:draft:v1";
@@ -48,12 +49,6 @@ const EMPTY_FORM: EstimationInput = {
   ownerCountLabel: "2",
   usageType: "personal",
 };
-
-function confidenceBadgeClass(label: "high" | "medium" | "low"): string {
-  if (label === "high") return "bg-success text-white";
-  if (label === "medium") return "bg-amber-500 text-black";
-  return "bg-destructive text-white";
-}
 
 const STEP_META = [
   { id: "vehicle", label: "Véhicule", helper: "Informations principales" },
@@ -196,21 +191,7 @@ const VehicleEstimationPage = () => {
   }, [form]);
 
   const canSubmit = vehicleStepErrors.length === 0;
-  const v2 = result?.outputV2 ?? null;
-  const effectiveValues = v2?.values;
-  const effectiveConfidence = v2?.confidence;
-  const effectiveTier = v2?.tierDecision;
-  const effectiveMode = v2?.modeGovernance;
-  const effectiveUiGovernance = v2?.uiGovernance;
-  const effectiveInsights = v2?.insights;
-  const effectiveEvidence = v2?.evidence;
   const presentation = result ? buildEstimationPresentation(result) : null;
-  const hideExactConfidence = Boolean(effectiveUiGovernance?.shouldHideExactConfidenceScore);
-  const deEmphasizePrecision = Boolean(effectiveUiGovernance?.shouldDeEmphasizePrecision);
-  const confidenceDisplayValue = presentation?.confidenceDisplayValue ?? (hideExactConfidence ? null : (effectiveConfidence?.confidenceScore ?? result?.output.confidenceScore ?? null));
-  const confidenceBand = presentation?.confidenceBand ?? effectiveConfidence?.confidenceBand ?? result?.output.confidenceLabel ?? "low";
-  const topClaimLabel = presentation?.claimLabel ?? "Rapport de valorisation AutoNex";
-  const topClaimMessage = presentation?.claimMessage ?? "Repère de valorisation pour préparer votre mise en vente.";
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/estimation`
     : "https://autonex.mg/estimation";
@@ -706,340 +687,25 @@ const VehicleEstimationPage = () => {
           </div>
         )}
 
-        {screen === "result" && result && (
-          <section className="space-y-6 md:space-y-7">
-            <Card className={`relative overflow-hidden rounded-3xl border-0 shadow-2xl ${ESTIMATION_PALETTE.hero}`}>
-              <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-              <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-              <CardContent className="p-7 md:p-10">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Badge variant="outline" className="font-sans normal-case border-background/30 bg-background/10 text-background">
-                    {topClaimLabel}
-                  </Badge>
-                  <Badge className={confidenceBadgeClass(confidenceBand)}>
-                    Confiance {confidenceLabelFr(confidenceBand)}
-                  </Badge>
-                </div>
-
-                <div className="mt-6 grid gap-5 md:grid-cols-[1.7fr_0.9fr] md:items-end">
-                  <div className="space-y-3">
-                    <p className="font-sans text-xs uppercase tracking-[0.14em] text-background/70">Valeur de marché estimée</p>
-                    <h2 className={`leading-[0.95] ${ESTIMATION_TYPO.valueHero}`}>
-                      {formatAriary(effectiveValues?.estimatedValue ?? result.output.adjustedPrice)}
-                    </h2>
-                    <div className="inline-flex w-full md:w-auto rounded-2xl border border-background/30 bg-background/12 px-4 py-2">
-                      <p className="font-sans text-xs text-background/85 leading-relaxed">
-                        Fourchette de valorisation ({presentation?.rangeToneLabel ?? "prudente"}) : {formatAriary(effectiveValues?.lowEstimate ?? result.output.lowRangePrice)} - {formatAriary(effectiveValues?.highEstimate ?? result.output.highRangePrice)}
-                      </p>
-                    </div>
-                    <p className="max-w-2xl font-sans text-sm text-background/70">
-                      {topClaimMessage}
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-background/25 bg-background/12 p-5 backdrop-blur-sm shadow-inner">
-                    <p className="font-sans text-xs uppercase tracking-wide text-background/70">Indice de confiance</p>
-                    <div className="mt-2 flex items-end gap-2">
-                      {confidenceDisplayValue != null ? (
-                        <>
-                          <p className="font-serif text-4xl leading-none">{confidenceDisplayValue}</p>
-                          <p className="pb-1 font-sans text-sm text-background/70">/100</p>
-                        </>
-                      ) : (
-                        <p className="font-serif text-2xl leading-none">Affichage prudent</p>
-                      )}
-                    </div>
-                    <p className="mt-2 font-sans text-xs text-background/70">
-                      {hideExactConfidence
-                        ? "Le score exact est volontairement dé-emphasé pour rester cohérent avec le niveau d'évidence disponible."
-                        : presentation?.confidenceInterpretation ?? "Niveau de fiabilité de cette estimation selon les données disponibles."}
-                    </p>
-                    <div className="mt-3 h-1.5 w-full rounded-full bg-background/20">
-                      <div
-                        className="h-full rounded-full bg-background/90 transition-all duration-500 ease-out"
-                        style={{ width: `${Math.max(8, Math.min(100, effectiveConfidence?.confidenceScore ?? result.output.confidenceScore))}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className={`rounded-2xl border border-border/70 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
-              <CardContent className="p-4 md:p-5">
-                <div className="mb-3 rounded-xl border border-border/60 bg-background/70 px-3 py-2">
-                  <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Lecture du rapport</p>
-                  <p className="font-sans text-sm text-foreground">{presentation?.evidenceHeadline ?? "Lecture d'évidence en cours"}</p>
-                </div>
-                <div className="grid grid-cols-1 gap-2 rounded-xl bg-background/65 p-3 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/60 md:p-0">
-                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
-                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
-                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(effectiveValues?.recommendedListingPrice ?? result.output.recommendedListingPrice)}</p>
-                    <p className="mt-1 font-sans text-xs text-muted-foreground">Positionnement conseillé pour publier sur AutoNex.</p>
-                  </div>
-                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
-                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix de vente rapide</p>
-                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(effectiveValues?.quickSalePrice ?? result.output.quickSalePrice)}</p>
-                    <p className="mt-1 font-sans text-xs text-muted-foreground">Repère pour accélérer la conversion.</p>
-                  </div>
-                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
-                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Base marché</p>
-                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(v2?.anchors.finalBaseAnchor ?? result.output.marketBasePrice)}</p>
-                    <p className="mt-1 font-sans text-xs text-muted-foreground">Ancrage principal avant ajustements véhicule.</p>
-                  </div>
-                  <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
-                    <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
-                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>
-                      {presentation?.summaryLevel ?? "Prudent"}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {(presentation?.indicativeRequired || confidenceBand === "low" || (v2?.comparables.length ?? result.output.comparables.length) === 0) && (
-              <div className="rounded-2xl border border-amber-400/40 bg-amber-100/50 px-4 py-4 text-sm font-sans text-amber-900">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="h-4 w-4 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Estimation indicative</p>
-                    <p className="mt-1 text-xs md:text-sm">
-                      {effectiveInsights?.disclaimers[0]?.label ?? result.output.estimationNote ??
-                        "Les données disponibles pour ce modèle sont plus limitées ; la fourchette est donc volontairement plus large."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-            {effectiveEvidence && (
-              <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
-                <p className="font-medium text-foreground">Qualité d'évidence</p>
-                <p className="mt-1">
-                  {effectiveEvidence.comparableCountUsed} comparables retenus, dont {effectiveEvidence.comparableCountStrong} solides, avec une similarité médiane de {Math.round(effectiveEvidence.comparableSimilarityMedian)} / 100.
-                </p>
-              </div>
-            )}
-            {!result.output.usedReferenceProfile && (
-              <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
-                Votre véhicule est bien reconnu. Les données comparables étant plus rares pour ce profil,
-                la fourchette est volontairement plus prudente.
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.05fr_0.95fr]">
-              <Card className={`rounded-2xl border border-emerald-300/25 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-serif text-xl flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-success" />
-                    Facteurs qui renforcent la valeur
-                  </CardTitle>
-                  <p className="font-sans text-xs text-muted-foreground">
-                    Points favorables identifiés dans le profil déclaré de votre véhicule.
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {(effectiveInsights?.pricingFactorsPositive.length ?? result.output.positiveFactors.length) === 0 ? (
-                    <div className="rounded-xl border border-emerald-200/30 bg-emerald-500/5 p-3">
-                      <p className="text-sm font-sans text-muted-foreground">
-                        Aucun levier majeur de surcote n'est détecté pour l'instant, mais votre positionnement reste cohérent.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {(effectiveInsights?.pricingFactorsPositive.map((item) => item.label) ?? result.output.positiveFactors).map((factor) => (
-                        <Badge
-                          key={factor}
-                          variant="secondary"
-                          className="rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 font-sans normal-case text-foreground"
-                        >
-                          {factor}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs font-sans text-muted-foreground">
-                    Ces éléments soutiennent votre prix conseillé et renforcent l'attractivité de l'annonce.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className={`rounded-2xl border border-destructive/20 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-serif text-xl flex items-center gap-2">
-                    <ShieldCheck className="h-5 w-5 text-destructive" />
-                    Points de vigilance prix
-                  </CardTitle>
-                  <p className="font-sans text-xs text-muted-foreground">
-                    Aspects qui peuvent élargir la négociation ou peser sur la valeur perçue.
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {(effectiveInsights?.pricingFactorsNegative.length ?? result.output.negativeFactors.length) === 0 ? (
-                    <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3">
-                      <p className="text-sm font-sans text-muted-foreground">
-                        Aucun facteur de décote marqué n'est relevé à ce stade.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {(effectiveInsights?.pricingFactorsNegative.map((item) => item.label) ?? result.output.negativeFactors).map((factor) => (
-                        <Badge
-                          key={factor}
-                          variant="outline"
-                          className="rounded-full border-destructive/35 px-3 py-1 font-sans normal-case"
-                        >
-                          {factor}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs font-sans text-muted-foreground">
-                    Les adresser dans votre annonce permet souvent de sécuriser des contacts plus qualifiés.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            {effectiveInsights && (
-              <Card className={`rounded-2xl border border-border/70 shadow-sm ${ESTIMATION_PALETTE.surface}`}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-serif text-xl flex items-center gap-2">
-                    <ShieldCheck className="h-5 w-5 text-primary" />
-                    Lecture d'évidence
-                  </CardTitle>
-                  <p className="font-sans text-xs text-muted-foreground">
-                    Ces éléments décrivent la qualité d'évidence du rapport, distincte des facteurs de prix.
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {effectiveInsights.evidenceNotes.length > 0 ? (
-                    effectiveInsights.evidenceNotes.map((note) => (
-                      <div key={note.id} className="rounded-lg border border-border/60 bg-background/70 px-3 py-2 text-sm font-sans">
-                        {note.label}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground font-sans">Pas de note d'évidence complémentaire pour ce cas.</p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
-              <CardHeader>
-                <CardTitle className="font-serif text-xl flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  Annonces AutoNex similaires
-                </CardTitle>
-                <p className="font-sans text-xs text-muted-foreground">
-                  {result.output.comparables.length > 0
-                    ? presentation?.comparablesIntro ?? `${result.output.comparables.length} repère(s) marché pour situer votre prix de mise en vente.`
-                    : presentation?.comparablesEmptyMessage ?? "Repères comparables en cours de consolidation pour ce modèle."}
-                </p>
-              </CardHeader>
-              <CardContent>
-                {result.output.comparables.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-border/80 bg-gradient-to-br from-secondary/20 to-background p-7">
-                    <div className="mx-auto max-w-2xl text-center">
-                      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80">
-                        <Sparkles className="h-4 w-4 text-primary" />
-                      </div>
-                      <p className="font-serif text-lg">{presentation?.comparablesEmptyTitle ?? "Comparaison marché bientôt enrichie"}</p>
-                      <p className="mt-2 font-sans text-sm text-muted-foreground">
-                        {presentation?.comparablesEmptyMessage ?? "Nous n'avons pas encore assez d'annonces strictement comparables sur ce profil. Votre estimation reste néanmoins un repère utile pour préparer une publication."}
-                      </p>
-                      <p className="mt-2 font-sans text-xs text-muted-foreground">
-                        Dès que davantage d'annonces similaires sont disponibles, la comparaison devient plus fine.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-                    {result.output.comparables.map((item) => (
-                      <Link
-                        key={item.listingId}
-                        to={`/annonce/${item.listingId}`}
-                        onClick={() =>
-                          void trackEstimationEvent(result.requestId, "viewed_similar_listings", {
-                            listingId: item.listingId,
-                          })
-                        }
-                        className="group rounded-xl border border-border/80 bg-background/70 p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-                      >
-                        <div className="aspect-[4/3] rounded-md overflow-hidden bg-muted mb-2">
-                          {item.imageUrl ? (
-                            <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center text-muted-foreground"><CarFront className="h-6 w-6" /></div>
-                          )}
-                        </div>
-                        <p className="font-sans text-sm font-semibold line-clamp-2">{item.title}</p>
-                        <p className="mt-1 font-serif text-base">{formatAriary(item.price)}</p>
-                        <p className="mt-1 font-sans text-xs text-muted-foreground">
-                          {item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}
-                        </p>
-                        <p className="mt-2 inline-flex items-center text-[11px] font-sans text-primary/90 transition-colors group-hover:text-primary">
-                          Voir l'annonce <ChevronRight className="ml-1 h-3 w-3" />
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className={`rounded-2xl border border-primary/15 bg-gradient-to-r shadow-md ${ESTIMATION_PALETTE.accent}`}>
-              <CardContent className="p-6 md:p-8">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-wide text-muted-foreground">
-                      <Target className="h-3.5 w-3.5" />
-                      Prochaine meilleure action
-                    </p>
-                    <p className="mt-2 font-serif text-2xl">{presentation?.actionHeadline ?? "Transformez cette estimation en annonce performante"}</p>
-                    <p className="mt-2 max-w-2xl font-sans text-sm text-muted-foreground">
-                      {presentation?.actionDescription ?? "Publiez avec un prix clair, crédible et cohérent avec le marché pour accélérer vos premiers contacts qualifiés."}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-5 grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
-                  <Button onClick={() => void publishFromEstimation()} size="lg" className={`${ESTIMATION_UI.primaryCta} w-full sm:w-auto`}>
-                    Publier cette voiture sur AutoNex
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      if (result) {
-                        try {
-                          await insertEstimationEvent(result.requestId, "clicked_refine_estimation");
-                        } catch {
-                          // Non-blocking analytics
-                        }
-                      }
-                      setScreen("vehicle");
-                    }}
-                    className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto`}
-                  >
-                    Affiner l'estimation
-                  </Button>
-                  <Button variant="ghost" onClick={() => navigate("/recherche")} className={`${ESTIMATION_UI.secondaryCta} w-full justify-start sm:w-auto sm:justify-center`}>
-                    Comparer avec des annonces similaires
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setResult(null);
-                      setScreen("vehicle");
-                    }}
-                    className={`${ESTIMATION_UI.secondaryCta} w-full justify-start sm:w-auto sm:justify-center`}
-                  >
-                    Refaire une estimation
-                  </Button>
-                </div>
-                <p className="mt-4 font-sans text-xs text-muted-foreground">
-                  Conseil AutoNex : un prix aligné sur la fourchette ({presentation?.precisionCaution ? "approche prudente recommandée" : "niveau de précision courant"}) améliore généralement la qualité des prises de contact.
-                </p>
-              </CardContent>
-            </Card>
+        {screen === "result" && result && presentation && (
+          <>
+            <EstimationResultReport
+              result={result}
+              presentation={presentation}
+              onPublish={() => void publishFromEstimation()}
+              onRefine={() => {
+                void trackEstimationEvent(result.requestId, "clicked_refine_estimation");
+                setScreen("vehicle");
+              }}
+              onCompare={() => navigate("/recherche")}
+              onRestart={() => {
+                setResult(null);
+                setScreen("vehicle");
+              }}
+              onViewComparable={(listingId) =>
+                void trackEstimationEvent(result.requestId, "viewed_similar_listings", { listingId })
+              }
+            />
             <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans text-muted-foreground">
               Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle,
               ni une expertise mécanique, ni un prix garanti.
@@ -1047,7 +713,7 @@ const VehicleEstimationPage = () => {
             <p className="text-xs text-muted-foreground font-sans">
               Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.
             </p>
-          </section>
+          </>
         )}
       </main>
       <Footer />

@@ -1,0 +1,291 @@
+import { AlertCircle, ArrowRight, CarFront, CheckCircle2, ChevronRight, ShieldCheck, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatAriary } from "@/lib/estimation/constants";
+import { confidenceLabelFr, type EstimationPresentation } from "@/lib/estimation/presentation";
+import type { EstimationRunResult } from "@/types/estimation";
+
+function confidenceBadgeClass(label: "high" | "medium" | "low"): string {
+  if (label === "high") return "bg-success text-white";
+  if (label === "medium") return "bg-amber-500 text-black";
+  return "bg-destructive text-white";
+}
+
+type Props = {
+  result: EstimationRunResult;
+  presentation: EstimationPresentation;
+  onPublish: () => void;
+  onRefine: () => void;
+  onCompare: () => void;
+  onRestart: () => void;
+  onViewComparable: (listingId: string) => void;
+};
+
+export default function EstimationResultReport({
+  result,
+  presentation,
+  onPublish,
+  onRefine,
+  onCompare,
+  onRestart,
+  onViewComparable,
+}: Props) {
+  const v2 = result.outputV2;
+  const values = v2.values;
+  const confidence = v2.confidence;
+  const evidence = v2.evidence;
+  const insights = v2.insights;
+  const comparables = v2.comparables;
+  const showIndicative = presentation.indicativeRequired || presentation.confidenceBand === "low" || comparables.length === 0;
+
+  return (
+    <section className="space-y-6 md:space-y-7">
+      <Card className="relative overflow-hidden rounded-3xl border-0 shadow-2xl bg-gradient-to-br from-[#071226] via-[#0D1E3E] to-[#1A3560] text-background">
+        <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <CardContent className="p-7 md:p-10">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Badge variant="outline" className="font-sans normal-case border-background/30 bg-background/10 text-background">
+              {presentation.claimLabel}
+            </Badge>
+            <Badge className={confidenceBadgeClass(presentation.confidenceBand)}>
+              Confiance {confidenceLabelFr(presentation.confidenceBand)}
+            </Badge>
+          </div>
+          <div className="mt-6 grid gap-5 md:grid-cols-[1.7fr_0.9fr] md:items-end">
+            <div className="space-y-3">
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-background/70">Valeur de marché estimée</p>
+              <h2 className="font-serif text-5xl md:text-7xl tracking-tight leading-[0.98]">{formatAriary(values.estimatedValue)}</h2>
+              <div className="inline-flex w-full md:w-auto rounded-2xl border border-background/30 bg-background/12 px-4 py-2">
+                <p className="font-sans text-xs text-background/85 leading-relaxed">
+                  Fourchette de valorisation ({presentation.rangeToneLabel}) : {formatAriary(values.lowEstimate)} - {formatAriary(values.highEstimate)}
+                </p>
+              </div>
+              <p className="max-w-2xl font-sans text-sm text-background/70">{presentation.claimMessage}</p>
+            </div>
+            <div className="rounded-2xl border border-background/25 bg-background/12 p-5 backdrop-blur-sm shadow-inner">
+              <p className="font-sans text-xs uppercase tracking-wide text-background/70">Indice de confiance</p>
+              <div className="mt-2 flex items-end gap-2">
+                {presentation.showExactConfidence ? (
+                  <>
+                    <p className="font-serif text-4xl leading-none">{presentation.confidenceDisplayValue}</p>
+                    <p className="pb-1 font-sans text-sm text-background/70">/100</p>
+                  </>
+                ) : (
+                  <p className="font-serif text-2xl leading-none">Affichage prudent</p>
+                )}
+              </div>
+              <p className="mt-2 font-sans text-xs text-background/70">
+                {!presentation.showExactConfidence
+                  ? "Le score exact est volontairement dé-emphasé pour rester cohérent avec le niveau d'évidence disponible."
+                  : presentation.confidenceInterpretation}
+              </p>
+              <div className="mt-3 h-1.5 w-full rounded-full bg-background/20">
+                <div className="h-full rounded-full bg-background/90 transition-all duration-500 ease-out" style={{ width: `${Math.max(8, Math.min(100, confidence.confidenceScore))}%` }} />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl border border-border/70 shadow-sm transition-all duration-300 ease-out hover:shadow-md bg-card/95">
+        <CardContent className="p-4 md:p-5">
+          <div className="mb-3 rounded-xl border border-border/60 bg-background/70 px-3 py-2">
+            <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Lecture du rapport</p>
+            <p className="font-sans text-sm text-foreground">{presentation.evidenceHeadline}</p>
+          </div>
+          <div className="grid grid-cols-1 gap-2 rounded-xl bg-background/65 p-3 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/60 md:p-0">
+            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
+              <p className="mt-1 font-serif text-2xl">{formatAriary(values.recommendedListingPrice)}</p>
+              <p className="mt-1 font-sans text-xs text-muted-foreground">Positionnement conseillé pour publier sur AutoNex.</p>
+            </div>
+            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix de vente rapide</p>
+              <p className="mt-1 font-serif text-2xl">{formatAriary(values.quickSalePrice)}</p>
+              <p className="mt-1 font-sans text-xs text-muted-foreground">Repère pour accélérer la conversion.</p>
+            </div>
+            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Base marché</p>
+              <p className="mt-1 font-serif text-2xl">{formatAriary(v2.anchors.finalBaseAnchor)}</p>
+              <p className="mt-1 font-sans text-xs text-muted-foreground">Ancrage principal avant ajustements véhicule.</p>
+            </div>
+            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
+              <p className="mt-1 font-serif text-2xl">{presentation.summaryLevel}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {showIndicative && (
+        <div className="rounded-2xl border border-amber-400/40 bg-amber-100/50 px-4 py-4 text-sm font-sans text-amber-900">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 mt-0.5" />
+            <div>
+              <p className="font-medium">Estimation indicative</p>
+              <p className="mt-1 text-xs md:text-sm">
+                {insights.disclaimers[0]?.label ?? result.output.estimationNote ?? "Les données disponibles sont plus limitées ; la fourchette est volontairement plus large."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
+        <p className="font-medium text-foreground">Qualité d'évidence</p>
+        <p className="mt-1">
+          {evidence.comparableCountUsed} comparables retenus, dont {evidence.comparableCountStrong} solides, avec une similarité médiane de {Math.round(evidence.comparableSimilarityMedian)} / 100.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.05fr_0.95fr]">
+        <Card className="rounded-2xl border border-emerald-300/25 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-serif text-xl flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-success" />
+              Facteurs qui renforcent la valeur
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {insights.pricingFactorsPositive.length === 0 ? (
+              <div className="rounded-xl border border-emerald-200/30 bg-emerald-500/5 p-3">
+                <p className="text-sm font-sans text-muted-foreground">Aucun levier majeur de surcote n'est détecté pour l'instant.</p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {insights.pricingFactorsPositive.map((item) => (
+                  <Badge key={item.id} variant="secondary" className="rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 font-sans normal-case text-foreground">
+                    {item.label}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border border-destructive/20 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-serif text-xl flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-destructive" />
+              Points de vigilance prix
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {insights.pricingFactorsNegative.length === 0 ? (
+              <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3">
+                <p className="text-sm font-sans text-muted-foreground">Aucun facteur de décote marqué n'est relevé à ce stade.</p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {insights.pricingFactorsNegative.map((item) => (
+                  <Badge key={item.id} variant="outline" className="rounded-full border-destructive/35 px-3 py-1 font-sans normal-case">
+                    {item.label}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="rounded-2xl border border-border/70 shadow-sm bg-card/95">
+        <CardHeader className="pb-3">
+          <CardTitle className="font-serif text-xl flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            Lecture d'évidence
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {insights.evidenceNotes.length > 0 ? (
+            insights.evidenceNotes.map((note) => (
+              <div key={note.id} className="rounded-lg border border-border/60 bg-background/70 px-3 py-2 text-sm font-sans">{note.label}</div>
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground font-sans">Pas de note d'évidence complémentaire pour ce cas.</p>
+          )}
+          {insights.disclaimers.length > 0 && (
+            <div className="rounded-lg border border-amber-400/35 bg-amber-100/40 px-3 py-2 text-sm font-sans text-amber-900">
+              {insights.disclaimers[0].label}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
+        <CardHeader>
+          <CardTitle className="font-serif text-xl flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Annonces AutoNex similaires
+          </CardTitle>
+          <p className="font-sans text-xs text-muted-foreground">
+            {comparables.length > 0 ? presentation.comparablesIntro : presentation.comparablesEmptyMessage}
+          </p>
+        </CardHeader>
+        <CardContent>
+          {comparables.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border/80 bg-gradient-to-br from-secondary/20 to-background p-7">
+              <div className="mx-auto max-w-2xl text-center">
+                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                </div>
+                <p className="font-serif text-lg">{presentation.comparablesEmptyTitle}</p>
+                <p className="mt-2 font-sans text-sm text-muted-foreground">{presentation.comparablesEmptyMessage}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {comparables.map((item) => (
+                <Link
+                  key={item.listingId}
+                  to={`/annonce/${item.listingId}`}
+                  onClick={() => onViewComparable(item.listingId)}
+                  className="group rounded-xl border border-border/80 bg-background/70 p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                >
+                  <div className="aspect-[4/3] rounded-md overflow-hidden bg-muted mb-2">
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-muted-foreground"><CarFront className="h-6 w-6" /></div>
+                    )}
+                  </div>
+                  <p className="font-sans text-sm font-semibold line-clamp-2">{item.title}</p>
+                  <p className="mt-1 font-serif text-base">{formatAriary(item.price)}</p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">{item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}</p>
+                  <p className="mt-2 inline-flex items-center text-[11px] font-sans text-primary/90 transition-colors group-hover:text-primary">
+                    Voir l'annonce <ChevronRight className="ml-1 h-3 w-3" />
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl border border-primary/15 bg-gradient-to-r shadow-md border-primary/30 bg-primary/[0.08]">
+        <CardContent className="p-6 md:p-8">
+          <p className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-wide text-muted-foreground">
+            <Target className="h-3.5 w-3.5" />
+            Prochaine meilleure action
+          </p>
+          <p className="mt-2 font-serif text-2xl">{presentation.actionHeadline}</p>
+          <p className="mt-2 max-w-2xl font-sans text-sm text-muted-foreground">{presentation.actionDescription}</p>
+          <div className="mt-5 grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
+            <Button onClick={onPublish} size="lg" className="rounded-xl px-8 font-sans shadow-lg w-full sm:w-auto">
+              Publier cette voiture sur AutoNex
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button variant="outline" onClick={onRefine} className="rounded-xl font-sans w-full sm:w-auto">Affiner l'estimation</Button>
+            <Button variant="ghost" onClick={onCompare} className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center">Comparer avec des annonces similaires</Button>
+            <Button variant="ghost" onClick={onRestart} className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center">Refaire une estimation</Button>
+          </div>
+          <p className="mt-4 font-sans text-xs text-muted-foreground">
+            Conseil AutoNex : un prix aligné sur la fourchette ({presentation.precisionCaution ? "approche prudente recommandée" : "niveau de précision courant"}) améliore généralement la qualité des prises de contact.
+          </p>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
