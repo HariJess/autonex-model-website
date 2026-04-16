@@ -15,7 +15,7 @@ export function SearchResultsGrid({ listings, showCloseMatchBadges, getCloseMatc
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 xl:gap-6">
       {listings.flatMap((listing, index): ReactNode[] => {
         const out: ReactNode[] = [];
-        if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 2) {
+        if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 5) {
           out.push(<SponsoredNativeCard key="monetization-sponsored" />);
         }
         out.push(

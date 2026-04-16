@@ -41,6 +41,7 @@ import { SearchResultsList } from "@/pages/search/components/SearchResultsList";
 import { SearchEmptyState } from "@/pages/search/components/SearchEmptyState";
 import { SearchLoadingState } from "@/pages/search/components/SearchLoadingState";
 import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
+import { SearchTrustPanel } from "@/pages/search/components/SearchTrustPanel";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 
@@ -626,6 +627,15 @@ const SearchPage = () => {
           </aside>
 
           <main className="flex-1 min-w-0">
+            {!queryError && !isLoading && (
+              <SearchTrustPanel
+                hasExactResults={sortedExact.length > 0}
+                hasSimilarFallback={sortedExact.length === 0 && similarFallbackListings.length > 0}
+                activeFilterCount={activeFilterCount}
+                exactCount={sortedExact.length}
+                similarCount={similarFallbackListings.length}
+              />
+            )}
             <SearchTopBanner />
             <SearchToolbar
               filters={filters}
@@ -702,6 +712,13 @@ const SearchPage = () => {
             {isLoading && <SearchLoadingState loadingLabel={t("common.loading", "Chargement")} />}
 
             {showResults && viewMode === "map" && (
+              <section className="space-y-3">
+                <div className="flex items-end justify-between gap-2">
+                  <div>
+                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Sélection principale</p>
+                    <p className="font-serif text-xl text-foreground">Exploration carte + annonces</p>
+                  </div>
+                </div>
               <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[min(600px,70vh)]">
                 <div className="w-full lg:w-[58%] h-[min(420px,50vh)] lg:h-full min-h-[280px]">
                   <Suspense
@@ -725,24 +742,41 @@ const SearchPage = () => {
                   ))}
                 </div>
               </div>
+              </section>
             )}
 
             {showResults && viewMode === "list" && (
-              <SearchResultsList
-                listings={displayListings}
-                showCloseMatchBadges={showCloseMatchBadges}
-                getCloseMatchLabel={closeMatchLabel}
-                formatPrice={formatPrice}
-                seeListingLabel={t("search.seeListing", "Voir l’annonce")}
-              />
+              <section className="space-y-3">
+                <div className="flex items-end justify-between gap-2">
+                  <div>
+                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Sélection principale</p>
+                    <p className="font-serif text-xl text-foreground">Annonces correspondant à votre recherche</p>
+                  </div>
+                </div>
+                <SearchResultsList
+                  listings={displayListings}
+                  showCloseMatchBadges={showCloseMatchBadges}
+                  getCloseMatchLabel={closeMatchLabel}
+                  formatPrice={formatPrice}
+                  seeListingLabel={t("search.seeListing", "Voir l’annonce")}
+                />
+              </section>
             )}
 
             {showResults && viewMode === "grid" && (
-              <SearchResultsGrid
-                listings={displayListings}
-                showCloseMatchBadges={showCloseMatchBadges}
-                getCloseMatchLabel={closeMatchLabel}
-              />
+              <section className="space-y-3">
+                <div className="flex items-end justify-between gap-2">
+                  <div>
+                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Sélection principale</p>
+                    <p className="font-serif text-xl text-foreground">Annonces correspondant à votre recherche</p>
+                  </div>
+                </div>
+                <SearchResultsGrid
+                  listings={displayListings}
+                  showCloseMatchBadges={showCloseMatchBadges}
+                  getCloseMatchLabel={closeMatchLabel}
+                />
+              </section>
             )}
 
             {showAlsoLikeBlock && (
