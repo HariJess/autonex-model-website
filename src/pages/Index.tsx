@@ -419,32 +419,9 @@ const Index = () => {
       </section>
 
       <section className="container mx-auto px-4 pt-6 md:pt-8">
-        <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-6">
-          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Pourquoi AutoNex</p>
-          <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-3">
-            <div className="rounded-xl border border-border/70 bg-card/80 px-3.5 py-3">
-              <p className="font-serif text-base text-foreground">Marketplace vérifiée</p>
-              <p className="mt-1 font-sans text-sm text-muted-foreground">Annonces, statuts de publication et contact vendeur cadrés pour une navigation fiable.</p>
-            </div>
-            <div className="rounded-xl border border-border/70 bg-card/80 px-3.5 py-3">
-              <p className="font-serif text-base text-foreground">Décision plus claire</p>
-              <p className="mt-1 font-sans text-sm text-muted-foreground">Recherche guidée, pages détails premium et signaux de confiance homogènes.</p>
-            </div>
-            <div className="rounded-xl border border-border/70 bg-card/80 px-3.5 py-3">
-              <p className="font-serif text-base text-foreground">Produit signature</p>
-              <p className="mt-1 font-sans text-sm text-muted-foreground">L’estimation AutoNex transforme l’exploration en décision de prix plus crédible.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="container mx-auto px-4 pt-6 md:pt-8">
         <div className="rounded-2xl border border-border/75 bg-card/70 p-4 md:p-6">
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Explorer par intention</p>
           <h2 className="font-serif text-xl md:text-2xl font-bold mt-1">Landings principales AutoNex</h2>
-          <p className="mt-2 text-sm text-muted-foreground font-sans">
-            Parcourez d'abord les axes les plus utiles: transaction, categorie, ville prioritaire puis estimation.
-          </p>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Transaction</p>
