@@ -84,6 +84,12 @@ const Header = () => {
 
   const navLinkClass = (active: boolean) =>
     `text-sm font-semibold transition-colors ${active ? "text-white" : "text-[#F2F7FF] hover:text-white"}`;
+  const estimationDesktopClass = isEstimationActive
+    ? "inline-flex items-center rounded-full border border-[#8FB8E8]/55 bg-gradient-to-r from-[#1A3F6A] to-[#24517F] px-3.5 py-1.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(21,57,96,0.35)]"
+    : "inline-flex items-center rounded-full border border-[#6F96C4]/45 bg-white/[0.04] px-3.5 py-1.5 text-sm font-semibold text-[#F3F8FF] transition-all hover:border-[#9DC2EA]/65 hover:bg-white/[0.08] hover:text-white";
+  const estimationMobileClass = isEstimationActive
+    ? "text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center justify-between touch-manipulation border border-[#8FB8E8]/55 bg-gradient-to-r from-[#1A3F6A] to-[#24517F] text-white"
+    : "text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center justify-between touch-manipulation border border-[#6F96C4]/35 bg-white/[0.03] text-[#F3F8FF] active:bg-white/[0.1]";
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#061427]/95 backdrop-blur-md">
@@ -176,7 +182,7 @@ const Header = () => {
               </Link>
             );
           })}
-          <Link to="/estimation" className={navLinkClass(isEstimationActive)}>
+          <Link to="/estimation" className={estimationDesktopClass}>
             Estimation
           </Link>
         </nav>
@@ -273,10 +279,10 @@ const Header = () => {
             <Link
               to="/estimation"
               onClick={() => setMenuOpen(false)}
-              className="text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center touch-manipulation bg-white/[0.02] active:bg-white/[0.08]"
-              style={{ color: "#FAFAFA" }}
+              className={estimationMobileClass}
             >
-              Estimation
+              <span>Estimation</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-[#D9E8FA]">Signature</span>
             </Link>
             <Link
               to="/conseils"
