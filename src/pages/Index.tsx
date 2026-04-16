@@ -16,6 +16,7 @@ import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/pre
 import {
   AUTO_DISCOVERY_CATEGORIES,
 } from "@/data/automotiveCatalog";
+import { SEO_P1_CATEGORIES, SEO_P1_CITIES, SEO_P1_TRANSACTIONS } from "@/lib/seoP1Registry";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -289,6 +290,66 @@ const Index = () => {
             <div className="rounded-xl border border-border/70 bg-card/80 px-3.5 py-3">
               <p className="font-serif text-base text-foreground">Produit signature</p>
               <p className="mt-1 font-sans text-sm text-muted-foreground">L’estimation AutoNex transforme l’exploration en décision de prix plus crédible.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 pt-6 md:pt-8">
+        <div className="rounded-2xl border border-border/75 bg-card/70 p-4 md:p-6">
+          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Explorer par intention</p>
+          <h2 className="font-serif text-xl md:text-2xl font-bold mt-1">Landings principales AutoNex</h2>
+          <p className="mt-2 text-sm text-muted-foreground font-sans">
+            Parcourez d'abord les axes les plus utiles: transaction, categorie, ville prioritaire puis estimation.
+          </p>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Transaction</p>
+              <div className="flex flex-wrap gap-2">
+                {SEO_P1_TRANSACTIONS.map((entry) => (
+                  <Link
+                    key={entry.slug}
+                    to={`/${entry.slug}`}
+                    className="rounded-full border border-border/70 px-3 py-1.5 text-sm font-sans hover:bg-secondary transition-colors"
+                  >
+                    {entry.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Categories</p>
+              <div className="flex flex-wrap gap-2">
+                {SEO_P1_CATEGORIES.map((entry) => (
+                  <Link
+                    key={entry.slug}
+                    to={`/vehicules/${entry.slug}`}
+                    className="rounded-full border border-border/70 px-3 py-1.5 text-sm font-sans hover:bg-secondary transition-colors"
+                  >
+                    {entry.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Villes prioritaires</p>
+              <div className="flex flex-wrap gap-2">
+                {SEO_P1_CITIES.map((entry) => (
+                  <Link
+                    key={entry.slug}
+                    to={`/ville/${entry.slug}`}
+                    className="rounded-full border border-border/70 px-3 py-1.5 text-sm font-sans hover:bg-secondary transition-colors"
+                  >
+                    {entry.city}
+                  </Link>
+                ))}
+                <Link
+                  to="/estimation"
+                  className="rounded-full border border-primary/40 px-3 py-1.5 text-sm font-sans text-primary hover:bg-primary/10 transition-colors"
+                >
+                  Estimation
+                </Link>
+              </div>
             </div>
           </div>
         </div>

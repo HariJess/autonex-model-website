@@ -34,6 +34,7 @@ const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
 const VehicleEstimationPage = lazy(() => import("./pages/VehicleEstimationPage.tsx"));
 const BlogList = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogList })));
 const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogArticle })));
+const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient({
@@ -63,6 +64,12 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/recherche" element={<SearchPage />} />
+            <Route path="/acheter" element={<SeoLandingPage />} />
+            <Route path="/location-longue-duree" element={<SeoLandingPage />} />
+            <Route path="/location-courte-duree" element={<SeoLandingPage />} />
+            <Route path="/vehicules/:categorySlug" element={<SeoLandingPage />} />
+            <Route path="/ville/:citySlug" element={<SeoLandingPage />} />
+            <Route path="/vehicules/:categorySlug/ville/:citySlug" element={<SeoLandingPage />} />
             <Route path="/annonce/:id" element={<ListingDetail />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />

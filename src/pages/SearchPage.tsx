@@ -34,6 +34,7 @@ import {
   matchesSurfaceMinStrict,
 } from "@/lib/searchLocationMatch";
 import { buildCanonicalUrl, composePageTitle, truncateMetaDescription } from "@/lib/seo";
+import { getOwnedSeoLandingPathForSearchParams } from "@/lib/seoP1Registry";
 import { SearchToolbar } from "@/pages/search/components/SearchToolbar";
 import { SearchActiveChips } from "@/pages/search/components/SearchActiveChips";
 import { SearchResultsGrid } from "@/pages/search/components/SearchResultsGrid";
@@ -482,6 +483,9 @@ const SearchPage = () => {
     );
   }, [filters]);
   const canonicalSearch = useMemo(() => {
+    const ownedLandingPath = getOwnedSeoLandingPathForSearchParams(searchParams);
+    if (ownedLandingPath) return buildCanonicalUrl(ownedLandingPath);
+
     const params = new URLSearchParams(searchParams);
     params.delete("sort");
     params.delete("view");
@@ -536,6 +540,9 @@ const SearchPage = () => {
     return count;
   }, [filters]);
   const robotsContent = useMemo(() => {
+    const ownedLandingPath = getOwnedSeoLandingPathForSearchParams(searchParams);
+    if (ownedLandingPath) return "noindex,follow";
+
     // Indexation policy: only allow a small set of facets to be indexable.
     // Anything with "advanced" filters becomes noindex,follow.
     if (noisyFiltersCount > 0) return "noindex,follow";
@@ -543,7 +550,7 @@ const SearchPage = () => {
     if (filters.vehicleTypes.length > 1) return "noindex,follow";
     if (filters.types.length > 0 && filters.vehicleTypes.length > 0) return "noindex,follow";
     return "index,follow";
-  }, [filters, noisyFiltersCount]);
+  }, [filters, noisyFiltersCount, searchParams]);
 
   const errorMessage = useMemo(() => {
     if (!queryError) return "";
