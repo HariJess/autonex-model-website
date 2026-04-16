@@ -37,10 +37,34 @@ AutoNex is an automotive marketplace for Madagascar: vehicle listings (achat, lo
 |-------------------|----------------------------|
 | `npm run dev`     | Start Vite dev server      |
 | `npm run build`   | Production build           |
+| `npm run seo:verify` | Verify SEO artifacts (warn-mode) |
+| `npm run seo:verify:strict` | Verify SEO artifacts (strict, fails if inventory SEO expected but missing) |
+| `npm run build:release` | Release build + strict SEO verification |
 | `npm run preview` | Preview production build   |
 | `npm run lint`    | ESLint                     |
 | `npm run test`    | Vitest unit tests          |
 | `npx tsc --noEmit`| Typecheck without emit     |
+
+## Production SEO pipeline (release gating)
+
+AutoNex generates critical SEO artifacts during `npm run build`:
+
+- `public/sitemap.xml` (sitemap index) + `public/sitemaps/*.xml`
+- inventory exports under `public/sitemaps/` (prerender data / listing HTML data)
+- listing HTML pages under `dist/annonce/<id>/index.html` (when inventory env is present)
+
+For release safety, use:
+
+```bash
+npm run build:release
+```
+
+In strict mode, the build is expected to run with:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+If these are missing (or inventory artifacts/pages are not produced), `seo:verify:strict` fails the release.
 
 ## Launch locally
 
