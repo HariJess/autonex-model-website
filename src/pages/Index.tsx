@@ -35,6 +35,46 @@ const Index = () => {
       ),
     [],
   );
+  const heroCategoryShortcuts = useMemo(
+    () => [
+      {
+        key: "suv-pickup",
+        label: "SUV & Pick-up",
+        to: "/recherche?vtype=suv_4x4,pick_up",
+        iconSrc: "/category-icons/category-suv-pickup.svg.svg",
+        iconAlt: "Silhouette SUV et Pick-up",
+      },
+      {
+        key: "berline",
+        label: "Berline",
+        to: "/recherche?vtype=berline",
+        iconSrc: "/category-icons/category-sedan.svg.svg",
+        iconAlt: "Silhouette berline",
+      },
+      {
+        key: "citadine",
+        label: "Citadine",
+        to: "/recherche?vtype=citadine",
+        iconSrc: "/category-icons/category-citadine.svg",
+        iconAlt: "Silhouette citadine",
+      },
+      {
+        key: "utilitaire",
+        label: "Utilitaire",
+        to: "/recherche?vtype=utilitaire_leger",
+        iconSrc: "/category-icons/category-utilitaire.svg.svg",
+        iconAlt: "Silhouette utilitaire",
+      },
+      {
+        key: "scooter",
+        label: "Moto",
+        to: "/recherche?vtype=moto",
+        iconSrc: "/category-icons/category-scooter.svg.svg",
+        iconAlt: "Silhouette scooter",
+      },
+    ],
+    [],
+  );
   const fourByFourAndPickup = useMemo(
     () =>
       thematicListings
@@ -274,6 +314,41 @@ const Index = () => {
       <Header />
 
       <HeroSearch />
+
+      <section className="container mx-auto px-4 pt-10 md:pt-14">
+        <div className="rounded-2xl border border-border/70 bg-background/95 px-3 py-4 md:px-6 md:py-5">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Explorer rapidement</p>
+              <h2 className="font-serif text-lg md:text-2xl font-semibold mt-1">Catégories principales</h2>
+            </div>
+            <Link
+              to="/recherche"
+              className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+            >
+              Voir tout
+            </Link>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+            {heroCategoryShortcuts.map((shortcut) => (
+              <Link
+                key={shortcut.key}
+                to={shortcut.to}
+                className="group rounded-xl border border-border/60 bg-card/30 px-3 py-3 md:py-3.5 min-h-[96px] md:min-h-[104px] flex flex-col items-center justify-center gap-2.5 md:gap-3 text-center motion-safe:transition-colors hover:border-primary/40 hover:bg-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              >
+                <img
+                  src={shortcut.iconSrc}
+                  alt={shortcut.iconAlt}
+                  loading="lazy"
+                  className="h-9 md:h-10 w-auto object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
+                />
+                <span className="font-serif text-sm md:text-base text-foreground leading-tight">{shortcut.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="container mx-auto px-4 pt-6 md:pt-8">
         <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-6">

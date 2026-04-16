@@ -17,6 +17,7 @@ import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BRANDS, resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
 import BrandLogo from "@/components/BrandLogo";
+import { useDbListings } from "@/hooks/useListings";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -111,7 +112,7 @@ const HeroSearch = () => {
     return TOP_AUTO_BRANDS.filter((brand) => brand.toLowerCase().includes(q));
   }, [brandSearch]);
 
-  const buildFilters = (): SearchFilters => {
+  const searchFilters = useMemo<SearchFilters>(() => {
     const mappedTypes = selectedVehicleTypeFilters.listingTypes.filter((lt) => allowedListingTypes.has(lt as ListingType));
     const fuelsValue = Array.from(new Set([...fuels, ...selectedVehicleTypeFilters.fuels]));
     const selectedYearPreset = HERO_YEAR_PRESETS.find((preset) => preset.value === yearPreset) ?? HERO_YEAR_PRESETS[0];
@@ -137,10 +138,72 @@ const HeroSearch = () => {
       yearMax: selectedYearPreset.max,
       fuels: fuelsValue,
     };
-  };
+  }, [
+    selectedVehicleTypeFilters.listingTypes,
+    selectedVehicleTypeFilters.fuels,
+    allowedListingTypes,
+    fuels,
+    yearPreset,
+    transaction,
+    vehicleTypes,
+    ville,
+    arrondissements,
+    quartiers,
+    quartierLibre,
+    priceMin,
+    priceMax,
+    brands,
+    modelQuery,
+  ]);
+
+  const canEstimateResultCount = useMemo(() => {
+    return (
+      vehicleTypes.length > 0 ||
+      ville.trim().length > 0 ||
+      quartierLibre.trim().length > 0 ||
+      priceMin > 0 ||
+      priceMax > 0 ||
+      brands.length > 0 ||
+      modelQuery.trim().length > 0 ||
+      fuels.length > 0 ||
+      yearPreset !== "all"
+    );
+  }, [vehicleTypes, ville, quartierLibre, priceMin, priceMax, brands, modelQuery, fuels, yearPreset]);
+
+  const countFilters = useMemo(
+    () =>
+      canEstimateResultCount
+        ? {
+            transaction: searchFilters.transaction,
+            vehicleTypes: searchFilters.vehicleTypes,
+            types: searchFilters.types,
+            ville: searchFilters.ville || undefined,
+            freeText: searchFilters.quartierLibre.trim() || undefined,
+            priceMin: searchFilters.priceMin || undefined,
+            priceMax: searchFilters.priceMax || undefined,
+            brands: searchFilters.brands.length > 0 ? searchFilters.brands : undefined,
+            modelQuery: searchFilters.modelQuery || undefined,
+            yearMin: searchFilters.yearMin || undefined,
+            yearMax: searchFilters.yearMax || undefined,
+            fuels: searchFilters.fuels.length > 0 ? searchFilters.fuels : undefined,
+            limit: undefined,
+          }
+        : { limit: 0 },
+    [canEstimateResultCount, searchFilters],
+  );
+
+  const { data: countListings = [], isLoading: countLoading } = useDbListings(countFilters);
+  const resultCount = countListings.length;
+  const ctaLabel = useMemo(() => {
+    if (!canEstimateResultCount) return t("hero.search");
+    if (countLoading) return "Recherche...";
+    if (resultCount <= 0) return "Voir les annonces";
+    if (resultCount === 1) return "1 résultat";
+    return `${resultCount} résultats`;
+  }, [canEstimateResultCount, countLoading, resultCount, t]);
 
   const handleSearch = () => {
-    navigate(searchPathFromFilters(buildFilters()));
+    navigate(searchPathFromFilters(searchFilters));
   };
 
   const locationLabel = useMemo(() => {
@@ -341,7 +404,7 @@ const HeroSearch = () => {
                   style={{ color: "#FAFAFA" }}
                 >
                   <Search className="h-5 w-5" />
-                  {t("hero.search")}
+                  {ctaLabel}
                 </Button>
               </div>
             </div>
@@ -571,7 +634,7 @@ const HeroSearch = () => {
                 style={{ color: "#FAFAFA" }}
               >
                 <Search className="h-5 w-5" />
-                {t("hero.search")}
+                {ctaLabel}
               </Button>
             </div>
           </div>
