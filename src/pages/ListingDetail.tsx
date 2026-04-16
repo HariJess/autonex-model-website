@@ -108,6 +108,31 @@ function buildContactTrustHints(
   ].filter(Boolean);
 }
 
+function buildListingTrustProofs(
+  listing: DisplayListing,
+  sellerLabel: string | null,
+  hasApproxMap: boolean,
+  t: (key: string, fallback?: string) => string,
+) {
+  return [
+    sellerLabel
+      ? t("listing.trustSellerType", "Vendeur identifié : {{label}}", { label: sellerLabel })
+      : null,
+    listing.agency_verified
+      ? t("listing.trustAgencyVerified", "Profil vendeur vérifié par AutoNex")
+      : null,
+    listing.images.length >= 3
+      ? t("listing.trustPhotosCount", "Galerie détaillée ({{count}} photos)", { count: listing.images.length })
+      : null,
+    hasApproxMap
+      ? t("listing.trustLocation", "Zone de localisation disponible sur la carte")
+      : null,
+    listing.status === "active"
+      ? t("listing.trustStatus", "Annonce active dans le catalogue public")
+      : null,
+  ].filter(Boolean);
+}
+
 function getOwnerStatusHint(
   listing: DisplayListing,
   isOwner: boolean,
@@ -427,6 +452,7 @@ const ListingDetail = () => {
   const sellerLabel = getSellerLabel(listing, t);
   const vehicleSpecRows = buildVehicleSpecRows(listing, sellerLabel, mileageLabel, doorsLabel);
   const contactTrustHints = buildContactTrustHints(listing, sellerLabel, t);
+  const listingTrustProofs = buildListingTrustProofs(listing, sellerLabel, hasApproxMap, t);
   const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);
   const displayedPhone = getDisplayedPhone(phoneRevealed, revealedPhone, listing, t);
   const displayBrand = cleanSpec(listing.vehicle?.make) ?? cleanSpec(displayTitle);
@@ -647,7 +673,24 @@ const ListingDetail = () => {
               )}
             </div>
 
-            <ListingSponsorBlock />
+            {listingTrustProofs.length > 0 && (
+              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
+                <h2 className="font-serif text-xl font-bold">{t("listing.trustLayerTitle", "Pourquoi cette annonce inspire confiance")}</h2>
+                <p className="mt-1.5 text-sm font-sans text-muted-foreground">
+                  {t("listing.trustLayerSubtitle", "Indicateurs utiles pour décider plus sereinement avant contact.")}
+                </p>
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {listingTrustProofs.map((proof) => (
+                    <div key={proof} className="rounded-xl border border-border/70 bg-secondary/20 px-3 py-2.5">
+                      <p className="inline-flex items-center gap-2 text-sm font-sans text-foreground">
+                        <ShieldCheck className="h-4 w-4 text-primary" />
+                        {proof}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
               {versionLabel && (
@@ -766,6 +809,7 @@ const ListingDetail = () => {
               type={listing.type}
             />
             <ListingPartnerAgencyStrip />
+            <ListingSponsorBlock />
 
             <section className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
               <div className="p-5 md:p-6 border-b border-border/80 bg-secondary/20">
@@ -883,6 +927,12 @@ const ListingDetail = () => {
                   </Button>
                 ) : null}
               </div>
+              <p className="hidden lg:block text-xs font-sans text-muted-foreground">
+                {t(
+                  "listing.contactReassurance",
+                  "Chaque action de contact est sécurisée et enregistrée pour garantir un échange fiable.",
+                )}
+              </p>
 
               <form onSubmit={handleContact} className="space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact")}</h4>
@@ -896,6 +946,12 @@ const ListingDetail = () => {
                 <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
                   {sending ? t("common.loading") : t("common.send")}
                 </Button>
+                <p className="text-xs font-sans text-muted-foreground">
+                  {t(
+                    "listing.contactDecisionHint",
+                    "Conseil: mentionnez votre disponibilité, votre budget et votre mode de contact préféré.",
+                  )}
+                </p>
               </form>
 
               {listing.agency_slug && (
@@ -908,8 +964,11 @@ const ListingDetail = () => {
         </div>
 
         {filteredSimilar.length > 0 && (
-          <section className="mt-16">
-            <h2 className="font-serif text-2xl font-bold mb-6">{t("listing.similar")}</h2>
+          <section className="mt-16 border-t border-border/70 pt-10">
+            <h2 className="font-serif text-2xl font-bold mb-1.5">{t("listing.similar")}</h2>
+            <p className="mb-6 text-sm font-sans text-muted-foreground">
+              {t("listing.similarHint", "Suggestions complémentaires pour élargir votre comparaison après avoir évalué cette annonce.")}
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredSimilar.map((l) => (
                 <ListingCard key={l.id} listing={l} />
