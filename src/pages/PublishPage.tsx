@@ -72,6 +72,7 @@ import { PublishDetailsSection } from "@/pages/publish/components/PublishDetails
 import { PublishMediaSection } from "@/pages/publish/components/PublishMediaSection";
 import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PremiumStatePanel } from "@/components/ui/premium-state";
 import { buildVehicleMetaTags, parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import {
   AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
@@ -1669,11 +1670,18 @@ const PublishPage = () => {
         />
 
         {user && !draftHydrated && (
-          <div className="flex items-center justify-center gap-3 py-16 mb-8 text-muted-foreground font-sans">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            {spEdit
-              ? t("publish.loadingEdit", "Chargement de l’annonce…")
-              : t("publish.loadingDraft", "Chargement du brouillon…")}
+          <div className="mb-8 py-4">
+            <PremiumStatePanel
+              overline={t("publish.loadingOverline", "Espace publication")}
+              title={spEdit
+                ? t("publish.loadingEditTitle", "Chargement de l’annonce à modifier")
+                : t("publish.loadingDraftTitle", "Chargement de votre brouillon")}
+              description={spEdit
+                ? t("publish.loadingEdit", "Chargement de l’annonce…")
+                : t("publish.loadingDraft", "Chargement du brouillon…")}
+              icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+              className="py-8"
+            />
           </div>
         )}
 

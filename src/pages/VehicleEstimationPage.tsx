@@ -30,6 +30,7 @@ import { buildEstimationEventContext } from "@/lib/estimation/telemetry";
 import { loadVehicleCatalog } from "@/lib/estimation/vehicleCatalog";
 import VehicleCatalogCombobox from "@/components/estimation/VehicleCatalogCombobox";
 import EstimationResultReport from "@/components/estimation/EstimationResultReport";
+import { PremiumStatePanel } from "@/components/ui/premium-state";
 import type { EstimationInput, EstimationRunResult } from "@/types/estimation";
 
 const ESTIMATION_DRAFT_KEY = "autonex:estimation:draft:v1";
@@ -473,20 +474,34 @@ const VehicleEstimationPage = () => {
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.55fr_0.65fr]">
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                {!catalogLoading && makeOptions.length === 0 && (
-                  <div className="md:col-span-2 rounded-lg border border-amber-400/30 bg-amber-100/30 p-3">
-                    <p className="font-sans text-sm text-amber-900">
-                      Le catalogue visible n'est pas disponible. Vérifiez la configuration UI du catalogue.
-                    </p>
-                  </div>
-                )}
-                {!catalogLoading && catalogPayload?.source === "ui-curated" && (
-                  <div className="md:col-span-2 rounded-lg border border-border/70 bg-secondary/20 p-3">
-                    <p className="font-sans text-xs text-muted-foreground">
-                      Catalogue visible chargé (source UI curatée).
-                    </p>
-                  </div>
-                )}
+                    {catalogLoading && (
+                      <div className="md:col-span-2">
+                        <PremiumStatePanel
+                          overline="Catalogue estimation"
+                          title="Chargement des références véhicules"
+                          description="Nous préparons les marques et modèles pour une saisie fiable."
+                          icon={<Loader2 className="h-5 w-5 animate-spin text-primary" />}
+                          className="py-6"
+                        />
+                      </div>
+                    )}
+                    {!catalogLoading && makeOptions.length === 0 && (
+                      <div className="md:col-span-2">
+                        <PremiumStatePanel
+                          overline="Catalogue estimation"
+                          title="Références véhicules indisponibles"
+                          description="Le catalogue n'est pas accessible pour le moment. Réessayez dans quelques instants pour continuer l'estimation."
+                          className="py-6"
+                        />
+                      </div>
+                    )}
+                    {!catalogLoading && catalogPayload?.source === "ui-curated" && (
+                      <div className="md:col-span-2 rounded-xl border border-border/70 bg-secondary/20 p-3">
+                        <p className="font-sans text-xs text-muted-foreground">
+                          Catalogue visible chargé (source UI curatée).
+                        </p>
+                      </div>
+                    )}
                 <div className="space-y-2">
                   <Label htmlFor="make">Marque</Label>
                   <VehicleCatalogCombobox

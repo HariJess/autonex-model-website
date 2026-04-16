@@ -26,6 +26,7 @@ import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescrip
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
+import { PremiumStatePanel } from "@/components/ui/premium-state";
 import BrandLogo from "@/components/BrandLogo";
 import { resolveBrandAsset } from "@/data/brandAssets";
 import {
@@ -67,7 +68,7 @@ function cleanSpec(value: string | number | null | undefined): string | null {
   return asString.length > 0 ? asString : null;
 }
 
-function getSellerLabel(listing: DisplayListing, t: (key: string, fallback?: string) => string): string | null {
+function getSellerLabel(listing: DisplayListing, t: (...args: unknown[]) => string): string | null {
   return listing.vehicle?.sellerType === "concessionnaire"
     ? t("listing.sellerDealer", "Concessionnaire")
     : listing.vehicle?.sellerType === "particulier"
@@ -99,7 +100,7 @@ function buildVehicleSpecRows(listing: DisplayListing, sellerLabel: string | nul
 function buildContactTrustHints(
   listing: DisplayListing,
   sellerLabel: string | null,
-  t: (key: string, fallback?: string) => string,
+  t: (...args: unknown[]) => string,
 ) {
   return [
     sellerLabel ? `${t("listing.seller", "Vendeur")} : ${sellerLabel}` : null,
@@ -112,7 +113,7 @@ function buildListingTrustProofs(
   listing: DisplayListing,
   sellerLabel: string | null,
   hasApproxMap: boolean,
-  t: (key: string, fallback?: string) => string,
+  t: (...args: unknown[]) => string,
 ) {
   return [
     sellerLabel
@@ -136,7 +137,7 @@ function buildListingTrustProofs(
 function getOwnerStatusHint(
   listing: DisplayListing,
   isOwner: boolean,
-  t: (key: string, fallback?: string) => string,
+  t: (...args: unknown[]) => string,
 ): string | null {
   const s = listing.status;
   if (!isOwner || s === "active") return null;
@@ -165,7 +166,7 @@ function getOwnerStatusHint(
   return t("listing.ownerNonActive", "Cette annonce n’est pas publiée actuellement.");
 }
 
-function getDisplayedPhone(phoneRevealed: boolean, revealedPhone: string | null, listing: DisplayListing, t: (key: string, fallback?: string) => string) {
+function getDisplayedPhone(phoneRevealed: boolean, revealedPhone: string | null, listing: DisplayListing, t: (...args: unknown[]) => string) {
   if (!phoneRevealed) return t("listing.revealPhone");
   return revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné");
 }
@@ -357,8 +358,13 @@ const ListingDetail = () => {
     return (
       <>
         <Header />
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="container mx-auto px-4 py-10">
+          <PremiumStatePanel
+            overline={t("listing.stateLoadingOverline", "Annonce AutoNex")}
+            title={t("listing.stateLoadingTitle", "Chargement de l’annonce")}
+            description={t("listing.stateLoadingDesc", "Nous préparons les informations du véhicule et les options de contact.")}
+            icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+          />
         </div>
         <Footer />
       </>
@@ -369,16 +375,17 @@ const ListingDetail = () => {
     return (
       <>
         <Header />
-        <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
-          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-          <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
-          <p className="text-muted-foreground font-sans mb-6">
-            {t(
+        <div className="container mx-auto px-4 py-10">
+          <PremiumStatePanel
+            overline={t("listing.stateErrorOverline", "Statut annonce")}
+            title={t("common.error")}
+            description={t(
               "listing.runtimeUnavailable",
               "Cette annonce est momentanément indisponible. Réessayez dans quelques instants.",
             )}
-          </p>
-          <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
+            icon={<AlertCircle className="h-6 w-6 text-destructive" />}
+            action={<Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>}
+          />
         </div>
         <Footer />
       </>
@@ -389,18 +396,21 @@ const ListingDetail = () => {
     return (
       <>
         <Header />
-        <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
-          <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-          <h1 className="font-serif text-2xl font-bold mb-2">{t("listing.notFound", "Annonce introuvable")}</h1>
-          <p className="text-muted-foreground font-sans mb-6">
-            {t("listing.notFoundDesc", "Cette annonce n'existe pas ou a été supprimée.")}
-          </p>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
-            <Button onClick={() => navigate("/recherche")} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-              {t("listing.viewAll", "Voir toutes les annonces")}
-            </Button>
-          </div>
+        <div className="container mx-auto px-4 py-10">
+          <PremiumStatePanel
+            overline={t("listing.stateNotFoundOverline", "Catalogue AutoNex")}
+            title={t("listing.notFound", "Annonce introuvable")}
+            description={t("listing.notFoundDesc", "Cette annonce n'existe pas ou a été supprimée.")}
+            icon={<AlertCircle className="h-6 w-6 text-muted-foreground" />}
+            action={
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+                <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
+                <Button onClick={() => navigate("/recherche")} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+                  {t("listing.viewAll", "Voir toutes les annonces")}
+                </Button>
+              </div>
+            }
+          />
         </div>
         <Footer />
       </>
