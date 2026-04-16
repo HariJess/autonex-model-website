@@ -41,7 +41,7 @@ const ListingLocationMap = ({ lat, lng, title, addressLine }: ListingLocationMap
             {title ? (
               <p className="font-semibold text-foreground mb-0.5">{title}</p>
             ) : (
-              <p className="font-semibold text-foreground mb-0.5">{t("listing.mapPin", "Emplacement du bien")}</p>
+              <p className="font-semibold text-foreground mb-0.5">{t("listing.mapPin", "Emplacement du véhicule")}</p>
             )}
             {addressLine ? (
               <p className="text-muted-foreground text-xs flex items-start gap-1">

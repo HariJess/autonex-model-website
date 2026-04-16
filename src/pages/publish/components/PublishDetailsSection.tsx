@@ -240,9 +240,9 @@ export function PublishDetailsSection({
       </div>
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
-          <p className="font-serif font-semibold text-sm">Identite vehicule</p>
+          <p className="font-serif font-semibold text-sm">Identité véhicule</p>
           <p className="text-xs text-muted-foreground font-sans mt-1">
-            Choisissez une marque connue AutoNex, puis precisez le modele.
+            Choisissez une marque référencée AutoNex, puis précisez le modèle.
           </p>
         </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
@@ -268,7 +268,7 @@ export function PublishDetailsSection({
             value={model}
             onChange={(e) => onModelChange(e.target.value)}
             className="font-sans"
-            placeholder={make ? `Modele ${make}` : "Ex: RAV4, Hilux, Ranger..."}
+            placeholder={make ? `Modèle ${make}` : "Ex: RAV4, Hilux, Ranger..."}
           />
           <datalist id="publish-model-hints">
             {modelSuggestions.map((modelHint) => (
@@ -477,7 +477,7 @@ export function PublishDetailsSection({
           onChange={(e) => onCustomFeaturesInputChange(e.target.value)}
           className="font-sans"
           rows={3}
-          placeholder="Ex: Suspension adaptative, sieges ventiles, affichage tete haute..."
+          placeholder="Ex: Suspension adaptative, sièges ventilés, affichage tête haute..."
         />
         <p className="text-xs text-muted-foreground font-sans">
           Séparez les éléments par des virgules pour ajouter plusieurs caractéristiques.

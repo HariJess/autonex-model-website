@@ -70,9 +70,9 @@ describe("ListingCard", () => {
     expect(screen.getByText(/200 km/)).toBeInTheDocument();
   });
 
-  it("affiche 'Base' pour un appartement 0 chambre", () => {
+  it("masque la version quand la valeur legacy est 0", () => {
     renderCard(makeListing({ type: "appartement", rooms: 0 }));
-    expect(screen.getByText(/Base/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Base/i)).not.toBeInTheDocument();
   });
 
   it("n'affiche pas 'Studio' pour un terrain", () => {

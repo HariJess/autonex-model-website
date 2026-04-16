@@ -1222,7 +1222,7 @@ const PublishPage = () => {
         if (!title.trim() || title.trim().length < 8) errors.push(t("publish.titleRequired", "Titre requis (min. 8 caractères)"));
         if (description.trim().length < 40) errors.push(t("publish.descFrenchRequired", "Description en français requise (min. 40 caractères)"));
         if (!priceMga || Number(priceMga) <= 0) errors.push(t("publish.priceRequired", "Prix valide requis"));
-        if (surface && Number(surface) < 0) errors.push(t("publish.surfaceInvalid", "Surface invalide"));
+        if (surface && Number(surface) < 0) errors.push(t("publish.surfaceInvalid", "Kilométrage invalide"));
         if (vehicleYear) {
           const y = Number(vehicleYear);
           const currentYear = new Date().getFullYear() + 1;

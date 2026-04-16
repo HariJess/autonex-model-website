@@ -6,8 +6,7 @@ export function formatVehicleMileage(value: number | null | undefined): string |
 }
 
 export function formatVehicleVersion(value: number | null | undefined): string | null {
-  if (value == null || value < 0) return null;
-  if (value === 0) return "Base";
+  if (value == null || value <= 0) return null;
   return `Version ${value}`;
 }
 
