@@ -130,6 +130,22 @@ describe("EstimationResultReport integration", () => {
     const result = makeResult({
       tierDecision: { tier: "A_STRONG_MARKET", tierReasonCode: "STRONG_COMPARABLE_SET", tierReasonSummary: "Strong." },
       modeGovernance: { pricingMode: "market_backed", claimMode: "ALLOW_STRONG_MARKET_CLAIM", precisionMode: "tight", rangeWidthMode: "tight" },
+      evidence: {
+        comparableCountCandidate: 30,
+        comparableCountAfterQualityFilter: 16,
+        comparableCountUsed: 9,
+        comparableCountStrong: 7,
+        comparableSimilarityAvg: 74,
+        comparableSimilarityMedian: 76,
+        comparableRecencyScore: 80,
+        comparableDispersionScore: 78,
+        comparableLocationStrength: "same_city",
+        canonicalModelCertainty: 86,
+        referenceProfileUsed: true,
+        referenceProfileStrength: 80,
+        fallbackUsed: false,
+        fallbackType: null,
+      },
       uiGovernance: {
         allowedMarketClaim: true,
         mustShowIndicativeLabel: false,
@@ -145,6 +161,8 @@ describe("EstimationResultReport integration", () => {
     expect(screen.getByText(/Analyse marché robuste/i)).toBeInTheDocument();
     expect(screen.queryByText(/Estimation indicative/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Publiez maintenant/i)).toBeInTheDocument();
+    expect(screen.getByText(/Support marché:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Appui marché solide/i)).toBeInTheDocument();
   });
 
   it("forces indicative framing and hides exact confidence when governed", () => {
@@ -152,6 +170,22 @@ describe("EstimationResultReport integration", () => {
       tierDecision: { tier: "D_HEURISTIC_ONLY", tierReasonCode: "NO_RELIABLE_COMPARABLES", tierReasonSummary: "Weak." },
       modeGovernance: { pricingMode: "heuristic_only", claimMode: "INDICATIVE_HEURISTIC_CLAIM_ONLY", precisionMode: "very_coarse", rangeWidthMode: "very_wide" },
       confidence: { confidenceScore: 34, confidenceBand: "low", confidenceCeiling: 45, confidenceBeforeCeiling: 34, confidenceCapped: false, drivers: [], explanationMode: "summary_only" },
+      evidence: {
+        comparableCountCandidate: 7,
+        comparableCountAfterQualityFilter: 2,
+        comparableCountUsed: 0,
+        comparableCountStrong: 0,
+        comparableSimilarityAvg: 0,
+        comparableSimilarityMedian: 0,
+        comparableRecencyScore: 30,
+        comparableDispersionScore: 0,
+        comparableLocationStrength: "weak",
+        canonicalModelCertainty: 62,
+        referenceProfileUsed: false,
+        referenceProfileStrength: null,
+        fallbackUsed: true,
+        fallbackType: "generic_heuristic",
+      },
       uiGovernance: {
         allowedMarketClaim: false,
         mustShowIndicativeLabel: true,
@@ -166,6 +200,8 @@ describe("EstimationResultReport integration", () => {
     expect(screen.getByText("Estimation indicative exploratoire")).toBeInTheDocument();
     expect(screen.getByText(/Affichage prudent/i)).toBeInTheDocument();
     expect(screen.queryByText(/34\s*\/100/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Support marché:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Appui marché faible/i)).toBeInTheDocument();
   });
 
   it("keeps evidence notes/disclaimers separate from pricing factor sections", () => {
@@ -191,5 +227,33 @@ describe("EstimationResultReport integration", () => {
     expect(screen.getByText("Points de vigilance prix")).toBeInTheDocument();
     expect(screen.getByText("Lecture d'évidence")).toBeInTheDocument();
     expect(screen.getAllByText("Ceci reste indicatif.").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("shows intentional comparable empty-state messaging when support is weak", () => {
+    const result = makeResult({
+      tierDecision: { tier: "C_REFERENCE_ASSISTED", tierReasonCode: "WEAK_COMPARABLES_REFERENCE_USED", tierReasonSummary: "Limited." },
+      modeGovernance: { pricingMode: "reference_assisted", claimMode: "INDICATIVE_REFERENCE_CLAIM_ONLY", precisionMode: "coarse", rangeWidthMode: "wide" },
+      evidence: {
+        comparableCountCandidate: 8,
+        comparableCountAfterQualityFilter: 3,
+        comparableCountUsed: 0,
+        comparableCountStrong: 0,
+        comparableSimilarityAvg: 0,
+        comparableSimilarityMedian: 0,
+        comparableRecencyScore: 40,
+        comparableDispersionScore: 0,
+        comparableLocationStrength: "weak",
+        canonicalModelCertainty: 70,
+        referenceProfileUsed: true,
+        referenceProfileStrength: 75,
+        fallbackUsed: true,
+        fallbackType: "profile_seeded",
+      },
+      comparables: [],
+    });
+    renderReport(result);
+    expect(screen.getByText(/Support marché: Faible/i)).toBeInTheDocument();
+    expect(screen.getByText(/Comparables encore insuffisants|Comparaison marché en consolidation/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Le rapport s'appuie surtout sur des signaux de référence|Le rapport reste utile pour cadrer votre décision/i).length).toBeGreaterThanOrEqual(1);
   });
 });

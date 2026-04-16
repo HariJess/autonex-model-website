@@ -225,6 +225,19 @@ export default function EstimationResultReport({
           </p>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 rounded-xl border border-border/60 bg-background/70 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="font-sans normal-case">
+                Support marché: {presentation.marketSupportLabel}
+              </Badge>
+              <p className="font-sans text-sm font-medium">{presentation.marketSupportHeadline}</p>
+            </div>
+            <p className="mt-2 font-sans text-xs text-muted-foreground">{presentation.marketSupportSummary}</p>
+            <p className="mt-1 font-sans text-xs text-muted-foreground">{presentation.comparableSelectionHint}</p>
+            {presentation.marketSupportCaution && (
+              <p className="mt-2 font-sans text-xs text-amber-800">{presentation.marketSupportCaution}</p>
+            )}
+          </div>
           {comparables.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border/80 bg-gradient-to-br from-secondary/20 to-background p-7">
               <div className="mx-auto max-w-2xl text-center">
@@ -254,6 +267,7 @@ export default function EstimationResultReport({
                   <p className="font-sans text-sm font-semibold line-clamp-2">{item.title}</p>
                   <p className="mt-1 font-serif text-base">{formatAriary(item.price)}</p>
                   <p className="mt-1 font-sans text-xs text-muted-foreground">{item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}</p>
+                  <p className="mt-1 font-sans text-[11px] text-muted-foreground">Pertinence marché: {Math.round(item.score)} / 100</p>
                   <p className="mt-2 inline-flex items-center text-[11px] font-sans text-primary/90 transition-colors group-hover:text-primary">
                     Voir l'annonce <ChevronRight className="ml-1 h-3 w-3" />
                   </p>

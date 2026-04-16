@@ -43,6 +43,11 @@ export type EstimationPresentation = {
   comparablesIntro: string;
   comparablesEmptyTitle: string;
   comparablesEmptyMessage: string;
+  marketSupportLabel: "Fort" | "Modéré" | "Limité" | "Faible";
+  marketSupportHeadline: string;
+  marketSupportSummary: string;
+  marketSupportCaution: string | null;
+  comparableSelectionHint: string;
 };
 
 export function buildEstimationPresentation(result: EstimationRunResult): EstimationPresentation {
@@ -107,6 +112,39 @@ export function buildEstimationPresentation(result: EstimationRunResult): Estima
     summaryLevel === "Prudent"
       ? "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente."
       : "Les comparables exacts sont encore peu nombreux. Le rapport reste utile pour cadrer votre décision.";
+  const marketSupportLabel =
+    v2.evidence.comparableCountStrong >= 6 && v2.evidence.comparableSimilarityMedian >= 68
+      ? "Fort"
+      : v2.evidence.comparableCountStrong >= 3 && v2.evidence.comparableSimilarityMedian >= 55
+        ? "Modéré"
+        : v2.evidence.comparableCountUsed >= 1
+          ? "Limité"
+          : "Faible";
+  const localityPhrase =
+    v2.evidence.comparableLocationStrength === "same_city"
+      ? "majoritairement dans la même ville"
+      : v2.evidence.comparableLocationStrength === "same_region"
+        ? "principalement dans la même région"
+        : v2.evidence.comparableLocationStrength === "mixed"
+          ? "avec une couverture géographique mixte"
+          : "avec une couverture géographique limitée";
+  const marketSupportHeadline =
+    marketSupportLabel === "Fort"
+      ? "Appui marché solide"
+      : marketSupportLabel === "Modéré"
+        ? "Appui marché exploitable"
+        : marketSupportLabel === "Limité"
+          ? "Appui marché partiel"
+          : "Appui marché faible";
+  const marketSupportSummary = `${v2.evidence.comparableCountUsed} comparables retenus (${v2.evidence.comparableCountStrong} solides), similarité médiane ${Math.round(v2.evidence.comparableSimilarityMedian)} / 100, ${localityPhrase}.`;
+  const marketSupportCaution =
+    marketSupportLabel === "Fort"
+      ? null
+      : marketSupportLabel === "Modéré"
+        ? "Le signal marché soutient l'estimation, mais une marge de prudence reste recommandée."
+        : "Le signal marché reste partiel : utilisez ce rapport comme repère de décision, pas comme preuve forte.";
+  const comparableSelectionHint =
+    "Comparables sélectionnés sur proximité modèle/année/kilométrage, qualité d'annonce et cohérence prix.";
 
   return {
     claimLabel,
@@ -125,5 +163,10 @@ export function buildEstimationPresentation(result: EstimationRunResult): Estima
     comparablesIntro,
     comparablesEmptyTitle,
     comparablesEmptyMessage,
+    marketSupportLabel,
+    marketSupportHeadline,
+    marketSupportSummary,
+    marketSupportCaution,
+    comparableSelectionHint,
   };
 }
