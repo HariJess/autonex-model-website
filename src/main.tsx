@@ -9,6 +9,10 @@ import "leaflet/dist/leaflet.css";
 import "./index.css";
 import "./i18n";
 
+if (typeof document !== "undefined") {
+  document.documentElement.classList.add("js");
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>

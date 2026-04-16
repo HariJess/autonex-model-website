@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
+import fssync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import readline from "node:readline";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +36,16 @@ function ensureTag(html, tagName, attrs, content) {
     ? `<${tagName}${attrs ? ` ${attrs}` : ""}>`
     : `<${tagName}${attrs ? ` ${attrs}` : ""}>${content}</${tagName}>`;
   return `${html.slice(0, headClose)}\n    ${tag}\n${html.slice(headClose)}`;
+}
+
+function ensureStaticSeoCss(html) {
+  if (html.includes("/* autonex-seo-static */")) return html;
+  return ensureTag(
+    html,
+    "style",
+    "",
+    `/* autonex-seo-static */\n.seo-static{padding:16px;max-width:1100px;margin:0 auto;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;}\n.seo-static h1{font-size:24px;line-height:1.2;margin:0 0 8px;font-family:ui-serif,Georgia;}\n.seo-static .meta{color:rgba(255,255,255,.72);font-size:14px;margin:0 0 10px;}\n.seo-static .price{font-size:22px;font-weight:700;margin:0 0 10px;}\n.seo-static dl{display:grid;grid-template-columns:160px 1fr;gap:6px 12px;margin:12px 0 0;}\n.seo-static dt{color:rgba(255,255,255,.65)}\n.seo-static dd{margin:0}\n.seo-static .desc{margin-top:12px;color:rgba(255,255,255,.78);line-height:1.6;white-space:pre-wrap;}\nhtml.js .seo-static{display:none;}\n`,
+  );
 }
 
 function upsertMeta(html, { title, description, canonical, ogImage, ogType = "article" }) {
@@ -191,13 +203,144 @@ function buildAgencyJsonLd(data, canonical) {
   return org;
 }
 
+function insertStaticMain(html, mainHtml) {
+  const marker = '<div id="root"></div>';
+  if (html.includes(marker)) {
+    return html.replace(marker, `${mainHtml}\n    ${marker}`);
+  }
+  return html.replace(/<body>/i, `<body>\n${mainHtml}\n`);
+}
+
+function formatPriceMga(value) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) return "";
+  return `${value.toLocaleString("fr-FR")} Ar`;
+}
+
+function safeText(s) {
+  return String(s ?? "").replace(/\s+/g, " ").trim();
+}
+
+function buildStaticListingMain(data) {
+  const title = safeText(data.title || "Annonce — AutoNex");
+  const price = formatPriceMga(data.priceMga);
+  const location = safeText([data.ville, data.region].filter(Boolean).join(", ") || "Madagascar");
+  const transaction = safeText(data.transaction || "");
+  const listingType = safeText(data.listingType || "");
+  const makeModel = safeText([data.make, data.model].filter(Boolean).join(" "));
+  const year = data.year ? safeText(data.year) : "";
+  const mileage = typeof data.mileageKm === "number" && data.mileageKm > 0 ? `${data.mileageKm.toLocaleString("fr-FR")} km` : "";
+  const fuel = safeText(data.fuel || "");
+  const bodyStyle = safeText(data.bodyStyle || "");
+  const cond = safeText(data.vehicleCondition || "");
+  const desc = safeText(data.description || "");
+
+  const rows = [
+    ["Localisation", location],
+    listingType ? ["Type", listingType] : null,
+    transaction ? ["Transaction", transaction] : null,
+    makeModel ? ["Marque / Modèle", makeModel] : null,
+    year ? ["Année", year] : null,
+    mileage ? ["Kilométrage", mileage] : null,
+    fuel ? ["Carburant", fuel] : null,
+    bodyStyle ? ["Carrosserie", bodyStyle] : null,
+    cond ? ["État", cond] : null,
+  ].filter(Boolean);
+
+  return `<main class="seo-static" data-autonex-seo="listing">
+  <h1>${escapeHtml(title)}</h1>
+  <p class="meta">${escapeHtml([listingType, transaction].filter(Boolean).join(" • "))}</p>
+  ${price ? `<p class="price">${escapeHtml(price)}</p>` : ""}
+  ${rows.length ? `<dl>${rows.map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join("")}</dl>` : ""}
+  ${desc ? `<div class="desc">${escapeHtml(desc)}</div>` : ""}
+</main>`;
+}
+
+async function generateListingHtmlPages({ distDir, baseHtml, publicDir }) {
+  const dataFile = path.join(publicDir, "sitemaps", "listings-html-data.jsonl");
+  const cacheFile = path.join(publicDir, "sitemaps", "listings-html-data-cache.jsonl");
+  const filePath = fssync.existsSync(dataFile) ? dataFile : cacheFile;
+  if (!fssync.existsSync(filePath)) {
+    // Fallback: generate from prerender JSON (smaller, but still improves HTML visibility for the available set).
+    const jsonPath = path.join(publicDir, "sitemaps", "listings-prerender-data.json");
+    const jsonCachePath = path.join(publicDir, "sitemaps", "listings-prerender-data-cache.json");
+    const jsonData = await readJsonSafe(jsonPath, await readJsonSafe(jsonCachePath, {}));
+    const ids = jsonData && typeof jsonData === "object" ? Object.keys(jsonData) : [];
+    let written = 0;
+    for (const id of ids) {
+      const data = jsonData[id];
+      if (!data?.id) continue;
+      const route = `/annonce/${data.id}`;
+      const canonical = `${SITE_URL}${route}`;
+
+      let html = ensureStaticSeoCss(baseHtml);
+      html = upsertMeta(html, {
+        title: data.title || "Annonce — AutoNex",
+        description: (data.description && truncate(data.description, 160)) || "Annonce automobile sur AutoNex.",
+        canonical,
+        ogImage: data.imageUrl,
+        ogType: "product",
+      });
+      const jsonLd = buildListingJsonLd(data, canonical);
+      html = ensureTag(html, "script", `type="application/ld+json"`, JSON.stringify(jsonLd));
+      html = insertStaticMain(html, buildStaticListingMain(data));
+
+      const outPath = distPathForRoute(distDir, route);
+      await fs.mkdir(path.dirname(outPath), { recursive: true });
+      await fs.writeFile(outPath, html, "utf8");
+      written += 1;
+    }
+    return { written, source: jsonPath };
+  }
+
+  const stream = fssync.createReadStream(filePath, { encoding: "utf8" });
+  const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
+
+  let written = 0;
+  for await (const line of rl) {
+    const raw = String(line || "").trim();
+    if (!raw) continue;
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      continue;
+    }
+    if (!data?.id) continue;
+
+    const route = `/annonce/${data.id}`;
+    const canonical = `${SITE_URL}${route}`;
+
+    let html = ensureStaticSeoCss(baseHtml);
+    html = upsertMeta(html, {
+      title: data.title || "Annonce — AutoNex",
+      description: (data.description && truncate(data.description, 160)) || "Annonce automobile sur AutoNex.",
+      canonical,
+      ogImage: data.imageUrl,
+      ogType: "product",
+    });
+
+    const jsonLd = buildListingJsonLd(data, canonical);
+    html = ensureTag(html, "script", `type="application/ld+json"`, JSON.stringify(jsonLd));
+
+    html = insertStaticMain(html, buildStaticListingMain(data));
+
+    const outPath = distPathForRoute(distDir, route);
+    await fs.mkdir(path.dirname(outPath), { recursive: true });
+    await fs.writeFile(outPath, html, "utf8");
+    written += 1;
+  }
+
+  return { written, source: filePath };
+}
+
 async function main() {
   const root = path.resolve(__dirname, "..", "..");
   const distDir = path.resolve(root, "dist");
   const publicDir = path.resolve(root, "public");
 
   const indexPath = path.join(distDir, "index.html");
-  const baseHtml = await fs.readFile(indexPath, "utf8");
+  const baseHtmlRaw = await fs.readFile(indexPath, "utf8");
+  const baseHtml = ensureStaticSeoCss(baseHtmlRaw);
 
   const routesFile = path.join(publicDir, "sitemaps", "prerender-routes.json");
   const routes = await readJsonSafe(routesFile, ["/", "/recherche", "/agences", "/estimation", "/conseils"]);
@@ -278,7 +421,10 @@ async function main() {
     written += 1;
   }
 
-  console.log(`[postbuild-prerender-shell] Wrote ${written} prerendered HTML shells.`);
+  const listingResult = await generateListingHtmlPages({ distDir, baseHtml, publicDir });
+  console.log(
+    `[postbuild-prerender-shell] Wrote ${written} prerendered HTML shells + ${listingResult.written} listing HTML pages from ${listingResult.source ?? "n/a"}.`,
+  );
 }
 
 main().catch((err) => {

@@ -16,6 +16,7 @@ const MAX_URLS_PER_SITEMAP = 45000;
 const PAGE_SIZE = 1000;
 const PRERENDER_LISTING_LIMIT = Number.parseInt(process.env.PRERENDER_LISTING_LIMIT || "5000", 10);
 const PRERENDER_AGENCY_LIMIT = Number.parseInt(process.env.PRERENDER_AGENCY_LIMIT || "1000", 10);
+const LISTING_HTML_LIMIT = Number.parseInt(process.env.LISTING_HTML_LIMIT || "50000", 10);
 
 // Must match `src/data/agencies.ts` seed. Kept local to avoid TS import at build time.
 const PARTNER_DEALER_SLUGS = ["oceantrade"];
@@ -79,6 +80,14 @@ async function writePublicFile(rel, content) {
   const outPath = path.resolve(root, "public", rel);
   await fs.mkdir(path.dirname(outPath), { recursive: true });
   await fs.writeFile(outPath, content, "utf8");
+  return outPath;
+}
+
+async function appendPublicFile(rel, content) {
+  const root = path.resolve(__dirname, "..", "..");
+  const outPath = path.resolve(root, "public", rel);
+  await fs.mkdir(path.dirname(outPath), { recursive: true });
+  await fs.appendFile(outPath, content, "utf8");
   return outPath;
 }
 
@@ -194,6 +203,10 @@ async function main() {
   let listingChunk = [];
   let listingChunkIndex = 1;
   let listingCount = 0;
+  let listingHtmlCount = 0;
+
+  // Reset HTML data export at each successful env-present run.
+  await writePublicFile("sitemaps/listings-html-data.jsonl", "");
 
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabase
@@ -271,6 +284,43 @@ async function main() {
         listingPrerenderIds.push(row.id);
       }
 
+      if (listingHtmlCount < LISTING_HTML_LIMIT) {
+        listingHtmlCount += 1;
+        await appendPublicFile(
+          "sitemaps/listings-html-data.jsonl",
+          `${JSON.stringify({
+            id: row.id,
+            canonical: loc,
+            title: row.title ? `${row.title} — AutoNex` : "Annonce — AutoNex",
+            description: truncateText(
+              [
+                row.price_mga ? `${Number(row.price_mga).toLocaleString("fr-FR")} Ar` : "",
+                row.ville || row.region || "Madagascar",
+                row.description || "",
+              ]
+                .filter(Boolean)
+                .join(" — "),
+              320,
+            ),
+            priceMga: row.price_mga,
+            currency: "MGA",
+            ville: row.ville,
+            region: row.region,
+            transaction: row.transaction,
+            listingType: row.type,
+            year: row.year,
+            make: row.make,
+            model: row.model,
+            mileageKm: row.mileage_km,
+            fuel: row.fuel,
+            bodyStyle: row.body_style,
+            vehicleCondition: row.vehicle_condition,
+            status: row.status,
+            updatedAt: row.updated_at,
+          })}\n`,
+        );
+      }
+
       if (listingChunk.length >= MAX_URLS_PER_SITEMAP) {
         const rel = `sitemaps/listings-${listingChunkIndex}.xml`;
         await writePublicFile(rel, makeUrlset(listingChunk));
@@ -318,6 +368,7 @@ async function main() {
   // Persist prerender data for postbuild consumption
   await writePublicFile("sitemaps/listings-prerender-data.json", JSON.stringify(listingsPrerender, null, 2));
   await writePublicFile("sitemaps/listings-prerender-data-cache.json", JSON.stringify(listingsPrerender, null, 2));
+  await writePublicFile("sitemaps/listings-html-data-cache.jsonl", await fs.readFile(path.join(publicDir, "sitemaps", "listings-html-data.jsonl"), "utf8"));
 
   // Include listing sitemap refs in index
   for (const r of listingSitemapRefs) sitemaps.push(r);
@@ -403,7 +454,7 @@ async function main() {
   await writePublicFile("sitemaps/prerender-routes.json", JSON.stringify(prerenderRoutes, null, 2));
 
   console.log(
-    `[generate-sitemaps] Wrote sitemap index. static=1 inventory sitemaps=${listingSitemapRefs.length + agencySitemapRefs.length} listings=${listingCount} agencies=${agencyCount} prerenderListings=${listingPrerenderIds.length} prerenderAgencies=${agencyPrerenderSlugs.length}`,
+    `[generate-sitemaps] Wrote sitemap index. static=1 inventory sitemaps=${listingSitemapRefs.length + agencySitemapRefs.length} listings=${listingCount} agencies=${agencyCount} prerenderListings=${listingPrerenderIds.length} prerenderAgencies=${agencyPrerenderSlugs.length} listingHtml=${listingHtmlCount}`,
   );
 }
 
