@@ -485,6 +485,33 @@ const SearchPage = () => {
     const params = new URLSearchParams(searchParams);
     params.delete("sort");
     params.delete("view");
+
+    // Facet indexation policy (scale-safe):
+    // - Allow only a small, curated set of facets to be canonical/indexable.
+    // - Everything else should canonicalize to a broader page to avoid index bloat.
+    const allowedKeys = new Set(["transaction", "type", "vtype", "ville"]);
+
+    const raw = Object.fromEntries(params.entries());
+    const hasAnyNonAllowed = Object.keys(raw).some((k) => !allowedKeys.has(k));
+
+    const type = (raw.type || "").split(",").map((s) => s.trim()).filter(Boolean);
+    const vtype = (raw.vtype || "").split(",").map((s) => s.trim()).filter(Boolean);
+    const hasMultiFacet = type.length > 1 || vtype.length > 1;
+    const hasBothTypeAndVType = type.length > 0 && vtype.length > 0;
+
+    const isIndexableFacetCombo = !hasAnyNonAllowed && !hasMultiFacet && !hasBothTypeAndVType;
+
+    if (!isIndexableFacetCombo) {
+      // Canonical to nearest "broad" page: keep only transaction + ville (and one single type OR vtype).
+      const canonicalParams = new URLSearchParams();
+      if (raw.transaction) canonicalParams.set("transaction", raw.transaction);
+      if (raw.ville) canonicalParams.set("ville", raw.ville);
+      if (type.length === 1) canonicalParams.set("type", type[0]);
+      else if (vtype.length === 1) canonicalParams.set("vtype", vtype[0]);
+      const qs = canonicalParams.toString();
+      return buildCanonicalUrl("/recherche", qs ? `?${qs}` : "");
+    }
+
     const qs = params.toString();
     return buildCanonicalUrl("/recherche", qs ? `?${qs}` : "");
   }, [searchParams]);
@@ -508,7 +535,15 @@ const SearchPage = () => {
     if (filters.yearMin > 0 || filters.yearMax > 0) count += 1;
     return count;
   }, [filters]);
-  const robotsContent = noisyFiltersCount >= 4 ? "noindex,follow" : "index,follow";
+  const robotsContent = useMemo(() => {
+    // Indexation policy: only allow a small set of facets to be indexable.
+    // Anything with "advanced" filters becomes noindex,follow.
+    if (noisyFiltersCount > 0) return "noindex,follow";
+    if (filters.types.length > 1) return "noindex,follow";
+    if (filters.vehicleTypes.length > 1) return "noindex,follow";
+    if (filters.types.length > 0 && filters.vehicleTypes.length > 0) return "noindex,follow";
+    return "index,follow";
+  }, [filters, noisyFiltersCount]);
 
   const errorMessage = useMemo(() => {
     if (!queryError) return "";
@@ -552,6 +587,18 @@ const SearchPage = () => {
         <meta property="og:title" content={queryError ? composePageTitle(t("search.title", "Recherche")) : composePageTitle(pageTitle)} />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:url" content={canonicalSearch} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: breadcrumbs.map((bc, idx) => ({
+              "@type": "ListItem",
+              position: idx + 1,
+              name: bc.label,
+              item: bc.to ? buildCanonicalUrl(bc.to) : canonicalSearch,
+            })),
+          })}
+        </script>
       </Helmet>
       <Header />
 

@@ -535,6 +535,17 @@ const ListingDetail = () => {
         <script type="application/ld+json">
           {JSON.stringify(listingJsonLd)}
         </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: t("nav.home", "Accueil"), item: buildCanonicalUrl("/") },
+              { "@type": "ListItem", position: 2, name: t("search.title", "Recherche"), item: buildCanonicalUrl("/recherche") },
+              { "@type": "ListItem", position: 3, name: displayTitle, item: canonical },
+            ],
+          })}
+        </script>
       </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-4 md:py-6 pb-32 lg:pb-6">

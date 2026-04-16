@@ -248,6 +248,27 @@ const Index = () => {
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
         {seoImage && <meta name="twitter:image" content={seoImage} />}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "AutoNex",
+            url: canonical,
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `${canonical.replace(/\/+$/, "")}/recherche?transaction={transaction}&ville={ville}&type={type}`,
+              "query-input": ["required name=transaction", "optional name=ville", "optional name=type"],
+            },
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "AutoNex",
+            url: canonical,
+          })}
+        </script>
       </Helmet>
       <Header />
 
