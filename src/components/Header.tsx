@@ -117,7 +117,7 @@ const Header = () => {
                 className={`inline-flex items-center justify-center rounded-md p-1 transition-colors ${
                   isRentActive ? "text-white" : "text-[#F2F7FF] hover:text-white"
                 }`}
-                aria-label={t("nav.rentSubmenu", "Ouvrir le sous-menu Louer")}
+                aria-label={t("nav.rentSubmenu", "Ouvrir le sous-menu Location longue durée")}
                 aria-expanded={desktopRentOpen}
                 aria-haspopup="menu"
                 onClick={() => setDesktopRentOpen((prev) => !prev)}

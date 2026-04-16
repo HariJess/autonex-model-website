@@ -484,7 +484,7 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
 
       <div className={cn("mt-3 pt-3 border-t border-border shrink-0", isSheet && "mt-4")}>
         <label className="text-xs text-muted-foreground font-sans mb-1.5 block">
-          {t("search.otherQuartierLabel", "Autre zone (hors liste)")}
+          {t("search.otherQuartierLabel", "Autre zone")}
         </label>
         <Input
           value={live.quartierLibre}

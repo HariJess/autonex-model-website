@@ -43,8 +43,8 @@ export type TransactionType = (typeof TRANSACTION_TYPES)[number];
 
 export const TRANSACTION_LABELS: Record<TransactionType, string> = {
   vente: "Acheter",
-  location: "Louer",
-  location_vacances: "Louer court terme",
+  location: "Location longue durée",
+  location_vacances: "Location courte durée",
 };
 
 /**

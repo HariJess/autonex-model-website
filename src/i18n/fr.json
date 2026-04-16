@@ -1,7 +1,7 @@
 {
   "nav": {
     "buy": "Acheter",
-    "rent": "Louer",
+    "rent": "Location longue durée",
     "newProjects": "Nouveautés",
     "agencies": "Concessionnaires",
     "advice": "Conseils auto",
@@ -14,8 +14,8 @@
   },
   "transaction": {
     "sale": "Acheter",
-    "rent": "Louer",
-    "vacation": "Vacances / courte durée"
+    "rent": "Location longue durée",
+    "vacation": "Location courte durée"
   },
   "hero": {
     "title": "Trouvez le véhicule qui vous correspond à Madagascar",
@@ -83,8 +83,8 @@
     "listView": "Liste",
     "transaction": "Transaction",
     "sale": "Acheter",
-    "rental": "Louer",
-    "vacationRental": "Location / courte durée",
+    "rental": "Location longue durée",
+    "vacationRental": "Location courte durée",
     "propertyType": "Type de véhicule",
     "apartment": "Citadine",
     "villa": "SUV / 4x4",
@@ -121,7 +121,7 @@
     "locationSearchPlaceholder": "Ville, quartier, zone…",
     "quartierQuickPick": "Quartiers correspondants",
     "quartiersGroupedHint": "Cochez un ou plusieurs quartiers — tous conservés.",
-    "otherQuartierLabel": "Autre zone (hors liste)",
+    "otherQuartierLabel": "Autre zone",
     "otherQuartierPlaceholder": "Ex. : Ivandry, Analakely…",
     "applyLocation": "Appliquer",
     "resetLocationDraft": "Réinitialiser"

@@ -68,9 +68,9 @@ export type AutoHomepageBrand = {
 
 export const AUTO_TRANSACTION_MODES = [
   { id: "acheter", label: "Acheter", href: "/recherche?transaction=vente" },
-  { id: "louer", label: "Louer", href: "/recherche?transaction=location" },
-  { id: "location_courte", label: "Louer court terme", href: "/recherche?transaction=location_vacances" },
-  { id: "location_longue", label: "Louer long terme", href: "/recherche?transaction=location&rental_term=longue" },
+  { id: "louer", label: "Location longue durée", href: "/recherche?transaction=location" },
+  { id: "location_courte", label: "Location courte durée", href: "/recherche?transaction=location_vacances" },
+  { id: "location_longue", label: "Location longue durée", href: "/recherche?transaction=location&rental_term=longue" },
   { id: "concessionnaires", label: "Concessionnaires", href: "/agences" },
 ] as const;
 
