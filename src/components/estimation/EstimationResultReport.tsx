@@ -1,4 +1,4 @@
-import { AlertCircle, ArrowRight, CarFront, CheckCircle2, ChevronRight, ShieldCheck, Sparkles, Target, TrendingUp } from "lucide-react";
+import { AlertCircle, ArrowRight, CarFront, CheckCircle2, ChevronRight, ShieldCheck, Sparkles, Target, TrendingUp, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -257,98 +257,138 @@ export default function EstimationResultReport({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border border-border/60 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md" role="region" aria-label="Support de comparables marché">
-        <CardHeader>
-          <CardTitle className="font-serif text-xl flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            Annonces AutoNex similaires
-          </CardTitle>
-          <p className="font-sans text-xs text-muted-foreground">
-            {comparables.length > 0 ? presentation.comparablesIntro : presentation.comparablesEmptyMessage}
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 rounded-xl border border-border/60 bg-background/70 p-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className="font-sans normal-case">
-                Support marché: {presentation.marketSupportLabel}
-              </Badge>
-              <p className="font-sans text-sm font-medium">{presentation.marketSupportHeadline}</p>
+      <section className="space-y-3" role="region" aria-label="Support de comparables marché">
+        <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-5">
+          <div className="grid gap-3 md:grid-cols-[1.35fr_0.65fr] md:items-center">
+            <div>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Support marché</p>
+              <p className="mt-1 font-serif text-2xl text-foreground">{presentation.marketSupportHeadline}</p>
+              <p className="mt-1 font-sans text-sm text-muted-foreground">
+                {comparables.length > 0 ? presentation.comparablesIntro : presentation.comparablesEmptyMessage}
+              </p>
             </div>
-            <p className="mt-2 font-sans text-xs text-muted-foreground">{presentation.marketSupportSummary}</p>
-            <p className="mt-1 font-sans text-xs text-muted-foreground">{presentation.comparableSelectionHint}</p>
+            <div className="rounded-xl border border-border/60 bg-background/80 px-3 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <Badge variant="outline" className="font-sans normal-case">
+                  Support {presentation.marketSupportLabel}
+                </Badge>
+                <span className="font-sans text-xs text-muted-foreground">AutoNex</span>
+              </div>
+              <p className="mt-2 font-sans text-xs leading-relaxed text-muted-foreground">{presentation.marketSupportSummary}</p>
+            </div>
+          </div>
+          <div className="mt-3 rounded-xl border border-border/55 bg-background/65 px-3 py-2.5">
+            <p className="font-sans text-xs text-muted-foreground">{presentation.comparableSelectionHint}</p>
             {presentation.marketSupportCaution && (
-              <p className="mt-2 font-sans text-xs text-amber-800">{presentation.marketSupportCaution}</p>
+              <p className="mt-1.5 font-sans text-xs text-amber-800">{presentation.marketSupportCaution}</p>
             )}
           </div>
-          {comparables.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 bg-gradient-to-br from-secondary/20 to-background p-7">
-              <div className="mx-auto max-w-2xl text-center">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                </div>
-                <p className="font-serif text-lg">{presentation.comparablesEmptyTitle}</p>
-                <p className="mt-2 font-sans text-sm text-muted-foreground">{presentation.comparablesEmptyMessage}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {comparables.map((item) => (
-                <Link
-                  key={item.listingId}
-                  to={`/annonce/${item.listingId}`}
-                  onClick={() => onViewComparable(item.listingId)}
-                  className="group rounded-xl border border-border/80 bg-background/70 p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-                  aria-label={`Voir l'annonce comparable ${item.title}`}
-                >
-                  <div className="aspect-[4/3] rounded-md overflow-hidden bg-muted mb-2">
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-muted-foreground"><CarFront className="h-6 w-6" /></div>
-                    )}
-                  </div>
-                  <p className="font-sans text-sm font-semibold line-clamp-2">{item.title}</p>
-                  <p className="mt-1 font-serif text-base">{formatAriary(item.price)}</p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">{item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}</p>
-                  <p className="mt-1 font-sans text-[11px] text-muted-foreground">Pertinence marché: {Math.round(item.score)} / 100</p>
-                  <p className="mt-2 inline-flex items-center text-[11px] font-sans text-primary/90 transition-colors group-hover:text-primary">
-                    Voir l'annonce <ChevronRight className="ml-1 h-3 w-3" />
-                  </p>
-                </Link>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card className="rounded-2xl border border-primary/15 bg-gradient-to-r shadow-md border-primary/30 bg-primary/[0.08]">
+        <Card className="rounded-2xl border border-border/60 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-serif text-xl flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              Annonces comparables retenues
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {comparables.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border/80 bg-gradient-to-br from-secondary/20 to-background p-8">
+                <div className="mx-auto max-w-2xl text-center">
+                  <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-border/70 bg-background/80">
+                    <Sparkles className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  <p className="font-serif text-xl">{presentation.comparablesEmptyTitle}</p>
+                  <p className="mt-2 font-sans text-sm text-muted-foreground">{presentation.comparablesEmptyMessage}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {comparables.map((item) => (
+                  <Link
+                    key={item.listingId}
+                    to={`/annonce/${item.listingId}`}
+                    onClick={() => onViewComparable(item.listingId)}
+                    className="group rounded-xl border border-border/70 bg-background/80 p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md"
+                    aria-label={`Voir l'annonce comparable ${item.title}`}
+                  >
+                    <div className="aspect-[16/10] rounded-lg overflow-hidden bg-muted mb-2.5">
+                      {item.imageUrl ? (
+                        <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-muted-foreground"><CarFront className="h-6 w-6" /></div>
+                      )}
+                    </div>
+                    <p className="font-sans text-sm font-semibold line-clamp-2">{item.title}</p>
+                    <p className="mt-1 font-serif text-base">{formatAriary(item.price)}</p>
+                    <p className="mt-1.5 font-sans text-xs text-muted-foreground">{item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}</p>
+                    <div className="mt-2.5 rounded-lg border border-border/50 bg-secondary/20 px-2.5 py-2">
+                      <div className="flex items-center justify-between">
+                        <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Pertinence marché</p>
+                        <p className="font-sans text-xs font-semibold text-foreground">{Math.round(item.score)} / 100</p>
+                      </div>
+                      <div className="mt-1.5 h-1.5 w-full rounded-full bg-muted/80">
+                        <div
+                          className="h-full rounded-full bg-primary/75 transition-all duration-500 ease-out"
+                          style={{ width: `${Math.max(6, Math.min(100, Math.round(item.score)))}%` }}
+                        />
+                      </div>
+                    </div>
+                    <p className="mt-2 inline-flex items-center text-[11px] font-sans text-primary/90 transition-colors group-hover:text-primary">
+                      Voir l'annonce <ChevronRight className="ml-1 h-3 w-3" />
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      <Card className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/[0.11] via-primary/[0.05] to-background shadow-md">
         <CardContent className="p-6 md:p-8">
-          <p className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-wide text-muted-foreground">
-            <Target className="h-3.5 w-3.5" />
-            Prochaine meilleure action
-          </p>
-          <p className="mt-2 font-serif text-2xl">{presentation.actionHeadline}</p>
-          <p className="mt-2 max-w-2xl font-sans text-sm text-muted-foreground">{presentation.actionDescription}</p>
-          <div className="mt-5 grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
-            <Button onClick={onPublish} size="lg" className="rounded-xl px-8 font-sans shadow-lg w-full sm:w-auto">
-              Publier cette voiture sur AutoNex
+          <div className="grid gap-5 md:grid-cols-[1.35fr_0.65fr] md:items-start">
+            <div>
+              <p className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                <Target className="h-3.5 w-3.5" />
+                Prochaine meilleure action
+              </p>
+              <p className="mt-2 font-serif text-2xl md:text-3xl">{presentation.actionHeadline}</p>
+              <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-muted-foreground">{presentation.actionDescription}</p>
+            </div>
+            <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-3">
+              <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Lecture finale</p>
+              <p className="mt-1 font-sans text-sm text-foreground">{presentation.marketSupportHeadline}</p>
+              <p className="mt-1 font-sans text-xs text-muted-foreground">{presentation.ctaFootnote}</p>
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-4">
+            <Button onClick={onPublish} size="lg" className="rounded-xl px-8 font-sans shadow-lg w-full">
+              Publier cette voiture
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button variant="outline" onClick={onRefine} className="rounded-xl font-sans w-full sm:w-auto">Affiner l'estimation</Button>
-                    <Button
-                      variant="ghost"
-                      onClick={onCompare}
-                      aria-label="Voir plus d'annonces similaires sur AutoNex"
-                      className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center"
-                    >
-                      Comparer avec des annonces similaires
-                    </Button>
-            <Button variant="ghost" onClick={onRestart} className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center">Refaire une estimation</Button>
+            <Button variant="outline" onClick={onRefine} className="rounded-xl font-sans w-full">
+              Affiner l'estimation
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={onCompare}
+              aria-label="Voir plus d'annonces similaires sur AutoNex"
+              className="rounded-xl font-sans w-full justify-start md:justify-center"
+            >
+              Comparer les annonces
+            </Button>
+            <Button variant="ghost" onClick={onRestart} className="rounded-xl font-sans w-full justify-start md:justify-center">
+              Refaire une estimation
+            </Button>
           </div>
-          <p className="mt-4 font-sans text-xs text-muted-foreground">
-            {presentation.ctaFootnote}
-          </p>
+
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-border/55 bg-background/65 px-3 py-2.5">
+            <Shield className="mt-0.5 h-4 w-4 text-primary/80" />
+            <p className="font-sans text-xs leading-relaxed text-muted-foreground">{presentation.ctaFootnote}</p>
+          </div>
         </CardContent>
       </Card>
     </section>

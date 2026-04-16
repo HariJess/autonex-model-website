@@ -161,8 +161,7 @@ describe("EstimationResultReport integration", () => {
     expect(screen.getByText(/Analyse marché robuste/i)).toBeInTheDocument();
     expect(screen.queryByText(/Estimation indicative/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Publiez maintenant/i)).toBeInTheDocument();
-    expect(screen.getByText(/Support marché:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Appui marché solide/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Appui marché solide/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it("forces indicative framing and hides exact confidence when governed", () => {
@@ -200,8 +199,7 @@ describe("EstimationResultReport integration", () => {
     expect(screen.getByText("Estimation indicative exploratoire")).toBeInTheDocument();
     expect(screen.getByText(/Affichage prudent/i)).toBeInTheDocument();
     expect(screen.queryByText(/34\s*\/100/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/Support marché:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Appui marché faible/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Appui marché faible/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it("keeps evidence notes/disclaimers separate from pricing factor sections", () => {
@@ -252,7 +250,6 @@ describe("EstimationResultReport integration", () => {
       comparables: [],
     });
     renderReport(result);
-    expect(screen.getByText(/Support marché: Faible/i)).toBeInTheDocument();
     expect(screen.getByText(/Comparables encore insuffisants|Comparaison marché en consolidation/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Le rapport s'appuie surtout sur des signaux de référence|Le rapport reste utile pour cadrer votre décision/i).length).toBeGreaterThanOrEqual(1);
   });
@@ -285,8 +282,7 @@ describe("EstimationResultReport integration", () => {
     renderReport(result);
     expect(screen.getByText(/Analyse marché qualifiée/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Évidence marché partielle mais exploitable/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Support marché:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Appui marché exploitable/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Appui marché exploitable/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/positionnement calibré/i)).toBeInTheDocument();
     expect(screen.queryByText(/Appui marché solide/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Publiez maintenant avec un positionnement assumé/i)).not.toBeInTheDocument();

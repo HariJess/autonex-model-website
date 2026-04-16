@@ -226,7 +226,7 @@ describe("VehicleEstimationPage result flow", () => {
     );
 
     await waitFor(() => expect(screen.getByText("Analyse marché robuste")).toBeInTheDocument());
-    expect(screen.getByText(/Appui marché solide/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Appui marché solide/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Publiez maintenant avec un positionnement assumé/i)).toBeInTheDocument();
   });
 
@@ -266,7 +266,7 @@ describe("VehicleEstimationPage result flow", () => {
 
     await waitFor(() => expect(screen.getByText("Estimation indicative exploratoire")).toBeInTheDocument());
     expect(screen.getByText(/Affichage prudent/i)).toBeInTheDocument();
-    expect(screen.getByText(/Appui marché faible/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Appui marché faible/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it("keeps moderate-empty support state qualified and actionable", async () => {
