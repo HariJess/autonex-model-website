@@ -54,6 +54,32 @@ function confidenceBadgeClass(label: "high" | "medium" | "low"): string {
   return "bg-destructive text-white";
 }
 
+function claimModeLabel(claimMode: EstimationRunResult["outputV2"]["modeGovernance"]["claimMode"]): string {
+  if (claimMode === "ALLOW_STRONG_MARKET_CLAIM") return "Analyse marché robuste";
+  if (claimMode === "ALLOW_LIMITED_MARKET_CLAIM") return "Analyse marché qualifiée";
+  if (claimMode === "INDICATIVE_REFERENCE_CLAIM_ONLY") return "Estimation indicative assistée";
+  return "Estimation indicative exploratoire";
+}
+
+function claimModeMessage(claimMode: EstimationRunResult["outputV2"]["modeGovernance"]["claimMode"]): string {
+  if (claimMode === "ALLOW_STRONG_MARKET_CLAIM") {
+    return "Estimation principalement appuyée sur des comparables solides du marché AutoNex.";
+  }
+  if (claimMode === "ALLOW_LIMITED_MARKET_CLAIM") {
+    return "Estimation guidée par le marché, avec un niveau de prudence supplémentaire.";
+  }
+  if (claimMode === "INDICATIVE_REFERENCE_CLAIM_ONLY") {
+    return "Estimation indicative appuyée par des références et un signal marché partiel.";
+  }
+  return "Estimation indicative en contexte de données marché encore insuffisantes.";
+}
+
+function confidenceLabelFr(label: "high" | "medium" | "low"): string {
+  if (label === "high") return "élevée";
+  if (label === "medium") return "moyenne";
+  return "prudente";
+}
+
 const STEP_META = [
   { id: "vehicle", label: "Véhicule", helper: "Informations principales" },
   { id: "condition", label: "État", helper: "Historique et usage" },
@@ -195,6 +221,20 @@ const VehicleEstimationPage = () => {
   }, [form]);
 
   const canSubmit = vehicleStepErrors.length === 0;
+  const v2 = result?.outputV2 ?? null;
+  const effectiveValues = v2?.values;
+  const effectiveConfidence = v2?.confidence;
+  const effectiveTier = v2?.tierDecision;
+  const effectiveMode = v2?.modeGovernance;
+  const effectiveUiGovernance = v2?.uiGovernance;
+  const effectiveInsights = v2?.insights;
+  const effectiveEvidence = v2?.evidence;
+  const hideExactConfidence = Boolean(effectiveUiGovernance?.shouldHideExactConfidenceScore);
+  const deEmphasizePrecision = Boolean(effectiveUiGovernance?.shouldDeEmphasizePrecision);
+  const confidenceDisplayValue = hideExactConfidence ? null : (effectiveConfidence?.confidenceScore ?? result?.output.confidenceScore ?? null);
+  const confidenceBand = effectiveConfidence?.confidenceBand ?? result?.output.confidenceLabel ?? "low";
+  const topClaimLabel = effectiveMode ? claimModeLabel(effectiveMode.claimMode) : "Rapport de valorisation AutoNex";
+  const topClaimMessage = effectiveMode ? claimModeMessage(effectiveMode.claimMode) : "Repère de valorisation pour préparer votre mise en vente.";
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/estimation`
     : "https://autonex.mg/estimation";
@@ -698,10 +738,10 @@ const VehicleEstimationPage = () => {
               <CardContent className="p-7 md:p-10">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Badge variant="outline" className="font-sans normal-case border-background/30 bg-background/10 text-background">
-                    Rapport de valorisation AutoNex
+                    {topClaimLabel}
                   </Badge>
-                  <Badge className={confidenceBadgeClass(result.output.confidenceLabel)}>
-                    Confiance {result.output.confidenceLabel === "high" ? "élevée" : result.output.confidenceLabel === "medium" ? "moyenne" : "faible"}
+                  <Badge className={confidenceBadgeClass(confidenceBand)}>
+                    Confiance {confidenceLabelFr(confidenceBand)}
                   </Badge>
                 </div>
 
@@ -709,31 +749,39 @@ const VehicleEstimationPage = () => {
                   <div className="space-y-3">
                     <p className="font-sans text-xs uppercase tracking-[0.14em] text-background/70">Valeur de marché estimée</p>
                     <h2 className={`leading-[0.95] ${ESTIMATION_TYPO.valueHero}`}>
-                      {formatAriary(result.output.adjustedPrice)}
+                      {formatAriary(effectiveValues?.estimatedValue ?? result.output.adjustedPrice)}
                     </h2>
                     <div className="inline-flex w-full md:w-auto rounded-2xl border border-background/30 bg-background/12 px-4 py-2">
                       <p className="font-sans text-xs text-background/85 leading-relaxed">
-                        Fourchette de valorisation : {formatAriary(result.output.lowRangePrice)} - {formatAriary(result.output.highRangePrice)}
+                        Fourchette de valorisation ({effectiveMode?.rangeWidthMode === "tight" ? "resserrée" : effectiveMode?.rangeWidthMode === "standard" ? "équilibrée" : "prudente"}) : {formatAriary(effectiveValues?.lowEstimate ?? result.output.lowRangePrice)} - {formatAriary(effectiveValues?.highEstimate ?? result.output.highRangePrice)}
                       </p>
                     </div>
                     <p className="max-w-2xl font-sans text-sm text-background/70">
-                      Un repère premium pour décider sereinement de votre stratégie de vente.
+                      {topClaimMessage}
                     </p>
                   </div>
 
                   <div className="rounded-2xl border border-background/25 bg-background/12 p-5 backdrop-blur-sm shadow-inner">
                     <p className="font-sans text-xs uppercase tracking-wide text-background/70">Indice de confiance</p>
                     <div className="mt-2 flex items-end gap-2">
-                      <p className="font-serif text-4xl leading-none">{result.output.confidenceScore}</p>
-                      <p className="pb-1 font-sans text-sm text-background/70">/100</p>
+                      {confidenceDisplayValue != null ? (
+                        <>
+                          <p className="font-serif text-4xl leading-none">{confidenceDisplayValue}</p>
+                          <p className="pb-1 font-sans text-sm text-background/70">/100</p>
+                        </>
+                      ) : (
+                        <p className="font-serif text-2xl leading-none">Affichage prudent</p>
+                      )}
                     </div>
                     <p className="mt-2 font-sans text-xs text-background/70">
-                      Niveau de fiabilité de cette estimation selon les données disponibles.
+                      {hideExactConfidence
+                        ? "Le score exact est volontairement dé-emphasé pour rester cohérent avec le niveau d'évidence disponible."
+                        : "Niveau de fiabilité de cette estimation selon les données disponibles."}
                     </p>
                     <div className="mt-3 h-1.5 w-full rounded-full bg-background/20">
                       <div
                         className="h-full rounded-full bg-background/90 transition-all duration-500 ease-out"
-                        style={{ width: `${Math.max(8, Math.min(100, result.output.confidenceScore))}%` }}
+                        style={{ width: `${Math.max(8, Math.min(100, effectiveConfidence?.confidenceScore ?? result.output.confidenceScore))}%` }}
                       />
                     </div>
                   </div>
@@ -745,38 +793,49 @@ const VehicleEstimationPage = () => {
                 <div className="grid grid-cols-1 gap-2 rounded-xl bg-background/65 p-3 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/60 md:p-0">
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
-                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.recommendedListingPrice)}</p>
+                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(effectiveValues?.recommendedListingPrice ?? result.output.recommendedListingPrice)}</p>
                   </div>
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix de vente rapide</p>
-                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.quickSalePrice)}</p>
+                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(effectiveValues?.quickSalePrice ?? result.output.quickSalePrice)}</p>
                   </div>
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Base marché</p>
-                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(result.output.marketBasePrice)}</p>
+                    <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(v2?.anchors.finalBaseAnchor ?? result.output.marketBasePrice)}</p>
                   </div>
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
                     <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>
-                      {result.output.confidenceLabel === "high" ? "Élevé" : result.output.confidenceLabel === "medium" ? "Moyen" : "Prudent"}
+                      {effectiveTier?.tier === "A_STRONG_MARKET"
+                        ? "Robuste"
+                        : effectiveTier?.tier === "B_MODERATE_MARKET"
+                          ? "Qualifié"
+                          : effectiveTier?.tier === "C_REFERENCE_ASSISTED"
+                            ? "Indicatif"
+                            : "Prudent"}
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {(result.output.confidenceLabel === "low" || !result.output.hasComparables) && (
+            {(effectiveUiGovernance?.mustShowIndicativeLabel || result.output.confidenceLabel === "low" || !result.output.hasComparables) && (
               <div className="rounded-2xl border border-amber-400/40 bg-amber-100/50 px-4 py-4 text-sm font-sans text-amber-900">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 mt-0.5" />
                   <div>
                     <p className="font-medium">Estimation indicative</p>
                     <p className="mt-1 text-xs md:text-sm">
-                      {result.output.estimationNote ??
+                      {effectiveInsights?.disclaimers[0]?.label ?? result.output.estimationNote ??
                         "Les données disponibles pour ce modèle sont plus limitées ; la fourchette est donc volontairement plus large."}
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+            {effectiveEvidence && (
+              <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
+                Évidence: {effectiveEvidence.comparableCountUsed} comparables retenus ({effectiveEvidence.comparableCountStrong} solides), similarité médiane {Math.round(effectiveEvidence.comparableSimilarityMedian)} / 100.
               </div>
             )}
             {!result.output.usedReferenceProfile && (
@@ -798,7 +857,7 @@ const VehicleEstimationPage = () => {
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {result.output.positiveFactors.length === 0 ? (
+                  {(effectiveInsights?.pricingFactorsPositive.length ?? result.output.positiveFactors.length) === 0 ? (
                     <div className="rounded-xl border border-emerald-200/30 bg-emerald-500/5 p-3">
                       <p className="text-sm font-sans text-muted-foreground">
                         Aucun levier majeur de surcote n'est détecté pour l'instant, mais votre positionnement reste cohérent.
@@ -806,7 +865,7 @@ const VehicleEstimationPage = () => {
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {result.output.positiveFactors.map((factor) => (
+                      {(effectiveInsights?.pricingFactorsPositive.map((item) => item.label) ?? result.output.positiveFactors).map((factor) => (
                         <Badge
                           key={factor}
                           variant="secondary"
@@ -834,7 +893,7 @@ const VehicleEstimationPage = () => {
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {result.output.negativeFactors.length === 0 ? (
+                  {(effectiveInsights?.pricingFactorsNegative.length ?? result.output.negativeFactors.length) === 0 ? (
                     <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3">
                       <p className="text-sm font-sans text-muted-foreground">
                         Aucun facteur de décote marqué n'est relevé à ce stade.
@@ -842,7 +901,7 @@ const VehicleEstimationPage = () => {
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {result.output.negativeFactors.map((factor) => (
+                      {(effectiveInsights?.pricingFactorsNegative.map((item) => item.label) ?? result.output.negativeFactors).map((factor) => (
                         <Badge
                           key={factor}
                           variant="outline"
@@ -859,6 +918,30 @@ const VehicleEstimationPage = () => {
                 </CardContent>
               </Card>
             </div>
+            {effectiveInsights && (
+              <Card className={`rounded-2xl border border-border/70 shadow-sm ${ESTIMATION_PALETTE.surface}`}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-serif text-xl flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-primary" />
+                    Lecture d'évidence
+                  </CardTitle>
+                  <p className="font-sans text-xs text-muted-foreground">
+                    Ces éléments décrivent la qualité d'évidence du rapport, distincte des facteurs de prix.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {effectiveInsights.evidenceNotes.length > 0 ? (
+                    effectiveInsights.evidenceNotes.map((note) => (
+                      <div key={note.id} className="rounded-lg border border-border/60 bg-background/70 px-3 py-2 text-sm font-sans">
+                        {note.label}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground font-sans">Pas de note d'évidence complémentaire pour ce cas.</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <Card className={`rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
               <CardHeader>
@@ -974,7 +1057,7 @@ const VehicleEstimationPage = () => {
                   </Button>
                 </div>
                 <p className="mt-4 font-sans text-xs text-muted-foreground">
-                  Conseil AutoNex : un prix d'annonce aligné sur cette fourchette améliore généralement la qualité des prises de contact.
+                  Conseil AutoNex : un prix aligné sur la fourchette ({deEmphasizePrecision ? "approche prudente recommandée" : "niveau de précision courant"}) améliore généralement la qualité des prises de contact.
                 </p>
               </CardContent>
             </Card>
