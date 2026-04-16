@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Coins, Sparkles } from "lucide-react";
+import { Coins, Sparkles, ChevronDown } from "lucide-react";
 import { LISTING_TYPE_LABELS, type ListingType, type TransactionType } from "@/types/listing";
 import {
   LISTING_PUBLISH_CREDIT_COST,
@@ -17,6 +17,7 @@ import {
   type PurchasableBoostType,
 } from "@/config/monetization";
 import type { CreditPackRow } from "@/lib/creditPacks";
+import { useState } from "react";
 
 type ManualPaymentMethod = {
   id: string;
@@ -107,6 +108,7 @@ const PublishStepVisibility = ({
 }: PublishStepVisibilityProps) => {
   const { t } = useTranslation();
   const publishAllowed = editMode || canPublishWithCredits;
+  const [showCreditPurchase, setShowCreditPurchase] = useState(!editMode && !canPublishWithCredits);
   const transactionLabel =
     transaction === "vente"
       ? "Vendre"
@@ -118,6 +120,14 @@ const PublishStepVisibility = ({
 
   return (
     <div className="space-y-5 pb-2">
+      <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3.5">
+        <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Étape finale</p>
+        <p className="mt-1 font-serif text-lg text-foreground">Finalisez en 3 choix simples</p>
+        <p className="mt-1 font-sans text-sm text-muted-foreground">
+          Vérifiez le coût, sélectionnez la visibilité souhaitée, puis envoyez votre annonce pour modération.
+        </p>
+      </div>
+
       <Card className="rounded-2xl border-border">
         <CardHeader>
           <CardTitle className="font-serif flex items-center gap-2">
@@ -207,6 +217,11 @@ const PublishStepVisibility = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
+          {!editMode && (
+            <p className="rounded-lg border border-border/70 bg-background/70 px-3 py-2 text-xs font-sans text-muted-foreground">
+              Sélectionnez uniquement les options utiles maintenant: vous pouvez publier sans boost.
+            </p>
+          )}
           {BOOST_ORDER.map((b) => (
             <label
               key={b}
@@ -295,72 +310,88 @@ const PublishStepVisibility = ({
       </Button>
 
       {!editMode && (
-      <div className="border-t border-border pt-6 space-y-4">
-        <h3 className="font-serif font-semibold">
-          {t("publish.buyCredits", "Acheter des crédits")}
-        </h3>
-        <p className="text-xs text-muted-foreground font-sans">
-          {t(
-            "publish.buyCreditsHint",
-            "Paiement manuel : transmettez le montant puis joignez une preuve. Aucun crédit n'est ajouté avant validation.",
-          )}
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {creditPacks.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => setCreditPackPurchase(p.id)}
-              className={`rounded-xl border p-3 min-h-14 text-left font-sans text-sm transition-colors touch-manipulation ${
-                creditPackPurchase === p.id ? "border-primary ring-1 ring-primary" : "border-border"
-              }`}
-            >
-              <p className="font-semibold">{p.name}</p>
-              <p className="text-muted-foreground">
-                {p.credits_amount} crédits — {formatAriary(p.price_mga)}
-              </p>
-            </button>
-          ))}
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">
-            {t("publish.paymentMethod", "Mode de paiement")}
-          </Label>
-          <Select value={purchasePaymentMethod} onValueChange={setPurchasePaymentMethod}>
-            <SelectTrigger className="font-sans min-h-11">
-              <SelectValue placeholder={t("common.select")} />
-            </SelectTrigger>
-            <SelectContent>
-              {paymentMethods.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  {m.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">
-            {t("publish.proofFile", "Preuve de paiement (fichier)")}
-          </Label>
-          <Input
-            type="file"
-            accept="image/*,.pdf"
-            className="font-sans min-h-11"
-            onChange={(e) => onProofFileChange(e.target.files?.[0] ?? null)}
-          />
-        </div>
-        <Button
+      <div className="border-t border-border pt-6 space-y-3">
+        <button
           type="button"
-          variant="outline"
-          className="w-full font-sans min-h-11 touch-manipulation"
-          disabled={purchaseSubmitting}
-          onClick={onSubmitCreditPurchase}
+          onClick={() => setShowCreditPurchase((prev) => !prev)}
+          className="flex w-full items-center justify-between rounded-xl border border-border/70 bg-background/70 px-3 py-2.5 text-left"
+          aria-expanded={showCreditPurchase}
         >
-          {purchaseSubmitting
-            ? t("common.loading")
-            : t("publish.submitCreditRequest", "Enregistrer la demande d'achat")}
-        </Button>
+          <div>
+            <h3 className="font-serif font-semibold">{t("publish.buyCredits", "Acheter des crédits")}</h3>
+            <p className="text-xs text-muted-foreground font-sans">
+              Ouvrez ce bloc uniquement si votre solde est insuffisant.
+            </p>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showCreditPurchase ? "rotate-180" : ""}`} />
+        </button>
+
+        {showCreditPurchase && (
+          <div className="space-y-4 rounded-xl border border-border/70 p-3 md:p-4">
+            <p className="text-xs text-muted-foreground font-sans">
+              {t(
+                "publish.buyCreditsHint",
+                "Paiement manuel : transmettez le montant puis joignez une preuve. Aucun crédit n'est ajouté avant validation.",
+              )}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {creditPacks.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setCreditPackPurchase(p.id)}
+                  className={`rounded-xl border p-3 min-h-14 text-left font-sans text-sm transition-colors touch-manipulation ${
+                    creditPackPurchase === p.id ? "border-primary ring-1 ring-primary" : "border-border"
+                  }`}
+                >
+                  <p className="font-semibold">{p.name}</p>
+                  <p className="text-muted-foreground">
+                    {p.credits_amount} crédits — {formatAriary(p.price_mga)}
+                  </p>
+                </button>
+              ))}
+            </div>
+            <div className="space-y-2">
+              <Label className="font-sans">
+                {t("publish.paymentMethod", "Mode de paiement")}
+              </Label>
+              <Select value={purchasePaymentMethod} onValueChange={setPurchasePaymentMethod}>
+                <SelectTrigger className="font-sans min-h-11">
+                  <SelectValue placeholder={t("common.select")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {paymentMethods.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="font-sans">
+                {t("publish.proofFile", "Preuve de paiement (fichier)")}
+              </Label>
+              <Input
+                type="file"
+                accept="image/*,.pdf"
+                className="font-sans min-h-11"
+                onChange={(e) => onProofFileChange(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full font-sans min-h-11 touch-manipulation"
+              disabled={purchaseSubmitting}
+              onClick={onSubmitCreditPurchase}
+            >
+              {purchaseSubmitting
+                ? t("common.loading")
+                : t("publish.submitCreditRequest", "Enregistrer la demande d'achat")}
+            </Button>
+          </div>
+        )}
       </div>
       )}
     </div>

@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { AUTO_BRANDS } from "@/data/automotiveCatalog";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 const EMPTY_OPTION = "__empty__";
 
@@ -217,27 +219,47 @@ export function PublishDetailsSection({
   onCustomFeaturesInputChange,
 }: PublishDetailsSectionProps) {
   const modelSuggestions = BRAND_MODEL_HINTS[make] ?? [];
+  const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
 
   return (
-    <div className="space-y-4.5 form-surface">
-      <div className="space-y-2">
-        <Label className="font-sans">{labels.listingTitle} *</Label>
+    <div className="space-y-5 form-surface">
+      <section className="space-y-3 rounded-xl border border-border/75 bg-gradient-to-br from-card to-secondary/15 p-4">
+        <div>
+          <p className="font-serif text-base text-foreground">Informations essentielles</p>
+          <p className="mt-1 font-sans text-xs text-muted-foreground">
+            Commencez par les champs qui influencent le plus la compréhension et la conversion.
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">{labels.listingTitle} *</Label>
         <Input value={title} onChange={(e) => onTitleChange(e.target.value)} className="font-sans" maxLength={120} />
         <p className="text-xs text-muted-foreground font-sans">Exemple: Toyota RAV4 2021 — automatique, 68 000 km</p>
-      </div>
-      <div className="space-y-2">
-        <Label className="font-sans">{labels.descriptionFr} *</Label>
-        <Textarea
-          value={description}
-          onChange={(e) => onDescriptionChange(e.target.value)}
-          className="font-sans"
-          rows={6}
-          maxLength={5000}
-          placeholder="Rédigez une description complète en français…"
-        />
-        <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
-        <p className="text-xs text-muted-foreground font-sans">Incluez de préférence: carburant, boîte, état général et historique d’entretien.</p>
-      </div>
+        </div>
+        <div className="space-y-2">
+          <Label className="font-sans">{labels.descriptionFr} *</Label>
+          <Textarea
+            value={description}
+            onChange={(e) => onDescriptionChange(e.target.value)}
+            className="font-sans"
+            rows={6}
+            maxLength={5000}
+            placeholder="Rédigez une description complète en français…"
+          />
+          <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
+          <p className="text-xs text-muted-foreground font-sans">Incluez de préférence: carburant, boîte, état général et historique d’entretien.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
+          <div className="space-y-2">
+            <Label className="font-sans">Prix (Ar) *</Label>
+            <Input type="number" value={priceMga} onChange={(e) => onPriceMgaChange(e.target.value)} className="font-sans" min={0} />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-sans">{labels.listingSurface} (km)</Label>
+            <Input type="number" value={surface} onChange={(e) => onSurfaceChange(e.target.value)} className="font-sans" min={0} />
+          </div>
+        </div>
+      </section>
+
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
           <p className="font-serif font-semibold text-sm">Identité véhicule</p>
@@ -299,16 +321,13 @@ export function PublishDetailsSection({
       </div>
       </section>
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
-        <p className="font-serif font-semibold text-sm">Prix et usage</p>
+        <div>
+          <p className="font-serif font-semibold text-sm">Caractéristiques principales</p>
+          <p className="text-xs text-muted-foreground font-sans mt-1">
+            Ces éléments aident les acheteurs à filtrer rapidement votre annonce.
+          </p>
+        </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
-        <div className="space-y-2">
-          <Label className="font-sans">Prix (Ar) *</Label>
-          <Input type="number" value={priceMga} onChange={(e) => onPriceMgaChange(e.target.value)} className="font-sans" min={0} />
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">{labels.listingSurface} (km)</Label>
-          <Input type="number" value={surface} onChange={(e) => onSurfaceChange(e.target.value)} className="font-sans" min={0} />
-        </div>
         <div className="space-y-2">
           <Label className="font-sans">Portes</Label>
           <Input type="number" min={0} value={doors} onChange={(e) => onDoorsChange(e.target.value)} className="font-sans" />
@@ -319,7 +338,7 @@ export function PublishDetailsSection({
         </div>
       </div>
       </section>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4 rounded-xl border border-border/70 bg-background/70 p-4">
         <div className="space-y-2">
           <Label className="font-sans">Carburant</Label>
           <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => onFuelChange(v === EMPTY_OPTION ? "" : v)}>
@@ -385,80 +404,116 @@ export function PublishDetailsSection({
           </Select>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3.5 md:gap-4">
-        <div className="space-y-2">
-          <Label className="font-sans">Carrosserie</Label>
-          <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => onBodyStyleChange(v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner une carrosserie" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {BODY_STYLE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Mode location</Label>
-          <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => onRentalModeChange(v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner un mode" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {RENTAL_MODE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="space-y-2">
-          <Label className="font-sans">Couleur extérieure</Label>
-          <Input value={exteriorColor} onChange={(e) => onExteriorColorChange(e.target.value)} className="font-sans" />
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Couleur intérieure</Label>
-          <Input value={interiorColor} onChange={(e) => onInteriorColorChange(e.target.value)} className="font-sans" />
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Disponibilité</Label>
-          <Select value={availabilityStatus || EMPTY_OPTION} onValueChange={(v) => onAvailabilityStatusChange(v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner une disponibilité" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {AVAILABILITY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">WhatsApp (optionnel)</Label>
-          <Input value={whatsappPhone} onChange={(e) => onWhatsappPhoneChange(e.target.value)} className="font-sans" placeholder="+261..." />
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border/70 px-4 py-3">
-        <label className="inline-flex items-center gap-2 font-sans text-sm">
-          <Switch checked={isElectric} onCheckedChange={onElectricChange} />
-          Électrique
-        </label>
-        <label className="inline-flex items-center gap-2 font-sans text-sm">
-          <Switch checked={isHybrid} onCheckedChange={onHybridChange} />
-          Hybride
-        </label>
-      </div>
+      <section className="rounded-xl border border-border/70 bg-background/70">
+        <button
+          type="button"
+          onClick={() => setShowAdvancedDetails((prev) => !prev)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left"
+          aria-expanded={showAdvancedDetails}
+        >
+          <div>
+            <p className="font-serif text-sm text-foreground">Informations avancées (optionnel)</p>
+            <p className="mt-0.5 font-sans text-xs text-muted-foreground">
+              Ajoutez ces détails pour affiner la qualité de votre annonce.
+            </p>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showAdvancedDetails ? "rotate-180" : ""}`} />
+        </button>
+        {showAdvancedDetails && (
+          <div className="space-y-4 border-t border-border/70 px-4 py-4">
+            {showRooms && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <Label className="font-sans">{labels.listingRooms}</Label>
+                  <Input value={rooms} onChange={(e) => onRoomsChange(e.target.value)} className="font-sans" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-sans">{labels.listingBathrooms}</Label>
+                  <Input value={bathrooms} onChange={(e) => onBathroomsChange(e.target.value)} className="font-sans" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-sans">{labels.toilets}</Label>
+                  <Input value={toilets} onChange={(e) => onToiletsChange(e.target.value)} className="font-sans" />
+                </div>
+              </div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
+              <div className="space-y-2">
+                <Label className="font-sans">Carrosserie</Label>
+                <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => onBodyStyleChange(v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder="Sélectionner une carrosserie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                    {BODY_STYLE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Mode location</Label>
+                <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => onRentalModeChange(v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder="Sélectionner un mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                    {RENTAL_MODE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label className="font-sans">Couleur extérieure</Label>
+                <Input value={exteriorColor} onChange={(e) => onExteriorColorChange(e.target.value)} className="font-sans" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Couleur intérieure</Label>
+                <Input value={interiorColor} onChange={(e) => onInteriorColorChange(e.target.value)} className="font-sans" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Disponibilité</Label>
+                <Select value={availabilityStatus || EMPTY_OPTION} onValueChange={(v) => onAvailabilityStatusChange(v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder="Sélectionner une disponibilité" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                    {AVAILABILITY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">WhatsApp (optionnel)</Label>
+                <Input value={whatsappPhone} onChange={(e) => onWhatsappPhoneChange(e.target.value)} className="font-sans" placeholder="+261..." />
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border/70 px-4 py-3">
+              <label className="inline-flex items-center gap-2 font-sans text-sm">
+                <Switch checked={isElectric} onCheckedChange={onElectricChange} />
+                Électrique
+              </label>
+              <label className="inline-flex items-center gap-2 font-sans text-sm">
+                <Switch checked={isHybrid} onCheckedChange={onHybridChange} />
+                Hybride
+              </label>
+            </div>
+          </div>
+        )}
+      </section>
       <div className="space-y-2">
         <Label className="font-sans">{labels.listingFeatures}</Label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

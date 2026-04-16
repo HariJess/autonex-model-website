@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload } from "lucide-react";
+import { ChevronDown, Upload } from "lucide-react";
 import type { ServerPhoto } from "@/lib/publishDraft";
+import { useState } from "react";
 
 type PendingPhoto = { file: File; preview: string };
 
@@ -37,10 +38,14 @@ export function PublishMediaSection({
   onVideoUrlChange,
   onVirtualTourUrlChange,
 }: PublishMediaSectionProps) {
+  const [showAdvancedMedia, setShowAdvancedMedia] = useState(false);
   return (
     <div className="space-y-5 form-surface">
-      <p className="text-sm text-muted-foreground font-sans">{labels.mainPhotoFirst}</p>
-      <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center">
+      <div className="rounded-xl border border-border/75 bg-gradient-to-br from-card to-secondary/15 px-4 py-3.5">
+        <p className="text-sm text-foreground font-sans font-medium">Photos principales</p>
+        <p className="mt-1 text-xs text-muted-foreground font-sans">{labels.mainPhotoFirst}</p>
+      </div>
+      <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center bg-background/70">
         <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
         <input type="file" multiple accept="image/*" onChange={onPhotoSelect} className="hidden" id="photo-upload" />
         <label htmlFor="photo-upload">
@@ -97,14 +102,32 @@ export function PublishMediaSection({
           })}
         </div>
       )}
-      <div className="space-y-2">
-        <Label className="font-sans">{labels.videoUrl}</Label>
-        <Input value={videoUrl} onChange={(e) => onVideoUrlChange(e.target.value)} className="font-sans" placeholder="https://" />
-      </div>
-      <div className="space-y-2">
-        <Label className="font-sans">{labels.tourUrl}</Label>
-        <Input value={virtualTourUrl} onChange={(e) => onVirtualTourUrlChange(e.target.value)} className="font-sans" placeholder="https://" />
-      </div>
+      <section className="rounded-xl border border-border/70 bg-background/70">
+        <button
+          type="button"
+          onClick={() => setShowAdvancedMedia((prev) => !prev)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left"
+          aria-expanded={showAdvancedMedia}
+        >
+          <div>
+            <p className="font-serif text-sm text-foreground">Médias complémentaires (optionnel)</p>
+            <p className="mt-0.5 font-sans text-xs text-muted-foreground">Ajoutez une vidéo ou une visite virtuelle si disponible.</p>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showAdvancedMedia ? "rotate-180" : ""}`} />
+        </button>
+        {showAdvancedMedia && (
+          <div className="space-y-3 border-t border-border/70 px-4 py-4">
+            <div className="space-y-2">
+              <Label className="font-sans">{labels.videoUrl}</Label>
+              <Input value={videoUrl} onChange={(e) => onVideoUrlChange(e.target.value)} className="font-sans" placeholder="https://" />
+            </div>
+            <div className="space-y-2">
+              <Label className="font-sans">{labels.tourUrl}</Label>
+              <Input value={virtualTourUrl} onChange={(e) => onVirtualTourUrlChange(e.target.value)} className="font-sans" placeholder="https://" />
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
