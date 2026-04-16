@@ -36,6 +36,13 @@ export type EstimationPresentation = {
   rangeToneLabel: "resserrée" | "équilibrée" | "prudente";
   summaryLevel: "Robuste" | "Qualifié" | "Indicatif" | "Prudent";
   precisionCaution: boolean;
+  confidenceInterpretation: string;
+  evidenceHeadline: string;
+  actionHeadline: string;
+  actionDescription: string;
+  comparablesIntro: string;
+  comparablesEmptyTitle: string;
+  comparablesEmptyMessage: string;
 };
 
 export function buildEstimationPresentation(result: EstimationRunResult): EstimationPresentation {
@@ -60,6 +67,46 @@ export function buildEstimationPresentation(result: EstimationRunResult): Estima
         : v2.tierDecision.tier === "C_REFERENCE_ASSISTED"
           ? "Indicatif"
           : "Prudent";
+  const confidenceInterpretation =
+    confidenceBand === "high"
+      ? "La base de comparaison est solide ; vous pouvez piloter votre prix avec une marge de négociation maîtrisée."
+      : confidenceBand === "medium"
+        ? "Le signal marché est exploitable, avec une prudence raisonnable sur le positionnement final."
+        : "Le résultat reste utile comme repère initial, mais nécessite une lecture prudente avant décision.";
+  const evidenceHeadline =
+    summaryLevel === "Robuste"
+      ? "Évidence marché bien établie"
+      : summaryLevel === "Qualifié"
+        ? "Évidence marché partielle mais exploitable"
+        : summaryLevel === "Indicatif"
+          ? "Évidence limitée, appui de référence"
+          : "Évidence marché insuffisante";
+  const actionHeadline =
+    summaryLevel === "Robuste"
+      ? "Publiez maintenant avec un positionnement assumé"
+      : summaryLevel === "Qualifié"
+        ? "Publiez avec un positionnement calibré"
+        : "Publiez prudemment ou affinez d'abord les données";
+  const actionDescription =
+    summaryLevel === "Robuste"
+      ? "Le rapport soutient une décision de publication rapide avec un cap prix crédible."
+      : summaryLevel === "Qualifié"
+        ? "Le rapport donne une base sérieuse, à ajuster selon vos priorités de délai et de marge."
+        : "Le rapport est indicatif : privilégiez une approche prudente et vérifiez vos hypothèses avant publication.";
+  const comparablesIntro =
+    summaryLevel === "Robuste"
+      ? "Comparables cohérents pour soutenir un prix de mise en marché convaincant."
+      : summaryLevel === "Qualifié"
+        ? "Comparables utiles pour cadrer le prix, avec une marge d'interprétation."
+        : "Comparables encore limités : utilisez-les comme repères, pas comme preuve forte.";
+  const comparablesEmptyTitle =
+    summaryLevel === "Prudent"
+      ? "Comparables encore insuffisants"
+      : "Comparaison marché en consolidation";
+  const comparablesEmptyMessage =
+    summaryLevel === "Prudent"
+      ? "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente."
+      : "Les comparables exacts sont encore peu nombreux. Le rapport reste utile pour cadrer votre décision.";
 
   return {
     claimLabel,
@@ -71,5 +118,12 @@ export function buildEstimationPresentation(result: EstimationRunResult): Estima
     rangeToneLabel,
     summaryLevel,
     precisionCaution: v2.uiGovernance.shouldDeEmphasizePrecision,
+    confidenceInterpretation,
+    evidenceHeadline,
+    actionHeadline,
+    actionDescription,
+    comparablesIntro,
+    comparablesEmptyTitle,
+    comparablesEmptyMessage,
   };
 }

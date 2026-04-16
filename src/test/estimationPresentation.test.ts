@@ -125,6 +125,8 @@ describe("estimation presentation governance", () => {
     expect(presentation.claimLabel).toContain("robuste");
     expect(presentation.summaryLevel).toBe("Robuste");
     expect(presentation.rangeToneLabel).toBe("resserrée");
+    expect(presentation.actionHeadline).toContain("Publiez maintenant");
+    expect(presentation.comparablesIntro).toContain("Comparables cohérents");
   });
 
   it("forces indicative framing and hides exact confidence for weak governance", () => {
@@ -165,6 +167,8 @@ describe("estimation presentation governance", () => {
     expect(presentation.confidenceDisplayValue).toBeNull();
     expect(presentation.rangeToneLabel).toBe("prudente");
     expect(presentation.precisionCaution).toBe(true);
+    expect(presentation.actionDescription).toContain("indicatif");
+    expect(presentation.comparablesEmptyTitle).toContain("insuffisants");
   });
 
   it("differentiates reference-assisted wording from limited market wording", () => {

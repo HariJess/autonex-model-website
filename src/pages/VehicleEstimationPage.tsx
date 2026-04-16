@@ -752,7 +752,7 @@ const VehicleEstimationPage = () => {
                     <p className="mt-2 font-sans text-xs text-background/70">
                       {hideExactConfidence
                         ? "Le score exact est volontairement dé-emphasé pour rester cohérent avec le niveau d'évidence disponible."
-                        : "Niveau de fiabilité de cette estimation selon les données disponibles."}
+                        : presentation?.confidenceInterpretation ?? "Niveau de fiabilité de cette estimation selon les données disponibles."}
                     </p>
                     <div className="mt-3 h-1.5 w-full rounded-full bg-background/20">
                       <div
@@ -766,18 +766,25 @@ const VehicleEstimationPage = () => {
             </Card>
             <Card className={`rounded-2xl border border-border/70 shadow-sm transition-all duration-300 ease-out hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
               <CardContent className="p-4 md:p-5">
+                <div className="mb-3 rounded-xl border border-border/60 bg-background/70 px-3 py-2">
+                  <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Lecture du rapport</p>
+                  <p className="font-sans text-sm text-foreground">{presentation?.evidenceHeadline ?? "Lecture d'évidence en cours"}</p>
+                </div>
                 <div className="grid grid-cols-1 gap-2 rounded-xl bg-background/65 p-3 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/60 md:p-0">
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
                     <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(effectiveValues?.recommendedListingPrice ?? result.output.recommendedListingPrice)}</p>
+                    <p className="mt-1 font-sans text-xs text-muted-foreground">Positionnement conseillé pour publier sur AutoNex.</p>
                   </div>
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix de vente rapide</p>
                     <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(effectiveValues?.quickSalePrice ?? result.output.quickSalePrice)}</p>
+                    <p className="mt-1 font-sans text-xs text-muted-foreground">Repère pour accélérer la conversion.</p>
                   </div>
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Base marché</p>
                     <p className={`mt-1 ${ESTIMATION_TYPO.valueMetric}`}>{formatAriary(v2?.anchors.finalBaseAnchor ?? result.output.marketBasePrice)}</p>
+                    <p className="mt-1 font-sans text-xs text-muted-foreground">Ancrage principal avant ajustements véhicule.</p>
                   </div>
                   <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
                     <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
@@ -805,7 +812,10 @@ const VehicleEstimationPage = () => {
             )}
             {effectiveEvidence && (
               <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
-                Évidence: {effectiveEvidence.comparableCountUsed} comparables retenus ({effectiveEvidence.comparableCountStrong} solides), similarité médiane {Math.round(effectiveEvidence.comparableSimilarityMedian)} / 100.
+                <p className="font-medium text-foreground">Qualité d'évidence</p>
+                <p className="mt-1">
+                  {effectiveEvidence.comparableCountUsed} comparables retenus, dont {effectiveEvidence.comparableCountStrong} solides, avec une similarité médiane de {Math.round(effectiveEvidence.comparableSimilarityMedian)} / 100.
+                </p>
               </div>
             )}
             {!result.output.usedReferenceProfile && (
@@ -921,8 +931,8 @@ const VehicleEstimationPage = () => {
                 </CardTitle>
                 <p className="font-sans text-xs text-muted-foreground">
                   {result.output.comparables.length > 0
-                    ? `${result.output.comparables.length} repère(s) marché pour situer votre prix de mise en vente.`
-                    : "Repères comparables en cours de consolidation pour ce modèle."}
+                    ? presentation?.comparablesIntro ?? `${result.output.comparables.length} repère(s) marché pour situer votre prix de mise en vente.`
+                    : presentation?.comparablesEmptyMessage ?? "Repères comparables en cours de consolidation pour ce modèle."}
                 </p>
               </CardHeader>
               <CardContent>
@@ -932,10 +942,9 @@ const VehicleEstimationPage = () => {
                       <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80">
                         <Sparkles className="h-4 w-4 text-primary" />
                       </div>
-                      <p className="font-serif text-lg">Comparaison marché bientôt enrichie</p>
+                      <p className="font-serif text-lg">{presentation?.comparablesEmptyTitle ?? "Comparaison marché bientôt enrichie"}</p>
                       <p className="mt-2 font-sans text-sm text-muted-foreground">
-                        Nous n'avons pas encore assez d'annonces strictement comparables sur ce profil.
-                        Votre estimation reste néanmoins un repère solide pour préparer une publication.
+                        {presentation?.comparablesEmptyMessage ?? "Nous n'avons pas encore assez d'annonces strictement comparables sur ce profil. Votre estimation reste néanmoins un repère utile pour préparer une publication."}
                       </p>
                       <p className="mt-2 font-sans text-xs text-muted-foreground">
                         Dès que davantage d'annonces similaires sont disponibles, la comparaison devient plus fine.
@@ -985,9 +994,9 @@ const VehicleEstimationPage = () => {
                       <Target className="h-3.5 w-3.5" />
                       Prochaine meilleure action
                     </p>
-                    <p className="mt-2 font-serif text-2xl">Transformez cette estimation en annonce performante</p>
+                    <p className="mt-2 font-serif text-2xl">{presentation?.actionHeadline ?? "Transformez cette estimation en annonce performante"}</p>
                     <p className="mt-2 max-w-2xl font-sans text-sm text-muted-foreground">
-                      Publiez avec un prix clair, crédible et cohérent avec le marché pour accélérer vos premiers contacts qualifiés.
+                      {presentation?.actionDescription ?? "Publiez avec un prix clair, crédible et cohérent avec le marché pour accélérer vos premiers contacts qualifiés."}
                     </p>
                   </div>
                 </div>
