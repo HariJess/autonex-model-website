@@ -172,7 +172,30 @@
     "stepCondition": "Toetry ny fiara",
     "stepConditionHelper": "Tantara sy fampiasana",
     "stepResult": "Vokatra",
-    "stepResultHelper": "Tatitra tombanana"
+    "stepResultHelper": "Tatitra tombanana",
+    "errorMakeRequired": "Tsy maintsy fenoina ny marika.",
+    "errorModelRequired": "Tsy maintsy fenoina ny modely.",
+    "errorYearRange": "Ny taona dia tokony ho eo anelanelan'ny 1950 sy ny taona ankehitriny.",
+    "errorCityRequired": "Tsy maintsy fenoina ny tanàna / faritra.",
+    "errorMileageRange": "Ny kilometatra dia tokony ho eo anelanelan'ny 0 sy 1 500 000 km.",
+    "stepOne": "Dingana 1",
+    "stepTwo": "Dingana 2",
+    "vehicleIdentity": "Mombamomba ny fiara",
+    "selectBrand": "Safidio ny marika",
+    "searchBrand": "Hitady marika...",
+    "noBrandFound": "Tsy nisy marika hita",
+    "selectModel": "Safidio ny modely",
+    "searchModel": "Hitady modely...",
+    "chooseBrandFirst": "Safidio aloha ny marika",
+    "noModelFound": "Tsy nisy modely hita amin'ity marika ity",
+    "cityRegion": "Tanàna / Faritra",
+    "selectCity": "Safidio ny tanàna / faritra",
+    "searchCity": "Hitady tanàna / faritra...",
+    "noCityFound": "Tsy nisy tanàna hita",
+    "generalCondition": "Toetra ankapobeny",
+    "maintenanceFollowed": "Fikojakojana narahina",
+    "ownerCount": "Isan'ny tompony",
+    "usage": "Fampiasana"
   },
   "states": {
     "loading": "Eo am-pamenoana",
@@ -198,6 +221,10 @@
     "select": "Hisafidy",
     "clearAll": "Averina",
     "languageFr": "FR",
-    "languageMg": "MG"
+    "languageMg": "MG",
+    "yes": "Eny",
+    "no": "Tsia",
+    "openMenu": "Hanokatra menu",
+    "closeMenu": "Hanakatona menu"
   }
 }

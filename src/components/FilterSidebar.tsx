@@ -54,8 +54,8 @@ const VEHICLE_TYPE_PREVIEW_IDS = new Set([
   "moto",
 ]);
 
-function summarizeTypeSelection(labels: string[]): string {
-  if (labels.length === 0) return "Tous types";
+function summarizeTypeSelection(labels: string[], allTypesLabel: string): string {
+  if (labels.length === 0) return allTypesLabel;
   if (labels.length === 1) return labels[0];
   if (labels.length === 2) return `${labels[0]}, ${labels[1]}`;
   return `${labels[0]}, ${labels[1]} +${labels.length - 2}`;
@@ -217,7 +217,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                 <p className="text-xs text-muted-foreground font-sans">
                   {selectedVehicleTypeLabels.length >= 3
                     ? t("search.selectedTypesCount", "{{count}} types sélectionnés", { count: selectedVehicleTypeLabels.length })
-                    : t("search.activeSelection", "Sélection active: {{value}}", { value: summarizeTypeSelection(selectedVehicleTypeLabels) })}
+                    : t("search.activeSelection", "Sélection active: {{value}}", { value: summarizeTypeSelection(selectedVehicleTypeLabels, t("search.allTypes", "Tous types")) })}
                 </p>
               )}
               {hasHiddenVehicleTypes && (

@@ -186,14 +186,14 @@ const VehicleEstimationPage = () => {
 
   const vehicleStepErrors = useMemo(() => {
     const errors: string[] = [];
-    if (!form.makeName.trim()) errors.push("La marque est obligatoire.");
-    if (!form.modelName.trim()) errors.push("Le modèle est obligatoire.");
+    if (!form.makeName.trim()) errors.push(t("estimation.errorMakeRequired", "La marque est obligatoire."));
+    if (!form.modelName.trim()) errors.push(t("estimation.errorModelRequired", "Le modèle est obligatoire."));
     if (!Number.isFinite(form.year) || form.year < 1950 || form.year > currentYear) {
-      errors.push("L'année doit être comprise entre 1950 et l'année en cours.");
+      errors.push(t("estimation.errorYearRange", "L'année doit être comprise entre 1950 et l'année en cours."));
     }
-    if (!form.city.trim()) errors.push("La ville / region est obligatoire.");
+    if (!form.city.trim()) errors.push(t("estimation.errorCityRequired", "La ville / region est obligatoire."));
     if (!Number.isFinite(form.mileage) || form.mileage < 0 || form.mileage > 1_500_000) {
-      errors.push("Le kilometrage doit etre entre 0 et 1 500 000 km.");
+      errors.push(t("estimation.errorMileageRange", "Le kilometrage doit etre entre 0 et 1 500 000 km."));
     }
     return errors;
   }, [form]);
@@ -461,8 +461,8 @@ const VehicleEstimationPage = () => {
           <Card className={`${ESTIMATION_UI.sectionCard} overflow-hidden`}>
             <CardHeader className="border-b border-border/50 pb-5">
               <div className="space-y-3">
-                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 px-2.5 py-0.5 font-sans normal-case text-primary">Étape 1</Badge>
-                <CardTitle className={ESTIMATION_TYPO.h2}>Identité du véhicule</CardTitle>
+                  <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 px-2.5 py-0.5 font-sans normal-case text-primary">{t("estimation.stepOne", "Étape 1")}</Badge>
+                <CardTitle className={ESTIMATION_TYPO.h2}>{t("estimation.vehicleIdentity", "Identité du véhicule")}</CardTitle>
                 <p className={ESTIMATION_TYPO.body}>
                   Renseignez les informations clés du véhicule pour établir une base d'estimation fiable et exploitable.
                 </p>
@@ -508,31 +508,31 @@ const VehicleEstimationPage = () => {
                       </div>
                     )}
                 <div className="space-y-2">
-                  <Label htmlFor="make">Marque</Label>
+                  <Label htmlFor="make">{t("search.brand", "Marque")}</Label>
                   <VehicleCatalogCombobox
                     value={form.makeName}
                     options={makeOptions}
-                    placeholder="Sélectionner une marque"
-                    searchPlaceholder="Rechercher une marque..."
-                    emptyLabel="Aucune marque trouvée"
+                    placeholder={t("estimation.selectBrand", "Sélectionner une marque")}
+                    searchPlaceholder={t("estimation.searchBrand", "Rechercher une marque...")}
+                    emptyLabel={t("estimation.noBrandFound", "Aucune marque trouvée")}
                     disabled={catalogLoading || makeOptions.length === 0}
                     onSelect={(value) => setForm((prev) => ({ ...prev, makeName: value, modelName: "" }))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="model">Modèle</Label>
+                  <Label htmlFor="model">{t("search.model", "Modèle")}</Label>
                   <VehicleCatalogCombobox
                     value={form.modelName}
                     options={modelOptions}
-                    placeholder={form.makeName ? "Sélectionner un modèle" : "Choisissez d'abord une marque"}
-                    searchPlaceholder="Rechercher un modèle..."
-                    emptyLabel={form.makeName ? "Aucun modèle trouvé pour cette marque" : "Sélectionnez une marque"}
+                    placeholder={form.makeName ? t("estimation.selectModel", "Sélectionner un modèle") : t("estimation.chooseBrandFirst", "Choisissez d'abord une marque")}
+                    searchPlaceholder={t("estimation.searchModel", "Rechercher un modèle...")}
+                    emptyLabel={form.makeName ? t("estimation.noModelFound", "Aucun modèle trouvé pour cette marque") : t("estimation.selectBrand", "Sélectionner une marque")}
                     disabled={!form.makeName.trim()}
                     onSelect={(value) => setForm((prev) => ({ ...prev, modelName: value }))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="year">Année</Label>
+                  <Label htmlFor="year">{t("search.year", "Année")}</Label>
                   <Input
                     id="year"
                     type="number"
@@ -544,18 +544,18 @@ const VehicleEstimationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">Ville / Région</Label>
+                  <Label htmlFor="city">{t("estimation.cityRegion", "Ville / Région")}</Label>
                   <VehicleCatalogCombobox
                     value={form.city}
                     options={[...MADAGASCAR_LOCATION_OPTIONS]}
-                    placeholder="Sélectionner une ville / région"
-                    searchPlaceholder="Rechercher une ville / région..."
-                    emptyLabel="Aucune ville trouvée"
+                    placeholder={t("estimation.selectCity", "Sélectionner une ville / région")}
+                    searchPlaceholder={t("estimation.searchCity", "Rechercher une ville / région...")}
+                    emptyLabel={t("estimation.noCityFound", "Aucune ville trouvée")}
                     onSelect={(value) => setForm((prev) => ({ ...prev, city: value }))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="mileage">Kilométrage (km)</Label>
+                  <Label htmlFor="mileage">{t("search.surface", "Kilométrage")} (km)</Label>
                   <Input
                     id="mileage"
                     type="number"
@@ -567,14 +567,14 @@ const VehicleEstimationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Carburant</Label>
+                  <Label>{t("search.fuel", "Carburant")}</Label>
                   <Select value={form.fuelType} onValueChange={(value) => setForm((prev) => ({ ...prev, fuelType: value as EstimationInput["fuelType"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_FUEL_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Boîte</Label>
+                  <Label>{t("search.transmission", "Boîte de vitesse")}</Label>
                   <Select value={form.transmissionType} onValueChange={(value) => setForm((prev) => ({ ...prev, transmissionType: value as EstimationInput["transmissionType"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_TRANSMISSION_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
@@ -618,13 +618,13 @@ const VehicleEstimationPage = () => {
                 </aside>
               </div>
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Étape précédente</Button>
+                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>{t("publish.previousStep", "Étape précédente")}</Button>
                 <Button
                   disabled={!canSubmit}
                   onClick={() => setScreen("condition")}
                   className={`${ESTIMATION_UI.primaryCta} w-full min-w-[150px] sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2`}
                 >
-                  Continuer
+                  {t("publish.continue", "Continuer")}
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
@@ -636,7 +636,7 @@ const VehicleEstimationPage = () => {
           <Card className={ESTIMATION_UI.sectionCard}>
             <CardHeader>
               <div className="space-y-2">
-                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">Étape 2</Badge>
+                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">{t("estimation.stepTwo", "Étape 2")}</Badge>
                 <CardTitle className={ESTIMATION_TYPO.h2}>État et historique</CardTitle>
                 <p className={ESTIMATION_TYPO.body}>
                   Affinez la valorisation avec le contexte d'usage pour obtenir un rapport plus juste.
@@ -648,28 +648,28 @@ const VehicleEstimationPage = () => {
                 <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>État général</Label>
+                  <Label>{t("estimation.generalCondition", "État général")}</Label>
                   <Select value={form.conditionLabel} onValueChange={(value) => setForm((prev) => ({ ...prev, conditionLabel: value as EstimationInput["conditionLabel"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_CONDITION_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Entretien suivi</Label>
+                  <Label>{t("estimation.maintenanceFollowed", "Entretien suivi")}</Label>
                   <Select value={form.maintenanceLevel} onValueChange={(value) => setForm((prev) => ({ ...prev, maintenanceLevel: value as EstimationInput["maintenanceLevel"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_MAINTENANCE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Nombre de propriétaires</Label>
+                  <Label>{t("estimation.ownerCount", "Nombre de propriétaires")}</Label>
                   <Select value={form.ownerCountLabel} onValueChange={(value) => setForm((prev) => ({ ...prev, ownerCountLabel: value as EstimationInput["ownerCountLabel"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_OWNER_COUNT_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Usage</Label>
+                  <Label>{t("estimation.usage", "Usage")}</Label>
                   <Select value={form.usageType} onValueChange={(value) => setForm((prev) => ({ ...prev, usageType: value as EstimationInput["usageType"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_USAGE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
@@ -688,7 +688,7 @@ const VehicleEstimationPage = () => {
                   className="font-sans"
                   onClick={() => setForm((prev) => ({ ...prev, accidentDeclared: !prev.accidentDeclared }))}
                 >
-                  {form.accidentDeclared ? "Oui" : "Non"}
+                  {form.accidentDeclared ? t("common.yes", "Oui") : t("common.no", "Non")}
                 </Button>
               </div>
 
