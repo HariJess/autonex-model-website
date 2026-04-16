@@ -116,35 +116,37 @@ export default function EstimationResultReport({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border border-border/70 shadow-sm transition-all duration-300 ease-out hover:shadow-md bg-card/95">
-        <CardContent className="p-4 md:p-5">
-          <div className="mb-3 rounded-xl border border-border/60 bg-background/70 px-3 py-2">
-            <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Lecture du rapport</p>
-            <p className="font-sans text-sm text-foreground">{presentation.evidenceHeadline}</p>
-          </div>
-          <div className="grid grid-cols-1 gap-2 rounded-xl bg-background/65 p-3 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/60 md:p-0">
-            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+      <section className="space-y-3">
+        <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] via-primary/[0.04] to-transparent px-4 py-3">
+          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-primary/80">Lecture du rapport</p>
+          <p className="mt-1 font-serif text-xl text-foreground md:text-2xl">{presentation.evidenceHeadline}</p>
+          <p className="mt-1 font-sans text-sm text-muted-foreground">{presentation.evidenceSummaryLine}</p>
+        </div>
+
+        <div className="rounded-2xl border border-border/60 bg-card/90 p-3 shadow-sm md:p-4">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/55">
+            <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
               <p className="mt-1 font-serif text-2xl">{formatAriary(values.recommendedListingPrice)}</p>
               <p className="mt-1 font-sans text-xs text-muted-foreground">Positionnement conseillé pour publier sur AutoNex.</p>
             </div>
-            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+            <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix de vente rapide</p>
               <p className="mt-1 font-serif text-2xl">{formatAriary(values.quickSalePrice)}</p>
               <p className="mt-1 font-sans text-xs text-muted-foreground">Repère pour accélérer la conversion.</p>
             </div>
-            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+            <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Base marché</p>
               <p className="mt-1 font-serif text-2xl">{formatAriary(v2.anchors.finalBaseAnchor)}</p>
               <p className="mt-1 font-sans text-xs text-muted-foreground">Ancrage principal avant ajustements véhicule.</p>
             </div>
-            <div className="rounded-lg px-3 py-2 md:rounded-none md:px-4 md:py-4">
+            <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
               <p className="mt-1 font-serif text-2xl">{presentation.summaryLevel}</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {showIndicative && (
         <div
@@ -165,7 +167,7 @@ export default function EstimationResultReport({
       )}
 
       <div
-        className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground"
+        className="rounded-xl border border-border/55 bg-secondary/10 px-4 py-3 text-sm font-sans text-muted-foreground"
         role="region"
         aria-label="Résumé de la qualité d'évidence"
       >
@@ -176,8 +178,13 @@ export default function EstimationResultReport({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.05fr_0.95fr]">
-        <Card className="rounded-2xl border border-emerald-300/25 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Analyse des facteurs</p>
+          <p className="font-sans text-xs text-muted-foreground">Ce qui influence la valeur</p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.05fr_0.95fr]">
+        <Card className="rounded-2xl border border-emerald-300/20 bg-gradient-to-br from-emerald-500/[0.06] to-background shadow-sm transition-all duration-300 ease-out hover:shadow-md">
           <CardHeader className="pb-3">
             <CardTitle className="font-serif text-xl flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-success" />
@@ -201,7 +208,7 @@ export default function EstimationResultReport({
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border border-destructive/20 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
+        <Card className="rounded-2xl border border-destructive/20 bg-gradient-to-br from-destructive/[0.04] to-background shadow-sm transition-all duration-300 ease-out hover:shadow-md">
           <CardHeader className="pb-3">
             <CardTitle className="font-serif text-xl flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-destructive" />
@@ -225,8 +232,9 @@ export default function EstimationResultReport({
           </CardContent>
         </Card>
       </div>
+      </section>
 
-      <Card className="rounded-2xl border border-border/70 shadow-sm bg-card/95">
+      <Card className="rounded-2xl border border-border/60 shadow-sm bg-background/80">
         <CardHeader className="pb-3">
           <CardTitle className="font-serif text-xl flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary" />
@@ -249,7 +257,7 @@ export default function EstimationResultReport({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md" role="region" aria-label="Support de comparables marché">
+      <Card className="rounded-2xl border border-border/60 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md" role="region" aria-label="Support de comparables marché">
         <CardHeader>
           <CardTitle className="font-serif text-xl flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
