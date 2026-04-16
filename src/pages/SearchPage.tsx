@@ -466,16 +466,16 @@ const SearchPage = () => {
     const typePart =
       filters.types.length === 1
         ? LISTING_TYPE_LABELS_PLURAL[filters.types[0] as keyof typeof LISTING_TYPE_LABELS_PLURAL] || filters.types[0]
-        : "vehicules";
+        : "véhicules";
     const transactionPart =
       filters.transaction === "vente"
-        ? "a vendre"
+        ? "à vendre"
         : filters.transaction === "location"
-          ? "a louer"
+          ? "à louer"
           : filters.transaction === "location_vacances"
             ? "en location vacances"
             : "";
-    const cityPart = filters.ville ? ` a ${filters.ville}` : " a Madagascar";
+    const cityPart = filters.ville ? ` à ${filters.ville}` : " à Madagascar";
     return truncateMetaDescription(
       `Consultez les ${typePart} ${transactionPart}${cityPart} sur AutoNex, avec des filtres par prix, budget et localisation.`,
     );

@@ -192,16 +192,16 @@ function buildAdjustmentFactors(input: EstimationInput): { multiplier: number; p
   const kmDeltaRatio = expectedKm > 0 ? (input.mileage - expectedKm) / expectedKm : 0;
   if (kmDeltaRatio <= -0.2) {
     adjustment += 0.035;
-    positive.push("Kilometrage inferieur a la moyenne");
+    positive.push("Kilométrage inférieur à la moyenne");
   } else if (kmDeltaRatio <= -0.08) {
     adjustment += 0.015;
-    positive.push("Kilometrage contenu pour l'age du vehicule");
+    positive.push("Kilométrage contenu pour l'âge du véhicule");
   } else if (kmDeltaRatio >= 0.3) {
     adjustment -= 0.06;
-    negative.push("Kilometrage superieur a la moyenne");
+    negative.push("Kilométrage supérieur à la moyenne");
   } else if (kmDeltaRatio >= 0.12) {
     adjustment -= 0.025;
-    negative.push("Kilometrage legerement eleve");
+    negative.push("Kilométrage légèrement élevé");
   }
 
   const conditionAdj = {
@@ -211,8 +211,8 @@ function buildAdjustmentFactors(input: EstimationInput): { multiplier: number; p
     needs_work: -0.1,
   }[input.conditionLabel];
   adjustment += conditionAdj;
-  if (conditionAdj > 0) positive.push("Etat general excellent");
-  if (conditionAdj < 0) negative.push("Etat general perfectible");
+  if (conditionAdj > 0) positive.push("État général excellent");
+  if (conditionAdj < 0) negative.push("État général perfectible");
 
   const maintenanceAdj = { full: 0.03, partial: 0.01, unknown: 0 }[input.maintenanceLevel];
   adjustment += maintenanceAdj;
@@ -220,13 +220,13 @@ function buildAdjustmentFactors(input: EstimationInput): { multiplier: number; p
 
   if (input.accidentDeclared) {
     adjustment -= 0.06;
-    negative.push("Historique d'accident declare");
+    negative.push("Historique d'accident déclaré");
   }
 
   const ownerAdj = { "1": 0.02, "2": 0, "3_plus": -0.03 }[input.ownerCountLabel];
   adjustment += ownerAdj;
-  if (ownerAdj > 0) positive.push("Un seul proprietaire");
-  if (ownerAdj < 0) negative.push("Plusieurs proprietaires");
+  if (ownerAdj > 0) positive.push("Un seul propriétaire");
+  if (ownerAdj < 0) negative.push("Plusieurs propriétaires");
 
   const usageAdj = { personal: 0, professional: -0.02, rental: -0.07, fleet: -0.08 }[input.usageType];
   adjustment += usageAdj;
@@ -280,12 +280,12 @@ export async function computeVehicleEstimation(input: EstimationInput): Promise<
   const recommendedListingPrice = Math.min(Math.round(adjustedPrice * 1.03), Math.round(highRangePrice * 0.995));
 
   const negativeFactors = [...adjustments.negative];
-  if (!profile) negativeFactors.push("Modele hors base de reference principale");
+  if (!profile) negativeFactors.push("Modèle hors base de référence principale");
   if (comparables.length < 5) negativeFactors.push("Peu de comparables AutoNex disponibles");
-  if (confidence.label === "low") negativeFactors.push("Estimation indicative a faible confiance");
+  if (confidence.label === "low") negativeFactors.push("Estimation indicative à faible confiance");
   const estimationNote =
     comparables.length === 0
-      ? "Nous n'avons pas encore assez d'annonces similaires sur AutoNex pour ce modele, mais voici une estimation indicative basee sur les caracteristiques de votre vehicule."
+      ? "Nous n'avons pas encore assez d'annonces similaires sur AutoNex pour ce modèle, mais voici une estimation indicative basée sur les caractéristiques de votre véhicule."
       : undefined;
 
   return {

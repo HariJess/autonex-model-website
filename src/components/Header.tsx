@@ -141,7 +141,7 @@ const Header = () => {
                   >
                     <p className="text-sm font-semibold leading-tight">Location courte durée</p>
                     <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-[#D5E3F7]">
-                      Sejours, vacances, besoins ponctuels
+                      Séjours, vacances, besoins ponctuels
                     </p>
                   </Link>
                   <Link
@@ -155,7 +155,7 @@ const Header = () => {
                   >
                     <p className="text-sm font-semibold leading-tight">Location longue durée</p>
                     <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-[#D5E3F7]">
-                      Usage prolonge, besoins mensuels
+                      Usage prolongé, besoins mensuels
                     </p>
                   </Link>
                 </div>

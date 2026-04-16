@@ -185,7 +185,7 @@ const VehicleEstimationPage = () => {
     if (!form.makeName.trim()) errors.push("La marque est obligatoire.");
     if (!form.modelName.trim()) errors.push("Le modèle est obligatoire.");
     if (!Number.isFinite(form.year) || form.year < 1950 || form.year > currentYear) {
-      errors.push("L'annee doit etre comprise entre 1950 et l'annee en cours.");
+      errors.push("L'année doit être comprise entre 1950 et l'année en cours.");
     }
     if (!form.city.trim()) errors.push("La ville / region est obligatoire.");
     if (!Number.isFinite(form.mileage) || form.mileage < 0 || form.mileage > 1_500_000) {
@@ -556,7 +556,7 @@ const VehicleEstimationPage = () => {
                       <p className="font-sans text-xs text-muted-foreground">Moins de 2 minutes pour compléter les éléments essentiels.</p>
                     </div>
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">Resultat actionnable</p>
+                      <p className="font-sans text-xs font-medium">Résultat actionnable</p>
                       <p className="font-sans text-xs text-muted-foreground">Prix conseillé, fourchette et niveau de confiance immédiats.</p>
                     </div>
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
@@ -644,7 +644,7 @@ const VehicleEstimationPage = () => {
               <div className="rounded-xl border border-dashed border-border/80 bg-secondary/15 p-4">
                 <p className="font-sans text-sm font-medium">Conseil AutoNex</p>
                 <p className="font-sans text-xs text-muted-foreground mt-1">
-                  Soyez le plus precis possible : cela renforce la credibilite de l'estimation.
+                  Soyez le plus précis possible : cela renforce la crédibilité de l'estimation.
                 </p>
                 <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
                   <Sparkles className="h-3.5 w-3.5" />

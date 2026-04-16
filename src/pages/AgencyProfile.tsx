@@ -209,11 +209,11 @@ const AgencyProfile = () => {
         ) : listings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-secondary/15 px-6 py-10 text-center">
             <p className="font-serif text-lg text-foreground">
-              {partnerDealer ? "Aucun vehicule actif pour le moment." : t("agencies.noListings")}
+              {partnerDealer ? "Aucun véhicule actif pour le moment." : t("agencies.noListings")}
             </p>
             {partnerDealer && (
               <p className="text-sm text-muted-foreground font-sans mt-2">
-                Le stock de {displayName} apparaitra ici des que des annonces seront explicitement liees a cette concession.
+                Le stock de {displayName} apparaîtra ici dès que des annonces seront explicitement liées à cette concession.
               </p>
             )}
           </div>
