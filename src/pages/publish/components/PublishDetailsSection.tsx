@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AUTO_BRANDS } from "@/data/automotiveCatalog";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const EMPTY_OPTION = "__empty__";
 
@@ -218,6 +219,7 @@ export function PublishDetailsSection({
   onToggleFeature,
   onCustomFeaturesInputChange,
 }: PublishDetailsSectionProps) {
+  const { t } = useTranslation();
   const modelSuggestions = BRAND_MODEL_HINTS[make] ?? [];
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
 
@@ -225,15 +227,15 @@ export function PublishDetailsSection({
     <div className="space-y-5 form-surface">
       <section className="space-y-3 rounded-xl border border-border/75 bg-gradient-to-br from-card to-secondary/15 p-4">
         <div>
-          <p className="font-serif text-base text-foreground">Informations essentielles</p>
+          <p className="font-serif text-base text-foreground">{t("publish.essentialInfoTitle", "Informations essentielles")}</p>
           <p className="mt-1 font-sans text-xs text-muted-foreground">
-            Commencez par les champs qui influencent le plus la compréhension et la conversion.
+            {t("publish.essentialInfoDesc", "Commencez par les champs qui influencent le plus la compréhension et la conversion.")}
           </p>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.listingTitle} *</Label>
         <Input value={title} onChange={(e) => onTitleChange(e.target.value)} className="font-sans" maxLength={120} />
-        <p className="text-xs text-muted-foreground font-sans">Exemple: Toyota RAV4 2021 — automatique, 68 000 km</p>
+        <p className="text-xs text-muted-foreground font-sans">{t("publish.titleExample", "Exemple: Toyota RAV4 2021 — automatique, 68 000 km")}</p>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.descriptionFr} *</Label>
@@ -243,10 +245,10 @@ export function PublishDetailsSection({
             className="font-sans"
             rows={6}
             maxLength={5000}
-            placeholder="Rédigez une description complète en français…"
+            placeholder={t("publish.descriptionPlaceholderLong", "Rédigez une description complète en français…")}
           />
-          <p className="text-xs text-muted-foreground font-sans">{description.trim().length}/5000 — min. 40 caractères</p>
-          <p className="text-xs text-muted-foreground font-sans">Incluez de préférence: carburant, boîte, état général et historique d’entretien.</p>
+          <p className="text-xs text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 — min. 40 caractères", { count: description.trim().length })}</p>
+          <p className="text-xs text-muted-foreground font-sans">{t("publish.descriptionHint", "Incluez de préférence: carburant, boîte, état général et historique d’entretien.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
           <div className="space-y-2">
@@ -262,9 +264,9 @@ export function PublishDetailsSection({
 
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
-          <p className="font-serif font-semibold text-sm">Identité véhicule</p>
+          <p className="font-serif font-semibold text-sm">{t("publish.vehicleIdentityTitle", "Identité véhicule")}</p>
           <p className="text-xs text-muted-foreground font-sans mt-1">
-            Choisissez une marque référencée AutoNex, puis précisez le modèle.
+            {t("publish.vehicleIdentityDesc", "Choisissez une marque référencée AutoNex, puis précisez le modèle.")}
           </p>
         </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
@@ -275,7 +277,7 @@ export function PublishDetailsSection({
             value={make}
             onChange={(e) => onMakeChange(e.target.value)}
             className="font-sans"
-            placeholder="Ex: Toyota, Nissan, Hyundai..."
+            placeholder={t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}
           />
           <datalist id="publish-brand-options">
             {AUTO_BRANDS.map((brand) => (
@@ -290,7 +292,7 @@ export function PublishDetailsSection({
             value={model}
             onChange={(e) => onModelChange(e.target.value)}
             className="font-sans"
-            placeholder={make ? `Modèle ${make}` : "Ex: RAV4, Hilux, Ranger..."}
+            placeholder={make ? t("publish.modelPlaceholderWithBrand", "Modèle {{brand}}", { brand: make }) : t("publish.modelPlaceholder", "Ex: RAV4, Hilux, Ranger...")}
           />
           <datalist id="publish-model-hints">
             {modelSuggestions.map((modelHint) => (
@@ -306,7 +308,7 @@ export function PublishDetailsSection({
           <Label className="font-sans">État</Label>
           <Select value={condition || EMPTY_OPTION} onValueChange={(v) => onConditionChange(v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner un état" />
+              <SelectValue placeholder={t("publish.selectCondition", "Sélectionner un état")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -322,9 +324,9 @@ export function PublishDetailsSection({
       </section>
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
-          <p className="font-serif font-semibold text-sm">Caractéristiques principales</p>
+          <p className="font-serif font-semibold text-sm">{t("publish.mainFeaturesTitle", "Caractéristiques principales")}</p>
           <p className="text-xs text-muted-foreground font-sans mt-1">
-            Ces éléments aident les acheteurs à filtrer rapidement votre annonce.
+            {t("publish.mainFeaturesDesc", "Ces éléments aident les acheteurs à filtrer rapidement votre annonce.")}
           </p>
         </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
@@ -343,7 +345,7 @@ export function PublishDetailsSection({
           <Label className="font-sans">Carburant</Label>
           <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => onFuelChange(v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner un carburant" />
+              <SelectValue placeholder={t("publish.selectFuel", "Sélectionner un carburant")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -359,7 +361,7 @@ export function PublishDetailsSection({
           <Label className="font-sans">Boîte</Label>
           <Select value={transmission || EMPTY_OPTION} onValueChange={(v) => onTransmissionChange(v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner une boîte" />
+              <SelectValue placeholder={t("publish.selectTransmission", "Sélectionner une boîte")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -375,7 +377,7 @@ export function PublishDetailsSection({
           <Label className="font-sans">Motricité</Label>
           <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => onDrivetrainChange(v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner une motricité" />
+              <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -391,7 +393,7 @@ export function PublishDetailsSection({
           <Label className="font-sans">Type vendeur</Label>
           <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => onSellerTypeChange(v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
-              <SelectValue placeholder="Sélectionner un vendeur" />
+              <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -412,9 +414,9 @@ export function PublishDetailsSection({
           aria-expanded={showAdvancedDetails}
         >
           <div>
-            <p className="font-serif text-sm text-foreground">Informations avancées (optionnel)</p>
+            <p className="font-serif text-sm text-foreground">{t("publish.advancedInfoTitle", "Informations avancées (optionnel)")}</p>
             <p className="mt-0.5 font-sans text-xs text-muted-foreground">
-              Ajoutez ces détails pour affiner la qualité de votre annonce.
+              {t("publish.advancedInfoDesc", "Ajoutez ces détails pour affiner la qualité de votre annonce.")}
             </p>
           </div>
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showAdvancedDetails ? "rotate-180" : ""}`} />
@@ -442,7 +444,7 @@ export function PublishDetailsSection({
                 <Label className="font-sans">Carrosserie</Label>
                 <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => onBodyStyleChange(v === EMPTY_OPTION ? "" : v)}>
                   <SelectTrigger className="font-sans">
-                    <SelectValue placeholder="Sélectionner une carrosserie" />
+                    <SelectValue placeholder={t("publish.selectBodyStyle", "Sélectionner une carrosserie")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -458,7 +460,7 @@ export function PublishDetailsSection({
                 <Label className="font-sans">Mode location</Label>
                 <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => onRentalModeChange(v === EMPTY_OPTION ? "" : v)}>
                   <SelectTrigger className="font-sans">
-                    <SelectValue placeholder="Sélectionner un mode" />
+                    <SelectValue placeholder={t("publish.selectRentalMode", "Sélectionner un mode")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -484,7 +486,7 @@ export function PublishDetailsSection({
                 <Label className="font-sans">Disponibilité</Label>
                 <Select value={availabilityStatus || EMPTY_OPTION} onValueChange={(v) => onAvailabilityStatusChange(v === EMPTY_OPTION ? "" : v)}>
                   <SelectTrigger className="font-sans">
-                    <SelectValue placeholder="Sélectionner une disponibilité" />
+                    <SelectValue placeholder={t("publish.selectAvailability", "Sélectionner une disponibilité")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
@@ -526,16 +528,16 @@ export function PublishDetailsSection({
         </div>
       </div>
       <div className="space-y-2">
-        <Label className="font-sans">Autres caractéristiques (optionnel)</Label>
+        <Label className="font-sans">{t("publish.otherFeaturesTitle", "Autres caractéristiques (optionnel)")}</Label>
         <Textarea
           value={customFeaturesInput}
           onChange={(e) => onCustomFeaturesInputChange(e.target.value)}
           className="font-sans"
           rows={3}
-          placeholder="Ex: Suspension adaptative, sièges ventilés, affichage tête haute..."
+          placeholder={t("publish.otherFeaturesPlaceholder", "Ex: Suspension adaptative, sièges ventilés, affichage tête haute...")}
         />
         <p className="text-xs text-muted-foreground font-sans">
-          Séparez les éléments par des virgules pour ajouter plusieurs caractéristiques.
+          {t("publish.otherFeaturesHint", "Séparez les éléments par des virgules pour ajouter plusieurs caractéristiques.")}
         </p>
       </div>
     </div>

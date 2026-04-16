@@ -897,7 +897,7 @@ const ListingDetail = () => {
               id="listing-contact"
               className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4.5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
             >
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Contact prioritaire</p>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("listing.priorityContact", "Contact prioritaire")}</p>
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
@@ -1018,7 +1018,7 @@ const ListingDetail = () => {
         aria-label={t("listing.contactActions", "Actions de contact")}
       >
         <div className="container mx-auto max-w-lg flex flex-col gap-1.5">
-          <p className="px-0.5 font-sans text-[11px] text-muted-foreground">Contact rapide</p>
+          <p className="px-0.5 font-sans text-[11px] text-muted-foreground">{t("listing.quickContact", "Contact rapide")}</p>
           <div className="flex gap-1.5">
             <Button
               type="button"

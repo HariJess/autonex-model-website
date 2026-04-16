@@ -322,34 +322,34 @@ const VehicleEstimationPage = () => {
                   </div>
                 </div>
                 <div className={`rounded-2xl border bg-background/85 p-5 md:p-6 ${ESTIMATION_PALETTE.surface}`}>
-                  <p className={ESTIMATION_TYPO.label}>Pourquoi c'est utile</p>
+                  <p className={ESTIMATION_TYPO.label}>{t("estimation.whyUseful", "Pourquoi c'est utile")}</p>
                   <div className="mt-4 space-y-3">
                     <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                       <TrendingUp className="mt-0.5 h-4 w-4 text-primary" />
                       <div>
-                        <p className="font-sans text-sm font-medium">Fourchette de marché</p>
-                        <p className="font-sans text-xs text-muted-foreground">Une base crédible pour décider de votre positionnement prix.</p>
+                        <p className="font-sans text-sm font-medium">{t("estimation.marketRangeTitle", "Fourchette de marché")}</p>
+                        <p className="font-sans text-xs text-muted-foreground">{t("estimation.marketRangeDesc", "Une base crédible pour décider de votre positionnement prix.")}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                       <Gauge className="mt-0.5 h-4 w-4 text-primary" />
                       <div>
-                        <p className="font-sans text-sm font-medium">Niveau de confiance</p>
-                        <p className="font-sans text-xs text-muted-foreground">Une lecture immédiate de la solidité de l'évaluation.</p>
+                        <p className="font-sans text-sm font-medium">{t("estimation.confidenceLevelTitle", "Niveau de confiance")}</p>
+                        <p className="font-sans text-xs text-muted-foreground">{t("estimation.confidenceLevelDesc", "Une lecture immédiate de la solidité de l'évaluation.")}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                       <Target className="mt-0.5 h-4 w-4 text-primary" />
                       <div>
-                        <p className="font-sans text-sm font-medium">Prix conseillé de publication</p>
-                        <p className="font-sans text-xs text-muted-foreground">Prêt à être utilisé pour publier rapidement sur AutoNex.</p>
+                        <p className="font-sans text-sm font-medium">{t("estimation.recommendedPriceTitle", "Prix conseillé de publication")}</p>
+                        <p className="font-sans text-xs text-muted-foreground">{t("estimation.recommendedPriceDesc", "Prêt à être utilisé pour publier rapidement sur AutoNex.")}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                       <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
                       <div>
-                        <p className="font-sans text-sm font-medium">Prêt pour la suite</p>
-                        <p className="font-sans text-xs text-muted-foreground">Après l'estimation, vous pouvez publier votre véhicule avec un prix recommandé.</p>
+                        <p className="font-sans text-sm font-medium">{t("estimation.readyNextTitle", "Prêt pour la suite")}</p>
+                        <p className="font-sans text-xs text-muted-foreground">{t("estimation.readyNextDesc", "Après l'estimation, vous pouvez publier votre véhicule avec un prix recommandé.")}</p>
                       </div>
                     </div>
                   </div>
@@ -360,26 +360,26 @@ const VehicleEstimationPage = () => {
             <div className="grid gap-4 md:grid-cols-3">
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-lg">Comment ça fonctionne</CardTitle>
+                  <CardTitle className="font-serif text-lg">{t("estimation.howItWorksTitle", "Comment ça fonctionne")}</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm text-muted-foreground">
-                  Décrivez votre véhicule, précisez son état, puis recevez un rapport d'estimation structuré en quelques secondes.
+                  {t("estimation.howItWorksDesc", "Décrivez votre véhicule, précisez son état, puis recevez un rapport d'estimation structuré en quelques secondes.")}
                 </CardContent>
               </Card>
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-lg">Fiable et transparent</CardTitle>
+                  <CardTitle className="font-serif text-lg">{t("estimation.reliableTransparentTitle", "Fiable et transparent")}</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm text-muted-foreground">
-                  L'outil combine profils de référence et signaux de marché. Chaque estimation inclut sa fourchette et son niveau de confiance.
+                  {t("estimation.reliableTransparentDesc", "L'outil combine profils de référence et signaux de marché. Chaque estimation inclut sa fourchette et son niveau de confiance.")}
                 </CardContent>
               </Card>
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-lg">Pensé pour convertir</CardTitle>
+                  <CardTitle className="font-serif text-lg">{t("estimation.convertReadyTitle", "Pensé pour convertir")}</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm text-muted-foreground">
-                  Une fois la valeur obtenue, vous pouvez publier votre véhicule immédiatement avec un prix conseillé.
+                  {t("estimation.convertReadyDesc", "Une fois la valeur obtenue, vous pouvez publier votre véhicule immédiatement avec un prix conseillé.")}
                 </CardContent>
               </Card>
             </div>
@@ -482,9 +482,9 @@ const VehicleEstimationPage = () => {
                     {catalogLoading && (
                       <div className="md:col-span-2">
                         <PremiumStatePanel
-                          overline="Catalogue estimation"
-                          title="Chargement des références véhicules"
-                          description="Nous préparons les marques et modèles pour une saisie fiable."
+                          overline={t("estimation.catalogOverline", "Catalogue estimation")}
+                          title={t("estimation.catalogLoadingTitle", "Chargement des références véhicules")}
+                          description={t("estimation.catalogLoadingDesc", "Nous préparons les marques et modèles pour une saisie fiable.")}
                           icon={<Loader2 className="h-5 w-5 animate-spin text-primary" />}
                           className="py-6"
                         />
@@ -493,9 +493,9 @@ const VehicleEstimationPage = () => {
                     {!catalogLoading && makeOptions.length === 0 && (
                       <div className="md:col-span-2">
                         <PremiumStatePanel
-                          overline="Catalogue estimation"
-                          title="Références véhicules indisponibles"
-                          description="Le catalogue est momentanément indisponible. Relancez l’estimation dans quelques instants."
+                          overline={t("estimation.catalogOverline", "Catalogue estimation")}
+                          title={t("estimation.catalogUnavailableTitle", "Références véhicules indisponibles")}
+                          description={t("estimation.catalogUnavailableDesc", "Le catalogue est momentanément indisponible. Relancez l’estimation dans quelques instants.")}
                           className="py-6"
                         />
                       </div>
@@ -503,7 +503,7 @@ const VehicleEstimationPage = () => {
                     {!catalogLoading && catalogPayload?.source === "ui-curated" && (
                       <div className="md:col-span-2 rounded-xl border border-border/70 bg-secondary/20 p-3">
                         <p className="font-sans text-xs text-muted-foreground">
-                          Référentiel estimation prêt (source UI curatée).
+                          {t("estimation.referenceReadyUi", "Référentiel estimation prêt (source UI curatée).")}
                         </p>
                       </div>
                     )}
@@ -589,30 +589,30 @@ const VehicleEstimationPage = () => {
                 </div>
                   </div>
                   <div className="rounded-xl border border-border/60 bg-secondary/10 p-4 md:p-5">
-                    <p className="font-sans text-xs uppercase tracking-wide text-muted-foreground">Conseil de saisie</p>
+                    <p className="font-sans text-xs uppercase tracking-wide text-muted-foreground">{t("estimation.inputTipTitle", "Conseil de saisie")}</p>
                     <p className="mt-1 font-sans text-sm text-muted-foreground">
-                      Plus les informations sont précises, plus l'estimation sera resserrée et directement actionnable.
+                      {t("estimation.inputTipDesc", "Plus les informations sont précises, plus l'estimation sera resserrée et directement actionnable.")}
                     </p>
                   </div>
                 </div>
                 <aside className={`rounded-2xl border bg-gradient-to-b p-4 shadow-sm sm:p-5 lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
-                  <p className={ESTIMATION_TYPO.label}>Pourquoi ces informations ?</p>
-                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Une estimation plus juste</h3>
+                  <p className={ESTIMATION_TYPO.label}>{t("estimation.whyTheseInfo", "Pourquoi ces informations ?")}</p>
+                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>{t("estimation.fairerEstimate", "Une estimation plus juste")}</h3>
                   <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
-                    Marque, modèle, année et kilométrage constituent le socle de valorisation le plus pertinent pour votre véhicule.
+                    {t("estimation.fairerEstimateDesc", "Marque, modèle, année et kilométrage constituent le socle de valorisation le plus pertinent pour votre véhicule.")}
                   </p>
                   <div className="mt-4 space-y-2.5">
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">Parcours rapide</p>
-                      <p className="font-sans text-xs text-muted-foreground">Environ 2 minutes pour compléter les informations essentielles.</p>
+                      <p className="font-sans text-xs font-medium">{t("estimation.quickJourneyTitle", "Parcours rapide")}</p>
+                      <p className="font-sans text-xs text-muted-foreground">{t("estimation.quickJourneyDesc", "Environ 2 minutes pour compléter les informations essentielles.")}</p>
                     </div>
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">Résultat actionnable</p>
-                      <p className="font-sans text-xs text-muted-foreground">Prix conseillé, fourchette et niveau de confiance immédiats.</p>
+                      <p className="font-sans text-xs font-medium">{t("estimation.actionableResultTitle", "Résultat actionnable")}</p>
+                      <p className="font-sans text-xs text-muted-foreground">{t("estimation.actionableResultDesc", "Prix conseillé, fourchette et niveau de confiance immédiats.")}</p>
                     </div>
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">Prêt pour la suite</p>
-                      <p className="font-sans text-xs text-muted-foreground">Vous pourrez publier ensuite sur AutoNex avec un cap prix clair.</p>
+                      <p className="font-sans text-xs font-medium">{t("estimation.readyAfterTitle", "Prêt pour la suite")}</p>
+                      <p className="font-sans text-xs text-muted-foreground">{t("estimation.readyAfterDesc", "Vous pourrez publier ensuite sur AutoNex avec un cap prix clair.")}</p>
                     </div>
                   </div>
                 </aside>
@@ -637,9 +637,9 @@ const VehicleEstimationPage = () => {
             <CardHeader>
               <div className="space-y-2">
                 <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">{t("estimation.stepTwo", "Étape 2")}</Badge>
-                <CardTitle className={ESTIMATION_TYPO.h2}>État et historique</CardTitle>
+                <CardTitle className={ESTIMATION_TYPO.h2}>{t("estimation.conditionHistoryTitle", "État et historique")}</CardTitle>
                 <p className={ESTIMATION_TYPO.body}>
-                  Affinez la valorisation avec le contexte d'usage pour obtenir un rapport plus juste.
+                  {t("estimation.conditionHistoryDesc", "Affinez la valorisation avec le contexte d'usage pour obtenir un rapport plus juste.")}
                 </p>
               </div>
             </CardHeader>
@@ -679,8 +679,8 @@ const VehicleEstimationPage = () => {
 
               <div className="rounded-xl border border-border/80 p-4 flex items-center justify-between gap-3 bg-background">
                 <div>
-                  <p className="font-sans text-sm font-medium">Accident déclaré</p>
-                  <p className="font-sans text-xs text-muted-foreground">Impacte le prix estimé.</p>
+                  <p className="font-sans text-sm font-medium">{t("estimation.accidentDeclaredTitle", "Accident déclaré")}</p>
+                  <p className="font-sans text-xs text-muted-foreground">{t("estimation.accidentDeclaredDesc", "Impacte le prix estimé.")}</p>
                 </div>
                 <Button
                   type="button"
@@ -693,25 +693,25 @@ const VehicleEstimationPage = () => {
               </div>
 
               <div className="rounded-xl border border-dashed border-border/80 bg-secondary/15 p-4">
-                <p className="font-sans text-sm font-medium">Conseil AutoNex</p>
+                <p className="font-sans text-sm font-medium">{t("estimation.autonexTipTitle", "Conseil AutoNex")}</p>
                 <p className="font-sans text-xs text-muted-foreground mt-1">
-                  Soyez le plus précis possible : cela renforce la crédibilité de l'estimation.
+                  {t("estimation.autonexTipDesc", "Soyez le plus précis possible : cela renforce la crédibilité de l'estimation.")}
                 </p>
                 <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span>Le rapport reste disponible même avec des données partielles.</span>
+                  <span>{t("estimation.partialDataHint", "Le rapport reste disponible même avec des données partielles.")}</span>
                 </div>
               </div>
                 </div>
                 <aside className={`rounded-2xl border bg-gradient-to-b p-5 shadow-sm lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
-                  <p className={ESTIMATION_TYPO.label}>Confiance du rapport</p>
-                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>Précision renforcée</h3>
+                  <p className={ESTIMATION_TYPO.label}>{t("estimation.reportConfidence", "Confiance du rapport")}</p>
+                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>{t("estimation.higherPrecision", "Précision renforcée")}</h3>
                   <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
-                    L'état, l'entretien et l'usage permettent d'ajuster la valeur avec plus de justesse.
+                    {t("estimation.higherPrecisionDesc", "L'état, l'entretien et l'usage permettent d'ajuster la valeur avec plus de justesse.")}
                   </p>
                   <div className="mt-4 rounded-lg border border-border/60 bg-background/80 p-3">
-                    <p className="font-sans text-xs font-medium">Conseil pratique</p>
-                    <p className="font-sans text-xs text-muted-foreground">Si vous hésitez, choisissez l'option la plus prudente.</p>
+                    <p className="font-sans text-xs font-medium">{t("estimation.practicalTipTitle", "Conseil pratique")}</p>
+                    <p className="font-sans text-xs text-muted-foreground">{t("estimation.practicalTipDesc", "Si vous hésitez, choisissez l'option la plus prudente.")}</p>
                   </div>
                 </aside>
               </div>
@@ -765,12 +765,11 @@ const VehicleEstimationPage = () => {
                 }
               />
             </section>
-            <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans leading-relaxed text-muted-foreground" role="note" aria-label="Cadre d'usage de l'estimation">
-              Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle,
-              ni une expertise mécanique, ni un prix garanti.
+            <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans leading-relaxed text-muted-foreground" role="note" aria-label={t("estimation.usageFrameAria", "Cadre d'usage de l'estimation")}>
+              {t("estimation.usageFrameText", "Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle, ni une expertise mécanique, ni un prix garanti.")}
             </div>
-            <p className="px-0.5 text-xs leading-relaxed text-muted-foreground font-sans" aria-label="Conseil d'utilisation du rapport d'estimation">
-              Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.
+            <p className="px-0.5 text-xs leading-relaxed text-muted-foreground font-sans" aria-label={t("estimation.usageAdviceAria", "Conseil d'utilisation du rapport d'estimation")}>
+              {t("estimation.usageAdviceText", "Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.")}
             </p>
           </>
         )}

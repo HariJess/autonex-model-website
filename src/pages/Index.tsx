@@ -280,14 +280,14 @@ const Index = () => {
           <p className="text-sm text-muted-foreground font-sans mt-1 leading-relaxed">{subtitle}</p>
         </div>
         <Link to={linksTo} className="text-primary font-sans text-sm font-medium hover:underline shrink-0 min-h-10 inline-flex items-center rounded-md motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
-          Voir plus
+          {t("sections.viewMore", "Voir plus")}
         </Link>
       </div>
       {themedLoading ? (
         <PremiumStatePanel
-          overline="Collection AutoNex"
-          title="Sélection en préparation"
-          description="Nous organisons cette collection pour vous proposer les annonces les plus pertinentes."
+          overline={t("home.collectionOverline", "Collection AutoNex")}
+          title={t("home.collectionLoadingTitle", "Sélection en préparation")}
+          description={t("home.collectionLoadingDesc", "Nous organisons cette collection pour vous proposer les annonces les plus pertinentes.")}
           icon={<Loader2 className="h-5 w-5 animate-spin text-primary" />}
           className="py-7"
         />
@@ -353,7 +353,7 @@ const Index = () => {
               to="/recherche"
               className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
             >
-              Voir tout
+              {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
 
@@ -386,7 +386,7 @@ const Index = () => {
               to="/recherche"
               className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
             >
-              Voir tout
+              {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
 
@@ -430,7 +430,7 @@ const Index = () => {
               <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.estimationOverline", "Différenciateur AutoNex")}</p>
               <h2 className="mt-1 font-serif text-2xl text-foreground md:text-[2rem]">{t("home.estimationTitle", "Estimation: votre repère avant négociation")}</h2>
               <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">
-                Obtenez une fourchette argumentée, un niveau de confiance explicite et un rapport utile pour cadrer votre décision d'achat ou de vente.
+                {t("home.estimationSupport", "Obtenez une fourchette argumentée, un niveau de confiance explicite et un rapport utile pour cadrer votre décision d'achat ou de vente.")}
               </p>
             </div>
             <div className="flex flex-wrap gap-2.5">
@@ -456,9 +456,9 @@ const Index = () => {
         {isLoading ? (
           <div className="space-y-4">
             <PremiumStatePanel
-              overline="Flux marché"
-              title="Chargement des nouvelles annonces"
-              description="Nous mettons à jour les dernières publications pour vous donner une vue actuelle du marché."
+              overline={t("home.marketFeedOverline", "Flux marché")}
+              title={t("home.marketFeedLoadingTitle", "Chargement des nouvelles annonces")}
+              description={t("home.marketFeedLoadingDesc", "Nous mettons à jour les dernières publications pour vous donner une vue actuelle du marché.")}
               icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
               className="py-8"
             />
@@ -466,9 +466,9 @@ const Index = () => {
           </div>
         ) : listings.length === 0 ? (
           <PremiumStatePanel
-            overline="Flux marché"
+            overline={t("home.marketFeedOverline", "Flux marché")}
             title={t("home.noListings", "Le catalogue AutoNex démarre. Publiez le premier véhicule !")}
-            description="Découvrez déjà la recherche et nos catégories, puis lancez votre première annonce pour activer le marché."
+            description={t("home.noListingsDesc", "Découvrez déjà la recherche et nos catégories, puis lancez votre première annonce pour activer le marché.")}
             action={
               <div className="flex flex-wrap justify-center gap-2.5">
                 <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
@@ -498,14 +498,14 @@ const Index = () => {
           <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6">
             <h3 className="font-serif text-lg md:text-xl font-bold text-foreground">{t("home.marketStarting", "Le marché se lance")}</h3>
             <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">
-              L’inventaire est encore limité. Publiez votre véhicule ou explorez les recherches pour suivre les nouvelles annonces.
+              {t("home.lowInventoryDesc", "L’inventaire est encore limité. Publiez votre véhicule ou explorez les recherches pour suivre les nouvelles annonces.")}
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
               <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
                 <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.publishVehicle", "Publier mon véhicule")}</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Voir les annonces</Link>
+                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("home.seeListings", "Voir les annonces")}</Link>
               </Button>
             </div>
           </div>
@@ -515,7 +515,7 @@ const Index = () => {
       <section className="container mx-auto px-4 py-5 md:py-6">
         <div className="rounded-2xl border border-border/70 bg-card/95 p-3.5 md:p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs uppercase tracking-wide text-muted-foreground font-sans mr-1">Catégories rapides</span>
+            <span className="text-xs uppercase tracking-wide text-muted-foreground font-sans mr-1">{t("home.quickCategories", "Catégories rapides")}</span>
             {compactCategoryLinks.map((category) => (
               <Link
                 key={category.id}
@@ -535,19 +535,19 @@ const Index = () => {
         <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Parcours conseillé</p>
-              <p className="mt-1 font-serif text-xl text-foreground">Explorez, estimez, puis passez à l’action</p>
-              <p className="mt-1 font-sans text-sm text-muted-foreground">Un flux simple pour comparer le marché, valider le bon prix et publier avec confiance.</p>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.recommendedFlowOverline", "Parcours conseillé")}</p>
+              <p className="mt-1 font-serif text-xl text-foreground">{t("home.recommendedFlowTitle", "Explorez, estimez, puis passez à l’action")}</p>
+              <p className="mt-1 font-sans text-sm text-muted-foreground">{t("home.recommendedFlowDesc", "Un flux simple pour comparer le marché, valider le bon prix et publier avec confiance.")}</p>
             </div>
             <div className="flex flex-wrap gap-2.5">
               <Button asChild variant="outline">
                 <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("home.exploreMarket", "Explorer le marché")}</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Estimer le véhicule</Link>
+                <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("estimation.estimateVehicle", "Estimer le véhicule")}</Link>
               </Button>
               <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Publier mon annonce</Link>
+                <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("publish.submit", "Publier mon véhicule")}</Link>
               </Button>
             </div>
           </div>
