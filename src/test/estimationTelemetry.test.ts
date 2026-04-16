@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { buildEstimationAuditSnapshot, buildEstimationEventContext } from "@/lib/estimation/telemetry";
+import {
+  buildEstimationAuditInspection,
+  buildEstimationAuditSnapshot,
+  buildEstimationEventContext,
+  formatEstimationAuditSnapshot,
+} from "@/lib/estimation/telemetry";
 import type { EstimationOutputV2 } from "@/types/estimation";
+import { ESTIMATION_CALIBRATION_QUERY_PACK } from "@/lib/estimation/calibrationQueryPack";
 
 function makeOutputV2(): EstimationOutputV2 {
   return {
@@ -103,6 +109,39 @@ describe("estimation telemetry snapshot", () => {
     expect(context.evidenceTier).toBe("B_MODERATE_MARKET");
     expect(context.eventSource).toBe("result_page");
     expect(context.requestId).toBe("req-1");
+  });
+
+  it("builds readable internal inspection summary", () => {
+    const inspection = buildEstimationAuditInspection(buildEstimationAuditSnapshot(makeOutputV2()));
+    expect(inspection.supportLevel).toBe("moderate");
+    expect(inspection.severity).toBe("low");
+    expect(inspection.headline).toContain("signal marché qualifié");
+    expect(inspection.summaryLines.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it("formats audit snapshot for QA/dev quick reading", () => {
+    const text = formatEstimationAuditSnapshot(buildEstimationAuditSnapshot(makeOutputV2()));
+    expect(text).toContain("[LOW][MODERATE]");
+    expect(text).toContain("Tier B_MODERATE_MARKET");
+    expect(text).toContain("Flags");
+  });
+});
+
+describe("estimation calibration query pack", () => {
+  it("contains core operational calibration queries", () => {
+    const ids = ESTIMATION_CALIBRATION_QUERY_PACK.map((q) => q.id);
+    expect(ids).toContain("tier_distribution_30d");
+    expect(ids).toContain("mode_distribution_30d");
+    expect(ids).toContain("fallback_and_caps_30d");
+    expect(ids).toContain("action_by_tier_30d");
+    expect(ids).toContain("weak_moderate_publish_propensity_30d");
+  });
+
+  it("ensures each query has executable SQL text", () => {
+    for (const query of ESTIMATION_CALIBRATION_QUERY_PACK) {
+      expect(query.sql.toLowerCase()).toContain("select");
+      expect(query.sql.trim().length).toBeGreaterThan(30);
+    }
   });
 });
 

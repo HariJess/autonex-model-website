@@ -31,6 +31,17 @@ export type EstimationAuditSnapshot = {
   heuristicAnchorPresent: boolean;
 };
 
+export type EstimationAuditSupportLevel = "strong" | "moderate" | "limited" | "weak";
+export type EstimationAuditSeverity = "low" | "medium" | "high";
+
+export type EstimationAuditInspection = {
+  supportLevel: EstimationAuditSupportLevel;
+  severity: EstimationAuditSeverity;
+  headline: string;
+  summaryLines: string[];
+  flags: string[];
+};
+
 export function buildEstimationAuditSnapshot(outputV2: EstimationOutputV2): EstimationAuditSnapshot {
   return {
     evidenceTier: outputV2.tierDecision.tier,
@@ -62,6 +73,63 @@ export function buildEstimationAuditSnapshot(outputV2: EstimationOutputV2): Esti
     referenceAnchorPresent: outputV2.anchors.referenceAnchor != null,
     heuristicAnchorPresent: outputV2.anchors.heuristicAnchor != null,
   };
+}
+
+export function deriveSupportLevel(snapshot: EstimationAuditSnapshot): EstimationAuditSupportLevel {
+  if (snapshot.comparableCountStrong >= 6 && snapshot.comparableSimilarityMedian >= 68) return "strong";
+  if (snapshot.comparableCountStrong >= 3 && snapshot.comparableSimilarityMedian >= 55) return "moderate";
+  if (snapshot.comparableCountUsed >= 1) return "limited";
+  return "weak";
+}
+
+export function buildEstimationAuditInspection(snapshot: EstimationAuditSnapshot): EstimationAuditInspection {
+  const supportLevel = deriveSupportLevel(snapshot);
+  const severity: EstimationAuditSeverity =
+    snapshot.claimMode === "INDICATIVE_HEURISTIC_CLAIM_ONLY" || snapshot.fallbackType === "generic_heuristic"
+      ? "high"
+      : snapshot.claimMode === "INDICATIVE_REFERENCE_CLAIM_ONLY" || snapshot.fallbackUsed
+        ? "medium"
+        : "low";
+  const headline =
+    supportLevel === "strong"
+      ? "Estimation majoritairement soutenue par des comparables solides."
+      : supportLevel === "moderate"
+        ? "Estimation soutenue par un signal marché qualifié."
+        : supportLevel === "limited"
+          ? "Estimation avec support marché partiel, lecture prudente recommandée."
+          : "Estimation surtout indicative avec support marché faible.";
+
+  const summaryLines = [
+    `Tier ${snapshot.evidenceTier} (${snapshot.tierReasonCode})`,
+    `Mode ${snapshot.pricingMode} / ${snapshot.claimMode}`,
+    `Confiance ${snapshot.confidenceBand} (${snapshot.confidenceScore}/100${snapshot.confidenceCapped ? ", cap appliqué" : ""})`,
+    `Comparables: ${snapshot.comparableCountUsed} retenus, ${snapshot.comparableCountStrong} solides, similarité médiane ${Math.round(snapshot.comparableSimilarityMedian)}/100`,
+    `Fallback: ${snapshot.fallbackUsed ? snapshot.fallbackType ?? "oui" : "non"} ; blend ${snapshot.anchorBlendMode}`,
+  ];
+
+  const flags: string[] = [];
+  if (snapshot.fallbackUsed) flags.push("fallback_used");
+  if (snapshot.confidenceCapped) flags.push("confidence_capped");
+  if (snapshot.comparableCountUsed === 0) flags.push("no_comparables_used");
+  if (snapshot.claimMode.includes("INDICATIVE")) flags.push("indicative_claim_mode");
+  if (snapshot.referenceProfileUsed) flags.push("reference_profile_used");
+
+  return {
+    supportLevel,
+    severity,
+    headline,
+    summaryLines,
+    flags,
+  };
+}
+
+export function formatEstimationAuditSnapshot(snapshot: EstimationAuditSnapshot): string {
+  const inspection = buildEstimationAuditInspection(snapshot);
+  return [
+    `[${inspection.severity.toUpperCase()}][${inspection.supportLevel.toUpperCase()}] ${inspection.headline}`,
+    ...inspection.summaryLines.map((line) => `- ${line}`),
+    inspection.flags.length ? `- Flags: ${inspection.flags.join(", ")}` : "- Flags: none",
+  ].join("\n");
 }
 
 export function buildEstimationEventContext(
