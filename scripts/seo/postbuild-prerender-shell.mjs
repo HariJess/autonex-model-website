@@ -1,15 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createClient } from "@supabase/supabase-js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DEFAULT_SITE_URL = "https://autonex.mg";
 const SITE_URL = (process.env.SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, "");
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "";
-const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
 function escapeHtml(s) {
   return String(s)
@@ -39,7 +36,7 @@ function ensureTag(html, tagName, attrs, content) {
   return `${html.slice(0, headClose)}\n    ${tag}\n${html.slice(headClose)}`;
 }
 
-function upsertMeta(html, { title, description, canonical, ogImage }) {
+function upsertMeta(html, { title, description, canonical, ogImage, ogType = "article" }) {
   let out = html;
 
   out = out.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
@@ -75,7 +72,7 @@ function upsertMeta(html, { title, description, canonical, ogImage }) {
       out = ensureTag(out, "meta", `property="${property}" content="${escapeHtml(value)}"`, null);
     }
   };
-  upsertOg("og:type", "article");
+  upsertOg("og:type", ogType);
   upsertOg("og:title", title);
   upsertOg("og:description", description);
   upsertOg("og:url", canonical);
@@ -98,6 +95,15 @@ function upsertMeta(html, { title, description, canonical, ogImage }) {
   if (ogImage) upsertTwitter("twitter:image", ogImage);
 
   return out;
+}
+
+function ensureNoscript(html, snippet) {
+  const marker = '<div id="root"></div>';
+  if (html.includes(marker)) {
+    return html.replace(marker, `${marker}\n  ${snippet}\n`);
+  }
+  // Fallback: put before </body>
+  return html.replace(/<\/body>/i, `${snippet}\n</body>`);
 }
 
 async function readJsonSafe(filePath, fallback) {
@@ -129,45 +135,60 @@ function isAgencyRoute(route) {
   return /^\/agence\/[^/]+$/i.test(route);
 }
 
-async function fetchListingMeta(supabase, id) {
-  const { data: listing, error } = await supabase
-    .from("listings")
-    .select("id,title,description,transaction,type,ville,region,price_mga,updated_at,created_at,status")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw error;
-  if (!listing) return null;
+function buildListingJsonLd(data, canonical) {
+  const name = data.title?.replace(/\s*—\s*AutoNex$/i, "") || "Annonce AutoNex";
+  const mileage =
+    typeof data.mileageKm === "number" && data.mileageKm > 0
+      ? {
+          "@type": "QuantitativeValue",
+          value: data.mileageKm,
+          unitText: "km",
+        }
+      : undefined;
 
-  const { data: photos } = await supabase
-    .from("listing_photos")
-    .select("url,position")
-    .eq("listing_id", id)
-    .order("position", { ascending: true })
-    .limit(1);
+  const availability =
+    data.status === "active" || data.status === "published" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
 
-  const title = listing.title ? `${listing.title} — AutoNex` : "Annonce — AutoNex";
-  const location = listing.ville || listing.region || "Madagascar";
-  const price = listing.price_mga ? `${Number(listing.price_mga).toLocaleString("fr-FR")} Ar` : "";
-  const desc = truncate([price, location, listing.description || ""].filter(Boolean).join(" — "), 160);
-  const image = photos?.[0]?.url ? (photos[0].url.startsWith("http") ? photos[0].url : `${SITE_URL}${photos[0].url}`) : undefined;
-
-  return { title, description: desc, image };
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name,
+    description: data.description,
+    url: canonical,
+    image: data.imageUrl ? [data.imageUrl] : undefined,
+    brand: data.make ? { "@type": "Brand", name: data.make } : undefined,
+    model: data.model || undefined,
+    vehicleModelDate: data.year || undefined,
+    mileageFromOdometer: mileage,
+    category: data.listingType || undefined,
+    address:
+      data.ville || data.region
+        ? {
+            "@type": "PostalAddress",
+            addressLocality: data.ville || undefined,
+            addressRegion: data.region || undefined,
+            addressCountry: "MG",
+          }
+        : undefined,
+    offers: {
+      "@type": "Offer",
+      price: typeof data.priceMga === "number" ? data.priceMga : undefined,
+      priceCurrency: data.currency || "MGA",
+      availability,
+      url: canonical,
+    },
+  };
 }
 
-async function fetchAgencyMeta(supabase, slug) {
-  const { data: agency, error } = await supabase
-    .from("agencies")
-    .select("name,bio,slug,updated_at,logo_url,city,area")
-    .eq("slug", slug)
-    .maybeSingle();
-  if (error) throw error;
-  if (!agency) return null;
-
-  const title = agency.name ? `${agency.name} — AutoNex` : "Concessionnaire — AutoNex";
-  const loc = [agency.city, agency.area].filter(Boolean).join(", ");
-  const desc = truncate([loc, agency.bio || ""].filter(Boolean).join(" — "), 160) || "Profil concessionnaire AutoNex.";
-  const image = agency.logo_url ? (agency.logo_url.startsWith("http") ? agency.logo_url : `${SITE_URL}${agency.logo_url}`) : undefined;
-  return { title, description: desc, image };
+function buildAgencyJsonLd(data, canonical) {
+  const org = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: data.name || "AutoNex",
+    url: canonical,
+  };
+  if (data.imageUrl) org.logo = data.imageUrl;
+  return org;
 }
 
 async function main() {
@@ -181,10 +202,13 @@ async function main() {
   const routesFile = path.join(publicDir, "sitemaps", "prerender-routes.json");
   const routes = await readJsonSafe(routesFile, ["/", "/recherche", "/agences", "/estimation", "/conseils"]);
 
-  const hasSupabase = SUPABASE_URL.length > 0 && SUPABASE_KEY.length > 0;
-  const supabase = hasSupabase
-    ? createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
-    : null;
+  const listingDataPath = path.join(publicDir, "sitemaps", "listings-prerender-data.json");
+  const listingCachePath = path.join(publicDir, "sitemaps", "listings-prerender-data-cache.json");
+  const agenciesDataPath = path.join(publicDir, "sitemaps", "agencies-prerender-data.json");
+  const agenciesCachePath = path.join(publicDir, "sitemaps", "agencies-prerender-data-cache.json");
+
+  const listingData = await readJsonSafe(listingDataPath, await readJsonSafe(listingCachePath, {}));
+  const agencyData = await readJsonSafe(agenciesDataPath, await readJsonSafe(agenciesCachePath, {}));
 
   let written = 0;
   for (const rawRoute of routes) {
@@ -194,17 +218,49 @@ async function main() {
     const canonical = `${SITE_URL}${route}`;
     let html = baseHtml;
 
-    if (isListingRoute(route) && supabase) {
+    if (isListingRoute(route)) {
       const id = route.split("/").pop();
-      const meta = await fetchListingMeta(supabase, id);
-      if (meta) {
-        html = upsertMeta(html, { title: meta.title, description: meta.description, canonical, ogImage: meta.image });
+      const data = id ? listingData?.[id] : null;
+      if (data) {
+        html = upsertMeta(html, {
+          title: data.title || "Annonce — AutoNex",
+          description: data.description || data.title || "Annonce automobile sur AutoNex.",
+          canonical,
+          ogImage: data.imageUrl,
+          ogType: "product",
+        });
+
+        const jsonLd = buildListingJsonLd(data, canonical);
+        html = ensureTag(html, "script", `type="application/ld+json"`, JSON.stringify(jsonLd));
+
+        const priceText = typeof data.priceMga === "number" ? `${Number(data.priceMga).toLocaleString("fr-FR")} Ar` : "";
+        const locationText = escapeHtml([data.ville, data.region].filter(Boolean).join(", ") || "Madagascar");
+        const specs = escapeHtml([data.make, data.model].filter(Boolean).join(" ") || "");
+        const yearText = data.year ? ` (${escapeHtml(String(data.year))})` : "";
+        const mileageText = typeof data.mileageKm === "number" && data.mileageKm > 0 ? ` - ${escapeHtml(String(data.mileageKm))} km` : "";
+        const snippet = `<noscript><article><h1>${escapeHtml(data.title || "Annonce — AutoNex")}</h1><p>${escapeHtml(
+          [priceText, locationText].filter(Boolean).join(" — "),
+        )}</p>${specs ? `<p>${specs}${yearText}${mileageText}</p>` : ""}</article></noscript>`;
+
+        html = ensureNoscript(html, snippet);
       }
-    } else if (isAgencyRoute(route) && supabase) {
+    } else if (isAgencyRoute(route)) {
       const slug = route.split("/").pop();
-      const meta = await fetchAgencyMeta(supabase, slug);
-      if (meta) {
-        html = upsertMeta(html, { title: meta.title, description: meta.description, canonical, ogImage: meta.image });
+      const data = slug ? agencyData?.[slug] : null;
+      if (data) {
+        html = upsertMeta(html, {
+          title: data.title || "Concessionnaire — AutoNex",
+          description: data.description || data.title || "Profil concessionnaire à Madagascar sur AutoNex.",
+          canonical,
+          ogImage: data.imageUrl,
+          ogType: "website",
+        });
+
+        const jsonLd = buildAgencyJsonLd(data, canonical);
+        html = ensureTag(html, "script", `type="application/ld+json"`, JSON.stringify(jsonLd));
+
+        const snippet = `<noscript><article><h1>${escapeHtml(data.title || "Concessionnaire — AutoNex")}</h1></article></noscript>`;
+        html = ensureNoscript(html, snippet);
       }
     } else {
       // Static route shell: at least ensure canonical is stable.

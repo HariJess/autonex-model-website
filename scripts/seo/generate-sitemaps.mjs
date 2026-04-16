@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import fssync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
@@ -12,6 +13,12 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
 const MAX_URLS_PER_SITEMAP = 45000;
+const PAGE_SIZE = 1000;
+const PRERENDER_LISTING_LIMIT = Number.parseInt(process.env.PRERENDER_LISTING_LIMIT || "5000", 10);
+const PRERENDER_AGENCY_LIMIT = Number.parseInt(process.env.PRERENDER_AGENCY_LIMIT || "1000", 10);
+
+// Must match `src/data/agencies.ts` seed. Kept local to avoid TS import at build time.
+const PARTNER_DEALER_SLUGS = ["oceantrade"];
 
 function escapeXml(s) {
   return String(s)
@@ -53,10 +60,9 @@ function makeSitemapIndex(sitemaps) {
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...sitemaps.map(({ loc, lastmod }) => {
-      const items = [
-        `<loc>${escapeXml(loc)}</loc>`,
-        lastmod ? `<lastmod>${escapeXml(lastmod)}</lastmod>` : "",
-      ].filter(Boolean);
+      const items = [`<loc>${escapeXml(loc)}</loc>`, lastmod ? `<lastmod>${escapeXml(lastmod)}</lastmod>` : ""].filter(
+        Boolean,
+      );
       return `<sitemap>${items.join("")}</sitemap>`;
     }),
     `</sitemapindex>`,
@@ -64,10 +70,8 @@ function makeSitemapIndex(sitemaps) {
   ].join("\n");
 }
 
-function chunk(arr, size) {
-  const out = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
+function normalizeSiteUrl(url) {
+  return String(url || DEFAULT_SITE_URL).replace(/\/+$/, "");
 }
 
 async function writePublicFile(rel, content) {
@@ -78,60 +82,43 @@ async function writePublicFile(rel, content) {
   return outPath;
 }
 
-async function fetchListingsForSitemap(supabase) {
-  const listings = [];
-  let from = 0;
-  const pageSize = 1000;
-
-  for (;;) {
-    const { data, error } = await supabase
-      .from("listings")
-      .select("id,updated_at,status")
-      .eq("status", "active")
-      .order("updated_at", { ascending: false })
-      .range(from, from + pageSize - 1);
-    if (error) throw error;
-    if (!data || data.length === 0) break;
-    for (const row of data) {
-      if (!row?.id) continue;
-      listings.push({ id: row.id, updated_at: row.updated_at || undefined });
-    }
-    if (data.length < pageSize) break;
-    from += pageSize;
+async function readJsonSafe(filePath, fallback) {
+  try {
+    const raw = await fs.readFile(filePath, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
   }
-
-  return listings;
 }
 
-async function fetchAgenciesForSitemap(supabase) {
-  const agencies = [];
-  let from = 0;
-  const pageSize = 1000;
-
-  for (;;) {
-    const { data, error } = await supabase
-      .from("agencies")
-      .select("slug,updated_at")
-      .not("slug", "is", null)
-      .order("updated_at", { ascending: false })
-      .range(from, from + pageSize - 1);
-    if (error) throw error;
-    if (!data || data.length === 0) break;
-    for (const row of data) {
-      if (!row?.slug) continue;
-      agencies.push({ slug: row.slug, updated_at: row.updated_at || undefined });
-    }
-    if (data.length < pageSize) break;
-    from += pageSize;
+async function listSitemapFiles(relDir, prefix) {
+  const root = path.resolve(__dirname, "..", "..");
+  const absDir = path.resolve(root, "public", relDir);
+  try {
+    const files = await fs.readdir(absDir);
+    return files.filter((f) => f.startsWith(prefix) && f.endsWith(".xml")).map((f) => path.join(relDir, f));
+  } catch {
+    return [];
   }
+}
 
-  return agencies;
+function canonicalAgencyPath(slug) {
+  return PARTNER_DEALER_SLUGS.includes(slug) ? `/concessionnaires/${slug}` : `/agence/${slug}`;
+}
+
+function truncateText(s, max = 160) {
+  const raw = String(s ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  if (!raw) return "";
+  if (raw.length <= max) return raw;
+  return `${raw.slice(0, max - 1).trimEnd()}…`;
 }
 
 async function main() {
+  const root = path.resolve(__dirname, "..", "..");
+  const publicDir = path.resolve(root, "public");
   const nowIso = new Date().toISOString();
-  const sitemaps = [];
 
+  const sitemaps = [];
   const staticUrls = [
     makeUrl(`${SITE_URL}/`, { changefreq: "daily", priority: 1.0 }),
     makeUrl(`${SITE_URL}/recherche`, { changefreq: "hourly", priority: 0.8 }),
@@ -139,18 +126,48 @@ async function main() {
     makeUrl(`${SITE_URL}/estimation`, { changefreq: "weekly", priority: 0.6 }),
     makeUrl(`${SITE_URL}/conseils`, { changefreq: "weekly", priority: 0.5 }),
   ];
+
   await writePublicFile("sitemaps/static.xml", makeUrlset(staticUrls));
   sitemaps.push({ loc: `${SITE_URL}/sitemaps/static.xml`, lastmod: nowIso });
 
   const hasSupabase = SUPABASE_URL.length > 0 && SUPABASE_KEY.length > 0;
+
+  // Always generate a prerender data+routes file if cache exists.
+  const cachedListingDataPath = path.join(publicDir, "sitemaps", "listings-prerender-data-cache.json");
+  const cachedAgencyDataPath = path.join(publicDir, "sitemaps", "agencies-prerender-data-cache.json");
+  const cachedPrerenderRoutesPath = path.join(publicDir, "sitemaps", "prerender-routes.json");
+  const cachedListingData = await readJsonSafe(cachedListingDataPath, null);
+  const cachedAgencyData = await readJsonSafe(cachedAgencyDataPath, null);
+  const cachedPrerenderRoutes = await readJsonSafe(cachedPrerenderRoutesPath, null);
+
   if (!hasSupabase) {
+    // Production-safety: do not drop inventory sitemaps if they already exist.
+    const listingSitemapFiles = await listSitemapFiles("sitemaps", "listings-");
+    const agencySitemapFiles = await listSitemapFiles("sitemaps", "agencies-");
+
+    // Keep existing listing/agencies sitemaps in index when present.
+    for (const rel of [...listingSitemapFiles, ...agencySitemapFiles]) {
+      const abs = path.resolve(root, "public", rel);
+      const st = fssync.existsSync(abs) ? fssync.statSync(abs) : null;
+      const lastmod = st?.mtime ? st.mtime.toISOString() : nowIso;
+      sitemaps.push({ loc: `${SITE_URL}/${rel.replace(/\\/g, "/")}`, lastmod });
+    }
+
     await writePublicFile("sitemap.xml", makeSitemapIndex(sitemaps));
-    await writePublicFile(
-      "sitemaps/prerender-routes.json",
-      JSON.stringify(["/", "/recherche", "/agences", "/estimation", "/conseils"], null, 2),
-    );
+
+    const staticRoutes = ["/", "/recherche", "/agences", "/estimation", "/conseils"];
+    const listingRoutes = cachedListingData && typeof cachedListingData === "object"
+      ? Object.keys(cachedListingData).map((id) => `/annonce/${id}`)
+      : [];
+    const agencyRoutes = cachedAgencyData && typeof cachedAgencyData === "object"
+      ? Object.keys(cachedAgencyData).map((slug) => canonicalAgencyPath(slug))
+      : [];
+
+    const prerenderRoutes = Array.from(new Set([...staticRoutes, ...listingRoutes, ...agencyRoutes]));
+    await writePublicFile("sitemaps/prerender-routes.json", JSON.stringify(prerenderRoutes, null, 2));
+
     console.warn(
-      "[generate-sitemaps] Missing env (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY). Generated static sitemap only.",
+      `[generate-sitemaps] Missing env (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY). Kept existing inventory sitemaps if any, and used cached prerender data if available. indexSitemaps=${sitemaps.length}`,
     );
     return;
   }
@@ -159,55 +176,234 @@ async function main() {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const [listings, agencies] = await Promise.all([
-    fetchListingsForSitemap(supabase),
-    fetchAgenciesForSitemap(supabase),
-  ]);
+  const listingSitemapRefs = [];
+  const agencySitemapRefs = [];
 
-  const listingUrls = listings.map((l) =>
-    makeUrl(`${SITE_URL}/annonce/${l.id}`, {
-      lastmod: isoDate(l.updated_at),
-      changefreq: "daily",
-      priority: 0.9,
-    }),
-  );
+  // Inventory prerender data (meta/structured data) for HTML injection.
+  let listingsPrerender = cachedListingData && typeof cachedListingData === "object" ? cachedListingData : {};
+  let agenciesPrerender = cachedAgencyData && typeof cachedAgencyData === "object" ? cachedAgencyData : {};
 
-  const listingChunks = chunk(listingUrls, MAX_URLS_PER_SITEMAP);
-  for (let i = 0; i < listingChunks.length; i += 1) {
-    const rel = `sitemaps/listings-${i + 1}.xml`;
-    await writePublicFile(rel, makeUrlset(listingChunks[i]));
-    sitemaps.push({ loc: `${SITE_URL}/${rel}`, lastmod: nowIso });
+  const listingPrerenderIds = Object.keys(listingsPrerender).slice(0, PRERENDER_LISTING_LIMIT);
+  const agencyPrerenderSlugs = Object.keys(agenciesPrerender).slice(0, PRERENDER_AGENCY_LIMIT);
+
+  // Prune cached maps so route coverage stays aligned with postbuild data volume.
+  listingsPrerender = Object.fromEntries(listingPrerenderIds.map((id) => [id, listingsPrerender[id]]));
+  agenciesPrerender = Object.fromEntries(agencyPrerenderSlugs.map((slug) => [slug, agenciesPrerender[slug]]));
+
+  // --- Listings sitemaps (stream/chunk) ---
+  let listingChunk = [];
+  let listingChunkIndex = 1;
+  let listingCount = 0;
+
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("listings")
+      .select(
+        [
+          "id",
+          "updated_at",
+          "created_at",
+          "status",
+          "title",
+          "description",
+          "transaction",
+          "type",
+          "ville",
+          "region",
+          "price_mga",
+          "mileage_km",
+          "year",
+          "make",
+          "model",
+          "fuel",
+          "body_style",
+          "vehicle_condition",
+        ].join(","),
+      )
+      .eq("status", "active")
+      .order("updated_at", { ascending: false })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+
+    for (const row of data) {
+      if (!row?.id) continue;
+      listingCount += 1;
+
+      const loc = `${SITE_URL}/annonce/${row.id}`;
+      listingChunk.push(
+        makeUrl(loc, {
+          lastmod: isoDate(row.updated_at),
+          changefreq: "daily",
+          priority: 0.9,
+        }),
+      );
+
+      if (
+        Object.keys(listingsPrerender).length < PRERENDER_LISTING_LIMIT &&
+        !listingsPrerender[row.id]
+      ) {
+        listingsPrerender[row.id] = {
+          id: row.id,
+          canonical: loc,
+          title: row.title ? `${row.title} — AutoNex` : "Annonce — AutoNex",
+          description: truncateText(
+            [row.price_mga ? `${Number(row.price_mga).toLocaleString("fr-FR")} Ar` : "", row.ville || "Madagascar", row.description || ""].filter(Boolean).join(" — "),
+            160,
+          ),
+          imageUrl: undefined, // filled later
+          ville: row.ville,
+          region: row.region,
+          priceMga: row.price_mga,
+          currency: "MGA",
+          createdAt: row.created_at,
+          transaction: row.transaction,
+          listingType: row.type,
+          year: row.year,
+          make: row.make,
+          model: row.model,
+          mileageKm: row.mileage_km,
+          fuel: row.fuel,
+          bodyStyle: row.body_style,
+          vehicleCondition: row.vehicle_condition,
+          status: row.status,
+        };
+        listingPrerenderIds.push(row.id);
+      }
+
+      if (listingChunk.length >= MAX_URLS_PER_SITEMAP) {
+        const rel = `sitemaps/listings-${listingChunkIndex}.xml`;
+        await writePublicFile(rel, makeUrlset(listingChunk));
+        listingSitemapRefs.push({ loc: `${SITE_URL}/${rel}`, lastmod: nowIso });
+        listingChunk = [];
+        listingChunkIndex += 1;
+      }
+    }
   }
 
-  const agencyUrls = agencies.map((a) =>
-    makeUrl(`${SITE_URL}/agence/${encodeURIComponent(a.slug)}`, {
-      lastmod: isoDate(a.updated_at),
-      changefreq: "weekly",
-      priority: 0.6,
-    }),
-  );
-  const agencyChunks = chunk(agencyUrls, MAX_URLS_PER_SITEMAP);
-  for (let i = 0; i < agencyChunks.length; i += 1) {
-    const rel = `sitemaps/agencies-${i + 1}.xml`;
-    await writePublicFile(rel, makeUrlset(agencyChunks[i]));
-    sitemaps.push({ loc: `${SITE_URL}/${rel}`, lastmod: nowIso });
+  if (listingChunk.length > 0) {
+    const rel = `sitemaps/listings-${listingChunkIndex}.xml`;
+    await writePublicFile(rel, makeUrlset(listingChunk));
+    listingSitemapRefs.push({ loc: `${SITE_URL}/${rel}`, lastmod: nowIso });
   }
 
+  // --- Fill listing images for prerender set only ---
+  if (listingPrerenderIds.length > 0) {
+    const ids = listingPrerenderIds;
+    const firstPhotoById = new Map();
+    for (let i = 0; i < ids.length; i += 800) {
+      const slice = ids.slice(i, i + 800);
+      const { data, error } = await supabase
+        .from("listing_photos")
+        .select("listing_id,url,position")
+        .in("listing_id", slice)
+        .order("position", { ascending: true });
+      if (error) throw error;
+      for (const p of data || []) {
+        const cur = firstPhotoById.get(p.listing_id);
+        if (!cur || (p.position != null && p.position < cur.position)) {
+          firstPhotoById.set(p.listing_id, p);
+        }
+      }
+    }
+
+    for (const id of listingPrerenderIds) {
+      const p = firstPhotoById.get(id);
+      if (!p?.url) continue;
+      const url = p.url.startsWith("http") ? p.url : `${SITE_URL}${p.url}`;
+      if (listingsPrerender[id]) listingsPrerender[id].imageUrl = url;
+    }
+  }
+
+  // Persist prerender data for postbuild consumption
+  await writePublicFile("sitemaps/listings-prerender-data.json", JSON.stringify(listingsPrerender, null, 2));
+  await writePublicFile("sitemaps/listings-prerender-data-cache.json", JSON.stringify(listingsPrerender, null, 2));
+
+  // Include listing sitemap refs in index
+  for (const r of listingSitemapRefs) sitemaps.push(r);
+
+  // --- Agencies sitemaps (stream/chunk) ---
+  let agencyChunk = [];
+  let agencyChunkIndex = 1;
+  let agencyCount = 0;
+
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("agencies")
+      .select(["slug", "updated_at", "name", "bio", "logo_url", "city", "area"].join(","))
+      .not("slug", "is", null)
+      .order("updated_at", { ascending: false })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+
+    for (const row of data) {
+      if (!row?.slug) continue;
+      agencyCount += 1;
+
+      const slug = String(row.slug);
+      const canonicalPath = canonicalAgencyPath(slug);
+      const loc = `${SITE_URL}${canonicalPath}`;
+      agencyChunk.push(
+        makeUrl(loc, {
+          lastmod: isoDate(row.updated_at),
+          changefreq: "weekly",
+          priority: 0.6,
+        }),
+      );
+
+      if (Object.keys(agenciesPrerender).length < PRERENDER_AGENCY_LIMIT && !agenciesPrerender[slug]) {
+        agenciesPrerender[slug] = {
+          slug,
+          canonical: loc,
+          title: row.name ? `${row.name} — AutoNex` : "Concessionnaire — AutoNex",
+          description: truncateText([row.city, row.area].filter(Boolean).join(", ") + " — " + (row.bio || ""), 160) || "Profil concessionnaire AutoNex.",
+          imageUrl: row.logo_url
+            ? row.logo_url.startsWith("http")
+              ? row.logo_url
+              : `${SITE_URL}${row.logo_url}`
+            : undefined,
+          city: row.city,
+          area: row.area,
+          name: row.name,
+          bio: row.bio,
+        };
+        agencyPrerenderSlugs.push(slug);
+      }
+
+      if (agencyChunk.length >= MAX_URLS_PER_SITEMAP) {
+        const rel = `sitemaps/agencies-${agencyChunkIndex}.xml`;
+        await writePublicFile(rel, makeUrlset(agencyChunk));
+        agencySitemapRefs.push({ loc: `${SITE_URL}/${rel}`, lastmod: nowIso });
+        agencyChunk = [];
+        agencyChunkIndex += 1;
+      }
+    }
+  }
+
+  if (agencyChunk.length > 0) {
+    const rel = `sitemaps/agencies-${agencyChunkIndex}.xml`;
+    await writePublicFile(rel, makeUrlset(agencyChunk));
+    agencySitemapRefs.push({ loc: `${SITE_URL}/${rel}`, lastmod: nowIso });
+  }
+
+  await writePublicFile("sitemaps/agencies-prerender-data.json", JSON.stringify(agenciesPrerender, null, 2));
+  await writePublicFile("sitemaps/agencies-prerender-data-cache.json", JSON.stringify(agenciesPrerender, null, 2));
+
+  for (const r of agencySitemapRefs) sitemaps.push(r);
+
+  // Write sitemap index
   await writePublicFile("sitemap.xml", makeSitemapIndex(sitemaps));
 
-  const prerenderRoutes = [
-    "/",
-    "/recherche",
-    "/agences",
-    "/estimation",
-    "/conseils",
-    ...listings.slice(0, 150).map((l) => `/annonce/${l.id}`),
-    ...agencies.slice(0, 50).map((a) => `/agence/${a.slug}`),
-  ];
+  const staticRoutes = ["/", "/recherche", "/agences", "/estimation", "/conseils"];
+  const listingRoutes = listingPrerenderIds.map((id) => `/annonce/${id}`);
+  const agencyRoutes = agencyPrerenderSlugs.map((slug) => canonicalAgencyPath(slug));
+
+  const prerenderRoutes = Array.from(new Set([...staticRoutes, ...listingRoutes, ...agencyRoutes]));
   await writePublicFile("sitemaps/prerender-routes.json", JSON.stringify(prerenderRoutes, null, 2));
 
   console.log(
-    `[generate-sitemaps] Wrote sitemap index with ${sitemaps.length} sitemaps. listings=${listings.length} agencies=${agencies.length}`,
+    `[generate-sitemaps] Wrote sitemap index. static=1 inventory sitemaps=${listingSitemapRefs.length + agencySitemapRefs.length} listings=${listingCount} agencies=${agencyCount} prerenderListings=${listingPrerenderIds.length} prerenderAgencies=${agencyPrerenderSlugs.length}`,
   );
 }
 
