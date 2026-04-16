@@ -15,6 +15,7 @@ import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
 import {
   AUTO_DISCOVERY_CATEGORIES,
+  AUTO_HOMEPAGE_BRANDS,
 } from "@/data/automotiveCatalog";
 import { SEO_P1_CATEGORIES, SEO_P1_CITIES, SEO_P1_TRANSACTIONS } from "@/lib/seoP1Registry";
 
@@ -75,6 +76,33 @@ const Index = () => {
     ],
     [],
   );
+  const popularBrands = useMemo(() => {
+    const curatedBrandIds = [
+      "toyota",
+      "nissan",
+      "hyundai",
+      "mazda",
+      "suzuki",
+      "ford",
+      "mitsubishi",
+      "isuzu",
+    ];
+    const brandLogoById: Record<string, string> = {
+      toyota: "/brands/toyota.svg",
+      nissan: "/brands/nissan.svg",
+      hyundai: "/brands/hyundai.svg",
+      mazda: "/brands/mazda.svg",
+      suzuki: "/brands/suzuki.svg",
+      ford: "/brands/ford.svg",
+      mitsubishi: "/brands/mitsubishi.svg",
+      isuzu: "/brands/isuzu.svg",
+    };
+    const curatedSet = new Set(curatedBrandIds);
+    return AUTO_HOMEPAGE_BRANDS.filter((brand) => curatedSet.has(brand.id)).map((brand) => ({
+      ...brand,
+      logoAsset: brandLogoById[brand.id] ?? brand.logoAsset,
+    }));
+  }, []);
   const fourByFourAndPickup = useMemo(
     () =>
       thematicListings
@@ -351,6 +379,46 @@ const Index = () => {
       </section>
 
       <section className="container mx-auto px-4 pt-6 md:pt-8">
+        <div className="rounded-2xl border border-border/70 bg-background/95 px-3 py-4 md:px-6 md:py-5">
+          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Navigation par marque</p>
+          <div className="mt-1 flex items-end justify-between gap-3">
+            <h2 className="font-serif text-lg md:text-2xl font-semibold">Marques populaires</h2>
+            <Link
+              to="/recherche"
+              className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+            >
+              Voir tout
+            </Link>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-3">
+            {popularBrands.map((brand) => (
+              <Link
+                key={brand.id}
+                to={brand.href}
+                className="group rounded-xl border border-border/60 bg-card/30 px-2.5 py-3 md:py-3.5 min-h-[94px] flex items-center justify-center text-center motion-safe:transition-colors hover:border-primary/40 hover:bg-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                aria-label={`Voir les annonces ${brand.label}`}
+                title={brand.label}
+              >
+                {brand.logoAsset ? (
+                  <img
+                    src={brand.logoAsset}
+                    alt={`Logo ${brand.label}`}
+                    loading="lazy"
+                    className="h-8 md:h-9 w-auto object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
+                  />
+                ) : (
+                  <span className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full border border-border/60 bg-background text-[11px] md:text-xs font-semibold tracking-wide text-foreground/85">
+                    {brand.label.slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 pt-6 md:pt-8">
         <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-6">
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Pourquoi AutoNex</p>
           <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -418,12 +486,6 @@ const Index = () => {
                     {entry.city}
                   </Link>
                 ))}
-                <Link
-                  to="/estimation"
-                  className="rounded-full border border-primary/40 px-3 py-1.5 text-sm font-sans text-primary hover:bg-primary/10 transition-colors"
-                >
-                  Estimation
-                </Link>
               </div>
             </div>
           </div>
