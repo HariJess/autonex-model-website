@@ -37,6 +37,9 @@ AutoNex is an automotive marketplace for Madagascar: vehicle listings (achat, lo
 |-------------------|----------------------------|
 | `npm run dev`     | Start Vite dev server      |
 | `npm run build`   | Production build           |
+| `npm run seo:preflight` | SEO preflight contract (warn-mode) |
+| `npm run seo:preflight:staging` | Strict preflight for staging |
+| `npm run seo:preflight:production` | Strict preflight for production |
 | `npm run seo:verify` | Verify SEO artifacts (warn-mode) |
 | `npm run seo:verify:strict` | Verify SEO artifacts (strict, fails if inventory SEO expected but missing) |
 | `npm run seo:verify:staging` | Strict verify with staging thresholds |
@@ -61,12 +64,19 @@ For release safety, use:
 npm run build:release
 ```
 
-In strict mode, the build is expected to run with:
+`build:release` now runs:
+
+1) `seo:preflight:production` (before expensive build work)  
+2) `build`  
+3) `seo:verify:production`
+
+In production preflight/verify mode, the pipeline expects:
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 
-If these are missing (or inventory artifacts/pages are not produced), `seo:verify:strict` fails the release.
+If these are missing, preflight fails before build starts.
+If generated coverage/artifacts are insufficient, verify fails after build.
 
 ### Inventory minimum coverage thresholds
 
@@ -87,6 +97,16 @@ Safe overrides (CI/env):
 - `SEO_MIN_LISTING_HTML_PAGES`
 - `SEO_MIN_HTML_VS_SITEMAP_RATIO`
 - `SEO_ENFORCE_INVENTORY_COVERAGE` (`1`/`true` to force inventory requirements)
+- `SEO_ENFORCE_INVENTORY_PREFLIGHT` (`1`/`true` to force preflight inventory env checks)
+
+### Audit artifacts
+
+Each run writes machine-readable JSON reports:
+
+- `artifacts/seo-preflight-report.json`
+- `artifacts/seo-verify-report.json`
+
+These reports include mode, strict flag, env presence, thresholds, result (`pass`/`warn`/`fail`), and reason codes/messages.
 
 ## Launch locally
 

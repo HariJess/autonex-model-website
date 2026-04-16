@@ -87,6 +87,13 @@ function fail(msg) {
   console.error(`❌ ${msg}`);
 }
 
+async function writeAuditReport(report) {
+  const outPath = path.resolve(root, "artifacts", "seo-verify-report.json");
+  await fs.mkdir(path.dirname(outPath), { recursive: true });
+  await fs.writeFile(outPath, JSON.stringify(report, null, 2), "utf8");
+  return outPath;
+}
+
 async function exists(filePath) {
   try {
     await fs.access(filePath);
@@ -169,11 +176,29 @@ async function main() {
     `[seo:verify] thresholds: minListingSitemapUrls=${thresholds.minListingSitemapUrls}, minListingHtmlPages=${thresholds.minListingHtmlPages}, minHtmlVsSitemapRatio=${thresholds.minHtmlVsSitemapRatio}, enforceInventoryCoverage=${thresholds.enforceInventoryCoverage}`,
   );
 
+  const issues = [];
+  const addIssue = (level, code, message, details) => {
+    issues.push({ level, code, message, details: details ?? null });
+  };
+
   // --- sitemap.xml ---
   const sitemapIndexPath = path.resolve(publicDir, "sitemap.xml");
   if (!(await exists(sitemapIndexPath))) {
     fail("public/sitemap.xml is missing");
+    addIssue("fail", "SITEMAP_INDEX_MISSING", "public/sitemap.xml is missing");
     process.exitCode = 1;
+    const reportPath = await writeAuditReport({
+      generatedAt: new Date().toISOString(),
+      script: "scripts/seo/verify-seo.mjs",
+      mode,
+      strict,
+      siteUrl: SITE_URL,
+      thresholds,
+      result: "fail",
+      issues,
+      metrics: {},
+    });
+    console.log(`[seo:verify] report=${path.relative(root, reportPath)}`);
     return;
   }
   ok("public/sitemap.xml exists");
@@ -182,7 +207,20 @@ async function main() {
   const sitemapLocs = parseSitemapIndex(sitemapIndexXml);
   if (sitemapLocs.length === 0) {
     fail("sitemap.xml is not a sitemapindex or contains 0 <sitemap> entries");
+    addIssue("fail", "SITEMAP_INDEX_EMPTY", "sitemap.xml is not a sitemapindex or contains 0 <sitemap> entries");
     process.exitCode = 1;
+    const reportPath = await writeAuditReport({
+      generatedAt: new Date().toISOString(),
+      script: "scripts/seo/verify-seo.mjs",
+      mode,
+      strict,
+      siteUrl: SITE_URL,
+      thresholds,
+      result: "fail",
+      issues,
+      metrics: {},
+    });
+    console.log(`[seo:verify] report=${path.relative(root, reportPath)}`);
     return;
   }
   ok(`sitemap index contains ${sitemapLocs.length} sub-sitemaps`);
@@ -194,19 +232,42 @@ async function main() {
 
   if (strict && thresholds.enforceInventoryCoverage && !hasEnv) {
     fail(`Missing required env for inventory SEO generation: ${requiredEnv.join(", ")}`);
+    addIssue("fail", "REQUIRED_ENV_MISSING", `Missing required inventory SEO env vars: ${requiredEnv.join(", ")}`, {
+      requiredEnv,
+    });
     process.exitCode = 1;
+    const reportPath = await writeAuditReport({
+      generatedAt: new Date().toISOString(),
+      script: "scripts/seo/verify-seo.mjs",
+      mode,
+      strict,
+      siteUrl: SITE_URL,
+      thresholds,
+      result: "fail",
+      issues,
+      metrics: {
+        sitemapSubSitemaps: sitemapLocs.length,
+      },
+    });
+    console.log(`[seo:verify] report=${path.relative(root, reportPath)}`);
     return;
   }
 
   if (inventoryExpected) {
     if (listingSitemaps.length === 0) {
       (strict ? fail : warn)("No listings-*.xml sitemap present in sitemap index (inventory expected)");
+      addIssue(
+        strict ? "fail" : "warn",
+        "LISTING_SITEMAP_MISSING",
+        "No listings-*.xml sitemap present in sitemap index (inventory expected)",
+      );
       if (strict) process.exitCode = 1;
     } else {
       ok(`Found ${listingSitemaps.length} listing sitemap(s) in index`);
     }
   } else {
     warn("Inventory not expected in this mode: coverage thresholds are informational only.");
+    addIssue("warn", "INVENTORY_NOT_EXPECTED", "Inventory not expected in this mode: coverage thresholds are informational only.");
   }
 
   // Count listing sitemap URLs across all listing sitemaps.
@@ -216,6 +277,7 @@ async function main() {
       const localPath = toLocalPublicPathFromLoc(loc);
       if (!localPath || !(await exists(localPath))) {
         (strict ? fail : warn)(`Listing sitemap file not found locally for ${loc}`);
+        addIssue(strict ? "fail" : "warn", "LISTING_SITEMAP_FILE_MISSING", `Listing sitemap file not found locally for ${loc}`);
         if (strict) process.exitCode = 1;
         continue;
       }
@@ -236,6 +298,7 @@ async function main() {
     const present = await exists(p);
     if (inventoryExpected && !present) {
       (strict ? fail : warn)(`Missing inventory artifact: public/${rel}`);
+      addIssue(strict ? "fail" : "warn", "INVENTORY_ARTIFACT_MISSING", `Missing inventory artifact: public/${rel}`);
       if (strict) process.exitCode = 1;
     } else if (present) {
       ok(`public/${rel} exists`);
@@ -250,6 +313,11 @@ async function main() {
   if (inventoryExpected) {
     if (pages.length === 0) {
       (strict ? fail : warn)("No dist/annonce/<id>/index.html pages found (inventory expected)");
+      addIssue(
+        strict ? "fail" : "warn",
+        "LISTING_HTML_MISSING",
+        "No dist/annonce/<id>/index.html pages found (inventory expected)",
+      );
       if (strict) process.exitCode = 1;
     } else {
       ok(`Found ${pages.length} listing HTML page(s) in dist`);
@@ -264,18 +332,30 @@ async function main() {
       (strict ? fail : warn)(
         `Listing HTML sample failed checks (missing: ${result.missing.join(", ")}): ${path.relative(root, sample.filePath)}`,
       );
+      addIssue(
+        strict ? "fail" : "warn",
+        "LISTING_HTML_SAMPLE_FAILED",
+        `Listing HTML sample failed checks: ${result.missing.join(", ")}`,
+        { file: path.relative(root, sample.filePath), missing: result.missing },
+      );
       if (strict) process.exitCode = 1;
     } else {
       ok(`Listing HTML sample passed checks: ${path.relative(root, sample.filePath)}`);
     }
   } else {
     warn("No listing HTML pages to sample (dist/annonce/*)");
+    addIssue("warn", "LISTING_HTML_SAMPLE_SKIPPED", "No listing HTML pages to sample (dist/annonce/*)");
   }
 
   // --- threshold enforcement ---
   if (inventoryExpected) {
     if (totalListingUrls < thresholds.minListingSitemapUrls) {
       (strict ? fail : warn)(
+        `Listing sitemap coverage too small: actual=${totalListingUrls}, expected>=${thresholds.minListingSitemapUrls}`,
+      );
+      addIssue(
+        strict ? "fail" : "warn",
+        "THRESHOLD_LISTING_SITEMAP_URLS",
         `Listing sitemap coverage too small: actual=${totalListingUrls}, expected>=${thresholds.minListingSitemapUrls}`,
       );
       if (strict) process.exitCode = 1;
@@ -285,6 +365,11 @@ async function main() {
 
     if (pages.length < thresholds.minListingHtmlPages) {
       (strict ? fail : warn)(
+        `Listing HTML coverage too small: actual=${pages.length}, expected>=${thresholds.minListingHtmlPages}`,
+      );
+      addIssue(
+        strict ? "fail" : "warn",
+        "THRESHOLD_LISTING_HTML_PAGES",
         `Listing HTML coverage too small: actual=${pages.length}, expected>=${thresholds.minListingHtmlPages}`,
       );
       if (strict) process.exitCode = 1;
@@ -298,6 +383,11 @@ async function main() {
         (strict ? fail : warn)(
           `Listing HTML/sitemap ratio too low: actual=${ratio.toFixed(3)}, expected>=${thresholds.minHtmlVsSitemapRatio}`,
         );
+        addIssue(
+          strict ? "fail" : "warn",
+          "THRESHOLD_HTML_SITEMAP_RATIO",
+          `Listing HTML/sitemap ratio too low: actual=${ratio.toFixed(3)}, expected>=${thresholds.minHtmlVsSitemapRatio}`,
+        );
         if (strict) process.exitCode = 1;
       } else {
         ok(
@@ -306,13 +396,42 @@ async function main() {
       }
     } else {
       warn("Cannot compute HTML/sitemap ratio because listing sitemap URL count is 0.");
+      addIssue("warn", "RATIO_SKIPPED_NO_SITEMAP_URLS", "Cannot compute HTML/sitemap ratio because listing sitemap URL count is 0.");
     }
   }
 
   // --- agencies (optional) ---
   if (inventoryExpected && agencySitemaps.length === 0) {
     warn("No agencies-*.xml sitemap present in sitemap index (inventory expected). Optional unless agencies SEO is required.");
+    addIssue(
+      "warn",
+      "AGENCY_SITEMAP_MISSING",
+      "No agencies-*.xml sitemap present in sitemap index (inventory expected). Optional unless agencies SEO is required.",
+    );
   }
+
+  const resultStatus = process.exitCode && process.exitCode !== 0 ? "fail" : issues.some((x) => x.level === "warn") ? "warn" : "pass";
+  const reportPath = await writeAuditReport({
+    generatedAt: new Date().toISOString(),
+    script: "scripts/seo/verify-seo.mjs",
+    mode,
+    strict,
+    siteUrl: SITE_URL,
+    thresholds,
+    result: resultStatus,
+    requiredEnv,
+    envPresence: requiredEnv.map((key) => ({ key, present: String(process.env[key] || "").trim().length > 0 })),
+    metrics: {
+      sitemapSubSitemaps: sitemapLocs.length,
+      listingSitemaps: listingSitemaps.length,
+      agencySitemaps: agencySitemaps.length,
+      totalListingUrls,
+      listingHtmlPages: pages.length,
+      htmlVsSitemapRatio: totalListingUrls > 0 ? Number((pages.length / totalListingUrls).toFixed(6)) : null,
+    },
+    issues,
+  });
+  console.log(`[seo:verify] report=${path.relative(root, reportPath)}`);
 
   if (process.exitCode && process.exitCode !== 0) {
     fail("SEO verification failed.");
