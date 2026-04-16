@@ -689,28 +689,30 @@ const VehicleEstimationPage = () => {
 
         {screen === "result" && result && presentation && (
           <>
-            <EstimationResultReport
-              result={result}
-              presentation={presentation}
-              onPublish={() => void publishFromEstimation()}
-              onRefine={() => {
-                void trackEstimationEvent(result.requestId, "clicked_refine_estimation");
-                setScreen("vehicle");
-              }}
-              onCompare={() => navigate("/recherche")}
-              onRestart={() => {
-                setResult(null);
-                setScreen("vehicle");
-              }}
-              onViewComparable={(listingId) =>
-                void trackEstimationEvent(result.requestId, "viewed_similar_listings", { listingId })
-              }
-            />
-            <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans text-muted-foreground">
+            <section aria-label="Résultat d'estimation véhicule" className="space-y-3">
+              <EstimationResultReport
+                result={result}
+                presentation={presentation}
+                onPublish={() => void publishFromEstimation()}
+                onRefine={() => {
+                  void trackEstimationEvent(result.requestId, "clicked_refine_estimation");
+                  setScreen("vehicle");
+                }}
+                onCompare={() => navigate("/recherche")}
+                onRestart={() => {
+                  setResult(null);
+                  setScreen("vehicle");
+                }}
+                onViewComparable={(listingId) =>
+                  void trackEstimationEvent(result.requestId, "viewed_similar_listings", { listingId })
+                }
+              />
+            </section>
+            <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans text-muted-foreground" role="note" aria-label="Cadre d'usage de l'estimation">
               Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle,
               ni une expertise mécanique, ni un prix garanti.
             </div>
-            <p className="text-xs text-muted-foreground font-sans">
+            <p className="text-xs text-muted-foreground font-sans" aria-label="Conseil d'utilisation du rapport d'estimation">
               Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.
             </p>
           </>

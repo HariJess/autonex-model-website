@@ -41,7 +41,7 @@ export default function EstimationResultReport({
   const showIndicative = presentation.indicativeRequired || presentation.confidenceBand === "low" || comparables.length === 0;
 
   return (
-    <section className="space-y-6 md:space-y-7">
+    <section className="space-y-6 md:space-y-7" aria-label="Rapport d'estimation AutoNex">
       <Card className="relative overflow-hidden rounded-3xl border-0 shadow-2xl bg-gradient-to-br from-[#071226] via-[#0D1E3E] to-[#1A3560] text-background">
         <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
@@ -121,7 +121,11 @@ export default function EstimationResultReport({
       </Card>
 
       {showIndicative && (
-        <div className="rounded-2xl border border-amber-400/40 bg-amber-100/50 px-4 py-4 text-sm font-sans text-amber-900">
+        <div
+          className="rounded-2xl border border-amber-400/40 bg-amber-100/50 px-4 py-4 text-sm font-sans text-amber-900"
+          role="note"
+          aria-label="Avertissement de lecture indicative"
+        >
           <div className="flex items-start gap-2">
             <AlertCircle className="h-4 w-4 mt-0.5" />
             <div>
@@ -134,7 +138,11 @@ export default function EstimationResultReport({
         </div>
       )}
 
-      <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
+      <div
+        className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground"
+        role="region"
+        aria-label="Résumé de la qualité d'évidence"
+      >
         <p className="font-medium text-foreground">Qualité d'évidence</p>
         <p className="mt-1 text-xs">{presentation.evidenceSummaryLine}</p>
         <p className="mt-1">
@@ -215,7 +223,7 @@ export default function EstimationResultReport({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
+      <Card className="rounded-2xl bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md" role="region" aria-label="Support de comparables marché">
         <CardHeader>
           <CardTitle className="font-serif text-xl flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
@@ -257,6 +265,7 @@ export default function EstimationResultReport({
                   to={`/annonce/${item.listingId}`}
                   onClick={() => onViewComparable(item.listingId)}
                   className="group rounded-xl border border-border/80 bg-background/70 p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                  aria-label={`Voir l'annonce comparable ${item.title}`}
                 >
                   <div className="aspect-[4/3] rounded-md overflow-hidden bg-muted mb-2">
                     {item.imageUrl ? (
@@ -293,7 +302,14 @@ export default function EstimationResultReport({
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button variant="outline" onClick={onRefine} className="rounded-xl font-sans w-full sm:w-auto">Affiner l'estimation</Button>
-            <Button variant="ghost" onClick={onCompare} className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center">Comparer avec des annonces similaires</Button>
+                    <Button
+                      variant="ghost"
+                      onClick={onCompare}
+                      aria-label="Voir plus d'annonces similaires sur AutoNex"
+                      className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center"
+                    >
+                      Comparer avec des annonces similaires
+                    </Button>
             <Button variant="ghost" onClick={onRestart} className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center">Refaire une estimation</Button>
           </div>
           <p className="mt-4 font-sans text-xs text-muted-foreground">
