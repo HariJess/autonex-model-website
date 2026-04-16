@@ -49,7 +49,7 @@ const Footer = () => {
             rel="noopener noreferrer"
             className="text-[#FAFAFA]/80 hover:text-[#FAFAFA] hover:underline underline-offset-2 transition-colors"
           >
-            APLI
+            APli
           </a>
         </div>
       </div>
