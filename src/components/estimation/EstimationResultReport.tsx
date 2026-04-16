@@ -46,7 +46,7 @@ export default function EstimationResultReport({
   const estimatedGroups = formatAriaryGroups(values.estimatedValue);
 
   return (
-    <section className="space-y-6 md:space-y-7" aria-label="Rapport d'estimation AutoNex">
+    <section className="space-y-5 md:space-y-7" aria-label="Rapport d'estimation AutoNex">
       <Card className="relative overflow-hidden rounded-3xl border-0 shadow-2xl bg-gradient-to-br from-[#071226] via-[#0D1E3E] to-[#1A3560] text-background">
         <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
@@ -117,13 +117,13 @@ export default function EstimationResultReport({
       </Card>
 
       <section className="space-y-3">
-        <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] via-primary/[0.04] to-transparent px-4 py-3">
+        <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] via-primary/[0.04] to-transparent px-4 py-3.5 md:px-5">
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-primary/80">Lecture du rapport</p>
           <p className="mt-1 font-serif text-xl text-foreground md:text-2xl">{presentation.evidenceHeadline}</p>
           <p className="mt-1 font-sans text-sm text-muted-foreground">{presentation.evidenceSummaryLine}</p>
         </div>
 
-        <div className="rounded-2xl border border-border/60 bg-card/90 p-3 shadow-sm md:p-4">
+        <div className="rounded-2xl border border-border/60 bg-card/90 p-3.5 shadow-sm md:p-4">
           <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/55">
             <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
@@ -167,7 +167,7 @@ export default function EstimationResultReport({
       )}
 
       <div
-        className="rounded-xl border border-border/55 bg-secondary/10 px-4 py-3 text-sm font-sans text-muted-foreground"
+        className="rounded-xl border border-border/55 bg-secondary/10 px-4 py-3.5 text-sm font-sans text-muted-foreground"
         role="region"
         aria-label="Résumé de la qualité d'évidence"
       >
@@ -178,7 +178,7 @@ export default function EstimationResultReport({
         </p>
       </div>
 
-      <section className="space-y-3">
+      <section className="space-y-3.5">
         <div className="flex items-center justify-between">
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Analyse des facteurs</p>
           <p className="font-sans text-xs text-muted-foreground">Ce qui influence la valeur</p>
@@ -257,7 +257,7 @@ export default function EstimationResultReport({
         </CardContent>
       </Card>
 
-      <section className="space-y-3" role="region" aria-label="Support de comparables marché">
+      <section className="space-y-3.5" role="region" aria-label="Support de comparables marché">
         <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-5">
           <div className="grid gap-3 md:grid-cols-[1.35fr_0.65fr] md:items-center">
             <div>
@@ -269,7 +269,7 @@ export default function EstimationResultReport({
             </div>
             <div className="rounded-xl border border-border/60 bg-background/80 px-3 py-3">
               <div className="flex items-center justify-between gap-2">
-                <Badge variant="outline" className="font-sans normal-case">
+                <Badge variant="outline" className="h-6 px-2.5 font-sans normal-case">
                   Support {presentation.marketSupportLabel}
                 </Badge>
                 <span className="font-sans text-xs text-muted-foreground">AutoNex</span>
@@ -310,7 +310,7 @@ export default function EstimationResultReport({
                     key={item.listingId}
                     to={`/annonce/${item.listingId}`}
                     onClick={() => onViewComparable(item.listingId)}
-                    className="group rounded-xl border border-border/70 bg-background/80 p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md"
+                    className="group rounded-xl border border-border/70 bg-background/80 p-3.5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
                     aria-label={`Voir l'annonce comparable ${item.title}`}
                   >
                     <div className="aspect-[16/10] rounded-lg overflow-hidden bg-muted mb-2.5">
@@ -347,45 +347,45 @@ export default function EstimationResultReport({
       </section>
 
       <Card className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/[0.11] via-primary/[0.05] to-background shadow-md">
-        <CardContent className="p-6 md:p-8">
-          <div className="grid gap-5 md:grid-cols-[1.35fr_0.65fr] md:items-start">
+        <CardContent className="p-5 md:p-8">
+          <div className="grid gap-4 md:gap-5 md:grid-cols-[1.35fr_0.65fr] md:items-start">
             <div>
               <p className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 <Target className="h-3.5 w-3.5" />
                 Prochaine meilleure action
               </p>
-              <p className="mt-2 font-serif text-2xl md:text-3xl">{presentation.actionHeadline}</p>
+              <p className="mt-2 font-serif text-2xl leading-tight md:text-3xl">{presentation.actionHeadline}</p>
               <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-muted-foreground">{presentation.actionDescription}</p>
             </div>
-            <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-3">
+            <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-3 md:px-3.5">
               <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Lecture finale</p>
               <p className="mt-1 font-sans text-sm text-foreground">{presentation.marketSupportHeadline}</p>
-              <p className="mt-1 font-sans text-xs text-muted-foreground">{presentation.ctaFootnote}</p>
+              <p className="mt-1 font-sans text-xs text-muted-foreground">{presentation.marketSupportSummary}</p>
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-4">
-            <Button onClick={onPublish} size="lg" className="rounded-xl px-8 font-sans shadow-lg w-full">
+          <div className="mt-5 grid grid-cols-1 gap-2.5 md:mt-6 md:grid-cols-2 xl:grid-cols-4">
+            <Button onClick={onPublish} size="lg" className="rounded-xl px-8 font-sans shadow-lg w-full transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
               Publier cette voiture
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button variant="outline" onClick={onRefine} className="rounded-xl font-sans w-full">
+            <Button variant="outline" onClick={onRefine} className="rounded-xl font-sans w-full transition-all duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2">
               Affiner l'estimation
             </Button>
             <Button
               variant="ghost"
               onClick={onCompare}
               aria-label="Voir plus d'annonces similaires sur AutoNex"
-              className="rounded-xl font-sans w-full justify-start md:justify-center"
+              className="rounded-xl font-sans w-full justify-start md:justify-center transition-all duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2"
             >
               Comparer les annonces
             </Button>
-            <Button variant="ghost" onClick={onRestart} className="rounded-xl font-sans w-full justify-start md:justify-center">
+            <Button variant="ghost" onClick={onRestart} className="rounded-xl font-sans w-full justify-start md:justify-center transition-all duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2">
               Refaire une estimation
             </Button>
           </div>
 
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-border/55 bg-background/65 px-3 py-2.5">
+          <div className="mt-3.5 flex items-start gap-2 rounded-lg border border-border/55 bg-background/65 px-3 py-2.5">
             <Shield className="mt-0.5 h-4 w-4 text-primary/80" />
             <p className="font-sans text-xs leading-relaxed text-muted-foreground">{presentation.ctaFootnote}</p>
           </div>

@@ -270,7 +270,7 @@ const VehicleEstimationPage = () => {
         <link rel="canonical" href={canonical} />
       </Helmet>
       <Header />
-      <main className="container mx-auto max-w-6xl px-4 py-8 md:py-14">
+      <main className="container mx-auto max-w-6xl px-4 py-7 md:py-14">
         <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-64 max-w-5xl bg-gradient-to-r from-primary/15 via-transparent to-primary/15 blur-3xl" />
         {screen === "landing" && (
           <section className="space-y-8 md:space-y-10">
@@ -381,8 +381,8 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen !== "landing" && (
-          <div className="mb-6 rounded-3xl border border-border/55 bg-gradient-to-br from-background/95 via-background to-secondary/20 px-4 py-4 shadow-sm md:mb-8 md:px-6 md:py-5">
-            <div className="mb-4 flex items-center justify-between">
+          <div className="mb-5 rounded-3xl border border-border/55 bg-gradient-to-br from-background/95 via-background to-secondary/20 px-4 py-4 shadow-sm md:mb-8 md:px-6 md:py-5">
+            <div className="mb-3.5 flex items-center justify-between md:mb-4">
               <p className="font-sans text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Progression estimation</p>
               <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1">
                 <p className="font-sans text-[11px] font-medium text-primary">Étape {currentStepIndex} / 3</p>
@@ -404,7 +404,7 @@ const VehicleEstimationPage = () => {
                   return (
                     <div
                       key={step.id}
-                      className={`relative rounded-2xl border px-3 pb-3 pt-2.5 transition-all duration-200 md:px-4 ${
+                      className={`relative rounded-2xl border px-2.5 pb-2.5 pt-2.5 transition-all duration-200 md:px-4 md:pb-3 ${
                         isActive
                           ? "border-primary/45 bg-primary/[0.08] shadow-[0_8px_24px_rgba(25,78,134,0.16)]"
                           : isDone
@@ -412,9 +412,9 @@ const VehicleEstimationPage = () => {
                             : "border-border/60 bg-background/70"
                       }`}
                     >
-                      <div className="mb-2 flex items-center gap-2">
+                      <div className="mb-1.5 flex items-center gap-1.5 md:mb-2 md:gap-2">
                         <div
-                          className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${
+                          className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold md:h-8 md:w-8 md:text-xs ${
                             isActive
                               ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
                               : isDone
@@ -436,7 +436,7 @@ const VehicleEstimationPage = () => {
                           {step.label}
                         </p>
                       </div>
-                      <p className={`font-sans text-xs ${isUpcoming ? "text-muted-foreground/80" : "text-muted-foreground"}`}>
+                      <p className={`font-sans text-[11px] leading-snug md:text-xs ${isUpcoming ? "text-muted-foreground/80" : "text-muted-foreground"}`}>
                         {step.helper}
                       </p>
                     </div>
@@ -594,11 +594,11 @@ const VehicleEstimationPage = () => {
                 </aside>
               </div>
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto`}>Retour</Button>
+                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Retour</Button>
                 <Button
                   disabled={!canSubmit}
                   onClick={() => setScreen("condition")}
-                  className={`${ESTIMATION_UI.primaryCta} w-full min-w-[150px] sm:w-auto`}
+                  className={`${ESTIMATION_UI.primaryCta} w-full min-w-[150px] sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2`}
                 >
                   Continuer
                   <ChevronRight className="ml-1 h-4 w-4" />
@@ -693,8 +693,8 @@ const VehicleEstimationPage = () => {
               </div>
 
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-4 sm:flex-row sm:justify-between">
-                <Button variant="outline" onClick={() => setScreen("vehicle")} className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto`}>Retour</Button>
-                <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className={`${ESTIMATION_UI.primaryCta} w-full sm:w-auto`}>
+                <Button variant="outline" onClick={() => setScreen("vehicle")} className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Retour</Button>
+                <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className={`${ESTIMATION_UI.primaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2`}>
                   {runMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -741,11 +741,11 @@ const VehicleEstimationPage = () => {
                 }
               />
             </section>
-            <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans text-muted-foreground" role="note" aria-label="Cadre d'usage de l'estimation">
+            <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans leading-relaxed text-muted-foreground" role="note" aria-label="Cadre d'usage de l'estimation">
               Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle,
               ni une expertise mécanique, ni un prix garanti.
             </div>
-            <p className="text-xs text-muted-foreground font-sans" aria-label="Conseil d'utilisation du rapport d'estimation">
+            <p className="px-0.5 text-xs leading-relaxed text-muted-foreground font-sans" aria-label="Conseil d'utilisation du rapport d'estimation">
               Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.
             </p>
           </>
