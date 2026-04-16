@@ -124,23 +124,23 @@ const PublishPage = () => {
   const stepGuides = [
     {
       title: t("publish.stepMain", "Informations principales"),
-      subtitle: "Cadrez la base de votre annonce.",
-      helper: "Transaction, type de véhicule et localisation précise.",
+      subtitle: "Cadrez la base de votre annonce avec clarté.",
+      helper: "Définissez transaction, type de véhicule et localisation pour une lecture immédiate.",
     },
     {
       title: t("publish.stepDetails", "Détails du véhicule"),
-      subtitle: "Rendez votre offre crédible et attractive.",
-      helper: "Titre clair, prix cohérent, identité véhicule complète.",
+      subtitle: "Renforcez la crédibilité de votre offre.",
+      helper: "Titre précis, prix cohérent et identité véhicule complète pour inspirer confiance.",
     },
     {
       title: t("publish.stepMedia", "Médias"),
       subtitle: "Valorisez visuellement votre annonce.",
-      helper: "Photos nettes et couverture forte pour améliorer les clics.",
+      helper: "Privilégiez des photos nettes et une couverture forte pour améliorer l’intention de contact.",
     },
     {
       title: t("publish.stepVisibility", "Visibilité & envoi"),
-      subtitle: "Finalisez votre publication sereinement.",
-      helper: "Choisissez vos options, vérifiez le récapitulatif, puis envoyez.",
+      subtitle: "Finalisez avec confiance.",
+      helper: "Vérifiez le récapitulatif, ajustez vos options puis envoyez votre annonce à la modération.",
     },
   ] as const;
 
@@ -1961,9 +1961,9 @@ const PublishPage = () => {
                 <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
                   <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
                     <Sparkles className="h-4 w-4 text-primary" />
-                    Progression guidée
+                    Parcours guidé
                   </p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">Complétez chaque étape puis continuez pour éviter les retours arrière.</p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">Validez chaque étape pour avancer sereinement et limiter les retours arrière.</p>
                 </div>
               </div>
             </div>

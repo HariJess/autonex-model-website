@@ -17,9 +17,9 @@ export function SearchErrorState({ title, message, onRetry }: SearchErrorStatePr
       icon={<AlertCircle className="h-6 w-6 text-muted-foreground" />}
       action={
         onRetry ? (
-          <Button variant="outline" className="rounded-xl border-border/70 font-sans" onClick={onRetry}>
+          <Button variant="outline" className="rounded-xl border-border/70 font-sans focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2" onClick={onRetry}>
             <RefreshCw className="h-4 w-4 mr-2" />
-            Réessayer
+            Relancer la recherche
           </Button>
         ) : undefined
       }

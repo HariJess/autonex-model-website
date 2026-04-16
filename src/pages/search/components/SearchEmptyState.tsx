@@ -17,7 +17,7 @@ export function SearchEmptyState({ title, description, resetLabel, onReset }: Se
       description={description}
       icon={<CarFront className="h-8 w-8 text-muted-foreground" />}
       action={
-        <Button variant="outline" className="rounded-xl font-sans border-border/70" onClick={onReset}>
+        <Button variant="outline" className="rounded-xl font-sans border-border/70 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2" onClick={onReset}>
           {resetLabel}
         </Button>
       }

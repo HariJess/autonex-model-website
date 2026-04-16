@@ -498,7 +498,7 @@ const VehicleEstimationPage = () => {
                     {!catalogLoading && catalogPayload?.source === "ui-curated" && (
                       <div className="md:col-span-2 rounded-xl border border-border/70 bg-secondary/20 p-3">
                         <p className="font-sans text-xs text-muted-foreground">
-                          Catalogue visible chargé (source UI curatée).
+                          Référentiel estimation chargé (source UI curatée).
                         </p>
                       </div>
                     )}
@@ -598,8 +598,8 @@ const VehicleEstimationPage = () => {
                   </p>
                   <div className="mt-4 space-y-2.5">
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">Étape rapide</p>
-                      <p className="font-sans text-xs text-muted-foreground">Moins de 2 minutes pour compléter les éléments essentiels.</p>
+                      <p className="font-sans text-xs font-medium">Parcours rapide</p>
+                      <p className="font-sans text-xs text-muted-foreground">Environ 2 minutes pour renseigner les éléments essentiels.</p>
                     </div>
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
                       <p className="font-sans text-xs font-medium">Résultat actionnable</p>
@@ -613,7 +613,7 @@ const VehicleEstimationPage = () => {
                 </aside>
               </div>
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Retour</Button>
+                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Étape précédente</Button>
                 <Button
                   disabled={!canSubmit}
                   onClick={() => setScreen("condition")}
@@ -712,12 +712,12 @@ const VehicleEstimationPage = () => {
               </div>
 
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-4 sm:flex-row sm:justify-between">
-                <Button variant="outline" onClick={() => setScreen("vehicle")} className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Retour</Button>
+                <Button variant="outline" onClick={() => setScreen("vehicle")} className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Étape précédente</Button>
                 <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className={`${ESTIMATION_UI.primaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2`}>
                   {runMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Calcul en cours...
+                      Estimation en cours...
                     </>
                   ) : (
                     "Voir mon estimation"

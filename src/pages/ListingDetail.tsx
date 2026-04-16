@@ -622,7 +622,7 @@ const ListingDetail = () => {
                 <Button
                   type="button"
                   onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className="gradient-primary border-0 font-sans min-h-11 px-5"
+                  className="gradient-primary border-0 font-sans min-h-11 px-5 focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
                   style={{ color: "#FAFAFA" }}
                 >
                   {t("listing.contactSeller", "Contacter le vendeur")}
@@ -945,16 +945,16 @@ const ListingDetail = () => {
               </p>
 
               <form onSubmit={handleContact} className="space-y-3">
-                <h4 className="font-serif font-semibold">{t("listing.contact")}</h4>
+                <h4 className="font-serif font-semibold">{t("listing.contact", "Écrire au vendeur")}</h4>
                 <p className="text-xs font-sans text-muted-foreground">
-                  {t("listing.contactHint", "Présentez votre besoin clairement pour recevoir une réponse plus rapide.")}
+                  {t("listing.contactHint", "Présentez votre besoin clairement pour obtenir une réponse plus rapide et utile.")}
                 </p>
                 <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans min-h-11" maxLength={100} />
                 <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans min-h-11" maxLength={255} />
                 <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans min-h-11" maxLength={30} />
                 <Textarea placeholder={t("listing.yourMessage", "Votre message...")} value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans min-h-24" rows={3} maxLength={1000} />
-                <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-                  {sending ? t("common.loading") : t("common.send")}
+                <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2" style={{ color: "#FAFAFA" }}>
+                  {sending ? t("common.loading") : t("listing.sendMessage", "Envoyer le message")}
                 </Button>
                 <p className="text-xs font-sans text-muted-foreground">
                   {t(
@@ -998,11 +998,11 @@ const ListingDetail = () => {
             <Button
               type="button"
               variant="outline"
-              className="flex-1 font-sans min-h-12 touch-manipulation gap-2"
+              className="flex-1 font-sans min-h-12 touch-manipulation gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2"
               onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
             >
               <MessageSquare className="h-4 w-4 shrink-0" />
-              {t("listing.contact")}
+              {t("listing.contact", "Écrire")}
             </Button>
             <Button
               type="button"

@@ -291,10 +291,10 @@ const Index = () => {
             </div>
             <div className="flex flex-wrap gap-2.5">
               <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/estimation">Lancer une estimation</Link>
+                <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Lancer l’estimation</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/recherche">Comparer les annonces</Link>
+                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Comparer les annonces</Link>
               </Button>
             </div>
           </div>
@@ -305,7 +305,7 @@ const Index = () => {
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="flex items-start justify-between gap-3 mb-5 md:mb-8">
           <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">{t("sections.latest", "Nouvelles annonces auto")}</h2>
-          <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline shrink-0 min-h-10">
+          <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline shrink-0 min-h-10 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
             {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
@@ -328,10 +328,10 @@ const Index = () => {
             action={
               <div className="flex flex-wrap justify-center gap-2.5">
                 <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                  <Link to="/publier">Publier un véhicule</Link>
+                  <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Publier mon véhicule</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/recherche">Explorer la recherche</Link>
+                  <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Explorer le marché</Link>
                 </Button>
               </div>
             }
@@ -358,10 +358,10 @@ const Index = () => {
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
               <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/publier">Publier maintenant</Link>
+                <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Publier mon véhicule</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/recherche">Voir les annonces</Link>
+                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Voir les annonces</Link>
               </Button>
             </div>
           </div>
@@ -376,7 +376,7 @@ const Index = () => {
               <Link
                 key={category.id}
                 to={category.href}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-2 min-h-10 hover:border-primary/35 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-2 min-h-10 hover:border-primary/35 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2"
               >
                 {categoryIcon(category.iconKey)}
                 <span className="text-xs font-semibold text-foreground">{category.label}</span>
@@ -397,13 +397,13 @@ const Index = () => {
             </div>
             <div className="flex flex-wrap gap-2.5">
               <Button asChild variant="outline">
-                <Link to="/recherche">Explorer</Link>
+                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Explorer le marché</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/estimation">Estimer</Link>
+                <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Estimer le véhicule</Link>
               </Button>
               <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/publier">Publier</Link>
+                <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Publier mon annonce</Link>
               </Button>
             </div>
           </div>
