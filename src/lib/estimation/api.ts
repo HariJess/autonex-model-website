@@ -1,4 +1,4 @@
-import { computeVehicleEstimation } from "@/lib/estimation/engine";
+import { computeVehicleEstimationV2, toLegacyEstimationFromV2 } from "@/lib/estimation/engine";
 import {
   insertEstimationEvent,
   insertEstimationRequest,
@@ -32,12 +32,15 @@ export async function runVehicleEstimation(
 ): Promise<EstimationRunResult> {
   const requestId = await insertEstimationRequest(input, userId);
   await safeInsertEstimationEvent(requestId, "estimation_started");
-  const output = await computeVehicleEstimation(input);
+  const outputV2 = await computeVehicleEstimationV2(input);
+  const output = toLegacyEstimationFromV2(outputV2);
   const resultId = await insertEstimationResult(requestId, output);
   await safeInsertEstimationEvent(requestId, "estimation_completed", {
     confidenceLabel: output.confidenceLabel,
     confidenceScore: output.confidenceScore,
     comparables: output.comparables.length,
+    evidenceTier: outputV2.tierDecision.tier,
+    pricingMode: outputV2.modeGovernance.pricingMode,
   });
-  return { requestId, resultId, output };
+  return { requestId, resultId, output, outputV2 };
 }
