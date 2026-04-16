@@ -4,8 +4,6 @@ import type {
   ClaimMode,
   ConfidenceBand,
   ConfidenceDriver,
-  ConfidenceLabel,
-  ConfidencePayload,
   EvidenceMetrics,
   EvidenceTier,
   EvidenceTierDecision,
@@ -17,7 +15,6 @@ import type {
   ModeGovernance,
   PrecisionMode,
   RangeWidthMode,
-  UiGovernance,
   FuelType,
   TransmissionType,
 } from "@/types/estimation";
@@ -367,33 +364,7 @@ async function fetchComparables(input: EstimationInput): Promise<ComparableFetch
   };
 }
 
-function buildConfidence(
-  input: EstimationInput,
-  comparables: EstimationComparable[],
-  usedReferenceProfile: boolean,
-): { score: number; label: ConfidenceLabel } {
-  let score = 78;
-  if (usedReferenceProfile) score += 10;
-  else score -= 10;
-  if (comparables.length >= 10) score += 12;
-  else if (comparables.length >= 5) score += 6;
-  else if (comparables.length === 0) score -= 14;
-  if (!input.city.trim()) score -= 6;
-  if (input.maintenanceLevel === "unknown") score -= 6;
-  if (input.makeName.trim().length < 2 || input.modelName.trim().length < 2) score -= 12;
-
-  const prices = comparables.map((c) => c.price);
-  if (prices.length > 2) {
-    const med = median(prices);
-    const avgAbsPct = prices.reduce((acc, p) => acc + Math.abs(p - med) / med, 0) / prices.length;
-    if (avgAbsPct > 0.19) score -= 10;
-  }
-
-  const finalScore = clamp(Math.round(score), 18, 97);
-  if (finalScore >= 80) return { score: finalScore, label: "high" };
-  if (finalScore >= 55) return { score: finalScore, label: "medium" };
-  return { score: finalScore, label: "low" };
-}
+type FallbackSeverity = "none" | "light" | "medium" | "high";
 
 function buildAdjustmentFactors(input: EstimationInput): {
   multiplier: number;
@@ -491,10 +462,24 @@ type TierPolicy = {
   confidenceCeiling: number;
 };
 
+type AnchorBlendPolicy = {
+  comparableWeight: number;
+  referenceWeight: number;
+  heuristicWeight: number;
+  blendMode: EstimationOutputV2["anchors"]["anchorBlendMode"];
+};
+
 function confidenceBandFromScore(score: number): ConfidenceBand {
   if (score >= 80) return "high";
   if (score >= 55) return "medium";
   return "low";
+}
+
+function calculateFallbackSeverity(evidence: EvidenceMetrics): FallbackSeverity {
+  if (!evidence.fallbackUsed) return "none";
+  if (evidence.comparableCountUsed >= 6 && evidence.comparableSimilarityMedian >= 58) return "light";
+  if (evidence.comparableCountUsed >= 3 && evidence.comparableSimilarityMedian >= 45) return "medium";
+  return "high";
 }
 
 function determineTier(
@@ -579,6 +564,160 @@ function tierPolicyFor(tier: EvidenceTier): TierPolicy {
   };
 }
 
+function resolveTierPolicy(tier: EvidenceTier, fallbackSeverity: FallbackSeverity): TierPolicy {
+  const base = tierPolicyFor(tier);
+  if (fallbackSeverity === "none") return base;
+  if (fallbackSeverity === "light") {
+    return {
+      ...base,
+      confidenceCeiling: Math.max(40, base.confidenceCeiling - 4),
+      rangeWidthMode: base.rangeWidthMode === "tight" ? "standard" : base.rangeWidthMode,
+      precisionMode: base.precisionMode === "tight" ? "medium" : base.precisionMode,
+    };
+  }
+  if (fallbackSeverity === "medium") {
+    return {
+      ...base,
+      pricingMode: base.pricingMode === "market_backed" ? "partially_market_backed" : base.pricingMode,
+      claimMode:
+        base.claimMode === "ALLOW_STRONG_MARKET_CLAIM"
+          ? "ALLOW_LIMITED_MARKET_CLAIM"
+          : base.claimMode,
+      confidenceCeiling: Math.max(35, base.confidenceCeiling - 10),
+      rangeWidthMode:
+        base.rangeWidthMode === "tight"
+          ? "standard"
+          : base.rangeWidthMode === "standard"
+            ? "wide"
+            : base.rangeWidthMode,
+      precisionMode:
+        base.precisionMode === "tight"
+          ? "medium"
+          : base.precisionMode === "medium"
+            ? "coarse"
+            : base.precisionMode,
+    };
+  }
+  return {
+    pricingMode: tier === "D_HEURISTIC_ONLY" ? "heuristic_only" : "reference_assisted",
+    claimMode:
+      tier === "D_HEURISTIC_ONLY"
+        ? "INDICATIVE_HEURISTIC_CLAIM_ONLY"
+        : "INDICATIVE_REFERENCE_CLAIM_ONLY",
+    precisionMode: "very_coarse",
+    rangeWidthMode: "very_wide",
+    confidenceCeiling: Math.min(base.confidenceCeiling, 50),
+  };
+}
+
+function getRangeSpreadFromPolicy(
+  rangeWidthMode: RangeWidthMode,
+  fallbackSeverity: FallbackSeverity,
+): number {
+  const base = {
+    tight: 0.055,
+    standard: 0.085,
+    wide: 0.12,
+    very_wide: 0.16,
+  }[rangeWidthMode];
+  const fallbackExtra = {
+    none: 0,
+    light: 0.0075,
+    medium: 0.015,
+    high: 0.03,
+  }[fallbackSeverity];
+  return clamp(base + fallbackExtra, 0.05, 0.2);
+}
+
+function computeAnchorBlendPolicy(
+  tier: EvidenceTier,
+  available: { hasComparable: boolean; hasReference: boolean },
+): AnchorBlendPolicy {
+  if (tier === "A_STRONG_MARKET") {
+    if (available.hasComparable && available.hasReference) {
+      return { comparableWeight: 0.88, referenceWeight: 0.12, heuristicWeight: 0, blendMode: "comparables_primary" };
+    }
+    if (available.hasComparable) {
+      return { comparableWeight: 1, referenceWeight: 0, heuristicWeight: 0, blendMode: "comparables_primary" };
+    }
+  }
+  if (tier === "B_MODERATE_MARKET") {
+    if (available.hasComparable && available.hasReference) {
+      return { comparableWeight: 0.68, referenceWeight: 0.32, heuristicWeight: 0, blendMode: "comparables_plus_reference" };
+    }
+    if (available.hasComparable) {
+      return { comparableWeight: 0.82, referenceWeight: 0, heuristicWeight: 0.18, blendMode: "comparables_plus_reference" };
+    }
+  }
+  if (tier === "C_REFERENCE_ASSISTED") {
+    if (available.hasReference && available.hasComparable) {
+      return { comparableWeight: 0.25, referenceWeight: 0.75, heuristicWeight: 0, blendMode: "reference_primary" };
+    }
+    if (available.hasReference) {
+      return { comparableWeight: 0, referenceWeight: 0.85, heuristicWeight: 0.15, blendMode: "reference_primary" };
+    }
+  }
+  if (available.hasReference) {
+    return { comparableWeight: 0, referenceWeight: 0.55, heuristicWeight: 0.45, blendMode: "heuristic_primary" };
+  }
+  return { comparableWeight: 0, referenceWeight: 0, heuristicWeight: 1, blendMode: "heuristic_primary" };
+}
+
+function blendAnchors(
+  policy: AnchorBlendPolicy,
+  anchors: { comparable: number | null; reference: number | null; heuristic: number | null },
+): number {
+  const entries = [
+    { value: anchors.comparable, weight: policy.comparableWeight },
+    { value: anchors.reference, weight: policy.referenceWeight },
+    { value: anchors.heuristic, weight: policy.heuristicWeight },
+  ].filter((entry): entry is { value: number; weight: number } => entry.value != null && entry.weight > 0);
+  if (entries.length === 0) return Math.max(3_500_000, anchors.heuristic ?? anchors.reference ?? anchors.comparable ?? 0);
+  const sumWeight = entries.reduce((sum, e) => sum + e.weight, 0);
+  const weighted = entries.reduce((sum, e) => sum + e.value * e.weight, 0) / Math.max(0.0001, sumWeight);
+  return Math.max(3_500_000, Math.round(weighted));
+}
+
+function computeConfidenceFromEvidence(
+  evidence: EvidenceMetrics,
+  canonicalCertainty: number,
+): { beforeCeiling: number; drivers: ConfidenceDriver[] } {
+  const countScore = clamp((evidence.comparableCountUsed / 12) * 100, 0, 100);
+  const strongScore = evidence.comparableCountUsed
+    ? clamp((evidence.comparableCountStrong / evidence.comparableCountUsed) * 100, 0, 100)
+    : 0;
+  const locationScore = {
+    same_city: 100,
+    same_region: 75,
+    mixed: 60,
+    weak: 35,
+  }[evidence.comparableLocationStrength];
+  const fallbackPenalty = evidence.fallbackUsed ? -18 : 0;
+  const referenceSignal = evidence.referenceProfileUsed ? Math.max(20, evidence.referenceProfileStrength ?? 45) : 20;
+  const raw =
+    10 +
+    countScore * 0.2 +
+    strongScore * 0.17 +
+    evidence.comparableSimilarityMedian * 0.2 +
+    evidence.comparableRecencyScore * 0.08 +
+    evidence.comparableDispersionScore * 0.14 +
+    locationScore * 0.07 +
+    canonicalCertainty * 0.08 +
+    referenceSignal * 0.06 +
+    fallbackPenalty;
+  const beforeCeiling = clamp(Math.round(raw), 18, 96);
+  const drivers: ConfidenceDriver[] = [
+    { key: "comparable_count", impact: countScore >= 55 ? "positive" : "negative", weight: 0.2 },
+    { key: "similarity", impact: evidence.comparableSimilarityMedian >= 55 ? "positive" : "negative", weight: 0.2 },
+    { key: "recency", impact: evidence.comparableRecencyScore >= 50 ? "positive" : "negative", weight: 0.08 },
+    { key: "dispersion", impact: evidence.comparableDispersionScore >= 50 ? "positive" : "negative", weight: 0.14 },
+    { key: "canonical_certainty", impact: canonicalCertainty >= 70 ? "positive" : "negative", weight: 0.08 },
+    { key: "reference_strength", impact: evidence.referenceProfileUsed ? "positive" : "negative", weight: 0.06 },
+    { key: "fallback_penalty", impact: evidence.fallbackUsed ? "negative" : "positive", weight: 0.24 },
+  ];
+  return { beforeCeiling, drivers };
+}
+
 function roundingStepFor(precisionMode: PrecisionMode): number {
   if (precisionMode === "tight") return 100_000;
   if (precisionMode === "medium") return 250_000;
@@ -627,10 +766,16 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
   const normalized = normalizeInput(input);
   const profile = await findReferenceProfile(normalized);
   const fallback = computeFallbackBaseline(normalized);
+  const currentYear = new Date().getFullYear();
   const yearsDeltaFromBaseline = Math.max(0, (profile?.baseline_year ?? normalized.year) - normalized.year);
   const depreciationRate = profile?.annual_depreciation_rate ?? fallback.annualDepreciationRate;
   const profileBase = profile?.baseline_price_mga ?? fallback.basePrice;
   const projectedBase = Math.max(3_500_000, Math.round(profileBase * Math.pow(1 - depreciationRate, yearsDeltaFromBaseline)));
+  const heuristicYearsDelta = Math.max(0, currentYear - normalized.year);
+  const heuristicProjected = Math.max(
+    3_500_000,
+    Math.round(fallback.basePrice * Math.pow(1 - fallback.annualDepreciationRate, heuristicYearsDelta)),
+  );
 
   let comparableFetch: ComparableFetchResult = {
     comparables: [],
@@ -683,17 +828,6 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
         )
       : null;
 
-  // Fallback-first: base estimate always exists. Comparables only enrich.
-  const marketBasePrice =
-    comparableMedian == null
-      ? projectedBase
-      : Math.round(projectedBase * 0.7 + comparableMedian * 0.3);
-
-  const adjustments = buildAdjustmentFactors(normalized);
-  const adjustedPrice = Math.round(marketBasePrice * adjustments.multiplier);
-
-  const legacyConfidence = buildConfidence(normalized, comparables, Boolean(profile));
-
   const avgSimilarity = comparables.length
     ? comparables.reduce((sum, c) => sum + c.score, 0) / comparables.length
     : 0;
@@ -734,12 +868,13 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
     comparableRecencyScore: recencyScore,
     comparableDispersionScore: dispersionScore,
     comparableLocationStrength: locationStrength,
-    canonicalModelCertainty: profile ? 90 : normalized.makeName && normalized.modelName ? 65 : 30,
+    canonicalModelCertainty: profile ? 90 : normalized.makeName && normalized.modelName ? 62 : 30,
     referenceProfileUsed: Boolean(profile),
-    referenceProfileStrength: profile ? 80 : null,
-    fallbackUsed: comparableMedian == null || !profile,
-    fallbackType: profile ? "profile_seeded" : "generic_heuristic",
+    referenceProfileStrength: profile ? clamp(Math.round(55 + (profile.popularity_score ?? 0) * 0.45), 55, 92) : null,
+    fallbackUsed: comparableMedian == null || comparables.length < 5,
+    fallbackType: comparableMedian == null || comparables.length < 5 ? (profile ? "profile_seeded" : "generic_heuristic") : null,
   };
+  const fallbackSeverity = calculateFallbackSeverity(evidence);
   const tierDecision = determineTier(
     {
       usedCount: comparables.length,
@@ -749,57 +884,50 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
     },
     Boolean(profile),
   );
-  const policy = tierPolicyFor(tierDecision.tier);
-  const cappedConfidence = Math.min(legacyConfidence.score, policy.confidenceCeiling);
+  const policy = resolveTierPolicy(tierDecision.tier, fallbackSeverity);
+  const anchorPolicy = computeAnchorBlendPolicy(tierDecision.tier, {
+    hasComparable: comparableMedian != null && comparables.length >= 3,
+    hasReference: Boolean(profile),
+  });
+  const comparableAnchorValue = comparableMedian != null && comparables.length >= 3 ? comparableMedian : null;
+  const referenceAnchorValue = profile ? projectedBase : null;
+  const heuristicAnchorValue =
+    fallbackSeverity === "none" && tierDecision.tier !== "D_HEURISTIC_ONLY" ? null : heuristicProjected;
+  const marketBasePrice = blendAnchors(anchorPolicy, {
+    comparable: comparableAnchorValue,
+    reference: referenceAnchorValue,
+    heuristic: heuristicAnchorValue ?? heuristicProjected,
+  });
+
+  const adjustments = buildAdjustmentFactors(normalized);
+  const adjustedPrice = Math.round(marketBasePrice * adjustments.multiplier);
+
+  const { beforeCeiling, drivers } = computeConfidenceFromEvidence(evidence, evidence.canonicalModelCertainty);
+  const cappedConfidence = Math.min(beforeCeiling, policy.confidenceCeiling);
   const confidenceBand = confidenceBandFromScore(cappedConfidence);
 
-  const confidenceDrivers: ConfidenceDriver[] = [
-    {
-      key: "comparable_count",
-      impact: comparables.length >= 6 ? "positive" : "negative",
-      weight: 0.3,
-    },
-    {
-      key: "similarity",
-      impact: medianSimilarity >= 55 ? "positive" : "negative",
-      weight: 0.2,
-    },
-    {
-      key: "dispersion",
-      impact: dispersionScore >= 45 ? "positive" : "negative",
-      weight: 0.15,
-    },
-    {
-      key: "reference_strength",
-      impact: profile ? "positive" : "negative",
-      weight: 0.15,
-    },
-    {
-      key: "fallback_penalty",
-      impact: comparableMedian == null ? "negative" : "positive",
-      weight: 0.2,
-    },
-  ];
-
   const roundingStep = roundingStepFor(policy.precisionMode);
-  let rangeSpread = legacyConfidence.label === "high" ? 0.04 : legacyConfidence.label === "medium" ? 0.07 : 0.12;
-  if (!profile) rangeSpread += 0.015;
-  if (comparables.length === 0) rangeSpread += 0.02;
-  rangeSpread = clamp(rangeSpread, 0.04, 0.16);
+  const rangeSpread = getRangeSpreadFromPolicy(policy.rangeWidthMode, fallbackSeverity);
   const lowRangePrice = Math.round(adjustedPrice * (1 - rangeSpread));
   const highRangePrice = Math.round(adjustedPrice * (1 + rangeSpread));
-  const quickDiscount = legacyConfidence.label === "high" ? 0.04 : legacyConfidence.label === "medium" ? 0.06 : 0.08;
+  const quickDiscount = confidenceBand === "high" ? 0.04 : confidenceBand === "medium" ? 0.065 : 0.085;
   const quickSalePrice = Math.round(adjustedPrice * (1 - quickDiscount));
-  const recommendedListingPrice = Math.min(Math.round(adjustedPrice * 1.03), Math.round(highRangePrice * 0.995));
+  const recommendedListingPrice = Math.min(
+    Math.round(adjustedPrice * (confidenceBand === "high" ? 1.03 : confidenceBand === "medium" ? 1.02 : 1.01)),
+    Math.round(highRangePrice * 0.995),
+  );
 
   const negativeFactors = [...adjustments.negative];
   if (!profile) negativeFactors.push("Modèle hors base de référence principale");
   if (comparables.length < 5) negativeFactors.push("Peu de comparables AutoNex disponibles");
-  if (confidence.label === "low") negativeFactors.push("Estimation indicative à faible confiance");
+  if (fallbackSeverity === "high") negativeFactors.push("Ancrage marché faible : estimation surtout indicative");
+  if (confidenceBand === "low") negativeFactors.push("Estimation indicative à faible confiance");
   const estimationNote =
-    comparables.length === 0
-      ? "Nous n'avons pas encore assez d'annonces similaires sur AutoNex pour ce modèle, mais voici une estimation indicative basée sur les caractéristiques de votre véhicule."
-      : undefined;
+    fallbackSeverity === "high"
+      ? "Nous n'avons pas encore assez d'annonces comparables solides sur AutoNex pour ce modèle. Cette estimation reste indicative et s'appuie davantage sur des références générales."
+      : comparables.length === 0
+        ? "Nous n'avons pas encore assez d'annonces similaires sur AutoNex pour ce modèle, mais voici une estimation indicative basée sur les caractéristiques de votre véhicule."
+        : undefined;
 
   const outputValues = {
     estimatedValue: roundToStep(adjustedPrice, roundingStep),
@@ -827,19 +955,12 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
     },
     evidence,
     anchors: {
-      comparableMarketAnchor: comparableMedian,
-      referenceAnchor: profile?.baseline_price_mga ?? null,
-      heuristicAnchor: fallback.basePrice,
+      comparableMarketAnchor: comparableAnchorValue,
+      referenceAnchor: referenceAnchorValue,
+      heuristicAnchor: heuristicAnchorValue,
       finalBaseAnchor: marketBasePrice,
       adjustedMarketEstimate: outputValues.estimatedValue,
-      anchorBlendMode:
-        tierDecision.tier === "A_STRONG_MARKET"
-          ? "comparables_primary"
-          : tierDecision.tier === "B_MODERATE_MARKET"
-            ? "comparables_plus_reference"
-            : tierDecision.tier === "C_REFERENCE_ASSISTED"
-              ? "reference_primary"
-              : "heuristic_primary",
+      anchorBlendMode: anchorPolicy.blendMode,
     },
     adjustments: {
       mileageAdjustment: {
@@ -880,9 +1001,9 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
       confidenceScore: cappedConfidence,
       confidenceBand,
       confidenceCeiling: policy.confidenceCeiling,
-      confidenceBeforeCeiling: legacyConfidence.score,
-      confidenceCapped: cappedConfidence !== legacyConfidence.score,
-      drivers: confidenceDrivers,
+      confidenceBeforeCeiling: beforeCeiling,
+      confidenceCapped: cappedConfidence !== beforeCeiling,
+      drivers,
       explanationMode: "summary_only",
     },
     values: outputValues,
@@ -914,15 +1035,16 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
         : [],
     },
     uiGovernance: {
-      allowedMarketClaim: policy.pricingMode === "market_backed",
-      mustShowIndicativeLabel: policy.pricingMode === "reference_assisted" || policy.pricingMode === "heuristic_only",
-      shouldDeEmphasizePrecision: policy.precisionMode === "coarse" || policy.precisionMode === "very_coarse",
-      shouldHideExactConfidenceScore: tierDecision.tier === "D_HEURISTIC_ONLY",
+      allowedMarketClaim: policy.claimMode === "ALLOW_STRONG_MARKET_CLAIM",
+      mustShowIndicativeLabel: policy.claimMode !== "ALLOW_STRONG_MARKET_CLAIM",
+      shouldDeEmphasizePrecision:
+        policy.precisionMode === "coarse" || policy.precisionMode === "very_coarse" || fallbackSeverity !== "none",
+      shouldHideExactConfidenceScore: tierDecision.tier === "D_HEURISTIC_ONLY" || fallbackSeverity === "high",
       allowedRangeTightness: policy.rangeWidthMode,
       recommendedPrimaryCTAStyle:
-        tierDecision.tier === "A_STRONG_MARKET"
+        policy.claimMode === "ALLOW_STRONG_MARKET_CLAIM"
           ? "strong"
-          : tierDecision.tier === "D_HEURISTIC_ONLY"
+          : policy.claimMode === "INDICATIVE_HEURISTIC_CLAIM_ONLY"
             ? "cautious"
             : "normal",
       requiredBadges: [policy.pricingMode],
