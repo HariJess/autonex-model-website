@@ -48,7 +48,69 @@ export type EstimationPresentation = {
   marketSupportSummary: string;
   marketSupportCaution: string | null;
   comparableSelectionHint: string;
+  evidenceSummaryLine: string;
+  ctaFootnote: string;
 };
+
+type ToneProfile = {
+  confidenceInterpretation: string;
+  evidenceHeadline: string;
+  actionHeadline: string;
+  actionDescription: string;
+  comparablesIntro: string;
+  comparablesEmptyTitle: string;
+  comparablesEmptyMessage: string;
+  ctaFootnote: string;
+};
+
+function toneProfile(level: EstimationPresentation["summaryLevel"]): ToneProfile {
+  if (level === "Robuste") {
+    return {
+      confidenceInterpretation: "La base de comparaison est solide ; vous pouvez piloter votre prix avec une marge de négociation maîtrisée.",
+      evidenceHeadline: "Évidence marché bien établie",
+      actionHeadline: "Publiez maintenant avec un positionnement assumé",
+      actionDescription: "Le rapport soutient une décision de publication rapide avec un cap prix crédible.",
+      comparablesIntro: "Comparables cohérents et proches du profil de votre véhicule pour soutenir un prix de mise en marché convaincant.",
+      comparablesEmptyTitle: "Comparaison marché en consolidation",
+      comparablesEmptyMessage: "Le socle d'évidence reste robuste, même si la vitrine de comparables affichée ici est partielle.",
+      ctaFootnote: "Conseil AutoNex : un prix aligné sur cette fourchette robuste favorise des prises de contact qualifiées.",
+    };
+  }
+  if (level === "Qualifié") {
+    return {
+      confidenceInterpretation: "Le signal marché est exploitable, avec une prudence raisonnable sur le positionnement final.",
+      evidenceHeadline: "Évidence marché partielle mais exploitable",
+      actionHeadline: "Publiez avec un positionnement calibré",
+      actionDescription: "Le rapport donne une base sérieuse, à ajuster selon vos priorités de délai et de marge.",
+      comparablesIntro: "Comparables utiles pour cadrer le prix, avec un niveau de preuve qualifié et une marge d'interprétation.",
+      comparablesEmptyTitle: "Comparaison marché en consolidation",
+      comparablesEmptyMessage: "Les comparables exacts sont encore peu nombreux. Le rapport reste utile pour cadrer votre décision avec prudence.",
+      ctaFootnote: "Conseil AutoNex : en mode qualifié, restez proche de la fourchette et ajustez selon le rythme des retours marché.",
+    };
+  }
+  if (level === "Indicatif") {
+    return {
+      confidenceInterpretation: "Le résultat reste utile comme repère initial, mais nécessite une lecture prudente avant décision.",
+      evidenceHeadline: "Évidence limitée, appui de référence",
+      actionHeadline: "Publiez prudemment ou affinez d'abord les données",
+      actionDescription: "Le rapport est indicatif : privilégiez une approche prudente et vérifiez vos hypothèses avant publication.",
+      comparablesIntro: "Comparables partiels : utilisez-les comme repères de cadrage, sans surinterpréter le signal marché.",
+      comparablesEmptyTitle: "Comparaison marché en consolidation",
+      comparablesEmptyMessage: "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente.",
+      ctaFootnote: "Conseil AutoNex : en mode indicatif, privilégiez un positionnement prudent et réévaluez après premiers retours.",
+    };
+  }
+  return {
+    confidenceInterpretation: "Le résultat reste utile comme repère initial, mais nécessite une lecture prudente avant décision.",
+    evidenceHeadline: "Évidence marché insuffisante",
+    actionHeadline: "Publiez prudemment ou affinez d'abord les données",
+    actionDescription: "Le rapport est indicatif : privilégiez une approche prudente et vérifiez vos hypothèses avant publication.",
+    comparablesIntro: "Comparables encore limités : utilisez-les comme repères, pas comme preuve forte.",
+    comparablesEmptyTitle: "Comparables encore insuffisants",
+    comparablesEmptyMessage: "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente.",
+    ctaFootnote: "Conseil AutoNex : en contexte d'évidence faible, privilégiez une stratégie prudente avant de figer le prix.",
+  };
+}
 
 export function buildEstimationPresentation(result: EstimationRunResult): EstimationPresentation {
   const v2 = result.outputV2;
@@ -72,46 +134,7 @@ export function buildEstimationPresentation(result: EstimationRunResult): Estima
         : v2.tierDecision.tier === "C_REFERENCE_ASSISTED"
           ? "Indicatif"
           : "Prudent";
-  const confidenceInterpretation =
-    confidenceBand === "high"
-      ? "La base de comparaison est solide ; vous pouvez piloter votre prix avec une marge de négociation maîtrisée."
-      : confidenceBand === "medium"
-        ? "Le signal marché est exploitable, avec une prudence raisonnable sur le positionnement final."
-        : "Le résultat reste utile comme repère initial, mais nécessite une lecture prudente avant décision.";
-  const evidenceHeadline =
-    summaryLevel === "Robuste"
-      ? "Évidence marché bien établie"
-      : summaryLevel === "Qualifié"
-        ? "Évidence marché partielle mais exploitable"
-        : summaryLevel === "Indicatif"
-          ? "Évidence limitée, appui de référence"
-          : "Évidence marché insuffisante";
-  const actionHeadline =
-    summaryLevel === "Robuste"
-      ? "Publiez maintenant avec un positionnement assumé"
-      : summaryLevel === "Qualifié"
-        ? "Publiez avec un positionnement calibré"
-        : "Publiez prudemment ou affinez d'abord les données";
-  const actionDescription =
-    summaryLevel === "Robuste"
-      ? "Le rapport soutient une décision de publication rapide avec un cap prix crédible."
-      : summaryLevel === "Qualifié"
-        ? "Le rapport donne une base sérieuse, à ajuster selon vos priorités de délai et de marge."
-        : "Le rapport est indicatif : privilégiez une approche prudente et vérifiez vos hypothèses avant publication.";
-  const comparablesIntro =
-    summaryLevel === "Robuste"
-      ? "Comparables cohérents pour soutenir un prix de mise en marché convaincant."
-      : summaryLevel === "Qualifié"
-        ? "Comparables utiles pour cadrer le prix, avec une marge d'interprétation."
-        : "Comparables encore limités : utilisez-les comme repères, pas comme preuve forte.";
-  const comparablesEmptyTitle =
-    summaryLevel === "Prudent"
-      ? "Comparables encore insuffisants"
-      : "Comparaison marché en consolidation";
-  const comparablesEmptyMessage =
-    summaryLevel === "Prudent"
-      ? "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente."
-      : "Les comparables exacts sont encore peu nombreux. Le rapport reste utile pour cadrer votre décision.";
+  const profile = toneProfile(summaryLevel);
   const marketSupportLabel =
     v2.evidence.comparableCountStrong >= 6 && v2.evidence.comparableSimilarityMedian >= 68
       ? "Fort"
@@ -145,6 +168,7 @@ export function buildEstimationPresentation(result: EstimationRunResult): Estima
         : "Le signal marché reste partiel : utilisez ce rapport comme repère de décision, pas comme preuve forte.";
   const comparableSelectionHint =
     "Comparables sélectionnés sur proximité modèle/année/kilométrage, qualité d'annonce et cohérence prix.";
+  const evidenceSummaryLine = `Niveau ${summaryLevel.toLowerCase()} : ${profile.evidenceHeadline.toLowerCase()}.`;
 
   return {
     claimLabel,
@@ -156,17 +180,19 @@ export function buildEstimationPresentation(result: EstimationRunResult): Estima
     rangeToneLabel,
     summaryLevel,
     precisionCaution: v2.uiGovernance.shouldDeEmphasizePrecision,
-    confidenceInterpretation,
-    evidenceHeadline,
-    actionHeadline,
-    actionDescription,
-    comparablesIntro,
-    comparablesEmptyTitle,
-    comparablesEmptyMessage,
+    confidenceInterpretation: profile.confidenceInterpretation,
+    evidenceHeadline: profile.evidenceHeadline,
+    actionHeadline: profile.actionHeadline,
+    actionDescription: profile.actionDescription,
+    comparablesIntro: profile.comparablesIntro,
+    comparablesEmptyTitle: profile.comparablesEmptyTitle,
+    comparablesEmptyMessage: profile.comparablesEmptyMessage,
     marketSupportLabel,
     marketSupportHeadline,
     marketSupportSummary,
     marketSupportCaution,
     comparableSelectionHint,
+    evidenceSummaryLine,
+    ctaFootnote: profile.ctaFootnote,
   };
 }

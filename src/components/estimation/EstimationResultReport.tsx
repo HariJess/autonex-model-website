@@ -136,6 +136,7 @@ export default function EstimationResultReport({
 
       <div className="rounded-xl border border-border/70 bg-secondary/20 px-4 py-3 text-sm font-sans text-muted-foreground">
         <p className="font-medium text-foreground">Qualité d'évidence</p>
+        <p className="mt-1 text-xs">{presentation.evidenceSummaryLine}</p>
         <p className="mt-1">
           {evidence.comparableCountUsed} comparables retenus, dont {evidence.comparableCountStrong} solides, avec une similarité médiane de {Math.round(evidence.comparableSimilarityMedian)} / 100.
         </p>
@@ -296,7 +297,7 @@ export default function EstimationResultReport({
             <Button variant="ghost" onClick={onRestart} className="rounded-xl font-sans w-full justify-start sm:w-auto sm:justify-center">Refaire une estimation</Button>
           </div>
           <p className="mt-4 font-sans text-xs text-muted-foreground">
-            Conseil AutoNex : un prix aligné sur la fourchette ({presentation.precisionCaution ? "approche prudente recommandée" : "niveau de précision courant"}) améliore généralement la qualité des prises de contact.
+            {presentation.ctaFootnote}
           </p>
         </CardContent>
       </Card>

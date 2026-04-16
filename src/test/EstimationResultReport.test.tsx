@@ -256,4 +256,39 @@ describe("EstimationResultReport integration", () => {
     expect(screen.getByText(/Comparables encore insuffisants|Comparaison marché en consolidation/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Le rapport s'appuie surtout sur des signaux de référence|Le rapport reste utile pour cadrer votre décision/i).length).toBeGreaterThanOrEqual(1);
   });
+
+  it("keeps moderate evidence with comparables clearly qualified", () => {
+    const result = makeResult({
+      tierDecision: { tier: "B_MODERATE_MARKET", tierReasonCode: "MODERATE_COMPARABLE_SET", tierReasonSummary: "Moderate." },
+      modeGovernance: { pricingMode: "partially_market_backed", claimMode: "ALLOW_LIMITED_MARKET_CLAIM", precisionMode: "medium", rangeWidthMode: "standard" },
+      evidence: {
+        comparableCountCandidate: 20,
+        comparableCountAfterQualityFilter: 10,
+        comparableCountUsed: 5,
+        comparableCountStrong: 3,
+        comparableSimilarityAvg: 62,
+        comparableSimilarityMedian: 60,
+        comparableRecencyScore: 68,
+        comparableDispersionScore: 63,
+        comparableLocationStrength: "mixed",
+        canonicalModelCertainty: 79,
+        referenceProfileUsed: true,
+        referenceProfileStrength: 75,
+        fallbackUsed: false,
+        fallbackType: null,
+      },
+      comparables: [
+        { listingId: "1", title: "Toyota Corolla", price: 49_500_000, year: 2019, mileage: 83000, city: "Antananarivo", score: 74 },
+        { listingId: "2", title: "Toyota Corolla S", price: 50_800_000, year: 2020, mileage: 76000, city: "Antananarivo", score: 71 },
+      ],
+    });
+    renderReport(result);
+    expect(screen.getByText(/Analyse marché qualifiée/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Évidence marché partielle mais exploitable/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/Support marché:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Appui marché exploitable/i)).toBeInTheDocument();
+    expect(screen.getByText(/positionnement calibré/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Appui marché solide/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Publiez maintenant avec un positionnement assumé/i)).not.toBeInTheDocument();
+  });
 });

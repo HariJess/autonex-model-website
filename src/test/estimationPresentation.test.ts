@@ -196,4 +196,44 @@ describe("estimation presentation governance", () => {
     expect(referenceAssisted.claimMessage).toContain("indicative");
     expect(moderateMarket.claimMessage).toContain("marché");
   });
+
+  it("keeps moderate evidence narrative qualified across sections", () => {
+    const presentation = buildEstimationPresentation(
+      makeResult({
+        tierDecision: {
+          tier: "B_MODERATE_MARKET",
+          tierReasonCode: "MODERATE_COMPARABLE_SET",
+          tierReasonSummary: "Moderate.",
+        },
+        modeGovernance: {
+          pricingMode: "partially_market_backed",
+          claimMode: "ALLOW_LIMITED_MARKET_CLAIM",
+          precisionMode: "medium",
+          rangeWidthMode: "standard",
+        },
+        evidence: {
+          comparableCountCandidate: 18,
+          comparableCountAfterQualityFilter: 9,
+          comparableCountUsed: 5,
+          comparableCountStrong: 3,
+          comparableSimilarityAvg: 63,
+          comparableSimilarityMedian: 60,
+          comparableRecencyScore: 69,
+          comparableDispersionScore: 62,
+          comparableLocationStrength: "mixed",
+          canonicalModelCertainty: 79,
+          referenceProfileUsed: true,
+          referenceProfileStrength: 74,
+          fallbackUsed: false,
+          fallbackType: null,
+        },
+      }),
+    );
+    expect(presentation.summaryLevel).toBe("Qualifié");
+    expect(presentation.evidenceHeadline).toContain("partielle");
+    expect(presentation.comparablesIntro).toContain("niveau de preuve qualifié");
+    expect(presentation.actionHeadline).toContain("positionnement calibré");
+    expect(presentation.ctaFootnote).toContain("mode qualifié");
+    expect(presentation.marketSupportHeadline).toContain("exploitable");
+  });
 });
