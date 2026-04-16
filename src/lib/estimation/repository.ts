@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { EstimationInput, EstimationOutput } from "@/types/estimation";
+import type { EstimationAuditSnapshot } from "@/lib/estimation/telemetry";
 
 export async function insertEstimationRequest(input: EstimationInput, userId: string | null): Promise<string> {
   const payload = {
@@ -34,7 +35,12 @@ export async function insertEstimationRequest(input: EstimationInput, userId: st
 export async function insertEstimationResult(
   estimationRequestId: string,
   output: EstimationOutput,
+  audit?: EstimationAuditSnapshot,
 ): Promise<string> {
+  const calculationPayload = {
+    legacy: output,
+    audit: audit ?? null,
+  } as unknown as Record<string, unknown>;
   const payload = {
     estimation_request_id: estimationRequestId,
     market_base_price: output.marketBasePrice,
@@ -48,7 +54,7 @@ export async function insertEstimationResult(
     positive_factors: output.positiveFactors,
     negative_factors: output.negativeFactors,
     comparables_used_count: output.comparables.length,
-    calculation_payload: output as unknown as Record<string, unknown>,
+    calculation_payload: calculationPayload,
   };
 
   const { data, error } = await supabase
@@ -65,8 +71,10 @@ export async function insertEstimationEvent(
   eventType:
     | "estimation_started"
     | "estimation_completed"
+    | "estimation_result_viewed"
     | "clicked_publish_after_estimation"
     | "clicked_refine_estimation"
+    | "clicked_compare_after_estimation"
     | "viewed_similar_listings",
   metadata?: Record<string, unknown>,
 ): Promise<void> {

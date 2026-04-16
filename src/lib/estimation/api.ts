@@ -4,6 +4,7 @@ import {
   insertEstimationRequest,
   insertEstimationResult,
 } from "@/lib/estimation/repository";
+import { buildEstimationAuditSnapshot, buildEstimationEventContext } from "@/lib/estimation/telemetry";
 import type { EstimationInput, EstimationRunResult } from "@/types/estimation";
 
 async function safeInsertEstimationEvent(
@@ -11,8 +12,10 @@ async function safeInsertEstimationEvent(
   eventType:
     | "estimation_started"
     | "estimation_completed"
+    | "estimation_result_viewed"
     | "clicked_publish_after_estimation"
     | "clicked_refine_estimation"
+    | "clicked_compare_after_estimation"
     | "viewed_similar_listings",
   metadata?: Record<string, unknown>,
 ): Promise<void> {
@@ -31,16 +34,24 @@ export async function runVehicleEstimation(
   userId: string | null,
 ): Promise<EstimationRunResult> {
   const requestId = await insertEstimationRequest(input, userId);
-  await safeInsertEstimationEvent(requestId, "estimation_started");
+  await safeInsertEstimationEvent(requestId, "estimation_started", {
+    hasMake: Boolean(input.makeName.trim()),
+    hasModel: Boolean(input.modelName.trim()),
+    hasCity: Boolean(input.city.trim()),
+    hasYear: Number.isFinite(input.year),
+    hasMileage: Number.isFinite(input.mileage),
+  });
   const outputV2 = await computeVehicleEstimationV2(input);
   const output = toLegacyEstimationFromV2(outputV2);
-  const resultId = await insertEstimationResult(requestId, output);
-  await safeInsertEstimationEvent(requestId, "estimation_completed", {
-    confidenceLabel: output.confidenceLabel,
-    confidenceScore: output.confidenceScore,
-    comparables: output.comparables.length,
-    evidenceTier: outputV2.tierDecision.tier,
-    pricingMode: outputV2.modeGovernance.pricingMode,
-  });
+  const audit = buildEstimationAuditSnapshot(outputV2);
+  const resultId = await insertEstimationResult(requestId, output, audit);
+  await safeInsertEstimationEvent(
+    requestId,
+    "estimation_completed",
+    buildEstimationEventContext(outputV2, {
+      resultId,
+      comparablesDisplayed: output.comparables.length,
+    }),
+  );
   return { requestId, resultId, output, outputV2 };
 }

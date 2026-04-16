@@ -26,6 +26,7 @@ import {
 import { runVehicleEstimation } from "@/lib/estimation/api";
 import { insertEstimationEvent } from "@/lib/estimation/repository";
 import { buildEstimationPresentation } from "@/lib/estimation/presentation";
+import { buildEstimationEventContext } from "@/lib/estimation/telemetry";
 import { loadVehicleCatalog } from "@/lib/estimation/vehicleCatalog";
 import VehicleCatalogCombobox from "@/components/estimation/VehicleCatalogCombobox";
 import EstimationResultReport from "@/components/estimation/EstimationResultReport";
@@ -113,6 +114,7 @@ const VehicleEstimationPage = () => {
   const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">("landing");
   const [form, setForm] = useState<EstimationInput>(EMPTY_FORM);
   const [result, setResult] = useState<EstimationRunResult | null>(null);
+  const [resultViewedForRequest, setResultViewedForRequest] = useState<string | null>(null);
 
   useEffect(() => {
     const raw = localStorage.getItem(ESTIMATION_DRAFT_KEY);
@@ -198,12 +200,28 @@ const VehicleEstimationPage = () => {
   const currentStepIndex =
     screen === "landing" ? 0 : screen === "vehicle" ? 1 : screen === "condition" ? 2 : 3;
 
+  useEffect(() => {
+    if (screen !== "result" || !result) return;
+    if (resultViewedForRequest === result.requestId) return;
+    setResultViewedForRequest(result.requestId);
+    void insertEstimationEvent(
+      result.requestId,
+      "estimation_result_viewed",
+      buildEstimationEventContext(result.outputV2, { resultId: result.resultId }),
+    );
+  }, [screen, result, resultViewedForRequest]);
+
   const publishFromEstimation = async () => {
     if (!result) return;
     try {
-      await insertEstimationEvent(result.requestId, "clicked_publish_after_estimation", {
-        recommendedPrice: result.output.recommendedListingPrice,
-      });
+      await insertEstimationEvent(
+        result.requestId,
+        "clicked_publish_after_estimation",
+        buildEstimationEventContext(result.outputV2, {
+          resultId: result.resultId,
+          recommendedPrice: result.output.recommendedListingPrice,
+        }),
+      );
     } catch {
       // Event tracking should not block navigation.
     }
@@ -229,11 +247,13 @@ const VehicleEstimationPage = () => {
     eventType:
       | "clicked_publish_after_estimation"
       | "clicked_refine_estimation"
+      | "clicked_compare_after_estimation"
       | "viewed_similar_listings",
+    outputV2: EstimationRunResult["outputV2"],
     metadata?: Record<string, unknown>,
   ) => {
     try {
-      await insertEstimationEvent(requestId, eventType, metadata ?? {});
+      await insertEstimationEvent(requestId, eventType, buildEstimationEventContext(outputV2, metadata ?? {}));
     } catch {
       // Analytics events are non-blocking by design.
     }
@@ -695,16 +715,19 @@ const VehicleEstimationPage = () => {
                 presentation={presentation}
                 onPublish={() => void publishFromEstimation()}
                 onRefine={() => {
-                  void trackEstimationEvent(result.requestId, "clicked_refine_estimation");
+                void trackEstimationEvent(result.requestId, "clicked_refine_estimation", result.outputV2);
                   setScreen("vehicle");
                 }}
-                onCompare={() => navigate("/recherche")}
+              onCompare={() => {
+                void trackEstimationEvent(result.requestId, "clicked_compare_after_estimation", result.outputV2);
+                navigate("/recherche");
+              }}
                 onRestart={() => {
                   setResult(null);
                   setScreen("vehicle");
                 }}
                 onViewComparable={(listingId) =>
-                  void trackEstimationEvent(result.requestId, "viewed_similar_listings", { listingId })
+                void trackEstimationEvent(result.requestId, "viewed_similar_listings", result.outputV2, { listingId })
                 }
               />
             </section>
