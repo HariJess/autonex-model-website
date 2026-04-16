@@ -161,7 +161,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
   };
 
   const filterBody = (
-      <div className={cn("bg-card rounded-2xl border border-border overflow-hidden", isMobile && "shadow-sm")}>
+      <div className={cn("bg-gradient-to-br from-card via-card to-secondary/15 rounded-2xl border border-border/75 overflow-hidden", isMobile && "shadow-sm")}>
         <Accordion type="multiple" defaultValue={defaultOpenSections} className="w-full">
           <AccordionItem value="transaction" className="border-b border-border px-4">
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.transaction", "Transaction")}</AccordionTrigger>
@@ -595,11 +595,14 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
   }
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between px-1 pb-2">
-        <h3 className="font-serif font-bold text-lg">{t("search.filters")}</h3>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between px-1 pb-1">
+        <div>
+          <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Recherche AutoNex</p>
+          <h3 className="font-serif font-bold text-lg">{t("search.filters")}</h3>
+        </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="text-xs font-sans text-muted-foreground h-7" onClick={resetFilters}>
+          <Button variant="ghost" size="sm" className="text-xs font-sans text-muted-foreground h-8 rounded-lg" onClick={resetFilters}>
             {t("common.clear", "Effacer")}
           </Button>
         </div>

@@ -45,7 +45,7 @@ export function SearchResultsList({
         return (
         <div
           key={listing.id}
-          className="flex flex-col sm:flex-row bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
+          className="group flex flex-col sm:flex-row bg-gradient-to-br from-card via-card to-secondary/20 rounded-2xl border border-border/70 overflow-hidden hover:shadow-lg transition-shadow"
         >
           <Link
             to={`/annonce/${listing.id}`}
@@ -74,7 +74,7 @@ export function SearchResultsList({
                 onFocus={() => void prefetchListing(queryClient, listing.id)}
                 onTouchStart={() => void prefetchListing(queryClient, listing.id)}
               >
-                <h2 className="font-serif font-semibold text-lg hover:text-primary transition-colors">{displayTitle}</h2>
+                <h2 className="font-serif font-semibold text-lg group-hover:text-primary transition-colors">{displayTitle}</h2>
                 {vehicleHeadline && <p className="text-xs text-muted-foreground font-sans mt-1">{vehicleHeadline}</p>}
               </Link>
               {showCloseMatchBadges && (
@@ -93,9 +93,9 @@ export function SearchResultsList({
                 <span>{listing.ville}</span>
               </div>
             </div>
-            <div className="flex items-center justify-between mt-3 gap-2">
+            <div className="flex items-center justify-between mt-3 gap-2 border-t border-border/50 pt-3">
               <span className="font-serif font-bold text-lg text-primary">{formatPrice(listing.price_mga)}</span>
-              <Button variant="outline" size="sm" className="font-sans shrink-0 min-h-10 touch-manipulation" asChild>
+              <Button variant="outline" size="sm" className="font-sans rounded-xl border-border/70 shrink-0 min-h-10 touch-manipulation" asChild>
                 <Link to={`/annonce/${listing.id}`}>{seeListingLabel}</Link>
               </Button>
             </div>

@@ -56,11 +56,12 @@ export function SearchToolbar({
   onSetSort,
 }: SearchToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card rounded-xl border border-border/80 p-3 sm:p-3.5 shadow-sm">
-      <div className="flex flex-wrap items-center gap-3 min-w-0">
+    <div className="mb-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-secondary/20 p-3.5 shadow-sm md:p-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-3 min-w-0">
         <Sheet open={mobileFiltersOpen} onOpenChange={onOpenMobileFilters}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="lg:hidden font-sans gap-2 shrink-0 min-h-11 touch-manipulation">
+            <Button variant="outline" size="sm" className="lg:hidden font-sans gap-2 shrink-0 min-h-11 rounded-xl border-border/70 bg-background/80 touch-manipulation">
               <SlidersHorizontal className="h-4 w-4" />
               {filtersLabel}
               {activeFilterCount > 0 && (
@@ -85,19 +86,20 @@ export function SearchToolbar({
           </SheetContent>
         </Sheet>
 
-        <p className="font-sans text-sm text-muted-foreground leading-snug">
+        <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2">
+          <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Résultats</p>
           {queryError ? (
-            <span className="text-destructive font-medium">{queryErrorLabel}</span>
+            <p className="font-sans text-sm font-medium text-destructive">{queryErrorLabel}</p>
           ) : (
-            <>
+            <p className="font-sans text-sm text-muted-foreground">
               <span className="font-semibold text-foreground">{resultCount}</span> {resultLabel}
-            </>
+            </p>
           )}
-        </p>
-      </div>
+        </div>
+        </div>
 
-      <div className="flex items-center gap-2 justify-between sm:justify-end w-full sm:w-auto">
-        <div className="flex items-center border border-border rounded-lg overflow-hidden shrink-0">
+        <div className="flex items-center gap-2 justify-between lg:justify-end w-full lg:w-auto">
+          <div className="flex items-center rounded-xl border border-border/70 bg-background/70 p-1 overflow-hidden shrink-0">
           {(
             [
               { mode: "grid" as const, icon: LayoutGrid, label: viewGridLabel },
@@ -109,25 +111,29 @@ export function SearchToolbar({
               key={mode}
               type="button"
               onClick={() => onSetViewMode(mode)}
-              className={`inline-flex items-center justify-center min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary/90 text-primary-foreground" : "hover:bg-muted/70 active:bg-muted"}`}
+              className={`inline-flex items-center justify-center rounded-lg min-h-11 min-w-11 p-2 touch-manipulation transition-colors sm:min-h-10 sm:min-w-10 ${viewMode === mode ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground active:bg-muted"}`}
               aria-label={label}
               aria-pressed={viewMode === mode}
             >
               <Icon className="h-4 w-4" />
             </button>
           ))}
-        </div>
+          </div>
 
-        <Select value={sort} onValueChange={(v) => onSetSort(v as SearchSortMode)}>
-          <SelectTrigger className="flex-1 sm:flex-none sm:w-40 font-sans text-sm min-w-[9rem] min-h-11">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="recent">{sortRecentLabel}</SelectItem>
-            <SelectItem value="priceAsc">{sortPriceAscLabel}</SelectItem>
-            <SelectItem value="priceDesc">{sortPriceDescLabel}</SelectItem>
-          </SelectContent>
-        </Select>
+          <div className="flex items-center gap-2 rounded-xl border border-border/70 bg-background/70 px-2 py-1.5 sm:px-2.5">
+            <span className="hidden sm:inline text-[11px] uppercase tracking-wide font-sans text-muted-foreground">Tri</span>
+            <Select value={sort} onValueChange={(v) => onSetSort(v as SearchSortMode)}>
+              <SelectTrigger className="flex-1 border-0 bg-transparent shadow-none sm:flex-none sm:w-44 font-sans text-sm min-w-[9rem] min-h-9 px-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">{sortRecentLabel}</SelectItem>
+                <SelectItem value="priceAsc">{sortPriceAscLabel}</SelectItem>
+                <SelectItem value="priceDesc">{sortPriceDescLabel}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
     </div>
   );

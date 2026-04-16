@@ -554,7 +554,8 @@ const SearchPage = () => {
       </Helmet>
       <Header />
 
-      <div className="container mx-auto px-4 pt-3 md:pt-4 pb-1.5 md:pb-2">
+      <div className="container mx-auto px-4 pt-3 md:pt-4 pb-2 md:pb-3">
+        <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3.5 md:px-5 md:py-4">
         <nav className="flex flex-wrap items-center gap-1.5 text-sm font-sans text-muted-foreground mb-3" aria-label="Breadcrumb">
           {breadcrumbs.map((bc, i) => (
             <span key={i} className="flex items-center gap-1.5">
@@ -575,7 +576,7 @@ const SearchPage = () => {
           ))}
         </nav>
 
-        <h1 className="font-serif text-lg md:text-2xl font-bold mb-2 leading-snug">
+        <h1 className="font-serif text-xl md:text-3xl font-bold mb-2 leading-snug">
           {queryError ? t("search.title", "Recherche") : pageTitle}{" "}
           {!queryError && (
             <span className="text-muted-foreground font-normal text-base md:text-lg">
@@ -599,6 +600,9 @@ const SearchPage = () => {
             </span>
           )}
         </h1>
+        <p className="font-sans text-sm text-muted-foreground max-w-3xl mb-3">
+          Explorez des annonces vérifiées avec des filtres avancés pour trouver plus vite le bon véhicule.
+        </p>
 
         <SearchActiveChips
           chips={activeChips}
@@ -606,10 +610,11 @@ const SearchPage = () => {
           onRemoveChip={removeChip}
           onClearAll={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
         />
+        </section>
       </div>
 
       <div className="container mx-auto px-4 pb-8 md:pb-10">
-        <div className="flex gap-6">
+        <div className="flex gap-6 lg:gap-7">
           <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <FilterSidebar filters={filters} onFiltersChange={updateFilters} idPrefix="desktop" />
             <SidebarPromoSlot />
@@ -651,7 +656,7 @@ const SearchPage = () => {
               onSetSort={setSort}
             />
             {sort === "recent" && (
-              <p className="text-xs text-muted-foreground font-sans -mt-2 mb-2 max-w-3xl">
+              <p className="text-xs text-muted-foreground font-sans -mt-1 mb-3 max-w-3xl">
                 {t(
                   "search.recentSortHint",
                   "Les annonces avec options de visibilité (top, à la une, actualisation) apparaissent en priorité, puis les plus récentes.",
@@ -660,9 +665,9 @@ const SearchPage = () => {
             )}
 
             {showSimilarBanner && (
-              <div className="mb-4 rounded-2xl border border-border/80 bg-card px-3.5 py-3.5 lg:py-3 shadow-sm">
+              <div className="mb-4 rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 px-3.5 py-3.5 lg:py-3.5 shadow-sm">
                 <div className="flex gap-3">
-                  <div className="shrink-0 mt-0.5 rounded-full bg-secondary p-2">
+                  <div className="shrink-0 mt-0.5 rounded-full border border-border/60 bg-background/85 p-2">
                     <Sparkles className="h-5 w-5 text-primary" aria-hidden />
                   </div>
                   <div className="min-w-0 space-y-1.5">
@@ -740,7 +745,7 @@ const SearchPage = () => {
             )}
 
             {showAlsoLikeBlock && (
-              <div className="mt-7 pt-5 border-t border-border max-lg:mt-8">
+              <div className="mt-8 pt-6 border-t border-border/70 max-lg:mt-8">
                 <h2 className="font-serif text-xl max-lg:font-bold font-semibold mb-2 max-lg:mb-3">
                   {t("search.youMayAlsoLike", "Vous pouvez aussi aimer")}
                 </h2>
