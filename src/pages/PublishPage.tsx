@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, ShieldCheck, Sparkles } from "lucide-react";
 import { type ListingType, type TransactionType } from "@/types/listing";
 import { getRegionForVille, getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
@@ -120,6 +120,28 @@ const PublishPage = () => {
     t("publish.stepMedia", "Médias"),
     t("publish.stepVisibility", "Visibilité & envoi"),
   ];
+  const stepGuides = [
+    {
+      title: t("publish.stepMain", "Informations principales"),
+      subtitle: "Cadrez la base de votre annonce.",
+      helper: "Transaction, type de véhicule et localisation précise.",
+    },
+    {
+      title: t("publish.stepDetails", "Détails du véhicule"),
+      subtitle: "Rendez votre offre crédible et attractive.",
+      helper: "Titre clair, prix cohérent, identité véhicule complète.",
+    },
+    {
+      title: t("publish.stepMedia", "Médias"),
+      subtitle: "Valorisez visuellement votre annonce.",
+      helper: "Photos nettes et couverture forte pour améliorer les clics.",
+    },
+    {
+      title: t("publish.stepVisibility", "Visibilité & envoi"),
+      subtitle: "Finalisez votre publication sereinement.",
+      helper: "Choisissez vos options, vérifiez le récapitulatif, puis envoyez.",
+    },
+  ] as const;
 
   const [transaction, setTransaction] = useState<TransactionType | "">("");
   const [listingType, setListingType] = useState<ListingType | "">("");
@@ -1622,7 +1644,7 @@ const PublishPage = () => {
         </title>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6 md:py-8 max-w-3xl pb-36 sm:pb-8">
+      <div className="container mx-auto max-w-6xl px-4 py-6 md:py-8 pb-36 sm:pb-8">
         <PublishPageHeader
           moderationText={t(
             "publish.moderationBanner",
@@ -1659,19 +1681,31 @@ const PublishPage = () => {
         <>
         <PublishProgressSteps steps={steps} step={step} progress={progress} />
 
-        <PublishStepErrors errors={stepErrors} />
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.45fr_0.55fr] lg:gap-6">
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-4 md:px-5">
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                Étape {step + 1} / {steps.length}
+              </p>
+              <p className="mt-1 font-serif text-2xl text-foreground">{stepGuides[step]?.title}</p>
+              <p className="mt-1 font-sans text-sm font-medium text-foreground/85">{stepGuides[step]?.subtitle}</p>
+              <p className="mt-1 font-sans text-sm text-muted-foreground">{stepGuides[step]?.helper}</p>
+            </div>
 
-        {isPublishedListingEdit && (
-          <Alert className="mb-6 rounded-2xl border-border bg-secondary/30">
-            <AlertDescription className="font-sans text-sm text-foreground leading-relaxed">
-              {t(
-                "publish.editBanner",
-                "Vous modifiez une annonce existante. Les changements sont enregistrés sur la même fiche. Si l’annonce était en ligne et que le contenu change, elle repassera en vérification avant d’être à nouveau visible publiquement.",
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
+            <PublishStepErrors errors={stepErrors} />
 
+            {isPublishedListingEdit && (
+              <Alert className="rounded-2xl border-border bg-secondary/30">
+                <AlertDescription className="font-sans text-sm text-foreground leading-relaxed">
+                  {t(
+                    "publish.editBanner",
+                    "Vous modifiez une annonce existante. Les changements sont enregistrés sur la même fiche. Si l’annonce était en ligne et que le contenu change, elle repassera en vérification avant d’être à nouveau visible publiquement.",
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="rounded-2xl border border-border/70 bg-card/95 p-4 md:p-5 shadow-sm">
         {step === 0 && (
           <PublishBasicInfoSection
             transaction={transaction}
@@ -1878,6 +1912,7 @@ const PublishPage = () => {
             onSubmitCreditPurchase={submitCreditPurchase}
           />
         )}
+            </div>
 
         <PublishStepNav
           step={step}
@@ -1894,6 +1929,38 @@ const PublishPage = () => {
           }}
           onNext={() => void handleNext()}
         />
+          </div>
+
+          <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
+            <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-secondary/20 p-4">
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Guidage AutoNex</p>
+              <p className="mt-1 font-serif text-lg text-foreground">Publiez avec confiance</p>
+              <div className="mt-3 space-y-2.5">
+                <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
+                  <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
+                    <ShieldCheck className="h-4 w-4 text-primary" />
+                    Brouillon sécurisé
+                  </p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">Vos modifications sont sauvegardées automatiquement.</p>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
+                  <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    Modération avant publication
+                  </p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">Chaque annonce est vérifiée pour protéger la qualité du catalogue.</p>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
+                  <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    Progression guidée
+                  </p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">Complétez chaque étape puis continuez pour éviter les retours arrière.</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
         </>
         )}
       </div>
