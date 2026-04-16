@@ -381,58 +381,68 @@ const VehicleEstimationPage = () => {
         )}
 
         {screen !== "landing" && (
-          <div className="mb-6 rounded-2xl border border-border/45 bg-background/85 px-3 py-3 md:mb-8 md:px-5 md:py-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="font-sans text-[10px] uppercase tracking-[0.14em] text-muted-foreground">PROGRESSION</p>
-              <p className="font-sans text-xs text-muted-foreground">Étape {currentStepIndex} sur 3</p>
+          <div className="mb-6 rounded-3xl border border-border/55 bg-gradient-to-br from-background/95 via-background to-secondary/20 px-4 py-4 shadow-sm md:mb-8 md:px-6 md:py-5">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="font-sans text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Progression estimation</p>
+              <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1">
+                <p className="font-sans text-[11px] font-medium text-primary">Étape {currentStepIndex} / 3</p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-3 items-end gap-2 md:gap-3">
-              {STEP_META.map((step, index) => {
-                const stepNumber = index + 1;
-                const isActive = step.id === screen;
-                const isDone = currentStepIndex > stepNumber;
-                return (
-                  <div key={step.id} className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full transition-colors duration-200 ${
-                          isActive
-                            ? "bg-primary"
-                            : isDone
-                              ? "bg-foreground/55"
-                              : "bg-muted-foreground/35"
-                        }`}
-                      />
-                      <p
-                        className={`font-sans text-xs transition-colors duration-200 sm:text-sm md:text-[15px] ${
-                          isActive
-                            ? "font-semibold text-primary"
-                            : isDone
-                              ? "font-medium text-foreground/90"
-                              : "font-medium text-muted-foreground/75"
-                        }`}
-                      >
-                        {step.label}
+            <div className="relative">
+              <div className="absolute left-0 right-0 top-[19px] h-[2px] rounded-full bg-border/50" />
+              <div
+                className="absolute left-0 top-[19px] h-[2px] rounded-full bg-primary/60 transition-all duration-300 ease-out"
+                style={{ width: `${Math.max(5, ((currentStepIndex - 1) / 2) * 100)}%` }}
+              />
+              <div className="grid grid-cols-3 gap-2 md:gap-3">
+                {STEP_META.map((step, index) => {
+                  const stepNumber = index + 1;
+                  const isActive = step.id === screen;
+                  const isDone = currentStepIndex > stepNumber;
+                  const isUpcoming = !isDone && !isActive;
+                  return (
+                    <div
+                      key={step.id}
+                      className={`relative rounded-2xl border px-3 pb-3 pt-2.5 transition-all duration-200 md:px-4 ${
+                        isActive
+                          ? "border-primary/45 bg-primary/[0.08] shadow-[0_8px_24px_rgba(25,78,134,0.16)]"
+                          : isDone
+                            ? "border-foreground/20 bg-foreground/[0.04]"
+                            : "border-border/60 bg-background/70"
+                      }`}
+                    >
+                      <div className="mb-2 flex items-center gap-2">
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${
+                            isActive
+                              ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                              : isDone
+                                ? "bg-foreground/80 text-background"
+                                : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {stepNumber}
+                        </div>
+                        <p
+                          className={`font-sans text-sm ${
+                            isActive
+                              ? "font-semibold text-primary"
+                              : isDone
+                                ? "font-semibold text-foreground"
+                                : "font-medium text-muted-foreground"
+                          }`}
+                        >
+                          {step.label}
+                        </p>
+                      </div>
+                      <p className={`font-sans text-xs ${isUpcoming ? "text-muted-foreground/80" : "text-muted-foreground"}`}>
+                        {step.helper}
                       </p>
                     </div>
-                    <div className="h-[2px] w-full rounded-full bg-border/45">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ease-out ${
-                          isActive ? "w-full bg-primary/70" : isDone ? "w-full bg-foreground/35" : "w-0 bg-transparent"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-3 h-px w-full overflow-hidden rounded-full bg-border/45">
-              <div
-                className="h-full bg-primary/35 transition-all duration-300 ease-out"
-                style={{ width: `${Math.max(8, (currentStepIndex / 3) * 100)}%` }}
-              />
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
