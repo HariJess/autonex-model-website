@@ -12,6 +12,7 @@ import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
+import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
 import {
   AUTO_DISCOVERY_CATEGORIES,
 } from "@/data/automotiveCatalog";
@@ -215,9 +216,13 @@ const Index = () => {
         </Link>
       </div>
       {themedLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="h-7 w-7 animate-spin text-primary" />
-        </div>
+        <PremiumStatePanel
+          overline="Collection AutoNex"
+          title="Sélection en préparation"
+          description="Nous organisons cette collection pour vous proposer les annonces les plus pertinentes."
+          icon={<Loader2 className="h-5 w-5 animate-spin text-primary" />}
+          className="py-7"
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {items.map((listing) => (
@@ -248,11 +253,53 @@ const Index = () => {
 
       <HeroSearch />
 
+      <section className="container mx-auto px-4 pt-6 md:pt-8">
+        <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-6">
+          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Pourquoi AutoNex</p>
+          <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-border/70 bg-card/80 px-3.5 py-3">
+              <p className="font-serif text-base text-foreground">Marketplace vérifiée</p>
+              <p className="mt-1 font-sans text-sm text-muted-foreground">Annonces, statuts de publication et contact vendeur cadrés pour une navigation fiable.</p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-card/80 px-3.5 py-3">
+              <p className="font-serif text-base text-foreground">Décision plus claire</p>
+              <p className="mt-1 font-sans text-sm text-muted-foreground">Recherche guidée, pages détails premium et signaux de confiance homogènes.</p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-card/80 px-3.5 py-3">
+              <p className="font-serif text-base text-foreground">Produit signature</p>
+              <p className="mt-1 font-sans text-sm text-muted-foreground">L’estimation AutoNex transforme l’exploration en décision de prix plus crédible.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <FeaturedListingsSection
         enabled={MONETIZATION_PLACEMENTS.homeFeaturedRail}
         title={t("sections.featured", "À la une")}
         limit={8}
       />
+
+      <section className="container mx-auto px-4 py-6 md:py-8">
+        <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4 md:p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Différenciateur AutoNex</p>
+              <h2 className="mt-1 font-serif text-2xl text-foreground md:text-[2rem]">Estimation: votre repère avant négociation</h2>
+              <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">
+                Obtenez une fourchette argumentée, un niveau de confiance explicite et un rapport utile pour cadrer votre décision d'achat ou de vente.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+                <Link to="/estimation">Lancer une estimation</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/recherche">Comparer les annonces</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Recent feed — complementary to “À la une” */}
       <section className="container mx-auto px-4 py-8 md:py-12">
@@ -263,26 +310,32 @@ const Index = () => {
           </Link>
         </div>
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="space-y-4">
+            <PremiumStatePanel
+              overline="Flux marché"
+              title="Chargement des nouvelles annonces"
+              description="Nous mettons à jour les dernières publications pour vous donner une vue actuelle du marché."
+              icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+              className="py-8"
+            />
+            <PremiumStateSkeletonGrid count={4} />
           </div>
         ) : listings.length === 0 ? (
-          <div className="rounded-2xl border border-border/80 bg-card p-6 md:p-8 text-center">
-            <p className="text-base font-serif text-foreground">
-              {t("home.noListings", "Le catalogue AutoNex démarre. Publiez le premier véhicule !")}
-            </p>
-            <p className="text-sm text-muted-foreground font-sans mt-2 leading-relaxed max-w-xl mx-auto">
-              Découvrez déjà la recherche et nos catégories, puis lancez votre première annonce pour activer le marché.
-            </p>
-            <div className="mt-5 flex flex-wrap justify-center gap-2.5">
-              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/publier">Publier un véhicule</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/recherche">Explorer la recherche</Link>
-              </Button>
-            </div>
-          </div>
+          <PremiumStatePanel
+            overline="Flux marché"
+            title={t("home.noListings", "Le catalogue AutoNex démarre. Publiez le premier véhicule !")}
+            description="Découvrez déjà la recherche et nos catégories, puis lancez votre première annonce pour activer le marché."
+            action={
+              <div className="flex flex-wrap justify-center gap-2.5">
+                <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+                  <Link to="/publier">Publier un véhicule</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/recherche">Explorer la recherche</Link>
+                </Button>
+              </div>
+            }
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {listings.map((listing) => (
@@ -330,6 +383,29 @@ const Index = () => {
                 <span className="text-[10px] text-muted-foreground">{categoryToken(category.iconKey)}</span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 pb-8 md:pb-12">
+        <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Parcours conseillé</p>
+              <p className="mt-1 font-serif text-xl text-foreground">Explorez, estimez, puis passez à l’action</p>
+              <p className="mt-1 font-sans text-sm text-muted-foreground">Un flux simple pour comparer le marché, valider le bon prix et publier avec confiance.</p>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              <Button asChild variant="outline">
+                <Link to="/recherche">Explorer</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/estimation">Estimer</Link>
+              </Button>
+              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+                <Link to="/publier">Publier</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
