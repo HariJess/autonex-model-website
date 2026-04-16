@@ -9,6 +9,8 @@ type PremiumStatePanelProps = {
   action?: ReactNode;
   className?: string;
   contentClassName?: string;
+  role?: "status" | "alert" | "region";
+  ariaLive?: "polite" | "assertive" | "off";
 };
 
 export function PremiumStatePanel({
@@ -19,11 +21,15 @@ export function PremiumStatePanel({
   action,
   className,
   contentClassName,
+  role = "status",
+  ariaLive = "polite",
 }: PremiumStatePanelProps) {
   return (
     <div
+      role={role}
+      aria-live={ariaLive}
       className={cn(
-        "rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 px-4 py-10 shadow-sm md:px-6 md:py-12",
+        "rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 px-4 py-10 shadow-sm motion-safe:transition-colors md:px-6 md:py-12",
         className,
       )}
     >

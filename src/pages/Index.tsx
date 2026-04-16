@@ -211,7 +211,7 @@ const Index = () => {
           <h3 className="font-serif text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
           <p className="text-sm text-muted-foreground font-sans mt-1 leading-relaxed">{subtitle}</p>
         </div>
-        <Link to={linksTo} className="text-primary font-sans text-sm font-medium hover:underline shrink-0 min-h-10 inline-flex items-center">
+        <Link to={linksTo} className="text-primary font-sans text-sm font-medium hover:underline shrink-0 min-h-10 inline-flex items-center rounded-md motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
           Voir plus
         </Link>
       </div>

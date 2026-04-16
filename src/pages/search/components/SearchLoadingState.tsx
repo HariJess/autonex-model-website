@@ -14,6 +14,8 @@ export function SearchLoadingState({ loadingLabel }: SearchLoadingStateProps) {
         description={loadingLabel}
         icon={<Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />}
         className="py-8 md:py-9"
+        role="status"
+        ariaLive="polite"
       />
       <PremiumStateSkeletonGrid count={6} />
       <span className="sr-only">{loadingLabel}</span>

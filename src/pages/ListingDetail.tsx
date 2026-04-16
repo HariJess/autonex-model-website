@@ -644,7 +644,7 @@ const ListingDetail = () => {
                     <button
                       type="button"
                       onClick={goToPreviousImage}
-                      className="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/75 bg-card/90 text-foreground shadow-md backdrop-blur-sm transition hover:bg-card md:left-3 md:h-9 md:w-9"
+                      className="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/75 bg-card/90 text-foreground shadow-md backdrop-blur-sm transition hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 md:left-3 md:h-9 md:w-9"
                       aria-label={t("listing.galleryPrev", "Image précédente")}
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -652,7 +652,7 @@ const ListingDetail = () => {
                     <button
                       type="button"
                       onClick={goToNextImage}
-                      className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/75 bg-card/90 text-foreground shadow-md backdrop-blur-sm transition hover:bg-card md:right-3 md:h-9 md:w-9"
+                      className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/75 bg-card/90 text-foreground shadow-md backdrop-blur-sm transition hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 md:right-3 md:h-9 md:w-9"
                       aria-label={t("listing.galleryNext", "Image suivante")}
                     >
                       <ChevronRight className="h-4 w-4" />
@@ -668,7 +668,14 @@ const ListingDetail = () => {
               {images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {images.map((img, i) => (
-                    <button key={i} type="button" onClick={() => setSelectedImg(i)} className={`w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}>
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setSelectedImg(i)}
+                      aria-label={t("listing.galleryGoToImage", "Voir l’image {{index}}", { index: i + 1 })}
+                      aria-pressed={i === selectedImg}
+                      className={`w-20 h-14 rounded-lg overflow-hidden border-2 motion-safe:transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}
+                    >
                       <img
                         src={img}
                         alt=""

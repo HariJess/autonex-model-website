@@ -15,6 +15,8 @@ export function SearchErrorState({ title, message, onRetry }: SearchErrorStatePr
       title={title}
       description={message}
       icon={<AlertCircle className="h-6 w-6 text-muted-foreground" />}
+      role="alert"
+      ariaLive="assertive"
       action={
         onRetry ? (
           <Button variant="outline" className="rounded-xl border-border/70 font-sans focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2" onClick={onRetry}>
