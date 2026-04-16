@@ -39,6 +39,8 @@ AutoNex is an automotive marketplace for Madagascar: vehicle listings (achat, lo
 | `npm run build`   | Production build           |
 | `npm run seo:verify` | Verify SEO artifacts (warn-mode) |
 | `npm run seo:verify:strict` | Verify SEO artifacts (strict, fails if inventory SEO expected but missing) |
+| `npm run seo:verify:staging` | Strict verify with staging thresholds |
+| `npm run seo:verify:production` | Strict verify with production thresholds |
 | `npm run build:release` | Release build + strict SEO verification |
 | `npm run preview` | Preview production build   |
 | `npm run lint`    | ESLint                     |
@@ -65,6 +67,26 @@ In strict mode, the build is expected to run with:
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 
 If these are missing (or inventory artifacts/pages are not produced), `seo:verify:strict` fails the release.
+
+### Inventory minimum coverage thresholds
+
+`seo:verify` now checks coverage quality, not only artifact existence.
+
+Default thresholds:
+
+- **local (warn mode)**: informational only (`1` sitemap URL, `1` HTML page, ratio `0.02`)
+- **staging**: minimum listing sitemap URLs `50`, listing HTML pages `20`, HTML/sitemap ratio `0.10`
+- **production**: minimum listing sitemap URLs `200`, listing HTML pages `100`, HTML/sitemap ratio `0.20`
+
+The verifier logs expected vs actual counts and fails in strict mode when below thresholds.
+
+Safe overrides (CI/env):
+
+- `SEO_VERIFY_ENV=local|staging|production`
+- `SEO_MIN_LISTING_SITEMAP_URLS`
+- `SEO_MIN_LISTING_HTML_PAGES`
+- `SEO_MIN_HTML_VS_SITEMAP_RATIO`
+- `SEO_ENFORCE_INVENTORY_COVERAGE` (`1`/`true` to force inventory requirements)
 
 ## Launch locally
 
