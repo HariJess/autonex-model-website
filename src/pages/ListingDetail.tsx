@@ -381,7 +381,7 @@ const ListingDetail = () => {
             title={t("common.error")}
             description={t(
               "listing.runtimeUnavailable",
-              "Cette annonce est momentanément indisponible. Réessayez dans quelques instants.",
+              "Cette annonce est momentanément indisponible. Revenez dans quelques instants ou retournez à la recherche.",
             )}
             icon={<AlertCircle className="h-6 w-6 text-destructive" />}
             action={<Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>}
@@ -400,7 +400,7 @@ const ListingDetail = () => {
           <PremiumStatePanel
             overline={t("listing.stateNotFoundOverline", "Catalogue AutoNex")}
             title={t("listing.notFound", "Annonce introuvable")}
-            description={t("listing.notFoundDesc", "Cette annonce n'existe pas ou a été supprimée.")}
+            description={t("listing.notFoundDesc", "Cette annonce n'est plus disponible. Retournez à la recherche pour consulter des alternatives.")}
             icon={<AlertCircle className="h-6 w-6 text-muted-foreground" />}
             action={
               <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
@@ -951,7 +951,7 @@ const ListingDetail = () => {
                 )}
               </p>
 
-              <form onSubmit={handleContact} className="space-y-3">
+              <form onSubmit={handleContact} className="space-y-2.5 md:space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact", "Écrire au vendeur")}</h4>
                 <p className="text-xs font-sans text-muted-foreground">
                   {t("listing.contactHint", "Présentez votre besoin clairement pour obtenir une réponse plus rapide et utile.")}
@@ -966,7 +966,7 @@ const ListingDetail = () => {
                 <p className="text-xs font-sans text-muted-foreground">
                   {t(
                     "listing.contactDecisionHint",
-                    "Conseil: mentionnez votre disponibilité, votre budget et votre mode de contact préféré.",
+                    "Conseil: indiquez votre disponibilité, votre budget et votre canal préféré pour accélérer la réponse.",
                   )}
                 </p>
               </form>
@@ -1000,8 +1000,9 @@ const ListingDetail = () => {
         role="region"
         aria-label={t("listing.contactActions", "Actions de contact")}
       >
-        <div className="container mx-auto max-w-lg flex flex-col gap-2">
-          <div className="flex gap-2">
+        <div className="container mx-auto max-w-lg flex flex-col gap-1.5">
+          <p className="px-0.5 font-sans text-[11px] text-muted-foreground">Contact rapide</p>
+          <div className="flex gap-1.5">
             <Button
               type="button"
               variant="outline"
@@ -1009,7 +1010,7 @@ const ListingDetail = () => {
               onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
             >
               <MessageSquare className="h-4 w-4 shrink-0" />
-              {t("listing.contact", "Écrire")}
+              {t("listing.contact", "Écrire au vendeur")}
             </Button>
             <Button
               type="button"

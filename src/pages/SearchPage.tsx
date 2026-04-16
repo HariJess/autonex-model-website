@@ -162,7 +162,7 @@ const SearchPage = () => {
 
   const qTrim = filters.quartierLibre.trim();
 
-  const { data: dbListings = [], isLoading, error: queryError } = useDbListings({
+  const { data: dbListings = [], isLoading, error: queryError, refetch } = useDbListings({
     transaction: filters.transaction || undefined,
     vehicleTypes: filters.vehicleTypes.length > 0 ? filters.vehicleTypes : undefined,
     types: filters.types.length > 0 ? filters.types : undefined,
@@ -523,12 +523,12 @@ const SearchPage = () => {
     ) {
       return t(
         "search.runtimeDataUnavailable",
-        "Le catalogue est momentanément indisponible. Vous pouvez réessayer dans quelques instants.",
+        "Le catalogue est momentanément indisponible. Relancez la recherche dans quelques instants.",
       );
     }
     return t(
       "search.runtimeGenericError",
-      "Impossible de charger les annonces pour le moment. Vérifiez votre connexion puis réessayez.",
+      "Les annonces ne peuvent pas être chargées pour le moment. Vérifiez votre connexion puis relancez la recherche.",
     );
   }, [queryError, t]);
 
@@ -705,7 +705,9 @@ const SearchPage = () => {
               <SearchErrorState
                 title={t("search.resultsUnavailable", "Résultats indisponibles")}
                 message={errorMessage}
-                onRetry={() => window.location.reload()}
+                onRetry={() => {
+                  void refetch();
+                }}
               />
             )}
 
@@ -798,8 +800,8 @@ const SearchPage = () => {
             {showEmpty && (
               <SearchEmptyState
                 title={t("search.noResults", "Aucune annonce ne correspond")}
-                description={t("search.tryDifferentWiden", "Élargissez la ville, le budget ou les quartiers, ou réinitialisez les filtres.")}
-                resetLabel={t("search.resetFilters", "Réinitialiser les filtres")}
+                description={t("search.tryDifferentWiden", "Aucun résultat exact trouvé. Élargissez la zone, le budget ou les quartiers, puis relancez la recherche.")}
+                resetLabel={t("search.resetFilters", "Réinitialiser pour relancer")}
                 onReset={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
               />
             )}

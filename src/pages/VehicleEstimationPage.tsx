@@ -173,7 +173,10 @@ const VehicleEstimationPage = () => {
     onError: (error) => {
       toast({
         title: "Estimation indisponible",
-        description: error instanceof Error ? error.message : "Une erreur est survenue.",
+        description:
+          error instanceof Error
+            ? `${error.message} Réessayez dans quelques instants.`
+            : "Une erreur est survenue. Réessayez dans quelques instants.",
         variant: "destructive",
       });
     },
@@ -490,7 +493,7 @@ const VehicleEstimationPage = () => {
                         <PremiumStatePanel
                           overline="Catalogue estimation"
                           title="Références véhicules indisponibles"
-                          description="Le catalogue n'est pas accessible pour le moment. Réessayez dans quelques instants pour continuer l'estimation."
+                          description="Le catalogue est momentanément indisponible. Relancez l’estimation dans quelques instants."
                           className="py-6"
                         />
                       </div>
@@ -498,7 +501,7 @@ const VehicleEstimationPage = () => {
                     {!catalogLoading && catalogPayload?.source === "ui-curated" && (
                       <div className="md:col-span-2 rounded-xl border border-border/70 bg-secondary/20 p-3">
                         <p className="font-sans text-xs text-muted-foreground">
-                          Référentiel estimation chargé (source UI curatée).
+                          Référentiel estimation prêt (source UI curatée).
                         </p>
                       </div>
                     )}
@@ -599,7 +602,7 @@ const VehicleEstimationPage = () => {
                   <div className="mt-4 space-y-2.5">
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
                       <p className="font-sans text-xs font-medium">Parcours rapide</p>
-                      <p className="font-sans text-xs text-muted-foreground">Environ 2 minutes pour renseigner les éléments essentiels.</p>
+                      <p className="font-sans text-xs text-muted-foreground">Environ 2 minutes pour compléter les informations essentielles.</p>
                     </div>
                     <div className="rounded-lg border border-border/60 bg-background/80 p-3">
                       <p className="font-sans text-xs font-medium">Résultat actionnable</p>
@@ -717,7 +720,7 @@ const VehicleEstimationPage = () => {
                   {runMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Estimation en cours...
+                      Génération de l’estimation...
                     </>
                   ) : (
                     "Voir mon estimation"
