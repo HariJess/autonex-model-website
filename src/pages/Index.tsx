@@ -346,8 +346,8 @@ const Index = () => {
         <div className="rounded-2xl border border-border/70 bg-background/95 px-3 py-4 md:px-6 md:py-5">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Explorer rapidement</p>
-              <h2 className="font-serif text-lg md:text-2xl font-semibold mt-1">Catégories principales</h2>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.quickExplore", "Explorer rapidement")}</p>
+              <h2 className="font-serif text-lg md:text-2xl font-semibold mt-1">{t("home.mainCategories", "Catégories principales")}</h2>
             </div>
             <Link
               to="/recherche"
@@ -379,9 +379,9 @@ const Index = () => {
 
       <section className="container mx-auto px-4 pt-6 md:pt-8">
         <div className="rounded-2xl border border-border/70 bg-background/95 px-3 py-4 md:px-6 md:py-5">
-          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Navigation par marque</p>
+          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.brandNavigation", "Navigation par marque")}</p>
           <div className="mt-1 flex items-end justify-between gap-3">
-            <h2 className="font-serif text-lg md:text-2xl font-semibold">Marques populaires</h2>
+            <h2 className="font-serif text-lg md:text-2xl font-semibold">{t("home.popularBrands", "Marques populaires")}</h2>
             <Link
               to="/recherche"
               className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
@@ -427,18 +427,18 @@ const Index = () => {
         <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4 md:p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Différenciateur AutoNex</p>
-              <h2 className="mt-1 font-serif text-2xl text-foreground md:text-[2rem]">Estimation: votre repère avant négociation</h2>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.estimationOverline", "Différenciateur AutoNex")}</p>
+              <h2 className="mt-1 font-serif text-2xl text-foreground md:text-[2rem]">{t("home.estimationTitle", "Estimation: votre repère avant négociation")}</h2>
               <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">
                 Obtenez une fourchette argumentée, un niveau de confiance explicite et un rapport utile pour cadrer votre décision d'achat ou de vente.
               </p>
             </div>
             <div className="flex flex-wrap gap-2.5">
               <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Lancer l’estimation</Link>
+                <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.launchEstimation", "Lancer l’estimation")}</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Comparer les annonces</Link>
+                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("home.compareListings", "Comparer les annonces")}</Link>
               </Button>
             </div>
           </div>
@@ -472,10 +472,10 @@ const Index = () => {
             action={
               <div className="flex flex-wrap justify-center gap-2.5">
                 <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                  <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Publier mon véhicule</Link>
+                  <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.publishVehicle", "Publier mon véhicule")}</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Explorer le marché</Link>
+                  <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("home.exploreMarket", "Explorer le marché")}</Link>
                 </Button>
               </div>
             }
@@ -496,13 +496,13 @@ const Index = () => {
       {isLowInventory && themedSectionsToRender.length === 0 && (
         <section className="container mx-auto px-4 py-5 md:py-6">
           <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6">
-            <h3 className="font-serif text-lg md:text-xl font-bold text-foreground">Le marché se lance</h3>
+            <h3 className="font-serif text-lg md:text-xl font-bold text-foreground">{t("home.marketStarting", "Le marché se lance")}</h3>
             <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">
               L’inventaire est encore limité. Publiez votre véhicule ou explorez les recherches pour suivre les nouvelles annonces.
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
               <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">Publier mon véhicule</Link>
+                <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.publishVehicle", "Publier mon véhicule")}</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Voir les annonces</Link>
@@ -541,7 +541,7 @@ const Index = () => {
             </div>
             <div className="flex flex-wrap gap-2.5">
               <Button asChild variant="outline">
-                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Explorer le marché</Link>
+                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("home.exploreMarket", "Explorer le marché")}</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">Estimer le véhicule</Link>

@@ -27,7 +27,7 @@ const TRANSACTIONS = [
 
 const NO_ROOMS_TYPES = new Set<string>(LISTING_TYPES_WITHOUT_ROOM_FILTERS);
 const HERO_YEAR_PRESETS = [
-  { value: "all", label: "Toutes années", min: 0, max: 0 },
+  { value: "all", label: "all", min: 0, max: 0 },
   { value: "2025", label: "2025+", min: 2025, max: 0 },
   { value: "2020", label: "2020+", min: 2020, max: 0 },
   { value: "2015", label: "2015+", min: 2015, max: 0 },
@@ -101,10 +101,10 @@ const HeroSearch = () => {
     ? t("hero.allTypes")
     : summarizeSelection(selectedTypeLabels, "types");
   const brandLabel = brands.length === 0
-    ? "Toutes les marques"
+    ? t("hero.allBrands", "Toutes les marques")
     : summarizeSelection(brands, "marques");
   const fuelLabel = fuels.length === 0
-    ? "Tous carburants"
+    ? t("hero.allFuels", "Tous carburants")
     : summarizeSelection(fuels, "carburants", " + ");
   const visibleTopBrands = useMemo(() => {
     const q = brandSearch.trim().toLowerCase();
@@ -196,10 +196,10 @@ const HeroSearch = () => {
   const resultCount = countListings.length;
   const ctaLabel = useMemo(() => {
     if (!canEstimateResultCount) return t("hero.search");
-    if (countLoading) return "Recherche...";
-    if (resultCount <= 0) return "Voir les annonces";
-    if (resultCount === 1) return "1 résultat";
-    return `${resultCount} résultats`;
+    if (countLoading) return t("hero.searching", "Recherche...");
+    if (resultCount <= 0) return t("hero.seeListings", "Voir les annonces");
+    if (resultCount === 1) return t("hero.result_one", "1 résultat");
+    return t("hero.result_many", { count: resultCount, defaultValue: `${resultCount} résultats` });
   }, [canEstimateResultCount, countLoading, resultCount, t]);
 
   const handleSearch = () => {
@@ -278,7 +278,7 @@ const HeroSearch = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-72 p-3" align="start">
                     <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">Type de véhicule</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t("hero.type")}</p>
                       {vehicleTypes.length > 0 && (
                         <button type="button" className="text-xs text-primary hover:underline" onClick={() => setVehicleTypes([])}>
                           Effacer
@@ -330,12 +330,12 @@ const HeroSearch = () => {
                     className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors"
                   >
                     <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
-                      {t("search.budget", "Budget")}
+                      {t("search.budget")}
                     </label>
                     <div className="flex items-center gap-1.5">
                       <BudgetIcon className="h-3.5 w-3.5 text-accent shrink-0" />
                       <span className={`font-sans text-sm truncate ${budgetLabel ? "text-foreground" : "text-muted-foreground"}`}>
-                        {budgetLabel || t("search.budget", "Budget")}
+                        {budgetLabel || t("search.budget")}
                       </span>
                     </div>
                   </button>
@@ -356,7 +356,7 @@ const HeroSearch = () => {
               {showBrand && (
                 <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                    Marque
+                    {t("search.brand", "Marque")}
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -364,7 +364,7 @@ const HeroSearch = () => {
                     </PopoverTrigger>
                     <PopoverContent className="w-72 p-3" align="start">
                     <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">Marque</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
                       {brands.length > 0 && (
                         <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
                           Effacer
@@ -374,7 +374,7 @@ const HeroSearch = () => {
                     <Input
                       value={brandSearch}
                       onChange={(e) => setBrandSearch(e.target.value)}
-                      placeholder="Rechercher une marque..."
+                      placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
                       className="h-8 text-xs mb-2"
                     />
                       <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
@@ -412,27 +412,27 @@ const HeroSearch = () => {
             <div className="hidden lg:grid grid-cols-12 gap-2 mt-2 rounded-xl border border-border/70 bg-background/70 p-2">
               <div className="col-span-6">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  Modèle
+                  {t("search.model", "Modèle")}
                 </label>
                 <Input
                   value={modelQuery}
                   onChange={(e) => setModelQuery(e.target.value)}
-                  placeholder="Ex: RAV4, Hilux, NMAX..."
+                  placeholder={t("hero.modelPlaceholder")}
                   className="h-9 font-sans text-sm"
                 />
               </div>
               <div className="col-span-3">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  Année
+                  {t("search.year", "Année")}
                 </label>
                 <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
                   <SelectTrigger className="h-9 font-sans text-sm">
-                    <SelectValue placeholder="Toutes années" />
+                    <SelectValue placeholder={t("hero.allYears", "Toutes années")} />
                   </SelectTrigger>
                   <SelectContent>
                     {HERO_YEAR_PRESETS.map((yearPresetOption) => (
                       <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
-                        {yearPresetOption.label}
+                        {yearPresetOption.value === "all" ? t("hero.allYears", "Toutes années") : yearPresetOption.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -440,7 +440,7 @@ const HeroSearch = () => {
               </div>
               <div className="col-span-3">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  Carburant
+                  {t("search.fuel", "Carburant")}
                 </label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -450,7 +450,7 @@ const HeroSearch = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-64 p-3" align="start">
                     <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">Carburant</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
                       {fuels.length > 0 && (
                         <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
                           Effacer
@@ -479,7 +479,7 @@ const HeroSearch = () => {
                 </PopoverTrigger>
                 <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-xs font-medium text-muted-foreground">Type de véhicule</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t("hero.type")}</p>
                     {vehicleTypes.length > 0 && (
                       <button type="button" className="text-xs text-primary hover:underline" onClick={() => setVehicleTypes([])}>
                         Effacer
@@ -550,7 +550,7 @@ const HeroSearch = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
                     <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">Marque</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
                       {brands.length > 0 && (
                         <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
                           Effacer
@@ -560,7 +560,7 @@ const HeroSearch = () => {
                     <Input
                       value={brandSearch}
                       onChange={(e) => setBrandSearch(e.target.value)}
-                      placeholder="Rechercher une marque..."
+                      placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
                       className="h-9 text-sm mb-2"
                     />
                     <div className="space-y-1">
@@ -584,13 +584,13 @@ const HeroSearch = () => {
               <Input
                 value={modelQuery}
                 onChange={(e) => setModelQuery(e.target.value)}
-                placeholder="Modèle (ex: RAV4, Hilux, NMAX...)"
+                placeholder={t("hero.modelPlaceholder")}
                 className="font-sans min-h-11 text-sm"
               />
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
                   <SelectTrigger className="font-sans min-h-11">
-                    <SelectValue placeholder="Année" />
+                    <SelectValue placeholder={t("search.year", "Année")} />
                   </SelectTrigger>
                   <SelectContent>
                     {HERO_YEAR_PRESETS.map((yearPresetOption) => (
@@ -608,7 +608,7 @@ const HeroSearch = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
                     <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">Carburant</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
                       {fuels.length > 0 && (
                         <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
                           Effacer

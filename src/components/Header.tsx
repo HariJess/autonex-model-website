@@ -31,11 +31,17 @@ const Header = () => {
     AUTO_TRANSACTION_MODES.find((mode) => mode.id === "location_longue") ?? AUTO_TRANSACTION_MODES[3];
   const dealersMode =
     AUTO_TRANSACTION_MODES.find((mode) => mode.id === "concessionnaires") ?? AUTO_TRANSACTION_MODES[4];
+  const language = localStorage.getItem("autonex-lang") || "fr";
 
   const desktopLinks = [
-    { label: dealersMode.label, href: dealersMode.href },
+    { label: t("nav.agencies"), href: dealersMode.href },
     { label: t("nav.advice"), href: "/conseils" },
   ];
+
+  const switchLanguage = (nextLang: "fr" | "mg") => {
+    localStorage.setItem("autonex-lang", nextLang);
+    window.location.reload();
+  };
 
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const transaction = query.get("transaction");
@@ -100,7 +106,7 @@ const Header = () => {
 
         <nav className="hidden lg:flex items-center gap-6">
           <Link to={buyMode.href} className={navLinkClass(isBuyActive)}>
-            {buyMode.label}
+            {t("nav.buy")}
           </Link>
 
           <div
@@ -110,7 +116,7 @@ const Header = () => {
           >
             <div className="flex items-center gap-1">
               <Link to={rentMode.href} className={navLinkClass(isRentActive)}>
-                {rentMode.label}
+                {t("nav.rent")}
               </Link>
               <button
                 type="button"
@@ -145,9 +151,9 @@ const Header = () => {
                         : "text-[#F8FBFF] hover:bg-white/14 hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
                     }`}
                   >
-                    <p className="text-sm font-semibold leading-tight">Location courte durée</p>
+                    <p className="text-sm font-semibold leading-tight">{t("transaction.vacation")}</p>
                     <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-[#D5E3F7]">
-                      Séjours, vacances, besoins ponctuels
+                      {t("transaction.vacation")}
                     </p>
                   </Link>
                   <Link
@@ -159,9 +165,9 @@ const Header = () => {
                         : "text-[#F8FBFF] hover:bg-white/14 hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
                     }`}
                   >
-                    <p className="text-sm font-semibold leading-tight">Location longue durée</p>
+                    <p className="text-sm font-semibold leading-tight">{t("transaction.rent")}</p>
                     <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-[#D5E3F7]">
-                      Usage prolongé, besoins mensuels
+                      {t("transaction.rent")}
                     </p>
                   </Link>
                 </div>
@@ -183,11 +189,29 @@ const Header = () => {
             );
           })}
           <Link to="/estimation" className={estimationDesktopClass}>
-            Estimation
+            {t("nav.estimation", "Estimation")}
           </Link>
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
+          <div className="inline-flex rounded-md border border-muted-foreground/30 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => switchLanguage("fr")}
+              className={`px-2 py-1 text-xs font-semibold ${language === "fr" ? "bg-white/15" : "bg-transparent"}`}
+              style={{ color: "#FAFAFA" }}
+            >
+              {t("common.languageFr", "FR")}
+            </button>
+            <button
+              type="button"
+              onClick={() => switchLanguage("mg")}
+              className={`px-2 py-1 text-xs font-semibold ${language === "mg" ? "bg-white/15" : "bg-transparent"}`}
+              style={{ color: "#FAFAFA" }}
+            >
+              {t("common.languageMg", "MG")}
+            </button>
+          </div>
           <button onClick={toggleCurrency} className="text-xs font-semibold px-2 py-1 rounded border border-muted-foreground/30" style={{ color: "#FAFAFA" }}>
             {currency}
           </button>
@@ -233,7 +257,7 @@ const Header = () => {
               className="text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center touch-manipulation bg-white/[0.02] active:bg-white/[0.08]"
               style={{ color: "#FAFAFA" }}
             >
-              {buyMode.label}
+              {t("nav.buy")}
             </Link>
             <div className="rounded-lg bg-white/[0.02]">
               <button
@@ -244,7 +268,7 @@ const Header = () => {
                 aria-expanded={mobileRentOpen}
                 aria-controls="mobile-rent-submenu"
               >
-                <span>{rentMode.label}</span>
+                <span>{t("nav.rent")}</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${mobileRentOpen ? "rotate-180" : ""}`} />
               </button>
               {mobileRentOpen && (
@@ -255,7 +279,7 @@ const Header = () => {
                     className="ml-2 mr-1 mt-1 text-sm px-3 py-2.5 min-h-11 rounded-lg flex items-center touch-manipulation bg-white/[0.03] active:bg-white/[0.1]"
                     style={{ color: "#FAFAFA" }}
                   >
-                    Location courte durée
+                    {t("transaction.vacation")}
                   </Link>
                   <Link
                     to={longTermMode.href}
@@ -263,7 +287,7 @@ const Header = () => {
                     className="ml-2 mr-1 mt-1 text-sm px-3 py-2.5 min-h-11 rounded-lg flex items-center touch-manipulation bg-white/[0.03] active:bg-white/[0.1]"
                     style={{ color: "#FAFAFA" }}
                   >
-                    Location longue durée
+                    {t("transaction.rent")}
                   </Link>
                 </div>
               )}
@@ -281,7 +305,7 @@ const Header = () => {
               onClick={() => setMenuOpen(false)}
               className={estimationMobileClass}
             >
-              <span>Estimation</span>
+              <span>{t("nav.estimation", "Estimation")}</span>
               <span className="text-[10px] font-semibold uppercase tracking-wide text-[#D9E8FA]">Signature</span>
             </Link>
             <Link
@@ -293,6 +317,14 @@ const Header = () => {
               {t("nav.advice")}
             </Link>
             <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => switchLanguage(language === "fr" ? "mg" : "fr")}
+                className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation"
+                style={{ color: "#FAFAFA" }}
+              >
+                {language === "fr" ? t("common.languageMg", "MG") : t("common.languageFr", "FR")}
+              </button>
               <button onClick={toggleCurrency} className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {currency}
               </button>
