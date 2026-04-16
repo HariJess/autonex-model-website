@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, Check, ChevronRight, Gauge, Loader2, Sparkles, Target, TrendingUp } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -53,9 +54,9 @@ const EMPTY_FORM: EstimationInput = {
 };
 
 const STEP_META = [
-  { id: "vehicle", label: "Véhicule", helper: "Informations principales" },
-  { id: "condition", label: "État", helper: "Historique et usage" },
-  { id: "result", label: "Résultat", helper: "Rapport estimatif" },
+  { id: "vehicle", labelKey: "estimation.stepVehicle", helperKey: "estimation.stepVehicleHelper", labelDefault: "Véhicule", helperDefault: "Informations principales" },
+  { id: "condition", labelKey: "estimation.stepCondition", helperKey: "estimation.stepConditionHelper", labelDefault: "État", helperDefault: "Historique et usage" },
+  { id: "result", labelKey: "estimation.stepResult", helperKey: "estimation.stepResultHelper", labelDefault: "Résultat", helperDefault: "Rapport estimatif" },
 ] as const;
 
 const MADAGASCAR_LOCATION_OPTIONS = [
@@ -109,6 +110,7 @@ const ESTIMATION_UI = {
 } as const;
 
 const VehicleEstimationPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -172,11 +174,11 @@ const VehicleEstimationPage = () => {
     },
     onError: (error) => {
       toast({
-        title: "Estimation indisponible",
+        title: t("estimation.unavailableTitle", "Estimation indisponible"),
         description:
           error instanceof Error
             ? `${error.message} Réessayez dans quelques instants.`
-            : "Une erreur est survenue. Réessayez dans quelques instants.",
+            : t("states.genericErrorRetry", "Une erreur est survenue. Réessayez dans quelques instants."),
         variant: "destructive",
       });
     },
@@ -284,21 +286,21 @@ const VehicleEstimationPage = () => {
               <CardContent className="grid gap-8 p-7 md:grid-cols-[1.4fr_1fr] md:p-11">
                 <div className="space-y-6">
                   <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">
-                    Outil de valorisation AutoNex
+                    {t("estimation.overline", "Outil de valorisation AutoNex")}
                   </Badge>
                   <div className="space-y-3">
                     <h1 className={ESTIMATION_TYPO.h1}>
-                      Estimez la valeur de votre véhicule
+                      {t("estimation.estimateVehicle", "Estimez la valeur de votre véhicule")}
                     </h1>
                     <p className={`${ESTIMATION_TYPO.body} max-w-2xl md:text-base`}>
-                      En quelques étapes, obtenez une estimation claire, crédible et directement utile avant publication.
+                      {t("estimation.landingLead", "En quelques étapes, obtenez une estimation claire, crédible et directement utile avant publication.")}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="font-sans normal-case">Rapide</Badge>
-                    <Badge variant="secondary" className="font-sans normal-case">Transparent</Badge>
-                    <Badge variant="secondary" className="font-sans normal-case">Utile avant publication</Badge>
-                    <Badge variant="secondary" className="font-sans normal-case">Pensé pour Madagascar</Badge>
+                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeFast", "Rapide")}</Badge>
+                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeTransparent", "Transparent")}</Badge>
+                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeUseful", "Utile avant publication")}</Badge>
+                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeMadagascar", "Pensé pour Madagascar")}</Badge>
                   </div>
                   <div className="flex flex-wrap gap-3 pt-1">
                     <Button
@@ -306,7 +308,7 @@ const VehicleEstimationPage = () => {
                       size="lg"
                       className="rounded-xl px-6 font-sans shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
                     >
-                      Commencer l'estimation
+                      {t("estimation.start", "Commencer l'estimation")}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                     <Button
@@ -315,7 +317,7 @@ const VehicleEstimationPage = () => {
                       className="rounded-xl px-5 font-sans transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
                       onClick={() => navigate("/recherche")}
                     >
-                      Explorer les annonces
+                      {t("estimation.exploreListings", "Explorer les annonces")}
                     </Button>
                   </div>
                 </div>
@@ -387,9 +389,9 @@ const VehicleEstimationPage = () => {
         {screen !== "landing" && (
           <div className="mb-5 rounded-3xl border border-border/65 bg-gradient-to-br from-background/95 via-background to-secondary/25 px-4 py-4 shadow-sm md:mb-8 md:px-6 md:py-5">
             <div className="mb-3.5 flex items-center justify-between md:mb-4">
-              <p className="font-sans text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Progression estimation</p>
+              <p className="font-sans text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{t("estimation.progress", "Progression estimation")}</p>
               <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/[0.08] px-2.5 py-1">
-                <p className="font-sans text-[11px] font-medium text-primary">Étape {currentStepIndex} / 3</p>
+                <p className="font-sans text-[11px] font-medium text-primary">{t("publish.stepCounter", "Étape {{current}} / {{total}}", { current: currentStepIndex, total: 3 })}</p>
               </div>
             </div>
 
@@ -438,11 +440,11 @@ const VehicleEstimationPage = () => {
                                 : "font-medium text-muted-foreground"
                           }`}
                         >
-                          {step.label}
+                          {t(step.labelKey, step.labelDefault)}
                         </p>
                       </div>
                       <p className={`font-sans text-[11px] leading-snug md:text-xs ${isUpcoming ? "text-muted-foreground/80" : "text-muted-foreground"}`}>
-                        {step.helper}
+                        {t(step.helperKey, step.helperDefault)}
                       </p>
                       {isActive && (
                         <div className="mt-2 h-0.5 w-10 rounded-full bg-primary/70" />
@@ -715,15 +717,15 @@ const VehicleEstimationPage = () => {
               </div>
 
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-4 sm:flex-row sm:justify-between">
-                <Button variant="outline" onClick={() => setScreen("vehicle")} className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>Étape précédente</Button>
+                <Button variant="outline" onClick={() => setScreen("vehicle")} className={`${ESTIMATION_UI.secondaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>{t("publish.previousStep", "Étape précédente")}</Button>
                 <Button onClick={() => runMutation.mutate()} disabled={!canSubmit || runMutation.isPending} className={`${ESTIMATION_UI.primaryCta} w-full sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2`}>
                   {runMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Génération de l’estimation...
+                      {t("estimation.generating", "Génération de l’estimation...")}
                     </>
                   ) : (
-                    "Voir mon estimation"
+                    t("estimation.viewMyEstimate", "Voir mon estimation")
                   )}
                 </Button>
               </div>

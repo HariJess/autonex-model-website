@@ -76,24 +76,30 @@ function getSellerLabel(listing: DisplayListing, t: (...args: unknown[]) => stri
       : null;
 }
 
-function buildVehicleSpecRows(listing: DisplayListing, sellerLabel: string | null, mileageLabel: string | null, doorsLabel: string | null) {
+function buildVehicleSpecRows(
+  listing: DisplayListing,
+  sellerLabel: string | null,
+  mileageLabel: string | null,
+  doorsLabel: string | null,
+  t: (...args: unknown[]) => string,
+) {
   return [
-    { label: "Marque", value: cleanSpec(listing.vehicle?.make) },
-    { label: "Modèle", value: cleanSpec(listing.vehicle?.model) },
-    { label: "Année", value: cleanSpec(listing.vehicle?.year) },
-    { label: "Kilométrage", value: cleanSpec(mileageLabel) },
-    { label: "Carburant", value: cleanSpec(listing.vehicle?.fuel) },
-    { label: "Boîte", value: cleanSpec(listing.vehicle?.transmission) },
-    { label: "Motricité", value: cleanSpec(listing.vehicle?.drivetrain) },
-    { label: "Portes", value: cleanSpec(doorsLabel) },
-    { label: "Places", value: listing.vehicle?.seats != null && listing.vehicle.seats > 0 ? `${listing.vehicle.seats}` : null },
-    { label: "Carrosserie", value: cleanSpec(listing.vehicle?.bodyStyle) },
-    { label: "État", value: cleanSpec(listing.vehicle?.condition) },
-    { label: "Type vendeur", value: cleanSpec(sellerLabel) },
-    { label: "Couleur ext.", value: cleanSpec(listing.vehicle?.exteriorColor) },
-    { label: "Couleur int.", value: cleanSpec(listing.vehicle?.interiorColor) },
-    { label: "Disponibilité", value: cleanSpec(listing.vehicle?.availabilityStatus) },
-    { label: "Mode location", value: cleanSpec(listing.vehicle?.rentalMode) },
+    { label: t("search.brand", "Marque"), value: cleanSpec(listing.vehicle?.make) },
+    { label: t("search.model", "Modèle"), value: cleanSpec(listing.vehicle?.model) },
+    { label: t("search.year", "Année"), value: cleanSpec(listing.vehicle?.year) },
+    { label: t("search.surface", "Kilométrage"), value: cleanSpec(mileageLabel) },
+    { label: t("search.fuel", "Carburant"), value: cleanSpec(listing.vehicle?.fuel) },
+    { label: t("search.transmission", "Boîte de vitesse"), value: cleanSpec(listing.vehicle?.transmission) },
+    { label: t("listing.drivetrain", "Motricité"), value: cleanSpec(listing.vehicle?.drivetrain) },
+    { label: t("listing.bathrooms", "Portes"), value: cleanSpec(doorsLabel) },
+    { label: t("listing.seats", "Places"), value: listing.vehicle?.seats != null && listing.vehicle.seats > 0 ? `${listing.vehicle.seats}` : null },
+    { label: t("listing.bodyStyle", "Carrosserie"), value: cleanSpec(listing.vehicle?.bodyStyle) },
+    { label: t("listing.condition", "État"), value: cleanSpec(listing.vehicle?.condition) },
+    { label: t("listing.sellerType", "Type vendeur"), value: cleanSpec(sellerLabel) },
+    { label: t("listing.exteriorColor", "Couleur ext."), value: cleanSpec(listing.vehicle?.exteriorColor) },
+    { label: t("listing.interiorColor", "Couleur int."), value: cleanSpec(listing.vehicle?.interiorColor) },
+    { label: t("listing.availability", "Disponibilité"), value: cleanSpec(listing.vehicle?.availabilityStatus) },
+    { label: t("listing.rentalMode", "Mode location"), value: cleanSpec(listing.vehicle?.rentalMode) },
   ].filter((item) => item.value);
 }
 
@@ -460,7 +466,7 @@ const ListingDetail = () => {
   const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
   const vehicleSummary = getVehicleHeadline(listing);
   const sellerLabel = getSellerLabel(listing, t);
-  const vehicleSpecRows = buildVehicleSpecRows(listing, sellerLabel, mileageLabel, doorsLabel);
+  const vehicleSpecRows = buildVehicleSpecRows(listing, sellerLabel, mileageLabel, doorsLabel, t);
   const contactTrustHints = buildContactTrustHints(listing, sellerLabel, t);
   const listingTrustProofs = buildListingTrustProofs(listing, sellerLabel, hasApproxMap, t);
   const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);

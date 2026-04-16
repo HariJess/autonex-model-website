@@ -368,7 +368,7 @@ const SearchPage = () => {
       });
     }
     filters.rooms.forEach((r) =>
-      chips.push({ label: `${r === 0 ? "Base" : `Version ${r}`}`, key: `room-${r}` })
+      chips.push({ label: `${r === 0 ? t("search.trimBase", "Base") : t("search.versionN", "Version {{count}}", { count: r })}`, key: `room-${r}` })
     );
     filters.bathrooms.forEach((b) =>
       chips.push({ label: `${b}${b === 4 ? "+" : ""} portes`, key: `bath-${b}` })
@@ -380,9 +380,9 @@ const SearchPage = () => {
     filters.conditions.forEach((c) => chips.push({ label: c, key: `condition-${c}` }));
     filters.sellerTypes.forEach((s) => chips.push({ label: s, key: `seller-${s}` }));
     filters.brands.forEach((b) => chips.push({ label: b, key: `brand-${b}` }));
-    if (filters.modelQuery.trim()) chips.push({ label: `Modèle: ${filters.modelQuery.trim()}`, key: "modelQuery" });
+    if (filters.modelQuery.trim()) chips.push({ label: `${t("search.model", "Modèle")}: ${filters.modelQuery.trim()}`, key: "modelQuery" });
     if (filters.yearMin > 0 || filters.yearMax > 0) {
-      chips.push({ label: `Année ${filters.yearMin || 0} - ${filters.yearMax || "..."}`, key: "yearRange" });
+      chips.push({ label: `${t("search.year", "Année")} ${filters.yearMin || 0} - ${filters.yearMax || "..."}`, key: "yearRange" });
     }
     return chips;
   }, [filters]);

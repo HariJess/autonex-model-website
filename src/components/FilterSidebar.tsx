@@ -195,7 +195,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                     onCheckedChange={() => setVehicleTypes([])}
                     className={isMobile ? "h-4 w-4" : undefined}
                   />
-                  <span className="font-sans text-sm flex-1">Tous types</span>
+                  <span className="font-sans text-sm flex-1">{t("search.allTypes", "Tous types")}</span>
                 </label>
                 {visibleVehicleTypeOptions.map((vehicleTypeOption) => (
                   <label key={vehicleTypeOption.id} className={cn("flex items-center gap-3 cursor-pointer touch-manipulation", isMobile ? "min-h-11 py-1" : "py-0.5")}>
@@ -216,8 +216,8 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
               {!showAllVehicleTypes && selectedVehicleTypeLabels.length > 0 && (
                 <p className="text-xs text-muted-foreground font-sans">
                   {selectedVehicleTypeLabels.length >= 3
-                    ? `${selectedVehicleTypeLabels.length} types sélectionnés`
-                    : `Sélection active: ${summarizeTypeSelection(selectedVehicleTypeLabels)}`}
+                    ? t("search.selectedTypesCount", "{{count}} types sélectionnés", { count: selectedVehicleTypeLabels.length })
+                    : t("search.activeSelection", "Sélection active: {{value}}", { value: summarizeTypeSelection(selectedVehicleTypeLabels) })}
                 </p>
               )}
               {hasHiddenVehicleTypes && (
@@ -228,7 +228,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                   className="h-8 px-1 font-sans text-xs text-primary hover:text-primary"
                   onClick={() => setShowAllVehicleTypes((prev) => !prev)}
                 >
-                  {showAllVehicleTypes ? "Voir moins" : "Voir plus"}
+                  {showAllVehicleTypes ? t("search.showLess", "Voir moins") : t("search.showMore", "Voir plus")}
                 </Button>
               )}
               {filters.transaction && typeOptions.length < LISTING_TYPES.length && (
@@ -238,7 +238,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           </AccordionItem>
           <AccordionItem value="brand" className="border-b border-border px-4">
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
-              Marque
+              {t("search.brand", "Marque")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 space-y-2">
               {AUTO_BRAND_GROUPS.map((group) => (
@@ -272,12 +272,12 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
               <Input
                 value={filters.modelQuery}
                 onChange={(e) => update({ modelQuery: e.target.value })}
-                placeholder="Modèle (ex: RAV4, Hilux, NMAX...)"
+                placeholder={t("search.modelPlaceholder", "Modèle (ex: RAV4, Hilux, NMAX...)")}
                 className="font-sans text-sm"
               />
               <div className="grid grid-cols-2 gap-2">
-                <Input type="number" min={1950} max={2100} value={filters.yearMin || ""} onChange={(e) => update({ yearMin: Number(e.target.value) || 0 })} placeholder="Année min" className="font-sans text-sm" />
-                <Input type="number" min={1950} max={2100} value={filters.yearMax || ""} onChange={(e) => update({ yearMax: Number(e.target.value) || 0 })} placeholder="Année max" className="font-sans text-sm" />
+                <Input type="number" min={1950} max={2100} value={filters.yearMin || ""} onChange={(e) => update({ yearMin: Number(e.target.value) || 0 })} placeholder={t("search.yearMin", "Année min")} className="font-sans text-sm" />
+                <Input type="number" min={1950} max={2100} value={filters.yearMax || ""} onChange={(e) => update({ yearMax: Number(e.target.value) || 0 })} placeholder={t("search.yearMax", "Année max")} className="font-sans text-sm" />
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -370,7 +370,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
               <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.rooms", "Version")}</AccordionTrigger>
               <AccordionContent className="pb-3">
                 <div className="flex flex-wrap gap-2">
-                  {[{ label: "Base", value: 0 }, { label: "Confort", value: 1 }, { label: "Premium", value: 2 }, { label: "Sport", value: 3 }, { label: "4x4", value: 4 }, { label: "Luxe", value: 5 }].map((r) => (
+                  {[{ label: t("search.trimBase", "Base"), value: 0 }, { label: t("search.trimComfort", "Confort"), value: 1 }, { label: t("search.trimPremium", "Premium"), value: 2 }, { label: t("search.trimSport", "Sport"), value: 3 }, { label: "4x4", value: 4 }, { label: t("search.trimLuxury", "Luxe"), value: 5 }].map((r) => (
                     <Button
                       key={r.value}
                       type="button"

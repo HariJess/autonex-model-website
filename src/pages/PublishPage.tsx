@@ -124,23 +124,23 @@ const PublishPage = () => {
   const stepGuides = [
     {
       title: t("publish.stepMain", "Informations principales"),
-      subtitle: "Cadrez la base de votre annonce avec clarté.",
-      helper: "Définissez transaction, type de véhicule et localisation pour une lecture immédiate.",
+      subtitle: t("publish.stepMainSubtitle", "Cadrez la base de votre annonce avec clarté."),
+      helper: t("publish.stepMainHelper", "Définissez transaction, type de véhicule et localisation pour une lecture immédiate."),
     },
     {
       title: t("publish.stepDetails", "Détails du véhicule"),
-      subtitle: "Renforcez la crédibilité de votre offre.",
-      helper: "Titre précis, prix cohérent et identité véhicule complète pour inspirer confiance.",
+      subtitle: t("publish.stepDetailsSubtitle", "Renforcez la crédibilité de votre offre."),
+      helper: t("publish.stepDetailsHelper", "Titre précis, prix cohérent et identité véhicule complète pour inspirer confiance."),
     },
     {
       title: t("publish.stepMedia", "Médias"),
-      subtitle: "Valorisez visuellement votre annonce.",
-      helper: "Privilégiez des photos nettes et une couverture forte pour améliorer l’intention de contact.",
+      subtitle: t("publish.stepMediaSubtitle", "Valorisez visuellement votre annonce."),
+      helper: t("publish.stepMediaHelper", "Privilégiez des photos nettes et une couverture forte pour améliorer l’intention de contact."),
     },
     {
       title: t("publish.stepVisibility", "Visibilité & envoi"),
-      subtitle: "Finalisez avec confiance.",
-      helper: "Vérifiez le récapitulatif, ajustez vos options puis envoyez votre annonce à la modération.",
+      subtitle: t("home.finalizeConfidence", "Finalisez avec confiance."),
+      helper: t("publish.stepVisibilityHelper", "Vérifiez le récapitulatif, ajustez vos options puis envoyez votre annonce à la modération."),
     },
   ] as const;
 
