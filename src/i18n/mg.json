@@ -40,9 +40,9 @@
     "result_many": "Valiny {{count}}"
   },
   "home": {
-    "quickExplore": "Hijery haingana",
+    "quickExplore": "Tsidiho haingana",
     "mainCategories": "Sokajy lehibe",
-    "brandNavigation": "Fitetezana araka marika",
+    "brandNavigation": "Mitady araka ny marika",
     "popularBrands": "Marika malaza",
     "estimationOverline": "Tanjaka AutoNex",
     "estimationTitle": "Tombana: antoka alohan'ny fifampiraharahana",
@@ -68,9 +68,9 @@
   },
   "sections": {
     "featured": "Annonces asongadina",
-    "viewAll": "Hijery rehetra",
+    "viewAll": "Jereo rehetra",
     "latest": "Annonce vaovao",
-    "viewMore": "Hijery bebe kokoa"
+    "viewMore": "Jereo bebe kokoa"
   },
   "search": {
     "title": "Valin'ny fikarohana",
@@ -92,7 +92,7 @@
     "allTypes": "Karazana rehetra",
     "selectedTypesCount": "Karazana {{count}} no voafidy",
     "activeSelection": "Safidy mavitrika: {{value}}",
-    "showLess": "Asehoy kely",
+    "showLess": "Asehoy vitsy kokoa",
     "showMore": "Asehoy bebe kokoa",
     "brand": "Marika",
     "model": "Modely",
@@ -129,9 +129,9 @@
     "viewList": "Lisitra",
     "viewMap": "Sarintany",
     "seeListing": "Hijery annonce",
-    "matchHintBudget": "Tetibola somary ambony",
+    "matchHintBudget": "Tetibola avo kokoa",
     "matchHintZone": "Valiny akaiky",
-    "matchHintApprox": "Mifanaraka manakaiky"
+    "matchHintApprox": "Mifanakaiky"
   },
   "listing": {
     "description": "Fanazavana",
@@ -151,7 +151,7 @@
     "locationApproxDesc": "Faritra manakaiky eo amin'ny sarintany (tsy aseho ampahibemaso ny adiresy marina).",
     "locationNoCoords": "Tsy misy toerana voatahiry amin'ny sarintany ho an'ity fiara ity.",
     "mapFallback": "Tsy misy sarintany ho an'ity fiara ity. Ny adiresy an-tsoratra etsy ambony no mari-toerana fototra.",
-    "priorityContact": "Fifandraisana laharam-pahamehana",
+    "priorityContact": "Fifandraisana voalohany",
     "quickContact": "Fifandraisana haingana",
     "contactReassurance": "Voaaro sy voarakitra ny hetsika fifandraisana rehetra mba hiantohana fifanakalozana azo itokisana.",
     "contactHint": "Lazao mazava ny filanao mba hahazoana valiny haingana sy mahasoa kokoa.",
@@ -224,7 +224,7 @@
     "selectAvailability": "Hisafidy disponibilité",
     "otherFeaturesTitle": "Toetra hafa (tsy voatery)",
     "otherFeaturesPlaceholder": "Ohatra: Suspension adaptative, sièges ventilés, affichage tête haute...",
-    "otherFeaturesHint": "Saraho amin'ny virgule ny singa raha hampiditra toetra maro."
+    "otherFeaturesHint": "Saraho amin'ny faingo ny singa raha hampiditra toetra maro."
   },
   "estimation": {
     "title": "Tombana",
@@ -290,7 +290,7 @@
     "marketRangeTitle": "Elanelam-bidin'ny tsena",
     "marketRangeDesc": "Fototra azo itokisana hanapahanao ny fametrahana ny vidiny.",
     "confidenceLevelTitle": "Haavon'ny fitokisana",
-    "confidenceLevelDesc": "Fijerena avy hatrany ny hamafin'ny tombana.",
+    "confidenceLevelDesc": "Fandrefesana avy hatrany ny tanjaka sy ny fahatokisana ny tombana.",
     "recommendedPriceTitle": "Vidiny atolotra amin'ny famoahana",
     "recommendedPriceDesc": "Vonona ampiasaina hamoahana haingana ao amin'ny AutoNex.",
     "readyNextTitle": "Vonona amin'ny dingana manaraka",
@@ -325,7 +325,7 @@
     "practicalTipTitle": "Torohevitra azo ampiharina",
     "practicalTipDesc": "Raha misalasala ianao dia fidio ny safidy malina kokoa.",
     "usageFrameAria": "Fetran'ny fampiasana ny tombana",
-    "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy expertise mécanique, ary tsy vidiny voaantoka.",
+    "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy fanombanana ara-mekanika, ary tsy vidiny voaantoka.",
     "usageAdviceAria": "Torohevitra fampiasana ny tatitra tombana",
     "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana annonce mifanaraka tsara."
   },
@@ -356,7 +356,7 @@
     "languageMg": "MG",
     "yes": "Eny",
     "no": "Tsia",
-    "openMenu": "Hanokatra menu",
-    "closeMenu": "Hanakatona menu"
+    "openMenu": "Sokafy ny menio",
+    "closeMenu": "Akatony ny menio"
   }
 }
