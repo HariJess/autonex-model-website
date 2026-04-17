@@ -1693,7 +1693,10 @@ const PublishPage = () => {
           <div className="space-y-4">
             <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-4 md:px-5">
               <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                Étape {step + 1} / {steps.length}
+                {t("publish.stepCounter", "Étape {{current}} / {{total}}", {
+                  current: step + 1,
+                  total: steps.length,
+                })}
               </p>
               <p className="mt-1 font-serif text-2xl text-foreground">{stepGuides[step]?.title}</p>
               <p className="mt-1 font-sans text-sm font-medium text-foreground/85">{stepGuides[step]?.subtitle}</p>
@@ -1737,10 +1740,16 @@ const PublishPage = () => {
               mapNeedVille: t("publish.mapNeedVille", "Choisissez d’abord une ville."),
               mapNoCoordsForCity: t("publish.mapNoCoordsForCity", "Impossible de placer la carte pour cette ville. Vérifiez le nom ou contactez le support."),
               select: t("common.select"),
-              sell: "Vendre",
-              rent: "Louer",
-              shortTermRental: "Location courte durée",
-              transactionHint: "Définissez le mode de commercialisation de votre annonce (vente, location, ou courte durée).",
+              sell: t("publish.sell", "Vendre"),
+              rent: t("publish.rent", "Louer"),
+              shortTermRental: t("publish.shortTermRental", "Location courte durée"),
+              transactionHint: t(
+                "publish.transactionHint",
+                "Définissez le mode de commercialisation de votre annonce (vente, location, ou courte durée).",
+              ),
+              transactionType: t("publish.transactionType", "Type de transaction"),
+              listingLocationTitle: t("publish.listingLocationTitle", "Localisation de l'annonce"),
+              listingLocationHint: t("publish.listingLocationHint", "La ville et un point sur carte sont requis pour publier."),
             }}
             onTransactionChange={(v) => {
               setTransaction(v);
@@ -1879,6 +1888,10 @@ const PublishPage = () => {
               localOnly: t("publish.localOnly", "Local"),
               videoUrl: t("publish.videoUrl", "Lien vidéo (YouTube, etc.) — optionnel"),
               tourUrl: t("publish.tourUrl", "Visite virtuelle (URL) — optionnel"),
+              mainPhotosTitle: t("publish.mainPhotosTitle", "Photos principales"),
+              cover: t("publish.cover", "Couverture"),
+              advancedMediaTitle: t("publish.advancedMediaTitle", "Médias complémentaires (optionnel)"),
+              advancedMediaHint: t("publish.advancedMediaHint", "Ajoutez une vidéo ou une visite virtuelle si disponible."),
             }}
             onPhotoSelect={handlePhotoSelect}
             onMakeCoverAtIndex={(i) => void makeCoverAtIndex(i)}
@@ -1941,29 +1954,37 @@ const PublishPage = () => {
 
           <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-secondary/20 p-4">
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Guidage AutoNex</p>
-              <p className="mt-1 font-serif text-lg text-foreground">Publiez avec confiance</p>
+              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                {t("publish.guidanceOverline", "Guidage AutoNex")}
+              </p>
+              <p className="mt-1 font-serif text-lg text-foreground">{t("publish.publishWithConfidence", "Publiez avec confiance")}</p>
               <div className="mt-3 space-y-2.5">
                 <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
                   <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
                     <ShieldCheck className="h-4 w-4 text-primary" />
-                    Brouillon sécurisé
+                    {t("publish.secureDraft", "Brouillon sécurisé")}
                   </p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">Vos modifications sont sauvegardées automatiquement.</p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">
+                    {t("publish.secureDraftHint", "Vos modifications sont sauvegardées automatiquement.")}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
                   <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    Modération avant publication
+                    {t("publish.prePublishModeration", "Modération avant publication")}
                   </p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">Chaque annonce est vérifiée pour protéger la qualité du catalogue.</p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">
+                    {t("publish.prePublishModerationHint", "Chaque annonce est vérifiée pour protéger la qualité du catalogue.")}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
                   <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
                     <Sparkles className="h-4 w-4 text-primary" />
-                    Parcours guidé
+                    {t("publish.guidedFlow", "Parcours guidé")}
                   </p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">Validez chaque étape pour avancer sereinement et limiter les retours arrière.</p>
+                  <p className="mt-1 font-sans text-xs text-muted-foreground">
+                    {t("publish.guidedFlowHint", "Validez chaque étape pour avancer sereinement et limiter les retours arrière.")}
+                  </p>
                 </div>
               </div>
             </div>

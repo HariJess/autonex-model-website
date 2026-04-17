@@ -440,11 +440,11 @@ const ListingDetail = () => {
 
   const transactionLabel =
     listing.transaction === "vente"
-      ? "Vente"
+      ? t("publish.sell", "Vente")
       : listing.transaction === "location"
-        ? "Location"
+        ? t("publish.rent", "Location")
         : listing.transaction === "location_vacances"
-          ? "Location courte durée"
+          ? t("publish.shortTermRental", "Location courte durée")
           : TRANSACTION_LABELS[listing.transaction] ?? listing.transaction;
   const typeLabel = LISTING_TYPE_LABELS[listing.type] ?? listing.type;
   const addressLine = [listing.ville, listing.arrondissement, listing.quartier, listing.region].filter(Boolean).join(", ");
@@ -586,8 +586,8 @@ const ListingDetail = () => {
               <div className="flex flex-wrap items-center gap-2.5 mb-2">
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{transactionLabel}</Badge>
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{typeLabel}</Badge>
-                {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Électrique</Badge>}
-                {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>Hybride</Badge>}
+                {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.electric", "Électrique")}</Badge>}
+                {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.hybrid", "Hybride")}</Badge>}
                 {listing.badge && (
                   <Badge
                     className={`font-sans text-xs ${
@@ -619,7 +619,9 @@ const ListingDetail = () => {
                     imgClassName="max-h-5"
                     showFallbackLabel={!displayBrandAsset?.logoPath}
                   />
-                  <span className="text-xs font-medium font-sans text-muted-foreground">Marque: {displayBrand}</span>
+                  <span className="text-xs font-medium font-sans text-muted-foreground">
+                    {t("search.brand", "Marque")}: {displayBrand}
+                  </span>
                 </div>
               )}
               {listing.internal_ref && isOwner && (
@@ -732,7 +734,7 @@ const ListingDetail = () => {
                   <CarFront className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{versionLabel}</p>
-                    <p className="text-xs text-muted-foreground font-sans">Version / finition</p>
+                    <p className="text-xs text-muted-foreground font-sans">{t("listing.rooms", "Version")} / {t("publish.advancedInfoTitle", "finition")}</p>
                   </div>
                 </div>
               )}
@@ -741,7 +743,7 @@ const ListingDetail = () => {
                   <Gauge className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{mileageLabel}</p>
-                    <p className="text-xs text-muted-foreground font-sans">Kilométrage</p>
+                    <p className="text-xs text-muted-foreground font-sans">{t("search.surface", "Kilométrage")}</p>
                   </div>
                 </div>
               )}
@@ -750,7 +752,7 @@ const ListingDetail = () => {
                   <DoorOpen className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{doorsLabel}</p>
-                    <p className="text-xs text-muted-foreground font-sans">Portes</p>
+                    <p className="text-xs text-muted-foreground font-sans">{t("listing.bathrooms", "Portes")}</p>
                   </div>
                 </div>
               )}
@@ -759,7 +761,7 @@ const ListingDetail = () => {
                   <Users className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{listing.vehicle.seats}</p>
-                    <p className="text-xs text-muted-foreground font-sans">Places</p>
+                    <p className="text-xs text-muted-foreground font-sans">{t("listing.seats", "Places")}</p>
                   </div>
                 </div>
               )}

@@ -111,20 +111,27 @@ const PublishStepVisibility = ({
   const [showCreditPurchase, setShowCreditPurchase] = useState(!editMode && !canPublishWithCredits);
   const transactionLabel =
     transaction === "vente"
-      ? "Vendre"
+      ? t("publish.sell", "Vendre")
       : transaction === "location"
-        ? "Louer"
+        ? t("publish.rent", "Louer")
         : transaction === "location_vacances"
-          ? "Location courte durée"
-          : "—";
+          ? t("publish.shortTermRental", "Location courte durée")
+          : t("common.none", "—");
 
   return (
     <div className="space-y-5 pb-2">
       <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3.5">
-        <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Étape finale</p>
-        <p className="mt-1 font-serif text-lg text-foreground">Finalisez en 3 choix simples</p>
+        <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+          {t("publish.finalStep", "Étape finale")}
+        </p>
+        <p className="mt-1 font-serif text-lg text-foreground">
+          {t("publish.finalizeThreeChoices", "Finalisez en 3 choix simples")}
+        </p>
         <p className="mt-1 font-sans text-sm text-muted-foreground">
-          Vérifiez le coût, sélectionnez la visibilité souhaitée, puis envoyez votre annonce pour modération.
+          {t(
+            "publish.finalizeStepHint",
+            "Vérifiez le coût, sélectionnez la visibilité souhaitée, puis envoyez votre annonce pour modération.",
+          )}
         </p>
       </div>
 
@@ -180,7 +187,7 @@ const PublishStepVisibility = ({
                 </div>
               )}
               <div className="flex justify-between font-semibold border-t pt-2">
-                <span>Total</span>
+                <span>{t("publish.total", "Total")}</span>
                 <span>{totalCost}</span>
               </div>
               {!canPublishWithCredits && (
@@ -219,7 +226,10 @@ const PublishStepVisibility = ({
         <CardContent className="space-y-2">
           {!editMode && (
             <p className="rounded-lg border border-border/70 bg-background/70 px-3 py-2 text-xs font-sans text-muted-foreground">
-              Sélectionnez uniquement les options utiles maintenant: vous pouvez publier sans boost.
+              {t(
+                "publish.boostPragmaticHint",
+                "Sélectionnez uniquement les options utiles maintenant: vous pouvez publier sans boost.",
+              )}
             </p>
           )}
           {BOOST_ORDER.map((b) => (
@@ -285,7 +295,7 @@ const PublishStepVisibility = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="font-sans text-sm space-y-1 text-muted-foreground">
-          <p><strong className="text-foreground">{title || "—"}</strong></p>
+          <p><strong className="text-foreground">{title || t("common.none", "—")}</strong></p>
           <p>
             {listingType ? LISTING_TYPE_LABELS[listingType as ListingType] : ""} · {transactionLabel} · {ville}
           </p>
@@ -320,7 +330,7 @@ const PublishStepVisibility = ({
           <div>
             <h3 className="font-serif font-semibold">{t("publish.buyCredits", "Acheter des crédits")}</h3>
             <p className="text-xs text-muted-foreground font-sans">
-              Ouvrez ce bloc uniquement si votre solde est insuffisant.
+              {t("publish.buyCreditsAccordionHint", "Ouvrez ce bloc uniquement si votre solde est insuffisant.")}
             </p>
           </div>
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showCreditPurchase ? "rotate-180" : ""}`} />

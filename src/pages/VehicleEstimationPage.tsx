@@ -464,7 +464,10 @@ const VehicleEstimationPage = () => {
                   <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 px-2.5 py-0.5 font-sans normal-case text-primary">{t("estimation.stepOne", "Étape 1")}</Badge>
                 <CardTitle className={ESTIMATION_TYPO.h2}>{t("estimation.vehicleIdentity", "Identité du véhicule")}</CardTitle>
                 <p className={ESTIMATION_TYPO.body}>
-                  Renseignez les informations clés du véhicule pour établir une base d'estimation fiable et exploitable.
+                  {t(
+                    "estimation.vehicleIdentityLead",
+                    "Renseignez les informations clés du véhicule pour établir une base d'estimation fiable et exploitable.",
+                  )}
                 </p>
               </div>
             </CardHeader>
@@ -581,7 +584,7 @@ const VehicleEstimationPage = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Carrosserie</Label>
+                  <Label>{t("listing.bodyStyle", "Carrosserie")}</Label>
                   <Select value={form.bodyType} onValueChange={(value) => setForm((prev) => ({ ...prev, bodyType: value as EstimationInput["bodyType"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
                     <SelectContent>{ESTIMATION_BODY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
@@ -743,7 +746,7 @@ const VehicleEstimationPage = () => {
 
         {screen === "result" && result && presentation && (
           <>
-            <section aria-label="Résultat d'estimation véhicule" className="space-y-3">
+            <section aria-label={t("estimation.resultSectionAria", "Résultat d'estimation véhicule")} className="space-y-3">
               <EstimationResultReport
                 result={result}
                 presentation={presentation}

@@ -39,41 +39,41 @@ const Index = () => {
     () => [
       {
         key: "suv-pickup",
-        label: "SUV & Pick-up",
+        label: t("home.categorySuvPickup", "SUV & Pick-up"),
         to: "/recherche?vtype=suv_4x4,pick_up",
-        iconSrc: "/category-icons/category-suv-pickup.svg",
-        iconAlt: "Silhouette SUV et Pick-up",
+        iconSrc: "/category-icons/category-suv-pickup.svg.svg",
+        iconAlt: t("home.categorySuvPickupAlt", "Silhouette SUV et Pick-up"),
       },
       {
         key: "berline",
-        label: "Berline",
+        label: t("home.categorySedan", "Berline"),
         to: "/recherche?vtype=berline",
-        iconSrc: "/category-icons/category-sedan.svg",
-        iconAlt: "Silhouette berline",
+        iconSrc: "/category-icons/category-sedan.svg.svg",
+        iconAlt: t("home.categorySedanAlt", "Silhouette berline"),
       },
       {
         key: "citadine",
-        label: "Citadine",
+        label: t("home.categoryCity", "Citadine"),
         to: "/recherche?vtype=citadine",
         iconSrc: "/category-icons/category-citadine.svg",
-        iconAlt: "Silhouette citadine",
+        iconAlt: t("home.categoryCityAlt", "Silhouette citadine"),
       },
       {
         key: "utilitaire",
-        label: "Utilitaire",
+        label: t("home.categoryUtility", "Utilitaire"),
         to: "/recherche?vtype=utilitaire_leger",
-        iconSrc: "/category-icons/category-utilitaire.svg",
-        iconAlt: "Silhouette utilitaire",
+        iconSrc: "/category-icons/category-utilitaire.svg.svg",
+        iconAlt: t("home.categoryUtilityAlt", "Silhouette utilitaire"),
       },
       {
         key: "scooter",
-        label: "Moto",
+        label: t("home.categoryMoto", "Moto"),
         to: "/recherche?vtype=moto",
-        iconSrc: "/category-icons/category-scooter.svg",
-        iconAlt: "Silhouette scooter",
+        iconSrc: "/category-icons/category-scooter.svg.svg",
+        iconAlt: t("home.categoryMotoAlt", "Silhouette scooter"),
       },
     ],
-    [],
+    [t],
   );
   const popularBrands = useMemo(() => {
     const curatedBrandIds = [
@@ -369,6 +369,13 @@ const Index = () => {
                   alt={shortcut.iconAlt}
                   loading="lazy"
                   className="h-9 md:h-10 w-auto object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
+                  onError={(event) => {
+                    const target = event.currentTarget;
+                    if (!target.dataset.fallbackApplied) {
+                      target.dataset.fallbackApplied = "1";
+                      target.src = "/category-icons/category-citadine.svg";
+                    }
+                  }}
                 />
                 <span className="font-serif text-sm md:text-base text-foreground leading-tight">{shortcut.label}</span>
               </Link>

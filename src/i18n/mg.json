@@ -2,7 +2,7 @@
   "nav": {
     "buy": "Hividy",
     "rent": "Fanofana maharitra",
-    "agencies": "Agence",
+    "agencies": "Concessionnaire",
     "advice": "Torohevitra",
     "publish": "Hampiditra annonce",
     "login": "Hiditra",
@@ -10,7 +10,8 @@
     "logout": "Hivoaka",
     "home": "Fandraisana",
     "estimation": "Tombana",
-    "favorites": "Ankafizina"
+    "favorites": "Ankafizina",
+    "estimationTag": "Signature"
   },
   "transaction": {
     "sale": "Hividy",
@@ -64,7 +65,18 @@
     "collectionOverline": "Fanangonana AutoNex",
     "collectionLoadingTitle": "Eo am-panomanana ny fisafidianana",
     "collectionLoadingDesc": "Alahatray ity fanangonana ity mba hanolorana anao ny annonces tena mifandraika indrindra.",
-    "estimationSupport": "Mahazoa elanelam-bidy voamarina, haavon'ny fitokisana mazava ary tatitra ilaina hanapahanao hevitra amin'ny fividianana na fivarotana."
+    "estimationSupport": "Mahazoa elanelam-bidy voamarina, haavon'ny fitokisana mazava ary tatitra ilaina hanapahanao hevitra amin'ny fividianana na fivarotana.",
+    "categorySuvPickup": "SUV sy Pick-up",
+    "categorySuvPickupAlt": "Endriky ny SUV sy Pick-up",
+    "categorySedan": "Berline",
+    "categorySedanAlt": "Endriky ny berline",
+    "categoryUtility": "Utilitaire",
+    "categoryUtilityAlt": "Endriky ny utilitaire",
+    "categoryMoto": "Moto",
+    "categoryMotoAlt": "Endriky ny scooter"
+    ,
+    "categoryCity": "Citadine",
+    "categoryCityAlt": "Endriky ny citadine"
   },
   "sections": {
     "featured": "Annonces asongadina",
@@ -131,7 +143,12 @@
     "seeListing": "Hijery annonce",
     "matchHintBudget": "Tetibola avo kokoa",
     "matchHintZone": "Valiny akaiky",
-    "matchHintApprox": "Mifanakaiky"
+    "matchHintApprox": "Mifanakaiky",
+    "heroLead": "Tsidiho ny annonces voamarina miaraka amin'ny sivana mandroso mba hahitana haingana kokoa ny fiara mety.",
+    "mainSelectionOverline": "Safidy fototra",
+    "mainSelectionMapTitle": "Fikarohana amin'ny sarintany sy annonces",
+    "mainSelectionListTitle": "Annonces mifanaraka amin'ny fikarohanao",
+    "sidebarOverline": "Fikarohana AutoNex"
   },
   "listing": {
     "description": "Fanazavana",
@@ -171,10 +188,17 @@
     "trustAgencyVerified": "Profil mpivarotra nohamarinin'i AutoNex",
     "trustPhotosCount": "Galerie feno (sary {{count}})",
     "trustLocation": "Misy faritra toerana eo amin'ny sarintany",
-    "trustStatus": "Annonce mavitrika ao amin'ny catalogue public"
+    "trustStatus": "Annonce mavitrika ao amin'ny catalogue public",
+    "electric": "Elektrika",
+    "hybrid": "Hybride",
+    "seats": "Seza"
   },
   "publish": {
     "title": "Hampiditra annonce",
+    "stepMain": "Fanazavana fototra",
+    "stepDetails": "Antsipirihan'ny fiara",
+    "stepMedia": "Sary sy media",
+    "stepVisibility": "Visibility sy fandefasana",
     "next": "Dingana manaraka",
     "prev": "Dingana teo aloha",
     "submit": "Hampiditra ny fiarako",
@@ -190,6 +214,16 @@
     "freeNoPayment": "Dika vonjimaika voatahiry",
     "moderation": "Fanaraha-maso"
     ,
+    "moderationBanner": "AutoNex dia manamarina ny annonce rehetra alohan'ny famoahana. Vidiny: {cost} crédits isaky ny fandefasana (+ safidy boost). Description dia amin'ny teny frantsay ihany.",
+    "newListing": "Annonce vaovao",
+    "saving": "Mitahiry…",
+    "draftSaved": "Voatahiry ny brouillon",
+    "draftSaveFailed": "Tsy nahomby ny fitahirizana",
+    "draftAuto": "Brouillon automatique",
+    "lastSaved": "Fitahirizana farany : {{time}}",
+    "transactionHint": "Farito ny fomba fivarotana ny annonce-nao (fivarotana, fanofana, na fanofana vetivety).",
+    "guidanceOverline": "Torolalana AutoNex",
+    "total": "Totaly",
     "stepMainSubtitle": "Farito mazava ny fototry ny annonce-nao.",
     "stepMainHelper": "Safidio ny transaction, karazana fiara ary toerana ho mora vakiana avy hatrany.",
     "stepDetailsSubtitle": "Hamafiso ny fahatokisana ny tolotrao.",
@@ -224,7 +258,29 @@
     "selectAvailability": "Hisafidy disponibilité",
     "otherFeaturesTitle": "Toetra hafa (tsy voatery)",
     "otherFeaturesPlaceholder": "Ohatra: Suspension adaptative, sièges ventilés, affichage tête haute...",
-    "otherFeaturesHint": "Saraho amin'ny faingo ny singa raha hampiditra toetra maro."
+    "otherFeaturesHint": "Saraho amin'ny faingo ny singa raha hampiditra toetra maro.",
+    "transactionType": "Karazana transaction",
+    "listingLocationTitle": "Toeran'ny annonce",
+    "listingLocationHint": "Ilaina ny tanàna sy teboka amin'ny sarintany vao afaka mamoaka.",
+    "mainPhotosTitle": "Sary fototra",
+    "cover": "Sary fonony",
+    "advancedMediaTitle": "Média fanampiny (tsy voatery)",
+    "advancedMediaHint": "Ampio rohy vidéo na visite virtuelle raha misy.",
+    "publishWithConfidence": "Mamoaha am-pahatokisana",
+    "secureDraft": "Brouillon voaaro",
+    "secureDraftHint": "Voatahiry ho azy ny fanovànao.",
+    "prePublishModeration": "Fanaraha-maso alohan'ny famoahana",
+    "prePublishModerationHint": "Hamarininay ny annonce rehetra hiarovana ny kalitaon'ny catalogue.",
+    "guidedFlow": "Lalana tarihina",
+    "guidedFlowHint": "Hamarino ny dingana tsirairay mba handrosoana milamina.",
+    "finalStep": "Dingana farany",
+    "finalizeThreeChoices": "Farano amin'ny safidy 3 tsotra",
+    "finalizeStepHint": "Jereo ny vidiny, fidio ny visibilité ilaina, avy eo alefaso ho fanaraha-maso ny annonce-nao.",
+    "boostPragmaticHint": "Safidio fotsiny ireo boost tena ilaina: afaka mamoaka tsy misy boost ianao.",
+    "buyCreditsAccordionHint": "Sokafy ity raha tsy ampy ny solde-nao.",
+    "sell": "Hivarotra",
+    "rent": "Hanofa",
+    "shortTermRental": "Fanofana vetivety"
   },
   "estimation": {
     "title": "Tombana",
@@ -327,7 +383,9 @@
     "usageFrameAria": "Fetran'ny fampiasana ny tombana",
     "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy fanombanana ara-mekanika, ary tsy vidiny voaantoka.",
     "usageAdviceAria": "Torohevitra fampiasana ny tatitra tombana",
-    "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana annonce mifanaraka tsara."
+    "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana annonce mifanaraka tsara.",
+    "vehicleIdentityLead": "Fenoy ny vaovao fototra momba ny fiara mba hahazoana tombana azo itokisana sy azo ampiasaina.",
+    "resultSectionAria": "Vokatry ny tombana fiara"
   },
   "states": {
     "loading": "Eo am-pamenoana",
@@ -357,6 +415,7 @@
     "yes": "Eny",
     "no": "Tsia",
     "openMenu": "Sokafy ny menio",
-    "closeMenu": "Akatony ny menio"
+    "closeMenu": "Akatony ny menio",
+    "none": "—"
   }
 }

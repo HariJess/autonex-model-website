@@ -298,7 +298,7 @@ const Header = () => {
               className="text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center touch-manipulation bg-white/[0.02] active:bg-white/[0.08]"
               style={{ color: "#FAFAFA" }}
             >
-              {dealersMode.label}
+              {t("nav.agencies")}
             </Link>
             <Link
               to="/estimation"
@@ -306,7 +306,9 @@ const Header = () => {
               className={estimationMobileClass}
             >
               <span>{t("nav.estimation", "Estimation")}</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-[#D9E8FA]">Signature</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-[#D9E8FA]">
+                {t("nav.estimationTag", "Signature")}
+              </span>
             </Link>
             <Link
               to="/conseils"

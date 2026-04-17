@@ -34,6 +34,9 @@ type PublishBasicInfoSectionProps = {
     rent: string;
     shortTermRental: string;
     transactionHint: string;
+    transactionType: string;
+    listingLocationTitle: string;
+    listingLocationHint: string;
   };
   onTransactionChange: (value: TransactionType) => void;
   onVehicleTypeChange: (value: string) => void;
@@ -73,7 +76,7 @@ export function PublishBasicInfoSection({
     <div className="space-y-5 form-surface">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="font-sans">Type de transaction *</Label>
+          <Label className="font-sans">{labels.transactionType} *</Label>
           <Select value={transaction} onValueChange={(v) => onTransactionChange(v as TransactionType)}>
             <SelectTrigger className="font-sans">
               <SelectValue placeholder={labels.select} />
@@ -115,9 +118,9 @@ export function PublishBasicInfoSection({
       </div>
       <div className="space-y-3 rounded-xl border border-border/80 bg-muted/20 px-4 py-4">
         <div>
-          <p className="font-serif font-semibold text-sm text-foreground">Localisation de l'annonce *</p>
+          <p className="font-serif font-semibold text-sm text-foreground">{labels.listingLocationTitle} *</p>
           <p className="text-xs text-muted-foreground font-sans mt-1">
-            La ville et un point sur carte sont requis pour publier.
+            {labels.listingLocationHint}
           </p>
         </div>
       <LocationPicker

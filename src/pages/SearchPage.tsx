@@ -656,7 +656,10 @@ const SearchPage = () => {
           )}
         </h1>
         <p className="font-sans text-sm text-muted-foreground max-w-3xl mb-3">
-          Explorez des annonces vérifiées avec des filtres avancés pour trouver plus vite le bon véhicule.
+          {t(
+            "search.heroLead",
+            "Explorez des annonces vérifiées avec des filtres avancés pour trouver plus vite le bon véhicule.",
+          )}
         </p>
 
         <SearchActiveChips
@@ -771,8 +774,12 @@ const SearchPage = () => {
               <section className="space-y-3">
                 <div className="flex items-end justify-between gap-2">
                   <div>
-                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Sélection principale</p>
-                    <p className="font-serif text-xl text-foreground">Exploration carte + annonces</p>
+                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                      {t("search.mainSelectionOverline", "Sélection principale")}
+                    </p>
+                    <p className="font-serif text-xl text-foreground">
+                      {t("search.mainSelectionMapTitle", "Exploration carte + annonces")}
+                    </p>
                   </div>
                 </div>
               <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[min(600px,70vh)]">
@@ -805,8 +812,12 @@ const SearchPage = () => {
               <section className="space-y-3">
                 <div className="flex items-end justify-between gap-2">
                   <div>
-                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Sélection principale</p>
-                    <p className="font-serif text-xl text-foreground">Annonces correspondant à votre recherche</p>
+                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                      {t("search.mainSelectionOverline", "Sélection principale")}
+                    </p>
+                    <p className="font-serif text-xl text-foreground">
+                      {t("search.mainSelectionListTitle", "Annonces correspondant à votre recherche")}
+                    </p>
                   </div>
                 </div>
                 <SearchResultsList
@@ -823,8 +834,12 @@ const SearchPage = () => {
               <section className="space-y-3">
                 <div className="flex items-end justify-between gap-2">
                   <div>
-                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Sélection principale</p>
-                    <p className="font-serif text-xl text-foreground">Annonces correspondant à votre recherche</p>
+                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                      {t("search.mainSelectionOverline", "Sélection principale")}
+                    </p>
+                    <p className="font-serif text-xl text-foreground">
+                      {t("search.mainSelectionListTitle", "Annonces correspondant à votre recherche")}
+                    </p>
                   </div>
                 </div>
                 <SearchResultsGrid
