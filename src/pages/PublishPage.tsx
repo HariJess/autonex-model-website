@@ -1374,11 +1374,21 @@ const PublishPage = () => {
     return errors;
   };
 
+  const getFirstInvalidStep = () => {
+    const checks: Array<{ step: number; errors: string[] }> = [
+      { step: 0, errors: validateStep(0) },
+      { step: 1, errors: validateStep(1) },
+      { step: 2, errors: validateStep(2) },
+    ];
+    return checks.find((entry) => entry.errors.length > 0) ?? null;
+  };
+
   const handleNext = async () => {
     const errors = validateStep(step);
     setStepErrors(errors);
     if (errors.length > 0) {
       toast.error(errors[0]);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     const nextStep = step + 1;
@@ -1387,11 +1397,15 @@ const PublishPage = () => {
   };
 
   const handlePublish = async () => {
-    const errors = validateStep(0).concat(validateStep(1)).concat(validateStep(2));
+    const firstInvalid = getFirstInvalidStep();
+    const errors = firstInvalid
+      ? validateStep(0).concat(validateStep(1)).concat(validateStep(2))
+      : [];
     setStepErrors(errors);
-    if (errors.length > 0) {
-      toast.error(errors[0]);
-      setStep(0);
+    if (firstInvalid) {
+      toast.error(firstInvalid.errors[0]);
+      setStep(firstInvalid.step);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     if (!user || !transaction || !listingType) {

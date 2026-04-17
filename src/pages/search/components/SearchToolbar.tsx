@@ -56,8 +56,8 @@ export function SearchToolbar({
   onSetSort,
 }: SearchToolbarProps) {
   return (
-    <div className="mb-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-secondary/20 p-3.5 shadow-sm md:p-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="mb-3 rounded-xl border border-border/65 bg-card/90 p-2.5 md:p-3">
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3 min-w-0">
         <Sheet open={mobileFiltersOpen} onOpenChange={onOpenMobileFilters}>
           <SheetTrigger asChild>
@@ -86,8 +86,7 @@ export function SearchToolbar({
           </SheetContent>
         </Sheet>
 
-        <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2">
-          <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">Résultats</p>
+        <div className="rounded-lg border border-border/60 bg-background/70 px-2.5 py-1.5">
           {queryError ? (
             <p className="font-sans text-sm font-medium text-destructive">{queryErrorLabel}</p>
           ) : (
@@ -120,8 +119,7 @@ export function SearchToolbar({
           ))}
           </div>
 
-          <div className="flex items-center gap-2 rounded-xl border border-border/70 bg-background/70 px-2 py-1.5 sm:px-2.5">
-            <span className="hidden sm:inline text-[11px] uppercase tracking-wide font-sans text-muted-foreground">Tri</span>
+          <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-background/70 px-2 py-1.5 sm:px-2.5">
             <Select value={sort} onValueChange={(v) => onSetSort(v as SearchSortMode)}>
               <SelectTrigger className="flex-1 border-0 bg-transparent shadow-none sm:flex-none sm:w-44 font-sans text-sm min-w-[9rem] min-h-9 px-2">
                 <SelectValue />

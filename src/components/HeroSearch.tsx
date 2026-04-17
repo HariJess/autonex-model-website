@@ -85,6 +85,7 @@ const HeroSearch = () => {
   const [mobileLocationOpen, setMobileLocationOpen] = useState(false);
   const [desktopBudgetOpen, setDesktopBudgetOpen] = useState(false);
   const [mobileBudgetOpen, setMobileBudgetOpen] = useState(false);
+  const [showMobileAdvanced, setShowMobileAdvanced] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
   const [modelQuery, setModelQuery] = useState("");
   const [yearPreset, setYearPreset] = useState<(typeof HERO_YEAR_PRESETS)[number]["value"]>("all");
@@ -540,92 +541,106 @@ const HeroSearch = () => {
                   />
                 </PopoverContent>
               </Popover>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowMobileAdvanced((prev) => !prev)}
+                className="w-full justify-center font-sans text-sm min-h-11"
+              >
+                {showMobileAdvanced
+                  ? t("hero.hideAdvancedMobile", "Masquer les filtres avancés")
+                  : t("hero.showAdvancedMobile", "Afficher plus de filtres")}
+              </Button>
 
-              {showBrand && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
-                      {brandLabel}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
-                      {brands.length > 0 && (
-                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
-                          Effacer
-                        </button>
-                      )}
-                    </div>
-                    <Input
-                      value={brandSearch}
-                      onChange={(e) => setBrandSearch(e.target.value)}
-                      placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
-                      className="h-9 text-sm mb-2"
-                    />
-                    <div className="space-y-1">
-                      {visibleTopBrands.map((b) => (
-                        <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
-                          <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
-                          <BrandLogo
-                            brand={b}
-                            className="h-8 w-12 rounded-md bg-background"
-                            imgClassName="max-h-5"
-                            labelClassName="text-[10px]"
-                          />
-                          <span>{b}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+              {showMobileAdvanced && (
+                <div className="space-y-2.5 rounded-xl border border-border/70 bg-background/60 p-2.5">
+                  {showBrand && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
+                          {brandLabel}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
+                        <div className="mb-2 flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
+                          {brands.length > 0 && (
+                            <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
+                              Effacer
+                            </button>
+                          )}
+                        </div>
+                        <Input
+                          value={brandSearch}
+                          onChange={(e) => setBrandSearch(e.target.value)}
+                          placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
+                          className="text-sm mb-2"
+                        />
+                        <div className="space-y-1">
+                          {visibleTopBrands.map((b) => (
+                            <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                              <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
+                              <BrandLogo
+                                brand={b}
+                                className="h-8 w-12 rounded-md bg-background"
+                                imgClassName="max-h-5"
+                                labelClassName="text-[10px]"
+                              />
+                              <span>{b}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+
+                  <Input
+                    value={modelQuery}
+                    onChange={(e) => setModelQuery(e.target.value)}
+                    placeholder={t("hero.modelPlaceholder")}
+                    className="font-sans text-sm"
+                  />
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
+                      <SelectTrigger className="font-sans">
+                        <SelectValue placeholder={t("search.year", "Année")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {HERO_YEAR_PRESETS.map((yearPresetOption) => (
+                          <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
+                            {yearPresetOption.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
+                          {fuelLabel}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
+                        <div className="mb-2 flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
+                          {fuels.length > 0 && (
+                            <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
+                              Effacer
+                            </button>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
+                            <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                              <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
+                              <span>{opt}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
               )}
-
-              <Input
-                value={modelQuery}
-                onChange={(e) => setModelQuery(e.target.value)}
-                placeholder={t("hero.modelPlaceholder")}
-                className="font-sans min-h-11 text-sm"
-              />
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
-                  <SelectTrigger className="font-sans min-h-11">
-                    <SelectValue placeholder={t("search.year", "Année")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {HERO_YEAR_PRESETS.map((yearPresetOption) => (
-                      <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
-                        {yearPresetOption.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
-                      {fuelLabel}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[calc(100vw-2rem)] max-w-md max-h-[min(75dvh,520px)] overflow-y-auto overscroll-contain p-4" align="start" sideOffset={8}>
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
-                      {fuels.length > 0 && (
-                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
-                          Effacer
-                        </button>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
-                        <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
-                          <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
-                          <span>{opt}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
 
               <Button
                 type="button"

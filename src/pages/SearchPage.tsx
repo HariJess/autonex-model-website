@@ -42,7 +42,6 @@ import { SearchResultsList } from "@/pages/search/components/SearchResultsList";
 import { SearchEmptyState } from "@/pages/search/components/SearchEmptyState";
 import { SearchLoadingState } from "@/pages/search/components/SearchLoadingState";
 import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
-import { SearchTrustPanel } from "@/pages/search/components/SearchTrustPanel";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import { formatEngineDisplacementLiters, getExteriorColorLabel } from "@/lib/vehicleAttributes";
@@ -652,7 +651,7 @@ const SearchPage = () => {
       <Header />
 
       <div className="container mx-auto px-4 pt-3 md:pt-4 pb-2 md:pb-3">
-        <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3.5 md:px-5 md:py-4">
+        <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3 md:px-5 md:py-3.5">
         <nav className="flex flex-wrap items-center gap-1.5 text-sm font-sans text-muted-foreground mb-3" aria-label="Breadcrumb">
           {breadcrumbs.map((bc, i) => (
             <span key={i} className="flex items-center gap-1.5">
@@ -697,13 +696,6 @@ const SearchPage = () => {
             </span>
           )}
         </h1>
-        <p className="font-sans text-sm text-muted-foreground max-w-3xl mb-3">
-          {t(
-            "search.heroLead",
-            "Explorez des annonces vérifiées avec des filtres avancés pour trouver plus vite le bon véhicule.",
-          )}
-        </p>
-
         <SearchActiveChips
           chips={activeChips}
           clearAllLabel={t("common.clearAll", "Effacer tout")}
@@ -726,15 +718,6 @@ const SearchPage = () => {
           </aside>
 
           <main className="flex-1 min-w-0">
-            {!queryError && !isLoading && (
-              <SearchTrustPanel
-                hasExactResults={sortedExact.length > 0}
-                hasSimilarFallback={sortedExact.length === 0 && similarFallbackListings.length > 0}
-                activeFilterCount={activeFilterCount}
-                exactCount={sortedExact.length}
-                similarCount={similarFallbackListings.length}
-              />
-            )}
             <SearchTopBanner />
             <SearchToolbar
               filters={filters}

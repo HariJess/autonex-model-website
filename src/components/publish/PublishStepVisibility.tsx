@@ -109,6 +109,7 @@ const PublishStepVisibility = ({
   const { t } = useTranslation();
   const publishAllowed = editMode || canPublishWithCredits;
   const [showCreditPurchase, setShowCreditPurchase] = useState(!editMode && !canPublishWithCredits);
+  const [showMobileOptions, setShowMobileOptions] = useState(false);
   const transactionLabel =
     transaction === "vente"
       ? t("publish.sell", "Vendre")
@@ -211,6 +212,22 @@ const PublishStepVisibility = ({
         </CardContent>
       </Card>
 
+      <button
+        type="button"
+        onClick={() => setShowMobileOptions((prev) => !prev)}
+        className="md:hidden flex w-full items-center justify-between rounded-xl border border-border/70 bg-background/70 px-3 py-2.5 text-left"
+        aria-expanded={showMobileOptions}
+      >
+        <div>
+          <p className="font-serif font-semibold text-sm">{t("publish.visibilityOptions", "Options de visibilité")}</p>
+          <p className="text-xs text-muted-foreground font-sans">
+            {t("publish.visibilityOptionsHint", "Boosts et options avancées (facultatif)")}
+          </p>
+        </div>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showMobileOptions ? "rotate-180" : ""}`} />
+      </button>
+
+      <div className={`${showMobileOptions ? "block" : "hidden"} md:block space-y-5`}>
       <Card className="rounded-2xl border-border">
         <CardHeader>
           <CardTitle className="font-serif flex items-center gap-2">
@@ -287,6 +304,7 @@ const PublishStepVisibility = ({
           </CardContent>
         </Card>
       )}
+      </div>
 
       <Card className="rounded-2xl border-border">
         <CardHeader>

@@ -304,7 +304,12 @@ const Header = () => {
               >
                 {t("common.languageEn", "EN")}
               </button>
-              <button onClick={toggleCurrency} className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation" style={{ color: "#FAFAFA" }}>
+              <button
+                type="button"
+                onClick={() => setCurrency(currency === "MGA" ? "EUR" : "MGA")}
+                className="text-xs font-semibold px-3 py-2 min-h-11 rounded border border-muted-foreground/30 touch-manipulation"
+                style={{ color: "#FAFAFA" }}
+              >
                 {currency}
               </button>
               <Button onClick={() => { navigate("/publier"); setMenuOpen(false); }} className="gradient-primary border-0 text-sm min-h-10 touch-manipulation" style={{ color: "#FAFAFA" }}>

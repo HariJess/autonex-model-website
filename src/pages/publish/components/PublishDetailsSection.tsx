@@ -228,6 +228,7 @@ export function PublishDetailsSection({
   const { t } = useTranslation();
   const modelSuggestions = BRAND_MODEL_HINTS[make] ?? [];
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
+  const [showAllEquipment, setShowAllEquipment] = useState(false);
   const hasCustomExteriorColor =
     exteriorColor.trim().length > 0 &&
     !EXTERIOR_COLOR_OPTIONS.some((option) => option.value === exteriorColor.trim().toLowerCase());
@@ -237,14 +238,14 @@ export function PublishDetailsSection({
       <section className="space-y-3 rounded-xl border border-border/75 bg-gradient-to-br from-card to-secondary/15 p-4">
         <div>
           <p className="font-serif text-base text-foreground">{t("publish.essentialInfoTitle", "Informations essentielles")}</p>
-          <p className="mt-1 font-sans text-xs text-muted-foreground">
+          <p className="mt-1 hidden sm:block font-sans text-xs text-muted-foreground">
             {t("publish.essentialInfoDesc", "Commencez par les champs qui influencent le plus la compréhension et la conversion.")}
           </p>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.listingTitle} *</Label>
         <Input value={title} onChange={(e) => onTitleChange(e.target.value)} className="font-sans" maxLength={120} />
-        <p className="text-xs text-muted-foreground font-sans">{t("publish.titleExample", "Exemple: Toyota RAV4 2021 — automatique, 68 000 km")}</p>
+        <p className="hidden sm:block text-xs text-muted-foreground font-sans">{t("publish.titleExample", "Exemple: Toyota RAV4 2021 — automatique, 68 000 km")}</p>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.descriptionFr} *</Label>
@@ -257,7 +258,7 @@ export function PublishDetailsSection({
             placeholder={t("publish.descriptionPlaceholderLong", "Rédigez une description complète en français…")}
           />
           <p className="text-xs text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 — min. 40 caractères", { count: description.trim().length })}</p>
-          <p className="text-xs text-muted-foreground font-sans">{t("publish.descriptionHint", "Incluez de préférence: carburant, boîte, état général et historique d’entretien.")}</p>
+          <p className="hidden sm:block text-xs text-muted-foreground font-sans">{t("publish.descriptionHint", "Incluez de préférence: carburant, boîte, état général et historique d’entretien.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
           <div className="space-y-2">
@@ -277,7 +278,7 @@ export function PublishDetailsSection({
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
           <p className="font-serif font-semibold text-sm">{t("publish.vehicleIdentityTitle", "Identité véhicule")}</p>
-          <p className="text-xs text-muted-foreground font-sans mt-1">
+          <p className="hidden sm:block text-xs text-muted-foreground font-sans mt-1">
             {t("publish.vehicleIdentityDesc", "Choisissez une marque référencée AutoNex, puis précisez le modèle.")}
           </p>
         </div>
@@ -337,7 +338,7 @@ export function PublishDetailsSection({
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
           <p className="font-serif font-semibold text-sm">{t("publish.mainFeaturesTitle", "Caractéristiques principales")}</p>
-          <p className="text-xs text-muted-foreground font-sans mt-1">
+          <p className="hidden sm:block text-xs text-muted-foreground font-sans mt-1">
             {t("publish.mainFeaturesDesc", "Ces éléments aident les acheteurs à filtrer rapidement votre annonce.")}
           </p>
         </div>
@@ -427,7 +428,7 @@ export function PublishDetailsSection({
         >
           <div>
             <p className="font-serif text-sm text-foreground">{t("publish.advancedInfoTitle", "Informations avancées (optionnel)")}</p>
-            <p className="mt-0.5 font-sans text-xs text-muted-foreground">
+            <p className="mt-0.5 hidden sm:block font-sans text-xs text-muted-foreground">
               {t("publish.advancedInfoDesc", "Ajoutez ces détails pour affiner la qualité de votre annonce.")}
             </p>
           </div>
@@ -559,13 +560,22 @@ export function PublishDetailsSection({
       <div className="space-y-2">
         <Label className="font-sans">{labels.listingFeatures}</Label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {equipmentOptions.map((f) => (
-            <label key={f} className="flex items-center gap-2 cursor-pointer font-sans text-sm">
+          {(showAllEquipment ? equipmentOptions : equipmentOptions.slice(0, 8)).map((f) => (
+            <label key={f} className="flex min-h-11 items-center gap-3 rounded-lg border border-border/70 bg-background/60 px-3 cursor-pointer font-sans text-sm touch-manipulation">
               <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => onToggleFeature(f)} />
               {f}
             </label>
           ))}
         </div>
+        {equipmentOptions.length > 8 && (
+          <button
+            type="button"
+            className="sm:hidden text-xs font-sans text-primary"
+            onClick={() => setShowAllEquipment((prev) => !prev)}
+          >
+            {showAllEquipment ? t("search.showLess", "Voir moins") : t("search.showMore", "Voir plus")}
+          </button>
+        )}
       </div>
       <div className="space-y-2">
         <Label className="font-sans">{t("publish.otherFeaturesTitle", "Autres caractéristiques (optionnel)")}</Label>

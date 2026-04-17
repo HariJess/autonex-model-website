@@ -63,14 +63,14 @@ export function PublishMediaSection({
           {serverPhotos.map((ph, i) => (
             <div key={ph.id} className="relative rounded-xl overflow-hidden border border-border aspect-square group">
               <img src={ph.url} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1 bg-background/80">
+              <div className="absolute inset-x-0 bottom-0 flex gap-1.5 p-1.5 bg-background/85">
                 {i > 0 && (
-                  <Button type="button" size="sm" variant="secondary" className="text-[10px] h-7 flex-1 font-sans" onClick={() => onMakeCoverAtIndex(i)}>
+                  <Button type="button" size="sm" variant="secondary" className="text-xs min-h-10 flex-1 font-sans" onClick={() => onMakeCoverAtIndex(i)}>
                     {labels.cover}
                   </Button>
                 )}
-                <Button type="button" size="sm" variant="destructive" className="text-[10px] h-7 font-sans" onClick={() => onRemovePhotoAt(i)}>
-                  ×
+                <Button type="button" size="sm" variant="destructive" className="text-xs min-h-10 px-3 font-sans" onClick={() => onRemovePhotoAt(i)}>
+                  Suppr.
                 </Button>
               </div>
               {i === 0 && (
@@ -85,14 +85,14 @@ export function PublishMediaSection({
             return (
               <div key={`${p.file.name}-${p.file.size}-${i}`} className="relative rounded-xl overflow-hidden border border-border aspect-square group border-dashed">
                 <img src={p.preview} alt="" className="w-full h-full object-cover opacity-90" />
-                <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1 bg-background/80">
+                <div className="absolute inset-x-0 bottom-0 flex gap-1.5 p-1.5 bg-background/85">
                   {gi > 0 && (
-                    <Button type="button" size="sm" variant="secondary" className="text-[10px] h-7 flex-1 font-sans" onClick={() => onMakeCoverAtIndex(gi)}>
+                    <Button type="button" size="sm" variant="secondary" className="text-xs min-h-10 flex-1 font-sans" onClick={() => onMakeCoverAtIndex(gi)}>
                       {labels.cover}
                     </Button>
                   )}
-                  <Button type="button" size="sm" variant="destructive" className="text-[10px] h-7 font-sans" onClick={() => onRemovePhotoAt(gi)}>
-                    ×
+                  <Button type="button" size="sm" variant="destructive" className="text-xs min-h-10 px-3 font-sans" onClick={() => onRemovePhotoAt(gi)}>
+                    Suppr.
                   </Button>
                 </div>
                 {gi === 0 && (
