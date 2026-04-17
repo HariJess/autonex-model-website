@@ -507,8 +507,8 @@ const ListingDetail = () => {
               <div className="flex flex-wrap items-center gap-2.5 mb-2">
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{transactionLabel}</Badge>
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{typeLabel}</Badge>
-                {listing.vehicle?.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.electric", "Électrique")}</Badge>}
-                {listing.vehicle?.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.hybrid", "Hybride")}</Badge>}
+                {canonicalVehicle.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.electric", "Électrique")}</Badge>}
+                {canonicalVehicle.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.hybrid", "Hybride")}</Badge>}
                 {listing.badge && (
                   <Badge
                     className={`font-sans text-xs ${
