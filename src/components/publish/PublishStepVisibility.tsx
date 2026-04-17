@@ -122,13 +122,13 @@ const PublishStepVisibility = ({
   return (
     <div className="space-y-5 pb-2">
       <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3.5">
-        <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
           {t("publish.finalStep", "Étape finale")}
         </p>
         <p className="mt-1 font-serif text-lg text-foreground">
           {t("publish.finalizeThreeChoices", "Finalisez en 3 choix simples")}
         </p>
-        <p className="mt-1 font-sans text-sm text-muted-foreground">
+        <p className="mt-1 font-sans text-[14px] md:text-sm text-muted-foreground leading-relaxed">
           {t(
             "publish.finalizeStepHint",
             "Vérifiez le coût, sélectionnez la visibilité souhaitée, puis envoyez votre annonce pour modération.",
@@ -242,7 +242,7 @@ const PublishStepVisibility = ({
         </CardHeader>
         <CardContent className="space-y-2">
           {!editMode && (
-            <p className="rounded-lg border border-border/70 bg-background/70 px-3 py-2 text-xs font-sans text-muted-foreground">
+            <p className="rounded-lg border border-border/70 bg-background/70 px-3 py-2 text-[13px] font-sans text-muted-foreground leading-relaxed">
               {t(
                 "publish.boostPragmaticHint",
                 "Sélectionnez uniquement les options utiles maintenant: vous pouvez publier sans boost.",
@@ -278,7 +278,7 @@ const PublishStepVisibility = ({
             <CardTitle className="font-serif text-base">
               {t("publish.agencySpotlightTitle", "Visibilité agence")}
             </CardTitle>
-            <CardDescription className="font-sans text-xs">
+            <CardDescription className="font-sans text-[13px] leading-relaxed">
               {t(
                 "publish.agencySpotlightDesc",
                 "Renforce la présence de votre marque sur le portail (après validation). Réservé aux comptes agence.",
@@ -347,7 +347,7 @@ const PublishStepVisibility = ({
         >
           <div>
             <h3 className="font-serif font-semibold">{t("publish.buyCredits", "Acheter des crédits")}</h3>
-            <p className="text-xs text-muted-foreground font-sans">
+            <p className="text-[13px] text-muted-foreground font-sans leading-relaxed">
               {t("publish.buyCreditsAccordionHint", "Ouvrez ce bloc uniquement si votre solde est insuffisant.")}
             </p>
           </div>
@@ -356,7 +356,7 @@ const PublishStepVisibility = ({
 
         {showCreditPurchase && (
           <div className="space-y-4 rounded-xl border border-border/70 p-3 md:p-4">
-            <p className="text-xs text-muted-foreground font-sans">
+            <p className="text-[13px] text-muted-foreground font-sans leading-relaxed">
               {t(
                 "publish.buyCreditsHint",
                 "Paiement manuel : transmettez le montant puis joignez une preuve. Aucun crédit n'est ajouté avant validation.",

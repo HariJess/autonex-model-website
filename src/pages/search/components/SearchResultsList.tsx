@@ -75,10 +75,10 @@ export function SearchResultsList({
                 onTouchStart={() => void prefetchListing(queryClient, listing.id)}
               >
                 <h2 className="font-serif font-semibold text-[1.02rem] sm:text-lg leading-snug group-hover:text-primary transition-colors line-clamp-2">{displayTitle}</h2>
-                {vehicleHeadline && <p className="text-xs text-muted-foreground font-sans mt-1">{vehicleHeadline}</p>}
+                {vehicleHeadline && <p className="text-[13px] text-muted-foreground font-sans mt-1 leading-relaxed">{vehicleHeadline}</p>}
               </Link>
               {showCloseMatchBadges && (
-                <Badge variant="secondary" className="mt-1.5 text-[10px] font-sans font-normal">
+                <Badge variant="secondary" className="mt-1.5 text-[11px] font-sans font-normal">
                   {getCloseMatchLabel(listing)}
                 </Badge>
               )}

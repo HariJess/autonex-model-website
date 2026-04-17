@@ -25,7 +25,7 @@ export function PublishProgressSteps({ steps, step, progress }: PublishProgressS
               {i < step ? <Check className="h-4 w-4 text-[#FAFAFA]" strokeWidth={2.5} /> : i + 1}
             </div>
             <span
-              className={`text-[10px] md:text-xs font-sans mt-1.5 text-center max-w-[6rem] leading-tight ${
+              className={`text-xs md:text-xs font-sans mt-1.5 text-center max-w-[6rem] leading-tight ${
                 i === step ? "text-foreground font-semibold" : i < step ? "text-primary font-medium" : "text-muted-foreground"
               }`}
             >

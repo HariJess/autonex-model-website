@@ -56,7 +56,7 @@ export function SearchToolbar({
   onSetSort,
 }: SearchToolbarProps) {
   return (
-    <div className="mb-2.5 rounded-xl border border-border/65 bg-card/90 p-2.5 md:p-3">
+    <div className="mb-3 rounded-xl border border-border/65 bg-card/90 p-2.5 md:p-3">
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-2 min-w-0">
         <Sheet open={mobileFiltersOpen} onOpenChange={onOpenMobileFilters}>
@@ -65,7 +65,7 @@ export function SearchToolbar({
               <SlidersHorizontal className="h-4 w-4" />
               {filtersLabel}
               {activeFilterCount > 0 && (
-                <Badge variant="secondary" className="h-5 min-w-5 px-1 flex items-center justify-center text-[10px] border border-border">
+                <Badge variant="secondary" className="h-5 min-w-5 px-1 flex items-center justify-center text-[11px] border border-border">
                   {activeFilterCount}
                 </Badge>
               )}
@@ -88,9 +88,9 @@ export function SearchToolbar({
 
         <div className="rounded-lg border border-border/60 bg-background/70 px-2.5 py-1.5 flex-1 lg:flex-initial min-w-0">
           {queryError ? (
-            <p className="font-sans text-sm font-medium text-destructive truncate">{queryErrorLabel}</p>
+            <p className="font-sans text-sm font-medium text-destructive truncate leading-relaxed">{queryErrorLabel}</p>
           ) : (
-            <p className="font-sans text-sm text-muted-foreground truncate">
+            <p className="font-sans text-sm text-muted-foreground truncate leading-relaxed">
               <span className="font-semibold text-foreground">{resultCount}</span> {resultLabel}
             </p>
           )}
@@ -98,7 +98,7 @@ export function SearchToolbar({
         </div>
 
         <div className="flex items-center gap-2 justify-between lg:justify-end w-full lg:w-auto">
-          <div className="flex items-center rounded-lg border border-border/70 bg-background/70 p-1 overflow-hidden shrink-0">
+          <div className="flex items-center rounded-lg border border-border/70 bg-background/70 p-1 overflow-hidden shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           {(
             [
               { mode: "grid" as const, icon: LayoutGrid, label: viewGridLabel },
@@ -119,7 +119,7 @@ export function SearchToolbar({
           ))}
           </div>
 
-          <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-background/70 px-1.5 py-1 sm:px-2">
+          <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-background/70 px-1.5 py-1 sm:px-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
             <Select value={sort} onValueChange={(v) => onSetSort(v as SearchSortMode)}>
               <SelectTrigger className="flex-1 border-0 bg-transparent shadow-none sm:flex-none sm:w-44 font-sans text-sm min-w-[8.25rem] min-h-9 px-1.5">
                 <SelectValue />

@@ -47,7 +47,7 @@ export function PublishMediaSection({
     <div className="space-y-5 form-surface">
       <div className="rounded-xl border border-border/75 bg-gradient-to-br from-card to-secondary/15 px-4 py-3.5">
         <p className="text-sm text-foreground font-sans font-medium">{labels.mainPhotosTitle}</p>
-        <p className="mt-1 text-xs text-muted-foreground font-sans">{labels.mainPhotoFirst}</p>
+        <p className="mt-1 text-[13px] text-muted-foreground font-sans leading-relaxed">{labels.mainPhotoFirst}</p>
       </div>
       <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center bg-background/70">
         <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
@@ -115,7 +115,7 @@ export function PublishMediaSection({
         >
           <div>
             <p className="font-serif text-sm text-foreground">{labels.advancedMediaTitle}</p>
-            <p className="mt-0.5 font-sans text-xs text-muted-foreground">{labels.advancedMediaHint}</p>
+            <p className="mt-0.5 font-sans text-[13px] text-muted-foreground leading-relaxed">{labels.advancedMediaHint}</p>
           </div>
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showAdvancedMedia ? "rotate-180" : ""}`} />
         </button>

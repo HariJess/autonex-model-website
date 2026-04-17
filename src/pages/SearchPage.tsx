@@ -650,9 +650,9 @@ const SearchPage = () => {
       </Helmet>
       <Header />
 
-      <div className="container mx-auto px-4 pt-3 md:pt-4 pb-2 md:pb-3">
+      <div className="container mx-auto px-4 pt-3.5 md:pt-4 pb-2.5 md:pb-3">
         <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3 md:px-5 md:py-3.5">
-        <nav className="flex flex-wrap items-center gap-1.5 text-sm font-sans text-muted-foreground mb-3" aria-label="Breadcrumb">
+        <nav className="flex flex-wrap items-center gap-1.5 text-sm font-sans text-muted-foreground mb-2.5" aria-label="Breadcrumb">
           {breadcrumbs.map((bc, i) => (
             <span key={i} className="flex items-center gap-1.5">
               {i > 0 && <ChevronRight className="h-3 w-3 shrink-0" />}
@@ -748,7 +748,7 @@ const SearchPage = () => {
               onSetSort={setSort}
             />
             {sort === "recent" && (
-              <p className="text-xs text-muted-foreground font-sans -mt-1 mb-3 max-w-3xl">
+              <p className="text-[13px] text-muted-foreground font-sans -mt-0.5 mb-3.5 max-w-3xl leading-relaxed">
                 {t(
                   "search.recentSortHint",
                   "Les annonces avec options de visibilité (top, à la une, actualisation) apparaissent en priorité, puis les plus récentes.",
@@ -763,16 +763,16 @@ const SearchPage = () => {
                     <Sparkles className="h-5 w-5 text-primary" aria-hidden />
                   </div>
                   <div className="min-w-0 space-y-1.5">
-                    <p className="font-sans text-sm font-semibold text-foreground leading-snug">
+                    <p className="font-sans text-[15px] font-semibold text-foreground leading-snug">
                       {t("search.noExactMatchTitle", "Aucun véhicule ne correspond exactement à votre recherche.")}
                     </p>
-                    <p className="font-sans text-sm text-muted-foreground leading-relaxed">
+                    <p className="font-sans text-[14px] text-muted-foreground leading-relaxed">
                       {t(
                         "search.similarIntro",
                         "Voici des véhicules similaires susceptibles de vous intéresser (même ville, critères assouplis).",
                       )}
                     </p>
-                    <p className="font-sans text-xs text-muted-foreground/90 pt-0.5">
+                    <p className="font-sans text-[13px] text-muted-foreground/90 pt-0.5 leading-relaxed">
                       {t(
                         "search.similarResultsBadgeHint",
                         "Chaque carte indique pourquoi le véhicule est proposé (budget, zone, etc.).",

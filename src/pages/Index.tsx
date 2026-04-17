@@ -294,7 +294,7 @@ const Index = () => {
         <div className="rounded-2xl border border-border/70 bg-background/95 px-3 py-4 md:px-6 md:py-5">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.quickExplore", "Explorer rapidement")}</p>
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.quickExplore", "Explorer rapidement")}</p>
               <h2 className="font-serif text-lg md:text-2xl font-semibold mt-1">{t("home.mainCategories", "Catégories principales")}</h2>
             </div>
             <Link
@@ -370,7 +370,7 @@ const Index = () => {
                     {brand.label.slice(0, 2).toUpperCase()}
                   </span>
                 )}
-                <span className="font-sans text-[11px] md:text-xs font-medium tracking-[0.01em] text-foreground/75">
+                <span className="font-sans text-[13px] md:text-xs font-medium tracking-[0.01em] text-foreground/75">
                   {brand.label}
                 </span>
               </Link>
@@ -415,9 +415,9 @@ const Index = () => {
         <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4 md:p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.estimationOverline", "Différenciateur AutoNex")}</p>
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.estimationOverline", "Différenciateur AutoNex")}</p>
               <h2 className="mt-1 font-serif text-2xl text-foreground md:text-[2rem]">{t("home.estimationTitle", "Estimation: votre repère avant négociation")}</h2>
-              <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-2 font-sans text-[14px] md:text-sm leading-relaxed text-muted-foreground">
                 {t("home.estimationSupport", "Obtenez une fourchette argumentée, un niveau de confiance explicite et un rapport utile pour cadrer votre décision d'achat ou de vente.")}
               </p>
             </div>

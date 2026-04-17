@@ -12,7 +12,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <img src={logo} alt="AutoNex" className="h-12 sm:h-14 w-auto" />
-            <p className="text-sm opacity-70 font-sans">
+            <p className="text-[0.95rem] leading-relaxed opacity-75 font-sans">
               {t("footer.tagline")}
             </p>
           </div>
@@ -20,24 +20,24 @@ const Footer = () => {
           {/* Automotive links */}
           <div className="space-y-3">
             <h4 className="font-semibold text-base md:text-lg">{t("footer.automotive", "Automobile")}</h4>
-            <div className="flex flex-col gap-2 text-sm font-sans opacity-70">
-              <Link to="/recherche?transaction=vente" className="hover:opacity-100 transition-opacity">{t("nav.buy")}</Link>
-              <Link to="/recherche?transaction=location" className="hover:opacity-100 transition-opacity">{t("nav.rent")}</Link>
-              <Link to="/agences" className="hover:opacity-100 transition-opacity">{t("nav.agencies")}</Link>
-              <Link to="/publier" className="hover:opacity-100 transition-opacity">{t("nav.publish")}</Link>
+            <div className="flex flex-col gap-1.5 text-[0.95rem] leading-relaxed font-sans opacity-75">
+              <Link to="/recherche?transaction=vente" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.buy")}</Link>
+              <Link to="/recherche?transaction=location" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.rent")}</Link>
+              <Link to="/agences" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.agencies")}</Link>
+              <Link to="/publier" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.publish")}</Link>
             </div>
           </div>
 
           {/* Links 2 */}
           <div className="space-y-3">
             <h4 className="font-semibold text-base md:text-lg">{t("footer.information")}</h4>
-            <div className="flex flex-col gap-2 text-sm font-sans opacity-70">
-              <Link to="/conseils" className="hover:opacity-100 transition-opacity">{t("nav.advice")}</Link>
+            <div className="flex flex-col gap-1.5 text-[0.95rem] leading-relaxed font-sans opacity-75">
+              <Link to="/conseils" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.advice")}</Link>
             </div>
           </div>
         </div>
 
-        <div className="mt-10 md:mt-12 pt-6 border-t border-muted-foreground/20 text-center text-sm font-sans opacity-50">
+        <div className="mt-10 md:mt-12 pt-6 border-t border-muted-foreground/20 text-center text-sm font-sans opacity-60">
           {t("footer.copyright")}
         </div>
 

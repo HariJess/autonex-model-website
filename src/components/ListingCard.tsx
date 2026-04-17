@@ -117,24 +117,24 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         )}
         {listing.badge && badgeLabels[listing.badge] && (
           <div className={`absolute left-3 ${displayBrandAsset?.logoPath ? "top-12" : "top-3"}`}>
-            <Badge className={`${badgeLabels[listing.badge].className} text-xs font-semibold px-3 py-1`} style={{ color: "#FAFAFA" }}>
+            <Badge className={`${badgeLabels[listing.badge].className} text-[11px] font-semibold px-2.5 py-1`} style={{ color: "#FAFAFA" }}>
               {badgeLabels[listing.badge].label}
             </Badge>
           </div>
         )}
         {dealMeta && (
           <div className={`absolute right-3 ${listing.badge && badgeLabels[listing.badge] ? "top-12" : "top-3"}`}>
-            <Badge className="bg-destructive text-xs font-semibold px-3 py-1" style={{ color: "#FAFAFA" }}>
+            <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1" style={{ color: "#FAFAFA" }}>
               -{dealMeta.discountPercent}%
             </Badge>
           </div>
         )}
         <div className="absolute top-3 right-3 flex gap-1.5">
-          <Badge variant="secondary" className="text-[10px] font-sans bg-card/90 border border-border/50">
+          <Badge variant="secondary" className="text-[11px] font-sans bg-card/90 border border-border/50">
             {transactionBadgeLabel}
           </Badge>
           {!isSearchVariant && listing.vehicle?.condition && (
-            <Badge variant="outline" className="text-[10px] font-sans capitalize bg-card/85">
+            <Badge variant="outline" className="text-[11px] font-sans capitalize bg-card/85">
               {listing.vehicle.condition}
             </Badge>
           )}
@@ -183,7 +183,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
 
       <Link
         to={`/annonce/${listing.id}`}
-        className={`block p-4 max-lg:p-4.5 space-y-2 ${isSearchVariant ? "md:p-4.5" : ""}`}
+        className={`block p-4 max-lg:p-4.5 space-y-2.5 ${isSearchVariant ? "md:p-4.5" : ""}`}
         onMouseEnter={handlePrefetchDetail}
         onFocus={handlePrefetchDetail}
         onTouchStart={handlePrefetchDetail}
@@ -197,20 +197,20 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               {formatPrice(dealMeta.originalPriceMga)}
             </p>
           )}
-          <p className="text-xs text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
+          <p className="text-sm text-muted-foreground/90 font-sans">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
         <h3 className={`font-serif text-foreground leading-snug line-clamp-2 ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>
           {displayTitle}
         </h3>
         {vehicleHeadline && (
-          <p className="text-xs font-sans text-muted-foreground -mt-1 line-clamp-1">{vehicleHeadline}</p>
+          <p className="text-[13px] font-sans text-muted-foreground -mt-1 line-clamp-1">{vehicleHeadline}</p>
         )}
         {matchBadge && (
-          <p className="text-[11px] font-sans text-muted-foreground border border-border/70 rounded-md px-2 py-0.5 w-fit bg-background/80">
+          <p className="text-xs font-sans text-muted-foreground border border-border/70 rounded-md px-2 py-0.5 w-fit bg-background/80">
             {matchBadge}
           </p>
         )}
-        <div className={`flex items-center gap-x-3 gap-y-1 text-xs text-muted-foreground font-sans flex-wrap ${isSearchVariant ? "pt-0.5" : ""}`}>
+        <div className={`flex items-center gap-x-3 gap-y-1.5 text-[13px] text-muted-foreground font-sans flex-wrap ${isSearchVariant ? "pt-0.5" : ""}`}>
           {versionLabel && (
             <span className="flex items-center gap-1">
               <CircleDot className="h-3.5 w-3.5 shrink-0" aria-hidden />
@@ -228,7 +228,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
           {listing.vehicle?.transmission && <span className={isSearchVariant ? "hidden sm:inline" : ""}>{listing.vehicle.transmission}</span>}
         </div>
         <div className="flex items-center justify-between border-t border-border/55 pt-2.5">
-          <p className="text-xs text-muted-foreground font-sans font-medium max-lg:text-[13px]">
+          <p className="text-[13px] text-muted-foreground font-sans font-medium">
             {city}
             {region ? `, ${region}` : ""}
           </p>

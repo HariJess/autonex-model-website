@@ -1828,15 +1828,15 @@ const PublishPage = () => {
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.45fr_0.55fr] lg:gap-6">
           <div className="space-y-4">
             <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-4 md:px-5">
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 {t("publish.stepCounter", "Étape {{current}} / {{total}}", {
                   current: step + 1,
                   total: steps.length,
                 })}
               </p>
               <p className="mt-1 font-serif text-2xl text-foreground">{stepGuides[step]?.title}</p>
-              <p className="mt-1 font-sans text-sm font-medium text-foreground/85">{stepGuides[step]?.subtitle}</p>
-              <p className="mt-1 font-sans text-sm text-muted-foreground">{stepGuides[step]?.helper}</p>
+              <p className="mt-1 font-sans text-[14px] md:text-sm font-medium text-foreground/85 leading-relaxed">{stepGuides[step]?.subtitle}</p>
+              <p className="mt-1 font-sans text-[14px] md:text-sm text-muted-foreground leading-relaxed">{stepGuides[step]?.helper}</p>
             </div>
 
             <PublishStepErrors errors={stepErrors} />

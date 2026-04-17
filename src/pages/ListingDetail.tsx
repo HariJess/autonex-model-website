@@ -56,9 +56,9 @@ const ListingLocationMap = lazy(() => import("@/components/ListingLocationMap"))
 const LISTING_WHATSAPP_BUTTON_CLASS =
   "border-emerald-200/85 bg-background text-foreground hover:bg-emerald-50/85 hover:border-emerald-300/95 hover:text-foreground dark:border-emerald-800/50 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600/55 focus-visible:ring-emerald-500/40";
 const LISTING_DETAIL_BADGE_CLASS =
-  "inline-flex min-h-8 items-center rounded-full border border-border/75 bg-card px-3 py-1 text-xs font-medium leading-none tracking-[0.01em] text-foreground shadow-sm whitespace-nowrap";
+  "inline-flex min-h-8 items-center rounded-full border border-border/75 bg-card px-3 py-1 text-[13px] md:text-xs font-medium leading-none tracking-[0.01em] text-foreground shadow-sm whitespace-nowrap";
 const LISTING_DETAIL_BADGE_SUBTLE_CLASS =
-  "inline-flex min-h-8 items-center rounded-full border border-border/60 bg-secondary/45 px-3 py-1 text-xs font-medium leading-none tracking-[0.01em] text-foreground whitespace-nowrap";
+  "inline-flex min-h-8 items-center rounded-full border border-border/60 bg-secondary/45 px-3 py-1 text-[13px] md:text-xs font-medium leading-none tracking-[0.01em] text-foreground whitespace-nowrap";
 
 function listingWhatsAppPrefill(title: string): string {
   const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
@@ -631,7 +631,7 @@ const ListingDetail = () => {
               </div>
               <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground">{displayTitle}</h1>
               {vehicleSummary && (
-                <p className="mt-1.5 text-sm text-muted-foreground font-sans">{vehicleSummary}</p>
+                <p className="mt-1.5 text-[14px] text-muted-foreground font-sans leading-relaxed">{vehicleSummary}</p>
               )}
               {displayBrand && (
                 <div className="mt-3 inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card px-2.5 py-1.5">
@@ -641,7 +641,7 @@ const ListingDetail = () => {
                     imgClassName="max-h-5"
                     showFallbackLabel={!displayBrandAsset?.logoPath}
                   />
-                  <span className="text-xs font-medium font-sans text-muted-foreground">
+                    <span className="text-[13px] md:text-xs font-medium font-sans text-muted-foreground">
                     {t("search.brand", "Marque")}: {displayBrand}
                   </span>
                 </div>
@@ -766,7 +766,7 @@ const ListingDetail = () => {
                   <CarFront className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{versionLabel}</p>
-                    <p className="text-xs text-muted-foreground font-sans">
+                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans leading-relaxed">
                       {t("listing.rooms", "Version")} / {t("listing.trimFinish", "Finition")}
                     </p>
                   </div>
@@ -777,7 +777,7 @@ const ListingDetail = () => {
                   <Gauge className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{mileageLabel}</p>
-                    <p className="text-xs text-muted-foreground font-sans">{t("search.surface", "Kilométrage")}</p>
+                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("search.surface", "Kilométrage")}</p>
                   </div>
                 </div>
               )}
@@ -786,7 +786,7 @@ const ListingDetail = () => {
                   <DoorOpen className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{doorsLabel}</p>
-                    <p className="text-xs text-muted-foreground font-sans">{t("listing.bathrooms", "Portes")}</p>
+                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("listing.bathrooms", "Portes")}</p>
                   </div>
                 </div>
               )}
@@ -795,7 +795,7 @@ const ListingDetail = () => {
                   <Users className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{listing.vehicle.seats}</p>
-                    <p className="text-xs text-muted-foreground font-sans">{t("listing.seats", "Places")}</p>
+                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("listing.seats", "Places")}</p>
                   </div>
                 </div>
               )}
@@ -897,7 +897,7 @@ const ListingDetail = () => {
             <section className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
               <div className="p-5 md:p-6 border-b border-border/80 bg-secondary/20">
                 <h2 className="font-serif text-xl font-bold">{t("listing.locationMap", "Localisation")}</h2>
-                <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">
+                <p className="text-[14px] text-muted-foreground font-sans mt-1.5 leading-relaxed">
                   {hasApproxMap
                     ? t(
                         "listing.locationApproxDesc",
@@ -946,7 +946,7 @@ const ListingDetail = () => {
               id="listing-contact"
               className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4.5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
             >
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("listing.priorityContact", "Contact prioritaire")}</p>
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("listing.priorityContact", "Contact prioritaire")}</p>
               <div className="flex items-center gap-3">
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
@@ -1019,7 +1019,7 @@ const ListingDetail = () => {
 
               <form onSubmit={handleContact} className="space-y-2.5 md:space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact", "Écrire au vendeur")}</h4>
-                <p className="hidden sm:block text-xs font-sans text-muted-foreground">
+                <p className="hidden sm:block text-[13px] font-sans text-muted-foreground leading-relaxed">
                   {t("listing.contactHint", "Présentez votre besoin clairement pour obtenir une réponse plus rapide et utile.")}
                 </p>
                 <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans min-h-11" maxLength={100} />
@@ -1029,7 +1029,7 @@ const ListingDetail = () => {
                 <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2" style={{ color: "#FAFAFA" }}>
                   {sending ? t("common.loading") : t("listing.sendMessage", "Envoyer le message")}
                 </Button>
-                <p className="hidden sm:block text-xs font-sans text-muted-foreground">
+                <p className="hidden sm:block text-[13px] font-sans text-muted-foreground leading-relaxed">
                   {t(
                     "listing.contactDecisionHint",
                     "Conseil: indiquez votre disponibilité, votre budget et votre canal préféré pour accélérer la réponse.",
@@ -1067,7 +1067,7 @@ const ListingDetail = () => {
         aria-label={t("listing.contactActions", "Actions de contact")}
       >
         <div className="container mx-auto max-w-lg flex flex-col gap-1.5">
-          <p className="px-0.5 font-sans text-[11px] text-muted-foreground">{t("listing.quickContact", "Contact rapide")}</p>
+          <p className="px-0.5 font-sans text-xs text-muted-foreground">{t("listing.quickContact", "Contact rapide")}</p>
           <div className="flex gap-1.5">
             <Button
               type="button"

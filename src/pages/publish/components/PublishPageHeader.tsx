@@ -36,9 +36,9 @@ export function PublishPageHeader({
 }: PublishPageHeaderProps) {
   return (
     <>
-      <div className="flex items-start gap-3 mb-6 rounded-2xl border-2 border-border/90 bg-secondary/40 p-4 shadow-sm">
+      <div className="flex items-start gap-3 mb-5 rounded-2xl border-2 border-border/90 bg-secondary/40 p-4 shadow-sm">
         <Shield className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-        <p className="text-sm text-muted-foreground font-sans leading-relaxed">{moderationText.replace("{cost}", String(publishCreditCost))}</p>
+        <p className="text-[14px] md:text-sm text-muted-foreground font-sans leading-relaxed">{moderationText.replace("{cost}", String(publishCreditCost))}</p>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
@@ -52,7 +52,7 @@ export function PublishPageHeader({
       </div>
 
       {showDraftStatus && (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6 text-sm font-sans">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 text-sm font-sans">
           <span className="inline-flex items-center gap-1.5 text-foreground">
             {saveStatus === "saving" && (
               <>
@@ -82,7 +82,7 @@ export function PublishPageHeader({
               )}
             </span>
           )}
-          {saveError && <span className="text-destructive text-xs">{saveError}</span>}
+          {saveError && <span className="text-destructive text-[13px]">{saveError}</span>}
         </div>
       )}
     </>
