@@ -11,7 +11,7 @@
     "home": "Fandraisana",
     "estimation": "Tombana",
     "favorites": "Ankafizina",
-    "estimationTag": "Signature"
+    "estimationTag": "Marika"
   },
   "transaction": {
     "sale": "Hividy",
@@ -170,7 +170,7 @@
   "listing": {
     "description": "Fanazavana",
     "features": "Toetra",
-    "contact": "Hifandray amin'ny mpivarotra",
+    "contact": "Handefa hafatra amin'ny mpivarotra",
     "whatsapp": "WhatsApp",
     "similar": "Annonces mitovitovy vaovao",
     "contactActions": "Fifandraisana haingana",
@@ -178,7 +178,7 @@
     "owner": "Mpivarotra",
     "verified": "Voamarina",
     "availability": "Fahafahana",
-    "send": "Handefa hafatra",
+    "send": "Alefa",
     "phone": "Laharana finday",
     "trustTitle": "Antony mahatonga ity annonce ity atokisana",
     "trustHint": "Hafatra mazava = valiny haingana kokoa",
@@ -208,7 +208,28 @@
     "trustStatus": "Annonce mavitrika ao amin'ny catalogue public",
     "electric": "Elektrika",
     "hybrid": "Hybride",
-    "seats": "Seza"
+    "seats": "Seza",
+    "doors": "Varavarana",
+    "trimFinish": "Finition",
+    "sellerDealer": "Concessionnaire",
+    "sellerPrivate": "Olon-tsotra",
+    "bodyStyle": "Karazana carrosserie",
+    "condition": "Toetry ny fiara",
+    "sellerType": "Karazana mpivarotra",
+    "exteriorColor": "Loko ivelany",
+    "interiorColor": "Loko anatiny",
+    "rentalMode": "Mode fanofana",
+    "vehicleSpecs": "Mombamomba ny fiara",
+    "mediaLinks": "Rohy media",
+    "videoLink": "Rohy vidéo",
+    "virtualTourLink": "Fitsidihana virtoaly",
+    "locationMap": "Toerana eo amin'ny sarintany",
+    "revealPhone": "Asehoy ny laharana",
+    "noPhone": "Tsy voatondro",
+    "sendMessage": "Alefa ny hafatra",
+    "internalRef": "Ref anatiny : {{ref}}",
+    "addressUnknown": "Adiresy tsy voafaritra",
+    "contactSeller": "Hifandray amin'ny mpivarotra"
   },
   "publish": {
     "title": "Hampiditra annonce",
@@ -226,8 +247,8 @@
     "descPlaceholder": "Fanazavana",
     "dragPhotos": "Sary",
     "chooseFiles": "Hanampy sary",
-    "summary": "Brouillon sécurisé",
-    "paymentMethod": "Crédits",
+    "summary": "Famintinana",
+    "paymentMethod": "Fomba fandoavana",
     "freeNoPayment": "Dika vonjimaika voatahiry",
     "moderation": "Fanaraha-maso"
     ,

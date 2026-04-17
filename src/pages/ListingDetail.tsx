@@ -734,7 +734,9 @@ const ListingDetail = () => {
                   <CarFront className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{versionLabel}</p>
-                    <p className="text-xs text-muted-foreground font-sans">{t("listing.rooms", "Version")} / {t("publish.advancedInfoTitle", "finition")}</p>
+                    <p className="text-xs text-muted-foreground font-sans">
+                      {t("listing.rooms", "Version")} / {t("listing.trimFinish", "Finition")}
+                    </p>
                   </div>
                 </div>
               )}

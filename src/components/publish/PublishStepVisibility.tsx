@@ -174,7 +174,7 @@ const PublishStepVisibility = ({
               </div>
               {selectedBoosts.map((b) => (
                 <div key={b} className="flex justify-between">
-                  <span className="text-muted-foreground">{BOOST_LABELS_FR[b]}</span>
+                  <span className="text-muted-foreground">{t(`publish.boost.${b}`, BOOST_LABELS_FR[b])}</span>
                   <span>{BOOST_CREDIT_COSTS[b]}</span>
                 </div>
               ))}

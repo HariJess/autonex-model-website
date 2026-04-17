@@ -371,7 +371,7 @@ const SearchPage = () => {
       chips.push({ label: `${r === 0 ? t("search.trimBase", "Base") : t("search.versionN", "Version {{count}}", { count: r })}`, key: `room-${r}` })
     );
     filters.bathrooms.forEach((b) =>
-      chips.push({ label: `${b}${b === 4 ? "+" : ""} portes`, key: `bath-${b}` })
+      chips.push({ label: `${b}${b === 4 ? "+" : ""} ${t("listing.doors", "Portes")}`, key: `bath-${b}` })
     );
     filters.equipments.forEach((e) => chips.push({ label: e, key: `eq-${e}` }));
     filters.fuels.forEach((f) => chips.push({ label: f, key: `fuel-${f}` }));
