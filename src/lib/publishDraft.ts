@@ -262,6 +262,21 @@ function showRoomsForType(listingType: ListingType | ""): boolean {
   return listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
 }
 
+function parseVehicleMileageKmFromLegacySurfaceInput(
+  surfaceInput: string,
+  normalizeInt: (value: string, min: number, max?: number) => number | null,
+): number | null {
+  return normalizeInt(surfaceInput, 0);
+}
+
+function buildVehicleCanonicalAndLegacyMileageFields(mileageKm: number | null): Pick<TablesUpdate<"listings">, "mileage_km" | "surface"> {
+  return {
+    mileage_km: mileageKm,
+    // Temporary legacy mirror used by existing listing/search compatibility paths.
+    surface: mileageKm,
+  };
+}
+
 /** Map wizard form to a listings UPDATE payload (draft or final). */
 export function formToListingUpdate(input: {
   transaction: TransactionType | "";
@@ -358,7 +373,7 @@ export function formToListingUpdate(input: {
   const titleOut =
     titleTrim.length > 0 ? titleTrim.slice(0, 120) : PUBLISH_DRAFT_TITLE_PLACEHOLDER;
   const currentYear = new Date().getFullYear() + 1;
-  const mileageKm = normalizeInt(input.surface, 0);
+  const mileageKm = parseVehicleMileageKmFromLegacySurfaceInput(input.surface, normalizeInt);
   const versionOrTrim = normalizeInt(input.rooms, 0);
   const doorsLegacy = normalizeInt(input.bathrooms, 0);
   const seats = normalizeInt(input.toilets, 0);
@@ -457,6 +472,8 @@ export function formToListingUpdate(input: {
 
   const pendingBoostJson = boostPayload as unknown as Json;
 
+  const vehicleMileageFields = buildVehicleCanonicalAndLegacyMileageFields(mileageKm);
+
   return {
     title: titleOut,
     description: input.description.trim() || (input.isDraftSave ? "" : ""),
@@ -464,14 +481,13 @@ export function formToListingUpdate(input: {
     transaction: tx,
     price_mga: priceNum,
     price_eur: priceNum > 0 ? Math.round((priceNum / 5050) * 100) / 100 : 0,
-    surface: mileageKm,
+    ...vehicleMileageFields,
     rooms: showRooms ? versionOrTrim : null,
     bathrooms: showRooms ? doorsLegacy : null,
     toilets: showRooms ? seats : null,
     make,
     model,
     year,
-    mileage_km: mileageKm,
     fuel,
     transmission_gearbox: transmission,
     drivetrain,
@@ -590,7 +606,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
     title: row.title === PUBLISH_DRAFT_TITLE_PLACEHOLDER ? "" : row.title,
     description: row.description ?? "",
     priceMga: row.price_mga != null ? String(row.price_mga) : "",
-    surface: row.surface != null ? String(row.surface) : "",
+    surface: row.mileage_km != null ? String(row.mileage_km) : row.surface != null ? String(row.surface) : "",
     rooms: row.rooms != null ? String(row.rooms) : "",
     bathrooms: row.bathrooms != null ? String(row.bathrooms) : "",
     toilets: row.toilets != null ? String(row.toilets) : "",
@@ -782,6 +798,17 @@ export function buildListingMaterialSnapshotFromForm(
     finalLng = input.pinLng.toFixed(7);
   }
   const features = input.selectedFeatures.slice().sort();
+  const normalizeInt = (value: string, min: number, max?: number): number | null => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    const intVal = Math.floor(n);
+    if (intVal < min) return null;
+    if (typeof max === "number" && intVal > max) return null;
+    return intVal;
+  };
+  const mileageKm = parseVehicleMileageKmFromLegacySurfaceInput(input.surface, normalizeInt);
+  const vehicleMileageFields = buildVehicleCanonicalAndLegacyMileageFields(mileageKm);
+
   return JSON.stringify({
     title: input.title.trim(),
     description: input.description.trim(),
@@ -794,14 +821,14 @@ export function buildListingMaterialSnapshotFromForm(
     quartier_libre: input.quartierLibre.trim(),
     lat: finalLat,
     lng: finalLng,
-    surface: input.surface ? Number(input.surface) || null : null,
+    surface: vehicleMileageFields.surface ?? null,
     rooms: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,
     bathrooms: showRooms ? (input.bathrooms ? Number(input.bathrooms) || null : null) : null,
     toilets: showRooms && input.toilets ? Number(input.toilets) || null : null,
     make: input.vehicleMake.trim(),
     model: input.vehicleModel.trim(),
     year: input.vehicleYear ? Number(input.vehicleYear) || null : null,
-    mileage_km: input.surface ? Number(input.surface) || null : null,
+    mileage_km: vehicleMileageFields.mileage_km ?? null,
     fuel: input.vehicleFuel.trim(),
     transmission_gearbox: input.vehicleTransmission.trim(),
     drivetrain: input.vehicleDrivetrain.trim(),

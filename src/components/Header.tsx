@@ -48,11 +48,10 @@ const Header = () => {
 
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const transaction = query.get("transaction");
-  const rentalTerm = query.get("rental_term");
   const isSearchPage = location.pathname === "/recherche";
   const isBuyActive = isSearchPage && transaction === "vente";
   const isShortRentActive = isSearchPage && transaction === "location_vacances";
-  const isLongRentActive = isSearchPage && transaction === "location" && rentalTerm === "longue";
+  const isLongRentActive = isSearchPage && transaction === "location";
   const isRentActive = isSearchPage && (transaction === "location" || transaction === "location_vacances");
   const isDealerActive =
     location.pathname === "/agences" ||

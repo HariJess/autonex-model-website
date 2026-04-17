@@ -30,8 +30,6 @@ import {
   matchesPriceMaxStrict,
   matchesPriceMinStrict,
   matchesRoomsStrict,
-  matchesSurfaceMaxStrict,
-  matchesSurfaceMinStrict,
 } from "@/lib/searchLocationMatch";
 import { buildCanonicalUrl, composePageTitle, truncateMetaDescription } from "@/lib/seo";
 import { getOwnedSeoLandingPathForSearchParams } from "@/lib/seoP1Registry";
@@ -65,6 +63,32 @@ function normalizeSearchToken(value: string | null | undefined): string {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim();
+}
+
+function resolveVehicleMileageKm(listing: DisplayListing): number | null {
+  const canonicalMileageKm = listing.vehicle?.mileageKm;
+  if (typeof canonicalMileageKm === "number" && canonicalMileageKm >= 0) {
+    return canonicalMileageKm;
+  }
+  // Legacy compatibility fallback for older rows mirrored via `surface`.
+  if (typeof listing.surface === "number" && listing.surface >= 0) {
+    return listing.surface;
+  }
+  return null;
+}
+
+function matchesVehicleMileageMinStrict(listing: DisplayListing, mileageMin: number): boolean {
+  if (!mileageMin || mileageMin <= 0) return true;
+  const mileageKm = resolveVehicleMileageKm(listing);
+  if (mileageKm == null) return false;
+  return mileageKm >= mileageMin;
+}
+
+function matchesVehicleMileageMaxStrict(listing: DisplayListing, mileageMax: number): boolean {
+  if (!mileageMax || mileageMax <= 0) return true;
+  const mileageKm = resolveVehicleMileageKm(listing);
+  if (mileageKm == null) return true;
+  return mileageKm <= mileageMax;
 }
 
 const SearchPage = () => {
@@ -273,10 +297,10 @@ const SearchPage = () => {
       results = results.filter((l) => matchesPriceMaxStrict(l.price_mga, filters.priceMax));
     }
     if (filters.surfaceMin > 0) {
-      results = results.filter((l) => matchesSurfaceMinStrict(l.surface, filters.surfaceMin));
+      results = results.filter((l) => matchesVehicleMileageMinStrict(l, filters.surfaceMin));
     }
     if (filters.surfaceMax > 0) {
-      results = results.filter((l) => matchesSurfaceMaxStrict(l.surface, filters.surfaceMax));
+      results = results.filter((l) => matchesVehicleMileageMaxStrict(l, filters.surfaceMax));
     }
     if (filters.rooms.length > 0) {
       results = results.filter((l) => matchesRoomsStrict(l.rooms, filters.rooms));

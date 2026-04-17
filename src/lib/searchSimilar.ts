@@ -59,6 +59,18 @@ function surfaceTolerance(surface: number | null, min: number, max: number): num
   return penalty;
 }
 
+function resolveVehicleMileageKm(listing: DisplayListing): number | null {
+  const canonicalMileageKm = listing.vehicle?.mileageKm;
+  if (typeof canonicalMileageKm === "number" && canonicalMileageKm >= 0) {
+    return canonicalMileageKm;
+  }
+  // Legacy compatibility fallback for older rows mirrored via `surface`.
+  if (typeof listing.surface === "number" && listing.surface >= 0) {
+    return listing.surface;
+  }
+  return null;
+}
+
 /**
  * Score how well a listing matches relaxed criteria (for « biens similaires » / recommandations).
  * Higher is better. Not shown to users as a « precision score ».
@@ -131,7 +143,7 @@ export function similarListingScore(
 
   const price = listing.price_mga;
   score -= priceTolerance(price, filters.priceMin, filters.priceMax);
-  score -= surfaceTolerance(listing.surface, filters.surfaceMin, filters.surfaceMax);
+  score -= surfaceTolerance(resolveVehicleMileageKm(listing), filters.surfaceMin, filters.surfaceMax);
 
   if (!roomMatch(listing.rooms, filters.rooms)) score -= 35;
   if (!bathroomMatch(listing.bathrooms, filters.bathrooms)) score -= 20;
