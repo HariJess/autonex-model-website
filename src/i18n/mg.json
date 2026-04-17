@@ -76,7 +76,15 @@
     "categoryMotoAlt": "Endriky ny scooter"
     ,
     "categoryCity": "Citadine",
-    "categoryCityAlt": "Endriky ny citadine"
+    "categoryCityAlt": "Endriky ny citadine",
+    "thematic4x4Title": "4x4 sy Pick-up",
+    "thematic4x4Subtitle": "Ho an'ny lalana sarotra, tanjaka ary fampiasana mifangaro arabe/sisintany.",
+    "thematicCityTitle": "Citadine sy SUV an-tanandehibe",
+    "thematicCitySubtitle": "Fivezivezena andavanandro, fampiononana an-tanandehibe ary fahaiza-mampifanaraka.",
+    "thematicUtilityTitle": "Utilitaire, Van sy Minibus",
+    "thematicUtilitySubtitle": "Fitaterana matihanina, logistika ary asam-pitaterana mpandeha.",
+    "thematicElectricTitle": "Elektrika sy Hybride",
+    "thematicElectricSubtitle": "Moteur mahomby kokoa ho an'ny diany isan'andro."
   },
   "sections": {
     "featured": "Annonces asongadina",
@@ -149,6 +157,15 @@
     "mainSelectionMapTitle": "Fikarohana amin'ny sarintany sy annonces",
     "mainSelectionListTitle": "Annonces mifanaraka amin'ny fikarohanao",
     "sidebarOverline": "Fikarohana AutoNex"
+    ,
+    "equipmentAutomaticGearbox": "Boîte automatique",
+    "equipmentRearCamera": "Caméra de recul",
+    "equipmentBluetooth": "Bluetooth",
+    "equipmentGps": "GPS intégré",
+    "equipmentSunroof": "Toit ouvrant",
+    "equipment4x4": "4x4",
+    "equipmentAirConditioning": "Climatisation",
+    "equipmentLowMileage": "Faible kilométrage"
   },
   "listing": {
     "description": "Fanazavana",
@@ -224,6 +241,36 @@
     "transactionHint": "Farito ny fomba fivarotana ny annonce-nao (fivarotana, fanofana, na fanofana vetivety).",
     "guidanceOverline": "Torolalana AutoNex",
     "total": "Totaly",
+    "creditsTitle": "Crédits sy vidiny",
+    "yourBalance": "Solde-nao",
+    "credits": "crédits",
+    "costPublication": "Famoahana (fanaraha-maso)",
+    "editCreditsHint": "Fanovana: tsy misy crédit fanampiny alaina. Ny safidy visibilité andoavam-bola dia tsy ovaina eto.",
+    "editCostFree": "Maimaim-poana ny fitahirizana ireo fanovana. Raha efa an-tserasera ilay annonce dia hiverina hojerena rehefa misy fiovana ny votoaty.",
+    "needMoreCredits": "Tsy ampy ny solde handefasana ity annonce ity miaraka amin'ireo safidy voafidy.",
+    "draftKept": "Voatahiry foana ny brouillon-nao: afaka mamoaka ianao rehefa mahazo crédits.",
+    "boostTitle": "Boost (aorian'ny fanamarinana)",
+    "boostHonest": "Ny boosts voafidy dia hodinihin'ny ekipanay rehefa ampidirina an-tserasera, arakaraka ny fahafahana.",
+    "agencySpotlight": "Spotlight concessionnaire (marika)",
+    "agencySpotlightTitle": "Visibility concessionnaire",
+    "agencySpotlightDesc": "Manamafy ny fisian'ny marikao ao amin'ny portail (aorian'ny fanamarinana). Ho an'ny kaonty concessionnaire ihany.",
+    "agencySpotlightLabel": "Spotlight concessionnaire",
+    "photoCount": "sary",
+    "submitForReview": "Alefaso ho fanaraha-maso",
+    "buyCredits": "Hividy crédits",
+    "buyCreditsHint": "Fandoavana manual: alefaso ny vola dia ampidiro porofo. Tsy misy crédit ampiana alohan'ny fanamarinana.",
+    "proofFile": "Porofon'ny fandoavana (rakitra)",
+    "submitCreditRequest": "Tehirizo ny fangatahana fividianana",
+    "boost": {
+      "top_search_7d": "Top recherche (7 andro)",
+      "featured_home_7d": "À la une homepage (7 andro)",
+      "refresh_7d": "Actualisation automatique (7 andro)"
+    },
+    "creditPack": {
+      "starter": "Starter",
+      "pro": "Pro",
+      "business": "Business"
+    },
     "stepMainSubtitle": "Farito mazava ny fototry ny annonce-nao.",
     "stepMainHelper": "Safidio ny transaction, karazana fiara ary toerana ho mora vakiana avy hatrany.",
     "stepDetailsSubtitle": "Hamafiso ny fahatokisana ny tolotrao.",

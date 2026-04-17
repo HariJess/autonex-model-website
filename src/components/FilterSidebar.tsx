@@ -76,6 +76,19 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
   const pid = idPrefix ? `${idPrefix}-` : "";
   const { t } = useTranslation();
   const [showAllVehicleTypes, setShowAllVehicleTypes] = useState(false);
+  const equipmentLabels = useMemo(
+    () => ({
+      "Boîte automatique": t("search.equipmentAutomaticGearbox", "Boîte automatique"),
+      "Caméra de recul": t("search.equipmentRearCamera", "Caméra de recul"),
+      Bluetooth: t("search.equipmentBluetooth", "Bluetooth"),
+      "GPS intégré": t("search.equipmentGps", "GPS intégré"),
+      "Toit ouvrant": t("search.equipmentSunroof", "Toit ouvrant"),
+      "4x4": t("search.equipment4x4", "4x4"),
+      Climatisation: t("search.equipmentAirConditioning", "Climatisation"),
+      "Faible kilométrage": t("search.equipmentLowMileage", "Faible kilométrage"),
+    }),
+    [t],
+  );
 
   const update = (partial: Partial<SearchFilters>) => {
     onFiltersChange({ ...filters, ...partial });
@@ -429,7 +442,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                     onCheckedChange={() => update({ equipments: toggleInArray(filters.equipments, eq) })}
                     className={isMobile ? "h-4 w-4" : undefined}
                   />
-                  <span className="font-sans text-sm">{eq}</span>
+                  <span className="font-sans text-sm">{equipmentLabels[eq as keyof typeof equipmentLabels] ?? eq}</span>
                 </label>
               ))}
             </AccordionContent>

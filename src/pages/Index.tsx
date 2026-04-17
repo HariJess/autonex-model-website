@@ -198,34 +198,34 @@ const Index = () => {
     () => [
       {
         id: "4x4-pickup",
-        title: "4x4 & Pick-up",
-        subtitle: "Terrain, robustesse et usages mixtes route/piste.",
+        title: t("home.thematic4x4Title", "4x4 & Pick-up"),
+        subtitle: t("home.thematic4x4Subtitle", "Terrain, robustesse et usages mixtes route/piste."),
         linksTo: "/recherche?drive=4x4&type=villa&type=local_commercial",
         items: fourByFourAndPickup,
       },
       {
         id: "city-urban",
-        title: "Citadines & SUV urbains",
-        subtitle: "Mobilité quotidienne, confort urbain et polyvalence.",
+        title: t("home.thematicCityTitle", "Citadines & SUV urbains"),
+        subtitle: t("home.thematicCitySubtitle", "Mobilité quotidienne, confort urbain et polyvalence."),
         linksTo: "/recherche?type=appartement&type=maison&type=villa",
         items: cityAndUrbanSuv,
       },
       {
         id: "utility-fleet",
-        title: "Utilitaires, Vans & Minibus",
-        subtitle: "Transport pro, logistique et activité passagers.",
+        title: t("home.thematicUtilityTitle", "Utilitaires, Vans & Minibus"),
+        subtitle: t("home.thematicUtilitySubtitle", "Transport pro, logistique et activité passagers."),
         linksTo: "/recherche?type=local_commercial&type=bureau",
         items: utilityFleet,
       },
       {
         id: "electric-hybrid",
-        title: "Électriques & hybrides",
-        subtitle: "Motorisations plus efficientes pour vos trajets.",
+        title: t("home.thematicElectricTitle", "Électriques & hybrides"),
+        subtitle: t("home.thematicElectricSubtitle", "Motorisations plus efficientes pour vos trajets."),
         linksTo: "/recherche?fuel=%C3%89lectrique&fuel=Hybride",
         items: electricHybrid,
       },
     ],
-    [fourByFourAndPickup, cityAndUrbanSuv, utilityFleet, electricHybrid],
+    [fourByFourAndPickup, cityAndUrbanSuv, utilityFleet, electricHybrid, t],
   );
   const themedSectionsToRender = useMemo(() => {
     if (themedLoading) return themedSections;

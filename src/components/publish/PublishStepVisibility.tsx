@@ -245,7 +245,7 @@ const PublishStepVisibility = ({
                   disabled={editMode}
                   onCheckedChange={() => toggleBoost(b)}
                 />
-                <span>{BOOST_LABELS_FR[b]}</span>
+                  <span>{t(`publish.boost.${b}`, BOOST_LABELS_FR[b])}</span>
               </span>
               <span className="text-muted-foreground whitespace-nowrap">
                 {BOOST_CREDIT_COSTS[b]} cr.
@@ -354,7 +354,7 @@ const PublishStepVisibility = ({
                     creditPackPurchase === p.id ? "border-primary ring-1 ring-primary" : "border-border"
                   }`}
                 >
-                  <p className="font-semibold">{p.name}</p>
+                  <p className="font-semibold">{t(`publish.creditPack.${p.id}`, p.name)}</p>
                   <p className="text-muted-foreground">
                     {p.credits_amount} crédits — {formatAriary(p.price_mga)}
                   </p>
