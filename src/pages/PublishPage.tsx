@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Loader2, ShieldCheck, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { type ListingType, type TransactionType } from "@/types/listing";
 import { getRegionForVille, getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
@@ -70,6 +70,8 @@ import { PublishBasicInfoSection } from "@/pages/publish/components/PublishBasic
 import { PublishDetailsSection } from "@/pages/publish/components/PublishDetailsSection";
 import { PublishMediaSection } from "@/pages/publish/components/PublishMediaSection";
 import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
+import { PublishStepGuideCard } from "@/pages/publish/components/PublishStepGuideCard";
+import { PublishGuidanceAside } from "@/pages/publish/components/PublishGuidanceAside";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
 import { buildVehicleMetaTags, parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
@@ -1841,17 +1843,13 @@ const PublishPage = () => {
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.45fr_0.55fr] lg:gap-6">
           <div className="space-y-4">
-            <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-4 md:px-5">
-              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                {t("publish.stepCounter", "Étape {{current}} / {{total}}", {
-                  current: step + 1,
-                  total: steps.length,
-                })}
-              </p>
-              <p className="mt-1 font-serif text-2xl text-foreground">{stepGuides[step]?.title}</p>
-              <p className="mt-1 font-sans text-[14px] md:text-sm font-medium text-foreground/85 leading-relaxed">{stepGuides[step]?.subtitle}</p>
-              <p className="mt-1 font-sans text-[14px] md:text-sm text-muted-foreground leading-relaxed">{stepGuides[step]?.helper}</p>
-            </div>
+            <PublishStepGuideCard
+              stepGuide={stepGuides[step]}
+              stepCounterLabel={t("publish.stepCounter", "Étape {{current}} / {{total}}", {
+                current: step + 1,
+                total: steps.length,
+              })}
+            />
 
             <PublishStepErrors errors={stepErrors} />
 
@@ -2105,43 +2103,25 @@ const PublishPage = () => {
         />
           </div>
 
-          <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
-            <div className="rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-secondary/20 p-4">
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                {t("publish.guidanceOverline", "Guidage AutoNex")}
-              </p>
-              <p className="mt-1 font-serif text-lg text-foreground">{t("publish.publishWithConfidence", "Publiez avec confiance")}</p>
-              <div className="mt-3 space-y-2.5">
-                <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
-                  <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    {t("publish.secureDraft", "Brouillon sécurisé")}
-                  </p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">
-                    {t("publish.secureDraftHint", "Vos modifications sont sauvegardées automatiquement.")}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
-                  <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    {t("publish.prePublishModeration", "Modération avant publication")}
-                  </p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">
-                    {t("publish.prePublishModerationHint", "Chaque annonce est vérifiée pour protéger la qualité du catalogue.")}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
-                  <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    {t("publish.guidedFlow", "Parcours guidé")}
-                  </p>
-                  <p className="mt-1 font-sans text-xs text-muted-foreground">
-                    {t("publish.guidedFlowHint", "Validez chaque étape pour avancer sereinement et limiter les retours arrière.")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </aside>
+          <PublishGuidanceAside
+            overline={t("publish.guidanceOverline", "Guidage AutoNex")}
+            title={t("publish.publishWithConfidence", "Publiez avec confiance")}
+            secureDraftTitle={t("publish.secureDraft", "Brouillon sécurisé")}
+            secureDraftHint={t(
+              "publish.secureDraftHint",
+              "Vos modifications sont sauvegardées automatiquement.",
+            )}
+            moderationTitle={t("publish.prePublishModeration", "Modération avant publication")}
+            moderationHint={t(
+              "publish.prePublishModerationHint",
+              "Chaque annonce est vérifiée pour protéger la qualité du catalogue.",
+            )}
+            guidedFlowTitle={t("publish.guidedFlow", "Parcours guidé")}
+            guidedFlowHint={t(
+              "publish.guidedFlowHint",
+              "Validez chaque étape pour avancer sereinement et limiter les retours arrière.",
+            )}
+          />
         </div>
         </>
         )}
