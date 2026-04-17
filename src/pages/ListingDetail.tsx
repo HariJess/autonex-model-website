@@ -198,6 +198,8 @@ const ListingDetail = () => {
   const [contactPhone, setContactPhone] = useState("");
   const [contactMessage, setContactMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [showAllSpecsMobile, setShowAllSpecsMobile] = useState(false);
+  const [showAllFeaturesMobile, setShowAllFeaturesMobile] = useState(false);
   const viewIncremented = useRef<string | null>(null);
   const lastContactSubmitAt = useRef(0);
   const lastWhatsAppAt = useRef(0);
@@ -491,6 +493,9 @@ const ListingDetail = () => {
   const displayBrandAsset = resolveBrandAsset(displayBrand);
   const listingFeatureBadges = sanitizeListingEquipment(listing.features);
   const customFeatureBadges = extractCustomFeatures(listing.features);
+  const allFeatureBadges = [...listingFeatureBadges, ...customFeatureBadges];
+  const visibleFeatureBadgesMobile = showAllFeaturesMobile ? allFeatureBadges : allFeatureBadges.slice(0, 8);
+  const visibleSpecRowsMobile = showAllSpecsMobile ? vehicleSpecRows : vehicleSpecRows.slice(0, 8);
   const activeDeal = getDealMeta(listing);
   const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
   const listingTitle = composePageTitle(displayTitle);
@@ -668,7 +673,7 @@ const ListingDetail = () => {
                 <Button
                   type="button"
                   onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className="gradient-primary border-0 font-sans min-h-11 px-5 focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                  className="hidden lg:inline-flex gradient-primary border-0 font-sans min-h-11 px-5 focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
                   style={{ color: "#FAFAFA" }}
                 >
                   {t("listing.contactSeller", "Contacter le vendeur")}
@@ -755,7 +760,7 @@ const ListingDetail = () => {
               </section>
             )}
 
-            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
               {versionLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
                   <CarFront className="h-5 w-5 text-primary" />
@@ -802,13 +807,22 @@ const ListingDetail = () => {
                   <h2 className="font-serif text-xl font-bold">{t("listing.vehicleSpecs", "Fiche véhicule")}</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 md:gap-y-3">
-                  {vehicleSpecRows.map((spec) => (
+                  {visibleSpecRowsMobile.map((spec) => (
                     <div key={spec.label} className="flex items-start justify-between gap-3 border-b border-border/70 pb-2">
                       <span className="text-sm font-sans text-muted-foreground">{spec.label}</span>
                       <span className="text-sm font-sans font-semibold text-foreground text-right capitalize">{spec.value}</span>
                     </div>
                   ))}
                 </div>
+                {vehicleSpecRows.length > 8 && (
+                  <button
+                    type="button"
+                    className="mt-3 sm:hidden text-xs font-sans text-primary"
+                    onClick={() => setShowAllSpecsMobile((prev) => !prev)}
+                  >
+                    {showAllSpecsMobile ? t("search.showLess", "Voir moins") : t("search.showMore", "Voir plus")}
+                  </button>
+                )}
               </section>
             )}
 
@@ -819,21 +833,25 @@ const ListingDetail = () => {
               </section>
             )}
 
-            {(listingFeatureBadges.length > 0 || customFeatureBadges.length > 0) && (
+            {allFeatureBadges.length > 0 && (
               <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
                 <div className="grid grid-cols-2 gap-2">
-                  {listingFeatureBadges.map((f) => (
+                  {visibleFeatureBadgesMobile.map((f) => (
                     <div key={f} className="flex items-center gap-2 text-sm font-sans">
                       <Check className="h-4 w-4 text-success" /> {f}
                     </div>
                   ))}
-                  {customFeatureBadges.map((f) => (
-                    <div key={`custom-${f}`} className="flex items-center gap-2 text-sm font-sans">
-                      <Check className="h-4 w-4 text-success" /> {f}
-                    </div>
-                  ))}
                 </div>
+                {allFeatureBadges.length > 8 && (
+                  <button
+                    type="button"
+                    className="mt-3 sm:hidden text-xs font-sans text-primary"
+                    onClick={() => setShowAllFeaturesMobile((prev) => !prev)}
+                  >
+                    {showAllFeaturesMobile ? t("search.showLess", "Voir moins") : t("search.showMore", "Voir plus")}
+                  </button>
+                )}
               </section>
             )}
 
@@ -1001,7 +1019,7 @@ const ListingDetail = () => {
 
               <form onSubmit={handleContact} className="space-y-2.5 md:space-y-3">
                 <h4 className="font-serif font-semibold">{t("listing.contact", "Écrire au vendeur")}</h4>
-                <p className="text-xs font-sans text-muted-foreground">
+                <p className="hidden sm:block text-xs font-sans text-muted-foreground">
                   {t("listing.contactHint", "Présentez votre besoin clairement pour obtenir une réponse plus rapide et utile.")}
                 </p>
                 <Input placeholder={t("auth.name")} value={contactName} onChange={(e) => setContactName(e.target.value)} className="font-sans min-h-11" maxLength={100} />
@@ -1011,7 +1029,7 @@ const ListingDetail = () => {
                 <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2" style={{ color: "#FAFAFA" }}>
                   {sending ? t("common.loading") : t("listing.sendMessage", "Envoyer le message")}
                 </Button>
-                <p className="text-xs font-sans text-muted-foreground">
+                <p className="hidden sm:block text-xs font-sans text-muted-foreground">
                   {t(
                     "listing.contactDecisionHint",
                     "Conseil: indiquez votre disponibilité, votre budget et votre canal préféré pour accélérer la réponse.",

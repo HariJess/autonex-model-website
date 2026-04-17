@@ -35,7 +35,7 @@ export function SearchResultsList({
   const queryClient = useQueryClient();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
       {listings.map((listing) => {
         const displayTitle = getVehicleDisplayTitle(listing);
         const mileageLabel = formatVehicleMileage(getVehicleMileageValue(listing));
@@ -49,7 +49,7 @@ export function SearchResultsList({
         >
           <Link
             to={`/annonce/${listing.id}`}
-            className="w-full sm:w-72 h-48 flex-shrink-0 block"
+            className="w-full sm:w-72 h-44 sm:h-48 flex-shrink-0 block"
             onMouseEnter={() => void prefetchListing(queryClient, listing.id)}
             onFocus={() => void prefetchListing(queryClient, listing.id)}
             onTouchStart={() => void prefetchListing(queryClient, listing.id)}
@@ -65,7 +65,7 @@ export function SearchResultsList({
               }}
             />
           </Link>
-          <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
+          <div className="flex-1 p-3.5 sm:p-4 flex flex-col justify-between min-w-0">
             <div>
               <Link
                 to={`/annonce/${listing.id}`}
@@ -74,7 +74,7 @@ export function SearchResultsList({
                 onFocus={() => void prefetchListing(queryClient, listing.id)}
                 onTouchStart={() => void prefetchListing(queryClient, listing.id)}
               >
-                <h2 className="font-serif font-semibold text-lg group-hover:text-primary transition-colors">{displayTitle}</h2>
+                <h2 className="font-serif font-semibold text-[1.02rem] sm:text-lg leading-snug group-hover:text-primary transition-colors line-clamp-2">{displayTitle}</h2>
                 {vehicleHeadline && <p className="text-xs text-muted-foreground font-sans mt-1">{vehicleHeadline}</p>}
               </Link>
               {showCloseMatchBadges && (
@@ -83,13 +83,13 @@ export function SearchResultsList({
                 </Badge>
               )}
               <p className="text-sm text-muted-foreground font-sans mt-1 line-clamp-2">{listing.description}</p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm font-sans text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-sm font-sans text-muted-foreground">
                 {mileageLabel && <span>{mileageLabel}</span>}
                 {versionLabel && <span>{versionLabel}</span>}
                 {doorsLabel && <span>{doorsLabel}</span>}
-                {listing.vehicle?.fuel && <span>{listing.vehicle.fuel}</span>}
-                {listing.vehicle?.transmission && <span>{listing.vehicle.transmission}</span>}
-                {listing.vehicle?.bodyStyle && <span>{listing.vehicle.bodyStyle}</span>}
+                <span className="hidden sm:inline">{listing.vehicle?.fuel}</span>
+                <span className="hidden sm:inline">{listing.vehicle?.transmission}</span>
+                <span className="hidden sm:inline">{listing.vehicle?.bodyStyle}</span>
                 <span>{listing.ville}</span>
               </div>
             </div>

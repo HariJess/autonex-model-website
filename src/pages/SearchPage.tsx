@@ -799,7 +799,7 @@ const SearchPage = () => {
               <section className="space-y-3">
                 <div className="flex items-end justify-between gap-2">
                   <div>
-                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <p className="hidden sm:block font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                       {t("search.mainSelectionOverline", "Sélection principale")}
                     </p>
                     <p className="font-serif text-xl text-foreground">
@@ -837,7 +837,7 @@ const SearchPage = () => {
               <section className="space-y-3">
                 <div className="flex items-end justify-between gap-2">
                   <div>
-                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <p className="hidden sm:block font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                       {t("search.mainSelectionOverline", "Sélection principale")}
                     </p>
                     <p className="font-serif text-xl text-foreground">
@@ -859,7 +859,7 @@ const SearchPage = () => {
               <section className="space-y-3">
                 <div className="flex items-end justify-between gap-2">
                   <div>
-                    <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <p className="hidden sm:block font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                       {t("search.mainSelectionOverline", "Sélection principale")}
                     </p>
                     <p className="font-serif text-xl text-foreground">

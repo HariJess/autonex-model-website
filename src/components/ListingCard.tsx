@@ -144,7 +144,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i > 0 ? i - 1 : images.length - 1)); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 min-h-10 min-w-10 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
+              className="absolute left-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
               aria-label="Photo précédente"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -152,7 +152,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i < images.length - 1 ? i + 1 : 0)); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-10 min-w-10 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
+              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
               aria-label="Photo suivante"
             >
               <ChevronRight className="h-5 w-5" />
@@ -224,8 +224,8 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             </span>
           )}
           {!isSearchVariant && <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>}
-          {listing.vehicle?.fuel && <span>{listing.vehicle.fuel}</span>}
-          {listing.vehicle?.transmission && <span>{listing.vehicle.transmission}</span>}
+          {listing.vehicle?.fuel && <span className={isSearchVariant ? "hidden sm:inline" : ""}>{listing.vehicle.fuel}</span>}
+          {listing.vehicle?.transmission && <span className={isSearchVariant ? "hidden sm:inline" : ""}>{listing.vehicle.transmission}</span>}
         </div>
         <div className="flex items-center justify-between border-t border-border/55 pt-2.5">
           <p className="text-xs text-muted-foreground font-sans font-medium max-lg:text-[13px]">
