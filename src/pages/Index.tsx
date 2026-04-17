@@ -397,12 +397,12 @@ const Index = () => {
             </Link>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-3">
+          <div className="mt-5 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-x-3 gap-y-4 md:gap-x-4 md:gap-y-5">
             {popularBrands.map((brand) => (
               <Link
                 key={brand.id}
                 to={brand.href}
-                className="group rounded-xl border border-border/60 bg-card/30 px-2.5 py-3 md:py-3.5 min-h-[94px] flex items-center justify-center text-center motion-safe:transition-colors hover:border-primary/40 hover:bg-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                className="group rounded-lg px-2 py-2.5 min-h-[108px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[3px] hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
                 aria-label={`Voir les annonces ${brand.label}`}
                 title={brand.label}
               >
@@ -411,7 +411,7 @@ const Index = () => {
                     src={brand.logoAsset}
                     alt={`Logo ${brand.label}`}
                     loading="lazy"
-                    className="h-8 md:h-9 w-auto object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
+                    className="h-8 md:h-9 w-auto max-w-[110px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
                   />
                 ) : (
                   <span className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full border border-border/60 bg-background text-[11px] md:text-xs font-semibold tracking-wide text-foreground/85">
