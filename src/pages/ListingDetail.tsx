@@ -43,6 +43,7 @@ import {
 import { getExteriorColorLabel } from "@/lib/vehicleAttributes";
 import { sanitizeListingEquipment, extractCustomFeatures } from "@/data/listing-equipment";
 import type { DisplayListing } from "@/types/listing";
+import { getDealMeta } from "@/lib/deals";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
@@ -490,6 +491,7 @@ const ListingDetail = () => {
   const displayBrandAsset = resolveBrandAsset(displayBrand);
   const listingFeatureBadges = sanitizeListingEquipment(listing.features);
   const customFeatureBadges = extractCustomFeatures(listing.features);
+  const activeDeal = getDealMeta(listing);
   const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
   const listingTitle = composePageTitle(displayTitle);
   const listingDescription = truncateMetaDescription(
@@ -651,8 +653,18 @@ const ListingDetail = () => {
               <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <p className="text-[1.65rem] md:text-[2rem] font-bold text-primary font-sans leading-tight">{formatPrice(listing.price_mga)}</p>
+                  {activeDeal ? (
+                    <p className="text-sm text-muted-foreground font-sans line-through">
+                      {formatPrice(activeDeal.originalPriceMga)}
+                    </p>
+                  ) : null}
                   <p className="text-sm text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
                 </div>
+                {activeDeal ? (
+                  <Badge className="bg-destructive text-xs font-semibold" style={{ color: "#FAFAFA" }}>
+                    -{activeDeal.discountPercent}%
+                  </Badge>
+                ) : null}
                 <Button
                   type="button"
                   onClick={() => contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}

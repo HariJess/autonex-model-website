@@ -56,6 +56,7 @@ import {
   saveLocalPublishBackup,
   setPhotoCoverFirst,
   shouldSendPublishedListingToReview,
+  computeOriginalPriceMgaForEdit,
   updateOwnerListing,
   uploadListingPhoto,
   type ServerPhoto,
@@ -108,6 +109,8 @@ const PublishPage = () => {
   /** Statut courant côté modération (passe à pending_review après changement matériel). */
   const [listingModerationStatus, setListingModerationStatus] = useState<string | null>(null);
   const baselineMaterialSnapshotRef = useRef<string>("");
+  const editPriceBaselineRef = useRef<number | null>(null);
+  const editOriginalPriceRef = useRef<number | null>(null);
 
   const steps = [
     t("publish.stepMain", "Informations principales"),
@@ -242,6 +245,8 @@ const PublishPage = () => {
     setIsPublishedListingEdit(false);
     setListingModerationStatus(null);
     baselineMaterialSnapshotRef.current = "";
+    editPriceBaselineRef.current = null;
+    editOriginalPriceRef.current = null;
   }, []);
 
   const applyListingRowToFormState = useCallback((row: Tables<"listings">) => {
@@ -301,7 +306,70 @@ const PublishPage = () => {
     setAgencySpotlight(fs.agencySpotlight);
     setStep(fs.step);
     setDraftListingId(row.id);
+    editPriceBaselineRef.current =
+      typeof row.price_mga === "number" && Number.isFinite(row.price_mga) ? row.price_mga : null;
+    editOriginalPriceRef.current =
+      typeof row.original_price_mga === "number" && Number.isFinite(row.original_price_mga)
+        ? row.original_price_mga
+        : null;
   }, []);
+
+  const currentPriceNumeric = useMemo(() => {
+    const value = Number(priceMga);
+    return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+  }, [priceMga]);
+
+  const activeOriginalForCurrentPrice = useMemo(
+    () =>
+      computeOriginalPriceMgaForEdit({
+        previousCurrentPriceMga: editPriceBaselineRef.current,
+        previousOriginalPriceMga: editOriginalPriceRef.current,
+        nextCurrentPriceMga: currentPriceNumeric,
+      }),
+    [currentPriceNumeric],
+  );
+
+  const priceDealHelperText = useMemo(() => {
+    if (!isPublishedListingEdit) {
+      return t(
+        "publish.priceDealHintDefault",
+        "Une baisse de prix réelle peut rendre votre annonce éligible à la section Bonnes affaires.",
+      );
+    }
+    const baselinePrice = editPriceBaselineRef.current;
+    if (!baselinePrice || currentPriceNumeric <= 0) {
+      return t(
+        "publish.priceDealHintDefault",
+        "Une baisse de prix réelle peut rendre votre annonce éligible à la section Bonnes affaires.",
+      );
+    }
+    if (activeOriginalForCurrentPrice && activeOriginalForCurrentPrice > currentPriceNumeric) {
+      const discountPercent = Math.round(
+        ((activeOriginalForCurrentPrice - currentPriceNumeric) / activeOriginalForCurrentPrice) * 100,
+      );
+      return t(
+        "publish.priceDealHintActive",
+        "Réduction active: {{percent}}% (ancien prix: {{oldPrice}}).",
+        { percent: discountPercent, oldPrice: formatAriary(activeOriginalForCurrentPrice) },
+      );
+    }
+    if (currentPriceNumeric < baselinePrice) {
+      return t(
+        "publish.priceDealHintLowering",
+        "Votre prix précédent sera conservé automatiquement en cas de baisse réelle.",
+      );
+    }
+    if (currentPriceNumeric > baselinePrice) {
+      return t(
+        "publish.priceDealHintIncrease",
+        "Une hausse de prix désactive la mise en avant Bonnes affaires jusqu'à une nouvelle baisse réelle.",
+      );
+    }
+    return t(
+      "publish.priceDealHintDefault",
+      "Une baisse de prix réelle peut rendre votre annonce éligible à la section Bonnes affaires.",
+    );
+  }, [isPublishedListingEdit, currentPriceNumeric, activeOriginalForCurrentPrice, t]);
 
   const selectedFeaturesWithVehicleMeta = useMemo(
     () => [
@@ -675,7 +743,15 @@ const PublishPage = () => {
         });
 
         if (isPublishedListingEdit) {
-          const patch = omitBoostFieldsFromListingPatch(patchBase);
+          const computedOriginalPriceMga = computeOriginalPriceMgaForEdit({
+            previousCurrentPriceMga: editPriceBaselineRef.current,
+            previousOriginalPriceMga: editOriginalPriceRef.current,
+            nextCurrentPriceMga: patchBase.price_mga,
+          });
+          const patch = {
+            ...omitBoostFieldsFromListingPatch(patchBase),
+            original_price_mga: computedOriginalPriceMga,
+          };
           const photoIdsOrdered = serverPhotosRef.current.map((p) => p.id);
           const currentSnap = buildListingMaterialSnapshotFromForm(
             {
@@ -732,6 +808,11 @@ const PublishPage = () => {
             user.id,
             toReview ? { ...patch, status: "pending_review" } : patch,
           );
+          editPriceBaselineRef.current =
+            typeof patchBase.price_mga === "number" && Number.isFinite(patchBase.price_mga)
+              ? patchBase.price_mga
+              : null;
+          editOriginalPriceRef.current = computedOriginalPriceMga;
           if (toReview) setListingModerationStatus("pending_review");
           baselineMaterialSnapshotRef.current = currentSnap;
           setLastSavedAt(updatedAt);
@@ -1391,7 +1472,15 @@ const PublishPage = () => {
           draftStep: step,
           isDraftSave: false,
         });
-        const patch = omitBoostFieldsFromListingPatch(patchBase);
+        const computedOriginalPriceMga = computeOriginalPriceMgaForEdit({
+          previousCurrentPriceMga: editPriceBaselineRef.current,
+          previousOriginalPriceMga: editOriginalPriceRef.current,
+          nextCurrentPriceMga: patchBase.price_mga,
+        });
+        const patch = {
+          ...omitBoostFieldsFromListingPatch(patchBase),
+          original_price_mga: computedOriginalPriceMga,
+        };
 
         const photoIdsOrdered = nextPhotos.map((p) => p.id);
         const currentSnap = buildListingMaterialSnapshotFromForm(
@@ -1456,6 +1545,12 @@ const PublishPage = () => {
           .eq("owner_id", user.id);
 
         if (upErr) throw new Error(upErr.message);
+
+        editPriceBaselineRef.current =
+          typeof patchBase.price_mga === "number" && Number.isFinite(patchBase.price_mga)
+            ? patchBase.price_mga
+            : null;
+        editOriginalPriceRef.current = computedOriginalPriceMga;
 
         if (toReview) setListingModerationStatus("pending_review");
         baselineMaterialSnapshotRef.current = currentSnap;
@@ -1867,6 +1962,7 @@ const PublishPage = () => {
               listingBathrooms: t("listing.bathrooms", "Portes"),
               toilets: t("publish.toilets", "Places / capacité (optionnel)"),
               listingFeatures: t("listing.features", "Équipements"),
+              priceDealHint: priceDealHelperText,
             }}
             onTitleChange={setTitle}
             onDescriptionChange={setDescription}

@@ -132,6 +132,7 @@ type PublishDetailsSectionProps = {
     listingBathrooms: string;
     toilets: string;
     listingFeatures: string;
+    priceDealHint?: string;
   };
   onTitleChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
@@ -262,6 +263,9 @@ export function PublishDetailsSection({
           <div className="space-y-2">
             <Label className="font-sans">Prix (Ar) *</Label>
             <Input type="number" value={priceMga} onChange={(e) => onPriceMgaChange(e.target.value)} className="font-sans" min={0} />
+            {labels.priceDealHint ? (
+              <p className="text-xs text-muted-foreground font-sans">{labels.priceDealHint}</p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label className="font-sans">{labels.listingSurface} (km)</Label>

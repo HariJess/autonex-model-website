@@ -845,6 +845,42 @@ export function shouldSendPublishedListingToReview(params: {
   );
 }
 
+export function computeOriginalPriceMgaForEdit(params: {
+  previousCurrentPriceMga: number | null | undefined;
+  previousOriginalPriceMga: number | null | undefined;
+  nextCurrentPriceMga: number | null | undefined;
+}): number | null {
+  const previousCurrent =
+    typeof params.previousCurrentPriceMga === "number" && Number.isFinite(params.previousCurrentPriceMga)
+      ? params.previousCurrentPriceMga
+      : null;
+  const previousOriginal =
+    typeof params.previousOriginalPriceMga === "number" && Number.isFinite(params.previousOriginalPriceMga)
+      ? params.previousOriginalPriceMga
+      : null;
+  const nextCurrent =
+    typeof params.nextCurrentPriceMga === "number" && Number.isFinite(params.nextCurrentPriceMga)
+      ? params.nextCurrentPriceMga
+      : null;
+
+  if (nextCurrent == null || nextCurrent <= 0) return null;
+
+  // Price increase invalidates previous deal context to avoid stale/fake discounts.
+  if (previousCurrent != null && nextCurrent > previousCurrent) return null;
+
+  // Real reduction: keep the highest credible reference price.
+  if (previousCurrent != null && nextCurrent < previousCurrent) {
+    if (previousOriginal != null && previousOriginal > nextCurrent && previousOriginal >= previousCurrent) {
+      return previousOriginal;
+    }
+    return previousCurrent;
+  }
+
+  // Unchanged price: preserve only a still-valid original comparison.
+  if (previousOriginal != null && previousOriginal > nextCurrent) return previousOriginal;
+  return null;
+}
+
 export async function uploadListingPhoto(listingId: string, file: File, position: number): Promise<ServerPhoto> {
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${listingId}/${position}-${Date.now()}.${ext}`;
