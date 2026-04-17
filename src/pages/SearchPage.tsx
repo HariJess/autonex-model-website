@@ -20,16 +20,10 @@ import { SearchTopBanner } from "@/components/monetization/SearchTopBanner";
 import { SidebarPromoSlot } from "@/components/monetization/SidebarPromoSlot";
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
-import { rankSimilarListings } from "@/lib/searchSimilar";
 import { recordSearchAnalytics } from "@/lib/searchAnalytics";
 import type { DisplayListing } from "@/types/listing";
 import {
   describeCloseMatchKind,
-  matchesBathroomsStrict,
-  matchesLocationSubareas,
-  matchesPriceMaxStrict,
-  matchesPriceMinStrict,
-  matchesRoomsStrict,
 } from "@/lib/searchLocationMatch";
 import { buildCanonicalUrl, composePageTitle, truncateMetaDescription } from "@/lib/seo";
 import { getOwnedSeoLandingPathForSearchParams } from "@/lib/seoP1Registry";
@@ -43,46 +37,9 @@ import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import { formatEngineDisplacementLiters, getExteriorColorLabel } from "@/lib/vehicleAttributes";
-import { getCanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
+import { buildSearchResultsModel } from "@/pages/search/searchResultsModel";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
-
-function listingMatchesEquipments(features: string[], required: string[]): boolean {
-  if (required.length === 0) return true;
-  const norm = (s: string) => s.toLowerCase().trim();
-  const feats = features.map(norm);
-  return required.every((eq) => {
-    const e = norm(eq);
-    return feats.some((f) => f.includes(e) || e.includes(f));
-  });
-}
-
-function normalizeSearchToken(value: string | null | undefined): string {
-  if (!value) return "";
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
-function resolveVehicleMileageKm(listing: DisplayListing): number | null {
-  return getCanonicalVehicleAttributes(listing).mileageKm;
-}
-
-function matchesVehicleMileageMinStrict(listing: DisplayListing, mileageMin: number): boolean {
-  if (!mileageMin || mileageMin <= 0) return true;
-  const mileageKm = resolveVehicleMileageKm(listing);
-  if (mileageKm == null) return false;
-  return mileageKm >= mileageMin;
-}
-
-function matchesVehicleMileageMaxStrict(listing: DisplayListing, mileageMax: number): boolean {
-  if (!mileageMax || mileageMax <= 0) return true;
-  const mileageKm = resolveVehicleMileageKm(listing);
-  if (mileageKm == null) return true;
-  return mileageKm <= mileageMax;
-}
 
 const SearchPage = () => {
   const { t } = useTranslation();
@@ -207,123 +164,21 @@ const SearchPage = () => {
     searchRelaxation: true,
   });
 
-  const equippedListings = useMemo(() => {
-    let results = [...dbListings];
-    if (filters.equipments.length > 0) {
-      results = results.filter((l) => listingMatchesEquipments(l.features, filters.equipments));
-    }
-    if (filters.fuels.length > 0) {
-      const wanted = new Set(filters.fuels.map((v) => normalizeSearchToken(v)));
-      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.fuel)));
-    }
-    if (filters.transmissions.length > 0) {
-      const wanted = new Set(filters.transmissions.map((v) => normalizeSearchToken(v)));
-      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.transmission)));
-    }
-    if (filters.drivetrains.length > 0) {
-      const wanted = new Set(filters.drivetrains.map((v) => normalizeSearchToken(v)));
-      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.drivetrain)));
-    }
-    if (filters.conditions.length > 0) {
-      const wanted = new Set(filters.conditions.map((v) => normalizeSearchToken(v)));
-      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.condition)));
-    }
-    if (filters.sellerTypes.length > 0) {
-      const wanted = new Set(filters.sellerTypes.map((v) => normalizeSearchToken(v)));
-      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.sellerType)));
-    }
-    if (filters.brands.length > 0) {
-      const wanted = new Set(filters.brands.map((v) => normalizeSearchToken(v)));
-      results = results.filter((l) => wanted.has(normalizeSearchToken(l.vehicle?.make)));
-    }
-    if (filters.modelQuery.trim()) {
-      const q = normalizeSearchToken(filters.modelQuery);
-      results = results.filter((l) => normalizeSearchToken(l.vehicle?.model).includes(q));
-    }
-    if (filters.yearMin > 0) {
-      results = results.filter((l) => (l.vehicle?.year ?? 0) >= filters.yearMin);
-    }
-    if (filters.yearMax > 0) {
-      results = results.filter((l) => (l.vehicle?.year ?? 0) <= filters.yearMax);
-    }
-    if (filters.exteriorColor) {
-      const wantedColor = normalizeSearchToken(filters.exteriorColor);
-      results = results.filter((l) => normalizeSearchToken(l.vehicle?.exteriorColor) === wantedColor);
-    }
-    if (filters.engineDisplacementMin > 0) {
-      results = results.filter(
-        (l) => (l.vehicle?.engineDisplacementL ?? 0) >= filters.engineDisplacementMin,
-      );
-    }
-    if (filters.engineDisplacementMax > 0) {
-      results = results.filter(
-        (l) => (l.vehicle?.engineDisplacementL ?? 0) <= filters.engineDisplacementMax,
-      );
-    }
-    return results;
-  }, [
-    dbListings,
-    filters.equipments,
-    filters.fuels,
-    filters.transmissions,
-    filters.drivetrains,
-    filters.conditions,
-    filters.sellerTypes,
-    filters.brands,
-    filters.modelQuery,
-    filters.yearMin,
-    filters.yearMax,
-    filters.exteriorColor,
-    filters.engineDisplacementMin,
-    filters.engineDisplacementMax,
-  ]);
-
-  const exactMatchListings = useMemo(() => {
-    let results = equippedListings;
-    if (filters.ville && (filters.arrondissements.length > 0 || filters.quartiers.length > 0)) {
-      results = results.filter((l) => matchesLocationSubareas(l, filters));
-    }
-    if (filters.priceMin > 0) {
-      results = results.filter((l) => matchesPriceMinStrict(l.price_mga, filters.priceMin));
-    }
-    if (filters.priceMax > 0) {
-      results = results.filter((l) => matchesPriceMaxStrict(l.price_mga, filters.priceMax));
-    }
-    if (filters.surfaceMin > 0) {
-      results = results.filter((l) => matchesVehicleMileageMinStrict(l, filters.surfaceMin));
-    }
-    if (filters.surfaceMax > 0) {
-      results = results.filter((l) => matchesVehicleMileageMaxStrict(l, filters.surfaceMax));
-    }
-    if (filters.rooms.length > 0) {
-      results = results.filter((l) => matchesRoomsStrict(l.rooms, filters.rooms));
-    }
-    if (filters.bathrooms.length > 0) {
-      results = results.filter((l) => matchesBathroomsStrict(l.bathrooms, filters.bathrooms));
-    }
-    return results;
-  }, [equippedListings, filters]);
-
-  const sortedExact = useMemo(() => {
-    const results = [...exactMatchListings];
-    if (sort === "priceAsc") {
-      results.sort((a, b) => a.price_mga - b.price_mga);
-    } else if (sort === "priceDesc") {
-      results.sort((a, b) => b.price_mga - a.price_mga);
-    } else if (sort === "recent") {
-      results.sort((a, b) => {
-        const sa = a.visibility_rank_score ?? new Date(a.created_at ?? 0).getTime();
-        const sb = b.visibility_rank_score ?? new Date(b.created_at ?? 0).getTime();
-        return sb - sa;
-      });
-    }
-    return results;
-  }, [exactMatchListings, sort]);
-
-  const similarFallbackListings = useMemo(() => {
-    if (sortedExact.length > 0) return [];
-    return rankSimilarListings(equippedListings, filters, new Set(), 9);
-  }, [sortedExact.length, equippedListings, filters]);
+  const {
+    sortedExact,
+    similarFallbackListings,
+    alsoLikeListings,
+    displayListings,
+    showCloseMatchBadges,
+  } = useMemo(
+    () =>
+      buildSearchResultsModel({
+        dbListings,
+        filters,
+        sort,
+      }),
+    [dbListings, filters, sort],
+  );
 
   const closeMatchLabel = useCallback(
     (listing: DisplayListing) => {
@@ -334,17 +189,6 @@ const SearchPage = () => {
     },
     [filters, t],
   );
-
-  const alsoLikeListings = useMemo(() => {
-    if (sortedExact.length < 1 || sortedExact.length > 3) return [];
-    const exclude = new Set(sortedExact.map((l) => l.id));
-    return rankSimilarListings(equippedListings, filters, exclude, 6);
-  }, [sortedExact, equippedListings, filters]);
-
-  /** Grille / liste / carte : résultats exacts, ou suggestions si aucun exact */
-  const displayListings = sortedExact.length > 0 ? sortedExact : similarFallbackListings;
-
-  const showCloseMatchBadges = sortedExact.length === 0 && similarFallbackListings.length > 0;
 
   const analyticsSentRef = useRef<string>("");
   useEffect(() => {
@@ -436,7 +280,7 @@ const SearchPage = () => {
       chips.push({ label: `${t("search.year", "Année")} ${filters.yearMin || 0} - ${filters.yearMax || "..."}`, key: "yearRange" });
     }
     return chips;
-  }, [filters]);
+  }, [filters, t]);
 
   const removeChip = (key: string) => {
     const newFilters = { ...filters };
