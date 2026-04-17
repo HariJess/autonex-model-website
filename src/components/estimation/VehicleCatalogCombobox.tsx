@@ -15,6 +15,25 @@ type VehicleCatalogComboboxProps = {
   onSelect: (value: string) => void;
 };
 
+export function normalizeCatalogSearchToken(input: string): string {
+  return input
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[-_/]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function isCatalogOptionMatch(option: string, query: string): boolean {
+  const normalizedOption = normalizeCatalogSearchToken(option);
+  const normalizedQuery = normalizeCatalogSearchToken(query);
+  if (!normalizedQuery) return true;
+  const collapsedOption = normalizedOption.replace(/\s+/g, "");
+  const collapsedQuery = normalizedQuery.replace(/\s+/g, "");
+  return normalizedOption.includes(normalizedQuery) || collapsedOption.includes(collapsedQuery);
+}
+
 export default function VehicleCatalogCombobox({
   value,
   options,
@@ -31,23 +50,8 @@ export default function VehicleCatalogCombobox({
     () => options.find((option) => option.toLowerCase() === normalized) ?? "",
     [normalized, options],
   );
-  const normalizeSearch = (input: string) =>
-    input
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[-_]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
   const filteredOptions = useMemo(() => {
-    const q = normalizeSearch(query);
-    if (!q) return options;
-    return options.filter((option) => {
-      const normalizedOption = normalizeSearch(option);
-      const collapsedOption = normalizedOption.replace(/\s+/g, "");
-      const collapsedQuery = q.replace(/\s+/g, "");
-      return normalizedOption.includes(q) || collapsedOption.includes(collapsedQuery);
-    });
+    return options.filter((option) => isCatalogOptionMatch(option, query));
   }, [options, query]);
 
   return (
@@ -66,7 +70,7 @@ export default function VehicleCatalogCombobox({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] rounded-xl border-border/70 p-0 shadow-lg" align="start">
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput
             placeholder={searchPlaceholder}
             value={query}
