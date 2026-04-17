@@ -363,7 +363,8 @@ const ListingDetail = () => {
   const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
   const mileageValue = canonicalVehicle.mileageKm ?? getVehicleMileageValue(listing);
   const mileageLabel = formatVehicleMileage(mileageValue);
-  const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
+  const doorsValue = canonicalVehicle.doors ?? getVehicleDoorsValue(listing);
+  const doorsLabel = formatVehicleDoors(doorsValue);
   const engineDisplacementLabel = formatVehicleEngineDisplacement(canonicalVehicle.engineDisplacementL);
   const exteriorColorLabel = getExteriorColorLabel(canonicalVehicle.exteriorColor, t);
   const vehicleSummary = getVehicleHeadline(listing);
