@@ -586,6 +586,8 @@
     "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy fanombanana ara-mekanika, ary tsy vidiny voaantoka.",
     "usageAdviceAria": "Torohevitra fampiasana ny tatitra tombana",
     "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana annonce mifanaraka tsara.",
+    "bodyStyleAutoHint": "Carrosserie atolotra ho azy amin'ity modely ity. Azonao ovaina raha ilaina.",
+    "bodyStyleChoiceHint": "Misy karazana carrosserie maro ity modely ity. Safidio izay mifanaraka amin'ny fiaranao.",
     "vehicleIdentityLead": "Fenoy ny vaovao fototra momba ny fiara mba hahazoana tombana azo itokisana sy azo ampiasaina.",
     "resultSectionAria": "Vokatry ny tombana fiara"
   },

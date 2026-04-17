@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   isCatalogOptionMatch,
   normalizeCatalogSearchToken,
-} from "@/components/estimation/VehicleCatalogCombobox";
+} from "@/lib/estimation/catalogSearch";
 
 describe("Vehicle catalog combobox search normalization", () => {
   it("normalizes case, separators, and spaces", () => {

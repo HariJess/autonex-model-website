@@ -24,6 +24,7 @@ function bodyFallbackMultiplier(bodyType: BodyType): number {
   if (bodyType === "van") return 1.06;
   if (bodyType === "wagon") return 1.01;
   if (bodyType === "coupe") return 1.03;
+  if (bodyType === "convertible") return 1.05;
   return 1.0;
 }
 

@@ -28,7 +28,7 @@ import { runVehicleEstimation } from "@/lib/estimation/api";
 import { insertEstimationEvent } from "@/lib/estimation/repository";
 import { buildEstimationPresentation } from "@/lib/estimation/presentation";
 import { buildEstimationEventContext } from "@/lib/estimation/telemetry";
-import { loadVehicleCatalog } from "@/lib/estimation/vehicleCatalog";
+import { loadVehicleCatalog, resolveModelBodyTypes } from "@/lib/estimation/vehicleCatalog";
 import VehicleCatalogCombobox from "@/components/estimation/VehicleCatalogCombobox";
 import EstimationResultReport from "@/components/estimation/EstimationResultReport";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
@@ -154,6 +154,17 @@ const VehicleEstimationPage = () => {
     return selected?.models ?? [];
   }, [form.makeName, vehicleCatalog]);
 
+  const modelBodyTypeOptions = useMemo(() => {
+    if (!form.makeName.trim() || !form.modelName.trim()) return [];
+    return resolveModelBodyTypes(vehicleCatalog, form.makeName, form.modelName);
+  }, [form.makeName, form.modelName, vehicleCatalog]);
+
+  const hasBodyTypeSuggestion = modelBodyTypeOptions.length >= 1;
+  const visibleBodyOptions = useMemo(() => {
+    if (modelBodyTypeOptions.length <= 1) return ESTIMATION_BODY_OPTIONS;
+    return ESTIMATION_BODY_OPTIONS.filter((option) => modelBodyTypeOptions.includes(option.value));
+  }, [modelBodyTypeOptions]);
+
   useEffect(() => {
     if (!form.makeName.trim()) return;
     const makeExists = makeOptions.some((make) => make.toLowerCase() === form.makeName.trim().toLowerCase());
@@ -165,6 +176,21 @@ const VehicleEstimationPage = () => {
       setForm((prev) => ({ ...prev, modelName: "" }));
     }
   }, [form.makeName, form.modelName, makeOptions, modelOptions]);
+
+  useEffect(() => {
+    if (!form.modelName.trim()) return;
+    if (modelBodyTypeOptions.length === 0) return;
+    if (modelBodyTypeOptions.length === 1) {
+      const onlyBody = modelBodyTypeOptions[0];
+      if (form.bodyType !== onlyBody) {
+        setForm((prev) => ({ ...prev, bodyType: onlyBody }));
+      }
+      return;
+    }
+    if (!modelBodyTypeOptions.includes(form.bodyType)) {
+      setForm((prev) => ({ ...prev, bodyType: modelBodyTypeOptions[0] }));
+    }
+  }, [form.bodyType, form.modelName, modelBodyTypeOptions]);
 
   const runMutation = useMutation({
     mutationFn: async () => runVehicleEstimation(form, user?.id ?? null),
@@ -587,8 +613,24 @@ const VehicleEstimationPage = () => {
                   <Label>{t("listing.bodyStyle", "Carrosserie")}</Label>
                   <Select value={form.bodyType} onValueChange={(value) => setForm((prev) => ({ ...prev, bodyType: value as EstimationInput["bodyType"] }))}>
                     <SelectTrigger className={ESTIMATION_UI.inputLike}><SelectValue /></SelectTrigger>
-                    <SelectContent>{ESTIMATION_BODY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
+                    <SelectContent>{visibleBodyOptions.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                   </Select>
+                  {hasBodyTypeSuggestion && (
+                    <p className="text-xs text-muted-foreground">
+                      {t(
+                        "estimation.bodyStyleAutoHint",
+                        "Carrosserie suggérée automatiquement pour ce modèle. Vous pouvez la modifier si besoin.",
+                      )}
+                    </p>
+                  )}
+                  {modelBodyTypeOptions.length > 1 && (
+                    <p className="text-xs text-muted-foreground">
+                      {t(
+                        "estimation.bodyStyleChoiceHint",
+                        "Ce modèle existe en plusieurs carrosseries. Sélectionnez celle qui correspond à votre véhicule.",
+                      )}
+                    </p>
+                  )}
                 </div>
                   </div>
                   <div className="rounded-xl border border-border/60 bg-secondary/10 p-4 md:p-5">

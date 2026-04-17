@@ -31,6 +31,7 @@ export const ESTIMATION_BODY_OPTIONS: Array<{ value: BodyType; label: string }> 
   { value: "van", label: "Van / Fourgon" },
   { value: "wagon", label: "Break" },
   { value: "coupe", label: "Coupe" },
+  { value: "convertible", label: "Cabriolet / Roadster" },
   { value: "other", label: "Autre" },
 ];
 

@@ -8,6 +8,7 @@ export type BodyType =
   | "van"
   | "wagon"
   | "coupe"
+  | "convertible"
   | "other";
 export type ConditionLabel = "excellent" | "good" | "fair" | "needs_work";
 export type MaintenanceLevel = "full" | "partial" | "unknown";

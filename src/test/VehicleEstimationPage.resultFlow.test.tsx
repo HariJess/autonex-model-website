@@ -23,9 +23,13 @@ vi.mock("@/lib/estimation/vehicleCatalog", () => ({
   loadVehicleCatalog: vi.fn().mockResolvedValue({
     source: "ui-curated",
     entries: [
-      { make: "Toyota", models: ["Corolla", "Yaris"] },
-      { make: "Nissan", models: ["X-Trail"] },
+      { make: "Toyota", models: ["Corolla", "Yaris"], modelBodyTypes: { Corolla: ["sedan", "hatchback"], Yaris: ["hatchback", "sedan"] } },
+      { make: "Nissan", models: ["X-Trail"], modelBodyTypes: { "X-Trail": ["suv"] } },
     ],
+  }),
+  resolveModelBodyTypes: vi.fn((entries: Array<{ make: string; modelBodyTypes?: Record<string, string[]> }>, makeName: string, modelName: string) => {
+    const selectedMake = entries.find((entry) => entry.make.toLowerCase() === makeName.toLowerCase());
+    return selectedMake?.modelBodyTypes?.[modelName] ?? [];
   }),
 }));
 vi.mock("@/lib/estimation/api", () => ({

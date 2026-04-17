@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadVehicleCatalog } from "@/lib/estimation/vehicleCatalog";
-import { isCatalogOptionMatch } from "@/components/estimation/VehicleCatalogCombobox";
+import { isCatalogOptionMatch } from "@/lib/estimation/catalogSearch";
 
 function getModelsForMake(
   entries: Array<{ make: string; models: string[] }>,

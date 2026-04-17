@@ -740,7 +740,9 @@
     "usageFrameAria": "Vehicle usage context",
     "usageFrameText": "These details help frame valuation relative to actual use.",
     "usageAdviceAria": "Usage guidance",
-    "usageAdviceText": "Pick the closest usage profile for better consistency."
+    "usageAdviceText": "Pick the closest usage profile for better consistency.",
+    "bodyStyleAutoHint": "Body style suggested automatically for this model. You can change it if needed.",
+    "bodyStyleChoiceHint": "This model exists in multiple body styles. Select the one that matches your vehicle."
   },
   "states": {
     "genericErrorRetry": "An error occurred. Please retry in a few moments."

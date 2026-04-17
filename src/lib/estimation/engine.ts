@@ -122,6 +122,7 @@ function normalizeBodyForDb(value: EstimationInput["bodyType"]): string[] {
     van: ["van", "minibus", "fourgon"],
     wagon: ["break", "wagon"],
     coupe: ["coupé", "coupe"],
+    convertible: ["cabriolet", "roadster", "convertible", "spyder"],
     other: [],
   };
   return map[value] ?? [];
