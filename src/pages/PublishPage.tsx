@@ -83,13 +83,6 @@ const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
 const LISTING_ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const MANUAL_PAYMENT_METHODS = [
-  { id: "bank_transfer" as const, name: "Virement bancaire" },
-  { id: "mvola" as const, name: "MVola" },
-  { id: "orange_money" as const, name: "Orange Money" },
-  { id: "airtel_money" as const, name: "Airtel Money" },
-];
-
 const PublishPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -202,6 +195,15 @@ const PublishPage = () => {
   const pendingUploadInFlightRef = useRef(false);
 
   const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
+  const manualPaymentMethods = useMemo(
+    () => [
+      { id: "bank_transfer", name: t("publish.paymentMethodBankTransfer", "Bank transfer") },
+      { id: "mvola", name: t("publish.paymentMethodMvola", "MVola") },
+      { id: "orange_money", name: t("publish.paymentMethodOrangeMoney", "Orange Money") },
+      { id: "airtel_money", name: t("publish.paymentMethodAirtelMoney", "Airtel Money") },
+    ],
+    [t],
+  );
   const typeOptions = listingTypesForTransaction(transaction);
   const publishVehicleTypeOptions = useMemo(() => {
     const allowed = new Set(typeOptions);
@@ -1925,7 +1927,7 @@ const PublishPage = () => {
             creditPacks={creditPacks}
             creditPackPurchase={creditPackPurchase}
             setCreditPackPurchase={setCreditPackPurchase}
-            paymentMethods={MANUAL_PAYMENT_METHODS}
+            paymentMethods={manualPaymentMethods}
             purchasePaymentMethod={purchasePaymentMethod}
             setPurchasePaymentMethod={setPurchasePaymentMethod}
             onProofFileChange={setProofFile}
