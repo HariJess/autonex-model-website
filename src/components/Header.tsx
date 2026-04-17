@@ -31,14 +31,15 @@ const Header = () => {
     AUTO_TRANSACTION_MODES.find((mode) => mode.id === "location_longue") ?? AUTO_TRANSACTION_MODES[3];
   const dealersMode =
     AUTO_TRANSACTION_MODES.find((mode) => mode.id === "concessionnaires") ?? AUTO_TRANSACTION_MODES[4];
-  const language = localStorage.getItem("autonex-lang") || "fr";
+  const rawLanguage = localStorage.getItem("autonex-lang");
+  const language = rawLanguage === "fr" || rawLanguage === "mg" || rawLanguage === "en" ? rawLanguage : "fr";
 
   const desktopLinks = [
     { label: t("nav.agencies"), href: dealersMode.href },
     { label: t("nav.advice"), href: "/conseils" },
   ];
 
-  const switchLanguage = (nextLang: "fr" | "mg") => {
+  const switchLanguage = (nextLang: "fr" | "mg" | "en") => {
     localStorage.setItem("autonex-lang", nextLang);
     window.location.reload();
   };
@@ -211,6 +212,14 @@ const Header = () => {
             >
               {t("common.languageMg", "MG")}
             </button>
+            <button
+              type="button"
+              onClick={() => switchLanguage("en")}
+              className={`px-2 py-1 text-xs font-semibold ${language === "en" ? "bg-white/15" : "bg-transparent"}`}
+              style={{ color: "#FAFAFA" }}
+            >
+              {t("common.languageEn", "EN")}
+            </button>
           </div>
           <button onClick={toggleCurrency} className="text-xs font-semibold px-2 py-1 rounded border border-muted-foreground/30" style={{ color: "#FAFAFA" }}>
             {currency}
@@ -321,11 +330,27 @@ const Header = () => {
             <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-white/10">
               <button
                 type="button"
-                onClick={() => switchLanguage(language === "fr" ? "mg" : "fr")}
+                onClick={() => switchLanguage("fr")}
                 className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation"
                 style={{ color: "#FAFAFA" }}
               >
-                {language === "fr" ? t("common.languageMg", "MG") : t("common.languageFr", "FR")}
+                {t("common.languageFr", "FR")}
+              </button>
+              <button
+                type="button"
+                onClick={() => switchLanguage("mg")}
+                className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation"
+                style={{ color: "#FAFAFA" }}
+              >
+                {t("common.languageMg", "MG")}
+              </button>
+              <button
+                type="button"
+                onClick={() => switchLanguage("en")}
+                className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation"
+                style={{ color: "#FAFAFA" }}
+              >
+                {t("common.languageEn", "EN")}
               </button>
               <button onClick={toggleCurrency} className="text-xs font-semibold px-3 py-2 min-h-10 rounded border border-muted-foreground/30 touch-manipulation" style={{ color: "#FAFAFA" }}>
                 {currency}
