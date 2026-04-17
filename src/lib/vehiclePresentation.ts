@@ -15,6 +15,12 @@ export function formatVehicleDoors(value: number | null | undefined): string | n
   return `${value}${value >= 4 ? "+" : ""} portes`;
 }
 
+export function formatVehicleEngineDisplacement(value: number | null | undefined): string | null {
+  if (value == null || !Number.isFinite(value) || value <= 0) return null;
+  const rounded = Math.round(value * 10) / 10;
+  return `${rounded.toFixed(1)} L`;
+}
+
 export function getVehicleDisplayTitle(listing: DisplayListing): string {
   const vehicleHeadline = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year]
     .filter(Boolean)

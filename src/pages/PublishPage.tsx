@@ -74,6 +74,7 @@ import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
 import { buildVehicleMetaTags, parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
+import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
 import {
   AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
   inferVehicleTypeOptionIdFromFilters,
@@ -170,6 +171,7 @@ const PublishPage = () => {
   const [vehicleDoors, setVehicleDoors] = useState("");
   const [vehicleSeats, setVehicleSeats] = useState("");
   const [vehicleExteriorColor, setVehicleExteriorColor] = useState("");
+  const [vehicleEngineDisplacement, setVehicleEngineDisplacement] = useState("");
   const [vehicleInteriorColor, setVehicleInteriorColor] = useState("");
   const [vehicleAvailabilityStatus, setVehicleAvailabilityStatus] = useState("");
   const [vehicleWhatsappPhone, setVehicleWhatsappPhone] = useState("");
@@ -285,6 +287,9 @@ const PublishPage = () => {
     setVehicleDoors(fs.vehicleDoors);
     setVehicleSeats(fs.vehicleSeats);
     setVehicleExteriorColor(fs.vehicleExteriorColor);
+    setVehicleEngineDisplacement(
+      fs.vehicleEngineDisplacement || (meta.engineDisplacementL != null ? String(meta.engineDisplacementL) : ""),
+    );
     setVehicleInteriorColor(fs.vehicleInteriorColor);
     setVehicleAvailabilityStatus(fs.vehicleAvailabilityStatus);
     setVehicleWhatsappPhone(fs.vehicleWhatsappPhone);
@@ -311,6 +316,7 @@ const PublishPage = () => {
         drivetrain: vehicleDrivetrain,
         condition: vehicleCondition,
         sellerType: vehicleSellerType,
+        engineDisplacementL: normalizeEngineDisplacementInput(vehicleEngineDisplacement),
       }),
     ],
     [
@@ -324,6 +330,7 @@ const PublishPage = () => {
       vehicleDrivetrain,
       vehicleCondition,
       vehicleSellerType,
+      vehicleEngineDisplacement,
     ],
   );
 
@@ -361,6 +368,7 @@ const PublishPage = () => {
         vehicleDoors: vehicleDoors.trim(),
         vehicleSeats: vehicleSeats.trim(),
         vehicleExteriorColor: vehicleExteriorColor.trim(),
+        vehicleEngineDisplacement: vehicleEngineDisplacement.trim(),
         vehicleInteriorColor: vehicleInteriorColor.trim(),
         vehicleAvailabilityStatus: vehicleAvailabilityStatus.trim(),
         vehicleWhatsappPhone: vehicleWhatsappPhone.trim(),
@@ -407,6 +415,7 @@ const PublishPage = () => {
       vehicleDoors,
       vehicleSeats,
       vehicleExteriorColor,
+      vehicleEngineDisplacement,
       vehicleInteriorColor,
       vehicleAvailabilityStatus,
       vehicleWhatsappPhone,
@@ -650,6 +659,7 @@ const PublishPage = () => {
           vehicleDoors,
           vehicleSeats,
           vehicleExteriorColor,
+          vehicleEngineDisplacement,
           vehicleInteriorColor,
           vehicleAvailabilityStatus,
           vehicleWhatsappPhone,
@@ -699,6 +709,7 @@ const PublishPage = () => {
               vehicleDoors,
               vehicleSeats,
               vehicleExteriorColor,
+              vehicleEngineDisplacement,
               vehicleInteriorColor,
               vehicleAvailabilityStatus,
               vehicleWhatsappPhone,
@@ -759,6 +770,7 @@ const PublishPage = () => {
             vehicleDoors,
             vehicleSeats,
             vehicleExteriorColor,
+            vehicleEngineDisplacement,
             vehicleInteriorColor,
             vehicleAvailabilityStatus,
             vehicleWhatsappPhone,
@@ -812,6 +824,7 @@ const PublishPage = () => {
           vehicleDoors,
           vehicleSeats,
           vehicleExteriorColor,
+          vehicleEngineDisplacement,
           vehicleInteriorColor,
           vehicleAvailabilityStatus,
           vehicleWhatsappPhone,
@@ -931,6 +944,7 @@ const PublishPage = () => {
     vehicleDoors,
     vehicleSeats,
     vehicleExteriorColor,
+    vehicleEngineDisplacement,
     vehicleInteriorColor,
     vehicleAvailabilityStatus,
     vehicleWhatsappPhone,
@@ -999,6 +1013,7 @@ const PublishPage = () => {
             vehicleDoors,
             vehicleSeats,
             vehicleExteriorColor,
+            vehicleEngineDisplacement,
             vehicleInteriorColor,
             vehicleAvailabilityStatus,
             vehicleWhatsappPhone,
@@ -1057,6 +1072,7 @@ const PublishPage = () => {
     vehicleDoors,
     vehicleSeats,
     vehicleExteriorColor,
+    vehicleEngineDisplacement,
     vehicleInteriorColor,
     vehicleAvailabilityStatus,
     vehicleWhatsappPhone,
@@ -1257,6 +1273,12 @@ const PublishPage = () => {
         }
         if (vehicleDoors && Number(vehicleDoors) < 0) errors.push(t("publish.doorsInvalid", "Nombre de portes invalide"));
         if (vehicleSeats && Number(vehicleSeats) < 0) errors.push(t("publish.seatsInvalid", "Nombre de places invalide"));
+        if (
+          vehicleEngineDisplacement &&
+          normalizeEngineDisplacementInput(vehicleEngineDisplacement) == null
+        ) {
+          errors.push(t("publish.engineDisplacementInvalid", "Cylindrée invalide"));
+        }
         if (!vehicleMake.trim()) errors.push(t("publish.makeRequired", "Marque requise"));
         if (!vehicleModel.trim()) errors.push(t("publish.modelRequired", "Modèle requis"));
         break;
@@ -1355,6 +1377,7 @@ const PublishPage = () => {
           vehicleDoors,
           vehicleSeats,
           vehicleExteriorColor,
+          vehicleEngineDisplacement,
           vehicleInteriorColor,
           vehicleAvailabilityStatus,
           vehicleWhatsappPhone,
@@ -1403,6 +1426,7 @@ const PublishPage = () => {
               vehicleDoors,
               vehicleSeats,
               vehicleExteriorColor,
+              vehicleEngineDisplacement,
               vehicleInteriorColor,
               vehicleAvailabilityStatus,
               vehicleWhatsappPhone,
@@ -1517,6 +1541,7 @@ const PublishPage = () => {
         vehicleDoors,
         vehicleSeats,
         vehicleExteriorColor,
+        vehicleEngineDisplacement,
         vehicleInteriorColor,
         vehicleAvailabilityStatus,
         vehicleWhatsappPhone,
@@ -1825,6 +1850,7 @@ const PublishPage = () => {
             doors={vehicleDoors}
             seats={vehicleSeats}
             exteriorColor={vehicleExteriorColor}
+            engineDisplacement={vehicleEngineDisplacement}
             interiorColor={vehicleInteriorColor}
             availabilityStatus={vehicleAvailabilityStatus}
             whatsappPhone={vehicleWhatsappPhone}
@@ -1868,6 +1894,7 @@ const PublishPage = () => {
               setToilets(value);
             }}
             onExteriorColorChange={setVehicleExteriorColor}
+            onEngineDisplacementChange={setVehicleEngineDisplacement}
             onInteriorColorChange={setVehicleInteriorColor}
             onAvailabilityStatusChange={setVehicleAvailabilityStatus}
             onWhatsappPhoneChange={setVehicleWhatsappPhone}

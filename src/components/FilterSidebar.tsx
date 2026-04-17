@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider from "@/components/BudgetRangeSlider";
 import { X } from "lucide-react";
@@ -25,10 +26,13 @@ import {
   AUTO_SEARCH_TRANSMISSION_OPTIONS,
 } from "@/data/automotiveCatalog";
 import BrandLogo from "@/components/BrandLogo";
+import { EXTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
 
 export type { SearchFilters };
 
 const SURFACE_SLIDER_MAX = 1000;
+const ENGINE_DISPLACEMENT_MAX = 8;
+const EMPTY_OPTION = "__empty__";
 
 const EQUIPMENTS = [
   "Boîte automatique", "Caméra de recul", "Bluetooth", "GPS intégré",
@@ -465,6 +469,61 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                     {opt}
                   </Button>
                 ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="exterior-color" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              {t("listing.exteriorColor", "Couleur extérieure")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3">
+              <Select
+                value={filters.exteriorColor || EMPTY_OPTION}
+                onValueChange={(v) => update({ exteriorColor: v === EMPTY_OPTION ? "" : v })}
+              >
+                <SelectTrigger className="font-sans text-sm">
+                  <SelectValue placeholder={t("search.allExteriorColors", "Toutes les couleurs")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_OPTION}>{t("search.allExteriorColors", "Toutes les couleurs")}</SelectItem>
+                  {EXTERIOR_COLOR_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {t(option.labelKey, option.fallback)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="engine-displacement" className="border-b border-border px-4">
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+              {t("listing.engineDisplacement", "Cylindrée")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 space-y-2">
+              <p className="text-xs text-muted-foreground font-sans">
+                {t("search.engineDisplacementHint", "Saisissez une plage en litres (ex: 1.5 à 2.8).")}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  type="number"
+                  min={0}
+                  max={ENGINE_DISPLACEMENT_MAX}
+                  step="0.1"
+                  value={filters.engineDisplacementMin || ""}
+                  onChange={(e) => update({ engineDisplacementMin: Number(e.target.value) || 0 })}
+                  placeholder={t("search.engineMin", "Min (L)")}
+                  className={cn("font-sans text-sm", isMobile && "min-h-12")}
+                />
+                <Input
+                  type="number"
+                  min={0}
+                  max={ENGINE_DISPLACEMENT_MAX}
+                  step="0.1"
+                  value={filters.engineDisplacementMax || ""}
+                  onChange={(e) => update({ engineDisplacementMax: Number(e.target.value) || 0 })}
+                  placeholder={t("search.engineMax", "Max (L)")}
+                  className={cn("font-sans text-sm", isMobile && "min-h-12")}
+                />
               </div>
             </AccordionContent>
           </AccordionItem>

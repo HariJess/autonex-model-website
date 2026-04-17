@@ -5,6 +5,7 @@ import { getRegionForVille } from "@/data/madagascar-locations";
 import type { PurchasableBoostType } from "@/config/monetization";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
+import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
 
 export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
 
@@ -72,6 +73,7 @@ export type LocalPublishBackupV1 = {
   vehicleDoors: string;
   vehicleSeats: string;
   vehicleExteriorColor: string;
+  vehicleEngineDisplacement: string;
   vehicleInteriorColor: string;
   vehicleAvailabilityStatus: string;
   vehicleWhatsappPhone: string;
@@ -292,6 +294,7 @@ export function formToListingUpdate(input: {
   vehicleDoors: string;
   vehicleSeats: string;
   vehicleExteriorColor: string;
+  vehicleEngineDisplacement: string;
   vehicleInteriorColor: string;
   vehicleAvailabilityStatus: string;
   vehicleWhatsappPhone: string;
@@ -436,6 +439,7 @@ export function formToListingUpdate(input: {
       hybride: "hybride",
     }) ?? normalizeText(input.vehicleBodyStyle, 60);
   const exteriorColor = normalizeText(input.vehicleExteriorColor, 40);
+  const engineDisplacementL = normalizeEngineDisplacementInput(input.vehicleEngineDisplacement);
   const interiorColor = normalizeText(input.vehicleInteriorColor, 40);
   const availabilityStatus =
     normalizeControlledValue(input.vehicleAvailabilityStatus, CONTROLLED_AVAILABILITY_VALUES, {
@@ -478,6 +482,7 @@ export function formToListingUpdate(input: {
     body_style: bodyStyle,
     seats,
     exterior_color: exteriorColor,
+    engine_displacement_l: engineDisplacementL,
     interior_color: interiorColor,
     availability_status: availabilityStatus,
     whatsapp_phone: whatsappPhone,
@@ -531,6 +536,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
   vehicleDoors: string;
   vehicleSeats: string;
   vehicleExteriorColor: string;
+  vehicleEngineDisplacement: string;
   vehicleInteriorColor: string;
   vehicleAvailabilityStatus: string;
   vehicleWhatsappPhone: string;
@@ -601,6 +607,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
     vehicleDoors: row.doors != null ? String(row.doors) : "",
     vehicleSeats: row.seats != null ? String(row.seats) : "",
     vehicleExteriorColor: row.exterior_color ?? "",
+    vehicleEngineDisplacement: row.engine_displacement_l != null ? String(row.engine_displacement_l) : "",
     vehicleInteriorColor: row.interior_color ?? "",
     vehicleAvailabilityStatus: row.availability_status ?? "",
     vehicleWhatsappPhone: row.whatsapp_phone ?? "",
@@ -684,6 +691,7 @@ export type PublishFormFieldsForSnapshot = {
   vehicleDoors: string;
   vehicleSeats: string;
   vehicleExteriorColor: string;
+  vehicleEngineDisplacement: string;
   vehicleInteriorColor: string;
   vehicleAvailabilityStatus: string;
   vehicleWhatsappPhone: string;
@@ -742,6 +750,7 @@ export function buildListingMaterialSnapshotFromRow(
     body_style: (row.body_style ?? "").trim(),
     seats: row.seats ?? null,
     exterior_color: (row.exterior_color ?? "").trim(),
+    engine_displacement_l: row.engine_displacement_l ?? null,
     interior_color: (row.interior_color ?? "").trim(),
     availability_status: (row.availability_status ?? "").trim(),
     whatsapp_phone: (row.whatsapp_phone ?? "").trim(),
@@ -803,6 +812,7 @@ export function buildListingMaterialSnapshotFromForm(
     body_style: input.vehicleBodyStyle.trim(),
     seats: input.vehicleSeats ? Number(input.vehicleSeats) || null : null,
     exterior_color: input.vehicleExteriorColor.trim(),
+    engine_displacement_l: normalizeEngineDisplacementInput(input.vehicleEngineDisplacement),
     interior_color: input.vehicleInteriorColor.trim(),
     availability_status: input.vehicleAvailabilityStatus.trim(),
     whatsapp_phone: input.vehicleWhatsappPhone.trim(),

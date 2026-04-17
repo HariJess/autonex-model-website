@@ -112,6 +112,7 @@ export interface DisplayListing {
     rentalMode: string | null;
     seats: number | null;
     exteriorColor: string | null;
+    engineDisplacementL: number | null;
     interiorColor: string | null;
     availabilityStatus: string | null;
     isElectric: boolean;

@@ -374,6 +374,7 @@ export type Database = {
           doors: number | null
           draft_step: number
           drivetrain: string | null
+          engine_displacement_l: number | null
           expires_at: string | null
           exterior_color: string | null
           features: Json | null
@@ -429,6 +430,7 @@ export type Database = {
           doors?: number | null
           draft_step?: number
           drivetrain?: string | null
+          engine_displacement_l?: number | null
           expires_at?: string | null
           exterior_color?: string | null
           features?: Json | null
@@ -484,6 +486,7 @@ export type Database = {
           doors?: number | null
           draft_step?: number
           drivetrain?: string | null
+          engine_displacement_l?: number | null
           expires_at?: string | null
           exterior_color?: string | null
           features?: Json | null

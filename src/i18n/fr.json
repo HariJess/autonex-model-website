@@ -67,7 +67,10 @@
     "whatsappUnavailable": "Numéro WhatsApp indisponible pour cette annonce.",
     "contactTooFast": "Veuillez patienter quelques secondes avant de renvoyer.",
     "contactActions": "Actions de contact",
-    "mapPin": "Emplacement du véhicule"
+    "mapPin": "Emplacement du véhicule",
+    "exteriorColor": "Couleur extérieure",
+    "engineDisplacement": "Cylindrée",
+    "interiorColor": "Couleur intérieure"
   },
   "search": {
     "title": "Résultats de recherche",
@@ -124,7 +127,11 @@
     "otherQuartierLabel": "Autre zone",
     "otherQuartierPlaceholder": "Ex. : Ivandry, Analakely…",
     "applyLocation": "Appliquer",
-    "resetLocationDraft": "Réinitialiser"
+    "resetLocationDraft": "Réinitialiser",
+    "allExteriorColors": "Toutes les couleurs extérieures",
+    "engineDisplacementHint": "Renseignez une plage en litres (ex: 1.5 à 2.8).",
+    "engineMin": "Min (L)",
+    "engineMax": "Max (L)"
   },
   "publish": {
     "title": "Publier une annonce",
@@ -172,7 +179,16 @@
     "error": "Erreur lors de la publication",
     "photoUploadPartial": "Certaines photos n'ont pas pu être uploadées",
     "mapNoCoordsForCity": "Impossible de placer la carte pour cette ville. Vérifiez le nom ou contactez le support.",
-    "photoPartialFail": "{{n}} photo(s) n’ont pas pu être enregistrées. Vérifiez votre connexion et complétez depuis votre tableau de bord si besoin."
+    "photoPartialFail": "{{n}} photo(s) n’ont pas pu être enregistrées. Vérifiez votre connexion et complétez depuis votre tableau de bord si besoin.",
+    "doorsInvalid": "Nombre de portes invalide",
+    "seatsInvalid": "Nombre de places invalide",
+    "engineDisplacementInvalid": "Cylindrée invalide",
+    "exteriorColor": "Couleur extérieure",
+    "selectExteriorColor": "Sélectionner une couleur",
+    "interiorColor": "Couleur intérieure",
+    "engineDisplacement": "Cylindrée (L)",
+    "engineDisplacementPlaceholder": "Ex: 1.5",
+    "notSpecified": "Non précisé"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -301,5 +317,18 @@
     "listingsOf": "Annonces de {{name}}",
     "noListings": "Aucune annonce active pour le moment.",
     "activeListings": "{{count}} annonce(s) active(s)"
+  },
+  "vehicleColor": {
+    "black": "Noir",
+    "white": "Blanc",
+    "gray": "Gris",
+    "silver": "Argent",
+    "blue": "Bleu",
+    "red": "Rouge",
+    "green": "Vert",
+    "beige": "Beige",
+    "brown": "Marron",
+    "orange": "Orange",
+    "yellow": "Jaune"
   }
 }

@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { AUTO_BRANDS } from "@/data/automotiveCatalog";
+import { EXTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -114,6 +115,7 @@ type PublishDetailsSectionProps = {
   doors: string;
   seats: string;
   exteriorColor: string;
+  engineDisplacement: string;
   interiorColor: string;
   availabilityStatus: string;
   whatsappPhone: string;
@@ -151,6 +153,7 @@ type PublishDetailsSectionProps = {
   onDoorsChange: (value: string) => void;
   onSeatsChange: (value: string) => void;
   onExteriorColorChange: (value: string) => void;
+  onEngineDisplacementChange: (value: string) => void;
   onInteriorColorChange: (value: string) => void;
   onAvailabilityStatusChange: (value: string) => void;
   onWhatsappPhoneChange: (value: string) => void;
@@ -182,6 +185,7 @@ export function PublishDetailsSection({
   doors,
   seats,
   exteriorColor,
+  engineDisplacement,
   interiorColor,
   availabilityStatus,
   whatsappPhone,
@@ -211,6 +215,7 @@ export function PublishDetailsSection({
   onDoorsChange,
   onSeatsChange,
   onExteriorColorChange,
+  onEngineDisplacementChange,
   onInteriorColorChange,
   onAvailabilityStatusChange,
   onWhatsappPhoneChange,
@@ -222,6 +227,9 @@ export function PublishDetailsSection({
   const { t } = useTranslation();
   const modelSuggestions = BRAND_MODEL_HINTS[make] ?? [];
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
+  const hasCustomExteriorColor =
+    exteriorColor.trim().length > 0 &&
+    !EXTERIOR_COLOR_OPTIONS.some((option) => option.value === exteriorColor.trim().toLowerCase());
 
   return (
     <div className="space-y-5 form-surface">
@@ -473,13 +481,41 @@ export function PublishDetailsSection({
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
               <div className="space-y-2">
-                <Label className="font-sans">Couleur extérieure</Label>
-                <Input value={exteriorColor} onChange={(e) => onExteriorColorChange(e.target.value)} className="font-sans" />
+                <Label className="font-sans">{t("publish.exteriorColor", "Couleur extérieure")}</Label>
+                <Select value={exteriorColor || EMPTY_OPTION} onValueChange={(v) => onExteriorColorChange(v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder={t("publish.selectExteriorColor", "Sélectionner une couleur")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
+                    {hasCustomExteriorColor && (
+                      <SelectItem value={exteriorColor}>{exteriorColor}</SelectItem>
+                    )}
+                    {EXTERIOR_COLOR_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {t(option.labelKey, option.fallback)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <Label className="font-sans">Couleur intérieure</Label>
+                <Label className="font-sans">{t("publish.engineDisplacement", "Cylindrée (L)")}</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={20}
+                  step="0.1"
+                  value={engineDisplacement}
+                  onChange={(e) => onEngineDisplacementChange(e.target.value)}
+                  className="font-sans"
+                  placeholder={t("publish.engineDisplacementPlaceholder", "Ex: 1.5")}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">{t("publish.interiorColor", "Couleur intérieure")}</Label>
                 <Input value={interiorColor} onChange={(e) => onInteriorColorChange(e.target.value)} className="font-sans" />
               </div>
               <div className="space-y-2">

@@ -23,6 +23,9 @@ export interface SearchFilters {
   drivetrains: string[];
   conditions: string[];
   sellerTypes: string[];
+  exteriorColor: string;
+  engineDisplacementMin: number;
+  engineDisplacementMax: number;
   brands: string[];
   modelQuery: string;
   yearMin: number;
@@ -49,6 +52,9 @@ export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   drivetrains: [],
   conditions: [],
   sellerTypes: [],
+  exteriorColor: "",
+  engineDisplacementMin: 0,
+  engineDisplacementMax: 0,
   brands: [],
   modelQuery: "",
   yearMin: 0,

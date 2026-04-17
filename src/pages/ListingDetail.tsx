@@ -31,6 +31,7 @@ import BrandLogo from "@/components/BrandLogo";
 import { resolveBrandAsset } from "@/data/brandAssets";
 import {
   formatVehicleDoors,
+  formatVehicleEngineDisplacement,
   formatVehicleMileage,
   formatVehicleVersion,
   getVehicleDisplayTitle,
@@ -39,6 +40,7 @@ import {
   getVehicleMileageValue,
   getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
+import { getExteriorColorLabel } from "@/lib/vehicleAttributes";
 import { sanitizeListingEquipment, extractCustomFeatures } from "@/data/listing-equipment";
 import type { DisplayListing } from "@/types/listing";
 import {
@@ -81,6 +83,8 @@ function buildVehicleSpecRows(
   sellerLabel: string | null,
   mileageLabel: string | null,
   doorsLabel: string | null,
+  exteriorColorLabel: string | null,
+  engineDisplacementLabel: string | null,
   t: (...args: unknown[]) => string,
 ) {
   return [
@@ -96,7 +100,8 @@ function buildVehicleSpecRows(
     { label: t("listing.bodyStyle", "Carrosserie"), value: cleanSpec(listing.vehicle?.bodyStyle) },
     { label: t("listing.condition", "État"), value: cleanSpec(listing.vehicle?.condition) },
     { label: t("listing.sellerType", "Type vendeur"), value: cleanSpec(sellerLabel) },
-    { label: t("listing.exteriorColor", "Couleur ext."), value: cleanSpec(listing.vehicle?.exteriorColor) },
+    { label: t("listing.exteriorColor", "Couleur ext."), value: cleanSpec(exteriorColorLabel) },
+    { label: t("listing.engineDisplacement", "Cylindrée"), value: cleanSpec(engineDisplacementLabel) },
     { label: t("listing.interiorColor", "Couleur int."), value: cleanSpec(listing.vehicle?.interiorColor) },
     { label: t("listing.availability", "Disponibilité"), value: cleanSpec(listing.vehicle?.availabilityStatus) },
     { label: t("listing.rentalMode", "Mode location"), value: cleanSpec(listing.vehicle?.rentalMode) },
@@ -464,9 +469,19 @@ const ListingDetail = () => {
   const mileageValue = getVehicleMileageValue(listing);
   const mileageLabel = formatVehicleMileage(mileageValue);
   const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
+  const engineDisplacementLabel = formatVehicleEngineDisplacement(listing.vehicle?.engineDisplacementL);
+  const exteriorColorLabel = getExteriorColorLabel(listing.vehicle?.exteriorColor, t);
   const vehicleSummary = getVehicleHeadline(listing);
   const sellerLabel = getSellerLabel(listing, t);
-  const vehicleSpecRows = buildVehicleSpecRows(listing, sellerLabel, mileageLabel, doorsLabel, t);
+  const vehicleSpecRows = buildVehicleSpecRows(
+    listing,
+    sellerLabel,
+    mileageLabel,
+    doorsLabel,
+    exteriorColorLabel,
+    engineDisplacementLabel,
+    t,
+  );
   const contactTrustHints = buildContactTrustHints(listing, sellerLabel, t);
   const listingTrustProofs = buildListingTrustProofs(listing, sellerLabel, hasApproxMap, t);
   const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);

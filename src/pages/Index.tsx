@@ -15,8 +15,9 @@ import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
 import {
   AUTO_DISCOVERY_CATEGORIES,
-  AUTO_HOMEPAGE_BRANDS,
 } from "@/data/automotiveCatalog";
+import { FEATURED_MAKES } from "@/data/featuredMakes";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -75,33 +76,16 @@ const Index = () => {
     ],
     [t],
   );
-  const popularBrands = useMemo(() => {
-    const curatedBrandIds = [
-      "toyota",
-      "nissan",
-      "hyundai",
-      "mazda",
-      "suzuki",
-      "ford",
-      "mitsubishi",
-      "isuzu",
-    ];
-    const brandLogoById: Record<string, string> = {
-      toyota: "/brands/toyota.svg",
-      nissan: "/brands/nissan.svg",
-      hyundai: "/brands/hyundai.svg",
-      mazda: "/brands/mazda.svg",
-      suzuki: "/brands/suzuki.svg",
-      ford: "/brands/ford.svg",
-      mitsubishi: "/brands/mitsubishi.svg",
-      isuzu: "/brands/isuzu.svg",
-    };
-    const curatedSet = new Set(curatedBrandIds);
-    return AUTO_HOMEPAGE_BRANDS.filter((brand) => curatedSet.has(brand.id)).map((brand) => ({
-      ...brand,
-      logoAsset: brandLogoById[brand.id] ?? brand.logoAsset,
-    }));
-  }, []);
+  const popularBrands = useMemo(
+    () =>
+      FEATURED_MAKES.map((make) => ({
+        id: make.slug,
+        label: make.name,
+        href: `/recherche?brand=${encodeURIComponent(make.name)}`,
+        logoAsset: make.logo,
+      })),
+    [],
+  );
   const fourByFourAndPickup = useMemo(
     () =>
       thematicListings
@@ -385,10 +369,9 @@ const Index = () => {
       </section>
 
       <section className="container mx-auto px-4 pt-6 md:pt-8">
-        <div className="rounded-2xl border border-border/70 bg-background/95 px-3 py-4 md:px-6 md:py-5">
-          <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.brandNavigation", "Navigation par marque")}</p>
+        <div className="py-1 md:py-2">
           <div className="mt-1 flex items-end justify-between gap-3">
-            <h2 className="font-serif text-lg md:text-2xl font-semibold">{t("home.popularBrands", "Marques populaires")}</h2>
+            <h2 className="font-serif text-xl md:text-[2rem] font-semibold">{t("home.popularBrands", "Marques populaires")}</h2>
             <Link
               to="/recherche"
               className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
@@ -397,27 +380,35 @@ const Index = () => {
             </Link>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-x-3 gap-y-4 md:gap-x-4 md:gap-y-5">
+          <div className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-5 md:gap-x-6 md:gap-y-6">
             {popularBrands.map((brand) => (
               <Link
                 key={brand.id}
                 to={brand.href}
-                className="group rounded-lg px-2 py-2.5 min-h-[108px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[3px] hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                className={cn(
+                  "group rounded-lg px-3 py-3.5 min-h-[132px] w-[144px] md:min-h-[148px] md:w-[168px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[3px] hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
+                  brand.wrapperClassName,
+                )}
                 aria-label={`Voir les annonces ${brand.label}`}
-                title={brand.label}
               >
                 {brand.logoAsset ? (
                   <img
                     src={brand.logoAsset}
                     alt={`Logo ${brand.label}`}
                     loading="lazy"
-                    className="h-8 md:h-9 w-auto max-w-[110px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
+                    className={cn(
+                      "h-[3.1rem] md:h-[3.35rem] w-auto max-w-[168px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity",
+                      brand.logoClassName,
+                    )}
                   />
                 ) : (
-                  <span className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full border border-border/60 bg-background text-[11px] md:text-xs font-semibold tracking-wide text-foreground/85">
+                  <span className="inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border/60 bg-background text-xs font-semibold tracking-wide text-foreground/85">
                     {brand.label.slice(0, 2).toUpperCase()}
                   </span>
                 )}
+                <span className="font-sans text-[11px] md:text-xs font-medium tracking-[0.01em] text-foreground/75">
+                  {brand.label}
+                </span>
               </Link>
             ))}
           </div>

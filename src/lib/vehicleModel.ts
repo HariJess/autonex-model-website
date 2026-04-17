@@ -52,6 +52,7 @@ export function deriveVehicleFromLegacy(input: {
   rentalMode?: string | null | undefined;
   seats?: number | null | undefined;
   exteriorColor?: string | null | undefined;
+  engineDisplacementL?: number | null | undefined;
   interiorColor?: string | null | undefined;
   availabilityStatus?: string | null | undefined;
   isElectric?: boolean | null | undefined;
@@ -116,6 +117,7 @@ export function deriveVehicleFromLegacy(input: {
     rentalMode: input.rentalMode ?? null,
     seats: input.seats ?? null,
     exteriorColor: input.exteriorColor ?? null,
+    engineDisplacementL: input.engineDisplacementL ?? tagged.engineDisplacementL ?? null,
     interiorColor: input.interiorColor ?? null,
     availabilityStatus: input.availabilityStatus ?? null,
     isElectric: input.isElectric === true || (fuel?.toLowerCase().includes("électrique") ?? false) || (fuel?.toLowerCase().includes("electrique") ?? false),

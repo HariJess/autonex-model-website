@@ -45,6 +45,7 @@ import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
 import { SearchTrustPanel } from "@/pages/search/components/SearchTrustPanel";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
 import { listingTypesForTransaction } from "@/lib/listingRules";
+import { formatEngineDisplacementLiters, getExteriorColorLabel } from "@/lib/vehicleAttributes";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -184,6 +185,9 @@ const SearchPage = () => {
     drivetrains: filters.drivetrains.length > 0 ? filters.drivetrains : undefined,
     conditions: filters.conditions.length > 0 ? filters.conditions : undefined,
     sellerTypes: filters.sellerTypes.length > 0 ? filters.sellerTypes : undefined,
+    exteriorColor: filters.exteriorColor || undefined,
+    engineDisplacementMin: filters.engineDisplacementMin || undefined,
+    engineDisplacementMax: filters.engineDisplacementMax || undefined,
     searchRelaxation: true,
   });
 
@@ -226,6 +230,20 @@ const SearchPage = () => {
     if (filters.yearMax > 0) {
       results = results.filter((l) => (l.vehicle?.year ?? 0) <= filters.yearMax);
     }
+    if (filters.exteriorColor) {
+      const wantedColor = normalizeSearchToken(filters.exteriorColor);
+      results = results.filter((l) => normalizeSearchToken(l.vehicle?.exteriorColor) === wantedColor);
+    }
+    if (filters.engineDisplacementMin > 0) {
+      results = results.filter(
+        (l) => (l.vehicle?.engineDisplacementL ?? 0) >= filters.engineDisplacementMin,
+      );
+    }
+    if (filters.engineDisplacementMax > 0) {
+      results = results.filter(
+        (l) => (l.vehicle?.engineDisplacementL ?? 0) <= filters.engineDisplacementMax,
+      );
+    }
     return results;
   }, [
     dbListings,
@@ -239,6 +257,9 @@ const SearchPage = () => {
     filters.modelQuery,
     filters.yearMin,
     filters.yearMax,
+    filters.exteriorColor,
+    filters.engineDisplacementMin,
+    filters.engineDisplacementMax,
   ]);
 
   const exactMatchListings = useMemo(() => {
@@ -379,6 +400,20 @@ const SearchPage = () => {
     filters.drivetrains.forEach((d) => chips.push({ label: d, key: `drive-${d}` }));
     filters.conditions.forEach((c) => chips.push({ label: c, key: `condition-${c}` }));
     filters.sellerTypes.forEach((s) => chips.push({ label: s, key: `seller-${s}` }));
+    if (filters.exteriorColor) {
+      chips.push({
+        label: `${t("listing.exteriorColor", "Couleur extérieure")}: ${getExteriorColorLabel(filters.exteriorColor, t) ?? filters.exteriorColor}`,
+        key: "exteriorColor",
+      });
+    }
+    if (filters.engineDisplacementMin > 0 || filters.engineDisplacementMax > 0) {
+      const minLabel = filters.engineDisplacementMin > 0 ? formatEngineDisplacementLiters(filters.engineDisplacementMin) : "0.0 L";
+      const maxLabel = filters.engineDisplacementMax > 0 ? formatEngineDisplacementLiters(filters.engineDisplacementMax) : "∞";
+      chips.push({
+        label: `${t("listing.engineDisplacement", "Cylindrée")} ${minLabel} - ${maxLabel}`,
+        key: "engineDisplacement",
+      });
+    }
     filters.brands.forEach((b) => chips.push({ label: b, key: `brand-${b}` }));
     if (filters.modelQuery.trim()) chips.push({ label: `${t("search.model", "Modèle")}: ${filters.modelQuery.trim()}`, key: "modelQuery" });
     if (filters.yearMin > 0 || filters.yearMax > 0) {
@@ -416,6 +451,11 @@ const SearchPage = () => {
     else if (key.startsWith("drive-")) newFilters.drivetrains = newFilters.drivetrains.filter((d) => d !== key.slice(6));
     else if (key.startsWith("condition-")) newFilters.conditions = newFilters.conditions.filter((c) => c !== key.slice(10));
     else if (key.startsWith("seller-")) newFilters.sellerTypes = newFilters.sellerTypes.filter((s) => s !== key.slice(7));
+    else if (key === "exteriorColor") newFilters.exteriorColor = "";
+    else if (key === "engineDisplacement") {
+      newFilters.engineDisplacementMin = 0;
+      newFilters.engineDisplacementMax = 0;
+    }
     else if (key.startsWith("brand-")) newFilters.brands = newFilters.brands.filter((b) => b !== key.slice(6));
     else if (key === "modelQuery") newFilters.modelQuery = "";
     else if (key === "yearRange") {
@@ -534,6 +574,8 @@ const SearchPage = () => {
     if (filters.drivetrains.length > 0) count += 1;
     if (filters.conditions.length > 0) count += 1;
     if (filters.sellerTypes.length > 0) count += 1;
+    if (filters.exteriorColor) count += 1;
+    if (filters.engineDisplacementMin > 0 || filters.engineDisplacementMax > 0) count += 1;
     if (filters.brands.length > 0) count += 1;
     if (filters.modelQuery.trim()) count += 1;
     if (filters.yearMin > 0 || filters.yearMax > 0) count += 1;

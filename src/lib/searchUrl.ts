@@ -79,6 +79,9 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     drivetrains: sp.get("drive")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
     conditions: sp.get("condition")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
     sellerTypes: sp.get("seller")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    exteriorColor: sp.get("ext_color")?.trim() ?? "",
+    engineDisplacementMin: parseFiniteNumber(sp.get("eng_min")),
+    engineDisplacementMax: parseFiniteNumber(sp.get("eng_max")),
     brands: sp.get("brand")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
     modelQuery: sp.get("model")?.trim() ?? "",
     yearMin: parseFiniteNumber(sp.get("year_min")),
@@ -111,6 +114,9 @@ export function filtersToSearchParams(f: SearchFilters): URLSearchParams {
   if (f.drivetrains.length) p.set("drive", f.drivetrains.join(","));
   if (f.conditions.length) p.set("condition", f.conditions.join(","));
   if (f.sellerTypes.length) p.set("seller", f.sellerTypes.join(","));
+  if (f.exteriorColor.trim()) p.set("ext_color", f.exteriorColor.trim());
+  if (f.engineDisplacementMin > 0) p.set("eng_min", String(f.engineDisplacementMin));
+  if (f.engineDisplacementMax > 0) p.set("eng_max", String(f.engineDisplacementMax));
   if (f.brands.length) p.set("brand", f.brands.join(","));
   if (f.modelQuery.trim()) p.set("model", f.modelQuery.trim());
   if (f.yearMin > 0) p.set("year_min", String(f.yearMin));

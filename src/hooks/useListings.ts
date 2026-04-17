@@ -25,6 +25,7 @@ type ListingRowLite = Pick<
   | "doors"
   | "drivetrain"
   | "exterior_color"
+  | "engine_displacement_l"
   | "fuel"
   | "interior_color"
   | "is_electric"
@@ -76,6 +77,7 @@ const LISTING_SELECT_COLUMNS = [
   "doors",
   "drivetrain",
   "exterior_color",
+  "engine_displacement_l",
   "fuel",
   "interior_color",
   "is_electric",
@@ -158,6 +160,7 @@ function mapListingRowToDisplayListing(
     rentalMode: listing.rental_mode,
     seats: listing.seats,
     exteriorColor: listing.exterior_color,
+    engineDisplacementL: listing.engine_displacement_l,
     interiorColor: listing.interior_color,
     availabilityStatus: listing.availability_status,
     isElectric: listing.is_electric,
@@ -325,6 +328,9 @@ export interface ListingsFilters {
   drivetrains?: string[];
   conditions?: string[];
   sellerTypes?: string[];
+  exteriorColor?: string;
+  engineDisplacementMin?: number;
+  engineDisplacementMax?: number;
   searchText?: string;
   limit?: number;
   ownerIds?: string[];
@@ -588,6 +594,15 @@ export function useDbListings(filters: ListingsFilters = {}) {
         }
         if (filters.sellerTypes && filters.sellerTypes.length > 0) {
           query = query.in("seller_type", filters.sellerTypes);
+        }
+        if (filters.exteriorColor) {
+          query = query.eq("exterior_color", filters.exteriorColor);
+        }
+        if (filters.engineDisplacementMin && filters.engineDisplacementMin > 0) {
+          query = query.gte("engine_displacement_l", filters.engineDisplacementMin);
+        }
+        if (filters.engineDisplacementMax && filters.engineDisplacementMax > 0) {
+          query = query.lte("engine_displacement_l", filters.engineDisplacementMax);
         }
       }
       if (filters.limit) {

@@ -134,6 +134,7 @@
     "condition": "Condition",
     "sellerType": "Seller type",
     "exteriorColor": "Exterior color",
+    "engineDisplacement": "Engine size",
     "interiorColor": "Interior color",
     "rentalMode": "Rental mode",
     "availability": "Availability",
@@ -315,6 +316,10 @@
     "mobileFiltersDraftHint": "Adjust filters, then apply.",
     "bathroomsHint": "Select number of doors to refine matching listings.",
     "equipmentHint": "Choose only equipment that matters for your search.",
+    "allExteriorColors": "All exterior colors",
+    "engineDisplacementHint": "Set a range in liters (e.g. 1.5 to 2.8).",
+    "engineMin": "Min (L)",
+    "engineMax": "Max (L)",
     "recentSortHint": "Visibility options are prioritized first, then newest listings.",
     "similarResultsBadgeHint": "These are close matches based on your criteria."
   },
@@ -404,6 +409,7 @@
     "mapRequired": "Map position is required.",
     "doorsInvalid": "Invalid door count.",
     "seatsInvalid": "Invalid seat count.",
+    "engineDisplacementInvalid": "Invalid engine size.",
     "yearInvalid": "Invalid year.",
     "photoRequired": "At least one photo (main photo) is required.",
     "uploadRetryNeeded": "Some photos failed to upload. Please retry.",
@@ -441,6 +447,12 @@
     "listingLocationHint": "City and map point are required to publish.",
     "mainPhotosTitle": "Main photos",
     "mainPhotoFirst": "Upload your best photos first. The first image becomes the cover by default.",
+    "exteriorColor": "Exterior color",
+    "selectExteriorColor": "Select a color",
+    "interiorColor": "Interior color",
+    "engineDisplacement": "Engine size (L)",
+    "engineDisplacementPlaceholder": "e.g. 1.5",
+    "notSpecified": "Not specified",
     "cover": "Cover",
     "remove": "Remove",
     "localOnly": "Local only",
@@ -726,5 +738,18 @@
   },
   "states": {
     "genericErrorRetry": "An error occurred. Please retry in a few moments."
+  },
+  "vehicleColor": {
+    "black": "Black",
+    "white": "White",
+    "gray": "Gray",
+    "silver": "Silver",
+    "blue": "Blue",
+    "red": "Red",
+    "green": "Green",
+    "beige": "Beige",
+    "brown": "Brown",
+    "orange": "Orange",
+    "yellow": "Yellow"
   }
 }
