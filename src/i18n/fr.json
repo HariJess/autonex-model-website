@@ -318,6 +318,10 @@
     "noListings": "Aucune annonce active pour le moment.",
     "activeListings": "{{count}} annonce(s) active(s)"
   },
+  "home": {
+    "goodDealsTitle": "Bonnes affaires",
+    "goodDealsSubtitle": "Annonces avec prix réellement réduits, vérifiés sur AutoNex."
+  },
   "vehicleColor": {
     "black": "Noir",
     "white": "Blanc",

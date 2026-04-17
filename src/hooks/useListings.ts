@@ -51,6 +51,7 @@ type ListingRowLite = Pick<
   | "views_count"
   | "created_at"
   | "owner_id"
+  | "original_price_mga"
   | "video_url"
   | "virtual_tour_url"
   | "internal_ref"
@@ -103,6 +104,7 @@ const LISTING_SELECT_COLUMNS = [
   "views_count",
   "created_at",
   "owner_id",
+  "original_price_mga",
   "video_url",
   "virtual_tour_url",
   "internal_ref",
@@ -197,6 +199,7 @@ function mapListingRowToDisplayListing(
     views_count: listing.views_count,
     created_at: listing.created_at,
     owner_id: listing.owner_id,
+    original_price_mga: listing.original_price_mga,
     owner_name: extras?.ownerName ?? null,
     owner_phone: extras?.ownerPhone ?? null,
     has_whatsapp_contact: extras?.hasWhatsappContact ?? Boolean(listing.whatsapp_phone?.trim()),

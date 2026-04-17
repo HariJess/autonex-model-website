@@ -18,6 +18,7 @@ import {
 } from "@/data/automotiveCatalog";
 import { FEATURED_MAKES } from "@/data/featuredMakes";
 import { cn } from "@/lib/utils";
+import { getDealMeta } from "@/lib/deals";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -29,6 +30,7 @@ const Index = () => {
   const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
   const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
   const { data: thematicListings = [], isLoading: themedLoading } = useDbListings({ limit: 32 });
+  const { data: dealCandidates = [], isLoading: dealsLoading } = useDbListings({ limit: 48 });
   const compactCategoryLinks = useMemo(
     () =>
       AUTO_DISCOVERY_CATEGORIES.filter((category) =>
@@ -218,6 +220,16 @@ const Index = () => {
     if (isLowInventory) return nonEmpty.slice(0, 2);
     return nonEmpty;
   }, [themedLoading, themedSections, isZeroInventory, isLowInventory]);
+  const discountedListings = useMemo(
+    () =>
+      dealCandidates
+        .map((listing) => ({ listing, deal: getDealMeta(listing) }))
+        .filter((entry): entry is { listing: typeof dealCandidates[number]; deal: NonNullable<ReturnType<typeof getDealMeta>> } => Boolean(entry.deal))
+        .sort((a, b) => b.deal.discountPercent - a.deal.discountPercent)
+        .slice(0, 8),
+    [dealCandidates],
+  );
+  const showDealsSection = !dealsLoading && discountedListings.length >= 3;
   const categoryIcon = (iconKey?: string) => {
     if (iconKey === "moto" || iconKey === "scooter") return <Bike className="h-4 w-4 text-primary" aria-hidden />;
     if (iconKey === "pickup" || iconKey === "camion" || iconKey === "utilitaire") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
@@ -420,6 +432,32 @@ const Index = () => {
         title={t("sections.featured", "À la une")}
         limit={8}
       />
+
+      {showDealsSection && (
+        <section className="container mx-auto px-4 pt-6 md:pt-8">
+          <div className="flex items-end justify-between gap-3 mb-4 md:mb-5">
+            <div className="min-w-0">
+              <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">
+                {t("home.goodDealsTitle", "Bonnes affaires")}
+              </h2>
+              <p className="text-sm text-muted-foreground font-sans mt-1 leading-relaxed">
+                {t("home.goodDealsSubtitle", "Annonces avec prix réellement réduits, vérifiés sur AutoNex.")}
+              </p>
+            </div>
+            <Link
+              to="/recherche?sort=recent"
+              className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+            >
+              {t("sections.viewAll", "Voir tout")}
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {discountedListings.map((entry) => (
+              <ListingCard key={`deal-${entry.listing.id}`} listing={entry.listing} dealMeta={entry.deal} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="container mx-auto px-4 py-6 md:py-8">
         <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4 md:p-6">

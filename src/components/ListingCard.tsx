@@ -18,6 +18,7 @@ import {
 } from "@/lib/vehiclePresentation";
 import BrandLogo from "@/components/BrandLogo";
 import { resolveBrandAsset } from "@/data/brandAssets";
+import type { DealMeta } from "@/lib/deals";
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -26,11 +27,12 @@ interface ListingCardProps {
   /** When set (e.g. « résultats proches »), shows a subtle hint under the title */
   matchBadge?: string;
   variant?: "default" | "search";
+  dealMeta?: DealMeta | null;
 }
 
 const LOCAL_PLACEHOLDER = "/placeholder.svg";
 
-const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default" }: ListingCardProps) => {
+const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default", dealMeta = null }: ListingCardProps) => {
   const images = useMemo(
     () => (listing.images.length > 0 ? listing.images : [LOCAL_PLACEHOLDER]),
     [listing.images],
@@ -120,6 +122,13 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             </Badge>
           </div>
         )}
+        {dealMeta && (
+          <div className={`absolute right-3 ${listing.badge && badgeLabels[listing.badge] ? "top-12" : "top-3"}`}>
+            <Badge className="bg-destructive text-xs font-semibold px-3 py-1" style={{ color: "#FAFAFA" }}>
+              -{dealMeta.discountPercent}%
+            </Badge>
+          </div>
+        )}
         <div className="absolute top-3 right-3 flex gap-1.5">
           <Badge variant="secondary" className="text-[10px] font-sans bg-card/90 border border-border/50">
             {transactionBadgeLabel}
@@ -183,6 +192,11 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
           <p className={`font-sans tracking-tight text-primary ${isSearchVariant ? "text-[1.35rem] font-semibold leading-none" : "text-xl max-sm:text-[1.22rem] font-bold"}`}>
             {formatPrice(listing.price_mga)}
           </p>
+          {dealMeta && (
+            <p className="text-xs font-sans text-muted-foreground line-through">
+              {formatPrice(dealMeta.originalPriceMga)}
+            </p>
+          )}
           <p className="text-xs text-muted-foreground font-sans">{formatPriceSecondary(listing.price_mga)}</p>
         </div>
         <h3 className={`font-serif text-foreground leading-snug line-clamp-2 ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>

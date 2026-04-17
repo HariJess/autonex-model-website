@@ -58,6 +58,7 @@ export interface DisplayListing {
   type: ListingType;
   transaction: TransactionType;
   price_mga: number;
+  original_price_mga?: number | null;
   price_eur: number | null;
   surface: number | null;
   rooms: number | null;
