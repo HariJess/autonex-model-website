@@ -28,7 +28,16 @@
     "location": "Localisation",
     "rooms": "Marque",
     "allTypes": "Tous les types",
-    "allRooms": "Toutes marques"
+    "allRooms": "Toutes marques",
+    "allBrands": "Toutes les marques",
+    "allFuels": "Tous carburants",
+    "allYears": "Toutes années",
+    "modelPlaceholder": "Modèle (ex: RAV4, Hilux, NMAX...)",
+    "brandSearchPlaceholder": "Rechercher une marque...",
+    "searching": "Recherche...",
+    "seeListings": "Voir les annonces",
+    "result_one": "1 résultat",
+    "result_many": "{{count}} résultats"
   },
   "sections": {
     "featured": "Véhicules à la une",
@@ -80,6 +89,7 @@
     "priceAsc": "Prix croissant",
     "priceDesc": "Prix décroissant",
     "relevance": "Pertinence",
+    "budget": "Budget",
     "recentSortHint": "Les annonces avec options de visibilité (top, à la une, actualisation) apparaissent en priorité, puis les plus récentes.",
     "results": "résultats",
     "mapView": "Carte",
