@@ -272,8 +272,8 @@ const Index = () => {
             url: canonical,
             potentialAction: {
               "@type": "SearchAction",
-              target: `${canonical.replace(/\/+$/, "")}/recherche?transaction={transaction}&ville={ville}&type={type}`,
-              "query-input": ["required name=transaction", "optional name=ville", "optional name=type"],
+              target: `${canonical.replace(/\/+$/, "")}/recherche?transaction={transaction}&ville={ville}&vtype={vtype}`,
+              "query-input": ["required name=transaction", "optional name=ville", "optional name=vtype"],
             },
           })}
         </script>

@@ -26,7 +26,6 @@ const Header = () => {
   const { currency, setCurrency } = useCurrency();
 
   const buyMode = AUTO_TRANSACTION_MODES.find((mode) => mode.id === "acheter") ?? AUTO_TRANSACTION_MODES[0];
-  const rentMode = AUTO_TRANSACTION_MODES.find((mode) => mode.id === "louer") ?? AUTO_TRANSACTION_MODES[1];
   const shortTermMode =
     AUTO_TRANSACTION_MODES.find((mode) => mode.id === "location_courte") ?? AUTO_TRANSACTION_MODES[2];
   const longTermMode =
