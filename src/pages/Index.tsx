@@ -6,16 +6,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
-import { ChevronRight, Loader2, Car, Bike, Truck, BusFront, ShieldCheck, RotateCw, CalendarClock } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
-import {
-  AUTO_DISCOVERY_CATEGORIES,
-} from "@/data/automotiveCatalog";
 import { FEATURED_MAKES } from "@/data/featuredMakes";
 import { cn } from "@/lib/utils";
 import { getDealMeta } from "@/lib/deals";
@@ -31,13 +28,6 @@ const Index = () => {
   const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
   const { data: thematicListings = [], isLoading: themedLoading } = useDbListings({ limit: 32 });
   const { data: dealCandidates = [], isLoading: dealsLoading } = useDbListings({ limit: 48 });
-  const compactCategoryLinks = useMemo(
-    () =>
-      AUTO_DISCOVERY_CATEGORIES.filter((category) =>
-        ["suv4x4", "pickup", "citadine", "crossover", "utilitaire-leger", "van-fourgon", "electrique", "hybride"].includes(category.id),
-      ),
-    [],
-  );
   const heroCategoryShortcuts = useMemo(
     () => [
       {
@@ -230,44 +220,6 @@ const Index = () => {
     [dealCandidates],
   );
   const showDealsSection = !dealsLoading && discountedListings.length >= 3;
-  const categoryIcon = (iconKey?: string) => {
-    if (iconKey === "moto" || iconKey === "scooter") return <Bike className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "pickup" || iconKey === "camion" || iconKey === "utilitaire") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "van") return <Truck className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "bus") return <BusFront className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "new") return <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "used") return <RotateCw className="h-4 w-4 text-primary" aria-hidden />;
-    if (iconKey === "rent-short" || iconKey === "rent-long") return <CalendarClock className="h-4 w-4 text-primary" aria-hidden />;
-    return <Car className="h-4 w-4 text-primary" aria-hidden />;
-  };
-  const categoryToken = (iconKey?: string) => {
-    const tokens: Record<string, string> = {
-      citadine: "CT",
-      berline: "BR",
-      suv: "SV",
-      crossover: "CR",
-      pickup: "PU",
-      coupe: "CP",
-      cabriolet: "CB",
-      moto: "MT",
-      scooter: "SC",
-      quad: "QD",
-      buggy: "BG",
-      utilitaire: "UL",
-      van: "VF",
-      bus: "MB",
-      camion: "CM",
-      electrique: "EV",
-      hybride: "HY",
-      "hybride-rechargeable": "PHEV",
-      thermique: "TH",
-      new: "N",
-      used: "OCC",
-      "rent-short": "LCD",
-      "rent-long": "LLD",
-    };
-    return tokens[iconKey ?? ""] ?? "VN";
-  };
   const renderThematicSection = (title: string, subtitle: string, linksTo: string, items: typeof listings) => (
     <section className="container mx-auto px-4 py-5 md:py-6">
       <div className="flex items-start justify-between gap-3 mb-4 md:mb-5">
@@ -547,48 +499,6 @@ const Index = () => {
           </div>
         </section>
       )}
-
-      <section className="container mx-auto px-4 py-5 md:py-6">
-        <div className="rounded-2xl border border-border/70 bg-card/95 p-3.5 md:p-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs uppercase tracking-wide text-muted-foreground font-sans mr-1">{t("home.quickCategories", "Catégories rapides")}</span>
-            {compactCategoryLinks.map((category) => (
-              <Link
-                key={category.id}
-                to={category.href}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-2 min-h-10 hover:border-primary/35 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2"
-              >
-                {categoryIcon(category.iconKey)}
-                <span className="text-xs font-semibold text-foreground">{category.label}</span>
-                <span className="text-[10px] text-muted-foreground">{categoryToken(category.iconKey)}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="container mx-auto px-4 pb-8 md:pb-12">
-        <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{t("home.recommendedFlowOverline", "Parcours conseillé")}</p>
-              <p className="mt-1 font-serif text-xl text-foreground">{t("home.recommendedFlowTitle", "Explorez, estimez, puis passez à l’action")}</p>
-              <p className="mt-1 font-sans text-sm text-muted-foreground">{t("home.recommendedFlowDesc", "Un flux simple pour comparer le marché, valider le bon prix et publier avec confiance.")}</p>
-            </div>
-            <div className="flex flex-wrap gap-2.5">
-              <Button asChild variant="outline">
-                <Link to="/recherche" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("home.exploreMarket", "Explorer le marché")}</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 rounded-md">{t("estimation.estimateVehicle", "Estimer le véhicule")}</Link>
-              </Button>
-              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
-                <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("publish.submit", "Publier mon véhicule")}</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </>
