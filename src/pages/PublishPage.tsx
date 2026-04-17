@@ -80,10 +80,18 @@ import {
   AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
   inferVehicleTypeOptionIdFromFilters,
 } from "@/data/automotiveCatalog";
+import { buildLegacyMirrorFieldsFromVehicle } from "@/lib/vehicleCanonical";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
 const LISTING_ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function toNullableInt(raw: string): number | null {
+  const num = Number(raw);
+  if (!Number.isFinite(num)) return null;
+  const intVal = Math.floor(num);
+  return intVal >= 0 ? intVal : null;
+}
 
 const PublishPage = () => {
   const { t } = useTranslation();
@@ -198,6 +206,21 @@ const PublishPage = () => {
   const lastPersistedFingerprintRef = useRef("");
   const fingerprintInitializedRef = useRef(false);
   const pendingUploadInFlightRef = useRef(false);
+
+  const applyVehicleLegacyMirrorFromInputs = useCallback(
+    (nextVehicle: { mileageKmInput?: string; doorsInput?: string; seatsInput?: string }) => {
+      const mirrored = buildLegacyMirrorFieldsFromVehicle({
+        mileageKm: nextVehicle.mileageKmInput != null ? toNullableInt(nextVehicle.mileageKmInput) : null,
+        trimOrVersion: toNullableInt(rooms),
+        doors: nextVehicle.doorsInput != null ? toNullableInt(nextVehicle.doorsInput) : null,
+        seats: nextVehicle.seatsInput != null ? toNullableInt(nextVehicle.seatsInput) : null,
+      });
+      if (nextVehicle.mileageKmInput != null) setSurface(nextVehicle.mileageKmInput);
+      if (nextVehicle.doorsInput != null) setBathrooms(mirrored.bathrooms != null ? String(mirrored.bathrooms) : "");
+      if (nextVehicle.seatsInput != null) setToilets(mirrored.toilets != null ? String(mirrored.toilets) : "");
+    },
+    [rooms],
+  );
 
   const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
   const manualPaymentMethods = useMemo(
@@ -1981,7 +2004,7 @@ const PublishPage = () => {
             onTitleChange={setTitle}
             onDescriptionChange={setDescription}
             onPriceMgaChange={setPriceMga}
-            onSurfaceChange={setSurface}
+            onSurfaceChange={(value) => applyVehicleLegacyMirrorFromInputs({ mileageKmInput: value })}
             onRoomsChange={setRooms}
             onBathroomsChange={setBathrooms}
             onToiletsChange={setToilets}
@@ -1997,11 +2020,11 @@ const PublishPage = () => {
             onBodyStyleChange={setVehicleBodyStyle}
             onDoorsChange={(value) => {
               setVehicleDoors(value);
-              setBathrooms(value);
+              applyVehicleLegacyMirrorFromInputs({ doorsInput: value });
             }}
             onSeatsChange={(value) => {
               setVehicleSeats(value);
-              setToilets(value);
+              applyVehicleLegacyMirrorFromInputs({ seatsInput: value });
             }}
             onExteriorColorChange={setVehicleExteriorColor}
             onEngineDisplacementChange={setVehicleEngineDisplacement}

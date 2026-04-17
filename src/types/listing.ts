@@ -48,6 +48,40 @@ export const TRANSACTION_LABELS: Record<TransactionType, string> = {
 };
 
 /**
+ * Canonical vehicle-native business attributes used by the product.
+ * DB legacy mirrors (`surface`, `rooms`, `bathrooms`, `toilets`) remain temporary compatibility fields.
+ */
+export type CanonicalVehicleInfo = {
+  make: string | null;
+  model: string | null;
+  year: number | null;
+  mileageKm: number | null;
+  fuel: string | null;
+  transmission: string | null;
+  drivetrain: string | null;
+  doors: number | null;
+  bodyStyle: string | null;
+  rentalMode: string | null;
+  seats: number | null;
+  exteriorColor: string | null;
+  engineDisplacementL: number | null;
+  interiorColor: string | null;
+  availabilityStatus: string | null;
+  isElectric: boolean;
+  isHybrid: boolean;
+  condition: "neuf" | "occasion" | null;
+  sellerType: "concessionnaire" | "particulier" | null;
+};
+
+/** Temporary legacy mirrors from historical property-style schema. */
+export type LegacyListingMirrorFields = {
+  surface: number | null;
+  rooms: number | null;
+  bathrooms: number | null;
+  toilets?: number | null;
+};
+
+/**
  * Normalized listing for display across the app.
  * Works for both DB listings and seed data.
  */
@@ -99,26 +133,6 @@ export interface DisplayListing {
    * with listing creation / bump recency. Higher = shown first.
    */
   visibility_rank_score?: number;
-  /** Frontend vehicle-native view model derived from legacy listing fields. */
-  vehicle?: {
-    make: string | null;
-    model: string | null;
-    year: number | null;
-    mileageKm: number | null;
-    fuel: string | null;
-    transmission: string | null;
-    drivetrain: string | null;
-    doors: number | null;
-    bodyStyle: string | null;
-    rentalMode: string | null;
-    seats: number | null;
-    exteriorColor: string | null;
-    engineDisplacementL: number | null;
-    interiorColor: string | null;
-    availabilityStatus: string | null;
-    isElectric: boolean;
-    isHybrid: boolean;
-    condition: "neuf" | "occasion" | null;
-    sellerType: "concessionnaire" | "particulier" | null;
-  };
+  /** Canonical vehicle attributes adapter (product truth layer). */
+  vehicle?: CanonicalVehicleInfo;
 }

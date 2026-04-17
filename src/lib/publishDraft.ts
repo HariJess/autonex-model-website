@@ -6,6 +6,7 @@ import type { PurchasableBoostType } from "@/config/monetization";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
+import { buildLegacyMirrorFieldsFromVehicle } from "@/lib/vehicleCanonical";
 
 export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
 
@@ -269,14 +270,6 @@ function parseVehicleMileageKmFromLegacySurfaceInput(
   return normalizeInt(surfaceInput, 0);
 }
 
-function buildVehicleCanonicalAndLegacyMileageFields(mileageKm: number | null): Pick<TablesUpdate<"listings">, "mileage_km" | "surface"> {
-  return {
-    mileage_km: mileageKm,
-    // Temporary legacy mirror used by existing listing/search compatibility paths.
-    surface: mileageKm,
-  };
-}
-
 /** Map wizard form to a listings UPDATE payload (draft or final). */
 export function formToListingUpdate(input: {
   transaction: TransactionType | "";
@@ -472,7 +465,12 @@ export function formToListingUpdate(input: {
 
   const pendingBoostJson = boostPayload as unknown as Json;
 
-  const vehicleMileageFields = buildVehicleCanonicalAndLegacyMileageFields(mileageKm);
+  const legacyMirrorFields = buildLegacyMirrorFieldsFromVehicle({
+    mileageKm,
+    trimOrVersion: versionOrTrim,
+    doors: doorsLegacy,
+    seats,
+  });
 
   return {
     title: titleOut,
@@ -481,10 +479,11 @@ export function formToListingUpdate(input: {
     transaction: tx,
     price_mga: priceNum,
     price_eur: priceNum > 0 ? Math.round((priceNum / 5050) * 100) / 100 : 0,
-    ...vehicleMileageFields,
-    rooms: showRooms ? versionOrTrim : null,
-    bathrooms: showRooms ? doorsLegacy : null,
-    toilets: showRooms ? seats : null,
+    mileage_km: mileageKm,
+    ...legacyMirrorFields,
+    rooms: showRooms ? legacyMirrorFields.rooms : null,
+    bathrooms: showRooms ? legacyMirrorFields.bathrooms : null,
+    toilets: showRooms ? legacyMirrorFields.toilets : null,
     make,
     model,
     year,
@@ -807,7 +806,12 @@ export function buildListingMaterialSnapshotFromForm(
     return intVal;
   };
   const mileageKm = parseVehicleMileageKmFromLegacySurfaceInput(input.surface, normalizeInt);
-  const vehicleMileageFields = buildVehicleCanonicalAndLegacyMileageFields(mileageKm);
+  const legacyMirrorFields = buildLegacyMirrorFieldsFromVehicle({
+    mileageKm,
+    trimOrVersion: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,
+    doors: showRooms ? (input.bathrooms ? Number(input.bathrooms) || null : null) : null,
+    seats: showRooms && input.toilets ? Number(input.toilets) || null : null,
+  });
 
   return JSON.stringify({
     title: input.title.trim(),
@@ -821,14 +825,14 @@ export function buildListingMaterialSnapshotFromForm(
     quartier_libre: input.quartierLibre.trim(),
     lat: finalLat,
     lng: finalLng,
-    surface: vehicleMileageFields.surface ?? null,
-    rooms: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,
-    bathrooms: showRooms ? (input.bathrooms ? Number(input.bathrooms) || null : null) : null,
-    toilets: showRooms && input.toilets ? Number(input.toilets) || null : null,
+    surface: legacyMirrorFields.surface ?? null,
+    rooms: showRooms ? legacyMirrorFields.rooms : null,
+    bathrooms: showRooms ? legacyMirrorFields.bathrooms : null,
+    toilets: showRooms ? (legacyMirrorFields.toilets ?? null) : null,
     make: input.vehicleMake.trim(),
     model: input.vehicleModel.trim(),
     year: input.vehicleYear ? Number(input.vehicleYear) || null : null,
-    mileage_km: vehicleMileageFields.mileage_km ?? null,
+    mileage_km: mileageKm ?? null,
     fuel: input.vehicleFuel.trim(),
     transmission_gearbox: input.vehicleTransmission.trim(),
     drivetrain: input.vehicleDrivetrain.trim(),

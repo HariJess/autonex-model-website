@@ -43,6 +43,7 @@ import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import { formatEngineDisplacementLiters, getExteriorColorLabel } from "@/lib/vehicleAttributes";
+import { getCanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -66,15 +67,7 @@ function normalizeSearchToken(value: string | null | undefined): string {
 }
 
 function resolveVehicleMileageKm(listing: DisplayListing): number | null {
-  const canonicalMileageKm = listing.vehicle?.mileageKm;
-  if (typeof canonicalMileageKm === "number" && canonicalMileageKm >= 0) {
-    return canonicalMileageKm;
-  }
-  // Legacy compatibility fallback for older rows mirrored via `surface`.
-  if (typeof listing.surface === "number" && listing.surface >= 0) {
-    return listing.surface;
-  }
-  return null;
+  return getCanonicalVehicleAttributes(listing).mileageKm;
 }
 
 function matchesVehicleMileageMinStrict(listing: DisplayListing, mileageMin: number): boolean {

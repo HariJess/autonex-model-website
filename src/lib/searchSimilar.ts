@@ -1,6 +1,7 @@
 import type { DisplayListing } from "@/types/listing";
 import type { SearchFilters } from "@/types/search";
 import { getVille } from "@/data/madagascar-locations";
+import { getCanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
 
 /** Arrondissement label for a quartier name within a ville (reference data), if known. */
 export function arrondissementForQuartier(villeName: string, quartierName: string): string | null {
@@ -60,15 +61,7 @@ function surfaceTolerance(surface: number | null, min: number, max: number): num
 }
 
 function resolveVehicleMileageKm(listing: DisplayListing): number | null {
-  const canonicalMileageKm = listing.vehicle?.mileageKm;
-  if (typeof canonicalMileageKm === "number" && canonicalMileageKm >= 0) {
-    return canonicalMileageKm;
-  }
-  // Legacy compatibility fallback for older rows mirrored via `surface`.
-  if (typeof listing.surface === "number" && listing.surface >= 0) {
-    return listing.surface;
-  }
-  return null;
+  return getCanonicalVehicleAttributes(listing).mileageKm;
 }
 
 /**
