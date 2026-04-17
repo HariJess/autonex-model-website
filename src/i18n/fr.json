@@ -287,7 +287,8 @@
     "close": "Fermer",
     "back": "Retour",
     "select": "Sélectionner",
-    "clearAll": "Effacer tout"
+    "clearAll": "Effacer tout",
+    "currency": "Devise"
   },
   "agencies": {
     "title": "Concessionnaires automobiles",

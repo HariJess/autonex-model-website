@@ -1,27 +1,29 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { User, Menu, X, LogOut, ChevronDown } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { User, Menu, X, LogOut, ChevronDown, Globe2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import logo from "@/assets/logo.png";
 import { AUTO_TRANSACTION_MODES } from "@/data/automotiveCatalog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [desktopRentOpen, setDesktopRentOpen] = useState(false);
   const [mobileRentOpen, setMobileRentOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { currency, setCurrency } = useCurrency();
-  const desktopCloseTimeoutRef = useRef<number | null>(null);
-
-  const toggleCurrency = () => {
-    setCurrency(currency === "MGA" ? "EUR" : "MGA");
-  };
 
   const buyMode = AUTO_TRANSACTION_MODES.find((mode) => mode.id === "acheter") ?? AUTO_TRANSACTION_MODES[0];
   const rentMode = AUTO_TRANSACTION_MODES.find((mode) => mode.id === "louer") ?? AUTO_TRANSACTION_MODES[1];
@@ -59,38 +61,16 @@ const Header = () => {
   const isAdviceActive = location.pathname === "/conseils" || location.pathname.startsWith("/conseils/");
   const isEstimationActive = location.pathname === "/estimation";
 
-  const openDesktopRentMenu = () => {
-    if (desktopCloseTimeoutRef.current != null) {
-      window.clearTimeout(desktopCloseTimeoutRef.current);
-      desktopCloseTimeoutRef.current = null;
-    }
-    setDesktopRentOpen(true);
-  };
-
-  const closeDesktopRentMenu = () => {
-    if (desktopCloseTimeoutRef.current != null) {
-      window.clearTimeout(desktopCloseTimeoutRef.current);
-    }
-    desktopCloseTimeoutRef.current = window.setTimeout(() => {
-      setDesktopRentOpen(false);
-      desktopCloseTimeoutRef.current = null;
-    }, 140);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (desktopCloseTimeoutRef.current != null) {
-        window.clearTimeout(desktopCloseTimeoutRef.current);
-      }
-    };
-  }, []);
-
   useEffect(() => {
     if (!menuOpen) setMobileRentOpen(false);
   }, [menuOpen]);
 
   const navLinkClass = (active: boolean) =>
     `text-sm font-semibold transition-colors ${active ? "text-white" : "text-[#F2F7FF] hover:text-white"}`;
+  const navDropdownTriggerClass = (active: boolean) =>
+    `inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors ${
+      active ? "text-white bg-white/[0.08]" : "text-[#F2F7FF] hover:text-white hover:bg-white/[0.05]"
+    }`;
   const estimationDesktopClass = isEstimationActive
     ? "inline-flex items-center rounded-full border border-[#8FB8E8]/55 bg-gradient-to-r from-[#1A3F6A] to-[#24517F] px-3.5 py-1.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(21,57,96,0.35)]"
     : "inline-flex items-center rounded-full border border-[#6F96C4]/45 bg-white/[0.04] px-3.5 py-1.5 text-sm font-semibold text-[#F3F8FF] transition-all hover:border-[#9DC2EA]/65 hover:bg-white/[0.08] hover:text-white";
@@ -106,75 +86,34 @@ const Header = () => {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6">
-          <Link to={buyMode.href} className={navLinkClass(isBuyActive)}>
-            {t("nav.buy")}
-          </Link>
-
-          <div
-            className="relative z-[60]"
-            onMouseEnter={openDesktopRentMenu}
-            onMouseLeave={closeDesktopRentMenu}
-          >
-            <div className="flex items-center gap-1">
-              <Link to={rentMode.href} className={navLinkClass(isRentActive)}>
-                {t("nav.rent")}
-              </Link>
-              <button
-                type="button"
-                className={`inline-flex items-center justify-center rounded-md p-1 transition-colors ${
-                  isRentActive ? "text-white" : "text-[#F2F7FF] hover:text-white"
-                }`}
-                aria-label={t("nav.rentSubmenu", "Ouvrir le sous-menu Location longue durée")}
-                aria-expanded={desktopRentOpen}
-                aria-haspopup="menu"
-                onClick={() => setDesktopRentOpen((prev) => !prev)}
-                onFocus={openDesktopRentMenu}
-              >
-                <ChevronDown className={`h-4 w-4 transition-transform ${desktopRentOpen ? "rotate-180" : ""}`} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className={navDropdownTriggerClass(isBuyActive || isRentActive)}>
+                <span>{t("nav.explore", "Explorer")}</span>
+                <ChevronDown className="h-4 w-4" />
               </button>
-            </div>
-
-            {desktopRentOpen && (
-              <div
-                className="absolute left-1/2 top-full z-[120] w-[292px] -translate-x-1/2 pt-2"
-                role="menu"
-                onMouseEnter={openDesktopRentMenu}
-                onMouseLeave={closeDesktopRentMenu}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-60 border-white/20 bg-[#0D223D] text-[#F7FBFF]">
+              <DropdownMenuItem
+                className="cursor-pointer focus:bg-white/10 focus:text-white"
+                onSelect={() => navigate(buyMode.href)}
               >
-                <div className="mx-auto h-2 w-2 rotate-45 border border-[#B7C9E4]/50 border-b-0 border-r-0 bg-[#17365D] -mb-1" aria-hidden />
-                <div className="rounded-xl border border-[#A7BEDC]/35 bg-[#17365D] p-1.5 shadow-[0_22px_58px_rgba(0,0,0,0.5)] ring-1 ring-black/25">
-                  <Link
-                    to={shortTermMode.href}
-                    role="menuitem"
-                    className={`block rounded-lg px-3 py-2.5 transition-all ${
-                      isShortRentActive
-                        ? "bg-white/24 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2)]"
-                        : "text-[#F8FBFF] hover:bg-white/14 hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
-                    }`}
-                  >
-                    <p className="text-sm font-semibold leading-tight">{t("transaction.vacation")}</p>
-                    <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-[#D5E3F7]">
-                      {t("transaction.vacation")}
-                    </p>
-                  </Link>
-                  <Link
-                    to={longTermMode.href}
-                    role="menuitem"
-                    className={`mt-1 block rounded-lg px-3 py-2.5 transition-all ${
-                      isLongRentActive
-                        ? "bg-white/24 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2)]"
-                        : "text-[#F8FBFF] hover:bg-white/14 hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
-                    }`}
-                  >
-                    <p className="text-sm font-semibold leading-tight">{t("transaction.rent")}</p>
-                    <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-[#D5E3F7]">
-                      {t("transaction.rent")}
-                    </p>
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
+                {t("nav.buy")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer focus:bg-white/10 focus:text-white"
+                onSelect={() => navigate(longTermMode.href)}
+              >
+                {t("transaction.rent")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer focus:bg-white/10 focus:text-white"
+                onSelect={() => navigate(shortTermMode.href)}
+              >
+                {t("transaction.vacation")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {desktopLinks.map((link) => {
             const active =
@@ -195,52 +134,65 @@ const Header = () => {
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          <div className="inline-flex rounded-md border border-muted-foreground/30 overflow-hidden">
-            <button
-              type="button"
-              onClick={() => switchLanguage("fr")}
-              className={`px-2 py-1 text-xs font-semibold ${language === "fr" ? "bg-white/15" : "bg-transparent"}`}
-              style={{ color: "#FAFAFA" }}
-            >
-              {t("common.languageFr", "FR")}
-            </button>
-            <button
-              type="button"
-              onClick={() => switchLanguage("mg")}
-              className={`px-2 py-1 text-xs font-semibold ${language === "mg" ? "bg-white/15" : "bg-transparent"}`}
-              style={{ color: "#FAFAFA" }}
-            >
-              {t("common.languageMg", "MG")}
-            </button>
-            <button
-              type="button"
-              onClick={() => switchLanguage("en")}
-              className={`px-2 py-1 text-xs font-semibold ${language === "en" ? "bg-white/15" : "bg-transparent"}`}
-              style={{ color: "#FAFAFA" }}
-            >
-              {t("common.languageEn", "EN")}
-            </button>
-          </div>
-          <button onClick={toggleCurrency} className="text-xs font-semibold px-2 py-1 rounded border border-muted-foreground/30" style={{ color: "#FAFAFA" }}>
-            {currency}
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full border border-[#6F96C4]/45 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-[#F3F8FF] transition-all hover:border-[#9DC2EA]/65 hover:bg-white/[0.08] hover:text-white"
+              >
+                <Globe2 className="h-3.5 w-3.5" />
+                <span>{language.toUpperCase()} · {currency}</span>
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 border-white/20 bg-[#0D223D] text-[#F7FBFF]">
+              <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-[#9FBCE0]">{t("common.language", "Language")}</DropdownMenuLabel>
+              <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => switchLanguage("fr")}>
+                Français
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => switchLanguage("mg")}>
+                Malagasy
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => switchLanguage("en")}>
+                English
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-[#9FBCE0]">{t("common.currency", "Currency")}</DropdownMenuLabel>
+              <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => setCurrency("MGA")}>
+                MGA
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => setCurrency("EUR")}>
+                EUR
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button onClick={() => navigate("/publier")} className="gradient-primary border-0 text-sm font-semibold" style={{ color: "#FAFAFA" }}>
             {t("nav.publish")}
           </Button>
-          {user ? (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} style={{ color: "#FAFAFA" }}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" style={{ color: "#FAFAFA" }} aria-label={t("nav.accountMenu", "Account menu")}>
                 <User className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={signOut} style={{ color: "#FAFAFA" }}>
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </div>
-          ) : (
-            <Button variant="ghost" size="icon" onClick={() => navigate("/login")} style={{ color: "#FAFAFA" }}>
-              <User className="h-5 w-5" />
-            </Button>
-          )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 border-white/20 bg-[#0D223D] text-[#F7FBFF]">
+              {user ? (
+                <>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/dashboard")}>
+                    {t("nav.dashboard", "My account")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t("nav.logout", "Sign out")}
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/login")}>
+                  {t("nav.login", "Log in")}
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <button
