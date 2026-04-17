@@ -44,7 +44,15 @@ import { getExteriorColorLabel } from "@/lib/vehicleAttributes";
 import { sanitizeListingEquipment, extractCustomFeatures } from "@/data/listing-equipment";
 import type { DisplayListing } from "@/types/listing";
 import { getDealMeta } from "@/lib/deals";
-import { getCanonicalVehicleAttributes, type CanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
+import { getCanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
+import {
+  buildContactTrustHints,
+  buildListingTrustProofs,
+  buildVehicleSpecRows,
+  getDisplayedPhone,
+  getOwnerStatusHint,
+  getSellerLabel,
+} from "@/pages/listing-detail/listingDetailPresentation";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
@@ -64,125 +72,6 @@ const LISTING_DETAIL_BADGE_SUBTLE_CLASS =
 function listingWhatsAppPrefill(title: string): string {
   const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
   return `Bonjour, je vous contacte au sujet de votre annonce sur AutoNex « ${short} ».`;
-}
-
-function cleanSpec(value: string | number | null | undefined): string | null {
-  if (value == null) return null;
-  const asString = String(value).trim();
-  return asString.length > 0 ? asString : null;
-}
-
-function getSellerLabel(listing: DisplayListing, t: (...args: unknown[]) => string): string | null {
-  const sellerType = getCanonicalVehicleAttributes(listing).sellerType;
-  return sellerType === "concessionnaire"
-    ? t("listing.sellerDealer", "Concessionnaire")
-    : sellerType === "particulier"
-      ? t("listing.sellerPrivate", "Particulier")
-      : null;
-}
-
-function buildVehicleSpecRows(
-  canonicalVehicle: CanonicalVehicleAttributes,
-  sellerLabel: string | null,
-  mileageLabel: string | null,
-  doorsLabel: string | null,
-  exteriorColorLabel: string | null,
-  engineDisplacementLabel: string | null,
-  t: (...args: unknown[]) => string,
-) {
-  return [
-    { label: t("search.brand", "Marque"), value: cleanSpec(canonicalVehicle.make) },
-    { label: t("search.model", "Modèle"), value: cleanSpec(canonicalVehicle.model) },
-    { label: t("search.year", "Année"), value: cleanSpec(canonicalVehicle.year) },
-    { label: t("search.surface", "Kilométrage"), value: cleanSpec(mileageLabel) },
-    { label: t("search.fuel", "Carburant"), value: cleanSpec(canonicalVehicle.fuel) },
-    { label: t("search.transmission", "Boîte de vitesse"), value: cleanSpec(canonicalVehicle.transmission) },
-    { label: t("listing.drivetrain", "Motricité"), value: cleanSpec(canonicalVehicle.drivetrain) },
-    { label: t("listing.bathrooms", "Portes"), value: cleanSpec(doorsLabel) },
-    { label: t("listing.seats", "Places"), value: canonicalVehicle.seats != null && canonicalVehicle.seats > 0 ? `${canonicalVehicle.seats}` : null },
-    { label: t("listing.bodyStyle", "Carrosserie"), value: cleanSpec(canonicalVehicle.bodyStyle) },
-    { label: t("listing.condition", "État"), value: cleanSpec(canonicalVehicle.condition) },
-    { label: t("listing.sellerType", "Type vendeur"), value: cleanSpec(sellerLabel) },
-    { label: t("listing.exteriorColor", "Couleur ext."), value: cleanSpec(exteriorColorLabel) },
-    { label: t("listing.engineDisplacement", "Cylindrée"), value: cleanSpec(engineDisplacementLabel) },
-    { label: t("listing.interiorColor", "Couleur int."), value: cleanSpec(canonicalVehicle.interiorColor) },
-    { label: t("listing.availability", "Disponibilité"), value: cleanSpec(canonicalVehicle.availabilityStatus) },
-    { label: t("listing.rentalMode", "Mode location"), value: cleanSpec(canonicalVehicle.rentalMode) },
-  ].filter((item) => item.value);
-}
-
-function buildContactTrustHints(
-  listing: DisplayListing,
-  sellerLabel: string | null,
-  t: (...args: unknown[]) => string,
-) {
-  return [
-    sellerLabel ? `${t("listing.seller", "Vendeur")} : ${sellerLabel}` : null,
-    listing.vehicle?.availabilityStatus ? `${t("listing.availability", "Disponibilité")} : ${listing.vehicle.availabilityStatus}` : null,
-    listing.has_whatsapp_contact ? t("listing.whatsappReady", "Réponse WhatsApp disponible") : null,
-  ].filter(Boolean);
-}
-
-function buildListingTrustProofs(
-  listing: DisplayListing,
-  sellerLabel: string | null,
-  hasApproxMap: boolean,
-  t: (...args: unknown[]) => string,
-) {
-  return [
-    sellerLabel
-      ? t("listing.trustSellerType", "Vendeur identifié : {{label}}", { label: sellerLabel })
-      : null,
-    listing.agency_verified
-      ? t("listing.trustAgencyVerified", "Profil vendeur vérifié par AutoNex")
-      : null,
-    listing.images.length >= 3
-      ? t("listing.trustPhotosCount", "Galerie détaillée ({{count}} photos)", { count: listing.images.length })
-      : null,
-    hasApproxMap
-      ? t("listing.trustLocation", "Zone de localisation disponible sur la carte")
-      : null,
-    listing.status === "active"
-      ? t("listing.trustStatus", "Annonce active dans le catalogue public")
-      : null,
-  ].filter(Boolean);
-}
-
-function getOwnerStatusHint(
-  listing: DisplayListing,
-  isOwner: boolean,
-  t: (...args: unknown[]) => string,
-): string | null {
-  const s = listing.status;
-  if (!isOwner || s === "active") return null;
-  if (s === "pending_review")
-    return t(
-      "listing.ownerPendingReview",
-      "Votre annonce est en cours de modération. Elle ne sera visible publiquement qu’après validation par notre équipe."
-    );
-  if (s === "pending_payment")
-    return t(
-      "listing.ownerPendingPayment",
-      "Paiement ou justificatif en attente de vérification. L’annonce reste hors ligne jusqu’à confirmation."
-    );
-  if (s === "pending_payment_verification")
-    return t(
-      "listing.ownerPendingPaymentVerification",
-      "Votre paiement est en cours de vérification par nos équipes. Les crédits seront attribués après validation du justificatif."
-    );
-  if (s === "rejected")
-    return listing.rejection_reason?.trim()
-      ? `${t("listing.ownerRejectedPrefix", "Annonce refusée")} : ${listing.rejection_reason.trim()}`
-      : t("listing.ownerRejected", "Cette annonce a été refusée. Contactez le support pour plus d’informations.");
-  if (s === "draft") return t("listing.ownerDraft", "Brouillon — terminez la publication depuis votre tableau de bord.");
-  if (s === "paused") return t("listing.ownerPaused", "Annonce en pause — elle n’apparaît pas dans la recherche.");
-  if (s === "expired") return t("listing.ownerExpired", "Annonce expirée.");
-  return t("listing.ownerNonActive", "Cette annonce n’est pas publiée actuellement.");
-}
-
-function getDisplayedPhone(phoneRevealed: boolean, revealedPhone: string | null, listing: DisplayListing, t: (...args: unknown[]) => string) {
-  if (!phoneRevealed) return t("listing.revealPhone");
-  return revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné");
 }
 
 const ListingDetail = () => {
@@ -478,7 +367,7 @@ const ListingDetail = () => {
   const engineDisplacementLabel = formatVehicleEngineDisplacement(canonicalVehicle.engineDisplacementL);
   const exteriorColorLabel = getExteriorColorLabel(canonicalVehicle.exteriorColor, t);
   const vehicleSummary = getVehicleHeadline(listing);
-  const sellerLabel = getSellerLabel(listing, t);
+  const sellerLabel = getSellerLabel(canonicalVehicle.sellerType, t);
   const vehicleSpecRows = buildVehicleSpecRows(
     canonicalVehicle,
     sellerLabel,
@@ -488,11 +377,18 @@ const ListingDetail = () => {
     engineDisplacementLabel,
     t,
   );
-  const contactTrustHints = buildContactTrustHints(listing, sellerLabel, t);
+  const contactTrustHints = buildContactTrustHints(
+    {
+      sellerLabel,
+      availabilityStatus: canonicalVehicle.availabilityStatus,
+      hasWhatsappContact: listing.has_whatsapp_contact,
+    },
+    t,
+  );
   const listingTrustProofs = buildListingTrustProofs(listing, sellerLabel, hasApproxMap, t);
   const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);
   const displayedPhone = getDisplayedPhone(phoneRevealed, revealedPhone, listing, t);
-  const displayBrand = cleanSpec(canonicalVehicle.make) ?? cleanSpec(displayTitle);
+  const displayBrand = canonicalVehicle.make ?? (displayTitle.trim() || null);
   const displayBrandAsset = resolveBrandAsset(displayBrand);
   const listingFeatureBadges = sanitizeListingEquipment(listing.features);
   const customFeatureBadges = extractCustomFeatures(listing.features);
@@ -793,11 +689,11 @@ const ListingDetail = () => {
                   </div>
                 </div>
               )}
-              {listing.vehicle?.seats != null && listing.vehicle.seats > 0 && (
+              {canonicalVehicle.seats != null && canonicalVehicle.seats > 0 && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
                   <Users className="h-5 w-5 text-primary" />
                   <div>
-                    <p className="font-semibold font-sans">{listing.vehicle.seats}</p>
+                    <p className="font-semibold font-sans">{canonicalVehicle.seats}</p>
                     <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("listing.seats", "Places")}</p>
                   </div>
                 </div>
