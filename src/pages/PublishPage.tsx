@@ -19,8 +19,6 @@ import {
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import {
   listingTypesForTransaction,
-  isTerrainRentalForbidden,
-  assertValidTransactionType,
   sanitizeListingTypeForTransaction,
 } from "@/lib/listingRules";
 import {
@@ -80,18 +78,16 @@ import {
   AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
   inferVehicleTypeOptionIdFromFilters,
 } from "@/data/automotiveCatalog";
-import { buildLegacyMirrorFieldsFromVehicle } from "@/lib/vehicleCanonical";
+import { buildLegacyMirrorPatchFromVehicleInputs } from "@/pages/publish/publishVehicleLegacyMirror";
+import {
+  getFirstInvalidPublishStep,
+  validatePublishStep,
+  type PublishValidationInput,
+} from "@/pages/publish/publishValidation";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
 const LISTING_ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function toNullableInt(raw: string): number | null {
-  const num = Number(raw);
-  if (!Number.isFinite(num)) return null;
-  const intVal = Math.floor(num);
-  return intVal >= 0 ? intVal : null;
-}
 
 const PublishPage = () => {
   const { t } = useTranslation();
@@ -207,19 +203,54 @@ const PublishPage = () => {
   const fingerprintInitializedRef = useRef(false);
   const pendingUploadInFlightRef = useRef(false);
 
+  const publishValidationInput = useMemo<PublishValidationInput>(
+    () => ({
+      transaction,
+      listingType,
+      ville,
+      pinLat,
+      pinLng,
+      title,
+      description,
+      priceMga,
+      surface,
+      vehicleYear,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleEngineDisplacement,
+      vehicleMake,
+      vehicleModel,
+      photoCount: serverPhotos.length + pendingPhotos.length,
+    }),
+    [
+      transaction,
+      listingType,
+      ville,
+      pinLat,
+      pinLng,
+      title,
+      description,
+      priceMga,
+      surface,
+      vehicleYear,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleEngineDisplacement,
+      vehicleMake,
+      vehicleModel,
+      serverPhotos.length,
+      pendingPhotos.length,
+    ],
+  );
+
   const applyVehicleLegacyMirrorFromInputs = useCallback(
     (nextVehicle: { mileageKmInput?: string; doorsInput?: string; seatsInput?: string }) => {
-      const mirrored = buildLegacyMirrorFieldsFromVehicle({
-        mileageKm: nextVehicle.mileageKmInput != null ? toNullableInt(nextVehicle.mileageKmInput) : null,
-        trimOrVersion: toNullableInt(rooms),
-        doors: nextVehicle.doorsInput != null ? toNullableInt(nextVehicle.doorsInput) : null,
-        seats: nextVehicle.seatsInput != null ? toNullableInt(nextVehicle.seatsInput) : null,
-      });
-      if (nextVehicle.mileageKmInput != null) setSurface(nextVehicle.mileageKmInput);
-      if (nextVehicle.doorsInput != null) setBathrooms(mirrored.bathrooms != null ? String(mirrored.bathrooms) : "");
-      if (nextVehicle.seatsInput != null) setToilets(mirrored.toilets != null ? String(mirrored.toilets) : "");
+      const mirrored = buildLegacyMirrorPatchFromVehicleInputs(nextVehicle);
+      if (mirrored.surface != null) setSurface(mirrored.surface);
+      if (mirrored.bathrooms != null) setBathrooms(mirrored.bathrooms);
+      if (mirrored.toilets != null) setToilets(mirrored.toilets);
     },
-    [rooms],
+    [],
   );
 
   const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
@@ -987,6 +1018,7 @@ const PublishPage = () => {
       vehicleDoors,
       vehicleSeats,
       vehicleExteriorColor,
+      vehicleEngineDisplacement,
       vehicleInteriorColor,
       vehicleAvailabilityStatus,
       vehicleWhatsappPhone,
@@ -1349,62 +1381,21 @@ const PublishPage = () => {
     };
   }, [draftListingId, pendingPhotos.length, user, flushPendingPhotosToServer, t]);
 
-  const validateStep = (s: number): string[] => {
-    const errors: string[] = [];
-    switch (s) {
-      case 0:
-        if (!transaction || !assertValidTransactionType(transaction)) errors.push(t("publish.transactionRequired", "Type de transaction requis"));
-        if (!listingType) errors.push(t("publish.typeRequired", "Type de véhicule requis"));
-        if (transaction && listingType && isTerrainRentalForbidden(transaction, listingType)) {
-          errors.push(t("publish.terrainNoRent", "Cette catégorie n’est pas disponible pour ce type d’annonce."));
-        }
-        if (!ville) errors.push(t("publish.villeRequired", "Ville requise"));
-        if (pinLat == null || pinLng == null || !isValidListingCoordinates(pinLat, pinLng)) {
-          errors.push(t("publish.mapRequired", "Position sur la carte requise"));
-        }
-        break;
-      case 1:
-        if (!title.trim() || title.trim().length < 8) errors.push(t("publish.titleRequired", "Titre requis (min. 8 caractères)"));
-        if (description.trim().length < 40) errors.push(t("publish.descFrenchRequired", "Description en français requise (min. 40 caractères)"));
-        if (!priceMga || Number(priceMga) <= 0) errors.push(t("publish.priceRequired", "Prix valide requis"));
-        if (surface && Number(surface) < 0) errors.push(t("publish.surfaceInvalid", "Kilométrage invalide"));
-        if (vehicleYear) {
-          const y = Number(vehicleYear);
-          const currentYear = new Date().getFullYear() + 1;
-          if (!Number.isFinite(y) || y < 1950 || y > currentYear) {
-            errors.push(t("publish.yearInvalid", "Année invalide"));
-          }
-        }
-        if (vehicleDoors && Number(vehicleDoors) < 0) errors.push(t("publish.doorsInvalid", "Nombre de portes invalide"));
-        if (vehicleSeats && Number(vehicleSeats) < 0) errors.push(t("publish.seatsInvalid", "Nombre de places invalide"));
-        if (
-          vehicleEngineDisplacement &&
-          normalizeEngineDisplacementInput(vehicleEngineDisplacement) == null
-        ) {
-          errors.push(t("publish.engineDisplacementInvalid", "Cylindrée invalide"));
-        }
-        if (!vehicleMake.trim()) errors.push(t("publish.makeRequired", "Marque requise"));
-        if (!vehicleModel.trim()) errors.push(t("publish.modelRequired", "Modèle requis"));
-        break;
-      case 2:
-        if (serverPhotos.length + pendingPhotos.length < 1) {
-          errors.push(t("publish.photoRequired", "Au moins une photo (photo principale) est requise"));
-        }
-        break;
-      default:
-        break;
-    }
-    return errors;
-  };
+  const validateStep = useCallback(
+    (s: number) =>
+      validatePublishStep(s, publishValidationInput, (key, fallback) =>
+        t(key, fallback),
+      ),
+    [publishValidationInput, t],
+  );
 
-  const getFirstInvalidStep = () => {
-    const checks: Array<{ step: number; errors: string[] }> = [
-      { step: 0, errors: validateStep(0) },
-      { step: 1, errors: validateStep(1) },
-      { step: 2, errors: validateStep(2) },
-    ];
-    return checks.find((entry) => entry.errors.length > 0) ?? null;
-  };
+  const getFirstInvalidStep = useCallback(
+    () =>
+      getFirstInvalidPublishStep(publishValidationInput, (key, fallback) =>
+        t(key, fallback),
+      ),
+    [publishValidationInput, t],
+  );
 
   const handleNext = async () => {
     const errors = validateStep(step);
