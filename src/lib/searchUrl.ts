@@ -21,6 +21,16 @@ function parseFiniteNumber(raw: string | null): number {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
+function parseMultiValueParam(sp: URLSearchParams, key: string): string[] {
+  const values = sp.getAll(key);
+  if (values.length === 0) return [];
+  const expanded = values.flatMap((value) => value.split(","));
+  const normalized = expanded
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return Array.from(new Set(normalized));
+}
+
 /** Keep only DB-valid listing types from URL (drops typos / legacy values). */
 export function sanitizeListingTypes(types: string[]): string[] {
   return types.filter((t): t is ListingType => LISTING_TYPE_SET.has(t));
@@ -33,12 +43,12 @@ export function parseTransaction(raw: string | null): string {
 
 export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
   const transaction = parseTransaction(sp.get("transaction"));
-  const rawTypes = sp.get("type")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
-  const vehicleTypes = sp.get("vtype")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
+  const rawTypes = parseMultiValueParam(sp, "type");
+  const vehicleTypes = parseMultiValueParam(sp, "vtype");
   const allowed = new Set(listingTypesForTransaction(transaction));
   const types = sanitizeListingTypes(rawTypes).filter((t) => allowed.has(t as ListingType));
 
-  const roomsRaw = sp.get("chambres");
+  const roomsRaw = parseMultiValueParam(sp, "chambres").join(",");
   const rooms: number[] = [];
   if (roomsRaw) {
     for (const part of roomsRaw.split(",")) {
@@ -47,7 +57,7 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     }
   }
 
-  const sdbRaw = sp.get("sdb");
+  const sdbRaw = parseMultiValueParam(sp, "sdb").join(",");
   const bathrooms: number[] = [];
   if (sdbRaw) {
     for (const part of sdbRaw.split(",")) {
@@ -56,9 +66,8 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     }
   }
 
-  const quartiers = sp.get("quartiers")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
-  const arrRaw = sp.get("arr")?.trim() ?? "";
-  const arrondissements = arrRaw ? arrRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
+  const quartiers = parseMultiValueParam(sp, "quartiers");
+  const arrondissements = parseMultiValueParam(sp, "arr");
   return {
     transaction,
     vehicleTypes,
@@ -73,16 +82,16 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     surfaceMax: parseFiniteNumber(sp.get("surface_max")),
     rooms,
     bathrooms,
-    equipments: sp.get("equip")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
-    fuels: sp.get("fuel")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
-    transmissions: sp.get("gear")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
-    drivetrains: sp.get("drive")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
-    conditions: sp.get("condition")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
-    sellerTypes: sp.get("seller")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    equipments: parseMultiValueParam(sp, "equip"),
+    fuels: parseMultiValueParam(sp, "fuel"),
+    transmissions: parseMultiValueParam(sp, "gear"),
+    drivetrains: parseMultiValueParam(sp, "drive"),
+    conditions: parseMultiValueParam(sp, "condition"),
+    sellerTypes: parseMultiValueParam(sp, "seller"),
     exteriorColor: sp.get("ext_color")?.trim() ?? "",
     engineDisplacementMin: parseFiniteNumber(sp.get("eng_min")),
     engineDisplacementMax: parseFiniteNumber(sp.get("eng_max")),
-    brands: sp.get("brand")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
+    brands: parseMultiValueParam(sp, "brand"),
     modelQuery: sp.get("model")?.trim() ?? "",
     yearMin: parseFiniteNumber(sp.get("year_min")),
     yearMax: parseFiniteNumber(sp.get("year_max")),

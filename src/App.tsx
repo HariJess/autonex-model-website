@@ -67,6 +67,7 @@ const App = () => (
             <Route path="/acheter" element={<SeoLandingPage />} />
             <Route path="/location-longue-duree" element={<SeoLandingPage />} />
             <Route path="/location-courte-duree" element={<SeoLandingPage />} />
+            <Route path="/:transactionSlug(acheter|location-longue-duree|location-courte-duree)" element={<SeoLandingPage />} />
             <Route path="/vehicules/:categorySlug" element={<SeoLandingPage />} />
             <Route path="/ville/:citySlug" element={<SeoLandingPage />} />
             <Route path="/vehicules/:categorySlug/ville/:citySlug" element={<SeoLandingPage />} />

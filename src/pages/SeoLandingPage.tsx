@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useMemo } from "react";
 import { useDbListings } from "@/hooks/useListings";
 import Header from "@/components/Header";
@@ -25,10 +25,17 @@ const MAX_LISTINGS = 24;
 
 const SeoLandingPage = () => {
   const params = useParams();
+  const location = useLocation();
+  const transactionSlugFromPath = useMemo(() => {
+    const slug = location.pathname.replace(/^\/+/, "").replace(/\/+$/, "");
+    if (!slug) return null;
+    return getTransactionLandingBySlug(slug)?.slug ?? null;
+  }, [location.pathname]);
 
   const landing = useMemo(() => {
-    if (params.transactionSlug) {
-      const tx = getTransactionLandingBySlug(params.transactionSlug);
+    const transactionSlug = params.transactionSlug ?? transactionSlugFromPath;
+    if (transactionSlug) {
+      const tx = getTransactionLandingBySlug(transactionSlug);
       if (!tx) return null;
       return {
         kind: "transaction" as LandingKind,
@@ -94,7 +101,19 @@ const SeoLandingPage = () => {
     }
 
     return null;
-  }, [params]);
+  }, [params, transactionSlugFromPath]);
+
+  const searchHref = useMemo(() => {
+    if (!landing) return "/recherche";
+    const params = new URLSearchParams();
+    if (landing.listingFilters.transaction) params.set("transaction", landing.listingFilters.transaction);
+    if (landing.listingFilters.ville) params.set("ville", landing.listingFilters.ville);
+    if (landing.listingFilters.vehicleTypes && landing.listingFilters.vehicleTypes.length > 0) {
+      params.set("vtype", landing.listingFilters.vehicleTypes.join(","));
+    }
+    const qs = params.toString();
+    return qs ? `/recherche?${qs}` : "/recherche";
+  }, [landing]);
 
   const { data: listings = [], isLoading, error, refetch } = useDbListings(landing?.listingFilters ?? { limit: 0 });
 
@@ -129,16 +148,6 @@ const SeoLandingPage = () => {
     }`,
   );
   const seoTitle = composePageTitle(landing.title);
-  const searchHref = useMemo(() => {
-    const params = new URLSearchParams();
-    if (landing.listingFilters.transaction) params.set("transaction", landing.listingFilters.transaction);
-    if (landing.listingFilters.ville) params.set("ville", landing.listingFilters.ville);
-    if (landing.listingFilters.vehicleTypes && landing.listingFilters.vehicleTypes.length > 0) {
-      params.set("vtype", landing.listingFilters.vehicleTypes.join(","));
-    }
-    const qs = params.toString();
-    return qs ? `/recherche?${qs}` : "/recherche";
-  }, [landing.listingFilters]);
 
   const relatedLinks = [
     ...SEO_P1_TRANSACTIONS.slice(0, 3).map((entry) => ({

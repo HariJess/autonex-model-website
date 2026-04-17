@@ -16,7 +16,6 @@ type SearchActiveChipsProps = {
 };
 
 export function SearchActiveChips({ chips, clearAllLabel, onRemoveChip, onClearAll }: SearchActiveChipsProps) {
-  if (chips.length === 0) return null;
   const [showAllMobileChips, setShowAllMobileChips] = useState(false);
   const mobileChipCap = 4;
   const hiddenChipCount = Math.max(0, chips.length - mobileChipCap);
@@ -24,6 +23,7 @@ export function SearchActiveChips({ chips, clearAllLabel, onRemoveChip, onClearA
     () => (showAllMobileChips ? chips : chips.slice(0, mobileChipCap)),
     [chips, showAllMobileChips],
   );
+  if (chips.length === 0) return null;
 
   return (
     <div className="flex flex-wrap items-center gap-1.5 mb-2.5 px-0 py-0">
