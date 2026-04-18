@@ -85,7 +85,7 @@ import {
   validatePublishStep,
   type PublishValidationInput,
 } from "@/pages/publish/publishValidation";
-import { publishListingWithCredits } from "@/lib/publishWithCredits";
+import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
@@ -1622,7 +1622,7 @@ const PublishPage = () => {
       }
 
       const publishResult = await publishListingWithCredits(draftListingId);
-      if (!publishResult.ok) {
+      if (isPublishWithCreditsFailure(publishResult)) {
         if (publishResult.code === "insufficient_credits") {
           throw new Error(
             t(

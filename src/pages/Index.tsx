@@ -69,7 +69,14 @@ const Index = () => {
     [t],
   );
   const popularBrands = useMemo(
-    () =>
+    (): Array<{
+      id: string;
+      label: string;
+      href: string;
+      logoAsset: string | null | undefined;
+      wrapperClassName?: string;
+      logoClassName?: string;
+    }> =>
       FEATURED_MAKES.map((make) => ({
         id: make.slug,
         label: make.name,

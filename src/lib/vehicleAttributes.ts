@@ -14,8 +14,6 @@ export const EXTERIOR_COLOR_OPTIONS = [
   { value: "yellow", labelKey: "vehicleColor.yellow", fallback: "Jaune" },
 ] as const;
 
-const EXTERIOR_COLOR_MAP = new Map(EXTERIOR_COLOR_OPTIONS.map((color) => [color.value, color]));
-
 export function normalizeEngineDisplacementInput(value: string | null | undefined): number | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim().replace(",", ".");
@@ -36,9 +34,10 @@ export function getExteriorColorLabel(value: string | null | undefined, t: TFunc
   if (!value) return null;
   const normalized = value.trim().toLowerCase();
   if (!normalized) return null;
-  const option = EXTERIOR_COLOR_MAP.get(normalized);
-  if (option) {
-    return t(option.labelKey, option.fallback);
+  for (const option of EXTERIOR_COLOR_OPTIONS) {
+    if (option.value === normalized) {
+      return t(option.labelKey, option.fallback);
+    }
   }
   return value.trim();
 }

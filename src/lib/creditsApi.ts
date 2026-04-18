@@ -17,8 +17,12 @@ export async function consumeCredits(
     p_user_id: user.id,
     p_amount: amount,
     p_reason: reason,
-    p_ref_type: ref?.refType ?? null,
-    p_ref_id: ref?.refId ?? null,
+    ...(ref
+      ? {
+          p_ref_type: ref.refType,
+          p_ref_id: ref.refId,
+        }
+      : {}),
   });
 
   if (error) return { ok: false, error: error.message };

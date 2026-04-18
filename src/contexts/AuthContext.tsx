@@ -117,8 +117,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       password,
       options: {
-        data: metadata as Record<string, unknown>,
         emailRedirectTo: window.location.origin,
+        data: {
+          full_name: metadata.full_name,
+          role: metadata.role,
+          phone: metadata.phone,
+          first_name: metadata.first_name,
+          last_name: metadata.last_name,
+          whatsapp_phone: metadata.whatsapp_phone,
+          contact_consent: metadata.contact_consent,
+          agency_name: metadata.agency_name,
+          agency_address: metadata.agency_address,
+          commercial_contact_name: metadata.commercial_contact_name,
+          nif: metadata.nif,
+          stat: metadata.stat,
+          reg_commerce: metadata.reg_commerce,
+          agency_logo_url: metadata.agency_logo_url,
+        },
       },
     });
     return { error: error as Error | null };

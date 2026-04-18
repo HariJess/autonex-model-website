@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
+import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 import { PARTNER_AD_PLACEMENT_KEYS, type PartnerAdPlacementKey } from "@/lib/partnerAds";
 
 type CampaignRow = Tables<"partner_ad_campaigns">;
@@ -92,7 +92,7 @@ const AdminPartnerAdsPage = () => {
 
   const saveCampaign = useMutation({
     mutationFn: async () => {
-      const payload: Tables<"partner_ad_campaigns">["Insert"] = {
+      const payload: TablesInsert<"partner_ad_campaigns"> = {
         advertiser_name: form.advertiser_name.trim(),
         internal_title: form.internal_title.trim(),
         internal_description: form.internal_description.trim() || null,

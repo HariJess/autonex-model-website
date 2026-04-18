@@ -727,14 +727,13 @@ export function buildListingMaterialSnapshotFromRow(
   const features = Array.isArray(featuresRaw)
     ? featuresRaw.filter((x): x is string => typeof x === "string").slice().sort()
     : [];
-  const lat =
-    row.lat != null && row.lat !== ""
-      ? Number(row.lat).toFixed(7)
-      : null;
-  const lng =
-    row.lng != null && row.lng !== ""
-      ? Number(row.lng).toFixed(7)
-      : null;
+  const coordSnapshot = (value: Tables<"listings">["lat"]) => {
+    if (value == null) return null;
+    const n = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(n) ? n.toFixed(7) : null;
+  };
+  const lat = coordSnapshot(row.lat);
+  const lng = coordSnapshot(row.lng);
   return JSON.stringify({
     title: (row.title ?? "").trim(),
     description: (row.description ?? "").trim(),

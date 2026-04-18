@@ -113,6 +113,12 @@ const LISTING_SELECT_COLUMNS = [
   "pending_boost_types",
 ].join(",");
 
+function isListingRowLite(row: unknown): row is ListingRowLite {
+  if (typeof row !== "object" || row === null) return false;
+  const r = row as Record<string, unknown>;
+  return typeof r.id === "string" && typeof r.title === "string" && typeof r.owner_id === "string";
+}
+
 function isCatalogUnavailableErrorMessage(message: string | undefined): boolean {
   if (!message) return false;
   const m = message.toLowerCase();
@@ -191,8 +197,8 @@ function mapListingRowToDisplayListing(
     arrondissement: listing.arrondissement,
     quartier: listing.quartier,
     quartier_libre: listing.quartier_libre,
-    lat: listing.lat != null && listing.lat !== "" ? Number(listing.lat) : null,
-    lng: listing.lng != null && listing.lng !== "" ? Number(listing.lng) : null,
+    lat: listing.lat != null && Number.isFinite(Number(listing.lat)) ? Number(listing.lat) : null,
+    lng: listing.lng != null && Number.isFinite(Number(listing.lng)) ? Number(listing.lng) : null,
     features,
     images: extras?.images ?? [],
     status: listing.status,
@@ -230,7 +236,7 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(`Erreur de chargement: ${error.message}`);
-  if (!listing) return null;
+  if (!listing || !isListingRowLite(listing)) return null;
 
   const { data: photos } = await supabase
     .from("listing_photos")
@@ -620,7 +626,11 @@ export function useDbListings(filters: ListingsFilters = {}) {
         throw new Error(`Erreur recherche: ${error.message}`);
       }
       if (!listings || listings.length === 0) return [];
-      return enrichListingsWithRelatedData(listings as ListingRowLite[]);
+      const rows: ListingRowLite[] = [];
+      for (const row of listings) {
+        if (isListingRowLite(row)) rows.push(row);
+      }
+      return enrichListingsWithRelatedData(rows);
     },
     retry: 1,
     staleTime: 30_000,

@@ -1240,6 +1240,13 @@ export type Database = {
           placement_key: string
         }[]
       }
+      get_active_listing_counts_by_ville: {
+        Args: { p_villes: string[] }
+        Returns: {
+          ville: string
+          count: number
+        }[]
+      }
       get_listing_owner_phone: {
         Args: { p_listing_id: string }
         Returns: string

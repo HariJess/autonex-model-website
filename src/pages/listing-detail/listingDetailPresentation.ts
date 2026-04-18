@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import type { CanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
 import type { DisplayListing } from "@/types/listing";
 
@@ -9,7 +10,7 @@ function cleanSpec(value: string | number | null | undefined): string | null {
 
 export function getSellerLabel(
   sellerType: CanonicalVehicleAttributes["sellerType"],
-  t: (...args: unknown[]) => string,
+  t: TFunction<"translation", undefined>,
 ): string | null {
   return sellerType === "concessionnaire"
     ? t("listing.sellerDealer", "Concessionnaire")
@@ -25,7 +26,7 @@ export function buildVehicleSpecRows(
   doorsLabel: string | null,
   exteriorColorLabel: string | null,
   engineDisplacementLabel: string | null,
-  t: (...args: unknown[]) => string,
+  t: TFunction<"translation", undefined>,
 ) {
   return [
     { label: t("search.brand", "Marque"), value: cleanSpec(canonicalVehicle.make) },
@@ -75,7 +76,7 @@ export function buildContactTrustHints(
     availabilityStatus: string | null;
     hasWhatsappContact: boolean | undefined;
   },
-  t: (...args: unknown[]) => string,
+  t: TFunction<"translation", undefined>,
 ) {
   return [
     params.sellerLabel ? `${t("listing.seller", "Vendeur")} : ${params.sellerLabel}` : null,
@@ -92,7 +93,7 @@ export function buildListingTrustProofs(
   listing: DisplayListing,
   sellerLabel: string | null,
   hasApproxMap: boolean,
-  t: (...args: unknown[]) => string,
+  t: TFunction<"translation", undefined>,
 ) {
   return [
     sellerLabel
@@ -118,7 +119,7 @@ export function buildListingTrustProofs(
 export function getOwnerStatusHint(
   listing: DisplayListing,
   isOwner: boolean,
-  t: (...args: unknown[]) => string,
+  t: TFunction<"translation", undefined>,
 ): string | null {
   const s = listing.status;
   if (!isOwner || s === "active") return null;
@@ -162,7 +163,7 @@ export function getDisplayedPhone(
   phoneRevealed: boolean,
   revealedPhone: string | null,
   listing: DisplayListing,
-  t: (...args: unknown[]) => string,
+  t: TFunction<"translation", undefined>,
 ) {
   if (!phoneRevealed) return t("listing.revealPhone");
   return revealedPhone ?? listing.owner_phone ?? t("listing.noPhone", "Non renseigné");

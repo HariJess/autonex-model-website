@@ -1,21 +1,9 @@
 import type { TablesUpdate } from "@/integrations/supabase/types";
-import type { DisplayListing } from "@/types/listing";
+import type { CanonicalVehicleInfo, DisplayListing } from "@/types/listing";
 
-export type CanonicalVehicleAttributes = {
-  make: string | null;
-  model: string | null;
+export type CanonicalVehicleAttributes = CanonicalVehicleInfo & {
+  /** Legacy trim/version mirror (historical schema used `rooms` as string holder). */
   trimOrVersion: string | null;
-  year: number | null;
-  mileageKm: number | null;
-  fuel: string | null;
-  transmission: string | null;
-  bodyStyle: string | null;
-  drivetrain: string | null;
-  doors: number | null;
-  seats: number | null;
-  engineDisplacementL: number | null;
-  condition: "neuf" | "occasion" | null;
-  sellerType: "concessionnaire" | "particulier" | null;
   city: string | null;
   locality: string | null;
 };
@@ -33,25 +21,32 @@ function textOrNull(value: string | null | undefined): string | null {
 }
 
 export function getCanonicalVehicleAttributes(listing: DisplayListing): CanonicalVehicleAttributes {
-  const mileageKmFromVehicle = nonNegativeNumberOrNull(listing.vehicle?.mileageKm);
+  const v = listing.vehicle;
+  const mileageKmFromVehicle = nonNegativeNumberOrNull(v?.mileageKm);
   const legacySurfaceFallbackKm = nonNegativeNumberOrNull(listing.surface);
   const canonicalMileageKm = mileageKmFromVehicle ?? legacySurfaceFallbackKm;
 
   return {
-    make: textOrNull(listing.vehicle?.make),
-    model: textOrNull(listing.vehicle?.model),
+    make: textOrNull(v?.make),
+    model: textOrNull(v?.model),
     trimOrVersion: listing.rooms != null ? String(listing.rooms) : null,
-    year: nonNegativeNumberOrNull(listing.vehicle?.year),
+    year: nonNegativeNumberOrNull(v?.year),
     mileageKm: canonicalMileageKm,
-    fuel: textOrNull(listing.vehicle?.fuel),
-    transmission: textOrNull(listing.vehicle?.transmission),
-    bodyStyle: textOrNull(listing.vehicle?.bodyStyle),
-    drivetrain: textOrNull(listing.vehicle?.drivetrain),
-    doors: nonNegativeNumberOrNull(listing.vehicle?.doors),
-    seats: nonNegativeNumberOrNull(listing.vehicle?.seats),
-    engineDisplacementL: nonNegativeNumberOrNull(listing.vehicle?.engineDisplacementL),
-    condition: listing.vehicle?.condition ?? null,
-    sellerType: listing.vehicle?.sellerType ?? null,
+    fuel: textOrNull(v?.fuel),
+    transmission: textOrNull(v?.transmission),
+    bodyStyle: textOrNull(v?.bodyStyle),
+    drivetrain: textOrNull(v?.drivetrain),
+    doors: nonNegativeNumberOrNull(v?.doors),
+    seats: nonNegativeNumberOrNull(v?.seats),
+    engineDisplacementL: nonNegativeNumberOrNull(v?.engineDisplacementL),
+    exteriorColor: textOrNull(v?.exteriorColor),
+    interiorColor: textOrNull(v?.interiorColor),
+    availabilityStatus: textOrNull(v?.availabilityStatus),
+    rentalMode: textOrNull(v?.rentalMode),
+    isElectric: v?.isElectric ?? false,
+    isHybrid: v?.isHybrid ?? false,
+    condition: v?.condition ?? null,
+    sellerType: v?.sellerType ?? null,
     city: textOrNull(listing.ville),
     locality: textOrNull(listing.quartier ?? listing.quartier_libre ?? null),
   };
@@ -64,7 +59,6 @@ export function buildLegacyMirrorFieldsFromVehicle(params: {
   seats: number | null;
 }): LegacyVehicleMirrorFields {
   return {
-    // Legacy mirrors kept for compatibility with current schema/query paths.
     surface: params.mileageKm,
     rooms: params.trimOrVersion,
     bathrooms: params.doors,

@@ -3,6 +3,7 @@ import { EstimationAppError, type EstimationFlowPhase } from "@/lib/estimation/e
 import type { EstimationInput, EstimationOutput } from "@/types/estimation";
 import type { VehicleEstimationRequestCreated, VehicleEstimationTelemetryEventType } from "@/types/estimation";
 import type { EstimationAuditSnapshot } from "@/lib/estimation/telemetry";
+import { toSupabaseJson } from "@/lib/supabase/json";
 
 /** Re-export for callers that only need RPC code mapping without pulling `errors.ts`. */
 export { mapEstimationRpcError, type EstimationRpcErrorCode } from "@/lib/estimation/errors";
@@ -28,7 +29,7 @@ export async function createVehicleEstimationRequest(
     maintenance_level: input.maintenanceLevel,
     owner_count_label: input.ownerCountLabel,
     usage_type: input.usageType,
-    raw_payload: input as unknown as Record<string, unknown>,
+    raw_payload: toSupabaseJson(input),
   };
 
   const { data, error } = await supabase
@@ -53,10 +54,10 @@ export async function recordVehicleEstimationResult(
   output: EstimationOutput,
   audit?: EstimationAuditSnapshot,
 ): Promise<string> {
-  const calculationPayload = {
+  const calculationPayload = toSupabaseJson({
     legacy: output,
     audit: audit ?? null,
-  } as unknown as Record<string, unknown>;
+  });
 
   const { data, error } = await supabase.rpc("record_vehicle_estimation_result", {
     p_estimation_request_id: estimationRequestId,
@@ -99,7 +100,7 @@ export async function recordVehicleEstimationEvent(
     p_estimation_request_id: estimationRequestId,
     p_submission_secret: submissionSecret,
     p_event_type: eventType,
-    p_metadata: metadata ?? {},
+    p_metadata: metadata ? toSupabaseJson(metadata) : {},
   });
   if (error) {
     throw EstimationAppError.fromSupabaseLike(error, flowPhase);

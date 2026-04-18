@@ -244,6 +244,7 @@ const SeoLandingPage = () => {
             <PremiumStateSkeletonGrid count={6} />
           ) : error ? (
             <SearchErrorState
+              title="Chargement impossible"
               message="Les annonces ne peuvent pas être chargées pour le moment."
               onRetry={() => {
                 void refetch();

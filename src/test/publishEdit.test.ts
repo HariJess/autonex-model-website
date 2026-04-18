@@ -40,6 +40,7 @@ const baseForm = {
   vehicleSeats: "",
   vehicleExteriorColor: "",
   vehicleInteriorColor: "",
+  vehicleEngineDisplacement: "",
   vehicleAvailabilityStatus: "",
   vehicleWhatsappPhone: "",
   vehicleIsElectric: false,

@@ -23,6 +23,12 @@ export type PublishWithCreditsFailure = {
   message: string;
 };
 
+export function isPublishWithCreditsFailure(
+  result: PublishWithCreditsSuccess | PublishWithCreditsFailure,
+): result is PublishWithCreditsFailure {
+  return result.ok === false;
+}
+
 type RpcPublishPayload = {
   ok?: boolean;
   listing_id?: string;
