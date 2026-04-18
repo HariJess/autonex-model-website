@@ -6,14 +6,16 @@ import {
 } from "@/types/listing";
 import type { SearchFilters, SearchSortMode, SearchViewMode } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
+import {
+  appendVehicleSemanticQueryParams,
+  parseDoorCountsFromSearchParams,
+  parseMileageKmBoundsFromSearchParams,
+  parseTrimVersionIndicesFromSearchParams,
+} from "@/lib/searchVehicleUrlParams";
+
+export { VEHICLE_SEARCH_QUERY_KEYS } from "@/lib/searchVehicleUrlParams";
 
 const LISTING_TYPE_SET = new Set<string>(LISTING_TYPES);
-
-function parsePositiveInt(s: string): number | undefined {
-  const n = parseInt(s, 10);
-  if (!Number.isFinite(n) || n < 0) return undefined;
-  return n;
-}
 
 function parseFiniteNumber(raw: string | null): number {
   if (raw == null || raw === "") return 0;
@@ -48,23 +50,9 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
   const allowed = new Set(listingTypesForTransaction(transaction));
   const types = sanitizeListingTypes(rawTypes).filter((t) => allowed.has(t as ListingType));
 
-  const roomsRaw = parseMultiValueParam(sp, "chambres").join(",");
-  const rooms: number[] = [];
-  if (roomsRaw) {
-    for (const part of roomsRaw.split(",")) {
-      const n = parsePositiveInt(part.trim());
-      if (n !== undefined && n <= 99) rooms.push(n);
-    }
-  }
-
-  const sdbRaw = parseMultiValueParam(sp, "sdb").join(",");
-  const bathrooms: number[] = [];
-  if (sdbRaw) {
-    for (const part of sdbRaw.split(",")) {
-      const n = parsePositiveInt(part.trim());
-      if (n !== undefined && n >= 1 && n <= 99) bathrooms.push(n);
-    }
-  }
+  const { min: surfaceMin, max: surfaceMax } = parseMileageKmBoundsFromSearchParams(sp);
+  const rooms = parseTrimVersionIndicesFromSearchParams(sp);
+  const bathrooms = parseDoorCountsFromSearchParams(sp);
 
   const quartiers = parseMultiValueParam(sp, "quartiers");
   const arrondissements = parseMultiValueParam(sp, "arr");
@@ -78,8 +66,8 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     quartierLibre: sp.get("q")?.trim() ?? "",
     priceMin: parseFiniteNumber(sp.get("prix_min")),
     priceMax: parseFiniteNumber(sp.get("prix_max")),
-    surfaceMin: parseFiniteNumber(sp.get("surface_min")),
-    surfaceMax: parseFiniteNumber(sp.get("surface_max")),
+    surfaceMin,
+    surfaceMax,
     rooms,
     bathrooms,
     equipments: parseMultiValueParam(sp, "equip"),
@@ -113,10 +101,7 @@ export function filtersToSearchParams(f: SearchFilters): URLSearchParams {
   if (f.quartierLibre) p.set("q", f.quartierLibre);
   if (f.priceMin) p.set("prix_min", String(f.priceMin));
   if (f.priceMax) p.set("prix_max", String(f.priceMax));
-  if (f.surfaceMin) p.set("surface_min", String(f.surfaceMin));
-  if (f.surfaceMax) p.set("surface_max", String(f.surfaceMax));
-  if (f.rooms.length) p.set("chambres", f.rooms.join(","));
-  if (f.bathrooms.length) p.set("sdb", f.bathrooms.join(","));
+  appendVehicleSemanticQueryParams(p, f);
   if (f.equipments.length) p.set("equip", f.equipments.join(","));
   if (f.fuels.length) p.set("fuel", f.fuels.join(","));
   if (f.transmissions.length) p.set("gear", f.transmissions.join(","));

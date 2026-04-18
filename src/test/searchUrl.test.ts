@@ -3,7 +3,10 @@ import {
   sanitizeListingTypes,
   parseTransaction,
   filtersFromSearchParams,
+  filtersToSearchParams,
 } from "@/lib/searchUrl";
+import type { SearchFilters } from "@/types/search";
+import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 
 describe("sanitizeListingTypes", () => {
   it("garde uniquement les types valides", () => {
@@ -91,9 +94,78 @@ describe("filtersFromSearchParams", () => {
     expect(f.bathrooms).toEqual([1, 2, 4]);
   });
 
+  it("accepte doors comme alias véhicule pour sdb", () => {
+    const sp = new URLSearchParams("doors=3,5");
+    const f = filtersFromSearchParams(sp);
+    expect(f.bathrooms).toEqual([3, 5]);
+  });
+
+  it("priorise doors sur sdb si doors est présent", () => {
+    const sp = new URLSearchParams("doors=2&sdb=5");
+    const f = filtersFromSearchParams(sp);
+    expect(f.bathrooms).toEqual([2]);
+  });
+
   it("exclut sdb=0 (invalide pour salle de bain)", () => {
     const sp = new URLSearchParams("sdb=0,1");
     const f = filtersFromSearchParams(sp);
     expect(f.bathrooms).toEqual([1]);
+  });
+
+  it("accepte mileage_min/max à la place de surface_*", () => {
+    const f = filtersFromSearchParams(new URLSearchParams("mileage_min=5000&mileage_max=200000"));
+    expect(f.surfaceMin).toBe(5000);
+    expect(f.surfaceMax).toBe(200000);
+  });
+
+  it("priorise mileage_* sur surface_* lorsque les deux sont présents", () => {
+    const f = filtersFromSearchParams(
+      new URLSearchParams("mileage_min=100000&surface_min=1&mileage_max=300000&surface_max=999999"),
+    );
+    expect(f.surfaceMin).toBe(100000);
+    expect(f.surfaceMax).toBe(300000);
+  });
+
+  it("parse trim comme alias pour chambres / rooms", () => {
+    const f = filtersFromSearchParams(new URLSearchParams("trim=2,3"));
+    expect(f.rooms).toEqual([2, 3]);
+  });
+
+  it("priorise trim sur chambres lorsque trim est défini", () => {
+    const f = filtersFromSearchParams(new URLSearchParams("trim=2&chambres=9"));
+    expect(f.rooms).toEqual([2]);
+  });
+
+  it("sérialise avec les paramètres véhicule (mileage_min, trim, doors)", () => {
+    const p = filtersToSearchParams({
+      ...EMPTY_SEARCH_FILTERS,
+      surfaceMin: 10000,
+      surfaceMax: 150000,
+      rooms: [1, 2],
+      bathrooms: [4, 5],
+    });
+    expect(p.get("mileage_min")).toBe("10000");
+    expect(p.get("mileage_max")).toBe("150000");
+    expect(p.get("trim")).toBe("1,2");
+    expect(p.get("doors")).toBe("4,5");
+    expect(p.get("surface_min")).toBeNull();
+    expect(p.get("chambres")).toBeNull();
+  });
+
+  it("round-trip interne équivalent après sérialisation canonique", () => {
+    const original: SearchFilters = {
+      ...EMPTY_SEARCH_FILTERS,
+      transaction: "vente",
+      surfaceMin: 5,
+      surfaceMax: 60000,
+      rooms: [2],
+      bathrooms: [5],
+    };
+    const restored = filtersFromSearchParams(filtersToSearchParams(original));
+    expect(restored.surfaceMin).toBe(original.surfaceMin);
+    expect(restored.surfaceMax).toBe(original.surfaceMax);
+    expect(restored.rooms).toEqual(original.rooms);
+    expect(restored.bathrooms).toEqual(original.bathrooms);
+    expect(restored.transaction).toBe(original.transaction);
   });
 });

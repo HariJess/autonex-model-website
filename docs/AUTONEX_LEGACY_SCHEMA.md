@@ -30,9 +30,24 @@ Ce document résume la dette **connue et assumée** après une passe code (sans 
 - **`getCanonicalVehicleAttributes`** : les portes et sièges utilisent désormais les **mêmes replis** que l’affichage (`bathrooms`, `toilets`) lorsque `vehicle.doors` / `vehicle.seats` sont absents — alignement avec les miroirs DB sans changer les écritures.
 - **`SearchFilters`** : JSDoc sur `surfaceMin`/`surfaceMax`/`rooms`/`bathrooms` pour limiter la confusion dans la recherche.
 
-### Suite recommandée (étape 3+)
+### Étape 3 (URL additive + vue lecture DB)
 
-1. Migration SQL **optionnelle** : vues ou colonnes générées (`mileage_km`, `doors_count`) alimentées depuis les colonnes actuelles pour lecture API plus claire.
+**URL / query params**
+
+- Lecture : accepte les **alias véhicule** `mileage_min`, `mileage_max`, `trim`, `version`, `doors` ; si absents, repli sur les clés legacy `surface_min`, `surface_max`, `chambres`, `sdb`.
+- Si à la fois `mileage_min` et `surface_min` sont présents : **`mileage_min` prime** ; idem pour `mileage_max`.
+- Si `trim` ou `version` porte au moins une valeur, **`chambres` est ignoré** (alias explicites prioritaires).
+- Écriture (navigation interne, liens générés) : **`filtersToSearchParams`** n’émet plus `surface_*` / `chambres` / `sdb` ; il émet **`mileage_min` / `mileage_max` / `trim` / `doors`**. Les anciennes URLs restent valides à la lecture.
+- Implémentation : `src/lib/searchVehicleUrlParams.ts`, appelée depuis `searchUrl.ts`. L’état applicatif interne reste `SearchFilters.surfaceMin` / `rooms` / `bathrooms` (noms legacy côté **objet TS** inchangés pour limiter la casse).
+
+**Base de données**
+
+- Vue additive **`public.listings_vehicle_semantics`** (migration `20260418194500_listings_vehicle_semantics_view.sql`) : colonnes effectives `mileage_km_effective`, `doors_effective`, `seats_effective`, etc., sans modifier la table physique.
+- `GRANT SELECT` pour `anon`, `authenticated`, `service_role` (lecture alignée sur les policies de `listings`).
+
+### Suite recommandée (étape 4+)
+
+1. Migration SQL **optionnelle** : colonnes générées persistées si besoin de perf indexée sur synonymes uniquement vue.
 2. Renommage **`immonex_is_admin`** → fonction neutre (`autonex_is_staff` ou équivalent) **après** recherche exhaustive dans les migrations et policies.
 3. Réduction progressive des fallbacks dans `vehiclePresentation` lorsque `listing.vehicle` est garanti rempli pour toutes les annonces actives.
 4. Renommage **optionnel** des champs `SearchFilters` (`surfaceMin` → `mileageMin`, etc.) derrière une couche d’alias URL pour ne pas casser les liens indexés.

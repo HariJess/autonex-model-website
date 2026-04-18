@@ -1,6 +1,7 @@
 /**
  * Search / filter state for the listings search flow.
- * Serialized to URL query params (see `src/lib/searchUrl.ts`).
+ * Serialized to URL query params (see `src/lib/searchUrl.ts` and clés `VEHICLE_SEARCH_QUERY_KEYS`).
+ * Les noms de champs restent historiques (ex. `surfaceMin` = km) ; l’URL émise utilise `mileage_min` / `trim` / `doors`.
  */
 export interface SearchFilters {
   transaction: string;
