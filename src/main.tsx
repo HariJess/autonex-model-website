@@ -4,9 +4,12 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { initMonitoring } from "./lib/monitoring";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n";
+
+initMonitoring();
 
 if (typeof document !== "undefined") {
   document.documentElement.classList.add("js");

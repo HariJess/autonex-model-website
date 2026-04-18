@@ -19,6 +19,7 @@ import {
   type ListingBoostPartition,
 } from "@/lib/listingBoosts";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
+import { wrapRpc } from "@/lib/monitoring";
 import {
   Dialog,
   DialogContent,
@@ -69,10 +70,12 @@ export function DashboardBoostPurchaseDialog({
   const purchase = useMutation({
     mutationFn: async (types: PurchasableBoostType[]) => {
       if (!listing?.id) throw new Error("listing_missing");
-      const { data, error } = await supabase.rpc("purchase_listing_boosts", {
-        p_listing_id: listing.id,
-        p_boost_types: types,
-      });
+      const { data, error } = await wrapRpc("purchase_listing_boosts", () =>
+        supabase.rpc("purchase_listing_boosts", {
+          p_listing_id: listing.id,
+          p_boost_types: types,
+        }),
+      );
       if (error) throw new Error(error.message);
       return data;
     },

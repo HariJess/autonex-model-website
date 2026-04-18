@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { wrapRpc } from "@/lib/monitoring";
 
 export type PublishWithCreditsErrorCode =
   | "not_authenticated"
@@ -65,9 +66,11 @@ export function parsePublishWithCreditsPayload(
 export async function publishListingWithCredits(
   listingId: string,
 ): Promise<PublishWithCreditsSuccess | PublishWithCreditsFailure> {
-  const { data, error } = await supabase.rpc("publish_listing_with_credits", {
-    p_listing_id: listingId,
-  });
+  const { data, error } = await wrapRpc("publish_listing_with_credits", () =>
+    supabase.rpc("publish_listing_with_credits", {
+      p_listing_id: listingId,
+    }),
+  );
 
   if (error) {
     const code = mapPublishWithCreditsError(error.message);
