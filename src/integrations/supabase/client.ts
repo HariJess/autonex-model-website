@@ -13,7 +13,7 @@ function hasValidSupabaseConfig(): boolean {
 
 function createRuntimeConfigError(): Error {
   return new Error(
-    "⚠️ Variables d'environnement Supabase manquantes ou invalides. Vérifie .env (VITE_SUPABASE_URL et VITE_SUPABASE_PUBLISHABLE_KEY)."
+    "Variables d'environnement Supabase manquantes ou invalides. Copie `.env.example` vers `.env` et renseigne VITE_SUPABASE_URL et VITE_SUPABASE_PUBLISHABLE_KEY (Supabase Dashboard > Project Settings > API).",
   );
 }
 

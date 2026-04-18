@@ -7,23 +7,32 @@ AutoNex is an automotive marketplace for Madagascar: vehicle listings (achat, lo
 - **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, TanStack Query, React Router, i18next
 - **Backend / data:** Supabase (PostgreSQL, Auth, Row Level Security, Storage, Edge-ready RPCs)
 
+## Package manager
+
+Ce dépôt est piloté avec **npm** uniquement (`package-lock.json`). N’utilise pas Bun / Yarn / pnpm pour les installs : les autres lockfiles sont ignorés par git pour éviter les collisions.
+
+Prérequis : **Node.js ≥ 18** (voir `engines` dans `package.json`).
+
 ## Local setup
 
 1. **Clone** the repository and install dependencies:
 
    ```bash
-   npm install
+   npm ci
    ```
+
+   (En développement habituel, `npm install` suffit.)
 
 2. **Environment:** copy `.env.example` to `.env` and fill in values from the Supabase dashboard (**Project Settings → API**):
 
-   - `VITE_SUPABASE_PROJECT_ID`
-   - `VITE_SUPABASE_PUBLISHABLE_KEY` (anon/public key)
    - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY` (anon / public key)
+
+   Optional: `VITE_SITE_URL` for canonical SEO URLs (see `.env.example`).
 
    The `.env` file is gitignored; never commit secrets.
 
-3. **Supabase migrations:** SQL migrations live in `supabase/migrations/`. Apply them to your linked project with the Supabase CLI (or paste into the SQL editor in the dashboard):
+3. **Supabase migrations:** SQL migrations live in `supabase/migrations/`. With the [Supabase CLI](https://supabase.com/docs/guides/cli) linked to your project:
 
    ```bash
    npx supabase db push
@@ -48,7 +57,7 @@ AutoNex is an automotive marketplace for Madagascar: vehicle listings (achat, lo
 | `npm run preview` | Preview production build   |
 | `npm run lint`    | ESLint                     |
 | `npm run test`    | Vitest unit tests          |
-| `npx tsc --noEmit`| Typecheck without emit     |
+| `npm run typecheck` | TypeScript check (sans emit, `tsconfig.app.json`) |
 
 ## Production SEO pipeline (release gating)
 

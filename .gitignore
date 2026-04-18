@@ -1,3 +1,9 @@
+# Lockfiles — npm only (`package-lock.json` is canonical). Do not commit Yarn/Bun/pnpm locks.
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
 # Logs
 logs
 *.log

@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "vite",
     "prebuild": "node ./scripts/seo/generate-sitemaps.mjs",
@@ -22,6 +25,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "catalog:import:vpic": "node ./scripts/catalog/import-vpic-catalog.mjs",
     "catalog:enrich:fueleconomy": "node ./scripts/catalog/enrich-fueleconomy-catalog.mjs",
     "catalog:report": "node ./scripts/catalog/catalog-report.mjs",
