@@ -57,7 +57,7 @@ describe("buildPublishLocalBackupPayload", () => {
   it("accepts the same shape as PublishPage onBeforeUnloadBackup (spread + draftListingId + step)", () => {
     const persistDraftForm = {
       transaction: "vente" as const,
-      listingType: "voiture" as const,
+      listingType: "terrain" as const,
       isNewProgram: false,
       internalRef: "",
       ville: "Antananarivo",

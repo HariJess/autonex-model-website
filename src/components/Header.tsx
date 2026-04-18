@@ -87,7 +87,7 @@ const Header = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button type="button" className={navDropdownTriggerClass(isBuyActive || isRentActive)}>
-                <span>{t("nav.explore", "Explorer")}</span>
+                <span>{t("nav.explore")}</span>
                 <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
@@ -127,7 +127,7 @@ const Header = () => {
             );
           })}
           <Link to="/estimation" className={estimationDesktopClass}>
-            {t("nav.estimation", "Estimation")}
+            {t("nav.estimation")}
           </Link>
         </nav>
 
@@ -144,7 +144,7 @@ const Header = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 border-white/20 bg-[#0D223D] text-[#F7FBFF]">
-              <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-[#9FBCE0]">{t("common.language", "Language")}</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-[#9FBCE0]">{t("common.language")}</DropdownMenuLabel>
               <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => switchLanguage("fr")}>
                 Français
               </DropdownMenuItem>
@@ -155,7 +155,7 @@ const Header = () => {
                 English
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-[#9FBCE0]">{t("common.currency", "Currency")}</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-[#9FBCE0]">{t("common.currency")}</DropdownMenuLabel>
               <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => setCurrency("MGA")}>
                 MGA
               </DropdownMenuItem>
@@ -169,7 +169,7 @@ const Header = () => {
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" style={{ color: "#FAFAFA" }} aria-label={t("nav.accountMenu", "Account menu")}>
+              <Button variant="ghost" size="icon" style={{ color: "#FAFAFA" }} aria-label={t("nav.accountMenu")}>
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
@@ -177,16 +177,16 @@ const Header = () => {
               {user ? (
                 <>
                   <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/dashboard")}>
-                    {t("nav.dashboard", "My account")}
+                    {t("nav.dashboard")}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={signOut}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    {t("nav.logout", "Sign out")}
+                    {t("nav.logout")}
                   </DropdownMenuItem>
                 </>
               ) : (
                 <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/login")}>
-                  {t("nav.login", "Log in")}
+                  {t("nav.login")}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -264,9 +264,9 @@ const Header = () => {
               onClick={() => setMenuOpen(false)}
               className={estimationMobileClass}
             >
-              <span>{t("nav.estimation", "Estimation")}</span>
+              <span>{t("nav.estimation")}</span>
               <span className="text-[10px] font-semibold uppercase tracking-wide text-[#D9E8FA]">
-                {t("nav.estimationTag", "Signature")}
+                {t("nav.estimationTag")}
               </span>
             </Link>
             <Link
@@ -319,7 +319,7 @@ const Header = () => {
                     <User className="h-4 w-4 mr-1" /> {t("nav.dashboard")}
                   </Button>
                   <Button variant="ghost" size="sm" className="justify-start min-h-10" onClick={() => { signOut(); setMenuOpen(false); }} style={{ color: "#FAFAFA" }}>
-                    <LogOut className="h-4 w-4 mr-1" /> {t("nav.logout", "Déconnexion")}
+                    <LogOut className="h-4 w-4 mr-1" /> {t("nav.logout")}
                   </Button>
                 </>
               ) : (
