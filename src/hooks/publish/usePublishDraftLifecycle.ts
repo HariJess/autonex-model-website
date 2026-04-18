@@ -1,5 +1,5 @@
 import type { MutableRefObject } from "react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 
 export type PublishDraftLifecycleOptions = {
@@ -107,19 +107,56 @@ export function usePublishDraftLifecycle(opts: PublishDraftLifecycleOptions): vo
     onBeforeUnloadBackup,
   ]);
 
-  useEffect(() => {
-    return () => {
-      if (exitBypassRef.current) return;
-      if (!userIdForCleanup || !draftListingIdForCleanup || isPublishedListingEditForCleanup) return;
-      if (hasMeaningfulDraftProgress) return;
-      void deleteCurrentDraft();
-    };
-  }, [
+  // --- Abandoned-draft cleanup -------------------------------------------
+  // Deletes the DB row on unmount IF the user left without contributing any
+  // meaningful content. Prior to this refactor, the effect listed each of
+  // these values as deps, so the cleanup re-fired on every transition —
+  // critically when `hasMeaningfulDraftProgress` flipped from false to true
+  // (e.g. user types the 4th character of the title). React fires the OLD
+  // cleanup BEFORE the new effect registers, and that old cleanup captured
+  // `hasMeaningfulDraftProgress=false` at its creation time. Result: the
+  // draft was deleted the moment the user's title crossed the 4-char
+  // threshold, and every subsequent autosave PATCH 406'd on a phantom id
+  // while photo uploads FK-failed with 400.
+  //
+  // Fix: mirror each value into a ref updated every render, and run the
+  // effect with an empty dep array so its cleanup fires only on real
+  // unmount. The cleanup reads the refs, so it always sees the LATEST
+  // values — not the stale ones captured on the render that registered it.
+  // In React 18 StrictMode dev double-invoke, the initial unmount fires
+  // before the async createDraftListing has resolved, so
+  // draftListingIdForCleanup is still null and the cleanup correctly skips.
+  const hasMeaningfulRef = useRef(hasMeaningfulDraftProgress);
+  hasMeaningfulRef.current = hasMeaningfulDraftProgress;
+
+  const deleteCurrentDraftRef = useRef(deleteCurrentDraft);
+  deleteCurrentDraftRef.current = deleteCurrentDraft;
+
+  const cleanupStateRef = useRef({
     exitBypassRef,
     userIdForCleanup,
     draftListingIdForCleanup,
     isPublishedListingEditForCleanup,
-    hasMeaningfulDraftProgress,
-    deleteCurrentDraft,
-  ]);
+  });
+  cleanupStateRef.current = {
+    exitBypassRef,
+    userIdForCleanup,
+    draftListingIdForCleanup,
+    isPublishedListingEditForCleanup,
+  };
+
+  useEffect(() => {
+    return () => {
+      const s = cleanupStateRef.current;
+      if (s.exitBypassRef.current) return;
+      if (!s.userIdForCleanup || !s.draftListingIdForCleanup || s.isPublishedListingEditForCleanup) return;
+      if (hasMeaningfulRef.current) return;
+      void deleteCurrentDraftRef.current();
+    };
+    // Intentional empty deps: we want cleanup to fire ONLY on real unmount,
+    // and we read latest values via refs above. Listing the values as deps
+    // would re-register the effect on every render and re-fire the cleanup
+    // with stale closure values — the exact bug this refactor fixes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }

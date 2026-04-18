@@ -99,6 +99,8 @@ const PublishPage = () => {
   const baselineMaterialSnapshotRef = useRef<string>("");
   const editPriceBaselineRef = useRef<number | null>(null);
   const editOriginalPriceRef = useRef<number | null>(null);
+  /** Skips bootstrap re-entry after we self-navigate post-create; see usePublishBootstrap. */
+  const selfNavigatedDraftIdRef = useRef<string | null>(null);
 
   const steps = [
     t("publish.stepMain", "Informations principales"),
@@ -821,7 +823,6 @@ const PublishPage = () => {
     setDraftHydrated,
     setDraftBootLoading,
     setSaveError,
-    setDraftListingId,
     setStep,
     setServerPhotos,
     setIsPublishedListingEdit,
@@ -833,6 +834,7 @@ const PublishPage = () => {
     fingerprintInitializedRef,
     hydratingRef,
     baselineMaterialSnapshotRef,
+    selfNavigatedDraftIdRef,
   });
 
   const persistDraft = useCallback(

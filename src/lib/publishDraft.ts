@@ -212,7 +212,14 @@ export async function fetchListingPhotos(listingId: string): Promise<ServerPhoto
   return (data ?? []) as ServerPhoto[];
 }
 
-export async function createDraftListing(ownerId: string): Promise<string> {
+/**
+ * Returns the full inserted row so the caller can hydrate its form state
+ * inline, without a second round-trip via fetchDraftListingForOwner. This
+ * avoids a race where the bootstrap effect re-enters the `?draft=<id>`
+ * branch after self-navigate and may observe null (RLS timing / React 18
+ * StrictMode double-invoke) on a row we just inserted.
+ */
+export async function createDraftListing(ownerId: string): Promise<Tables<"listings">> {
   const row: TablesInsert<"listings"> = {
     owner_id: ownerId,
     title: PUBLISH_DRAFT_TITLE_PLACEHOLDER,
@@ -227,9 +234,9 @@ export async function createDraftListing(ownerId: string): Promise<string> {
     features: [] as unknown as Json,
     pending_boost_types: [] as unknown as Json,
   };
-  const { data, error } = await supabase.from("listings").insert(row).select("id").single();
+  const { data, error } = await supabase.from("listings").insert(row).select("*").single();
   if (error) throw new Error(error.message);
-  return data.id;
+  return data;
 }
 
 export async function deleteDraftListingForOwner(listingId: string, ownerId: string): Promise<void> {

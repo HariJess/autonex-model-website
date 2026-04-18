@@ -31,7 +31,6 @@ export type PublishBootstrapDeps = {
   setDraftHydrated: (v: boolean) => void;
   setDraftBootLoading: (v: boolean) => void;
   setSaveError: (msg: string | null) => void;
-  setDraftListingId: (id: string | null) => void;
   setStep: (n: number | ((prev: number) => number)) => void;
   setServerPhotos: (photos: ServerPhoto[]) => void;
   setIsPublishedListingEdit: (v: boolean) => void;
@@ -45,6 +44,14 @@ export type PublishBootstrapDeps = {
   fingerprintInitializedRef: MutableRefObject<boolean>;
   hydratingRef: MutableRefObject<boolean>;
   baselineMaterialSnapshotRef: MutableRefObject<string>;
+  /**
+   * Set to the draft id we just created AND hydrated inline, right before
+   * we `navigate('?draft=<id>')`. The next effect run sees `spDraft` match
+   * this ref and skips the re-fetch / re-hydrate path, which otherwise
+   * could observe a null row (RLS timing, StrictMode) and wrongly redirect
+   * to /dashboard after issuing a phantom-UUID autosave.
+   */
+  selfNavigatedDraftIdRef: MutableRefObject<string | null>;
 };
 
 /**
@@ -62,7 +69,6 @@ export function usePublishBootstrap(deps: PublishBootstrapDeps): void {
     setDraftHydrated,
     setDraftBootLoading,
     setSaveError,
-    setDraftListingId,
     setStep,
     setServerPhotos,
     setIsPublishedListingEdit,
@@ -74,12 +80,21 @@ export function usePublishBootstrap(deps: PublishBootstrapDeps): void {
     fingerprintInitializedRef,
     hydratingRef,
     baselineMaterialSnapshotRef,
+    selfNavigatedDraftIdRef,
   } = deps;
 
   useEffect(() => {
     if (!userId) {
       setDraftHydrated(true);
       setDraftBootLoading(false);
+      return;
+    }
+    // Post-create re-entry: the previous run already inserted + hydrated
+    // the draft matching spDraft. Clear the flag and return early so we
+    // don't fetch a row we just wrote (and possibly miss it under RLS
+    // timing or StrictMode double-invocation).
+    if (spDraft && spDraft === selfNavigatedDraftIdRef.current) {
+      selfNavigatedDraftIdRef.current = null;
       return;
     }
     let cancelled = false;
@@ -94,11 +109,17 @@ export function usePublishBootstrap(deps: PublishBootstrapDeps): void {
 
         if (wantNew) {
           setDraftMode();
-          const id = await createDraftListing(userId);
+          const row = await createDraftListing(userId);
           if (cancelled) return;
-          setDraftListingId(id);
-          navigate(`/publier?draft=${id}`, { replace: true });
+          applyListingRowToFormState(row);
+          setServerPhotos([]);
+          setLastSavedAt(row.updated_at ?? row.created_at ?? null);
+          selfNavigatedDraftIdRef.current = row.id;
+          navigate(`/publier?draft=${row.id}`, { replace: true });
           setStep(0);
+          queueMicrotask(() => {
+            hydratingRef.current = false;
+          });
           setDraftHydrated(true);
           return;
         }
@@ -161,10 +182,16 @@ export function usePublishBootstrap(deps: PublishBootstrapDeps): void {
         }
 
         setDraftMode();
-        const id = await createDraftListing(userId);
+        const row = await createDraftListing(userId);
         if (cancelled) return;
-        setDraftListingId(id);
-        navigate(`/publier?draft=${id}`, { replace: true });
+        applyListingRowToFormState(row);
+        setServerPhotos([]);
+        setLastSavedAt(row.updated_at ?? row.created_at ?? null);
+        selfNavigatedDraftIdRef.current = row.id;
+        navigate(`/publier?draft=${row.id}`, { replace: true });
+        queueMicrotask(() => {
+          hydratingRef.current = false;
+        });
         setDraftHydrated(true);
       } catch (e) {
         if (!cancelled) {
