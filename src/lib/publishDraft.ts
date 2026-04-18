@@ -11,11 +11,7 @@ import {
   mileageKmFormStringFromListingRow,
   parseMileageKmFromPublishSurfaceField,
 } from "@/lib/legacyListingVehicleMapping";
-import {
-  AUTONEX_STORAGE_KEYS,
-  LEGACY_IMMONEX_STORAGE_KEYS,
-  publishDraftStorageKey,
-} from "@/lib/localStorageLegacyKeys";
+import { getDraft, removeDraft, setDraft } from "@/lib/draftStorage";
 
 export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
 
@@ -94,56 +90,25 @@ export type LocalPublishBackupV1 = {
   agencySpotlight: boolean;
 };
 
-export function localBackupKey(userId: string, draftListingId: string) {
-  return publishDraftStorageKey(AUTONEX_STORAGE_KEYS.publishDraftPrefix, userId, draftListingId);
-}
-
-function legacyPublishDraftBackupKey(userId: string, draftListingId: string) {
-  return publishDraftStorageKey(LEGACY_IMMONEX_STORAGE_KEYS.publishDraftPrefix, userId, draftListingId);
-}
-
-export function saveLocalPublishBackup(userId: string, draftListingId: string, data: Omit<LocalPublishBackupV1, "v" | "savedAt"> & { step: number }) {
-  try {
-    const payload: LocalPublishBackupV1 = {
-      v: 1,
-      savedAt: new Date().toISOString(),
-      ...data,
-    };
-    const key = localBackupKey(userId, draftListingId);
-    localStorage.setItem(key, JSON.stringify(payload));
-    localStorage.removeItem(legacyPublishDraftBackupKey(userId, draftListingId));
-  } catch {
-    /* quota / private mode */
-  }
+/**
+ * Thin wrappers over @/lib/draftStorage so existing call sites keep a stable
+ * API. All localStorage mechanics (keys, prefix, legacy fallback) live in
+ * draftStorage.ts — this file never touches window.localStorage directly.
+ */
+export function saveLocalPublishBackup(
+  userId: string,
+  draftListingId: string,
+  data: Omit<LocalPublishBackupV1, "v" | "savedAt"> & { step: number },
+) {
+  setDraft(userId, draftListingId, data);
 }
 
 export function loadLocalPublishBackup(userId: string, draftListingId: string): LocalPublishBackupV1 | null {
-  try {
-    let raw = localStorage.getItem(localBackupKey(userId, draftListingId));
-    if (!raw) {
-      const legacy = localStorage.getItem(legacyPublishDraftBackupKey(userId, draftListingId));
-      if (legacy) {
-        localStorage.setItem(localBackupKey(userId, draftListingId), legacy);
-        localStorage.removeItem(legacyPublishDraftBackupKey(userId, draftListingId));
-        raw = legacy;
-      }
-    }
-    if (!raw) return null;
-    const p = JSON.parse(raw) as LocalPublishBackupV1;
-    if (p.v !== 1 || !p.savedAt) return null;
-    return p;
-  } catch {
-    return null;
-  }
+  return getDraft(userId, draftListingId);
 }
 
 export function clearLocalPublishBackup(userId: string, draftListingId: string) {
-  try {
-    localStorage.removeItem(localBackupKey(userId, draftListingId));
-    localStorage.removeItem(legacyPublishDraftBackupKey(userId, draftListingId));
-  } catch {
-    /* ignore */
-  }
+  removeDraft(userId, draftListingId);
 }
 
 export type ServerPhoto = { id: string; url: string; position: number };
