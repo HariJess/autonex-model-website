@@ -12,6 +12,10 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement;
 };
 
+// shadcn/ui toast pattern: actionTypes is consumed solely through `typeof actionTypes`
+// (see ActionType below). The runtime object is never read, but removing it breaks
+// the derived type. Suppressing unused-vars only on this declaration.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
