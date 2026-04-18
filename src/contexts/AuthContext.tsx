@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -38,6 +46,11 @@ interface AuthContextType {
   profile: Profile | null;
   /** True when profile.role is `admin` (server still enforces RPC permissions). */
   isAdmin: boolean;
+  /**
+   * True until the first bootstrap completes: session resolved from `getSession` and,
+   * if a user exists, profile row loaded (or confirmed absent). Subsequent auth events
+   * update session/profile without flipping this flag back to true (avoid full-page flicker).
+   */
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   /** OAuth Google — réservé au parcours particulier (profil `particulier`, pas d’agence). */
@@ -55,44 +68,109 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
+  /** Monotonic generation so an older profile response cannot overwrite a newer user. */
+  const profileFetchGenerationRef = useRef(0);
+  /** Latest user id tied to in-flight profile fetch (for stale checks after await). */
+  const profileTargetUserIdRef = useRef<string | null>(null);
+  /** Last user id applied from session; when it changes, clear profile to avoid showing the previous account. */
+  const lastSessionUserIdRef = useRef<string | null>(null);
+  /** Mirrors `user` for callbacks that must not capture stale React state. */
+  const userRef = useRef<User | null>(null);
+  userRef.current = user;
+
+  const applySessionTokens = useCallback((next: Session | null) => {
+    const nextUserId = next?.user?.id ?? null;
+    if (nextUserId !== lastSessionUserIdRef.current) {
+      lastSessionUserIdRef.current = nextUserId;
+      setProfile(null);
+    }
+    setSession(next);
+    setUser(next?.user ?? null);
+  }, []);
+
+  /**
+   * Loads profile for `userId`, or clears profile when `userId` is null.
+   * Drops stale responses when auth changes mid-flight.
+   */
+  const loadProfileForUser = useCallback(async (userId: string | null) => {
+    const generation = ++profileFetchGenerationRef.current;
+    profileTargetUserIdRef.current = userId;
+
+    if (!userId) {
+      setProfile(null);
+      return;
+    }
+
+    const { data, error } = await supabase
       .from("profiles")
       .select("id, role, full_name, phone, agency_id")
       .eq("id", userId)
-      .single();
-    if (data) {
-      setProfile(data as Profile);
-    }
-  };
+      .maybeSingle();
 
-  const refreshProfile = async () => {
-    if (user) await fetchProfile(user.id);
-  };
+    if (generation !== profileFetchGenerationRef.current) return;
+    if (profileTargetUserIdRef.current !== userId) return;
+
+    if (error) {
+      console.warn("[AuthProvider] profile fetch failed:", error.message);
+      setProfile(null);
+      return;
+    }
+
+    setProfile(data as Profile | null);
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    const uid = userRef.current?.id ?? null;
+    if (!uid) return;
+    await loadProfileForUser(uid);
+  }, [loadProfileForUser]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setTimeout(() => fetchProfile(session.user.id), 0);
-        } else {
-          setProfile(null);
-        }
-        setLoading(false);
-      }
-    );
+    let cancelled = false;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
-      setLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (cancelled) return;
+
+      applySessionTokens(nextSession);
+
+      // Token rotation only: session object updates, same logical user — avoid extra profile round-trip.
+      if (event === "TOKEN_REFRESHED") {
+        return;
+      }
+
+      // Initial session is applied once via `getSession()` below; handling it again here
+      // duplicates work and races profile loading.
+      if (event === "INITIAL_SESSION") {
+        return;
+      }
+
+      // Defer Supabase data calls out of the auth callback to avoid documented deadlocks.
+      queueMicrotask(() => {
+        if (cancelled) return;
+        void loadProfileForUser(nextSession?.user?.id ?? null);
+      });
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    void (async () => {
+      const {
+        data: { session: initialSession },
+      } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      applySessionTokens(initialSession);
+      await loadProfileForUser(initialSession?.user?.id ?? null);
+      if (!cancelled) {
+        setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [applySessionTokens, loadProfileForUser]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -140,6 +218,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    profileFetchGenerationRef.current += 1;
+    profileTargetUserIdRef.current = null;
     await supabase.auth.signOut();
     setProfile(null);
   };
