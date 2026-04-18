@@ -107,7 +107,7 @@ const PublishStepVisibility = ({
   onSubmitCreditPurchase,
 }: PublishStepVisibilityProps) => {
   const { t } = useTranslation();
-  const publishAllowed = editMode || canPublishWithCredits;
+  const publishAllowed = true;
   const [showCreditPurchase, setShowCreditPurchase] = useState(!editMode && !canPublishWithCredits);
   const [showMobileOptions, setShowMobileOptions] = useState(false);
   const transactionLabel =
@@ -130,8 +130,8 @@ const PublishStepVisibility = ({
         </p>
         <p className="mt-1 font-sans text-[14px] md:text-sm text-muted-foreground leading-relaxed">
           {t(
-            "publish.finalizeStepHint",
-            "Vérifiez le coût, sélectionnez la visibilité souhaitée, puis envoyez votre annonce pour modération.",
+                "publish.finalizeStepHintInstant",
+                "Vérifiez le coût, sélectionnez la visibilité souhaitée, puis publiez votre annonce.",
           )}
         </p>
       </div>
@@ -169,7 +169,7 @@ const PublishStepVisibility = ({
             <>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {t("publish.costPublication", "Publication (modération)")}
+                  {t("publish.costPublicationInstant", "Publication standard")}
                 </span>
                 <span>{LISTING_PUBLISH_CREDIT_COST}</span>
               </div>
@@ -231,12 +231,12 @@ const PublishStepVisibility = ({
       <Card className="rounded-2xl border-border">
         <CardHeader>
           <CardTitle className="font-serif flex items-center gap-2">
-            <Sparkles className="h-5 w-5" /> {t("publish.boostTitle", "Boosts (après validation)")}
+            <Sparkles className="h-5 w-5" /> {t("publish.boostTitleInstant", "Boosts (application immédiate)")}
           </CardTitle>
           <CardDescription className="font-sans">
             {t(
-              "publish.boostHonest",
-              "Les boosts sélectionnés seront pris en compte lors de la mise en ligne par notre équipe, sous réserve de disponibilité.",
+              "publish.boostHonestInstant",
+              "Les boosts sélectionnés sont appliqués au moment de la publication, selon les règles de disponibilité.",
             )}
           </CardDescription>
         </CardHeader>
@@ -280,8 +280,8 @@ const PublishStepVisibility = ({
             </CardTitle>
             <CardDescription className="font-sans text-[13px] leading-relaxed">
               {t(
-                "publish.agencySpotlightDesc",
-                "Renforce la présence de votre marque sur le portail (après validation). Réservé aux comptes agence.",
+                "publish.agencySpotlightDescInstant",
+                "Renforce la présence de votre marque sur le portail dès publication. Réservé aux comptes agence.",
               )}
             </CardDescription>
           </CardHeader>
@@ -334,7 +334,7 @@ const PublishStepVisibility = ({
           ? t("common.loading")
           : editMode
             ? (editSubmitLabel ?? t("publish.editSave", "Enregistrer les modifications"))
-            : t("publish.submitForReview", "Envoyer pour modération")}
+            : t("publish.submitNow", "Publier maintenant")}
       </Button>
 
       {!editMode && (

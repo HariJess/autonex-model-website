@@ -32,7 +32,6 @@ import {
   type PurchasableBoostType,
 } from "@/config/monetization";
 import { mergeCanonicalCreditPacks, type CreditPackRow } from "@/lib/creditPacks";
-import { consumeCredits } from "@/lib/creditsApi";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
 import { useCreditsBalance } from "@/hooks/useCreditsBalance";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
@@ -62,7 +61,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Json, Tables } from "@/integrations/supabase/types";
+import type { Tables } from "@/integrations/supabase/types";
 import { PublishPageHeader } from "@/pages/publish/components/PublishPageHeader";
 import { PublishProgressSteps } from "@/pages/publish/components/PublishProgressSteps";
 import { PublishStepErrors } from "@/pages/publish/components/PublishStepErrors";
@@ -86,6 +85,7 @@ import {
   validatePublishStep,
   type PublishValidationInput,
 } from "@/pages/publish/publishValidation";
+import { publishListingWithCredits } from "@/lib/publishWithCredits";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
@@ -1607,11 +1607,6 @@ const PublishPage = () => {
       return;
     }
 
-    if (!canPublishWithCredits) {
-      toast.error(t("publish.insufficientCredits", "Crédits insuffisants — achetez un pack ou choisissez moins d’options boost."));
-      return;
-    }
-
     setPublishing(true);
     try {
       if (pendingPhotos.length > 0 && draftListingId) {
@@ -1621,97 +1616,44 @@ const PublishPage = () => {
         }
       }
 
-      const priceNum = Number(priceMga) || 0;
-      let finalLat: number | null = null;
-      let finalLng: number | null = null;
-      if (pinLat != null && pinLng != null && isValidListingCoordinates(pinLat, pinLng)) {
-        finalLat = Number(pinLat.toFixed(7));
-        finalLng = Number(pinLng.toFixed(7));
-      } else {
-        const fallback = getSuggestedListingCoordinates(ville, arrondissement || undefined, quartier || undefined);
-        if (fallback) {
-          finalLat = Number(fallback.lat.toFixed(7));
-          finalLng = Number(fallback.lng.toFixed(7));
+      const saved = await persistDraft(step);
+      if (!saved) {
+        throw new Error(t("publish.draftSaveFailed", "Échec de la sauvegarde"));
+      }
+
+      const publishResult = await publishListingWithCredits(draftListingId);
+      if (!publishResult.ok) {
+        if (publishResult.code === "insufficient_credits") {
+          throw new Error(
+            t(
+              "publish.insufficientCredits",
+              "Crédits insuffisants — achetez un pack ou choisissez moins d’options boost.",
+            ),
+          );
         }
+        if (publishResult.code === "listing_not_found") {
+          throw new Error(
+            t("publish.listingNotFoundForPublish", "Annonce introuvable ou déjà supprimée."),
+          );
+        }
+        if (publishResult.code === "invalid_listing_status" || publishResult.code === "already_published") {
+          throw new Error(
+            t("publish.invalidStatusForPublish", "Cette annonce n’est plus en brouillon et ne peut pas être publiée ici."),
+          );
+        }
+        if (publishResult.code === "not_owner" || publishResult.code === "not_authenticated") {
+          throw new Error(
+            t("publish.notAuthorizedForPublish", "Action non autorisée pour cette annonce."),
+          );
+        }
+        throw new Error(
+          t("publish.error", "Erreur lors de la publication"),
+        );
       }
 
-      const patch = formToListingUpdate({
-        transaction,
-        listingType,
-        isNewProgram,
-        internalRef,
-        ville,
-        arrondissement,
-        quartier,
-        quartierLibre,
-        pinLat: finalLat,
-        pinLng: finalLng,
-        title,
-        description,
-        priceMga,
-        surface,
-        rooms,
-        bathrooms,
-        toilets,
-        vehicleMake,
-        vehicleModel,
-        vehicleYear,
-        vehicleFuel,
-        vehicleTransmission,
-        vehicleDrivetrain,
-        vehicleCondition,
-        vehicleSellerType,
-        vehicleRentalMode,
-        vehicleBodyStyle,
-        vehicleDoors,
-        vehicleSeats,
-        vehicleExteriorColor,
-        vehicleEngineDisplacement,
-        vehicleInteriorColor,
-        vehicleAvailabilityStatus,
-        vehicleWhatsappPhone,
-        vehicleIsElectric,
-        vehicleIsHybrid,
-        selectedFeatures: selectedFeaturesWithVehicleMeta,
-        videoUrl,
-        virtualTourUrl,
-        selectedBoosts,
-        agencySpotlight,
-        draftStep: step,
-        isDraftSave: false,
-      });
-
-      const { error: upErr } = await supabase
-        .from("listings")
-        .update({
-          ...patch,
-          description: description.trim(),
-          status: "pending_review",
-          publication_credits_charged: totalCost,
-          pending_boost_types: [
-            ...selectedBoosts,
-            ...(agencySpotlightActive ? (["agency_spotlight"] as const) : []),
-          ] as unknown as Json,
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-        })
-        .eq("id", draftListingId)
-        .eq("status", "draft");
-
-      if (upErr) throw new Error(upErr.message);
-
-      const { ok, error: creditErr } = await consumeCredits(totalCost, "listing_publish", {
-        refType: "listing_publish",
-        refId: draftListingId,
-      });
-      if (!ok) {
-        await supabase
-          .from("listings")
-          .update({ status: "draft", publication_credits_charged: null })
-          .eq("id", draftListingId);
-        throw new Error(creditErr ?? "Crédits insuffisants");
-      }
       invalidateCreditsBalanceQueries(queryClient, user.id);
       await queryClient.invalidateQueries({ queryKey: ["my-credits-ledger", user.id] });
+      await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
       await refreshProfile();
 
       await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
@@ -1719,8 +1661,8 @@ const PublishPage = () => {
       exitBypassRef.current = true;
       toast.success(
         t(
-          "publish.successModeration",
-          "Annonce envoyée ! Elle sera visible après modération par notre équipe. Les boosts demandés seront examinés en même temps."
+          "publish.successPublishedInstant",
+          "Annonce publiée avec succès. Elle est maintenant visible sur AutoNex."
         )
       );
       navigate("/dashboard");
@@ -1800,8 +1742,8 @@ const PublishPage = () => {
       <div className="container mx-auto max-w-6xl px-4 py-6 md:py-8 pb-36 sm:pb-8">
         <PublishPageHeader
           moderationText={t(
-            "publish.moderationBanner",
-            "AutoNex vérifie chaque annonce avant publication. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français.",
+            "publish.publishBannerInstant",
+            "Publication directe sur AutoNex. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français.",
           )}
           publishCreditCost={LISTING_PUBLISH_CREDIT_COST}
           title={isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title")}
