@@ -36,3 +36,6 @@ dist-ssr
 
 # Supabase local temp/state artifacts
 supabase/.temp/
+
+# Claude Code local files
+.claude/
