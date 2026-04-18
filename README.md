@@ -13,6 +13,8 @@ Ce dépôt est piloté avec **npm** uniquement (`package-lock.json`). N’utilis
 
 Prérequis : **Node.js ≥ 18** (voir `engines` dans `package.json`).
 
+Nom npm du workspace : **`autonex-madagascar`** (`package.json`, dépôt privé — non publié sur le registre npm).
+
 ## Local setup
 
 1. **Clone** the repository and install dependencies:
@@ -132,7 +134,7 @@ Open the URL shown in the terminal (typically `http://localhost:5173`).
 
 ## Product notes
 
-- **Blog / conseils:** sample content may use seed data; see in-app copy and `src/data/seed-listings` where relevant.
+- **Blog / conseils:** sample content may use seed data; see in-app copy and `src/data/seed-listings.ts` where relevant.
 - **Credits:** the UI’s **available balance** is driven by the sum of `credits_ledger` (see `useCreditsBalance` / `fetchCreditsBalanceFromLedger`).
 
 ## License
