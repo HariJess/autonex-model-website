@@ -21,11 +21,10 @@ import {
   sanitizeListingTypeForTransaction,
 } from "@/lib/listingRules";
 import {
-  LISTING_PUBLISH_CREDIT_COST,
-  totalPublicationCredits,
   formatAriary,
   type PurchasableBoostType,
 } from "@/config/monetization";
+import { usePricing } from "@/hooks/usePricing";
 import { mergeCanonicalCreditPacks, type CreditPackRow } from "@/lib/creditPacks";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
 import { useCreditsBalance } from "@/hooks/useCreditsBalance";
@@ -926,8 +925,9 @@ const PublishPage = () => {
   }, [listingType]);
 
   const { data: creditsBalance = 0, isPending: creditsBalancePending } = useCreditsBalance();
+  const { prices: livePrices, totalPublication } = usePricing();
   const agencySpotlightActive = Boolean(profile?.agency_id && agencySpotlight);
-  const totalCost = totalPublicationCredits(selectedBoosts, { agencySpotlight: agencySpotlightActive });
+  const totalCost = totalPublication(selectedBoosts, { agencySpotlight: agencySpotlightActive });
   const canPublishWithCredits = !creditsBalancePending && creditsBalance >= totalCost;
 
   const toggleFeature = (f: string) => {
@@ -1293,7 +1293,7 @@ const PublishPage = () => {
             "publish.publishBannerInstant",
             "Publication directe sur AutoNex. Coût : {cost} crédits par soumission (+ options boost). Description uniquement en français.",
           )}
-          publishCreditCost={LISTING_PUBLISH_CREDIT_COST}
+          publishCreditCost={livePrices.publish_listing}
           title={isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title")}
           showNewButton={Boolean(user)}
           newListingLabel={t("publish.newListing", "Nouvelle annonce")}

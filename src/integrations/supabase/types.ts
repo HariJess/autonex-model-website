@@ -1255,6 +1255,14 @@ export type Database = {
         Args: { p_listing_id: string }
         Returns: string
       }
+      get_pricing: {
+        Args: never
+        Returns: {
+          amount: number
+          description: string | null
+          key: string
+        }[]
+      }
       get_profile_for_listing_display: {
         Args: { p_owner_id: string }
         Returns: {

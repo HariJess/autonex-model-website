@@ -1,12 +1,22 @@
 /**
  * Central monetization config — credit packs (Ar), publication cost, boosts, agency products.
- * Adjust prices here; DB `credit_packs` should stay in sync via migrations.
+ *
+ * The six credit prices below (LISTING_PUBLISH_CREDIT_COST, BOOST_CREDIT_COSTS,
+ * AGENCY_SPOTLIGHT_CREDIT_COST) are FALLBACK VALUES ONLY. The source of truth is
+ * the DB `credit_pricing` table, exposed to the front via the get_pricing RPC
+ * and consumed through the usePricing hook (src/hooks/usePricing.ts). The
+ * fallback keeps the UI functional during the initial query and on unstable
+ * networks; server-side RPCs (publish_listing_with_credits,
+ * purchase_listing_boosts) always read from the DB directly.
+ *
+ * When prices change, update BOTH the DB (via a new migration or an admin
+ * UPDATE) AND this file, so the fallback stays aligned with production.
  */
 
-/** Standard listing submission (moderation included). */
+/** Fallback only — see usePricing for live value. */
 export const LISTING_PUBLISH_CREDIT_COST = 100;
 
-/** Paid boosts applied after moderation when inventory allows (stored in `pending_boost_types`). */
+/** Fallback only — see usePricing for live values. */
 export const BOOST_CREDIT_COSTS = {
   urgent: 20,
   daily_bump: 30,
@@ -44,13 +54,15 @@ export const BOOST_VISIBILITY_FR: Record<PurchasableBoostType, string> = {
   top: "Priorité maximale dans les résultats pendant la durée du boost.",
 };
 
-/** Agency-level visibility (agencies only); billed at publish like boosts. */
+/** Fallback only — see usePricing for live value. */
 export const AGENCY_SPOTLIGHT_CREDIT_COST = 120;
 
+/** Fallback-backed helper. Components that need live prices should call usePricing().totalBoosts. */
 export function totalBoostCredits(selected: PurchasableBoostType[]): number {
   return selected.reduce((sum, k) => sum + BOOST_CREDIT_COSTS[k], 0);
 }
 
+/** Fallback-backed helper. Components that need live prices should call usePricing().totalPublication. */
 export function totalPublicationCredits(
   selected: PurchasableBoostType[],
   options?: { agencySpotlight?: boolean },

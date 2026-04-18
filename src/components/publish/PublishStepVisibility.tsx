@@ -8,14 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Coins, Sparkles, ChevronDown } from "lucide-react";
 import { LISTING_TYPE_LABELS, type ListingType, type TransactionType } from "@/types/listing";
 import {
-  LISTING_PUBLISH_CREDIT_COST,
-  BOOST_CREDIT_COSTS,
   BOOST_ORDER,
   BOOST_LABELS_FR,
-  AGENCY_SPOTLIGHT_CREDIT_COST,
   formatAriary,
   type PurchasableBoostType,
 } from "@/config/monetization";
+import { usePricing } from "@/hooks/usePricing";
 import type { CreditPackRow } from "@/lib/creditPacks";
 import { useState } from "react";
 
@@ -110,6 +108,7 @@ const PublishStepVisibility = ({
   const publishAllowed = true;
   const [showCreditPurchase, setShowCreditPurchase] = useState(!editMode && !canPublishWithCredits);
   const [showMobileOptions, setShowMobileOptions] = useState(false);
+  const { prices, boostPrice } = usePricing();
   const transactionLabel =
     transaction === "vente"
       ? t("publish.sell", "Vendre")
@@ -171,12 +170,12 @@ const PublishStepVisibility = ({
                 <span className="text-muted-foreground">
                   {t("publish.costPublicationInstant", "Publication standard")}
                 </span>
-                <span>{LISTING_PUBLISH_CREDIT_COST}</span>
+                <span>{prices.publish_listing}</span>
               </div>
               {selectedBoosts.map((b) => (
                 <div key={b} className="flex justify-between">
                   <span className="text-muted-foreground">{t(`publish.boost.${b}`, BOOST_LABELS_FR[b])}</span>
-                  <span>{BOOST_CREDIT_COSTS[b]}</span>
+                  <span>{boostPrice(b)}</span>
                 </div>
               ))}
               {agencySpotlightActive && (
@@ -184,7 +183,7 @@ const PublishStepVisibility = ({
                   <span className="text-muted-foreground">
                     {t("publish.agencySpotlight", "Spotlight agence (marque)")}
                   </span>
-                  <span>{AGENCY_SPOTLIGHT_CREDIT_COST}</span>
+                  <span>{prices.agency_spotlight}</span>
                 </div>
               )}
               <div className="flex justify-between font-semibold border-t pt-2">
@@ -265,7 +264,7 @@ const PublishStepVisibility = ({
                   <span>{t(`publish.boost.${b}`, BOOST_LABELS_FR[b])}</span>
               </span>
               <span className="text-muted-foreground whitespace-nowrap">
-                {BOOST_CREDIT_COSTS[b]} cr.
+                {boostPrice(b)} cr.
               </span>
             </label>
           ))}
@@ -299,7 +298,7 @@ const PublishStepVisibility = ({
                 />
                 <span>{t("publish.agencySpotlightLabel", "Spotlight agence")}</span>
               </span>
-              <span className="text-muted-foreground">{AGENCY_SPOTLIGHT_CREDIT_COST} cr.</span>
+              <span className="text-muted-foreground">{prices.agency_spotlight} cr.</span>
             </label>
           </CardContent>
         </Card>

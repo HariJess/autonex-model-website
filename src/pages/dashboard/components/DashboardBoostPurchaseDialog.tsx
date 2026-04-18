@@ -5,14 +5,13 @@ import { Loader2, Sparkles } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  BOOST_CREDIT_COSTS,
   BOOST_DURATION_DAYS,
   BOOST_LABELS_FR,
   BOOST_ORDER,
   BOOST_VISIBILITY_FR,
-  totalBoostCredits,
   type PurchasableBoostType,
 } from "@/config/monetization";
+import { usePricing } from "@/hooks/usePricing";
 import {
   purchaseListingBoostsErrorMessage,
   purchasableBoostTypesForListing,
@@ -62,8 +61,9 @@ export function DashboardBoostPurchaseDialog({
     if (open) setSelected(new Set());
   }, [open, listing?.id]);
 
+  const { boostPrice, totalBoosts } = usePricing();
   const selectedList = useMemo(() => BOOST_ORDER.filter((k) => selected.has(k)), [selected]);
-  const total = totalBoostCredits(selectedList);
+  const total = totalBoosts(selectedList);
   const canAfford = !creditsBalancePending && creditsBalance >= total;
   const nothingSelected = selectedList.length === 0;
 
@@ -152,7 +152,7 @@ export function DashboardBoostPurchaseDialog({
                       </Label>
                       <p className="text-xs text-muted-foreground font-sans leading-snug">{BOOST_VISIBILITY_FR[k]}</p>
                       <p className="text-xs font-sans">
-                        <span className="font-medium text-foreground">{BOOST_CREDIT_COSTS[k]} crédits</span>
+                        <span className="font-medium text-foreground">{boostPrice(k)} crédits</span>
                         <span className="text-muted-foreground"> · {BOOST_DURATION_DAYS[k]} jours</span>
                       </p>
                     </div>
