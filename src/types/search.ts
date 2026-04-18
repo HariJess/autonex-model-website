@@ -1,7 +1,11 @@
 /**
- * Search / filter state for the listings search flow.
- * Serialized to URL query params (see `src/lib/searchUrl.ts` and clés `VEHICLE_SEARCH_QUERY_KEYS`).
- * Les noms de champs restent historiques (ex. `surfaceMin` = km) ; l’URL émise utilise `mileage_min` / `trim` / `doors`.
+ * État filtres recherche — **sémantique véhicule** côté frontend.
+ *
+ * Sérialisation URL : `mileage_min` / `mileage_max` / `trim` / `doors` (`searchUrl.ts`).
+ * Pont SQL PostgREST : `ListingsFilters` garde encore les noms colonnes legacy (`surface`, `rooms`, `bathrooms`) dans `listingQueryFilters.ts`.
+ * Événements analytics : colonnes table `surface_min` inchangées ; mapping dans `searchAnalytics.ts`.
+ *
+ * Hydratation depuis ancienne forme objet : `hydrateSearchFilters` dans `searchFiltersCompat.ts`.
  */
 export interface SearchFilters {
   transaction: string;
@@ -14,14 +18,12 @@ export interface SearchFilters {
   quartierLibre: string;
   priceMin: number;
   priceMax: number;
-  /** Kilométrage min (URL/historique `surface_*` — pas une surface logement). */
-  surfaceMin: number;
-  /** Kilométrage max — colonne DB encore nommée `surface` côté filtres SQL. */
-  surfaceMax: number;
-  /** Finition/version numérique — colonne DB encore nommée `rooms`. */
-  rooms: number[];
-  /** Portes — colonne DB encore nommée `bathrooms`. */
-  bathrooms: number[];
+  mileageMinKm: number;
+  mileageMaxKm: number;
+  /** Indices finition/version (colonne DB `rooms`). */
+  trimVersionIndices: number[];
+  /** Sélection nombre de portes (colonne DB `bathrooms` / `doors`). */
+  doorCounts: number[];
   equipments: string[];
   fuels: string[];
   transmissions: string[];
@@ -47,10 +49,10 @@ export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   quartierLibre: "",
   priceMin: 0,
   priceMax: 0,
-  surfaceMin: 0,
-  surfaceMax: 0,
-  rooms: [],
-  bathrooms: [],
+  mileageMinKm: 0,
+  mileageMaxKm: 0,
+  trimVersionIndices: [],
+  doorCounts: [],
   equipments: [],
   fuels: [],
   transmissions: [],

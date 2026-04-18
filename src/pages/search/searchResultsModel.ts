@@ -94,24 +94,24 @@ export function buildSearchResultsModel(params: {
       matchesPriceMaxStrict(l.price_mga, filters.priceMax),
     );
   }
-  if (filters.surfaceMin > 0) {
+  if (filters.mileageMinKm > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
-      matchesVehicleMileageMinStrict(l, filters.surfaceMin),
+      matchesVehicleMileageMinStrict(l, filters.mileageMinKm),
     );
   }
-  if (filters.surfaceMax > 0) {
+  if (filters.mileageMaxKm > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
-      matchesVehicleMileageMaxStrict(l, filters.surfaceMax),
+      matchesVehicleMileageMaxStrict(l, filters.mileageMaxKm),
     );
   }
-  if (filters.rooms.length > 0) {
+  if (filters.trimVersionIndices.length > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
-      matchesRoomsStrict(l.rooms, filters.rooms),
+      matchesRoomsStrict(l.rooms, filters.trimVersionIndices),
     );
   }
-  if (filters.bathrooms.length > 0) {
+  if (filters.doorCounts.length > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
-      matchesBathroomsStrict(l.bathrooms, filters.bathrooms),
+      matchesBathroomsStrict(l.bathrooms, filters.doorCounts),
     );
   }
 

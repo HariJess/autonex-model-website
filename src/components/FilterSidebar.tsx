@@ -30,7 +30,8 @@ import { EXTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
 
 export type { SearchFilters };
 
-const SURFACE_SLIDER_MAX = 1000;
+/** UI cap (km) for the mileage range slider high end; above → « no max » in control state. */
+const MILEAGE_KM_SLIDER_UI_CAP = 1000;
 const ENGINE_DISPLACEMENT_MAX = 8;
 const EMPTY_OPTION = "__empty__";
 
@@ -118,10 +119,10 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
     filters.types.length === 0 ||
     filters.types.some((tp) => !withoutRoomsSet.has(tp));
 
-  const surfaceSliderRight =
-    filters.surfaceMax === 0
-      ? SURFACE_SLIDER_MAX
-      : Math.min(filters.surfaceMax, SURFACE_SLIDER_MAX);
+  const mileageSliderUiRight =
+    filters.mileageMaxKm === 0
+      ? MILEAGE_KM_SLIDER_UI_CAP
+      : Math.min(filters.mileageMaxKm, MILEAGE_KM_SLIDER_UI_CAP);
 
   const typeOptions = useMemo(() => AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, []);
   const allowedListingTypes = useMemo(
@@ -354,7 +355,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </div>
           )}
 
-          <AccordionItem value="surface" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
+          <AccordionItem value="mileageKm" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
             <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.surface", "Kilométrage")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="space-y-3">
@@ -363,33 +364,33 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                 </p>
                 <Slider
                   min={0}
-                  max={SURFACE_SLIDER_MAX}
+                  max={MILEAGE_KM_SLIDER_UI_CAP}
                   step={10}
-                  value={[filters.surfaceMin, surfaceSliderRight]}
+                  value={[filters.mileageMinKm, mileageSliderUiRight]}
                   onValueChange={([min, max]) => {
                     const nextMax =
-                      max >= SURFACE_SLIDER_MAX
-                        ? filters.surfaceMax > SURFACE_SLIDER_MAX
-                          ? filters.surfaceMax
+                      max >= MILEAGE_KM_SLIDER_UI_CAP
+                        ? filters.mileageMaxKm > MILEAGE_KM_SLIDER_UI_CAP
+                          ? filters.mileageMaxKm
                           : 0
                         : max;
-                    update({ surfaceMin: min, surfaceMax: nextMax });
+                    update({ mileageMinKm: min, mileageMaxKm: nextMax });
                   }}
                 />
                 <div className="flex gap-2">
                   <Input
                     type="number"
                     min={0}
-                    value={filters.surfaceMin || ""}
-                    onChange={(e) => update({ surfaceMin: Number(e.target.value) || 0 })}
+                    value={filters.mileageMinKm || ""}
+                    onChange={(e) => update({ mileageMinKm: Number(e.target.value) || 0 })}
                     placeholder={t("search.min", "Min")}
                     className={cn("font-sans text-sm", isMobile && "min-h-12")}
                   />
                   <Input
                     type="number"
                     min={0}
-                    value={filters.surfaceMax || ""}
-                    onChange={(e) => update({ surfaceMax: Number(e.target.value) || 0 })}
+                    value={filters.mileageMaxKm || ""}
+                    onChange={(e) => update({ mileageMaxKm: Number(e.target.value) || 0 })}
                     placeholder={t("search.max", "Max")}
                     className={cn("font-sans text-sm", isMobile && "min-h-12")}
                   />
@@ -412,9 +413,11 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                       className={cn(
                         "font-sans touch-manipulation",
                         isMobile ? "min-h-11 px-4 text-sm" : "text-xs h-8 px-3",
-                        filters.rooms.includes(r.value) ? "border-primary bg-primary/10 text-primary" : "",
+                        filters.trimVersionIndices.includes(r.value) ? "border-primary bg-primary/10 text-primary" : "",
                       )}
-                      onClick={() => update({ rooms: toggleInNumArray(filters.rooms, r.value) })}
+                      onClick={() =>
+                        update({ trimVersionIndices: toggleInNumArray(filters.trimVersionIndices, r.value) })
+                      }
                     >
                       {r.label}
                     </Button>
@@ -439,9 +442,9 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
                       className={cn(
                         "font-sans touch-manipulation",
                         isMobile ? "min-h-11 min-w-[2.75rem] px-3 text-sm" : "text-xs h-8 px-3",
-                        filters.bathrooms.includes(b) ? "border-primary bg-primary/10 text-primary" : "",
+                        filters.doorCounts.includes(b) ? "border-primary bg-primary/10 text-primary" : "",
                       )}
-                      onClick={() => update({ bathrooms: toggleInNumArray(filters.bathrooms, b) })}
+                      onClick={() => update({ doorCounts: toggleInNumArray(filters.doorCounts, b) })}
                     >
                       {b}{b === 4 ? "+" : ""}
                     </Button>

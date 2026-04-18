@@ -85,8 +85,8 @@ export function parseDoorCountsFromSearchParams(sp: URLSearchParams): number[] {
 
 /** Sérialisation des champs véhicule vers des clés URL explicites (kilométrage, trim, portes). */
 export function appendVehicleSemanticQueryParams(p: URLSearchParams, f: SearchFilters): void {
-  if (f.surfaceMin) p.set(VEHICLE_SEARCH_QUERY_KEYS.mileageMin, String(f.surfaceMin));
-  if (f.surfaceMax) p.set(VEHICLE_SEARCH_QUERY_KEYS.mileageMax, String(f.surfaceMax));
-  if (f.rooms.length) p.set(VEHICLE_SEARCH_QUERY_KEYS.trim, f.rooms.join(","));
-  if (f.bathrooms.length) p.set(VEHICLE_SEARCH_QUERY_KEYS.doors, f.bathrooms.join(","));
+  if (f.mileageMinKm) p.set(VEHICLE_SEARCH_QUERY_KEYS.mileageMin, String(f.mileageMinKm));
+  if (f.mileageMaxKm) p.set(VEHICLE_SEARCH_QUERY_KEYS.mileageMax, String(f.mileageMaxKm));
+  if (f.trimVersionIndices.length) p.set(VEHICLE_SEARCH_QUERY_KEYS.trim, f.trimVersionIndices.join(","));
+  if (f.doorCounts.length) p.set(VEHICLE_SEARCH_QUERY_KEYS.doors, f.doorCounts.join(","));
 }

@@ -50,9 +50,9 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
   const allowed = new Set(listingTypesForTransaction(transaction));
   const types = sanitizeListingTypes(rawTypes).filter((t) => allowed.has(t as ListingType));
 
-  const { min: surfaceMin, max: surfaceMax } = parseMileageKmBoundsFromSearchParams(sp);
-  const rooms = parseTrimVersionIndicesFromSearchParams(sp);
-  const bathrooms = parseDoorCountsFromSearchParams(sp);
+  const { min: mileageMinKm, max: mileageMaxKm } = parseMileageKmBoundsFromSearchParams(sp);
+  const trimVersionIndices = parseTrimVersionIndicesFromSearchParams(sp);
+  const doorCounts = parseDoorCountsFromSearchParams(sp);
 
   const quartiers = parseMultiValueParam(sp, "quartiers");
   const arrondissements = parseMultiValueParam(sp, "arr");
@@ -66,10 +66,10 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     quartierLibre: sp.get("q")?.trim() ?? "",
     priceMin: parseFiniteNumber(sp.get("prix_min")),
     priceMax: parseFiniteNumber(sp.get("prix_max")),
-    surfaceMin,
-    surfaceMax,
-    rooms,
-    bathrooms,
+    mileageMinKm,
+    mileageMaxKm,
+    trimVersionIndices,
+    doorCounts,
     equipments: parseMultiValueParam(sp, "equip"),
     fuels: parseMultiValueParam(sp, "fuel"),
     transmissions: parseMultiValueParam(sp, "gear"),

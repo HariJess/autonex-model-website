@@ -129,7 +129,6 @@ const HeroSearch = () => {
       quartierLibre,
       priceMin,
       priceMax,
-      rooms: [],
       transmissions: [],
       drivetrains: [],
       conditions: [],

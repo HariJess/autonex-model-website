@@ -240,16 +240,16 @@ const SearchPage = () => {
         key: "price",
       });
     }
-    if (filters.surfaceMin || filters.surfaceMax) {
+    if (filters.mileageMinKm || filters.mileageMaxKm) {
       chips.push({
-        label: `${filters.surfaceMin || 0} - ${filters.surfaceMax ? `${filters.surfaceMax.toLocaleString("fr-FR")} km` : "∞ km"}`,
-        key: "surface",
+        label: `${filters.mileageMinKm || 0} - ${filters.mileageMaxKm ? `${filters.mileageMaxKm.toLocaleString("fr-FR")} km` : "∞ km"}`,
+        key: "mileageKm",
       });
     }
-    filters.rooms.forEach((r) =>
+    filters.trimVersionIndices.forEach((r) =>
       chips.push({ label: `${r === 0 ? t("search.trimBase", "Base") : t("search.versionN", "Version {{count}}", { count: r })}`, key: `room-${r}` })
     );
-    filters.bathrooms.forEach((b) =>
+    filters.doorCounts.forEach((b) =>
       chips.push({ label: `${b}${b === 4 ? "+" : ""} ${t("listing.bathrooms", "Portes")}`, key: `bath-${b}` })
     );
     filters.equipments.forEach((e) => chips.push({ label: e, key: `eq-${e}` }));
@@ -298,11 +298,13 @@ const SearchPage = () => {
     else if (key === "price") {
       newFilters.priceMin = 0;
       newFilters.priceMax = 0;
-    } else if (key === "surface") {
-      newFilters.surfaceMin = 0;
-      newFilters.surfaceMax = 0;
-    } else if (key.startsWith("room-")) newFilters.rooms = newFilters.rooms.filter((r) => r !== Number(key.slice(5)));
-    else if (key.startsWith("bath-")) newFilters.bathrooms = newFilters.bathrooms.filter((b) => b !== Number(key.slice(5)));
+    } else if (key === "mileageKm") {
+      newFilters.mileageMinKm = 0;
+      newFilters.mileageMaxKm = 0;
+    } else if (key.startsWith("room-"))
+      newFilters.trimVersionIndices = newFilters.trimVersionIndices.filter((r) => r !== Number(key.slice(5)));
+    else if (key.startsWith("bath-"))
+      newFilters.doorCounts = newFilters.doorCounts.filter((b) => b !== Number(key.slice(5)));
     else if (key.startsWith("eq-")) newFilters.equipments = newFilters.equipments.filter((e) => e !== key.slice(3));
     else if (key.startsWith("fuel-")) newFilters.fuels = newFilters.fuels.filter((f) => f !== key.slice(5));
     else if (key.startsWith("gear-")) newFilters.transmissions = newFilters.transmissions.filter((g) => g !== key.slice(5));
@@ -423,9 +425,9 @@ const SearchPage = () => {
     if (filters.quartiers.length > 0) count += 1;
     if (filters.quartierLibre.trim()) count += 1;
     if (filters.priceMin > 0 || filters.priceMax > 0) count += 1;
-    if (filters.surfaceMin > 0 || filters.surfaceMax > 0) count += 1;
-    if (filters.rooms.length > 0) count += 1;
-    if (filters.bathrooms.length > 0) count += 1;
+    if (filters.mileageMinKm > 0 || filters.mileageMaxKm > 0) count += 1;
+    if (filters.trimVersionIndices.length > 0) count += 1;
+    if (filters.doorCounts.length > 0) count += 1;
     if (filters.equipments.length > 0) count += 1;
     if (filters.fuels.length > 0) count += 1;
     if (filters.transmissions.length > 0) count += 1;

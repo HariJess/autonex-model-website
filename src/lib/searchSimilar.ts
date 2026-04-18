@@ -136,10 +136,10 @@ export function similarListingScore(
 
   const price = listing.price_mga;
   score -= priceTolerance(price, filters.priceMin, filters.priceMax);
-  score -= surfaceTolerance(resolveVehicleMileageKm(listing), filters.surfaceMin, filters.surfaceMax);
+  score -= surfaceTolerance(resolveVehicleMileageKm(listing), filters.mileageMinKm, filters.mileageMaxKm);
 
-  if (!roomMatch(listing.rooms, filters.rooms)) score -= 35;
-  if (!bathroomMatch(listing.bathrooms, filters.bathrooms)) score -= 20;
+  if (!roomMatch(listing.rooms, filters.trimVersionIndices)) score -= 35;
+  if (!bathroomMatch(listing.bathrooms, filters.doorCounts)) score -= 20;
 
   const created = listing.created_at ? new Date(listing.created_at).getTime() : 0;
   score += Math.min(created / 1e12, 15);

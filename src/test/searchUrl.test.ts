@@ -76,73 +76,73 @@ describe("filtersFromSearchParams", () => {
     expect(f.quartiers).toContain("Ambatobe");
   });
 
-  it("parse les chambres (rooms)", () => {
+  it("parse les chambres (legacy chambres → trimVersionIndices)", () => {
     const sp = new URLSearchParams("transaction=vente&chambres=2,3");
     const f = filtersFromSearchParams(sp);
-    expect(f.rooms).toEqual([2, 3]);
+    expect(f.trimVersionIndices).toEqual([2, 3]);
   });
 
   it("ignore les chambres invalides (négatives, texte)", () => {
     const sp = new URLSearchParams("chambres=abc,-1,2");
     const f = filtersFromSearchParams(sp);
-    expect(f.rooms).toEqual([2]);
+    expect(f.trimVersionIndices).toEqual([2]);
   });
 
-  it("parse les salles de bains", () => {
+  it("parse les salles de bains (legacy sdb → doorCounts)", () => {
     const sp = new URLSearchParams("sdb=1,2,4");
     const f = filtersFromSearchParams(sp);
-    expect(f.bathrooms).toEqual([1, 2, 4]);
+    expect(f.doorCounts).toEqual([1, 2, 4]);
   });
 
   it("accepte doors comme alias véhicule pour sdb", () => {
     const sp = new URLSearchParams("doors=3,5");
     const f = filtersFromSearchParams(sp);
-    expect(f.bathrooms).toEqual([3, 5]);
+    expect(f.doorCounts).toEqual([3, 5]);
   });
 
   it("priorise doors sur sdb si doors est présent", () => {
     const sp = new URLSearchParams("doors=2&sdb=5");
     const f = filtersFromSearchParams(sp);
-    expect(f.bathrooms).toEqual([2]);
+    expect(f.doorCounts).toEqual([2]);
   });
 
   it("exclut sdb=0 (invalide pour salle de bain)", () => {
     const sp = new URLSearchParams("sdb=0,1");
     const f = filtersFromSearchParams(sp);
-    expect(f.bathrooms).toEqual([1]);
+    expect(f.doorCounts).toEqual([1]);
   });
 
   it("accepte mileage_min/max à la place de surface_*", () => {
     const f = filtersFromSearchParams(new URLSearchParams("mileage_min=5000&mileage_max=200000"));
-    expect(f.surfaceMin).toBe(5000);
-    expect(f.surfaceMax).toBe(200000);
+    expect(f.mileageMinKm).toBe(5000);
+    expect(f.mileageMaxKm).toBe(200000);
   });
 
   it("priorise mileage_* sur surface_* lorsque les deux sont présents", () => {
     const f = filtersFromSearchParams(
       new URLSearchParams("mileage_min=100000&surface_min=1&mileage_max=300000&surface_max=999999"),
     );
-    expect(f.surfaceMin).toBe(100000);
-    expect(f.surfaceMax).toBe(300000);
+    expect(f.mileageMinKm).toBe(100000);
+    expect(f.mileageMaxKm).toBe(300000);
   });
 
-  it("parse trim comme alias pour chambres / rooms", () => {
+  it("parse trim comme alias pour chambres / trimVersionIndices", () => {
     const f = filtersFromSearchParams(new URLSearchParams("trim=2,3"));
-    expect(f.rooms).toEqual([2, 3]);
+    expect(f.trimVersionIndices).toEqual([2, 3]);
   });
 
   it("priorise trim sur chambres lorsque trim est défini", () => {
     const f = filtersFromSearchParams(new URLSearchParams("trim=2&chambres=9"));
-    expect(f.rooms).toEqual([2]);
+    expect(f.trimVersionIndices).toEqual([2]);
   });
 
   it("sérialise avec les paramètres véhicule (mileage_min, trim, doors)", () => {
     const p = filtersToSearchParams({
       ...EMPTY_SEARCH_FILTERS,
-      surfaceMin: 10000,
-      surfaceMax: 150000,
-      rooms: [1, 2],
-      bathrooms: [4, 5],
+      mileageMinKm: 10000,
+      mileageMaxKm: 150000,
+      trimVersionIndices: [1, 2],
+      doorCounts: [4, 5],
     });
     expect(p.get("mileage_min")).toBe("10000");
     expect(p.get("mileage_max")).toBe("150000");
@@ -156,16 +156,16 @@ describe("filtersFromSearchParams", () => {
     const original: SearchFilters = {
       ...EMPTY_SEARCH_FILTERS,
       transaction: "vente",
-      surfaceMin: 5,
-      surfaceMax: 60000,
-      rooms: [2],
-      bathrooms: [5],
+      mileageMinKm: 5,
+      mileageMaxKm: 60000,
+      trimVersionIndices: [2],
+      doorCounts: [5],
     };
     const restored = filtersFromSearchParams(filtersToSearchParams(original));
-    expect(restored.surfaceMin).toBe(original.surfaceMin);
-    expect(restored.surfaceMax).toBe(original.surfaceMax);
-    expect(restored.rooms).toEqual(original.rooms);
-    expect(restored.bathrooms).toEqual(original.bathrooms);
+    expect(restored.mileageMinKm).toBe(original.mileageMinKm);
+    expect(restored.mileageMaxKm).toBe(original.mileageMaxKm);
+    expect(restored.trimVersionIndices).toEqual(original.trimVersionIndices);
+    expect(restored.doorCounts).toEqual(original.doorCounts);
     expect(restored.transaction).toBe(original.transaction);
   });
 });
