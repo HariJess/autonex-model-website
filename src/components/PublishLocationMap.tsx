@@ -1,4 +1,5 @@
 import "@/lib/leafletDefaultIcon";
+import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import { useTranslation } from "react-i18next";

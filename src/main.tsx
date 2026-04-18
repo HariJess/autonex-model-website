@@ -5,7 +5,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import App from "./App.tsx";
-import "leaflet/dist/leaflet.css";
 import "./index.css";
 import "./i18n";
 

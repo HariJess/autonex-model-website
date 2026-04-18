@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -31,7 +31,6 @@ import { buildEstimationPresentation } from "@/lib/estimation/presentation";
 import { buildEstimationEventContext } from "@/lib/estimation/telemetry";
 import { loadVehicleCatalog, resolveModelBodyTypes } from "@/lib/estimation/vehicleCatalog";
 import VehicleCatalogCombobox from "@/components/estimation/VehicleCatalogCombobox";
-import EstimationResultReport from "@/components/estimation/EstimationResultReport";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
 import type { EstimationInput, EstimationRunResult } from "@/types/estimation";
 import EstimationProgressHeader from "@/pages/estimation/components/EstimationProgressHeader";
@@ -39,6 +38,8 @@ import {
   getCurrentEstimationStepIndex,
   getVehicleStepErrors,
 } from "@/pages/estimation/estimationPageModel";
+
+const EstimationResultReport = lazy(() => import("@/components/estimation/EstimationResultReport"));
 
 const ESTIMATION_DRAFT_KEY = "autonex:estimation:draft:v1";
 const currentYear = new Date().getFullYear();
@@ -760,26 +761,35 @@ const VehicleEstimationPage = () => {
         {screen === "result" && result && presentation && (
           <>
             <section aria-label={t("estimation.resultSectionAria", "Résultat d'estimation véhicule")} className="space-y-3">
-              <EstimationResultReport
-                result={result}
-                presentation={presentation}
-                onPublish={() => void publishFromEstimation()}
-                onRefine={() => {
-                void trackEstimationEvent(result.requestId, result.submissionSecret, "clicked_refine_estimation", result.outputV2);
-                  setScreen("vehicle");
-                }}
-              onCompare={() => {
-                void trackEstimationEvent(result.requestId, result.submissionSecret, "clicked_compare_after_estimation", result.outputV2);
-                navigate("/recherche");
-              }}
-                onRestart={() => {
-                  setResult(null);
-                  setScreen("vehicle");
-                }}
-                onViewComparable={(listingId) =>
-                void trackEstimationEvent(result.requestId, result.submissionSecret, "viewed_similar_listings", result.outputV2, { listingId })
+              <Suspense
+                fallback={
+                  <div className="rounded-2xl border border-border bg-card p-10 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
+                    <p className="text-sm font-sans text-center">{t("states.pleaseWait", "Please wait")}</p>
+                  </div>
                 }
-              />
+              >
+                <EstimationResultReport
+                  result={result}
+                  presentation={presentation}
+                  onPublish={() => void publishFromEstimation()}
+                  onRefine={() => {
+                  void trackEstimationEvent(result.requestId, result.submissionSecret, "clicked_refine_estimation", result.outputV2);
+                    setScreen("vehicle");
+                  }}
+                onCompare={() => {
+                  void trackEstimationEvent(result.requestId, result.submissionSecret, "clicked_compare_after_estimation", result.outputV2);
+                  navigate("/recherche");
+                }}
+                  onRestart={() => {
+                    setResult(null);
+                    setScreen("vehicle");
+                  }}
+                  onViewComparable={(listingId) =>
+                  void trackEstimationEvent(result.requestId, result.submissionSecret, "viewed_similar_listings", result.outputV2, { listingId })
+                  }
+                />
+              </Suspense>
             </section>
             <div className="rounded-xl border border-border/80 bg-secondary/15 p-4 text-xs font-sans leading-relaxed text-muted-foreground" role="note" aria-label={t("estimation.usageFrameAria", "Cadre d'usage de l'estimation")}>
               {t("estimation.usageFrameText", "Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle, ni une expertise mécanique, ni un prix garanti.")}

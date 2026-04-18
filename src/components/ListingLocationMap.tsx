@@ -1,4 +1,5 @@
 import "@/lib/leafletDefaultIcon";
+import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useTranslation } from "react-i18next";
 import { MapPin } from "lucide-react";

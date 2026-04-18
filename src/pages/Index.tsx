@@ -327,6 +327,7 @@ const Index = () => {
                     src={shortcut.iconSrc}
                     alt=""
                     loading="lazy"
+                    decoding="async"
                     className="h-9 md:h-10 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
                     onError={(event) => {
                       const target = event.currentTarget;
@@ -372,6 +373,7 @@ const Index = () => {
                     src={brand.logoAsset}
                     alt={`Logo ${brand.label}`}
                     loading="lazy"
+                    decoding="async"
                     className={cn(
                       "h-[3.1rem] md:h-[3.35rem] w-auto max-w-[168px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity",
                       brand.logoClassName,
