@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 
 export function ListingDetailLoading() {
   const { t } = useTranslation();
@@ -13,13 +13,13 @@ export function ListingDetailLoading() {
       <Header />
       <div className="container mx-auto px-4 py-10">
         <PremiumStatePanel
-          overline={t("listing.stateLoadingOverline", "Annonce AutoNex")}
-          title={t("listing.stateLoadingTitle", "Chargement de l’annonce")}
+          overline={t("listing.stateLoadingOverline", "AutoNex listing")}
+          title={t("listing.stateLoadingTitle", "Opening this listing")}
           description={t(
             "listing.stateLoadingDesc",
-            "Nous préparons les informations du véhicule et les options de contact.",
+            "We are loading vehicle details and contact options.",
           )}
-          icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+          icon={<Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />}
         />
       </div>
       <Footer />
@@ -27,7 +27,11 @@ export function ListingDetailLoading() {
   );
 }
 
-export function ListingDetailFetchError() {
+type ListingDetailFetchErrorProps = {
+  onRetry?: () => void;
+};
+
+export function ListingDetailFetchError({ onRetry }: ListingDetailFetchErrorProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
@@ -35,17 +39,33 @@ export function ListingDetailFetchError() {
       <Header />
       <div className="container mx-auto px-4 py-10">
         <PremiumStatePanel
-          overline={t("listing.stateErrorOverline", "Statut annonce")}
-          title={t("common.error")}
+          overline={t("listing.stateErrorOverline", "Listing")}
+          title={t("listing.fetchErrorTitle", "Could not load this listing")}
           description={t(
             "listing.runtimeUnavailable",
-            "Cette annonce est momentanément indisponible. Revenez dans quelques instants ou retournez à la recherche.",
+            "This listing is temporarily unavailable. Try again in a moment or return to search.",
           )}
-          icon={<AlertCircle className="h-6 w-6 text-destructive" />}
+          icon={<AlertCircle className="h-6 w-6 text-destructive" aria-hidden />}
           action={
-            <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">
-              {t("common.back", "Retour")}
-            </Button>
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+              {onRetry ? (
+                <Button
+                  variant="default"
+                  className="gradient-primary border-0 font-sans"
+                  style={{ color: "#FAFAFA" }}
+                  onClick={onRetry}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" aria-hidden />
+                  {t("states.retry")}
+                </Button>
+              ) : null}
+              <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">
+                {t("common.back", "Back")}
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/recherche")} className="font-sans">
+                {t("listing.viewSearch", "Go to search")}
+              </Button>
+            </div>
           }
         />
       </div>
@@ -62,24 +82,24 @@ export function ListingDetailNotFound() {
       <Header />
       <div className="container mx-auto px-4 py-10">
         <PremiumStatePanel
-          overline={t("listing.stateNotFoundOverline", "Catalogue AutoNex")}
-          title={t("listing.notFound", "Annonce introuvable")}
+          overline={t("listing.stateNotFoundOverline", "AutoNex catalogue")}
+          title={t("listing.notFound", "Listing not found")}
           description={t(
             "listing.notFoundDesc",
-            "Cette annonce n'est plus disponible. Retournez à la recherche pour consulter des alternatives.",
+            "This listing is no longer available. Head back to search to explore other vehicles.",
           )}
-          icon={<AlertCircle className="h-6 w-6 text-muted-foreground" />}
+          icon={<AlertCircle className="h-6 w-6 text-muted-foreground" aria-hidden />}
           action={
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
               <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">
-                {t("common.back", "Retour")}
+                {t("common.back", "Back")}
               </Button>
               <Button
                 onClick={() => navigate("/recherche")}
                 className="gradient-primary border-0 font-sans"
                 style={{ color: "#FAFAFA" }}
               >
-                {t("listing.viewAll", "Voir toutes les annonces")}
+                {t("listing.viewAll", "Browse listings")}
               </Button>
             </div>
           }

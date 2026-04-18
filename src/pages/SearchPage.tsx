@@ -660,7 +660,7 @@ const SearchPage = () => {
               />
             )}
 
-            {isLoading && <SearchLoadingState loadingLabel={t("common.loading", "Chargement")} />}
+            {isLoading && <SearchLoadingState />}
 
             {showResults && viewMode === "map" && (
               <section className="space-y-3">

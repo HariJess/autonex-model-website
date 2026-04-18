@@ -9,7 +9,7 @@ import { getSearchSessionId } from "@/lib/searchSession";
 export function useListingDetailPageData(listingId: string | undefined) {
   const viewIncremented = useRef<string | null>(null);
 
-  const { data: listing, isLoading, error: fetchError } = useListing(listingId);
+  const { data: listing, isLoading, error: fetchError, refetch } = useListing(listingId);
 
   useEffect(() => {
     if (listing?.id && viewIncremented.current !== listing.id) {
@@ -38,6 +38,7 @@ export function useListingDetailPageData(listingId: string | undefined) {
     listing,
     isLoading,
     fetchError,
+    refetch,
     filteredSimilar,
   };
 }

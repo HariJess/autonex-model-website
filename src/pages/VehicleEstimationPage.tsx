@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, ChevronRight, Gauge, Loader2, Sparkles, Target, TrendingUp } from "lucide-react";
+import { AlertCircle, ArrowRight, ChevronRight, Gauge, Loader2, RefreshCw, Sparkles, Target, TrendingUp } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
@@ -144,6 +144,8 @@ const VehicleEstimationPage = () => {
   const {
     data: catalogPayload,
     isLoading: catalogLoading,
+    isFetching: catalogFetching,
+    refetch: refetchCatalog,
   } = useQuery({
     queryKey: ["estimation-vehicle-catalog"],
     queryFn: loadVehicleCatalog,
@@ -474,10 +476,27 @@ const VehicleEstimationPage = () => {
                     {!catalogLoading && makeOptions.length === 0 && (
                       <div className="md:col-span-2">
                         <PremiumStatePanel
-                          overline={t("estimation.catalogOverline", "Catalogue estimation")}
-                          title={t("estimation.catalogUnavailableTitle", "Références véhicules indisponibles")}
-                          description={t("estimation.catalogUnavailableDesc", "Le catalogue est momentanément indisponible. Relancez l’estimation dans quelques instants.")}
+                          overline={t("estimation.catalogOverline")}
+                          title={t("estimation.catalogUnavailableTitle")}
+                          description={t("estimation.catalogUnavailableDesc")}
+                          icon={<AlertCircle className="h-6 w-6 text-destructive" aria-hidden />}
                           className="py-6"
+                          action={
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="rounded-xl font-sans"
+                              disabled={catalogFetching}
+                              onClick={() => void refetchCatalog()}
+                            >
+                              {catalogFetching ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden />
+                              ) : (
+                                <RefreshCw className="h-4 w-4 mr-2" aria-hidden />
+                              )}
+                              {t("estimation.catalogRetry")}
+                            </Button>
+                          }
                         />
                       </div>
                     )}

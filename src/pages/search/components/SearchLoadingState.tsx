@@ -1,24 +1,26 @@
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
 
-type SearchLoadingStateProps = {
-  loadingLabel: string;
-};
-
-export function SearchLoadingState({ loadingLabel }: SearchLoadingStateProps) {
+export function SearchLoadingState() {
+  const { t } = useTranslation();
+  const loadingDesc = t(
+    "search.loadingDesc",
+    "We apply your filters and prepare the most recent matching listings.",
+  );
   return (
     <div className="space-y-4 py-4">
       <PremiumStatePanel
-        overline="Recherche AutoNex"
-        title="Analyse du marché en cours"
-        description={loadingLabel}
+        overline={t("search.loadingOverline", "AutoNex search")}
+        title={t("search.loadingTitle", "Searching the marketplace")}
+        description={loadingDesc}
         icon={<Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />}
         className="py-8 md:py-9"
         role="status"
         ariaLive="polite"
       />
       <PremiumStateSkeletonGrid count={6} />
-      <span className="sr-only">{loadingLabel}</span>
+      <span className="sr-only">{loadingDesc}</span>
     </div>
   );
 }

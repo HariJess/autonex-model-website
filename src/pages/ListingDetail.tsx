@@ -67,7 +67,7 @@ const ListingDetail = () => {
   const [showAllSpecsMobile, setShowAllSpecsMobile] = useState(false);
   const [showAllFeaturesMobile, setShowAllFeaturesMobile] = useState(false);
 
-  const { listing, isLoading, fetchError, filteredSimilar } = useListingDetailPageData(id);
+  const { listing, isLoading, fetchError, refetch, filteredSimilar } = useListingDetailPageData(id);
 
   const contact = useListingDetailContact({
     listing,
@@ -106,7 +106,7 @@ const ListingDetail = () => {
   }
 
   if (fetchError && !listing) {
-    return <ListingDetailFetchError />;
+    return <ListingDetailFetchError onRetry={() => void refetch()} />;
   }
 
   if (!listing || !vm) {
