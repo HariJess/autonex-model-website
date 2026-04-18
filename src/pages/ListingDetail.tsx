@@ -70,7 +70,7 @@ const ListingDetail = () => {
   const { listing, isLoading, fetchError, refetch, filteredSimilar } = useListingDetailPageData(id);
 
   const contact = useListingDetailContact({
-    listing,
+    listing: listing ?? undefined,
     user,
     isAdmin,
     navigate,

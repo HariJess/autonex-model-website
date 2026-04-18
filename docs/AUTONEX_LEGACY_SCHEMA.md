@@ -24,8 +24,15 @@ Ce document résume la dette **connue et assumée** après une passe code (sans 
 | `immonex_currency` | `autonex_currency` | Idem (`CurrencyContext.tsx`) |
 | `immonex_analytics_session_id` | `autonex_analytics_session_id` | Idem (`searchSession.ts`) |
 
-## Suite recommandée (hors passe actuelle)
+## Étape 2 (code — pas de migration DB)
+
+- **`src/lib/legacyListingVehicleMapping.ts`** : couche unique pour la **lecture** kilométrage / portes / sièges / finition depuis les colonnes legacy et depuis `listing.vehicle`, utilisée par `vehiclePresentation.ts`, `vehicleCanonical.ts`, et les helpers publication (`publishDraft.ts`).
+- **`getCanonicalVehicleAttributes`** : les portes et sièges utilisent désormais les **mêmes replis** que l’affichage (`bathrooms`, `toilets`) lorsque `vehicle.doors` / `vehicle.seats` sont absents — alignement avec les miroirs DB sans changer les écritures.
+- **`SearchFilters`** : JSDoc sur `surfaceMin`/`surfaceMax`/`rooms`/`bathrooms` pour limiter la confusion dans la recherche.
+
+### Suite recommandée (étape 3+)
 
 1. Migration SQL **optionnelle** : vues ou colonnes générées (`mileage_km`, `doors_count`) alimentées depuis les colonnes actuelles pour lecture API plus claire.
 2. Renommage **`immonex_is_admin`** → fonction neutre (`autonex_is_staff` ou équivalent) **après** recherche exhaustive dans les migrations et policies.
 3. Réduction progressive des fallbacks dans `vehiclePresentation` lorsque `listing.vehicle` est garanti rempli pour toutes les annonces actives.
+4. Renommage **optionnel** des champs `SearchFilters` (`surfaceMin` → `mileageMin`, etc.) derrière une couche d’alias URL pour ne pas casser les liens indexés.

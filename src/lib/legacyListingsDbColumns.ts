@@ -5,7 +5,7 @@
  * Ne pas « corriger » massivement le schéma ici : toute migration SQL doit être planifiée à part.
  *
  * @see `buildLegacyMirrorFieldsFromVehicle` dans `vehicleCanonical.ts`
- * @see `getVehicleMileageValue` / `getVehicleDoorsValue` dans `vehiclePresentation.ts`
+ * @see `legacyListingVehicleMapping.ts` — lecture centralisée legacy → véhicule
  */
 export const LEGACY_LISTINGS_COLUMN_SEMANTICS = {
   /** Kilométrage (km), pas une surface en m². */

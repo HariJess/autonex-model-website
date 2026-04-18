@@ -1,8 +1,13 @@
 /**
  * Affichage carte annonce — préfère `listing.vehicle` lorsque présent ; sinon repli vers les colonnes DB
  * encore nommées comme à l’époque immobilière (`surface`, `rooms`, `bathrooms`).
- * Voir `legacyListingsDbColumns.ts` pour la carte sémantique des colonnes.
+ * La lecture détaillée est centralisée dans `legacyListingVehicleMapping.ts`.
  */
+import {
+  doorsLooseFromDisplayListing,
+  mileageKmLooseFromDisplayListing,
+  trimVersionNumericLooseFromDisplayListing,
+} from "@/lib/legacyListingVehicleMapping";
 import type { DisplayListing } from "@/types/listing";
 
 export function formatVehicleMileage(value: number | null | undefined): string | null {
@@ -39,15 +44,15 @@ export function getVehicleHeadline(listing: DisplayListing): string {
 
 /** Kilométrage : JSON `vehicle` puis colonne legacy `surface` (= km). */
 export function getVehicleMileageValue(listing: DisplayListing): number | null {
-  return listing.vehicle?.mileageKm ?? listing.surface ?? null;
+  return mileageKmLooseFromDisplayListing(listing);
 }
 
 /** Portes : JSON `vehicle` puis colonne legacy `bathrooms`. */
 export function getVehicleDoorsValue(listing: DisplayListing): number | null {
-  return listing.vehicle?.doors ?? listing.bathrooms ?? null;
+  return doorsLooseFromDisplayListing(listing);
 }
 
 /** Version / finition : colonne legacy `rooms` (numérique). */
 export function getVehicleVersionValue(listing: DisplayListing): number | null {
-  return listing.rooms ?? null;
+  return trimVersionNumericLooseFromDisplayListing(listing);
 }

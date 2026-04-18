@@ -13,9 +13,13 @@ export interface SearchFilters {
   quartierLibre: string;
   priceMin: number;
   priceMax: number;
+  /** Kilométrage min (URL/historique `surface_*` — pas une surface logement). */
   surfaceMin: number;
+  /** Kilométrage max — colonne DB encore nommée `surface` côté filtres SQL. */
   surfaceMax: number;
+  /** Finition/version numérique — colonne DB encore nommée `rooms`. */
   rooms: number[];
+  /** Portes — colonne DB encore nommée `bathrooms`. */
   bathrooms: number[];
   equipments: string[];
   fuels: string[];

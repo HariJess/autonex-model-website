@@ -2,6 +2,7 @@ import type { ListingsFilters } from "@/lib/listingQueryFilters";
 import { SEARCH_RELAXED_DB_ROW_CAP } from "@/config/searchListings";
 import type { SearchFilters } from "@/types/search";
 
+/** Mappe les clés `SearchFilters` vers les noms SQL encore legacy (`surface`, `rooms`, `bathrooms`). */
 function coreListingFiltersFromSearch(filters: SearchFilters): Omit<
   ListingsFilters,
   "searchRelaxation" | "limit" | "offset" | "arrondissements" | "quartiers"

@@ -8,6 +8,10 @@ import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
 import { buildLegacyMirrorFieldsFromVehicle } from "@/lib/vehicleCanonical";
 import {
+  mileageKmFormStringFromListingRow,
+  parseMileageKmFromPublishFormLegacySurfaceField,
+} from "@/lib/legacyListingVehicleMapping";
+import {
   AUTONEX_STORAGE_KEYS,
   LEGACY_IMMONEX_STORAGE_KEYS,
   publishDraftStorageKey,
@@ -280,13 +284,6 @@ function showRoomsForType(listingType: ListingType | ""): boolean {
   return listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
 }
 
-function parseVehicleMileageKmFromLegacySurfaceInput(
-  surfaceInput: string,
-  normalizeInt: (value: string, min: number, max?: number) => number | null,
-): number | null {
-  return normalizeInt(surfaceInput, 0);
-}
-
 /** Map wizard form to a listings UPDATE payload (draft or final). */
 export function formToListingUpdate(input: {
   transaction: TransactionType | "";
@@ -383,7 +380,7 @@ export function formToListingUpdate(input: {
   const titleOut =
     titleTrim.length > 0 ? titleTrim.slice(0, 120) : PUBLISH_DRAFT_TITLE_PLACEHOLDER;
   const currentYear = new Date().getFullYear() + 1;
-  const mileageKm = parseVehicleMileageKmFromLegacySurfaceInput(input.surface, normalizeInt);
+  const mileageKm = parseMileageKmFromPublishFormLegacySurfaceField(input.surface, normalizeInt);
   const versionOrTrim = normalizeInt(input.rooms, 0);
   const doorsLegacy = normalizeInt(input.bathrooms, 0);
   const seats = normalizeInt(input.toilets, 0);
@@ -622,7 +619,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
     title: row.title === PUBLISH_DRAFT_TITLE_PLACEHOLDER ? "" : row.title,
     description: row.description ?? "",
     priceMga: row.price_mga != null ? String(row.price_mga) : "",
-    surface: row.mileage_km != null ? String(row.mileage_km) : row.surface != null ? String(row.surface) : "",
+    surface: mileageKmFormStringFromListingRow(row),
     rooms: row.rooms != null ? String(row.rooms) : "",
     bathrooms: row.bathrooms != null ? String(row.bathrooms) : "",
     toilets: row.toilets != null ? String(row.toilets) : "",
@@ -821,7 +818,7 @@ export function buildListingMaterialSnapshotFromForm(
     if (typeof max === "number" && intVal > max) return null;
     return intVal;
   };
-  const mileageKm = parseVehicleMileageKmFromLegacySurfaceInput(input.surface, normalizeInt);
+  const mileageKm = parseMileageKmFromPublishFormLegacySurfaceField(input.surface, normalizeInt);
   const legacyMirrorFields = buildLegacyMirrorFieldsFromVehicle({
     mileageKm,
     trimOrVersion: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,

@@ -57,6 +57,7 @@ export const TRANSACTION_LABELS: Record<TransactionType, string> = {
 /**
  * Canonical vehicle-native business attributes used by the product.
  * DB legacy mirrors (`surface`, `rooms`, `bathrooms`, `toilets`) remain temporary compatibility fields.
+ * @see `legacyListingVehicleMapping.ts` for read/mapping rules.
  */
 export type CanonicalVehicleInfo = {
   make: string | null;

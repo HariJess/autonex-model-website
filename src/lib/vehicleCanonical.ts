@@ -1,4 +1,9 @@
 import type { TablesUpdate } from "@/integrations/supabase/types";
+import {
+  doorsCanonicalFromDisplayListing,
+  mileageKmCanonicalFromDisplayListing,
+  seatsCanonicalFromDisplayListing,
+} from "@/lib/legacyListingVehicleMapping";
 import type { CanonicalVehicleInfo, DisplayListing } from "@/types/listing";
 
 export type CanonicalVehicleAttributes = CanonicalVehicleInfo & {
@@ -22,22 +27,19 @@ function textOrNull(value: string | null | undefined): string | null {
 
 export function getCanonicalVehicleAttributes(listing: DisplayListing): CanonicalVehicleAttributes {
   const v = listing.vehicle;
-  const mileageKmFromVehicle = nonNegativeNumberOrNull(v?.mileageKm);
-  const legacySurfaceFallbackKm = nonNegativeNumberOrNull(listing.surface);
-  const canonicalMileageKm = mileageKmFromVehicle ?? legacySurfaceFallbackKm;
 
   return {
     make: textOrNull(v?.make),
     model: textOrNull(v?.model),
     trimOrVersion: listing.rooms != null ? String(listing.rooms) : null,
     year: nonNegativeNumberOrNull(v?.year),
-    mileageKm: canonicalMileageKm,
+    mileageKm: mileageKmCanonicalFromDisplayListing(listing),
     fuel: textOrNull(v?.fuel),
     transmission: textOrNull(v?.transmission),
     bodyStyle: textOrNull(v?.bodyStyle),
     drivetrain: textOrNull(v?.drivetrain),
-    doors: nonNegativeNumberOrNull(v?.doors),
-    seats: nonNegativeNumberOrNull(v?.seats),
+    doors: doorsCanonicalFromDisplayListing(listing),
+    seats: seatsCanonicalFromDisplayListing(listing),
     engineDisplacementL: nonNegativeNumberOrNull(v?.engineDisplacementL),
     exteriorColor: textOrNull(v?.exteriorColor),
     interiorColor: textOrNull(v?.interiorColor),
