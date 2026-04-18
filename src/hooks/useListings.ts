@@ -238,15 +238,29 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
   if (error) throw new Error(`Erreur de chargement: ${error.message}`);
   if (!listing || !isListingRowLite(listing)) return null;
 
-  const { data: photos } = await supabase
-    .from("listing_photos")
-    .select("url, position")
-    .eq("listing_id", listing.id)
-    .order("position", { ascending: true });
+  const endsAfter = new Date().toISOString();
+  const [
+    photosRes,
+    profileRes,
+    boostsRes,
+    whatsappRes,
+  ] = await Promise.all([
+    supabase
+      .from("listing_photos")
+      .select("url, position")
+      .eq("listing_id", listing.id)
+      .order("position", { ascending: true }),
+    supabase.rpc("get_profile_for_listing_display", {
+      p_owner_id: listing.owner_id,
+    }),
+    supabase.from("boosts").select("type").eq("listing_id", listing.id).gte("ends_at", endsAfter),
+    supabase.rpc("listing_has_whatsapp_contact", {
+      p_listing_id: listing.id,
+    }),
+  ]);
 
-  const { data: profileRow, error: profileRpcError } = await supabase.rpc("get_profile_for_listing_display", {
-    p_owner_id: listing.owner_id,
-  });
+  const { data: photos } = photosRes;
+  const { data: profileRow, error: profileRpcError } = profileRes;
   if (profileRpcError) {
     throw new Error(`Profil: ${profileRpcError.message}`);
   }
@@ -263,19 +277,12 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
   }
 
   let badge: DisplayListing["badge"] = null;
-  const { data: boosts } = await supabase
-    .from("boosts")
-    .select("type")
-    .eq("listing_id", listing.id)
-    .gte("ends_at", new Date().toISOString());
-  const boostTypes = new Set((boosts ?? []).map((b) => b.type));
+  const boostTypes = new Set((boostsRes.data ?? []).map((b) => b.type));
   if (boostTypes.has("top")) badge = "boost";
   else if (boostTypes.has("featured")) badge = "coup_de_coeur";
   else if (boostTypes.has("urgent")) badge = "urgent";
 
-  const { data: hasWhatsappRaw, error: hasWhatsappErr } = await supabase.rpc("listing_has_whatsapp_contact", {
-    p_listing_id: listing.id,
-  });
+  const { data: hasWhatsappRaw, error: hasWhatsappErr } = whatsappRes;
 
   return mapListingRowToDisplayListing(listing, {
     images: photos?.map((p) => p.url) ?? [],
@@ -409,15 +416,176 @@ function badgeForTypes(types: Set<string>): DisplayListing["badge"] {
   return null;
 }
 
+/** Chain methods used by listing filters — shared by full row select and `{ count: 'exact', head: true }` queries */
+type FilterableListingQuery = {
+  eq(column: string, value: unknown): FilterableListingQuery;
+  gte(column: string, value: unknown): FilterableListingQuery;
+  lte(column: string, value: unknown): FilterableListingQuery;
+  or(filters: string): FilterableListingQuery;
+  in(column: string, values: readonly unknown[]): FilterableListingQuery;
+  ilike(column: string, pattern: string): FilterableListingQuery;
+};
+
+function applyListingFilters(query: FilterableListingQuery, filters: ListingsFilters): FilterableListingQuery {
+  const idsOnly = filters.listingIds && filters.listingIds.length > 0;
+  const relaxed = filters.searchRelaxation === true;
+
+  if (idsOnly) {
+    return query.in("id", filters.listingIds!);
+  }
+
+  let q = query;
+  const resolvedVehicleTypeFilters = resolveVehicleTypeFilters(filters.vehicleTypes ?? []);
+  const mergedTypes = Array.from(new Set([...(filters.types ?? []), ...resolvedVehicleTypeFilters.listingTypes]));
+  const mergedFuels = Array.from(new Set([...(filters.fuels ?? []), ...resolvedVehicleTypeFilters.fuels]));
+  if (filters.transaction) {
+    q = q.eq("transaction", filters.transaction as TransactionType);
+  }
+  if (mergedTypes.length > 0) {
+    q = q.in("type", mergedTypes as ListingType[]);
+  }
+  if (filters.ville) {
+    q = q.eq("ville", filters.ville);
+  }
+  const ft = filters.freeText?.trim();
+  if (ft) {
+    const safe = sanitizeIlikeTerm(ft);
+    if (safe.length >= 1) {
+      const p = `%${safe}%`;
+      q = q.or(
+        `title.ilike.${p},description.ilike.${p},make.ilike.${p},model.ilike.${p},fuel.ilike.${p},body_style.ilike.${p},quartier.ilike.${p},quartier_libre.ilike.${p},region.ilike.${p},ville.ilike.${p}`,
+      );
+    }
+  }
+  if (filters.ownerIds && filters.ownerIds.length > 0) {
+    q = q.in("owner_id", filters.ownerIds);
+  }
+  if (filters.priceMin) {
+    q = q.gte("price_mga", filters.priceMin);
+  }
+  if (filters.priceMax) {
+    const cap = relaxed ? Math.ceil(filters.priceMax * CLOSE_MATCH_PRICE_FACTOR) : filters.priceMax;
+    q = q.lte("price_mga", cap);
+  }
+  if (filters.rooms && filters.rooms.length > 0) {
+    if (relaxed) {
+      const expanded = expandRoomsForRelaxedQuery(filters.rooms);
+      const under5 = [...new Set(expanded.filter((r) => r < 5))].sort((a, b) => a - b);
+      const hasGte5 = expanded.some((r) => r >= 5);
+      if (hasGte5 && under5.length > 0) {
+        q = q.or(`rooms.in.(${under5.join(",")}),rooms.gte.5`);
+      } else if (hasGte5) {
+        q = q.gte("rooms", 4);
+      } else {
+        q = q.in("rooms", under5);
+      }
+    } else {
+      const hasHighEnd = filters.rooms.includes(5);
+      if (hasHighEnd) {
+        const otherRooms = filters.rooms.filter((r) => r < 5);
+        if (otherRooms.length > 0) {
+          q = q.or(`rooms.in.(${otherRooms.join(",")}),rooms.gte.5`);
+        } else {
+          q = q.gte("rooms", 5);
+        }
+      } else {
+        q = q.in("rooms", filters.rooms);
+      }
+    }
+  }
+  if (filters.bathrooms && filters.bathrooms.length > 0) {
+    if (relaxed) {
+      const expanded = expandBathroomsForRelaxedQuery(filters.bathrooms);
+      const under4 = [...new Set(expanded.filter((b) => b < 4))].sort((a, b) => a - b);
+      const hasGte4 = expanded.some((b) => b >= 4);
+      if (hasGte4 && under4.length > 0) {
+        q = q.or(
+          `doors.in.(${under4.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${under4.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
+        );
+      } else if (hasGte4) {
+        q = q.or("doors.gte.3,and(doors.is.null,bathrooms.gte.3)");
+      } else {
+        q = q.or(`doors.in.(${under4.join(",")}),and(doors.is.null,bathrooms.in.(${under4.join(",")}))`);
+      }
+    } else {
+      const hasPlus = filters.bathrooms.includes(4);
+      const others = filters.bathrooms.filter((b) => b < 4);
+      if (hasPlus && others.length > 0) {
+        q = q.or(
+          `doors.in.(${others.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${others.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
+        );
+      } else if (hasPlus) {
+        q = q.or("doors.gte.4,and(doors.is.null,bathrooms.gte.4)");
+      } else {
+        q = q.or(`doors.in.(${others.join(",")}),and(doors.is.null,bathrooms.in.(${others.join(",")}))`);
+      }
+    }
+  }
+  if (filters.surfaceMin) {
+    const sm = relaxed ? Math.max(0, Math.floor(filters.surfaceMin * 0.88)) : filters.surfaceMin;
+    q = q.or(`mileage_km.gte.${sm},and(mileage_km.is.null,surface.gte.${sm})`);
+  }
+  if (filters.surfaceMax && filters.surfaceMax > 0) {
+    const cap = relaxed ? Math.ceil(filters.surfaceMax * CLOSE_MATCH_SURFACE_MAX_FACTOR) : filters.surfaceMax;
+    q = q.or(`mileage_km.lte.${cap},and(mileage_km.is.null,surface.lte.${cap})`);
+  }
+  if (filters.brands && filters.brands.length > 0) {
+    q = q.in("make", filters.brands);
+  }
+  if (filters.modelQuery && filters.modelQuery.trim()) {
+    const safe = sanitizeIlikeTerm(filters.modelQuery);
+    if (safe) q = q.ilike("model", `%${safe}%`);
+  }
+  if (filters.yearMin && filters.yearMin > 0) {
+    q = q.gte("year", filters.yearMin);
+  }
+  if (filters.yearMax && filters.yearMax > 0) {
+    q = q.lte("year", filters.yearMax);
+  }
+  if (mergedFuels.length > 0) {
+    q = q.in("fuel", mergedFuels);
+  }
+  if (filters.transmissions && filters.transmissions.length > 0) {
+    q = q.in("transmission_gearbox", filters.transmissions);
+  }
+  if (filters.drivetrains && filters.drivetrains.length > 0) {
+    q = q.in("drivetrain", filters.drivetrains);
+  }
+  if (filters.conditions && filters.conditions.length > 0) {
+    q = q.in("vehicle_condition", filters.conditions);
+  }
+  if (filters.sellerTypes && filters.sellerTypes.length > 0) {
+    q = q.in("seller_type", filters.sellerTypes);
+  }
+  if (filters.exteriorColor) {
+    q = q.eq("exterior_color", filters.exteriorColor);
+  }
+  if (filters.engineDisplacementMin && filters.engineDisplacementMin > 0) {
+    q = q.gte("engine_displacement_l", filters.engineDisplacementMin);
+  }
+  if (filters.engineDisplacementMax && filters.engineDisplacementMax > 0) {
+    q = q.lte("engine_displacement_l", filters.engineDisplacementMax);
+  }
+
+  return q;
+}
+
 async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promise<DisplayListing[]> {
   if (listings.length === 0) return [];
 
   const listingIds = listings.map((l) => l.id);
-  const { data: allPhotos } = await supabase
-    .from("listing_photos")
-    .select("listing_id, url, position")
-    .in("listing_id", listingIds)
-    .order("position", { ascending: true });
+  const [{ data: allPhotos }, { data: allBoosts }] = await Promise.all([
+    supabase
+      .from("listing_photos")
+      .select("listing_id, url, position")
+      .in("listing_id", listingIds)
+      .order("position", { ascending: true }),
+    supabase
+      .from("boosts")
+      .select("listing_id, type, starts_at")
+      .in("listing_id", listingIds)
+      .gte("ends_at", new Date().toISOString()),
+  ]);
 
   const photosByListing = new Map<string, string[]>();
   allPhotos?.forEach((p) => {
@@ -425,12 +593,6 @@ async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promis
     arr.push(p.url);
     photosByListing.set(p.listing_id, arr);
   });
-
-  const { data: allBoosts } = await supabase
-    .from("boosts")
-    .select("listing_id, type, starts_at")
-    .in("listing_id", listingIds)
-    .gte("ends_at", new Date().toISOString());
 
   const typesByListing = new Map<string, Set<string>>();
   const dailyBumpStarts = new Map<string, number>();
@@ -462,158 +624,14 @@ export function useDbListings(filters: ListingsFilters = {}) {
     queryFn: async (): Promise<DisplayListing[]> => {
       if (filters.limit === 0) return [];
 
-      let query = supabase
+      const baseQuery = supabase
         .from("listings")
         .select(LISTING_SELECT_COLUMNS)
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
-      const idsOnly = filters.listingIds && filters.listingIds.length > 0;
-      const relaxed = filters.searchRelaxation === true;
+      let query = applyListingFilters(baseQuery as unknown as FilterableListingQuery, filters) as typeof baseQuery;
 
-      if (idsOnly) {
-        query = query.in("id", filters.listingIds!);
-      } else {
-        const resolvedVehicleTypeFilters = resolveVehicleTypeFilters(filters.vehicleTypes ?? []);
-        const mergedTypes = Array.from(new Set([...(filters.types ?? []), ...resolvedVehicleTypeFilters.listingTypes]));
-        const mergedFuels = Array.from(new Set([...(filters.fuels ?? []), ...resolvedVehicleTypeFilters.fuels]));
-        if (filters.transaction) {
-          query = query.eq("transaction", filters.transaction as TransactionType);
-        }
-        if (mergedTypes.length > 0) {
-          query = query.in("type", mergedTypes as ListingType[]);
-        }
-        if (filters.ville) {
-          query = query.eq("ville", filters.ville);
-        }
-        const ft = filters.freeText?.trim();
-        if (ft) {
-          const safe = sanitizeIlikeTerm(ft);
-          if (safe.length >= 1) {
-            const p = `%${safe}%`;
-            query = query.or(
-              `title.ilike.${p},description.ilike.${p},make.ilike.${p},model.ilike.${p},fuel.ilike.${p},body_style.ilike.${p},quartier.ilike.${p},quartier_libre.ilike.${p},region.ilike.${p},ville.ilike.${p}`,
-            );
-          }
-        }
-        if (filters.ownerIds && filters.ownerIds.length > 0) {
-          query = query.in("owner_id", filters.ownerIds);
-        }
-        if (filters.priceMin) {
-          query = query.gte("price_mga", filters.priceMin);
-        }
-        if (filters.priceMax) {
-          const cap = relaxed
-            ? Math.ceil(filters.priceMax * CLOSE_MATCH_PRICE_FACTOR)
-            : filters.priceMax;
-          query = query.lte("price_mga", cap);
-        }
-        if (filters.rooms && filters.rooms.length > 0) {
-          if (relaxed) {
-            const expanded = expandRoomsForRelaxedQuery(filters.rooms);
-            const under5 = [...new Set(expanded.filter((r) => r < 5))].sort((a, b) => a - b);
-            const hasGte5 = expanded.some((r) => r >= 5);
-            if (hasGte5 && under5.length > 0) {
-              query = query.or(`rooms.in.(${under5.join(",")}),rooms.gte.5`);
-            } else if (hasGte5) {
-              query = query.gte("rooms", 4);
-            } else {
-              query = query.in("rooms", under5);
-            }
-          } else {
-            const hasHighEnd = filters.rooms.includes(5);
-            if (hasHighEnd) {
-              const otherRooms = filters.rooms.filter((r) => r < 5);
-              if (otherRooms.length > 0) {
-                query = query.or(`rooms.in.(${otherRooms.join(",")}),rooms.gte.5`);
-              } else {
-                query = query.gte("rooms", 5);
-              }
-            } else {
-              query = query.in("rooms", filters.rooms);
-            }
-          }
-        }
-        if (filters.bathrooms && filters.bathrooms.length > 0) {
-          if (relaxed) {
-            const expanded = expandBathroomsForRelaxedQuery(filters.bathrooms);
-            const under4 = [...new Set(expanded.filter((b) => b < 4))].sort((a, b) => a - b);
-            const hasGte4 = expanded.some((b) => b >= 4);
-            if (hasGte4 && under4.length > 0) {
-              query = query.or(
-                `doors.in.(${under4.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${under4.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
-              );
-            } else if (hasGte4) {
-              query = query.or("doors.gte.3,and(doors.is.null,bathrooms.gte.3)");
-            } else {
-              query = query.or(
-                `doors.in.(${under4.join(",")}),and(doors.is.null,bathrooms.in.(${under4.join(",")}))`,
-              );
-            }
-          } else {
-            const hasPlus = filters.bathrooms.includes(4);
-            const others = filters.bathrooms.filter((b) => b < 4);
-            if (hasPlus && others.length > 0) {
-              query = query.or(
-                `doors.in.(${others.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${others.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
-              );
-            } else if (hasPlus) {
-              query = query.or("doors.gte.4,and(doors.is.null,bathrooms.gte.4)");
-            } else {
-              query = query.or(
-                `doors.in.(${others.join(",")}),and(doors.is.null,bathrooms.in.(${others.join(",")}))`,
-              );
-            }
-          }
-        }
-        if (filters.surfaceMin) {
-          const sm = relaxed ? Math.max(0, Math.floor(filters.surfaceMin * 0.88)) : filters.surfaceMin;
-          query = query.or(`mileage_km.gte.${sm},and(mileage_km.is.null,surface.gte.${sm})`);
-        }
-        if (filters.surfaceMax && filters.surfaceMax > 0) {
-          const cap = relaxed
-            ? Math.ceil(filters.surfaceMax * CLOSE_MATCH_SURFACE_MAX_FACTOR)
-            : filters.surfaceMax;
-          query = query.or(`mileage_km.lte.${cap},and(mileage_km.is.null,surface.lte.${cap})`);
-        }
-        if (filters.brands && filters.brands.length > 0) {
-          query = query.in("make", filters.brands);
-        }
-        if (filters.modelQuery && filters.modelQuery.trim()) {
-          const safe = sanitizeIlikeTerm(filters.modelQuery);
-          if (safe) query = query.ilike("model", `%${safe}%`);
-        }
-        if (filters.yearMin && filters.yearMin > 0) {
-          query = query.gte("year", filters.yearMin);
-        }
-        if (filters.yearMax && filters.yearMax > 0) {
-          query = query.lte("year", filters.yearMax);
-        }
-        if (mergedFuels.length > 0) {
-          query = query.in("fuel", mergedFuels);
-        }
-        if (filters.transmissions && filters.transmissions.length > 0) {
-          query = query.in("transmission_gearbox", filters.transmissions);
-        }
-        if (filters.drivetrains && filters.drivetrains.length > 0) {
-          query = query.in("drivetrain", filters.drivetrains);
-        }
-        if (filters.conditions && filters.conditions.length > 0) {
-          query = query.in("vehicle_condition", filters.conditions);
-        }
-        if (filters.sellerTypes && filters.sellerTypes.length > 0) {
-          query = query.in("seller_type", filters.sellerTypes);
-        }
-        if (filters.exteriorColor) {
-          query = query.eq("exterior_color", filters.exteriorColor);
-        }
-        if (filters.engineDisplacementMin && filters.engineDisplacementMin > 0) {
-          query = query.gte("engine_displacement_l", filters.engineDisplacementMin);
-        }
-        if (filters.engineDisplacementMax && filters.engineDisplacementMax > 0) {
-          query = query.lte("engine_displacement_l", filters.engineDisplacementMax);
-        }
-      }
       if (filters.limit) {
         query = query.limit(filters.limit);
       }
@@ -632,6 +650,38 @@ export function useDbListings(filters: ListingsFilters = {}) {
       }
       return enrichListingsWithRelatedData(rows);
     },
+    retry: 1,
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+/** Head-count using the same PostgREST filters as `useDbListings` — avoids downloading rows for hero / counters. */
+export async function fetchFilteredActiveListingCount(filters: ListingsFilters): Promise<number> {
+  if (filters.limit === 0) return 0;
+
+  const baseQuery = supabase
+    .from("listings")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "active");
+
+  const query = applyListingFilters(baseQuery as unknown as FilterableListingQuery, filters) as typeof baseQuery;
+
+  const { count, error } = await query;
+  if (error) {
+    if (isCatalogUnavailableErrorMessage(error.message)) {
+      throw new Error(`Catalogue indisponible: ${error.message}`);
+    }
+    throw new Error(`Erreur recherche: ${error.message}`);
+  }
+  return count ?? 0;
+}
+
+export function useFilteredActiveListingCount(filters: ListingsFilters) {
+  return useQuery({
+    queryKey: ["db-listings-count", filters],
+    queryFn: () => fetchFilteredActiveListingCount(filters),
     retry: 1,
     staleTime: 30_000,
     gcTime: 5 * 60_000,

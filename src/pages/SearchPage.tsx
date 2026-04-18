@@ -38,6 +38,7 @@ import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import { formatEngineDisplacementLiters, getExteriorColorLabel } from "@/lib/vehicleAttributes";
 import { buildSearchResultsModel } from "@/pages/search/searchResultsModel";
+import { SEARCH_RELAXED_DB_ROW_CAP } from "@/config/searchListings";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -162,6 +163,7 @@ const SearchPage = () => {
     engineDisplacementMin: filters.engineDisplacementMin || undefined,
     engineDisplacementMax: filters.engineDisplacementMax || undefined,
     searchRelaxation: true,
+    limit: SEARCH_RELAXED_DB_ROW_CAP,
   });
 
   const {

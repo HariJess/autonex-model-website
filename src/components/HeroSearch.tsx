@@ -17,7 +17,7 @@ import { EMPTY_SEARCH_FILTERS } from "@/types/search";
 import { listingTypesForTransaction } from "@/lib/listingRules";
 import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BRANDS, resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
 import BrandLogo from "@/components/BrandLogo";
-import { useDbListings } from "@/hooks/useListings";
+import { useFilteredActiveListingCount } from "@/hooks/useListings";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -187,14 +187,12 @@ const HeroSearch = () => {
             yearMin: searchFilters.yearMin || undefined,
             yearMax: searchFilters.yearMax || undefined,
             fuels: searchFilters.fuels.length > 0 ? searchFilters.fuels : undefined,
-            limit: undefined,
           }
         : { limit: 0 },
     [canEstimateResultCount, searchFilters],
   );
 
-  const { data: countListings = [], isLoading: countLoading } = useDbListings(countFilters);
-  const resultCount = countListings.length;
+  const { data: resultCount = 0, isLoading: countLoading } = useFilteredActiveListingCount(countFilters);
   const ctaLabel = useMemo(() => {
     if (!canEstimateResultCount) return t("hero.search");
     if (countLoading) return t("hero.searching", "Recherche...");

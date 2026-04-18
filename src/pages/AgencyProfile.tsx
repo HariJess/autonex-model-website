@@ -15,6 +15,7 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { getPartnerDealerBySlug } from "@/data/agencies";
+import { AGENCY_PROFILE_LISTINGS_CAP } from "@/config/searchListings";
 
 const AgencyProfile = () => {
   const { slug } = useParams();
@@ -57,7 +58,9 @@ const AgencyProfile = () => {
 
   const { data: listings = [], isLoading: listingsLoading } = useDbListings(
     agency?.id
-      ? (agentIds.length > 0 ? { ownerIds: agentIds } : { ownerIds: ["__none__"] })
+      ? (agentIds.length > 0
+          ? { ownerIds: agentIds, limit: AGENCY_PROFILE_LISTINGS_CAP }
+          : { ownerIds: ["__none__"] })
       : partnerDealer
         ? (partnerDealer.listingOwnerIds && partnerDealer.listingOwnerIds.length > 0
             ? { ownerIds: partnerDealer.listingOwnerIds, limit: 24 }
