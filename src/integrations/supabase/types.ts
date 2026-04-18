@@ -1003,6 +1003,7 @@ export type Database = {
           model_name_snapshot: string
           owner_count_label: string
           raw_payload: Json
+          submission_secret: string
           transmission_type: string
           usage_type: string
           user_id: string | null
@@ -1024,6 +1025,7 @@ export type Database = {
           model_name_snapshot: string
           owner_count_label: string
           raw_payload?: Json
+          submission_secret?: string
           transmission_type: string
           usage_type: string
           user_id?: string | null
@@ -1045,6 +1047,7 @@ export type Database = {
           model_name_snapshot?: string
           owner_count_label?: string
           raw_payload?: Json
+          submission_secret?: string
           transmission_type?: string
           usage_type?: string
           user_id?: string | null
@@ -1279,6 +1282,34 @@ export type Database = {
           p_title: string
         }
         Returns: unknown
+      }
+      record_vehicle_estimation_event: {
+        Args: {
+          p_estimation_request_id: string
+          p_event_type: string
+          p_metadata?: Json
+          p_submission_secret: string
+        }
+        Returns: undefined
+      }
+      record_vehicle_estimation_result: {
+        Args: {
+          p_adjusted_price: number
+          p_calculation_payload: Json
+          p_comparables_used_count: number
+          p_confidence_label: string
+          p_confidence_score: number
+          p_estimation_request_id: string
+          p_high_range_price: number
+          p_low_range_price: number
+          p_market_base_price: number
+          p_negative_factors: Json
+          p_positive_factors: Json
+          p_quick_sale_price: number
+          p_recommended_listing_price: number
+          p_submission_secret: string
+        }
+        Returns: string
       }
       purchase_listing_boosts: {
         Args: { p_boost_types: string[]; p_listing_id: string }

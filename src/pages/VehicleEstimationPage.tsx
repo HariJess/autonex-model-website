@@ -238,6 +238,7 @@ const VehicleEstimationPage = () => {
     setResultViewedForRequest(result.requestId);
     void insertEstimationEvent(
       result.requestId,
+      result.submissionSecret,
       "estimation_result_viewed",
       buildEstimationEventContext(result.outputV2, { resultId: result.resultId }),
     );
@@ -248,6 +249,7 @@ const VehicleEstimationPage = () => {
     try {
       await insertEstimationEvent(
         result.requestId,
+        result.submissionSecret,
         "clicked_publish_after_estimation",
         buildEstimationEventContext(result.outputV2, {
           resultId: result.resultId,
@@ -276,6 +278,7 @@ const VehicleEstimationPage = () => {
 
   const trackEstimationEvent = async (
     requestId: string,
+    submissionSecret: string,
     eventType:
       | "clicked_publish_after_estimation"
       | "clicked_refine_estimation"
@@ -285,7 +288,12 @@ const VehicleEstimationPage = () => {
     metadata?: Record<string, unknown>,
   ) => {
     try {
-      await insertEstimationEvent(requestId, eventType, buildEstimationEventContext(outputV2, metadata ?? {}));
+      await insertEstimationEvent(
+        requestId,
+        submissionSecret,
+        eventType,
+        buildEstimationEventContext(outputV2, metadata ?? {}),
+      );
     } catch {
       // Analytics events are non-blocking by design.
     }
@@ -732,11 +740,11 @@ const VehicleEstimationPage = () => {
                 presentation={presentation}
                 onPublish={() => void publishFromEstimation()}
                 onRefine={() => {
-                void trackEstimationEvent(result.requestId, "clicked_refine_estimation", result.outputV2);
+                void trackEstimationEvent(result.requestId, result.submissionSecret, "clicked_refine_estimation", result.outputV2);
                   setScreen("vehicle");
                 }}
               onCompare={() => {
-                void trackEstimationEvent(result.requestId, "clicked_compare_after_estimation", result.outputV2);
+                void trackEstimationEvent(result.requestId, result.submissionSecret, "clicked_compare_after_estimation", result.outputV2);
                 navigate("/recherche");
               }}
                 onRestart={() => {
@@ -744,7 +752,7 @@ const VehicleEstimationPage = () => {
                   setScreen("vehicle");
                 }}
                 onViewComparable={(listingId) =>
-                void trackEstimationEvent(result.requestId, "viewed_similar_listings", result.outputV2, { listingId })
+                void trackEstimationEvent(result.requestId, result.submissionSecret, "viewed_similar_listings", result.outputV2, { listingId })
                 }
               />
             </section>

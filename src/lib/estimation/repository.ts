@@ -2,7 +2,35 @@ import { supabase } from "@/integrations/supabase/client";
 import type { EstimationInput, EstimationOutput } from "@/types/estimation";
 import type { EstimationAuditSnapshot } from "@/lib/estimation/telemetry";
 
-export async function insertEstimationRequest(input: EstimationInput, userId: string | null): Promise<string> {
+export interface EstimationRequestInsertResult {
+  id: string;
+  submissionSecret: string;
+}
+
+export type EstimationRpcErrorCode =
+  | "ESTIMATION_REQUEST_NOT_FOUND"
+  | "ESTIMATION_WRITE_FORBIDDEN"
+  | "ESTIMATION_RESULT_ALREADY_EXISTS"
+  | "ESTIMATION_EVENT_TYPE_INVALID"
+  | "unknown";
+
+export function mapEstimationRpcError(message: string): EstimationRpcErrorCode {
+  const ordered: EstimationRpcErrorCode[] = [
+    "ESTIMATION_REQUEST_NOT_FOUND",
+    "ESTIMATION_WRITE_FORBIDDEN",
+    "ESTIMATION_RESULT_ALREADY_EXISTS",
+    "ESTIMATION_EVENT_TYPE_INVALID",
+  ];
+  for (const code of ordered) {
+    if (message.includes(code)) return code;
+  }
+  return "unknown";
+}
+
+export async function insertEstimationRequest(
+  input: EstimationInput,
+  userId: string | null,
+): Promise<EstimationRequestInsertResult> {
   const payload = {
     user_id: userId,
     make_id: input.makeId ?? null,
@@ -26,14 +54,16 @@ export async function insertEstimationRequest(input: EstimationInput, userId: st
   const { data, error } = await supabase
     .from("vehicle_estimation_requests")
     .insert(payload)
-    .select("id")
+    .select("id, submission_secret")
     .single();
   if (error) throw new Error(error.message);
-  return String((data as { id: string }).id);
+  const row = data as { id: string; submission_secret: string };
+  return { id: String(row.id), submissionSecret: String(row.submission_secret) };
 }
 
 export async function insertEstimationResult(
   estimationRequestId: string,
+  submissionSecret: string,
   output: EstimationOutput,
   audit?: EstimationAuditSnapshot,
 ): Promise<string> {
@@ -41,33 +71,31 @@ export async function insertEstimationResult(
     legacy: output,
     audit: audit ?? null,
   } as unknown as Record<string, unknown>;
-  const payload = {
-    estimation_request_id: estimationRequestId,
-    market_base_price: output.marketBasePrice,
-    adjusted_price: output.adjustedPrice,
-    low_range_price: output.lowRangePrice,
-    high_range_price: output.highRangePrice,
-    recommended_listing_price: output.recommendedListingPrice,
-    quick_sale_price: output.quickSalePrice,
-    confidence_score: output.confidenceScore,
-    confidence_label: output.confidenceLabel,
-    positive_factors: output.positiveFactors,
-    negative_factors: output.negativeFactors,
-    comparables_used_count: output.comparables.length,
-    calculation_payload: calculationPayload,
-  };
 
-  const { data, error } = await supabase
-    .from("vehicle_estimation_results")
-    .insert(payload)
-    .select("id")
-    .single();
+  const { data, error } = await supabase.rpc("record_vehicle_estimation_result", {
+    p_estimation_request_id: estimationRequestId,
+    p_submission_secret: submissionSecret,
+    p_market_base_price: output.marketBasePrice,
+    p_adjusted_price: output.adjustedPrice,
+    p_low_range_price: output.lowRangePrice,
+    p_high_range_price: output.highRangePrice,
+    p_recommended_listing_price: output.recommendedListingPrice,
+    p_quick_sale_price: output.quickSalePrice,
+    p_confidence_score: output.confidenceScore,
+    p_confidence_label: output.confidenceLabel,
+    p_positive_factors: output.positiveFactors,
+    p_negative_factors: output.negativeFactors,
+    p_comparables_used_count: output.comparables.length,
+    p_calculation_payload: calculationPayload,
+  });
+
   if (error) throw new Error(error.message);
-  return String((data as { id: string }).id);
+  return String(data as string);
 }
 
 export async function insertEstimationEvent(
   estimationRequestId: string,
+  submissionSecret: string,
   eventType:
     | "estimation_started"
     | "estimation_completed"
@@ -78,12 +106,11 @@ export async function insertEstimationEvent(
     | "viewed_similar_listings",
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const { error } = await supabase.from("vehicle_estimation_events").insert(
-    {
-      estimation_request_id: estimationRequestId,
-      event_type: eventType,
-      metadata: metadata ?? {},
-    },
-  );
+  const { error } = await supabase.rpc("record_vehicle_estimation_event", {
+    p_estimation_request_id: estimationRequestId,
+    p_submission_secret: submissionSecret,
+    p_event_type: eventType,
+    p_metadata: metadata ?? {},
+  });
   if (error) throw new Error(error.message);
 }

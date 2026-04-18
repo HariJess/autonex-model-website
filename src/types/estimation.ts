@@ -241,6 +241,8 @@ export type EstimationOutput = EstimationLegacyOutput;
 
 export interface EstimationRunResult {
   requestId: string;
+  /** Returned to the client after request creation; required for RPC writes when user_id is null (anonymous). */
+  submissionSecret: string;
   resultId: string;
   output: EstimationLegacyOutput;
   outputV2: EstimationOutputV2;

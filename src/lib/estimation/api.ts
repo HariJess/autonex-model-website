@@ -9,6 +9,7 @@ import type { EstimationInput, EstimationRunResult } from "@/types/estimation";
 
 async function safeInsertEstimationEvent(
   requestId: string,
+  submissionSecret: string,
   eventType:
     | "estimation_started"
     | "estimation_completed"
@@ -20,7 +21,7 @@ async function safeInsertEstimationEvent(
   metadata?: Record<string, unknown>,
 ): Promise<void> {
   try {
-    await insertEstimationEvent(requestId, eventType, metadata);
+    await insertEstimationEvent(requestId, submissionSecret, eventType, metadata);
   } catch (error) {
     // Event logging must never block estimation completion.
     if (import.meta.env.DEV) {
@@ -33,8 +34,8 @@ export async function runVehicleEstimation(
   input: EstimationInput,
   userId: string | null,
 ): Promise<EstimationRunResult> {
-  const requestId = await insertEstimationRequest(input, userId);
-  await safeInsertEstimationEvent(requestId, "estimation_started", {
+  const { id: requestId, submissionSecret } = await insertEstimationRequest(input, userId);
+  await safeInsertEstimationEvent(requestId, submissionSecret, "estimation_started", {
     hasMake: Boolean(input.makeName.trim()),
     hasModel: Boolean(input.modelName.trim()),
     hasCity: Boolean(input.city.trim()),
@@ -44,14 +45,15 @@ export async function runVehicleEstimation(
   const outputV2 = await computeVehicleEstimationV2(input);
   const output = toLegacyEstimationFromV2(outputV2);
   const audit = buildEstimationAuditSnapshot(outputV2);
-  const resultId = await insertEstimationResult(requestId, output, audit);
+  const resultId = await insertEstimationResult(requestId, submissionSecret, output, audit);
   await safeInsertEstimationEvent(
     requestId,
+    submissionSecret,
     "estimation_completed",
     buildEstimationEventContext(outputV2, {
       resultId,
       comparablesDisplayed: output.comparables.length,
     }),
   );
-  return { requestId, resultId, output, outputV2 };
+  return { requestId, submissionSecret, resultId, output, outputV2 };
 }

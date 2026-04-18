@@ -5,6 +5,7 @@ import type { EstimationRunResult } from "@/types/estimation";
 function makeResult(overrides?: Partial<EstimationRunResult["outputV2"]>): EstimationRunResult {
   return {
     requestId: "req-1",
+    submissionSecret: "00000000-0000-4000-8000-000000000001",
     resultId: "res-1",
     output: {
       marketBasePrice: 50_000_000,
