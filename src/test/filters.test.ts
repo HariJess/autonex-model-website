@@ -7,7 +7,6 @@ import {
   TRANSACTION_LABELS,
   TRANSACTION_TYPES,
 } from "@/types/listing";
-import type { ListingType, TransactionType } from "@/types/listing";
 
 describe("Listing types", () => {
   it("every LISTING_TYPE has a label", () => {

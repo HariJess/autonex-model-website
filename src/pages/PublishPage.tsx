@@ -22,11 +22,7 @@ import {
 } from "@/lib/listingRules";
 import {
   LISTING_PUBLISH_CREDIT_COST,
-  BOOST_CREDIT_COSTS,
-  BOOST_ORDER,
-  BOOST_LABELS_FR,
   totalPublicationCredits,
-  AGENCY_SPOTLIGHT_CREDIT_COST,
   formatAriary,
   type PurchasableBoostType,
 } from "@/config/monetization";

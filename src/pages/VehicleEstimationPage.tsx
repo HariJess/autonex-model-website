@@ -22,7 +22,6 @@ import {
   ESTIMATION_OWNER_COUNT_OPTIONS,
   ESTIMATION_TRANSMISSION_OPTIONS,
   ESTIMATION_USAGE_OPTIONS,
-  formatAriary,
 } from "@/lib/estimation/constants";
 import { runVehicleEstimation } from "@/lib/estimation/api";
 import { describeEstimationErrorForUi } from "@/lib/estimation/errors";
