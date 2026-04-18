@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,7 +26,6 @@ const LocationPicker = ({
   onQuartierLibreChange,
   compact = false,
 }: LocationPickerProps) => {
-  const { t } = useTranslation();
   const selectedVille = getVille(ville);
   const selectedArr = selectedVille?.arrondissements.find((a) => a.name === arrondissement);
 

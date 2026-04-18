@@ -49,8 +49,6 @@ const Header = () => {
   const transaction = query.get("transaction");
   const isSearchPage = location.pathname === "/recherche";
   const isBuyActive = isSearchPage && transaction === "vente";
-  const isShortRentActive = isSearchPage && transaction === "location_vacances";
-  const isLongRentActive = isSearchPage && transaction === "location";
   const isRentActive = isSearchPage && (transaction === "location" || transaction === "location_vacances");
   const isDealerActive =
     location.pathname === "/agences" ||

@@ -476,7 +476,6 @@ const SearchPage = () => {
     );
   }, [queryError, t]);
 
-  const showToolbar = !isLoading;
   const showResults = !isLoading && !queryError && displayListings.length > 0;
   const showEmpty = !isLoading && !queryError && displayListings.length === 0;
   const showSimilarBanner = !isLoading && !queryError && sortedExact.length === 0 && similarFallbackListings.length > 0;
