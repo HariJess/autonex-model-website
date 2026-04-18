@@ -8,71 +8,52 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { CarFront, DoorOpen, Gauge, Phone, Users, ChevronRight, ChevronLeft, Check, MapPin, Loader2, AlertCircle, Info, Video, ExternalLink, MessageSquare, ShieldCheck } from "lucide-react";
+import {
+  CarFront,
+  DoorOpen,
+  Gauge,
+  Phone,
+  Users,
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  MapPin,
+  Loader2,
+  Info,
+  Video,
+  ExternalLink,
+  MessageSquare,
+  ShieldCheck,
+} from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { useListing, useDbListings } from "@/hooks/useListings";
-import { LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
-import { useState, useEffect, useRef, lazy, Suspense } from "react";
-import { toast } from "sonner";
-import { isValidListingCoordinates } from "@/lib/mapCoordinates";
-import { toApproximatePublicCoordinates } from "@/lib/mapPrivacy";
-import { contactLeadSchema } from "@/lib/validation";
-import { buildWhatsAppUrl } from "@/lib/whatsappUrl";
-import { getSearchSessionId } from "@/lib/searchSession";
-import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
-import { PremiumStatePanel } from "@/components/ui/premium-state";
 import BrandLogo from "@/components/BrandLogo";
-import { resolveBrandAsset } from "@/data/brandAssets";
-import {
-  formatVehicleDoors,
-  formatVehicleEngineDisplacement,
-  formatVehicleMileage,
-  formatVehicleVersion,
-  getVehicleDisplayTitle,
-  getVehicleHeadline,
-  getVehicleDoorsValue,
-  getVehicleMileageValue,
-  getVehicleVersionValue,
-} from "@/lib/vehiclePresentation";
-import { getExteriorColorLabel } from "@/lib/vehicleAttributes";
-import { sanitizeListingEquipment, extractCustomFeatures } from "@/data/listing-equipment";
-import type { DisplayListing } from "@/types/listing";
-import { getDealMeta } from "@/lib/deals";
-import { getCanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
-import {
-  buildContactTrustHints,
-  buildListingTrustProofs,
-  buildVehicleSpecRows,
-  getDisplayedPhone,
-  getOwnerStatusHint,
-  getSellerLabel,
-} from "@/pages/listing-detail/listingDetailPresentation";
+import { buildCanonicalUrl } from "@/lib/seo";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ListingSponsorBlock,
   ListingRelatedPromoted,
   ListingPartnerAgencyStrip,
 } from "@/components/monetization/ListingDetailPlacements";
+import { useListingDetailPageData } from "@/pages/listing-detail/useListingDetailPageData";
+import { useListingDetailContact } from "@/pages/listing-detail/useListingDetailContact";
+import { buildListingDetailViewModel } from "@/pages/listing-detail/buildListingDetailViewModel";
+import {
+  LISTING_DETAIL_BADGE_CLASS,
+  LISTING_DETAIL_BADGE_SUBTLE_CLASS,
+  LISTING_WHATSAPP_BUTTON_CLASS,
+} from "@/pages/listing-detail/listingDetailConstants";
+import {
+  ListingDetailLoading,
+  ListingDetailFetchError,
+  ListingDetailNotFound,
+} from "@/pages/listing-detail/ListingDetailShellStates";
 
 const ListingLocationMap = lazy(() => import("@/components/ListingLocationMap"));
-
-/** Outline + hover/focus accents only; brand green is on the FaWhatsapp icon. */
-const LISTING_WHATSAPP_BUTTON_CLASS =
-  "border-emerald-200/85 bg-background text-foreground hover:bg-emerald-50/85 hover:border-emerald-300/95 hover:text-foreground dark:border-emerald-800/50 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600/55 focus-visible:ring-emerald-500/40";
-const LISTING_DETAIL_BADGE_CLASS =
-  "inline-flex min-h-8 items-center rounded-full border border-border/75 bg-card px-3 py-1 text-[13px] md:text-xs font-medium leading-none tracking-[0.01em] text-foreground shadow-sm whitespace-nowrap";
-const LISTING_DETAIL_BADGE_SUBTLE_CLASS =
-  "inline-flex min-h-8 items-center rounded-full border border-border/60 bg-secondary/45 px-3 py-1 text-[13px] md:text-xs font-medium leading-none tracking-[0.01em] text-foreground whitespace-nowrap";
-
-function listingWhatsAppPrefill(title: string): string {
-  const short = title.length > 80 ? `${title.slice(0, 77)}…` : title;
-  return `Bonjour, je vous contacte au sujet de votre annonce sur AutoNex « ${short} ».`;
-}
 
 const ListingDetail = () => {
   const { id } = useParams();
@@ -81,176 +62,37 @@ const ListingDetail = () => {
   const { t } = useTranslation();
   const { user, isAdmin } = useAuth();
   const { formatPrice, formatPriceSecondary } = useCurrency();
-  const [phoneRevealed, setPhoneRevealed] = useState(false);
-  const [revealedPhone, setRevealedPhone] = useState<string | null>(null);
+
   const [selectedImg, setSelectedImg] = useState(0);
-  const [contactName, setContactName] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [contactMessage, setContactMessage] = useState("");
-  const [sending, setSending] = useState(false);
   const [showAllSpecsMobile, setShowAllSpecsMobile] = useState(false);
   const [showAllFeaturesMobile, setShowAllFeaturesMobile] = useState(false);
-  const viewIncremented = useRef<string | null>(null);
-  const lastContactSubmitAt = useRef(0);
-  const lastWhatsAppAt = useRef(0);
-  const contactSectionRef = useRef<HTMLDivElement | null>(null);
 
-  const loginForContact = () => {
-    toast.error(
-      t("auth.loginRequiredForListingContact", "Connectez-vous pour contacter l’annonceur."),
-    );
-    navigate("/login", { state: { from: `${location.pathname}${location.search}` } });
-  };
+  const { listing, isLoading, fetchError, filteredSimilar } = useListingDetailPageData(id);
 
-  const { data: listing, isLoading, error: fetchError } = useListing(id);
-
-  // Increment views once per listing per session (debounced)
-  useEffect(() => {
-    if (listing?.id && viewIncremented.current !== listing.id) {
-      viewIncremented.current = listing.id;
-      const timer = setTimeout(() => {
-        const sessionId = getSearchSessionId();
-        supabase
-          .rpc("increment_views_public", { p_listing_id: listing.id, p_session_id: sessionId })
-          .then(() => {});
-      }, 2000); // 2s delay to filter bots/quick bounces
-      return () => clearTimeout(timer);
-    }
-  }, [listing?.id]);
-
-  // Fetch similar listings by same transaction + type + ville
-  const { data: similar = [] } = useDbListings({
-    ville: listing?.ville ?? undefined,
-    types: listing?.type ? [listing.type] : undefined,
-    transaction: listing?.transaction ?? undefined,
-    limit: listing ? 5 : 0,
+  const contact = useListingDetailContact({
+    listing,
+    user,
+    isAdmin,
+    navigate,
+    location,
+    t,
   });
-  const filteredSimilar = similar.filter((l) => l.id !== listing?.id).slice(0, 4);
 
-  const handleRevealPhone = async () => {
-    if (!listing) return;
-    if (!user) {
-      loginForContact();
-      return;
-    }
-    if (user.id === listing.owner_id || isAdmin) {
-      setPhoneRevealed(true);
-      setRevealedPhone(listing.owner_phone ?? null);
-      return;
-    }
-    const { error: leadError } = await supabase.from("leads").insert({
-      listing_id: listing.id,
-      visitor_name: user.id,
-      type: "phone_reveal" as const,
-    });
-    if (leadError) {
-      toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
-      return;
-    }
-    const { data: phone, error: phoneErr } = await supabase.rpc("get_listing_owner_phone", {
-      p_listing_id: listing.id,
-    });
-    if (phoneErr) {
-      toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
-      return;
-    }
-    setPhoneRevealed(true);
-    setRevealedPhone(typeof phone === "string" ? phone : null);
-  };
+  const isOwner = Boolean(user?.id && listing?.owner_id && user.id === listing.owner_id);
 
-  const handleContact = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!listing) return;
-    if (!user) {
-      loginForContact();
-      return;
-    }
-    const now = Date.now();
-    if (now - lastContactSubmitAt.current < 4000) {
-      toast.error(t("listing.contactTooFast", "Veuillez patienter quelques secondes avant de renvoyer."));
-      return;
-    }
-    const parsed = contactLeadSchema.safeParse({
-      name: contactName,
-      email: contactEmail,
-      phone: contactPhone,
-      message: contactMessage,
-    });
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? t("common.error"));
-      return;
-    }
-    setSending(true);
-    lastContactSubmitAt.current = now;
-    try {
-      const { error: leadError } = await supabase.from("leads").insert({
-        listing_id: listing.id,
-        visitor_name: parsed.data.name || null,
-        visitor_email: parsed.data.email || null,
-        visitor_phone: parsed.data.phone || null,
-        message: parsed.data.message || null,
-        type: "contact_form" as const,
-      });
-      if (leadError) {
-        toast.error(leadError.message);
-      } else {
-        toast.success(t("listing.messageSent", "Message envoyé !"));
-        setContactName("");
-        setContactEmail("");
-        setContactPhone("");
-        setContactMessage("");
-      }
-    } catch {
-      toast.error(t("listing.contactSendError", "Impossible d'envoyer votre message pour le moment."));
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleWhatsApp = async () => {
-    if (!listing?.has_whatsapp_contact) return;
-    if (!user) {
-      loginForContact();
-      return;
-    }
-    const now = Date.now();
-    if (now - lastWhatsAppAt.current < 4000) {
-      toast.error(t("listing.contactTooFast", "Veuillez patienter quelques secondes avant de renvoyer."));
-      return;
-    }
-    const skipLead = user.id === listing.owner_id || isAdmin;
-    if (!skipLead) {
-      const { error: leadError } = await supabase.from("leads").insert({
-        listing_id: listing.id,
-        visitor_name: user.id,
-        type: "whatsapp" as const,
-      });
-      if (leadError) {
-        toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
-        return;
-      }
-    }
-    const { data: phoneRaw, error: phoneErr } = await supabase.rpc("get_listing_whatsapp_phone", {
-      p_listing_id: listing.id,
-    });
-    if (phoneErr) {
-      toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
-      return;
-    }
-    const phone = typeof phoneRaw === "string" ? phoneRaw : null;
-    if (!phone?.trim()) {
-      toast.error(t("listing.whatsappUnavailable", "Numéro WhatsApp indisponible pour cette annonce."));
-      return;
-    }
-    const url = buildWhatsAppUrl(phone, listingWhatsAppPrefill(listing.title));
-    if (!url) {
-      toast.error(t("listing.whatsappUnavailable", "Numéro WhatsApp indisponible pour cette annonce."));
-      return;
-    }
-    lastWhatsAppAt.current = now;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
+  const vm = useMemo(
+    () =>
+      listing
+        ? buildListingDetailViewModel({
+            listing,
+            t,
+            isOwner,
+            showAllSpecsMobile,
+            showAllFeaturesMobile,
+          })
+        : null,
+    [listing, t, isOwner, showAllSpecsMobile, showAllFeaturesMobile],
+  );
 
   useEffect(() => {
     if (!listing) return;
@@ -260,72 +102,49 @@ const ListingDetail = () => {
   }, [listing, selectedImg]);
 
   if (isLoading) {
-    return (
-      <>
-        <Header />
-        <div className="container mx-auto px-4 py-10">
-          <PremiumStatePanel
-            overline={t("listing.stateLoadingOverline", "Annonce AutoNex")}
-            title={t("listing.stateLoadingTitle", "Chargement de l’annonce")}
-            description={t("listing.stateLoadingDesc", "Nous préparons les informations du véhicule et les options de contact.")}
-            icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
-          />
-        </div>
-        <Footer />
-      </>
-    );
+    return <ListingDetailLoading />;
   }
 
   if (fetchError && !listing) {
-    return (
-      <>
-        <Header />
-        <div className="container mx-auto px-4 py-10">
-          <PremiumStatePanel
-            overline={t("listing.stateErrorOverline", "Statut annonce")}
-            title={t("common.error")}
-            description={t(
-              "listing.runtimeUnavailable",
-              "Cette annonce est momentanément indisponible. Revenez dans quelques instants ou retournez à la recherche.",
-            )}
-            icon={<AlertCircle className="h-6 w-6 text-destructive" />}
-            action={<Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>}
-          />
-        </div>
-        <Footer />
-      </>
-    );
+    return <ListingDetailFetchError />;
   }
 
-  if (!listing) {
-    return (
-      <>
-        <Header />
-        <div className="container mx-auto px-4 py-10">
-          <PremiumStatePanel
-            overline={t("listing.stateNotFoundOverline", "Catalogue AutoNex")}
-            title={t("listing.notFound", "Annonce introuvable")}
-            description={t("listing.notFoundDesc", "Cette annonce n'est plus disponible. Retournez à la recherche pour consulter des alternatives.")}
-            icon={<AlertCircle className="h-6 w-6 text-muted-foreground" />}
-            action={
-              <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
-                <Button variant="outline" onClick={() => navigate(-1)} className="font-sans">{t("common.back", "Retour")}</Button>
-                <Button onClick={() => navigate("/recherche")} className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
-                  {t("listing.viewAll", "Voir toutes les annonces")}
-                </Button>
-              </div>
-            }
-          />
-        </div>
-        <Footer />
-      </>
-    );
+  if (!listing || !vm) {
+    return <ListingDetailNotFound />;
   }
 
-  const images = listing.images.length > 0
-    ? listing.images
-    : ["/placeholder.svg"];
-  const hasMultipleImages = images.length > 1;
+  const {
+    transactionLabel,
+    typeLabel,
+    addressLine,
+    mapPublic,
+    hasApproxMap,
+    canonicalVehicle,
+    displayTitle,
+    versionLabel,
+    mileageLabel,
+    doorsLabel,
+    vehicleSummary,
+    sellerLabel,
+    vehicleSpecRows,
+    visibleSpecRowsMobile,
+    contactTrustHints,
+    listingTrustProofs,
+    ownerStatusHint,
+    displayBrand,
+    displayBrandAsset,
+    allFeatureBadges,
+    visibleFeatureBadgesMobile,
+    activeDeal,
+    canonical,
+    listingTitle,
+    listingDescription,
+    seoImage,
+    listingJsonLd,
+  } = vm;
+
+  const images = vm.images;
+  const hasMultipleImages = vm.hasMultipleImages;
 
   const goToPreviousImage = () => {
     if (!hasMultipleImages) return;
@@ -337,113 +156,23 @@ const ListingDetail = () => {
     setSelectedImg((prev) => (prev + 1) % images.length);
   };
 
-  const transactionLabel =
-    listing.transaction === "vente"
-      ? t("publish.sell", "Vente")
-      : listing.transaction === "location"
-        ? t("publish.rent", "Location")
-        : listing.transaction === "location_vacances"
-          ? t("publish.shortTermRental", "Location courte durée")
-          : TRANSACTION_LABELS[listing.transaction] ?? listing.transaction;
-  const typeLabel = LISTING_TYPE_LABELS[listing.type] ?? listing.type;
-  const addressLine = [listing.ville, listing.arrondissement, listing.quartier, listing.region].filter(Boolean).join(", ");
-  const hasExactCoords =
-    listing.lat != null &&
-    listing.lng != null &&
-    isValidListingCoordinates(listing.lat, listing.lng);
-  const mapPublic =
-    hasExactCoords && listing.lat != null && listing.lng != null
-      ? toApproximatePublicCoordinates(listing.lat, listing.lng, listing.id)
-      : null;
-  const hasApproxMap =
-    mapPublic != null && isValidListingCoordinates(mapPublic.lat, mapPublic.lng);
-  const isOwner = user?.id === listing.owner_id;
-  const canonicalVehicle = getCanonicalVehicleAttributes(listing);
-  const displayTitle = getVehicleDisplayTitle(listing);
-  const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
-  const mileageValue = canonicalVehicle.mileageKm ?? getVehicleMileageValue(listing);
-  const mileageLabel = formatVehicleMileage(mileageValue);
-  const doorsValue = canonicalVehicle.doors ?? getVehicleDoorsValue(listing);
-  const doorsLabel = formatVehicleDoors(doorsValue);
-  const engineDisplacementLabel = formatVehicleEngineDisplacement(canonicalVehicle.engineDisplacementL);
-  const exteriorColorLabel = getExteriorColorLabel(canonicalVehicle.exteriorColor, t);
-  const vehicleSummary = getVehicleHeadline(listing);
-  const sellerLabel = getSellerLabel(canonicalVehicle.sellerType, t);
-  const vehicleSpecRows = buildVehicleSpecRows(
-    canonicalVehicle,
-    sellerLabel,
-    mileageLabel,
-    doorsLabel,
-    exteriorColorLabel,
-    engineDisplacementLabel,
-    t,
-  );
-  const contactTrustHints = buildContactTrustHints(
-    {
-      sellerLabel,
-      availabilityStatus: canonicalVehicle.availabilityStatus,
-      hasWhatsappContact: listing.has_whatsapp_contact,
-    },
-    t,
-  );
-  const listingTrustProofs = buildListingTrustProofs(listing, sellerLabel, hasApproxMap, t);
-  const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);
-  const displayedPhone = getDisplayedPhone(phoneRevealed, revealedPhone, listing, t);
-  const displayBrand = canonicalVehicle.make ?? (displayTitle.trim() || null);
-  const displayBrandAsset = resolveBrandAsset(displayBrand);
-  const listingFeatureBadges = sanitizeListingEquipment(listing.features);
-  const customFeatureBadges = extractCustomFeatures(listing.features);
-  const allFeatureBadges = [...listingFeatureBadges, ...customFeatureBadges];
-  const visibleFeatureBadgesMobile = showAllFeaturesMobile ? allFeatureBadges : allFeatureBadges.slice(0, 8);
-  const visibleSpecRowsMobile = showAllSpecsMobile ? vehicleSpecRows : vehicleSpecRows.slice(0, 8);
-  const activeDeal = getDealMeta(listing);
-  const canonical = buildCanonicalUrl(`/annonce/${listing.id}`);
-  const listingTitle = composePageTitle(displayTitle);
-  const listingDescription = truncateMetaDescription(
-    [
-      `${typeLabel} ${transactionLabel} a ${listing.ville || "Madagascar"}`,
-      listing.price_mga ? `${listing.price_mga.toLocaleString("fr-FR")} Ar` : "",
-      listing.description || "",
-    ]
-      .filter(Boolean)
-      .join(" — "),
-  );
-  const seoImage = toAbsoluteUrl(images[0] || "/placeholder.svg");
-  const listingJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: displayTitle,
-    description: listingDescription,
-    url: canonical,
-    image: seoImage ? [seoImage] : undefined,
-    datePosted: listing.created_at || undefined,
-    address: listing.ville || listing.region
-      ? {
-          "@type": "PostalAddress",
-          addressLocality: listing.ville || undefined,
-          addressRegion: listing.region || undefined,
-          addressCountry: "MG",
-        }
-      : undefined,
-    category: typeLabel,
-    brand: canonicalVehicle.make ? { "@type": "Brand", name: canonicalVehicle.make } : undefined,
-    model: canonicalVehicle.model ?? undefined,
-    vehicleModelDate: canonicalVehicle.year ?? undefined,
-    mileageFromOdometer: mileageValue && mileageValue > 0
-      ? {
-          "@type": "QuantitativeValue",
-          value: mileageValue,
-          unitText: "km",
-        }
-      : undefined,
-    offers: {
-      "@type": "Offer",
-      price: listing.price_mga,
-      priceCurrency: "MGA",
-      availability: listing.status === "active" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      url: canonical,
-    },
-  };
+  const {
+    phoneRevealed,
+    contactName,
+    setContactName,
+    contactEmail,
+    setContactEmail,
+    contactPhone,
+    setContactPhone,
+    contactMessage,
+    setContactMessage,
+    sending,
+    contactSectionRef,
+    displayedPhone,
+    handleRevealPhone,
+    handleContact,
+    handleWhatsApp,
+  } = contact;
 
   return (
     <>
@@ -460,16 +189,19 @@ const ListingDetail = () => {
         <meta name="twitter:title" content={listingTitle} />
         <meta name="twitter:description" content={listingDescription} />
         {seoImage && <meta name="twitter:image" content={seoImage} />}
-        <script type="application/ld+json">
-          {JSON.stringify(listingJsonLd)}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(listingJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: t("nav.home", "Accueil"), item: buildCanonicalUrl("/") },
-              { "@type": "ListItem", position: 2, name: t("search.title", "Recherche"), item: buildCanonicalUrl("/recherche") },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: t("search.title", "Recherche"),
+                item: buildCanonicalUrl("/recherche"),
+              },
               { "@type": "ListItem", position: 3, name: displayTitle, item: canonical },
             ],
           })}
@@ -478,9 +210,13 @@ const ListingDetail = () => {
       <Header />
       <div className="container mx-auto px-4 py-4 md:py-6 pb-32 lg:pb-6">
         <nav className="flex items-center gap-2 text-xs md:text-sm font-sans text-muted-foreground mb-4 md:mb-6 overflow-x-auto whitespace-nowrap">
-          <Link to="/" className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
+          <Link to="/" className="hover:text-primary">
+            {t("nav.home", "Accueil")}
+          </Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to="/recherche" className="hover:text-primary">{t("search.title")}</Link>
+          <Link to="/recherche" className="hover:text-primary">
+            {t("search.title")}
+          </Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-foreground">{displayTitle}</span>
         </nav>
@@ -495,7 +231,7 @@ const ListingDetail = () => {
                 {t(
                   "listing.pendingBoostsNote",
                   "Options de visibilité sélectionnées : {{list}} — elles seront appliquées après validation.",
-                  { list: listing.pending_boost_types.join(", ") }
+                  { list: listing.pending_boost_types.join(", ") },
                 )}
               </AlertDescription>
             )}
@@ -506,10 +242,22 @@ const ListingDetail = () => {
           <div className="lg:col-span-2 space-y-6 md:space-y-8">
             <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 p-4.5 md:p-6">
               <div className="flex flex-wrap items-center gap-2.5 mb-2">
-                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{transactionLabel}</Badge>
-                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>{typeLabel}</Badge>
-                {canonicalVehicle.isElectric && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.electric", "Électrique")}</Badge>}
-                {canonicalVehicle.isHybrid && <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>{t("listing.hybrid", "Hybride")}</Badge>}
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>
+                  {transactionLabel}
+                </Badge>
+                <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>
+                  {typeLabel}
+                </Badge>
+                {canonicalVehicle.isElectric && (
+                  <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>
+                    {t("listing.electric", "Électrique")}
+                  </Badge>
+                )}
+                {canonicalVehicle.isHybrid && (
+                  <Badge variant="secondary" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_SUBTLE_CLASS)}>
+                    {t("listing.hybrid", "Hybride")}
+                  </Badge>
+                )}
                 {listing.badge && (
                   <Badge
                     className={`font-sans text-xs ${
@@ -541,7 +289,7 @@ const ListingDetail = () => {
                     imgClassName="max-h-5"
                     showFallbackLabel={!displayBrandAsset?.logoPath}
                   />
-                    <span className="text-[13px] md:text-xs font-medium font-sans text-muted-foreground">
+                  <span className="text-[13px] md:text-xs font-medium font-sans text-muted-foreground">
                     {t("search.brand", "Marque")}: {displayBrand}
                   </span>
                 </div>
@@ -557,7 +305,9 @@ const ListingDetail = () => {
               </p>
               <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="text-[1.65rem] md:text-[2rem] font-bold text-primary font-sans leading-tight">{formatPrice(listing.price_mga)}</p>
+                  <p className="text-[1.65rem] md:text-[2rem] font-bold text-primary font-sans leading-tight">
+                    {formatPrice(listing.price_mga)}
+                  </p>
                   {activeDeal ? (
                     <p className="text-sm text-muted-foreground font-sans line-through">
                       {formatPrice(activeDeal.originalPriceMga)}
@@ -801,7 +551,7 @@ const ListingDetail = () => {
                   {hasApproxMap
                     ? t(
                         "listing.locationApproxDesc",
-                        "Zone approximative sur la carte (l’adresse exacte n’est pas affichée publiquement)."
+                        "Zone approximative sur la carte (l’adresse exacte n’est pas affichée publiquement).",
                       )
                     : t("listing.locationNoCoords", "Aucune position carte n’a été enregistrée pour ce véhicule.")}
                 </p>
@@ -831,7 +581,7 @@ const ListingDetail = () => {
                     <p className="font-sans text-sm text-foreground max-w-md leading-relaxed">
                       {t(
                         "listing.mapFallback",
-                        "La carte n’est pas disponible pour ce véhicule. L’adresse textuelle ci-dessus reste votre principal repère."
+                        "La carte n’est pas disponible pour ce véhicule. L’adresse textuelle ci-dessus reste votre principal repère.",
                       )}
                     </p>
                   </div>
@@ -871,7 +621,11 @@ const ListingDetail = () => {
                   <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Vendeur")}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {sellerLabel && <Badge variant="outline" className="text-xs font-sans">{sellerLabel}</Badge>}
-                    {listing.agency_verified && <Badge variant="secondary" className="text-xs font-sans">{t("listing.verified", "Vérifié")}</Badge>}
+                    {listing.agency_verified && (
+                      <Badge variant="secondary" className="text-xs font-sans">
+                        {t("listing.verified", "Vérifié")}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>
