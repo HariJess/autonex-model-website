@@ -7,7 +7,7 @@ import ListingCard from "@/components/ListingCard";
 import FilterSidebar from "@/components/FilterSidebar";
 import { ChevronRight, Home, Loader2, Sparkles } from "lucide-react";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
-import { useDbListings } from "@/hooks/useListings";
+import { useDbListings, useFilteredActiveListingCount } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useCallback, useState, useEffect, useRef, lazy, Suspense } from "react";
 import {
@@ -39,6 +39,10 @@ import { listingTypesForTransaction } from "@/lib/listingRules";
 import { formatEngineDisplacementLiters, getExteriorColorLabel } from "@/lib/vehicleAttributes";
 import { buildSearchResultsModel } from "@/pages/search/searchResultsModel";
 import { SEARCH_RELAXED_DB_ROW_CAP } from "@/config/searchListings";
+import {
+  buildSearchRelaxedFetchFilters,
+  buildSearchStrictCountFilters,
+} from "@/lib/searchListingFilters";
 
 const ListingsMap = lazy(() => import("@/components/ListingsMap"));
 
@@ -136,35 +140,11 @@ const SearchPage = () => {
     setMobileFilterDraft(null);
   }, [mobileFilterDraft, filters, updateFilters]);
 
-  const qTrim = filters.quartierLibre.trim();
+  const relaxedListingFilters = useMemo(() => buildSearchRelaxedFetchFilters(filters), [filters]);
+  const strictCountFilters = useMemo(() => buildSearchStrictCountFilters(filters), [filters]);
 
-  const { data: dbListings = [], isLoading, error: queryError, refetch } = useDbListings({
-    transaction: filters.transaction || undefined,
-    vehicleTypes: filters.vehicleTypes.length > 0 ? filters.vehicleTypes : undefined,
-    types: filters.types.length > 0 ? filters.types : undefined,
-    ville: filters.ville || undefined,
-    freeText: qTrim.length >= 1 ? qTrim : undefined,
-    priceMin: filters.priceMin || undefined,
-    priceMax: filters.priceMax || undefined,
-    rooms: filters.rooms.length > 0 ? filters.rooms : undefined,
-    bathrooms: filters.bathrooms.length > 0 ? filters.bathrooms : undefined,
-    surfaceMin: filters.surfaceMin || undefined,
-    surfaceMax: filters.surfaceMax || undefined,
-    brands: filters.brands.length > 0 ? filters.brands : undefined,
-    modelQuery: filters.modelQuery.trim() || undefined,
-    yearMin: filters.yearMin || undefined,
-    yearMax: filters.yearMax || undefined,
-    fuels: filters.fuels.length > 0 ? filters.fuels : undefined,
-    transmissions: filters.transmissions.length > 0 ? filters.transmissions : undefined,
-    drivetrains: filters.drivetrains.length > 0 ? filters.drivetrains : undefined,
-    conditions: filters.conditions.length > 0 ? filters.conditions : undefined,
-    sellerTypes: filters.sellerTypes.length > 0 ? filters.sellerTypes : undefined,
-    exteriorColor: filters.exteriorColor || undefined,
-    engineDisplacementMin: filters.engineDisplacementMin || undefined,
-    engineDisplacementMax: filters.engineDisplacementMax || undefined,
-    searchRelaxation: true,
-    limit: SEARCH_RELAXED_DB_ROW_CAP,
-  });
+  const { data: dbListings = [], isLoading, error: queryError, refetch } = useDbListings(relaxedListingFilters);
+  const { data: strictTotal } = useFilteredActiveListingCount(strictCountFilters);
 
   const {
     sortedExact,
@@ -181,6 +161,22 @@ const SearchPage = () => {
       }),
     [dbListings, filters, sort],
   );
+
+  const equipmentFiltersActive = filters.equipments.length > 0;
+
+  /** Comptage titre : requête head stricte (cohérent SQL) sauf si filtre équipements (non comptabilisé en SQL). */
+  const headlineExactTotal = useMemo(() => {
+    if (equipmentFiltersActive) return sortedExact.length;
+    if (typeof strictTotal === "number") return strictTotal;
+    return sortedExact.length;
+  }, [equipmentFiltersActive, strictTotal, sortedExact.length]);
+
+  const showRelaxedFetchCapHint = useMemo(() => {
+    if (equipmentFiltersActive) return false;
+    if (typeof strictTotal !== "number") return false;
+    if (dbListings.length < SEARCH_RELAXED_DB_ROW_CAP) return false;
+    return strictTotal > sortedExact.length;
+  }, [equipmentFiltersActive, strictTotal, dbListings.length, sortedExact.length]);
 
   const closeMatchLabel = useCallback(
     (listing: DisplayListing) => {
@@ -541,9 +537,9 @@ const SearchPage = () => {
             <span className="text-muted-foreground font-normal text-base md:text-lg">
               {sortedExact.length > 0 ? (
                 <>
-                  ({sortedExact.length}{" "}
+                  ({headlineExactTotal}{" "}
                   {t("search.listingCount", "annonce")}
-                  {sortedExact.length !== 1 ? "s" : ""})
+                  {headlineExactTotal !== 1 ? "s" : ""})
                 </>
               ) : similarFallbackListings.length > 0 ? (
                 <>
@@ -589,7 +585,7 @@ const SearchPage = () => {
               activeFilterCount={activeFilterCount}
               queryError={Boolean(queryError)}
               queryErrorLabel={t("search.resultsUnavailable", "Résultats indisponibles")}
-              resultCount={sortedExact.length > 0 ? sortedExact.length : displayListings.length}
+              resultCount={sortedExact.length > 0 ? headlineExactTotal : displayListings.length}
               resultLabel={
                 sortedExact.length === 0 && similarFallbackListings.length > 0
                   ? t("search.resultsSimilarLabel", "suggestions")
@@ -610,6 +606,14 @@ const SearchPage = () => {
               onSetViewMode={setViewMode}
               onSetSort={setSort}
             />
+            {showRelaxedFetchCapHint && (
+              <p className="text-[13px] text-muted-foreground font-sans mb-3 max-w-3xl leading-relaxed" role="note">
+                {t(
+                  "search.relaxedFetchCapHint",
+                  "Les résultats affichés sont prioritaires sur les annonces récentes dans une fenêtre limitée ; le total peut inclure des annonces hors de cette fenêtre.",
+                )}
+              </p>
+            )}
             {sort === "recent" && (
               <p className="text-[13px] text-muted-foreground font-sans -mt-0.5 mb-3.5 max-w-3xl leading-relaxed">
                 {t(

@@ -20,15 +20,6 @@ function listingMatchesEquipments(features: string[], required: string[]): boole
   });
 }
 
-function normalizeSearchToken(value: string | null | undefined): string {
-  if (!value) return "";
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
 function resolveVehicleMileageKm(listing: DisplayListing): number | null {
   return getCanonicalVehicleAttributes(listing).mileageKm;
 }
@@ -80,74 +71,12 @@ export function buildSearchResultsModel(params: {
 }): SearchResultsModel {
   const { dbListings, filters, sort } = params;
 
+  // Équipements : seul filtre non exprimé proprement en SQL (`features` json) — affinage client.
+  // Carburant, marque, année, etc. sont déjà appliqués côté requête (useDbListings).
   let equippedListings = [...dbListings];
   if (filters.equipments.length > 0) {
     equippedListings = equippedListings.filter((l) =>
       listingMatchesEquipments(l.features, filters.equipments),
-    );
-  }
-  if (filters.fuels.length > 0) {
-    const wanted = new Set(filters.fuels.map((v) => normalizeSearchToken(v)));
-    equippedListings = equippedListings.filter((l) =>
-      wanted.has(normalizeSearchToken(l.vehicle?.fuel)),
-    );
-  }
-  if (filters.transmissions.length > 0) {
-    const wanted = new Set(filters.transmissions.map((v) => normalizeSearchToken(v)));
-    equippedListings = equippedListings.filter((l) =>
-      wanted.has(normalizeSearchToken(l.vehicle?.transmission)),
-    );
-  }
-  if (filters.drivetrains.length > 0) {
-    const wanted = new Set(filters.drivetrains.map((v) => normalizeSearchToken(v)));
-    equippedListings = equippedListings.filter((l) =>
-      wanted.has(normalizeSearchToken(l.vehicle?.drivetrain)),
-    );
-  }
-  if (filters.conditions.length > 0) {
-    const wanted = new Set(filters.conditions.map((v) => normalizeSearchToken(v)));
-    equippedListings = equippedListings.filter((l) =>
-      wanted.has(normalizeSearchToken(l.vehicle?.condition)),
-    );
-  }
-  if (filters.sellerTypes.length > 0) {
-    const wanted = new Set(filters.sellerTypes.map((v) => normalizeSearchToken(v)));
-    equippedListings = equippedListings.filter((l) =>
-      wanted.has(normalizeSearchToken(l.vehicle?.sellerType)),
-    );
-  }
-  if (filters.brands.length > 0) {
-    const wanted = new Set(filters.brands.map((v) => normalizeSearchToken(v)));
-    equippedListings = equippedListings.filter((l) =>
-      wanted.has(normalizeSearchToken(l.vehicle?.make)),
-    );
-  }
-  if (filters.modelQuery.trim()) {
-    const q = normalizeSearchToken(filters.modelQuery);
-    equippedListings = equippedListings.filter((l) =>
-      normalizeSearchToken(l.vehicle?.model).includes(q),
-    );
-  }
-  if (filters.yearMin > 0) {
-    equippedListings = equippedListings.filter((l) => (l.vehicle?.year ?? 0) >= filters.yearMin);
-  }
-  if (filters.yearMax > 0) {
-    equippedListings = equippedListings.filter((l) => (l.vehicle?.year ?? 0) <= filters.yearMax);
-  }
-  if (filters.exteriorColor) {
-    const wantedColor = normalizeSearchToken(filters.exteriorColor);
-    equippedListings = equippedListings.filter((l) =>
-      normalizeSearchToken(l.vehicle?.exteriorColor) === wantedColor,
-    );
-  }
-  if (filters.engineDisplacementMin > 0) {
-    equippedListings = equippedListings.filter(
-      (l) => (l.vehicle?.engineDisplacementL ?? 0) >= filters.engineDisplacementMin,
-    );
-  }
-  if (filters.engineDisplacementMax > 0) {
-    equippedListings = equippedListings.filter(
-      (l) => (l.vehicle?.engineDisplacementL ?? 0) <= filters.engineDisplacementMax,
     );
   }
 

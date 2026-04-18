@@ -18,6 +18,7 @@ import { listingTypesForTransaction } from "@/lib/listingRules";
 import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BRANDS, resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
 import BrandLogo from "@/components/BrandLogo";
 import { useFilteredActiveListingCount } from "@/hooks/useListings";
+import { buildSearchStrictCountFilters } from "@/lib/searchListingFilters";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -173,22 +174,7 @@ const HeroSearch = () => {
 
   const countFilters = useMemo(
     () =>
-      canEstimateResultCount
-        ? {
-            transaction: searchFilters.transaction,
-            vehicleTypes: searchFilters.vehicleTypes,
-            types: searchFilters.types,
-            ville: searchFilters.ville || undefined,
-            freeText: searchFilters.quartierLibre.trim() || undefined,
-            priceMin: searchFilters.priceMin || undefined,
-            priceMax: searchFilters.priceMax || undefined,
-            brands: searchFilters.brands.length > 0 ? searchFilters.brands : undefined,
-            modelQuery: searchFilters.modelQuery || undefined,
-            yearMin: searchFilters.yearMin || undefined,
-            yearMax: searchFilters.yearMax || undefined,
-            fuels: searchFilters.fuels.length > 0 ? searchFilters.fuels : undefined,
-          }
-        : { limit: 0 },
+      canEstimateResultCount ? buildSearchStrictCountFilters(searchFilters) : { limit: 0 },
     [canEstimateResultCount, searchFilters],
   );
 
