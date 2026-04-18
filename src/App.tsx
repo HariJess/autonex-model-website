@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 
 // Eager load: landing page and layout
 import Index from "./pages/Index.tsx";
+import SentrySmokeTest from "./components/dev/SentrySmokeTest";
 
 // Lazy load all other routes
 const SearchPage = lazy(() => import("./pages/SearchPage.tsx"));
@@ -59,6 +60,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <SentrySmokeTest />
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <Routes>
