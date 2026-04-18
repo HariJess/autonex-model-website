@@ -5,10 +5,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { type ListingType, type TransactionType } from "@/types/listing";
-import { getRegionForVille, getSuggestedListingCoordinates } from "@/data/madagascar-locations";
+import { getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
   LISTING_EQUIPMENT_OPTIONS,
   sanitizeListingEquipment,
@@ -40,7 +39,6 @@ import {
   clearLocalPublishBackup,
   createDraftListing,
   deleteDraftListingForOwner,
-  deleteListingPhotoRow,
   fetchDraftListingForOwner,
   fetchListingForOwnerEdit,
   fetchListingPhotos,
@@ -51,12 +49,9 @@ import {
   omitBoostFieldsFromListingPatch,
   saveDraftListing,
   saveLocalPublishBackup,
-  setPhotoCoverFirst,
   shouldSendPublishedListingToReview,
   computeOriginalPriceMgaForEdit,
   updateOwnerListing,
-  uploadListingPhoto,
-  type ServerPhoto,
 } from "@/lib/publishDraft";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -80,11 +75,10 @@ import {
   inferVehicleTypeOptionIdFromFilters,
 } from "@/data/automotiveCatalog";
 import { buildLegacyMirrorPatchFromVehicleInputs } from "@/pages/publish/publishVehicleLegacyMirror";
-import {
-  getFirstInvalidPublishStep,
-  validatePublishStep,
-  type PublishValidationInput,
-} from "@/pages/publish/publishValidation";
+import type { PublishValidationInput } from "@/pages/publish/publishValidation";
+import { buildPublishLocalBackupPayload } from "@/pages/publish/publishBackupPayload";
+import { usePublishMedia } from "@/hooks/publish/usePublishMedia";
+import { usePublishStepValidation } from "@/hooks/publish/usePublishStepValidation";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
@@ -109,7 +103,6 @@ const PublishPage = () => {
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const hydratingRef = useRef(false);
-  const serverPhotosRef = useRef<ServerPhoto[]>([]);
   /** Mode édition d’annonce déjà publiée / hors brouillon (?edit=uuid). */
   const [isPublishedListingEdit, setIsPublishedListingEdit] = useState(false);
   /** Statut courant côté modération (passe à pending_review après changement matériel). */
@@ -187,9 +180,6 @@ const PublishPage = () => {
   const [vehicleIsElectric, setVehicleIsElectric] = useState(false);
   const [vehicleIsHybrid, setVehicleIsHybrid] = useState(false);
 
-  const [serverPhotos, setServerPhotos] = useState<ServerPhoto[]>([]);
-  /** Photos not yet uploaded (waiting for draft id or queued) */
-  const [pendingPhotos, setPendingPhotos] = useState<{ file: File; preview: string }[]>([]);
   const [videoUrl, setVideoUrl] = useState("");
   const [virtualTourUrl, setVirtualTourUrl] = useState("");
 
@@ -203,7 +193,17 @@ const PublishPage = () => {
   const exitBypassRef = useRef(false);
   const lastPersistedFingerprintRef = useRef("");
   const fingerprintInitializedRef = useRef(false);
-  const pendingUploadInFlightRef = useRef(false);
+
+  const {
+    serverPhotos,
+    setServerPhotos,
+    pendingPhotos,
+    serverPhotosRef,
+    flushPendingPhotosToServer,
+    handlePhotoSelect,
+    removePhotoAt,
+    makeCoverAtIndex,
+  } = usePublishMedia(draftListingId, user ?? null);
 
   const publishValidationInput = useMemo<PublishValidationInput>(
     () => ({
@@ -244,6 +244,8 @@ const PublishPage = () => {
       pendingPhotos.length,
     ],
   );
+
+  const { validateStep, getFirstInvalidStep } = usePublishStepValidation(publishValidationInput, t);
 
   const applyVehicleLegacyMirrorFromInputs = useCallback(
     (nextVehicle: { mileageKmInput?: string; doorsInput?: string; seatsInput?: string }) => {
@@ -633,16 +635,6 @@ const PublishPage = () => {
     }
   }, [ville]);
 
-  useEffect(() => {
-    serverPhotosRef.current = serverPhotos;
-  }, [serverPhotos]);
-
-  useEffect(() => {
-    return () => {
-      pendingPhotos.forEach((p) => URL.revokeObjectURL(p.preview));
-    };
-  }, [pendingPhotos]);
-
   /** Bootstrap draft listing: ?new=1 forces a fresh draft; ?draft=id resumes; default creates a fresh draft. */
   useEffect(() => {
     if (!user?.id) {
@@ -874,7 +866,68 @@ const PublishPage = () => {
           setLastSavedAt(updatedAt);
           setSaveStatus("saved");
           lastPersistedFingerprintRef.current = progressFingerprint;
-          saveLocalPublishBackup(user.id, draftListingId, {
+          saveLocalPublishBackup(
+            user.id,
+            draftListingId,
+            buildPublishLocalBackupPayload({
+              draftListingId,
+              step: stepOverride ?? step,
+              transaction,
+              listingType,
+              isNewProgram,
+              internalRef,
+              ville,
+              arrondissement,
+              quartier,
+              quartierLibre,
+              pinLat,
+              pinLng,
+              title,
+              description,
+              priceMga,
+              surface,
+              rooms,
+              bathrooms,
+              toilets,
+              vehicleMake,
+              vehicleModel,
+              vehicleYear,
+              vehicleFuel,
+              vehicleTransmission,
+              vehicleDrivetrain,
+              vehicleCondition,
+              vehicleSellerType,
+              vehicleRentalMode,
+              vehicleBodyStyle,
+              vehicleDoors,
+              vehicleSeats,
+              vehicleExteriorColor,
+              vehicleEngineDisplacement,
+              vehicleInteriorColor,
+              vehicleAvailabilityStatus,
+              vehicleWhatsappPhone,
+              vehicleIsElectric,
+              vehicleIsHybrid,
+              selectedFeatures: selectedFeaturesWithVehicleMeta,
+              videoUrl,
+              virtualTourUrl,
+              selectedBoosts,
+              agencySpotlight,
+            }),
+          );
+          await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
+          await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
+          return true;
+        }
+
+        const { updatedAt } = await saveDraftListing(draftListingId, patchBase);
+        setLastSavedAt(updatedAt);
+        setSaveStatus("saved");
+        lastPersistedFingerprintRef.current = progressFingerprint;
+        saveLocalPublishBackup(
+          user.id,
+          draftListingId,
+          buildPublishLocalBackupPayload({
             draftListingId,
             step: stepOverride ?? step,
             transaction,
@@ -918,61 +971,8 @@ const PublishPage = () => {
             virtualTourUrl,
             selectedBoosts,
             agencySpotlight,
-          });
-          await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
-          await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
-          return true;
-        }
-
-        const { updatedAt } = await saveDraftListing(draftListingId, patchBase);
-        setLastSavedAt(updatedAt);
-        setSaveStatus("saved");
-        lastPersistedFingerprintRef.current = progressFingerprint;
-        saveLocalPublishBackup(user.id, draftListingId, {
-          draftListingId,
-          step: stepOverride ?? step,
-          transaction,
-          listingType,
-          isNewProgram,
-          internalRef,
-          ville,
-          arrondissement,
-          quartier,
-          quartierLibre,
-          pinLat,
-          pinLng,
-          title,
-          description,
-          priceMga,
-          surface,
-          rooms,
-          bathrooms,
-          toilets,
-          vehicleMake,
-          vehicleModel,
-          vehicleYear,
-          vehicleFuel,
-          vehicleTransmission,
-          vehicleDrivetrain,
-          vehicleCondition,
-          vehicleSellerType,
-          vehicleRentalMode,
-          vehicleBodyStyle,
-          vehicleDoors,
-          vehicleSeats,
-          vehicleExteriorColor,
-          vehicleEngineDisplacement,
-          vehicleInteriorColor,
-          vehicleAvailabilityStatus,
-          vehicleWhatsappPhone,
-          vehicleIsElectric,
-          vehicleIsHybrid,
-          selectedFeatures: selectedFeaturesWithVehicleMeta,
-          videoUrl,
-          virtualTourUrl,
-          selectedBoosts,
-          agencySpotlight,
-        });
+          }),
+        );
         await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
         return true;
       } catch (e) {
@@ -1118,51 +1118,55 @@ const PublishPage = () => {
       }
       if (draftListingId && user?.id) {
         try {
-          saveLocalPublishBackup(user.id, draftListingId, {
+          saveLocalPublishBackup(
+            user.id,
             draftListingId,
-            step,
-            transaction,
-            listingType,
-            isNewProgram,
-            internalRef,
-            ville,
-            arrondissement,
-            quartier,
-            quartierLibre,
-            pinLat,
-            pinLng,
-            title,
-            description,
-            priceMga,
-            surface,
-            rooms,
-            bathrooms,
-            toilets,
-            vehicleMake,
-            vehicleModel,
-            vehicleYear,
-            vehicleFuel,
-            vehicleTransmission,
-            vehicleDrivetrain,
-            vehicleCondition,
-            vehicleSellerType,
-            vehicleRentalMode,
-            vehicleBodyStyle,
-            vehicleDoors,
-            vehicleSeats,
-            vehicleExteriorColor,
-            vehicleEngineDisplacement,
-            vehicleInteriorColor,
-            vehicleAvailabilityStatus,
-            vehicleWhatsappPhone,
-            vehicleIsElectric,
-            vehicleIsHybrid,
-            selectedFeatures: selectedFeaturesWithVehicleMeta,
-            videoUrl,
-            virtualTourUrl,
-            selectedBoosts,
-            agencySpotlight,
-          });
+            buildPublishLocalBackupPayload({
+              draftListingId,
+              step,
+              transaction,
+              listingType,
+              isNewProgram,
+              internalRef,
+              ville,
+              arrondissement,
+              quartier,
+              quartierLibre,
+              pinLat,
+              pinLng,
+              title,
+              description,
+              priceMga,
+              surface,
+              rooms,
+              bathrooms,
+              toilets,
+              vehicleMake,
+              vehicleModel,
+              vehicleYear,
+              vehicleFuel,
+              vehicleTransmission,
+              vehicleDrivetrain,
+              vehicleCondition,
+              vehicleSellerType,
+              vehicleRentalMode,
+              vehicleBodyStyle,
+              vehicleDoors,
+              vehicleSeats,
+              vehicleExteriorColor,
+              vehicleEngineDisplacement,
+              vehicleInteriorColor,
+              vehicleAvailabilityStatus,
+              vehicleWhatsappPhone,
+              vehicleIsElectric,
+              vehicleIsHybrid,
+              selectedFeatures: selectedFeaturesWithVehicleMeta,
+              videoUrl,
+              virtualTourUrl,
+              selectedBoosts,
+              agencySpotlight,
+            }),
+          );
         } catch {
           /* ignore */
         }
@@ -1269,135 +1273,6 @@ const PublishPage = () => {
       setTitle(autoTitle.slice(0, 120));
     }
   }, [vehicleMake, vehicleModel, vehicleYear, title]);
-
-  const makeCoverAtIndex = async (globalIndex: number) => {
-    if (!draftListingId || globalIndex <= 0) return;
-    const nServer = serverPhotos.length;
-    if (globalIndex < nServer) {
-      try {
-        await setPhotoCoverFirst(draftListingId, serverPhotos, globalIndex);
-        const next = await fetchListingPhotos(draftListingId);
-        setServerPhotos(next);
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Erreur");
-      }
-    } else {
-      const pendingIdx = globalIndex - nServer;
-      setPendingPhotos((prev) => {
-        if (pendingIdx <= 0) return prev;
-        const n = [...prev];
-        const [x] = n.splice(pendingIdx, 1);
-        n.unshift(x);
-        return n;
-      });
-    }
-  };
-
-  const flushPendingPhotosToServer = useCallback(async (): Promise<{ uploaded: number; failed: number }> => {
-    if (!draftListingId || pendingPhotos.length === 0) return { uploaded: 0, failed: 0 };
-    if (pendingUploadInFlightRef.current) return { uploaded: 0, failed: 0 };
-
-    pendingUploadInFlightRef.current = true;
-    const batch = [...pendingPhotos];
-    const successPreviews = new Set<string>();
-    let failed = 0;
-    let nextPosition = serverPhotosRef.current.length;
-
-    try {
-      for (const row of batch) {
-        try {
-          const photo = await uploadListingPhoto(draftListingId, row.file, nextPosition);
-          nextPosition += 1;
-          successPreviews.add(row.preview);
-          serverPhotosRef.current = [...serverPhotosRef.current, photo];
-          setServerPhotos((prev) => [...prev, photo]);
-        } catch {
-          failed += 1;
-        }
-      }
-    } finally {
-      setPendingPhotos((prev) => prev.filter((row) => !successPreviews.has(row.preview)));
-      successPreviews.forEach((preview) => URL.revokeObjectURL(preview));
-      pendingUploadInFlightRef.current = false;
-    }
-
-    return { uploaded: successPreviews.size, failed };
-  }, [draftListingId, pendingPhotos]);
-
-  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const files = Array.from(e.target.files).slice(0, 10);
-    if (!draftListingId || !user) {
-      setPendingPhotos((prev) => [
-        ...prev,
-        ...files.map((file) => ({ file, preview: URL.createObjectURL(file) })),
-      ]);
-      return;
-    }
-    let nextPosition = serverPhotosRef.current.length;
-    for (const file of files) {
-      try {
-        const ph = await uploadListingPhoto(draftListingId, file, nextPosition);
-        nextPosition += 1;
-        serverPhotosRef.current = [...serverPhotosRef.current, ph];
-        setServerPhotos((s) => [...s, ph]);
-      } catch (err) {
-        setPendingPhotos((prev) => [...prev, { file, preview: URL.createObjectURL(file) }]);
-        toast.error(err instanceof Error ? err.message : "Upload impossible");
-      }
-    }
-  };
-
-  const removePhotoAt = async (globalIndex: number) => {
-    const nServer = serverPhotos.length;
-    if (globalIndex < nServer) {
-      const ph = serverPhotos[globalIndex];
-      try {
-        await deleteListingPhotoRow(ph.id, ph.url);
-        setServerPhotos((s) => s.filter((x) => x.id !== ph.id));
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Erreur");
-      }
-    } else {
-      const pi = globalIndex - nServer;
-      setPendingPhotos((prev) => {
-        const row = prev[pi];
-        if (row) URL.revokeObjectURL(row.preview);
-        return prev.filter((_, i) => i !== pi);
-      });
-    }
-  };
-
-  /** Flush pending local files once draft id exists (e.g. user logged in late). */
-  useEffect(() => {
-    if (!draftListingId || pendingPhotos.length === 0 || !user) return;
-    let cancelled = false;
-    (async () => {
-      const { failed } = await flushPendingPhotosToServer();
-      if (!cancelled && failed > 0) {
-        toast.error(t("publish.uploadRetryNeeded", "Certaines photos n'ont pas pu être envoyées. Réessayez."));
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [draftListingId, pendingPhotos.length, user, flushPendingPhotosToServer, t]);
-
-  const validateStep = useCallback(
-    (s: number) =>
-      validatePublishStep(s, publishValidationInput, (key, fallback) =>
-        t(key, fallback),
-      ),
-    [publishValidationInput, t],
-  );
-
-  const getFirstInvalidStep = useCallback(
-    () =>
-      getFirstInvalidPublishStep(publishValidationInput, (key, fallback) =>
-        t(key, fallback),
-      ),
-    [publishValidationInput, t],
-  );
 
   const handleNext = async () => {
     const errors = validateStep(step);
