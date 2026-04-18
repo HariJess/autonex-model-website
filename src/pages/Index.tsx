@@ -25,9 +25,12 @@ const Index = () => {
     "AutoNex : annonces automobiles à Madagascar — achat, vente, voitures, 4x4, motos et utilitaires.",
   );
   const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
-  const { data: listings = [], isLoading } = useDbListings({ limit: 8 });
-  const { data: thematicListings = [], isLoading: themedLoading } = useDbListings({ limit: 32 });
-  const { data: dealCandidates = [], isLoading: dealsLoading } = useDbListings({ limit: 48 });
+  const { data: allListings = [], isLoading } = useDbListings({ limit: 48 });
+  const listings = useMemo(() => allListings.slice(0, 8), [allListings]);
+  const thematicListings = useMemo(() => allListings.slice(0, 32), [allListings]);
+  const dealCandidates = allListings;
+  const themedLoading = isLoading;
+  const dealsLoading = isLoading;
   const heroCategoryShortcuts = useMemo(
     () => [
       {
