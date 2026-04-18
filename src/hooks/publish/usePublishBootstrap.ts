@@ -12,6 +12,7 @@ import {
   buildListingMaterialSnapshotFromRow,
   type ServerPhoto,
 } from "@/lib/publishDraft";
+import { removeDraft } from "@/lib/draftStorage";
 
 export const LISTING_ID_UUID_PARAM_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -138,6 +139,10 @@ export function usePublishBootstrap(deps: PublishBootstrapDeps): void {
           const row = await fetchDraftListingForOwner(draftParam, userId);
           if (cancelled) return;
           if (!row) {
+            // Phantom UUID: backup kept a draft id whose row no longer
+            // exists server-side. Drop the local entry so subsequent
+            // autosave attempts don't 406-loop on a missing row.
+            removeDraft(userId, draftParam);
             toast.error(t("publish.draftNotFound", "Brouillon introuvable."));
             navigate("/dashboard");
             return;

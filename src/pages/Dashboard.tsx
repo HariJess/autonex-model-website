@@ -13,6 +13,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { useCreditsBalance } from "@/hooks/useCreditsBalance";
 import { BOOST_LABELS_FR } from "@/config/monetization";
 import { partitionBoostRowsByListing } from "@/lib/listingBoosts";
+import { removeDraft } from "@/lib/draftStorage";
 import { DashboardHeader } from "@/pages/dashboard/components/DashboardHeader";
 import { DashboardStatsCards } from "@/pages/dashboard/components/DashboardStatsCards";
 import { DashboardDraftListingsSection } from "@/pages/dashboard/components/DashboardDraftListingsSection";
@@ -218,6 +219,9 @@ const Dashboard = () => {
       // Delete listing
       const { error } = await supabase.from("listings").delete().eq("id", id);
       if (error) throw new Error(error.message);
+      // Drop any matching local draft backup so a later /publier visit
+      // doesn't autosave-loop against a phantom UUID.
+      if (user?.id) removeDraft(user.id, id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-listings", user?.id] });

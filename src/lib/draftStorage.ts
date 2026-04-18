@@ -17,6 +17,12 @@ import type { LocalPublishBackupV1 } from "@/lib/publishDraft";
 export const DRAFT_PREFIX = "autonex.publishDraft.v1:";
 export const LEGACY_IMMONEX_PREFIX = "immonex.publishDraft.v1:";
 
+/**
+ * Drafts not touched for this long are considered abandoned and swept at
+ * boot. Exposed for the unit test; the runtime purge reads this constant.
+ */
+export const DRAFT_TTL_DAYS = 30;
+
 export type DraftIdentifier = { userId: string; draftId: string };
 
 function draftKey(userId: string, draftId: string): string {
@@ -54,13 +60,15 @@ export function getDraft(userId: string, draftId: string): LocalPublishBackupV1 
 export function setDraft(
   userId: string,
   draftId: string,
-  data: Omit<LocalPublishBackupV1, "v" | "savedAt"> & { step: number },
+  data: Omit<LocalPublishBackupV1, "v" | "savedAt" | "lastTouchedAt"> & { step: number },
 ): void {
   if (typeof window === "undefined") return;
   try {
+    const now = new Date().toISOString();
     const payload: LocalPublishBackupV1 = {
       v: 1,
-      savedAt: new Date().toISOString(),
+      savedAt: now,
+      lastTouchedAt: now,
       ...data,
     };
     window.localStorage.setItem(draftKey(userId, draftId), JSON.stringify(payload));
@@ -110,6 +118,51 @@ export function listDrafts(): DraftIdentifier[] {
  *
  * @returns number of legacy entries migrated or cleaned up.
  */
+/**
+ * Sweeps drafts whose last save timestamp is older than `DRAFT_TTL_DAYS`.
+ * Falls back to `savedAt` when a pre-TTL entry has no `lastTouchedAt`.
+ * Safe under localStorage quota/private-mode errors.
+ *
+ * @returns number of entries purged.
+ */
+export function purgeExpiredDrafts(ttlDays: number = DRAFT_TTL_DAYS): number {
+  if (typeof window === "undefined") return 0;
+  const ttlMs = ttlDays * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  try {
+    const candidates: string[] = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const k = window.localStorage.key(i);
+      if (k && k.startsWith(DRAFT_PREFIX)) candidates.push(k);
+    }
+    let purged = 0;
+    for (const key of candidates) {
+      const raw = window.localStorage.getItem(key);
+      if (!raw) continue;
+      let stamp: number | null = null;
+      try {
+        const parsed = JSON.parse(raw) as LocalPublishBackupV1;
+        const iso = parsed.lastTouchedAt ?? parsed.savedAt;
+        const t = iso ? Date.parse(iso) : NaN;
+        stamp = Number.isFinite(t) ? t : null;
+      } catch {
+        stamp = null;
+      }
+      // Corrupt/timestamp-less entries are swept too — nothing to protect.
+      if (stamp == null || now - stamp > ttlMs) {
+        window.localStorage.removeItem(key);
+        purged += 1;
+      }
+    }
+    if (import.meta.env.DEV && purged > 0) {
+      console.info(`[draftStorage] purged ${purged} draft(s) older than ${ttlDays} days`);
+    }
+    return purged;
+  } catch {
+    return 0;
+  }
+}
+
 export function migrateLegacyImmonexDrafts(): number {
   if (typeof window === "undefined") return 0;
   try {

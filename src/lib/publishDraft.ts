@@ -46,6 +46,8 @@ export type LocalPublishBackupV1 = {
   v: 1;
   draftListingId: string;
   savedAt: string;
+  /** Refreshed on every setDraft. Drives TTL purge. Optional for pre-TTL entries still in user browsers. */
+  lastTouchedAt?: string;
   step: number;
   transaction: TransactionType | "";
   listingType: ListingType | "";
@@ -149,6 +151,26 @@ export async function fetchDraftListingForOwner(
     .maybeSingle();
   if (error) throw new Error(error.message);
   return data;
+}
+
+/**
+ * If a local backup exists for (userId, draftId) but no matching draft row is
+ * in Supabase, remove the local entry. Prevents the "phantom UUID" PATCH loop
+ * where the autosave keeps targeting an id that no longer exists server-side.
+ *
+ * Call this at the mount of /publier whenever a draftId is in scope (either
+ * from the URL or cached state). Safe to call when the local entry is absent.
+ */
+export async function reconcileDraftWithDb(userId: string, draftId: string): Promise<void> {
+  const local = getDraft(userId, draftId);
+  if (!local) return;
+  try {
+    const row = await fetchDraftListingForOwner(draftId, userId);
+    if (!row) removeDraft(userId, draftId);
+  } catch {
+    // Network or RLS error — leave the local entry alone rather than
+    // discarding a potentially recoverable draft on a transient failure.
+  }
 }
 
 /** Annonce déjà créée (non brouillon) — propriétaire uniquement. */
