@@ -52,6 +52,7 @@ export function getCanonicalVehicleAttributes(listing: DisplayListing): Canonica
   };
 }
 
+/** Écrit les valeurs véhicule dans les colonnes DB encore nommées à l’ancienne ; voir `legacyListingsDbColumns.ts`. */
 export function buildLegacyMirrorFieldsFromVehicle(params: {
   mileageKm: number | null;
   trimOrVersion: number | null;

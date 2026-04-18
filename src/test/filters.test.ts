@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { LISTING_TYPES, LISTING_TYPE_LABELS, TRANSACTION_TYPES, TRANSACTION_LABELS } from "@/types/listing";
+import {
+  LISTING_TYPES,
+  LISTING_TYPE_LABELS,
+  LISTING_TYPES_WITHOUT_ROOM_FILTERS,
+  LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS,
+  TRANSACTION_LABELS,
+  TRANSACTION_TYPES,
+} from "@/types/listing";
 import type { ListingType, TransactionType } from "@/types/listing";
 
 describe("Listing types", () => {
@@ -84,19 +91,16 @@ describe("Filter URL serialization", () => {
   });
 });
 
-describe("Type-aware field logic", () => {
-  const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
-  const TYPES_WITHOUT_ROOMS: ListingType[] = ["terrain", "local_commercial", "bureau"];
-
-  it("residential types should show rooms", () => {
-    for (const type of TYPES_WITH_ROOMS) {
-      expect(TYPES_WITH_ROOMS.includes(type)).toBe(true);
+describe("Type-aware field logic (legacy DB columns as trim/doors)", () => {
+  it("trim/doors fields apply to citadine / SUV / berline categories", () => {
+    for (const type of LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS) {
+      expect(LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(type)).toBe(true);
     }
   });
 
-  it("non-residential types should not show rooms", () => {
-    for (const type of TYPES_WITHOUT_ROOMS) {
-      expect(TYPES_WITH_ROOMS.includes(type)).toBe(false);
+  it("types without trim/doors filters exclude those categories", () => {
+    for (const type of LISTING_TYPES_WITHOUT_ROOM_FILTERS) {
+      expect(LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(type)).toBe(false);
     }
   });
 });

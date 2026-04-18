@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { formatMGA, formatEUR, mgaToEur } from "@/config/currency";
+import { AUTONEX_STORAGE_KEYS, LEGACY_IMMONEX_STORAGE_KEYS } from "@/lib/localStorageLegacyKeys";
 
 type Currency = "MGA" | "EUR";
 
@@ -11,12 +12,19 @@ interface CurrencyContextType {
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
-const CURRENCY_STORAGE_KEY = "immonex_currency";
 
 function readStoredCurrency(): Currency {
   try {
     if (typeof window === "undefined") return "MGA";
-    const stored = window.localStorage.getItem(CURRENCY_STORAGE_KEY);
+    let stored = window.localStorage.getItem(AUTONEX_STORAGE_KEYS.currency);
+    if (!stored) {
+      const legacy = window.localStorage.getItem(LEGACY_IMMONEX_STORAGE_KEYS.currency);
+      if (legacy === "EUR" || legacy === "MGA") {
+        stored = legacy;
+        window.localStorage.setItem(AUTONEX_STORAGE_KEYS.currency, legacy);
+        window.localStorage.removeItem(LEGACY_IMMONEX_STORAGE_KEYS.currency);
+      }
+    }
     return stored === "EUR" || stored === "MGA" ? stored : "MGA";
   } catch {
     return "MGA";
@@ -29,7 +37,8 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     try {
       if (typeof window !== "undefined") {
-        window.localStorage.setItem(CURRENCY_STORAGE_KEY, currency);
+        window.localStorage.setItem(AUTONEX_STORAGE_KEYS.currency, currency);
+        window.localStorage.removeItem(LEGACY_IMMONEX_STORAGE_KEYS.currency);
       }
     } catch {
       // Ignore storage write failures (private mode, blocked storage).

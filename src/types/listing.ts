@@ -20,6 +20,13 @@ export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly ListingType[] = [
   "bureau",
 ] as const;
 
+/**
+ * Valeurs `listing_type` où le flux publication/recherche expose encore les champs DB legacy
+ * `rooms` (= finition/version) et `bathrooms` (= portes). Nom historique « rooms » = immobilier ;
+ * préférer cette constante à un libellé trompeur type `TYPES_WITH_ROOMS`.
+ */
+export const LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS: readonly ListingType[] = ["appartement", "villa", "maison"];
+
 export const LISTING_TYPE_LABELS: Record<ListingType, string> = {
   appartement: "Citadine",
   villa: "SUV / 4x4",
@@ -78,6 +85,7 @@ export type LegacyListingMirrorFields = {
   surface: number | null;
   rooms: number | null;
   bathrooms: number | null;
+  /** Sièges / places côté véhicule. */
   toilets?: number | null;
 };
 
@@ -94,8 +102,11 @@ export interface DisplayListing {
   price_mga: number;
   original_price_mga?: number | null;
   price_eur: number | null;
+  /** Kilométrage (km) tant que la colonne DB `surface` garde ce nom legacy. */
   surface: number | null;
+  /** Indice version/finition (`rooms` en base — pas « chambres »). */
   rooms: number | null;
+  /** Portes (`bathrooms` en base — pas salles de bain). */
   bathrooms: number | null;
   ville: string | null;
   region: string | null;
@@ -120,6 +131,7 @@ export interface DisplayListing {
   agency_logo?: string | null;
   agency_verified?: boolean;
   badge?: "boost" | "coup_de_coeur" | "nouveau" | "urgent" | null;
+  /** Places / sièges lorsque reflété par la colonne legacy `toilets`. */
   toilets?: number | null;
   video_url?: string | null;
   virtual_tour_url?: string | null;

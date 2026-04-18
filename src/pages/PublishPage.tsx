@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { Loader2 } from "lucide-react";
-import { type ListingType, type TransactionType } from "@/types/listing";
+import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType, type TransactionType } from "@/types/listing";
 import { getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
   LISTING_EQUIPMENT_OPTIONS,
@@ -78,8 +78,6 @@ import { usePublishStepValidation } from "@/hooks/publish/usePublishStepValidati
 import { usePublishBootstrap } from "@/hooks/publish/usePublishBootstrap";
 import { usePublishDraftLifecycle } from "@/hooks/publish/usePublishDraftLifecycle";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
-
-const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
 
 const PublishPage = () => {
   const { t } = useTranslation();
@@ -253,7 +251,8 @@ const PublishPage = () => {
     [],
   );
 
-  const showRooms = listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
+  const showRooms =
+    listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
   const manualPaymentMethods = useMemo(
     () => [
       { id: "bank_transfer", name: t("publish.paymentMethodBankTransfer", "Bank transfer") },
@@ -923,7 +922,7 @@ const PublishPage = () => {
   });
 
   useEffect(() => {
-    if (listingType && !TYPES_WITH_ROOMS.includes(listingType as ListingType)) {
+    if (listingType && !LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType)) {
       setRooms("");
       setBathrooms("");
       setToilets("");

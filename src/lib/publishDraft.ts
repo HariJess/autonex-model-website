@@ -1,16 +1,19 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
-import type { ListingType, TransactionType } from "@/types/listing";
+import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType, type TransactionType } from "@/types/listing";
 import { getRegionForVille } from "@/data/madagascar-locations";
 import type { PurchasableBoostType } from "@/config/monetization";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
 import { buildLegacyMirrorFieldsFromVehicle } from "@/lib/vehicleCanonical";
+import {
+  AUTONEX_STORAGE_KEYS,
+  LEGACY_IMMONEX_STORAGE_KEYS,
+  publishDraftStorageKey,
+} from "@/lib/localStorageLegacyKeys";
 
 export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
-
-const LOCAL_KEY_PREFIX = "immonex.publishDraft.v1";
 
 const CONTROLLED_FUEL_VALUES = ["Essence", "Diesel", "Hybride", "Hybride rechargeable", "Électrique"] as const;
 const CONTROLLED_TRANSMISSION_VALUES = ["Boîte manuelle", "Boîte automatique"] as const;
@@ -88,7 +91,11 @@ export type LocalPublishBackupV1 = {
 };
 
 export function localBackupKey(userId: string, draftListingId: string) {
-  return `${LOCAL_KEY_PREFIX}:${userId}:${draftListingId}`;
+  return publishDraftStorageKey(AUTONEX_STORAGE_KEYS.publishDraftPrefix, userId, draftListingId);
+}
+
+function legacyPublishDraftBackupKey(userId: string, draftListingId: string) {
+  return publishDraftStorageKey(LEGACY_IMMONEX_STORAGE_KEYS.publishDraftPrefix, userId, draftListingId);
 }
 
 export function saveLocalPublishBackup(userId: string, draftListingId: string, data: Omit<LocalPublishBackupV1, "v" | "savedAt"> & { step: number }) {
@@ -98,7 +105,9 @@ export function saveLocalPublishBackup(userId: string, draftListingId: string, d
       savedAt: new Date().toISOString(),
       ...data,
     };
-    localStorage.setItem(localBackupKey(userId, draftListingId), JSON.stringify(payload));
+    const key = localBackupKey(userId, draftListingId);
+    localStorage.setItem(key, JSON.stringify(payload));
+    localStorage.removeItem(legacyPublishDraftBackupKey(userId, draftListingId));
   } catch {
     /* quota / private mode */
   }
@@ -106,7 +115,15 @@ export function saveLocalPublishBackup(userId: string, draftListingId: string, d
 
 export function loadLocalPublishBackup(userId: string, draftListingId: string): LocalPublishBackupV1 | null {
   try {
-    const raw = localStorage.getItem(localBackupKey(userId, draftListingId));
+    let raw = localStorage.getItem(localBackupKey(userId, draftListingId));
+    if (!raw) {
+      const legacy = localStorage.getItem(legacyPublishDraftBackupKey(userId, draftListingId));
+      if (legacy) {
+        localStorage.setItem(localBackupKey(userId, draftListingId), legacy);
+        localStorage.removeItem(legacyPublishDraftBackupKey(userId, draftListingId));
+        raw = legacy;
+      }
+    }
     if (!raw) return null;
     const p = JSON.parse(raw) as LocalPublishBackupV1;
     if (p.v !== 1 || !p.savedAt) return null;
@@ -119,6 +136,7 @@ export function loadLocalPublishBackup(userId: string, draftListingId: string): 
 export function clearLocalPublishBackup(userId: string, draftListingId: string) {
   try {
     localStorage.removeItem(localBackupKey(userId, draftListingId));
+    localStorage.removeItem(legacyPublishDraftBackupKey(userId, draftListingId));
   } catch {
     /* ignore */
   }
@@ -259,8 +277,7 @@ function effectiveListingType(t: ListingType | ""): ListingType {
 }
 
 function showRoomsForType(listingType: ListingType | ""): boolean {
-  const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
-  return listingType === "" || TYPES_WITH_ROOMS.includes(listingType as ListingType);
+  return listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
 }
 
 function parseVehicleMileageKmFromLegacySurfaceInput(
