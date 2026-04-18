@@ -5,7 +5,7 @@ import {
   mileageKmLooseFromDisplayListing,
   doorsCanonicalFromDisplayListing,
   doorsLooseFromDisplayListing,
-  parseMileageKmFromPublishFormLegacySurfaceField,
+  parseMileageKmFromPublishSurfaceField,
   seatsCanonicalFromDisplayListing,
   trimVersionNumericLooseFromDisplayListing,
 } from "@/lib/legacyListingVehicleMapping";
@@ -89,7 +89,7 @@ describe("legacyListingVehicleMapping", () => {
     expect(mileageKmFormStringFromListingRow({ mileage_km: null, surface: null })).toBe("");
   });
 
-  it("parseMileageKmFromPublishFormLegacySurfaceField delegates to normalizeInt", () => {
+  it("parseMileageKmFromPublishSurfaceField delegates to normalizeInt", () => {
     const normalizeInt = (value: string, min: number, max?: number) => {
       const n = Number(value);
       if (!Number.isFinite(n)) return null;
@@ -98,8 +98,8 @@ describe("legacyListingVehicleMapping", () => {
       if (typeof max === "number" && intVal > max) return null;
       return intVal;
     };
-    expect(parseMileageKmFromPublishFormLegacySurfaceField("45000", normalizeInt)).toBe(45000);
+    expect(parseMileageKmFromPublishSurfaceField("45000", normalizeInt)).toBe(45000);
     // Aligné sur `Number("")` → 0 avec min 0 (champ vide = 0 km acceptable pour le parseur).
-    expect(parseMileageKmFromPublishFormLegacySurfaceField("", normalizeInt)).toBe(0);
+    expect(parseMileageKmFromPublishSurfaceField("", normalizeInt)).toBe(0);
   });
 });

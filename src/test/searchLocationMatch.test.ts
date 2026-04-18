@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import {
   matchesLocationSubareas,
-  matchesRoomsStrict,
-  matchesBathroomsStrict,
+  matchesTrimVersionFilterStrict,
+  matchesDoorCountFilterStrict,
   matchesPriceMaxStrict,
   matchesPriceMinStrict,
-  matchesSurfaceMaxStrict,
-  matchesSurfaceMinStrict,
+  matchesMileageKmMaxStrict,
+  matchesMileageKmMinStrict,
 } from "@/lib/searchLocationMatch";
 import type { DisplayListing } from "@/types/listing";
 import type { SearchFilters } from "@/types/search";
@@ -94,61 +94,61 @@ describe("matchesLocationSubareas", () => {
   });
 });
 
-describe("matchesRoomsStrict", () => {
+describe("matchesTrimVersionFilterStrict", () => {
   it("match si aucun filtre", () => {
-    expect(matchesRoomsStrict(3, [])).toBe(true);
+    expect(matchesTrimVersionFilterStrict(3, [])).toBe(true);
   });
 
   it("match nombre exact", () => {
-    expect(matchesRoomsStrict(3, [3])).toBe(true);
+    expect(matchesTrimVersionFilterStrict(3, [3])).toBe(true);
   });
 
   it("ne match pas nombre différent", () => {
-    expect(matchesRoomsStrict(3, [2])).toBe(false);
+    expect(matchesTrimVersionFilterStrict(3, [2])).toBe(false);
   });
 
   it("match studio (0)", () => {
-    expect(matchesRoomsStrict(0, [0])).toBe(true);
+    expect(matchesTrimVersionFilterStrict(0, [0])).toBe(true);
   });
 
   it("5+ filter : match 5", () => {
-    expect(matchesRoomsStrict(5, [5])).toBe(true);
+    expect(matchesTrimVersionFilterStrict(5, [5])).toBe(true);
   });
 
   it("5+ filter : match 10", () => {
-    expect(matchesRoomsStrict(10, [5])).toBe(true);
+    expect(matchesTrimVersionFilterStrict(10, [5])).toBe(true);
   });
 
   it("5+ filter : ne match pas 4", () => {
-    expect(matchesRoomsStrict(4, [5])).toBe(false);
+    expect(matchesTrimVersionFilterStrict(4, [5])).toBe(false);
   });
 
   it("match si l'une des valeurs du filtre match", () => {
-    expect(matchesRoomsStrict(3, [1, 2, 3])).toBe(true);
+    expect(matchesTrimVersionFilterStrict(3, [1, 2, 3])).toBe(true);
   });
 
-  it("rooms null ne match rien (sauf filtre vide)", () => {
-    expect(matchesRoomsStrict(null, [2])).toBe(false);
-    expect(matchesRoomsStrict(null, [])).toBe(true);
+  it("indice null ne match rien (sauf filtre vide)", () => {
+    expect(matchesTrimVersionFilterStrict(null, [2])).toBe(false);
+    expect(matchesTrimVersionFilterStrict(null, [])).toBe(true);
   });
 });
 
-describe("matchesBathroomsStrict", () => {
+describe("matchesDoorCountFilterStrict", () => {
   it("match exact", () => {
-    expect(matchesBathroomsStrict(2, [2])).toBe(true);
+    expect(matchesDoorCountFilterStrict(2, [2])).toBe(true);
   });
 
   it("4+ filter : match 4 et plus", () => {
-    expect(matchesBathroomsStrict(4, [4])).toBe(true);
-    expect(matchesBathroomsStrict(7, [4])).toBe(true);
+    expect(matchesDoorCountFilterStrict(4, [4])).toBe(true);
+    expect(matchesDoorCountFilterStrict(7, [4])).toBe(true);
   });
 
   it("4+ filter : ne match pas 3", () => {
-    expect(matchesBathroomsStrict(3, [4])).toBe(false);
+    expect(matchesDoorCountFilterStrict(3, [4])).toBe(false);
   });
 
   it("filtre vide = match tout", () => {
-    expect(matchesBathroomsStrict(1, [])).toBe(true);
+    expect(matchesDoorCountFilterStrict(1, [])).toBe(true);
   });
 });
 
@@ -184,30 +184,30 @@ describe("matchesPriceMinStrict", () => {
   });
 });
 
-describe("matchesSurfaceMaxStrict", () => {
-  it("match si surface <= max", () => {
-    expect(matchesSurfaceMaxStrict(80, 100)).toBe(true);
+describe("matchesMileageKmMaxStrict", () => {
+  it("match si km <= max", () => {
+    expect(matchesMileageKmMaxStrict(80, 100)).toBe(true);
   });
 
-  it("ne match pas si surface > max", () => {
-    expect(matchesSurfaceMaxStrict(120, 100)).toBe(false);
+  it("ne match pas si km > max", () => {
+    expect(matchesMileageKmMaxStrict(120, 100)).toBe(false);
   });
 
-  it("surface null est tolérée (ne filtre pas)", () => {
-    expect(matchesSurfaceMaxStrict(null, 100)).toBe(true);
+  it("km null est toléré (ne filtre pas)", () => {
+    expect(matchesMileageKmMaxStrict(null, 100)).toBe(true);
   });
 });
 
-describe("matchesSurfaceMinStrict", () => {
-  it("match si surface >= min", () => {
-    expect(matchesSurfaceMinStrict(120, 100)).toBe(true);
+describe("matchesMileageKmMinStrict", () => {
+  it("match si km >= min", () => {
+    expect(matchesMileageKmMinStrict(120, 100)).toBe(true);
   });
 
-  it("ne match pas si surface < min", () => {
-    expect(matchesSurfaceMinStrict(80, 100)).toBe(false);
+  it("ne match pas si km < min", () => {
+    expect(matchesMileageKmMinStrict(80, 100)).toBe(false);
   });
 
-  it("surface null ne match pas si min > 0", () => {
-    expect(matchesSurfaceMinStrict(null, 50)).toBe(false);
+  it("km null ne match pas si min > 0", () => {
+    expect(matchesMileageKmMinStrict(null, 50)).toBe(false);
   });
 });

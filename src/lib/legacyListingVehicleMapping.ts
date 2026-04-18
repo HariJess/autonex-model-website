@@ -64,12 +64,14 @@ export function mileageKmFormStringFromListingRow(row: Pick<Tables<"listings">, 
 }
 
 /**
- * Parse le champ formulaire encore nommé `surface` (stockage kilométrage).
+ * Parse kilométrage depuis le champ publication encore nommé **`surface`** dans les types formulaire / payload
+ * (héritage colonne DB `surface` = km).
+ *
  * @param normalizeInt — même stratégie que dans `formToListingUpdate` (bornes kilomètres).
  */
-export function parseMileageKmFromPublishFormLegacySurfaceField(
-  surfaceInput: string,
+export function parseMileageKmFromPublishSurfaceField(
+  surfaceFormValue: string,
   normalizeInt: (value: string, min: number, max?: number) => number | null,
 ): number | null {
-  return normalizeInt(surfaceInput, 0);
+  return normalizeInt(surfaceFormValue, 0);
 }

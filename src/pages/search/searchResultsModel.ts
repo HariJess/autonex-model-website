@@ -1,10 +1,10 @@
 import { rankSimilarListings } from "@/lib/searchSimilar";
 import {
-  matchesBathroomsStrict,
+  matchesDoorCountFilterStrict,
   matchesLocationSubareas,
   matchesPriceMaxStrict,
   matchesPriceMinStrict,
-  matchesRoomsStrict,
+  matchesTrimVersionFilterStrict,
 } from "@/lib/searchLocationMatch";
 import { getCanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
 import type { DisplayListing } from "@/types/listing";
@@ -106,12 +106,12 @@ export function buildSearchResultsModel(params: {
   }
   if (filters.trimVersionIndices.length > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
-      matchesRoomsStrict(l.rooms, filters.trimVersionIndices),
+      matchesTrimVersionFilterStrict(l.rooms, filters.trimVersionIndices),
     );
   }
   if (filters.doorCounts.length > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
-      matchesBathroomsStrict(l.bathrooms, filters.doorCounts),
+      matchesDoorCountFilterStrict(l.bathrooms, filters.doorCounts),
     );
   }
 

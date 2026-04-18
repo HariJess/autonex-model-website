@@ -60,13 +60,14 @@ export function parseTrimVersionIndicesFromSearchParams(sp: URLSearchParams): nu
   const legacyTags = parseMultiValueSearchParam(sp, VEHICLE_SEARCH_QUERY_KEYS.legacyChambres);
   const useAliases = trimTags.length > 0 || versionTags.length > 0;
   const csv = useAliases ? [...trimTags, ...versionTags].join(",") : legacyTags.join(",");
-  const rooms: number[] = [];
-  if (!csv) return rooms;
+  // Indices finition/version (colonnes DB `rooms` après persistance).
+  const trimIndices: number[] = [];
+  if (!csv) return trimIndices;
   for (const part of csv.split(",")) {
     const n = parsePositiveInt(part.trim());
-    if (n !== undefined && n <= 99) rooms.push(n);
+    if (n !== undefined && n <= 99) trimIndices.push(n);
   }
-  return rooms;
+  return trimIndices;
 }
 
 /** Portes (`bathrooms` en DB) : param `doors` si présent, sinon `sdb`. */
@@ -74,13 +75,14 @@ export function parseDoorCountsFromSearchParams(sp: URLSearchParams): number[] {
   const doorTags = parseMultiValueSearchParam(sp, VEHICLE_SEARCH_QUERY_KEYS.doors);
   const legacyTags = parseMultiValueSearchParam(sp, VEHICLE_SEARCH_QUERY_KEYS.legacySdb);
   const csv = doorTags.length > 0 ? doorTags.join(",") : legacyTags.join(",");
-  const bathrooms: number[] = [];
-  if (!csv) return bathrooms;
+  // Comptes portes (colonnes DB `bathrooms` après persistance).
+  const doorCountsParsed: number[] = [];
+  if (!csv) return doorCountsParsed;
   for (const part of csv.split(",")) {
     const n = parsePositiveInt(part.trim());
-    if (n !== undefined && n >= 1 && n <= 99) bathrooms.push(n);
+    if (n !== undefined && n >= 1 && n <= 99) doorCountsParsed.push(n);
   }
-  return bathrooms;
+  return doorCountsParsed;
 }
 
 /** Sérialisation des champs véhicule vers des clés URL explicites (kilométrage, trim, portes). */

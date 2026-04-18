@@ -1,3 +1,7 @@
+/**
+ * Score « biens similaires » — utilise encore `listing.rooms` / `listing.bathrooms` pour la lecture ligne
+ * (colonnes legacy), alors que les filtres sont `SearchFilters` canoniques.
+ */
 import type { DisplayListing } from "@/types/listing";
 import type { SearchFilters } from "@/types/search";
 import { getVille } from "@/data/madagascar-locations";
@@ -16,19 +20,21 @@ export function arrondissementForQuartier(villeName: string, quartierName: strin
   return null;
 }
 
-function roomMatch(listingRooms: number | null, filterRooms: number[]): boolean {
-  if (filterRooms.length === 0) return true;
-  const r = listingRooms ?? -1;
-  return filterRooms.some((fr) => {
+/** Similarité « relax » : indices finition (colonne DB `rooms`). */
+function relaxedTrimVersionMatch(listingTrimIndex: number | null, filterIndices: number[]): boolean {
+  if (filterIndices.length === 0) return true;
+  const r = listingTrimIndex ?? -1;
+  return filterIndices.some((fr) => {
     if (fr === 5) return r >= 5;
     return r === fr || r === fr - 1 || r === fr + 1;
   });
 }
 
-function bathroomMatch(listingBath: number | null, filterBath: number[]): boolean {
-  if (filterBath.length === 0) return true;
-  const b = listingBath ?? -1;
-  return filterBath.some((fb) => {
+/** Similarité « relax » : portes (colonne DB `bathrooms` / `doors`). */
+function relaxedDoorCountMatch(listingDoors: number | null, filterDoorCounts: number[]): boolean {
+  if (filterDoorCounts.length === 0) return true;
+  const b = listingDoors ?? -1;
+  return filterDoorCounts.some((fb) => {
     if (fb === 4) return b >= 4;
     return b === fb || b === fb - 1 || b === fb + 1;
   });
@@ -48,14 +54,14 @@ function priceTolerance(price: number, min: number, max: number): number {
   return penalty;
 }
 
-function surfaceTolerance(surface: number | null, min: number, max: number): number {
-  if (surface == null || surface <= 0) return 8;
+function mileageKmTolerancePenalty(mileageKm: number | null, minKm: number, maxKm: number): number {
+  if (mileageKm == null || mileageKm <= 0) return 8;
   let penalty = 0;
-  if (min > 0 && surface < min) {
-    penalty += Math.min((min - surface) / Math.max(min, 1), 0.4) * 25;
+  if (minKm > 0 && mileageKm < minKm) {
+    penalty += Math.min((minKm - mileageKm) / Math.max(minKm, 1), 0.4) * 25;
   }
-  if (max > 0 && surface > max) {
-    penalty += Math.min((surface - max) / Math.max(max, 1), 0.4) * 25;
+  if (maxKm > 0 && mileageKm > maxKm) {
+    penalty += Math.min((mileageKm - maxKm) / Math.max(maxKm, 1), 0.4) * 25;
   }
   return penalty;
 }
@@ -136,10 +142,10 @@ export function similarListingScore(
 
   const price = listing.price_mga;
   score -= priceTolerance(price, filters.priceMin, filters.priceMax);
-  score -= surfaceTolerance(resolveVehicleMileageKm(listing), filters.mileageMinKm, filters.mileageMaxKm);
+  score -= mileageKmTolerancePenalty(resolveVehicleMileageKm(listing), filters.mileageMinKm, filters.mileageMaxKm);
 
-  if (!roomMatch(listing.rooms, filters.trimVersionIndices)) score -= 35;
-  if (!bathroomMatch(listing.bathrooms, filters.doorCounts)) score -= 20;
+  if (!relaxedTrimVersionMatch(listing.rooms, filters.trimVersionIndices)) score -= 35;
+  if (!relaxedDoorCountMatch(listing.bathrooms, filters.doorCounts)) score -= 20;
 
   const created = listing.created_at ? new Date(listing.created_at).getTime() : 0;
   score += Math.min(created / 1e12, 15);

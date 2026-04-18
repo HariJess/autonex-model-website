@@ -9,7 +9,7 @@ import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
 import { buildLegacyMirrorFieldsFromVehicle } from "@/lib/vehicleCanonical";
 import {
   mileageKmFormStringFromListingRow,
-  parseMileageKmFromPublishFormLegacySurfaceField,
+  parseMileageKmFromPublishSurfaceField,
 } from "@/lib/legacyListingVehicleMapping";
 import {
   AUTONEX_STORAGE_KEYS,
@@ -380,7 +380,7 @@ export function formToListingUpdate(input: {
   const titleOut =
     titleTrim.length > 0 ? titleTrim.slice(0, 120) : PUBLISH_DRAFT_TITLE_PLACEHOLDER;
   const currentYear = new Date().getFullYear() + 1;
-  const mileageKm = parseMileageKmFromPublishFormLegacySurfaceField(input.surface, normalizeInt);
+  const mileageKm = parseMileageKmFromPublishSurfaceField(input.surface, normalizeInt);
   const versionOrTrim = normalizeInt(input.rooms, 0);
   const doorsLegacy = normalizeInt(input.bathrooms, 0);
   const seats = normalizeInt(input.toilets, 0);
@@ -818,7 +818,7 @@ export function buildListingMaterialSnapshotFromForm(
     if (typeof max === "number" && intVal > max) return null;
     return intVal;
   };
-  const mileageKm = parseMileageKmFromPublishFormLegacySurfaceField(input.surface, normalizeInt);
+  const mileageKm = parseMileageKmFromPublishSurfaceField(input.surface, normalizeInt);
   const legacyMirrorFields = buildLegacyMirrorFieldsFromVehicle({
     mileageKm,
     trimOrVersion: showRooms ? (input.rooms ? Number(input.rooms) || null : null) : null,

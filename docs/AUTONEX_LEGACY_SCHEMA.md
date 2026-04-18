@@ -58,7 +58,28 @@ Ce document résume la dette **connue et assumée** après une passe code (sans 
 - **PostgREST** : `ListingsFilters` / `listingQueryFilters.ts` gardent **`surfaceMin` / `surfaceMax` / `rooms` / `bathrooms`** = noms colonnes DB ; le pont depuis `SearchFilters` est dans **`searchListingFilters.ts`**.
 - **Analytics** : colonnes DB `surface_min`, `rooms`, `bathrooms` inchangées ; `searchAnalytics.ts` mappe depuis les champs canoniques.
 
-### Suite recommandée (étape 5+)
+### Étape 5 (frontend — helpers / docs / frontières explicites, sans migration DB)
+
+**Helpers recherche**
+
+- Renommages à sémantique véhicule : `matchesTrimVersionFilterStrict`, `matchesDoorCountFilterStrict`, `matchesMileageKmMinStrict`, `matchesMileageKmMaxStrict` (`src/lib/searchLocationMatch.ts`) ; anciens noms « surface / rooms / bathrooms » retirés.
+- Similarité relâchée : `mileageKmTolerancePenalty`, `relaxedTrimVersionMatch`, `relaxedDoorCountMatch` (`src/lib/searchSimilar.ts`).
+
+**Publication / listing**
+
+- Parse formulaire : `parseMileageKmFromPublishSurfaceField` (remplace l’intitulé long « …LegacySurfaceField » ; le champ payload reste `surface` côté types existants).
+
+**Modules documentés**
+
+- `searchAnalytics.ts` — rappel que les **clés d’insertion** reflètent la table legacy.
+- `searchListingFilters.ts`, `listingQueryFilters.ts` — pont « canon UI » ↔ « forme colonnes DB ».
+
+**Volontairement inchangé**
+
+- Schéma DB, colonnes analytics, query params URL, propriétés `DisplayListing.surface` / `rooms` / `bathrooms`.
+- Libellés i18n `minSurface` / `maxSurface` (clés historiques ; textes déjà orientés kilométrage).
+
+### Suite recommandée (étape 6+ / DB)
 
 1. Migration SQL **optionnelle** : colonnes générées persistées si besoin de perf indexée sur synonymes uniquement vue.
 2. Renommage **`immonex_is_admin`** → fonction neutre (`autonex_is_staff` ou équivalent) **après** recherche exhaustive dans les migrations et policies.

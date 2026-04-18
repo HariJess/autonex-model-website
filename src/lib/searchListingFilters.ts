@@ -1,8 +1,12 @@
+/**
+ * Pont **SearchFilters** (canon véhicule, `types/search.ts`) → **ListingsFilters** (forme PostgREST /
+ * colonnes inchangées : `surface*` = km, `rooms`, `bathrooms`).
+ */
 import type { ListingsFilters } from "@/lib/listingQueryFilters";
 import { SEARCH_RELAXED_DB_ROW_CAP } from "@/config/searchListings";
 import type { SearchFilters } from "@/types/search";
 
-/** Mappe les clés `SearchFilters` vers les noms SQL encore legacy (`surface`, `rooms`, `bathrooms`). */
+/** Mappe les champs canoniques vers les propriétés attendues par `applyListingFilters` / SQL legacy. */
 function coreListingFiltersFromSearch(filters: SearchFilters): Omit<
   ListingsFilters,
   "searchRelaxation" | "limit" | "offset" | "arrondissements" | "quartiers"

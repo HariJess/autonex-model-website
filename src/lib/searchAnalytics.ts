@@ -1,3 +1,8 @@
+/**
+ * Envoi événements recherche vers Supabase — **colonnes table = legacy** (`surface_*`, `rooms`, `bathrooms`,
+ * `property_types`). Ne pas renommer les clés de `row` sans migration DB ; l’état applicatif source est
+ * `SearchFilters` (voir mapping explicite ci‑dessous).
+ */
 import { supabase } from "@/integrations/supabase/client";
 import type { SearchFilters } from "@/types/search";
 import { getSearchSessionId } from "@/lib/searchSession";

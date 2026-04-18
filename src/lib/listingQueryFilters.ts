@@ -1,3 +1,7 @@
+/**
+ * Construit des filtres Supabase pour la table **`listings`** avec **noms de colonnes legacy** inchangés
+ * (`surface` = kilométrage km, `rooms`, `bathrooms`, …). Ne pas confondre avec `SearchFilters` (`types/search.ts`).
+ */
 import type { ListingType, TransactionType } from "@/types/listing";
 import { resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
 
