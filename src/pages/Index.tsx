@@ -298,7 +298,7 @@ const Index = () => {
       <HeroSearch />
 
       <section className="container mx-auto px-4 pt-10 md:pt-14">
-        <div className="rounded-2xl border border-border/70 bg-background/95 px-3 py-4 md:px-6 md:py-5">
+        <div className="rounded-2xl border border-border/80 bg-gradient-to-b from-slate-50/90 to-background px-3 py-4 md:px-6 md:py-5 shadow-[0_1px_3px_-1px_rgba(15,23,42,0.07)]">
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.quickExplore", "Explorer rapidement")}</p>
@@ -317,21 +317,26 @@ const Index = () => {
               <Link
                 key={shortcut.key}
                 to={shortcut.to}
-                className="group rounded-xl border border-border/60 bg-card/30 px-3 py-3 md:py-3.5 min-h-[96px] md:min-h-[104px] flex flex-col items-center justify-center gap-2.5 md:gap-3 text-center motion-safe:transition-colors hover:border-primary/40 hover:bg-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                className="group rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 md:py-3.5 min-h-[96px] md:min-h-[104px] flex flex-col items-center justify-center gap-2.5 md:gap-3 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 hover:-translate-y-px hover:border-slate-300/95 hover:from-blue-50/85 hover:to-slate-50 hover:shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
               >
-                <img
-                  src={shortcut.iconSrc}
-                  alt={shortcut.iconAlt}
-                  loading="lazy"
-                  className="h-9 md:h-10 w-auto object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
-                  onError={(event) => {
-                    const target = event.currentTarget;
-                    if (!target.dataset.fallbackApplied) {
-                      target.dataset.fallbackApplied = "1";
-                      target.src = "/category-icons/category-citadine.svg";
-                    }
-                  }}
-                />
+                <span
+                  className="flex h-14 w-[4.25rem] md:h-[3.75rem] md:w-[4.75rem] shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                  aria-hidden="true"
+                >
+                  <img
+                    src={shortcut.iconSrc}
+                    alt=""
+                    loading="lazy"
+                    className="h-9 md:h-10 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      if (!target.dataset.fallbackApplied) {
+                        target.dataset.fallbackApplied = "1";
+                        target.src = "/category-icons/category-citadine.svg";
+                      }
+                    }}
+                  />
+                </span>
                 <span className="font-serif text-sm md:text-base text-foreground leading-tight">{shortcut.label}</span>
               </Link>
             ))}
