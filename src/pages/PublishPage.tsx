@@ -33,25 +33,17 @@ import {
 import { mergeCanonicalCreditPacks, type CreditPackRow } from "@/lib/creditPacks";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
 import { useCreditsBalance } from "@/hooks/useCreditsBalance";
-import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   clearLocalPublishBackup,
-  createDraftListing,
   deleteDraftListingForOwner,
-  fetchDraftListingForOwner,
-  fetchListingForOwnerEdit,
-  fetchListingPhotos,
   formToListingUpdate,
   buildListingMaterialSnapshotFromForm,
-  buildListingMaterialSnapshotFromRow,
   listingRowToFormState,
   omitBoostFieldsFromListingPatch,
-  saveDraftListing,
   saveLocalPublishBackup,
   shouldSendPublishedListingToReview,
   computeOriginalPriceMgaForEdit,
-  updateOwnerListing,
 } from "@/lib/publishDraft";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -77,13 +69,17 @@ import {
 import { buildLegacyMirrorPatchFromVehicleInputs } from "@/pages/publish/publishVehicleLegacyMirror";
 import type { PublishValidationInput } from "@/pages/publish/publishValidation";
 import { buildPublishLocalBackupPayload } from "@/pages/publish/publishBackupPayload";
+import {
+  runPersistDraftOperation,
+  type PersistDraftFormSnapshot,
+} from "@/pages/publish/publishPersistDraftOperation";
 import { usePublishMedia } from "@/hooks/publish/usePublishMedia";
 import { usePublishStepValidation } from "@/hooks/publish/usePublishStepValidation";
+import { usePublishBootstrap } from "@/hooks/publish/usePublishBootstrap";
+import { usePublishDraftLifecycle } from "@/hooks/publish/usePublishDraftLifecycle";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
 
 const TYPES_WITH_ROOMS: ListingType[] = ["appartement", "villa", "maison"];
-
-const LISTING_ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const PublishPage = () => {
   const { t } = useTranslation();
@@ -460,6 +456,96 @@ const PublishPage = () => {
     ],
   );
 
+  /** Snapshot stabilisé pour la persistance serveur / backup (évite les divergences avec les champs bruts). */
+  const persistDraftForm = useMemo<PersistDraftFormSnapshot>(
+    () => ({
+      transaction,
+      listingType,
+      isNewProgram,
+      internalRef,
+      ville,
+      arrondissement,
+      quartier,
+      quartierLibre,
+      pinLat,
+      pinLng,
+      title,
+      description,
+      priceMga,
+      surface,
+      rooms,
+      bathrooms,
+      toilets,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+      vehicleRentalMode,
+      vehicleBodyStyle,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleExteriorColor,
+      vehicleEngineDisplacement,
+      vehicleInteriorColor,
+      vehicleAvailabilityStatus,
+      vehicleWhatsappPhone,
+      vehicleIsElectric,
+      vehicleIsHybrid,
+      selectedFeatures: selectedFeaturesWithVehicleMeta,
+      videoUrl,
+      virtualTourUrl,
+      selectedBoosts,
+      agencySpotlight,
+    }),
+    [
+      transaction,
+      listingType,
+      isNewProgram,
+      internalRef,
+      ville,
+      arrondissement,
+      quartier,
+      quartierLibre,
+      pinLat,
+      pinLng,
+      title,
+      description,
+      priceMga,
+      surface,
+      rooms,
+      bathrooms,
+      toilets,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+      vehicleRentalMode,
+      vehicleBodyStyle,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleExteriorColor,
+      vehicleEngineDisplacement,
+      vehicleInteriorColor,
+      vehicleAvailabilityStatus,
+      vehicleWhatsappPhone,
+      vehicleIsElectric,
+      vehicleIsHybrid,
+      selectedFeaturesWithVehicleMeta,
+      videoUrl,
+      virtualTourUrl,
+      selectedBoosts,
+      agencySpotlight,
+    ],
+  );
+
   const progressFingerprint = useMemo(
     () =>
       JSON.stringify({
@@ -591,6 +677,102 @@ const PublishPage = () => {
   const hasUnsavedMeaningfulChanges =
     hasMeaningfulDraftProgress && progressFingerprint !== lastPersistedFingerprintRef.current;
 
+  /** Signal unique pour l’autosave debouncé (équivalent aux dépendances listées individuellement avant refactor). */
+  const draftAutosaveSignal = useMemo(
+    () => ({
+      transaction,
+      listingType,
+      isNewProgram,
+      internalRef,
+      ville,
+      arrondissement,
+      quartier,
+      quartierLibre,
+      pinLat,
+      pinLng,
+      title,
+      description,
+      priceMga,
+      surface,
+      rooms,
+      bathrooms,
+      toilets,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+      vehicleRentalMode,
+      vehicleBodyStyle,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleExteriorColor,
+      vehicleEngineDisplacement,
+      vehicleInteriorColor,
+      vehicleAvailabilityStatus,
+      vehicleWhatsappPhone,
+      vehicleIsElectric,
+      vehicleIsHybrid,
+      selectedFeaturesWithVehicleMeta,
+      selectedFeatures,
+      customFeaturesInput,
+      videoUrl,
+      virtualTourUrl,
+      selectedBoosts,
+      agencySpotlight,
+      step,
+    }),
+    [
+      transaction,
+      listingType,
+      isNewProgram,
+      internalRef,
+      ville,
+      arrondissement,
+      quartier,
+      quartierLibre,
+      pinLat,
+      pinLng,
+      title,
+      description,
+      priceMga,
+      surface,
+      rooms,
+      bathrooms,
+      toilets,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleFuel,
+      vehicleTransmission,
+      vehicleDrivetrain,
+      vehicleCondition,
+      vehicleSellerType,
+      vehicleRentalMode,
+      vehicleBodyStyle,
+      vehicleDoors,
+      vehicleSeats,
+      vehicleExteriorColor,
+      vehicleEngineDisplacement,
+      vehicleInteriorColor,
+      vehicleAvailabilityStatus,
+      vehicleWhatsappPhone,
+      vehicleIsElectric,
+      vehicleIsHybrid,
+      selectedFeaturesWithVehicleMeta,
+      selectedFeatures,
+      customFeaturesInput,
+      videoUrl,
+      virtualTourUrl,
+      selectedBoosts,
+      agencySpotlight,
+      step,
+    ],
+  );
+
   useEffect(() => {
     refreshProfile();
   }, [refreshProfile]);
@@ -635,597 +817,69 @@ const PublishPage = () => {
     }
   }, [ville]);
 
-  /** Bootstrap draft listing: ?new=1 forces a fresh draft; ?draft=id resumes; default creates a fresh draft. */
-  useEffect(() => {
-    if (!user?.id) {
-      setDraftHydrated(true);
-      setDraftBootLoading(false);
-      return;
-    }
-    let cancelled = false;
-    const run = async () => {
-      setDraftBootLoading(true);
-      setSaveError(null);
-      exitBypassRef.current = false;
-      fingerprintInitializedRef.current = false;
-      try {
-        const wantNew = spNew === "1";
-        const draftParam = spDraft;
-
-        if (wantNew) {
-          setDraftMode();
-          const id = await createDraftListing(user.id);
-          if (cancelled) return;
-          setDraftListingId(id);
-          navigate(`/publier?draft=${id}`, { replace: true });
-          setStep(0);
-          setDraftHydrated(true);
-          return;
-        }
-
-        if (spEdit) {
-          if (!LISTING_ID_UUID_RE.test(spEdit)) {
-            toast.error(t("publish.editInvalidId", "Lien de modification invalide."));
-            navigate("/dashboard");
-            return;
-          }
-          const row = await fetchListingForOwnerEdit(spEdit, user.id);
-          if (cancelled) return;
-          if (!row) {
-            toast.error(t("publish.editNotFound", "Annonce introuvable ou non modifiable."));
-            navigate("/dashboard");
-            return;
-          }
-          applyListingRowToFormState(row);
-          setIsPublishedListingEdit(true);
-          setListingModerationStatus(row.status);
-          const photos = await fetchListingPhotos(row.id);
-          if (cancelled) return;
-          setServerPhotos(photos);
-          baselineMaterialSnapshotRef.current = buildListingMaterialSnapshotFromRow(
-            row,
-            photos.map((p) => p.id),
-          );
-          setLastSavedAt(row.updated_at ?? row.created_at ?? null);
-          navigate(`/publier?edit=${row.id}`, { replace: true });
-          queueMicrotask(() => {
-            hydratingRef.current = false;
-          });
-          setDraftHydrated(true);
-          return;
-        }
-
-        if (draftParam) {
-          const row = await fetchDraftListingForOwner(draftParam, user.id);
-          if (cancelled) return;
-          if (!row) {
-            toast.error(t("publish.draftNotFound", "Brouillon introuvable."));
-            navigate("/dashboard");
-            return;
-          }
-          setDraftMode();
-          applyListingRowToFormState(row);
-          const photos = await fetchListingPhotos(row.id);
-          if (cancelled) return;
-          setServerPhotos(photos);
-          setLastSavedAt(row.updated_at ?? row.created_at ?? null);
-          queueMicrotask(() => {
-            hydratingRef.current = false;
-          });
-          setDraftHydrated(true);
-          return;
-        }
-
-        setDraftMode();
-        const id = await createDraftListing(user.id);
-        if (cancelled) return;
-        setDraftListingId(id);
-        navigate(`/publier?draft=${id}`, { replace: true });
-        setDraftHydrated(true);
-      } catch (e) {
-        if (!cancelled) {
-          setSaveError(e instanceof Error ? e.message : "Erreur");
-          toast.error(e instanceof Error ? e.message : "Erreur");
-          setDraftHydrated(true);
-        }
-      } finally {
-        if (!cancelled) setDraftBootLoading(false);
-      }
-    };
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id, spNew, spDraft, spEdit, navigate, t, applyListingRowToFormState, setDraftMode]);
+  usePublishBootstrap({
+    userId: user?.id,
+    spNew,
+    spDraft,
+    spEdit,
+    navigate,
+    t,
+    setDraftHydrated,
+    setDraftBootLoading,
+    setSaveError,
+    setDraftListingId,
+    setStep,
+    setServerPhotos,
+    setIsPublishedListingEdit,
+    setListingModerationStatus,
+    setLastSavedAt,
+    applyListingRowToFormState,
+    setDraftMode,
+    exitBypassRef,
+    fingerprintInitializedRef,
+    hydratingRef,
+    baselineMaterialSnapshotRef,
+  });
 
   const persistDraft = useCallback(
-    async (stepOverride?: number) => {
-      if (!user?.id || !draftListingId || !draftHydrated) return false;
-      try {
-        setSaveStatus("saving");
-        setSaveError(null);
-        const patchBase = formToListingUpdate({
-          transaction,
-          listingType,
-          isNewProgram,
-          internalRef,
-          ville,
-          arrondissement,
-          quartier,
-          quartierLibre,
-          pinLat,
-          pinLng,
-          title,
-          description,
-          priceMga,
-          surface,
-          rooms,
-          bathrooms,
-          toilets,
-          vehicleMake,
-          vehicleModel,
-          vehicleYear,
-          vehicleFuel,
-          vehicleTransmission,
-          vehicleDrivetrain,
-          vehicleCondition,
-          vehicleSellerType,
-          vehicleRentalMode,
-          vehicleBodyStyle,
-          vehicleDoors,
-          vehicleSeats,
-          vehicleExteriorColor,
-          vehicleEngineDisplacement,
-          vehicleInteriorColor,
-          vehicleAvailabilityStatus,
-          vehicleWhatsappPhone,
-          vehicleIsElectric,
-          vehicleIsHybrid,
-          selectedFeatures: selectedFeaturesWithVehicleMeta,
-          videoUrl,
-          virtualTourUrl,
-          selectedBoosts,
-          agencySpotlight,
-          draftStep: stepOverride ?? step,
-          isDraftSave: true,
-        });
-
-        if (isPublishedListingEdit) {
-          const computedOriginalPriceMga = computeOriginalPriceMgaForEdit({
-            previousCurrentPriceMga: editPriceBaselineRef.current,
-            previousOriginalPriceMga: editOriginalPriceRef.current,
-            nextCurrentPriceMga: patchBase.price_mga,
-          });
-          const patch = {
-            ...omitBoostFieldsFromListingPatch(patchBase),
-            original_price_mga: computedOriginalPriceMga,
-          };
-          const photoIdsOrdered = serverPhotosRef.current.map((p) => p.id);
-          const currentSnap = buildListingMaterialSnapshotFromForm(
-            {
-              transaction,
-              listingType,
-              isNewProgram,
-              internalRef,
-              ville,
-              arrondissement,
-              quartier,
-              quartierLibre,
-              pinLat,
-              pinLng,
-              title,
-              description,
-              priceMga,
-              surface,
-              rooms,
-              bathrooms,
-              toilets,
-              vehicleMake,
-              vehicleModel,
-              vehicleYear,
-              vehicleFuel,
-              vehicleTransmission,
-              vehicleDrivetrain,
-              vehicleCondition,
-              vehicleSellerType,
-              vehicleRentalMode,
-              vehicleBodyStyle,
-              vehicleDoors,
-              vehicleSeats,
-              vehicleExteriorColor,
-              vehicleEngineDisplacement,
-              vehicleInteriorColor,
-              vehicleAvailabilityStatus,
-              vehicleWhatsappPhone,
-              vehicleIsElectric,
-              vehicleIsHybrid,
-              selectedFeatures: selectedFeaturesWithVehicleMeta,
-              videoUrl,
-              virtualTourUrl,
-            },
-            photoIdsOrdered,
-            pendingPhotos.length,
-          );
-          const toReview = shouldSendPublishedListingToReview({
-            moderationStatus: listingModerationStatus,
-            baselineSnapshot: baselineMaterialSnapshotRef.current,
-            currentSnapshot: currentSnap,
-          });
-          const { updatedAt } = await updateOwnerListing(
-            draftListingId,
-            user.id,
-            toReview ? { ...patch, status: "pending_review" } : patch,
-          );
-          editPriceBaselineRef.current =
-            typeof patchBase.price_mga === "number" && Number.isFinite(patchBase.price_mga)
-              ? patchBase.price_mga
-              : null;
-          editOriginalPriceRef.current = computedOriginalPriceMga;
-          if (toReview) setListingModerationStatus("pending_review");
-          baselineMaterialSnapshotRef.current = currentSnap;
-          setLastSavedAt(updatedAt);
-          setSaveStatus("saved");
-          lastPersistedFingerprintRef.current = progressFingerprint;
-          saveLocalPublishBackup(
-            user.id,
-            draftListingId,
-            buildPublishLocalBackupPayload({
-              draftListingId,
-              step: stepOverride ?? step,
-              transaction,
-              listingType,
-              isNewProgram,
-              internalRef,
-              ville,
-              arrondissement,
-              quartier,
-              quartierLibre,
-              pinLat,
-              pinLng,
-              title,
-              description,
-              priceMga,
-              surface,
-              rooms,
-              bathrooms,
-              toilets,
-              vehicleMake,
-              vehicleModel,
-              vehicleYear,
-              vehicleFuel,
-              vehicleTransmission,
-              vehicleDrivetrain,
-              vehicleCondition,
-              vehicleSellerType,
-              vehicleRentalMode,
-              vehicleBodyStyle,
-              vehicleDoors,
-              vehicleSeats,
-              vehicleExteriorColor,
-              vehicleEngineDisplacement,
-              vehicleInteriorColor,
-              vehicleAvailabilityStatus,
-              vehicleWhatsappPhone,
-              vehicleIsElectric,
-              vehicleIsHybrid,
-              selectedFeatures: selectedFeaturesWithVehicleMeta,
-              videoUrl,
-              virtualTourUrl,
-              selectedBoosts,
-              agencySpotlight,
-            }),
-          );
-          await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
-          await queryClient.invalidateQueries({ queryKey: ["listing", draftListingId] });
-          return true;
-        }
-
-        const { updatedAt } = await saveDraftListing(draftListingId, patchBase);
-        setLastSavedAt(updatedAt);
-        setSaveStatus("saved");
-        lastPersistedFingerprintRef.current = progressFingerprint;
-        saveLocalPublishBackup(
-          user.id,
-          draftListingId,
-          buildPublishLocalBackupPayload({
-            draftListingId,
-            step: stepOverride ?? step,
-            transaction,
-            listingType,
-            isNewProgram,
-            internalRef,
-            ville,
-            arrondissement,
-            quartier,
-            quartierLibre,
-            pinLat,
-            pinLng,
-            title,
-            description,
-            priceMga,
-            surface,
-            rooms,
-            bathrooms,
-            toilets,
-            vehicleMake,
-            vehicleModel,
-            vehicleYear,
-            vehicleFuel,
-            vehicleTransmission,
-            vehicleDrivetrain,
-            vehicleCondition,
-            vehicleSellerType,
-            vehicleRentalMode,
-            vehicleBodyStyle,
-            vehicleDoors,
-            vehicleSeats,
-            vehicleExteriorColor,
-            vehicleEngineDisplacement,
-            vehicleInteriorColor,
-            vehicleAvailabilityStatus,
-            vehicleWhatsappPhone,
-            vehicleIsElectric,
-            vehicleIsHybrid,
-            selectedFeatures: selectedFeaturesWithVehicleMeta,
-            videoUrl,
-            virtualTourUrl,
-            selectedBoosts,
-            agencySpotlight,
-          }),
-        );
-        await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
-        return true;
-      } catch (e) {
-        setSaveStatus("error");
-        const msg = e instanceof Error ? e.message : "Erreur";
-        setSaveError(msg);
-        toast.error(t("publish.draftSaveError", "Sauvegarde impossible : {{msg}}").replace("{{msg}}", msg));
-        return false;
-      }
-    },
+    async (stepOverride?: number) =>
+      runPersistDraftOperation({
+        stepOverride,
+        step,
+        userId: user?.id,
+        draftListingId,
+        draftHydrated,
+        isPublishedListingEdit,
+        listingModerationStatus,
+        pendingPhotosCount: pendingPhotos.length,
+        progressFingerprint,
+        queryClient,
+        t,
+        serverPhotosRef,
+        editPriceBaselineRef,
+        editOriginalPriceRef,
+        baselineMaterialSnapshotRef,
+        lastPersistedFingerprintRef,
+        setSaveStatus,
+        setSaveError,
+        setLastSavedAt,
+        setListingModerationStatus,
+        form: persistDraftForm,
+      }),
     [
+      step,
       user?.id,
       draftListingId,
       draftHydrated,
       isPublishedListingEdit,
       listingModerationStatus,
       pendingPhotos.length,
-      transaction,
-      listingType,
-      isNewProgram,
-      internalRef,
-      ville,
-      arrondissement,
-      quartier,
-      quartierLibre,
-      pinLat,
-      pinLng,
-      title,
-      description,
-      priceMga,
-      surface,
-      rooms,
-      bathrooms,
-      toilets,
-      vehicleMake,
-      vehicleModel,
-      vehicleYear,
-      vehicleFuel,
-      vehicleTransmission,
-      vehicleDrivetrain,
-      vehicleCondition,
-      vehicleSellerType,
-      vehicleRentalMode,
-      vehicleBodyStyle,
-      vehicleDoors,
-      vehicleSeats,
-      vehicleExteriorColor,
-      vehicleEngineDisplacement,
-      vehicleInteriorColor,
-      vehicleAvailabilityStatus,
-      vehicleWhatsappPhone,
-      vehicleIsElectric,
-      vehicleIsHybrid,
-      selectedFeaturesWithVehicleMeta,
-      videoUrl,
-      virtualTourUrl,
-      selectedBoosts,
-      agencySpotlight,
-      step,
       progressFingerprint,
       queryClient,
       t,
+      persistDraftForm,
     ],
   );
-
-  const debouncedPersist = useDebouncedCallback(() => {
-    void persistDraft();
-  }, 1000);
-
-  useEffect(() => {
-    if (!draftHydrated || !draftListingId || !user?.id) return;
-    if (isPublishedListingEdit) return;
-    debouncedPersist();
-  }, [
-    debouncedPersist,
-    draftHydrated,
-    draftListingId,
-    user?.id,
-    isPublishedListingEdit,
-    transaction,
-    listingType,
-    isNewProgram,
-    internalRef,
-    ville,
-    arrondissement,
-    quartier,
-    quartierLibre,
-    pinLat,
-    pinLng,
-    title,
-    description,
-    priceMga,
-    surface,
-    rooms,
-    bathrooms,
-    toilets,
-    vehicleMake,
-    vehicleModel,
-    vehicleYear,
-    vehicleFuel,
-    vehicleTransmission,
-    vehicleDrivetrain,
-    vehicleCondition,
-    vehicleSellerType,
-    vehicleRentalMode,
-    vehicleBodyStyle,
-    vehicleDoors,
-    vehicleSeats,
-    vehicleExteriorColor,
-    vehicleEngineDisplacement,
-    vehicleInteriorColor,
-    vehicleAvailabilityStatus,
-    vehicleWhatsappPhone,
-    vehicleIsElectric,
-    vehicleIsHybrid,
-    selectedFeaturesWithVehicleMeta,
-    selectedFeatures,
-    customFeaturesInput,
-    videoUrl,
-    virtualTourUrl,
-    selectedBoosts,
-    agencySpotlight,
-    step,
-  ]);
-
-  useEffect(() => {
-    if (!draftHydrated || !draftListingId || !user?.id) return;
-    if (fingerprintInitializedRef.current) return;
-    lastPersistedFingerprintRef.current = progressFingerprint;
-    fingerprintInitializedRef.current = true;
-  }, [draftHydrated, draftListingId, user?.id, progressFingerprint]);
-
-  useEffect(() => {
-    const onVis = () => {
-      if (document.visibilityState === "hidden" && draftListingId && user?.id) {
-        void persistDraft();
-      }
-    };
-    const onBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (hasUnsavedMeaningfulChanges) {
-        event.preventDefault();
-        event.returnValue = "";
-      }
-      if (draftListingId && user?.id) {
-        try {
-          saveLocalPublishBackup(
-            user.id,
-            draftListingId,
-            buildPublishLocalBackupPayload({
-              draftListingId,
-              step,
-              transaction,
-              listingType,
-              isNewProgram,
-              internalRef,
-              ville,
-              arrondissement,
-              quartier,
-              quartierLibre,
-              pinLat,
-              pinLng,
-              title,
-              description,
-              priceMga,
-              surface,
-              rooms,
-              bathrooms,
-              toilets,
-              vehicleMake,
-              vehicleModel,
-              vehicleYear,
-              vehicleFuel,
-              vehicleTransmission,
-              vehicleDrivetrain,
-              vehicleCondition,
-              vehicleSellerType,
-              vehicleRentalMode,
-              vehicleBodyStyle,
-              vehicleDoors,
-              vehicleSeats,
-              vehicleExteriorColor,
-              vehicleEngineDisplacement,
-              vehicleInteriorColor,
-              vehicleAvailabilityStatus,
-              vehicleWhatsappPhone,
-              vehicleIsElectric,
-              vehicleIsHybrid,
-              selectedFeatures: selectedFeaturesWithVehicleMeta,
-              videoUrl,
-              virtualTourUrl,
-              selectedBoosts,
-              agencySpotlight,
-            }),
-          );
-        } catch {
-          /* ignore */
-        }
-      }
-    };
-    document.addEventListener("visibilitychange", onVis);
-    window.addEventListener("beforeunload", onBeforeUnload);
-    return () => {
-      document.removeEventListener("visibilitychange", onVis);
-      window.removeEventListener("beforeunload", onBeforeUnload);
-    };
-  }, [
-    draftListingId,
-    user?.id,
-    hasUnsavedMeaningfulChanges,
-    persistDraft,
-    step,
-    transaction,
-    listingType,
-    isNewProgram,
-    internalRef,
-    ville,
-    arrondissement,
-    quartier,
-    quartierLibre,
-    pinLat,
-    pinLng,
-    title,
-    description,
-    priceMga,
-    surface,
-    rooms,
-    bathrooms,
-    toilets,
-    vehicleMake,
-    vehicleModel,
-    vehicleYear,
-    vehicleFuel,
-    vehicleTransmission,
-    vehicleDrivetrain,
-    vehicleCondition,
-    vehicleSellerType,
-    vehicleRentalMode,
-    vehicleBodyStyle,
-    vehicleDoors,
-    vehicleSeats,
-    vehicleExteriorColor,
-    vehicleEngineDisplacement,
-    vehicleInteriorColor,
-    vehicleAvailabilityStatus,
-    vehicleWhatsappPhone,
-    vehicleIsElectric,
-    vehicleIsHybrid,
-    selectedFeaturesWithVehicleMeta,
-    videoUrl,
-    virtualTourUrl,
-    selectedBoosts,
-    agencySpotlight,
-  ]);
 
   const deleteCurrentDraft = useCallback(async () => {
     if (!user?.id || !draftListingId || isPublishedListingEdit) return true;
@@ -1235,14 +889,38 @@ const PublishPage = () => {
     return true;
   }, [user?.id, draftListingId, isPublishedListingEdit, queryClient]);
 
-  useEffect(() => {
-    return () => {
-      if (exitBypassRef.current) return;
-      if (!user?.id || !draftListingId || isPublishedListingEdit) return;
-      if (hasMeaningfulDraftProgress) return;
-      void deleteCurrentDraft();
-    };
-  }, [user?.id, draftListingId, isPublishedListingEdit, hasMeaningfulDraftProgress, deleteCurrentDraft]);
+  const onBeforeUnloadBackup = useCallback(() => {
+    if (!user?.id || !draftListingId) return;
+    saveLocalPublishBackup(
+      user.id,
+      draftListingId,
+      buildPublishLocalBackupPayload({
+        draftListingId,
+        step,
+        ...persistDraftForm,
+      }),
+    );
+  }, [user?.id, draftListingId, step, persistDraftForm]);
+
+  usePublishDraftLifecycle({
+    persistDraft,
+    draftHydrated,
+    draftListingId,
+    userId: user?.id,
+    isPublishedListingEdit,
+    progressFingerprint,
+    fingerprintInitializedRef,
+    lastPersistedFingerprintRef,
+    draftAutosaveSignal,
+    hasUnsavedMeaningfulChanges,
+    onBeforeUnloadBackup,
+    exitBypassRef,
+    userIdForCleanup: user?.id,
+    draftListingIdForCleanup: draftListingId,
+    isPublishedListingEditForCleanup: isPublishedListingEdit,
+    hasMeaningfulDraftProgress,
+    deleteCurrentDraft,
+  });
 
   useEffect(() => {
     if (listingType && !TYPES_WITH_ROOMS.includes(listingType as ListingType)) {

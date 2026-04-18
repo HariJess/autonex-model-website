@@ -53,4 +53,60 @@ describe("buildPublishLocalBackupPayload", () => {
     expect(p.step).toBe(2);
     expect(p.agencySpotlight).toBe(false);
   });
+
+  it("accepts the same shape as PublishPage onBeforeUnloadBackup (spread + draftListingId + step)", () => {
+    const persistDraftForm = {
+      transaction: "vente" as const,
+      listingType: "voiture" as const,
+      isNewProgram: false,
+      internalRef: "",
+      ville: "Antananarivo",
+      arrondissement: "",
+      quartier: "",
+      quartierLibre: "",
+      pinLat: null,
+      pinLng: null,
+      title: "Titre",
+      description: "Description assez longue pour les contraintes.",
+      priceMga: "1000000",
+      surface: "",
+      rooms: "",
+      bathrooms: "",
+      toilets: "",
+      vehicleMake: "",
+      vehicleModel: "",
+      vehicleYear: "",
+      vehicleFuel: "",
+      vehicleTransmission: "",
+      vehicleDrivetrain: "",
+      vehicleCondition: "",
+      vehicleSellerType: "particulier",
+      vehicleRentalMode: "",
+      vehicleBodyStyle: "",
+      vehicleDoors: "",
+      vehicleSeats: "",
+      vehicleExteriorColor: "",
+      vehicleEngineDisplacement: "",
+      vehicleInteriorColor: "",
+      vehicleAvailabilityStatus: "",
+      vehicleWhatsappPhone: "",
+      vehicleIsElectric: false,
+      vehicleIsHybrid: false,
+      selectedFeatures: ["a"] as string[],
+      videoUrl: "",
+      virtualTourUrl: "",
+      selectedBoosts: [] as [],
+      agencySpotlight: false,
+    };
+    const draftListingId = "550e8400-e29b-41d4-a716-446655440000";
+    const step = 1;
+    const p = buildPublishLocalBackupPayload({
+      draftListingId,
+      step,
+      ...persistDraftForm,
+    });
+    expect(p.draftListingId).toBe(draftListingId);
+    expect(p.step).toBe(step);
+    expect(p.selectedFeatures).toEqual(["a"]);
+  });
 });
