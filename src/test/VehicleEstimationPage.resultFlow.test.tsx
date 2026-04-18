@@ -17,7 +17,7 @@ vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: null }),
 }));
 vi.mock("@/lib/estimation/repository", () => ({
-  insertEstimationEvent: vi.fn().mockResolvedValue(undefined),
+  recordVehicleEstimationEvent: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock("@/lib/estimation/vehicleCatalog", () => ({
   loadVehicleCatalog: vi.fn().mockResolvedValue({

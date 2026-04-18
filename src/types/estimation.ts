@@ -239,6 +239,22 @@ export interface EstimationLegacyOutput {
 // Backward-compatible alias during migration.
 export type EstimationOutput = EstimationLegacyOutput;
 
+/** Telemetry event names persisted via `record_vehicle_estimation_event` RPC. */
+export type VehicleEstimationTelemetryEventType =
+  | "estimation_started"
+  | "estimation_completed"
+  | "estimation_result_viewed"
+  | "clicked_publish_after_estimation"
+  | "clicked_refine_estimation"
+  | "clicked_compare_after_estimation"
+  | "viewed_similar_listings";
+
+/** Row identity after inserting an estimation request (submissionSecret proves ownership for anonymous RPC writes). */
+export interface VehicleEstimationRequestCreated {
+  requestId: string;
+  submissionSecret: string;
+}
+
 export interface EstimationRunResult {
   requestId: string;
   /** Returned to the client after request creation; required for RPC writes when user_id is null (anonymous). */

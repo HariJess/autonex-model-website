@@ -1,36 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
+import { EstimationAppError, type EstimationFlowPhase } from "@/lib/estimation/errors";
 import type { EstimationInput, EstimationOutput } from "@/types/estimation";
+import type { VehicleEstimationRequestCreated, VehicleEstimationTelemetryEventType } from "@/types/estimation";
 import type { EstimationAuditSnapshot } from "@/lib/estimation/telemetry";
 
-export interface EstimationRequestInsertResult {
-  id: string;
-  submissionSecret: string;
-}
+/** Re-export for callers that only need RPC code mapping without pulling `errors.ts`. */
+export { mapEstimationRpcError, type EstimationRpcErrorCode } from "@/lib/estimation/errors";
 
-export type EstimationRpcErrorCode =
-  | "ESTIMATION_REQUEST_NOT_FOUND"
-  | "ESTIMATION_WRITE_FORBIDDEN"
-  | "ESTIMATION_RESULT_ALREADY_EXISTS"
-  | "ESTIMATION_EVENT_TYPE_INVALID"
-  | "unknown";
-
-export function mapEstimationRpcError(message: string): EstimationRpcErrorCode {
-  const ordered: EstimationRpcErrorCode[] = [
-    "ESTIMATION_REQUEST_NOT_FOUND",
-    "ESTIMATION_WRITE_FORBIDDEN",
-    "ESTIMATION_RESULT_ALREADY_EXISTS",
-    "ESTIMATION_EVENT_TYPE_INVALID",
-  ];
-  for (const code of ordered) {
-    if (message.includes(code)) return code;
-  }
-  return "unknown";
-}
-
-export async function insertEstimationRequest(
+export async function createVehicleEstimationRequest(
   input: EstimationInput,
   userId: string | null,
-): Promise<EstimationRequestInsertResult> {
+): Promise<VehicleEstimationRequestCreated> {
   const payload = {
     user_id: userId,
     make_id: input.makeId ?? null,
@@ -56,12 +36,18 @@ export async function insertEstimationRequest(
     .insert(payload)
     .select("id, submission_secret")
     .single();
-  if (error) throw new Error(error.message);
+
+  if (error) {
+    throw EstimationAppError.fromSupabaseLike(error, "create_request");
+  }
   const row = data as { id: string; submission_secret: string };
-  return { id: String(row.id), submissionSecret: String(row.submission_secret) };
+  return {
+    requestId: String(row.id),
+    submissionSecret: String(row.submission_secret),
+  };
 }
 
-export async function insertEstimationResult(
+export async function recordVehicleEstimationResult(
   estimationRequestId: string,
   submissionSecret: string,
   output: EstimationOutput,
@@ -89,22 +75,25 @@ export async function insertEstimationResult(
     p_calculation_payload: calculationPayload,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw EstimationAppError.fromSupabaseLike(error, "record_result");
+  }
+  if (data === null || data === undefined) {
+    throw new EstimationAppError(
+      "Réponse vide du serveur lors de l'enregistrement du résultat.",
+      "record_result",
+      "unexpected_response",
+    );
+  }
   return String(data as string);
 }
 
-export async function insertEstimationEvent(
+export async function recordVehicleEstimationEvent(
   estimationRequestId: string,
   submissionSecret: string,
-  eventType:
-    | "estimation_started"
-    | "estimation_completed"
-    | "estimation_result_viewed"
-    | "clicked_publish_after_estimation"
-    | "clicked_refine_estimation"
-    | "clicked_compare_after_estimation"
-    | "viewed_similar_listings",
+  eventType: VehicleEstimationTelemetryEventType,
   metadata?: Record<string, unknown>,
+  flowPhase: EstimationFlowPhase = "record_event",
 ): Promise<void> {
   const { error } = await supabase.rpc("record_vehicle_estimation_event", {
     p_estimation_request_id: estimationRequestId,
@@ -112,5 +101,7 @@ export async function insertEstimationEvent(
     p_event_type: eventType,
     p_metadata: metadata ?? {},
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw EstimationAppError.fromSupabaseLike(error, flowPhase);
+  }
 }

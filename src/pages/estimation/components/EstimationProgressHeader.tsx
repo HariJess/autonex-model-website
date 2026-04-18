@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import { Check } from "lucide-react";
 
 type StepMetaItem = {
@@ -12,7 +13,7 @@ type EstimationProgressHeaderProps = {
   currentStepIndex: number;
   screen: "landing" | "vehicle" | "condition" | "result";
   steps: readonly StepMetaItem[];
-  t: (key: string, defaultValue?: string, options?: Record<string, unknown>) => string;
+  t: TFunction<"translation", undefined>;
 };
 
 export default function EstimationProgressHeader({

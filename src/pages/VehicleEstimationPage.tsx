@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -25,7 +25,8 @@ import {
   formatAriary,
 } from "@/lib/estimation/constants";
 import { runVehicleEstimation } from "@/lib/estimation/api";
-import { insertEstimationEvent } from "@/lib/estimation/repository";
+import { describeEstimationErrorForUi } from "@/lib/estimation/errors";
+import { recordVehicleEstimationEvent } from "@/lib/estimation/repository";
 import { buildEstimationPresentation } from "@/lib/estimation/presentation";
 import { buildEstimationEventContext } from "@/lib/estimation/telemetry";
 import { loadVehicleCatalog, resolveModelBodyTypes } from "@/lib/estimation/vehicleCatalog";
@@ -122,7 +123,8 @@ const VehicleEstimationPage = () => {
   const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">("landing");
   const [form, setForm] = useState<EstimationInput>(EMPTY_FORM);
   const [result, setResult] = useState<EstimationRunResult | null>(null);
-  const [resultViewedForRequest, setResultViewedForRequest] = useState<string | null>(null);
+  /** Avoid duplicate "result viewed" telemetry without an extra render (StrictMode-safe single fire per request id). */
+  const resultViewedRequestRef = useRef<string | null>(null);
 
   useEffect(() => {
     const raw = localStorage.getItem(ESTIMATION_DRAFT_KEY);
@@ -206,10 +208,9 @@ const VehicleEstimationPage = () => {
     onError: (error) => {
       toast({
         title: t("estimation.unavailableTitle", "Estimation indisponible"),
-        description:
-          error instanceof Error
-            ? `${error.message} Réessayez dans quelques instants.`
-            : t("states.genericErrorRetry", "Une erreur est survenue. Réessayez dans quelques instants."),
+        description: describeEstimationErrorForUi(error, (key, defaultValue) =>
+          defaultValue !== undefined ? t(key, defaultValue) : t(key),
+        ),
         variant: "destructive",
       });
     },
@@ -234,20 +235,23 @@ const VehicleEstimationPage = () => {
 
   useEffect(() => {
     if (screen !== "result" || !result) return;
-    if (resultViewedForRequest === result.requestId) return;
-    setResultViewedForRequest(result.requestId);
-    void insertEstimationEvent(
+    if (resultViewedRequestRef.current === result.requestId) return;
+    resultViewedRequestRef.current = result.requestId;
+    void recordVehicleEstimationEvent(
       result.requestId,
       result.submissionSecret,
       "estimation_result_viewed",
       buildEstimationEventContext(result.outputV2, { resultId: result.resultId }),
-    );
-  }, [screen, result, resultViewedForRequest]);
+      "record_event",
+    ).catch(() => {
+      /* telemetry must not affect UX */
+    });
+  }, [screen, result]);
 
   const publishFromEstimation = async () => {
     if (!result) return;
     try {
-      await insertEstimationEvent(
+      await recordVehicleEstimationEvent(
         result.requestId,
         result.submissionSecret,
         "clicked_publish_after_estimation",
@@ -255,6 +259,7 @@ const VehicleEstimationPage = () => {
           resultId: result.resultId,
           recommendedPrice: result.output.recommendedListingPrice,
         }),
+        "record_event",
       );
     } catch {
       // Event tracking should not block navigation.
@@ -288,11 +293,12 @@ const VehicleEstimationPage = () => {
     metadata?: Record<string, unknown>,
   ) => {
     try {
-      await insertEstimationEvent(
+      await recordVehicleEstimationEvent(
         requestId,
         submissionSecret,
         eventType,
         buildEstimationEventContext(outputV2, metadata ?? {}),
+        "record_event",
       );
     } catch {
       // Analytics events are non-blocking by design.
