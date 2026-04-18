@@ -24,6 +24,32 @@ export default tseslint.config(
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
       ],
+      // Block direct localStorage access for publishDraft keys: everything must
+      // go through @/lib/draftStorage (enforces the autonex.* prefix and keeps
+      // the phantom-UUID / TTL cleanup paths in one place).
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "CallExpression[callee.object.name='localStorage'][callee.property.name=/^(getItem|setItem|removeItem)$/][arguments.0.value=/publishDraft/i]",
+          message:
+            "Direct localStorage access for publishDraft keys is forbidden. Use getDraft/setDraft/removeDraft from @/lib/draftStorage.",
+        },
+        {
+          selector:
+            "CallExpression[callee.object.property.name='localStorage'][callee.property.name=/^(getItem|setItem|removeItem)$/][arguments.0.value=/publishDraft/i]",
+          message:
+            "Direct window.localStorage access for publishDraft keys is forbidden. Use getDraft/setDraft/removeDraft from @/lib/draftStorage.",
+        },
+      ],
+    },
+  },
+  // draftStorage.ts is the one module allowed to touch localStorage with
+  // publishDraft keys — disable the guard just there.
+  {
+    files: ["src/lib/draftStorage.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
 );
