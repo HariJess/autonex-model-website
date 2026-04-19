@@ -1,4 +1,8 @@
 import { useTranslation } from "react-i18next";
+import { useState, useMemo } from "react";
+import { useFormContext } from "react-hook-form";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Coins, Sparkles, ChevronDown } from "lucide-react";
-import { LISTING_TYPE_LABELS, type ListingType, type TransactionType } from "@/types/listing";
+import { LISTING_TYPE_LABELS, type ListingType } from "@/types/listing";
 import {
   BOOST_ORDER,
   BOOST_LABELS_FR,
@@ -14,101 +18,95 @@ import {
   type PurchasableBoostType,
 } from "@/config/monetization";
 import { usePricing } from "@/hooks/usePricing";
-import type { CreditPackRow } from "@/lib/creditPacks";
-import { useState } from "react";
-
-type ManualPaymentMethod = {
-  id: string;
-  name: string;
-};
+import { useCreditsBalance } from "@/hooks/useCreditsBalance";
+import { mergeCanonicalCreditPacks, type CreditPackRow } from "@/lib/creditPacks";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
 
 export type PublishStepVisibilityProps = {
   /** Édition d’annonce existante : pas de débit de crédits, boosts non modifiables. */
   editMode?: boolean;
   editSubmitLabel?: string;
-  editModeCreditsHint?: string;
-  // Crédits + état
-  creditsBalance: number;
-  creditsBalancePending: boolean;
-  totalCost: number;
-  canPublishWithCredits: boolean;
-
-  // Résumé
-  title: string;
-  listingType: ListingType | "";
-  transaction: TransactionType | "";
-  ville: string;
+  /** Photo count (server + pending) — comes from usePublishMedia parent. */
   photoCount: number;
-
-  // Boosts
-  selectedBoosts: PurchasableBoostType[];
-  toggleBoost: (b: PurchasableBoostType) => void;
-
-  // Spotlight agence
-  hasAgency: boolean;
-  agencySpotlight: boolean;
-  setAgencySpotlight: (v: boolean) => void;
-  agencySpotlightActive: boolean;
-
-  // Publication
+  /** Lifecycle: handlePublish (parent) toggles setPublishing across the publish flow. */
   publishing: boolean;
+  /** Cross-step orchestration callback (handlePublish in PublishPage). */
   onPublish: () => void;
-
-  // Achat de crédits
-  creditPacks: CreditPackRow[];
-  creditPackPurchase: string;
-  setCreditPackPurchase: (id: string) => void;
-  paymentMethods: ManualPaymentMethod[];
-  purchasePaymentMethod: string;
-  setPurchasePaymentMethod: (id: string) => void;
-  onProofFileChange: (file: File | null) => void;
-  purchaseSubmitting: boolean;
-  onSubmitCreditPurchase: () => void;
 };
 
 /**
  * Étape 3 du wizard de publication : choix des boosts, récapitulatif,
  * bouton d'envoi pour modération, et formulaire d'achat de crédits.
  *
- * Composant purement présentationnel : tout le state et la logique métier
- * restent dans PublishPage.tsx. Ce composant reçoit ses données et callbacks via props.
+ * Phase 6.4.e: form-aware via useFormContext + autonomous purchase mini-form.
+ * Reads 6 form fields (title, listingType, transaction, ville, selectedBoosts,
+ * agencySpotlight). Owns its own purchase state (creditPackPurchase, payment
+ * method, proof file, submission flag) and the credit purchase async flow.
+ *
+ * Only `publishing` + `onPublish` cross the parent boundary, since the publish
+ * orchestration spans multiple steps and lives in PublishPage's handlePublish.
  */
 const PublishStepVisibility = ({
   editMode = false,
   editSubmitLabel,
-  editModeCreditsHint,
-  creditsBalance,
-  creditsBalancePending,
-  totalCost,
-  canPublishWithCredits,
-  title,
-  listingType,
-  transaction,
-  ville,
   photoCount,
-  selectedBoosts,
-  toggleBoost,
-  hasAgency,
-  agencySpotlight,
-  setAgencySpotlight,
-  agencySpotlightActive,
   publishing,
   onPublish,
-  creditPacks,
-  creditPackPurchase,
-  setCreditPackPurchase,
-  paymentMethods,
-  purchasePaymentMethod,
-  setPurchasePaymentMethod,
-  onProofFileChange,
-  purchaseSubmitting,
-  onSubmitCreditPurchase,
 }: PublishStepVisibilityProps) => {
   const { t } = useTranslation();
-  const publishAllowed = true;
+  const { user, profile } = useAuth();
+  const queryClient = useQueryClient();
+  const form = useFormContext<PublishFormValues>();
+
+  // Form fields
+  const title = form.watch("title");
+  const listingType = form.watch("listingType");
+  const transaction = form.watch("transaction");
+  const ville = form.watch("ville");
+  const selectedBoosts = form.watch("selectedBoosts");
+  const agencySpotlight = form.watch("agencySpotlight");
+
+  // Pricing & credits (migrated from parent in Phase 6.4.e)
+  const { prices, boostPrice, totalPublication } = usePricing();
+  const { data: creditsBalance = 0, isPending: creditsBalancePending } = useCreditsBalance();
+  const { data: creditPacks = [] } = useQuery({
+    queryKey: ["credit-packs"],
+    queryFn: async (): Promise<CreditPackRow[]> => {
+      const { data, error } = await supabase.from("credit_packs").select("*").order("sort_order", { ascending: true });
+      if (error) return mergeCanonicalCreditPacks(null);
+      return mergeCanonicalCreditPacks(data as CreditPackRow[]);
+    },
+  });
+
+  const hasAgency = Boolean(profile?.agency_id);
+  const agencySpotlightActive = Boolean(profile?.agency_id && agencySpotlight);
+  const totalCost = totalPublication(selectedBoosts, { agencySpotlight: agencySpotlightActive });
+  const canPublishWithCredits = !creditsBalancePending && creditsBalance >= totalCost;
+
+  const manualPaymentMethods = useMemo(
+    () => [
+      { id: "bank_transfer", name: t("publish.paymentMethodBankTransfer", "Bank transfer") },
+      { id: "mvola", name: t("publish.paymentMethodMvola", "MVola") },
+      { id: "orange_money", name: t("publish.paymentMethodOrangeMoney", "Orange Money") },
+      { id: "airtel_money", name: t("publish.paymentMethodAirtelMoney", "Airtel Money") },
+    ],
+    [t],
+  );
+
+  // Purchase mini-form local state
+  const [creditPackPurchase, setCreditPackPurchase] = useState("");
+  const [purchasePaymentMethod, setPurchasePaymentMethod] = useState("");
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [purchaseSubmitting, setPurchaseSubmitting] = useState(false);
+
+  // UI collapse state
   const [showCreditPurchase, setShowCreditPurchase] = useState(!editMode && !canPublishWithCredits);
   const [showMobileOptions, setShowMobileOptions] = useState(false);
-  const { prices, boostPrice } = usePricing();
+
+  const publishAllowed = true;
+
   const transactionLabel =
     transaction === "vente"
       ? t("publish.sell", "Vendre")
@@ -117,6 +115,74 @@ const PublishStepVisibility = ({
         : transaction === "location_vacances"
           ? t("publish.shortTermRental", "Location courte durée")
           : t("common.none", "—");
+
+  // Display values gated by editMode (pricing display + capacity)
+  const totalCostDisplay = editMode ? 0 : totalCost;
+  const canPublishDisplay = editMode || canPublishWithCredits;
+
+  const toggleBoost = (b: PurchasableBoostType) => {
+    const current = form.getValues("selectedBoosts");
+    form.setValue(
+      "selectedBoosts",
+      current.includes(b) ? current.filter((x) => x !== b) : [...current, b],
+    );
+  };
+
+  const submitCreditPurchase = async () => {
+    if (!user) {
+      toast.error(t("publish.loginRequired", "Vous devez être connecté"));
+      return;
+    }
+    const pack = creditPacks.find((p) => p.id === creditPackPurchase);
+    if (!pack) {
+      toast.error(t("publish.selectPack", "Choisissez un pack de crédits"));
+      return;
+    }
+    if (!purchasePaymentMethod) {
+      toast.error(t("publish.paymentProofRequired", "Choisissez un mode de paiement"));
+      return;
+    }
+    if (!proofFile) {
+      toast.error(t("publish.proofRequired", "Joignez une preuve de paiement (capture ou RIB annoté)"));
+      return;
+    }
+
+    setPurchaseSubmitting(true);
+    try {
+      const ext = proofFile.name.split(".").pop() ?? "jpg";
+      const path = `${user.id}/${Date.now()}-proof.${ext}`;
+      const { error: upErr } = await supabase.storage.from("payment-proofs").upload(path, proofFile);
+      if (upErr) throw new Error(upErr.message);
+
+      const { error: txErr } = await supabase.from("transactions").insert({
+        user_id: user.id,
+        amount_mga: pack.price_mga,
+        method: purchasePaymentMethod as "bank_transfer" | "mvola" | "orange_money" | "airtel_money",
+        status: "pending",
+        reference: `CR-${pack.id}-${Date.now()}`,
+        payment_proof_url: path,
+        credit_pack_id: pack.id,
+      });
+      if (txErr) throw new Error(txErr.message);
+
+      await queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", user.id] });
+      await queryClient.invalidateQueries({ queryKey: ["credit-tx-history", user.id] });
+
+      toast(
+        t(
+          "publish.creditRequestSent",
+          "Demande enregistrée. Nos équipes valideront votre paiement et créditeront votre compte sous peu — les crédits ne sont pas encore disponibles."
+        ),
+        { duration: 6500 },
+      );
+      setProofFile(null);
+      setCreditPackPurchase("");
+      setPurchasePaymentMethod("");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    }
+    setPurchaseSubmitting(false);
+  };
 
   return (
     <div className="space-y-5 pb-2">
@@ -142,7 +208,6 @@ const PublishStepVisibility = ({
           </CardTitle>
           <CardDescription className="font-sans">
             {editMode ? (
-              editModeCreditsHint ??
               t(
                 "publish.editCreditsHint",
                 "Modification : aucun crédit supplémentaire n’est débité. Les options de visibilité payantes ne sont pas modifiables ici.",
@@ -188,9 +253,9 @@ const PublishStepVisibility = ({
               )}
               <div className="flex justify-between font-semibold border-t pt-2">
                 <span>{t("publish.total", "Total")}</span>
-                <span>{totalCost}</span>
+                <span>{totalCostDisplay}</span>
               </div>
-              {!canPublishWithCredits && (
+              {!canPublishDisplay && (
                 <div className="space-y-1">
                   <p className="text-destructive text-sm">
                     {t(
@@ -294,7 +359,7 @@ const PublishStepVisibility = ({
                 <Checkbox
                   checked={agencySpotlight}
                   disabled={editMode}
-                  onCheckedChange={(c) => setAgencySpotlight(c === true)}
+                  onCheckedChange={(c) => form.setValue("agencySpotlight", c === true)}
                 />
                 <span>{t("publish.agencySpotlightLabel", "Spotlight agence")}</span>
               </span>
@@ -387,7 +452,7 @@ const PublishStepVisibility = ({
                   <SelectValue placeholder={t("common.select")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {paymentMethods.map((m) => (
+                  {manualPaymentMethods.map((m) => (
                     <SelectItem key={m.id} value={m.id}>
                       {m.name}
                     </SelectItem>
@@ -403,7 +468,7 @@ const PublishStepVisibility = ({
                 type="file"
                 accept="image/*,.pdf"
                 className="font-sans min-h-11"
-                onChange={(e) => onProofFileChange(e.target.files?.[0] ?? null)}
+                onChange={(e) => setProofFile(e.target.files?.[0] ?? null)}
               />
             </div>
             <Button
@@ -411,7 +476,7 @@ const PublishStepVisibility = ({
               variant="outline"
               className="w-full font-sans min-h-11 touch-manipulation"
               disabled={purchaseSubmitting}
-              onClick={onSubmitCreditPurchase}
+              onClick={submitCreditPurchase}
             >
               {purchaseSubmitting
                 ? t("common.loading")

@@ -9,21 +9,14 @@ import { Loader2 } from "lucide-react";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
-  LISTING_EQUIPMENT_OPTIONS,
   sanitizeListingEquipment,
   parseCustomFeaturesInput,
   encodeCustomFeature,
 } from "@/data/listing-equipment";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
-import { listingTypesForTransaction } from "@/lib/listingRules";
-import {
-  formatAriary,
-  type PurchasableBoostType,
-} from "@/config/monetization";
+import { formatAriary } from "@/config/monetization";
 import { usePricing } from "@/hooks/usePricing";
-import { mergeCanonicalCreditPacks, type CreditPackRow } from "@/lib/creditPacks";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
-import { useCreditsBalance } from "@/hooks/useCreditsBalance";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   clearLocalPublishBackup,
@@ -37,7 +30,7 @@ import {
   computeOriginalPriceMgaForEdit,
 } from "@/lib/publishDraft";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 import { PublishPageHeader } from "@/pages/publish/components/PublishPageHeader";
@@ -53,10 +46,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
 import { buildVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
-import {
-  AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
-  inferVehicleTypeOptionIdFromFilters,
-} from "@/data/automotiveCatalog";
 import { buildLegacyMirrorPatchFromVehicleInputs } from "@/pages/publish/publishVehicleLegacyMirror";
 import type { PublishValidationInput } from "@/pages/publish/publishValidation";
 import { buildPublishLocalBackupPayload } from "@/pages/publish/publishBackupPayload";
@@ -198,11 +187,10 @@ const PublishPage = () => {
   // Phase 6.3.b: boosts migrated to RHF (permissive sub-schema in publishFormSchema).
   const selectedBoosts = form.watch("selectedBoosts");
   const agencySpotlight = form.watch("agencySpotlight");
-  const [creditPackPurchase, setCreditPackPurchase] = useState("");
-  const [purchasePaymentMethod, setPurchasePaymentMethod] = useState("");
-  const [proofFile, setProofFile] = useState<File | null>(null);
+  // Phase 6.4.e: 4 purchase useState (creditPackPurchase, purchasePaymentMethod,
+  // proofFile, purchaseSubmitting) moved into PublishStepVisibility. publishing
+  // stays here because handlePublish (parent) toggles it across the publish flow.
   const [publishing, setPublishing] = useState(false);
-  const [purchaseSubmitting, setPurchaseSubmitting] = useState(false);
   const exitBypassRef = useRef(false);
   const lastPersistedFingerprintRef = useRef("");
   const fingerprintInitializedRef = useRef(false);
@@ -270,48 +258,12 @@ const PublishPage = () => {
     [form],
   );
 
-  const showRooms =
-    listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
-  const manualPaymentMethods = useMemo(
-    () => [
-      { id: "bank_transfer", name: t("publish.paymentMethodBankTransfer", "Bank transfer") },
-      { id: "mvola", name: t("publish.paymentMethodMvola", "MVola") },
-      { id: "orange_money", name: t("publish.paymentMethodOrangeMoney", "Orange Money") },
-      { id: "airtel_money", name: t("publish.paymentMethodAirtelMoney", "Airtel Money") },
-    ],
-    [t],
-  );
-  const typeOptions = listingTypesForTransaction(transaction);
-  const publishVehicleTypeOptions = useMemo(() => {
-    const allowed = new Set(typeOptions);
-    return AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((option) => {
-      if (!option.listingTypes?.length) return true;
-      return option.listingTypes.some((listingTypeOption) => allowed.has(listingTypeOption as ListingType));
-    });
-  }, [typeOptions]);
-  const selectedPublishVehicleTypeId = useMemo(() => {
-    if (vehicleBodyStyle && publishVehicleTypeOptions.some((opt) => opt.id === vehicleBodyStyle)) {
-      return vehicleBodyStyle;
-    }
-    const inferred = inferVehicleTypeOptionIdFromFilters({
-      types: listingType ? [listingType] : [],
-      modelQuery: vehicleBodyStyle,
-      fuels: vehicleFuel ? [vehicleFuel] : [],
-    });
-    if (inferred && publishVehicleTypeOptions.some((opt) => opt.id === inferred)) {
-      return inferred;
-    }
-    return "";
-  }, [vehicleBodyStyle, publishVehicleTypeOptions, listingType, vehicleFuel]);
+  // Phase 6.4.c: showRooms moved into PublishDetailsSection (computed locally from watch("listingType")).
+  // Phase 6.4.e: manualPaymentMethods moved into PublishStepVisibility.
+  // Phase 6.4.b: typeOptions, publishVehicleTypeOptions and selectedPublishVehicleTypeId
+  // moved into PublishBasicInfoSection (recomputed locally from form watches).
 
-  const { data: creditPacks = [] } = useQuery({
-    queryKey: ["credit-packs"],
-    queryFn: async (): Promise<CreditPackRow[]> => {
-      const { data, error } = await supabase.from("credit_packs").select("*").order("sort_order", { ascending: true });
-      if (error) return mergeCanonicalCreditPacks(null);
-      return mergeCanonicalCreditPacks(data as CreditPackRow[]);
-    },
-  });
+  // Phase 6.4.e: creditPacks useQuery moved into PublishStepVisibility.
 
   const setDraftMode = useCallback(() => {
     setIsPublishedListingEdit(false);
@@ -706,28 +658,10 @@ const PublishPage = () => {
     }
   }, [listingType, form]);
 
-  const { data: creditsBalance = 0, isPending: creditsBalancePending } = useCreditsBalance();
-  const { prices: livePrices, totalPublication } = usePricing();
-  const agencySpotlightActive = Boolean(profile?.agency_id && agencySpotlight);
-  const totalCost = totalPublication(selectedBoosts, { agencySpotlight: agencySpotlightActive });
-  const canPublishWithCredits = !creditsBalancePending && creditsBalance >= totalCost;
-
-  const toggleFeature = (f: string) => {
-    if (!LISTING_EQUIPMENT_OPTIONS.includes(f)) return;
-    const current = form.getValues("selectedFeatures");
-    form.setValue(
-      "selectedFeatures",
-      current.includes(f) ? current.filter((x) => x !== f) : [...current, f],
-    );
-  };
-
-  const toggleBoost = (b: PurchasableBoostType) => {
-    const current = form.getValues("selectedBoosts");
-    form.setValue(
-      "selectedBoosts",
-      current.includes(b) ? current.filter((x) => x !== b) : [...current, b],
-    );
-  };
+  // Phase 6.4.e: useCreditsBalance + agencySpotlightActive + totalCost +
+  // canPublishWithCredits + toggleBoost moved into PublishStepVisibility.
+  // usePricing kept here for livePrices.publish_listing (consumed by header).
+  const { prices: livePrices } = usePricing();
 
   useEffect(() => {
     const autoTitle = [vehicleMake.trim(), vehicleModel.trim(), vehicleYear.trim()].filter(Boolean).join(" ");
@@ -942,61 +876,7 @@ const PublishPage = () => {
     setPublishing(false);
   };
 
-  const submitCreditPurchase = async () => {
-    if (!user) {
-      toast.error(t("publish.loginRequired", "Vous devez être connecté"));
-      return;
-    }
-    const pack = creditPacks.find((p) => p.id === creditPackPurchase);
-    if (!pack) {
-      toast.error(t("publish.selectPack", "Choisissez un pack de crédits"));
-      return;
-    }
-    if (!purchasePaymentMethod) {
-      toast.error(t("publish.paymentProofRequired", "Choisissez un mode de paiement"));
-      return;
-    }
-    if (!proofFile) {
-      toast.error(t("publish.proofRequired", "Joignez une preuve de paiement (capture ou RIB annoté)"));
-      return;
-    }
-
-    setPurchaseSubmitting(true);
-    try {
-      const ext = proofFile.name.split(".").pop() ?? "jpg";
-      const path = `${user.id}/${Date.now()}-proof.${ext}`;
-      const { error: upErr } = await supabase.storage.from("payment-proofs").upload(path, proofFile);
-      if (upErr) throw new Error(upErr.message);
-
-      const { error: txErr } = await supabase.from("transactions").insert({
-        user_id: user.id,
-        amount_mga: pack.price_mga,
-        method: purchasePaymentMethod as "bank_transfer" | "mvola" | "orange_money" | "airtel_money",
-        status: "pending",
-        reference: `CR-${pack.id}-${Date.now()}`,
-        payment_proof_url: path,
-        credit_pack_id: pack.id,
-      });
-      if (txErr) throw new Error(txErr.message);
-
-      await queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", user.id] });
-      await queryClient.invalidateQueries({ queryKey: ["credit-tx-history", user.id] });
-
-      toast(
-        t(
-          "publish.creditRequestSent",
-          "Demande enregistrée. Nos équipes valideront votre paiement et créditeront votre compte sous peu — les crédits ne sont pas encore disponibles."
-        ),
-        { duration: 6500 },
-      );
-      setProofFile(null);
-      setCreditPackPurchase("");
-      setPurchasePaymentMethod("");
-    } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Erreur");
-    }
-    setPurchaseSubmitting(false);
-  };
+  // Phase 6.4.e: submitCreditPurchase moved into PublishStepVisibility (purchase mini-form is autonomous).
 
   const progress = ((step + 1) / steps.length) * 100;
 
@@ -1078,17 +958,6 @@ const PublishPage = () => {
             <div className="rounded-2xl border border-border/70 bg-card/95 p-4 md:p-5 shadow-sm">
         {step === 0 && (
           <PublishBasicInfoSection
-            transaction={transaction}
-            vehicleTypeId={selectedPublishVehicleTypeId}
-            vehicleTypeOptions={publishVehicleTypeOptions}
-            isNewProgram={isNewProgram}
-            internalRef={internalRef}
-            ville={ville}
-            arrondissement={arrondissement}
-            quartier={quartier}
-            quartierLibre={quartierLibre}
-            pinLat={pinLat}
-            pinLng={pinLng}
             labels={{
               propertyType: t("publish.propertyType", "Type de véhicule"),
               newProgram: t("publish.newProgram", "Véhicule neuf / import"),
@@ -1110,94 +979,11 @@ const PublishPage = () => {
               listingLocationTitle: t("publish.listingLocationTitle", "Localisation de l'annonce"),
               listingLocationHint: t("publish.listingLocationHint", "La ville et un point sur carte sont requis pour publier."),
             }}
-            onTransactionChange={(v) => {
-              form.setValue("transaction", v);
-              const currentListingType = form.getValues("listingType");
-              const allowed = new Set(listingTypesForTransaction(v));
-              form.setValue(
-                "listingType",
-                allowed.has(currentListingType as ListingType) ? currentListingType : "",
-              );
-              const currentBodyStyle = form.getValues("vehicleBodyStyle");
-              if (currentBodyStyle) {
-                const nextOptions = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((option) => {
-                  if (!option.listingTypes?.length) return true;
-                  const allowedInner = new Set(listingTypesForTransaction(v));
-                  return option.listingTypes.some((listingTypeOption) =>
-                    allowedInner.has(listingTypeOption as ListingType),
-                  );
-                });
-                form.setValue(
-                  "vehicleBodyStyle",
-                  nextOptions.some((option) => option.id === currentBodyStyle) ? currentBodyStyle : "",
-                );
-              }
-            }}
-            onVehicleTypeChange={(vehicleTypeId) => {
-              const option = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((entry) => entry.id === vehicleTypeId);
-              const allowed = new Set(typeOptions);
-              const mappedType =
-                option?.listingTypes?.find((entry) => allowed.has(entry as ListingType)) ?? null;
-
-              form.setValue("vehicleBodyStyle", vehicleTypeId);
-              if (mappedType) {
-                form.setValue("listingType", mappedType as ListingType);
-              } else if (!listingType) {
-                form.setValue("listingType", typeOptions[0] ?? "");
-              }
-              if (option?.fuels?.length) {
-                form.setValue("vehicleFuel", option.fuels[0]);
-                const isElectric = option.fuels.includes("Électrique");
-                const isHybrid = option.fuels.some((fuelOption) => fuelOption.includes("Hybride"));
-                form.setValue("vehicleIsElectric", isElectric);
-                form.setValue("vehicleIsHybrid", isHybrid);
-              }
-            }}
-            onNewProgramChange={(v) => form.setValue("isNewProgram", v)}
-            onInternalRefChange={(v) => form.setValue("internalRef", v)}
-            onVilleChange={(v) => form.setValue("ville", v)}
-            onArrondissementChange={(v) => form.setValue("arrondissement", v)}
-            onQuartierChange={(v) => form.setValue("quartier", v)}
-            onQuartierLibreChange={(v) => form.setValue("quartierLibre", v)}
-            onMapPositionChange={(la, ln) => {
-              form.setValue("pinLat", la);
-              form.setValue("pinLng", ln);
-            }}
           />
         )}
 
         {step === 1 && (
           <PublishDetailsSection
-            showRooms={showRooms}
-            title={title}
-            description={description}
-            priceMga={priceMga}
-            surface={surface}
-            rooms={rooms}
-            bathrooms={bathrooms}
-            toilets={toilets}
-            make={vehicleMake}
-            model={vehicleModel}
-            year={vehicleYear}
-            fuel={vehicleFuel}
-            transmission={vehicleTransmission}
-            drivetrain={vehicleDrivetrain}
-            condition={vehicleCondition}
-            sellerType={vehicleSellerType}
-            rentalMode={vehicleRentalMode}
-            bodyStyle={vehicleBodyStyle}
-            doors={vehicleDoors}
-            seats={vehicleSeats}
-            exteriorColor={vehicleExteriorColor}
-            engineDisplacement={vehicleEngineDisplacement}
-            interiorColor={vehicleInteriorColor}
-            availabilityStatus={vehicleAvailabilityStatus}
-            whatsappPhone={vehicleWhatsappPhone}
-            isElectric={vehicleIsElectric}
-            isHybrid={vehicleIsHybrid}
-            selectedFeatures={selectedFeatures}
-            customFeaturesInput={customFeaturesInput}
-            equipmentOptions={LISTING_EQUIPMENT_OPTIONS}
             labels={{
               listingTitle: t("publish.listingTitle", "Titre"),
               descriptionFr: t("publish.descriptionFr", "Description (français)"),
@@ -1208,40 +994,7 @@ const PublishPage = () => {
               listingFeatures: t("listing.features", "Équipements"),
               priceDealHint: priceDealHelperText,
             }}
-            onTitleChange={(v) => form.setValue("title", v)}
-            onDescriptionChange={(v) => form.setValue("description", v)}
-            onPriceMgaChange={(v) => form.setValue("priceMga", v)}
-            onSurfaceChange={(value) => applyVehicleLegacyMirrorFromInputs({ mileageKmInput: value })}
-            onRoomsChange={(v) => form.setValue("rooms", v)}
-            onBathroomsChange={(v) => form.setValue("bathrooms", v)}
-            onToiletsChange={(v) => form.setValue("toilets", v)}
-            onMakeChange={(v) => form.setValue("vehicleMake", v)}
-            onModelChange={(v) => form.setValue("vehicleModel", v)}
-            onYearChange={(v) => form.setValue("vehicleYear", v)}
-            onFuelChange={(v) => form.setValue("vehicleFuel", v)}
-            onTransmissionChange={(v) => form.setValue("vehicleTransmission", v)}
-            onDrivetrainChange={(v) => form.setValue("vehicleDrivetrain", v)}
-            onConditionChange={(v) => form.setValue("vehicleCondition", v)}
-            onSellerTypeChange={(v) => form.setValue("vehicleSellerType", v)}
-            onRentalModeChange={(v) => form.setValue("vehicleRentalMode", v)}
-            onBodyStyleChange={(v) => form.setValue("vehicleBodyStyle", v)}
-            onDoorsChange={(value) => {
-              form.setValue("vehicleDoors", value);
-              applyVehicleLegacyMirrorFromInputs({ doorsInput: value });
-            }}
-            onSeatsChange={(value) => {
-              form.setValue("vehicleSeats", value);
-              applyVehicleLegacyMirrorFromInputs({ seatsInput: value });
-            }}
-            onExteriorColorChange={(v) => form.setValue("vehicleExteriorColor", v)}
-            onEngineDisplacementChange={(v) => form.setValue("vehicleEngineDisplacement", v)}
-            onInteriorColorChange={(v) => form.setValue("vehicleInteriorColor", v)}
-            onAvailabilityStatusChange={(v) => form.setValue("vehicleAvailabilityStatus", v)}
-            onWhatsappPhoneChange={(v) => form.setValue("vehicleWhatsappPhone", v)}
-            onElectricChange={(v) => form.setValue("vehicleIsElectric", v)}
-            onHybridChange={(v) => form.setValue("vehicleIsHybrid", v)}
-            onToggleFeature={toggleFeature}
-            onCustomFeaturesInputChange={(v) => form.setValue("customFeaturesInput", v)}
+            onApplyVehicleLegacyMirror={applyVehicleLegacyMirrorFromInputs}
           />
         )}
 
@@ -1249,8 +1002,6 @@ const PublishPage = () => {
           <PublishMediaSection
             serverPhotos={serverPhotos}
             pendingPhotos={pendingPhotos}
-            videoUrl={videoUrl}
-            virtualTourUrl={virtualTourUrl}
             labels={{
               mainPhotoFirst: t("publish.mainPhotoFirst", "La première image est la photo principale. Utilisez « Couverture » pour réorganiser."),
               chooseFiles: t("publish.chooseFiles", "Choisir des photos"),
@@ -1265,8 +1016,6 @@ const PublishPage = () => {
             onPhotoSelect={handlePhotoSelect}
             onMakeCoverAtIndex={(i) => void makeCoverAtIndex(i)}
             onRemovePhotoAt={(i) => void removePhotoAt(i)}
-            onVideoUrlChange={(v) => form.setValue("videoUrl", v)}
-            onVirtualTourUrlChange={(v) => form.setValue("virtualTourUrl", v)}
           />
         )}
 
@@ -1274,32 +1023,9 @@ const PublishPage = () => {
           <PublishStepVisibility
             editMode={isPublishedListingEdit}
             editSubmitLabel={t("publish.editSave", "Enregistrer les modifications")}
-            creditsBalance={creditsBalance}
-            creditsBalancePending={creditsBalancePending}
-            totalCost={isPublishedListingEdit ? 0 : totalCost}
-            canPublishWithCredits={isPublishedListingEdit || canPublishWithCredits}
-            title={title}
-            listingType={listingType}
-            transaction={transaction}
-            ville={ville}
             photoCount={serverPhotos.length + pendingPhotos.length}
-            selectedBoosts={selectedBoosts}
-            toggleBoost={toggleBoost}
-            hasAgency={Boolean(profile?.agency_id)}
-            agencySpotlight={agencySpotlight}
-            setAgencySpotlight={(v) => form.setValue("agencySpotlight", v)}
-            agencySpotlightActive={agencySpotlightActive}
             publishing={publishing}
             onPublish={handlePublish}
-            creditPacks={creditPacks}
-            creditPackPurchase={creditPackPurchase}
-            setCreditPackPurchase={setCreditPackPurchase}
-            paymentMethods={manualPaymentMethods}
-            purchasePaymentMethod={purchasePaymentMethod}
-            setPurchasePaymentMethod={setPurchasePaymentMethod}
-            onProofFileChange={setProofFile}
-            purchaseSubmitting={purchaseSubmitting}
-            onSubmitCreditPurchase={submitCreditPurchase}
           />
         )}
             </div>

@@ -6,9 +6,13 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { AUTO_BRANDS } from "@/data/automotiveCatalog";
 import { EXTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
+import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
+import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useFormContext } from "react-hook-form";
+import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
 
 const EMPTY_OPTION = "__empty__";
 
@@ -94,36 +98,6 @@ const BRAND_MODEL_HINTS: Record<string, string[]> = {
 };
 
 type PublishDetailsSectionProps = {
-  showRooms: boolean;
-  title: string;
-  description: string;
-  priceMga: string;
-  surface: string;
-  rooms: string;
-  bathrooms: string;
-  toilets: string;
-  make: string;
-  model: string;
-  year: string;
-  fuel: string;
-  transmission: string;
-  drivetrain: string;
-  condition: string;
-  sellerType: string;
-  rentalMode: string;
-  bodyStyle: string;
-  doors: string;
-  seats: string;
-  exteriorColor: string;
-  engineDisplacement: string;
-  interiorColor: string;
-  availabilityStatus: string;
-  whatsappPhone: string;
-  isElectric: boolean;
-  isHybrid: boolean;
-  selectedFeatures: string[];
-  customFeaturesInput: string;
-  equipmentOptions: string[];
   labels: {
     listingTitle: string;
     descriptionFr: string;
@@ -134,104 +108,81 @@ type PublishDetailsSectionProps = {
     listingFeatures: string;
     priceDealHint?: string;
   };
-  onTitleChange: (value: string) => void;
-  onDescriptionChange: (value: string) => void;
-  onPriceMgaChange: (value: string) => void;
-  onSurfaceChange: (value: string) => void;
-  onRoomsChange: (value: string) => void;
-  onBathroomsChange: (value: string) => void;
-  onToiletsChange: (value: string) => void;
-  onMakeChange: (value: string) => void;
-  onModelChange: (value: string) => void;
-  onYearChange: (value: string) => void;
-  onFuelChange: (value: string) => void;
-  onTransmissionChange: (value: string) => void;
-  onDrivetrainChange: (value: string) => void;
-  onConditionChange: (value: string) => void;
-  onSellerTypeChange: (value: string) => void;
-  onRentalModeChange: (value: string) => void;
-  onBodyStyleChange: (value: string) => void;
-  onDoorsChange: (value: string) => void;
-  onSeatsChange: (value: string) => void;
-  onExteriorColorChange: (value: string) => void;
-  onEngineDisplacementChange: (value: string) => void;
-  onInteriorColorChange: (value: string) => void;
-  onAvailabilityStatusChange: (value: string) => void;
-  onWhatsappPhoneChange: (value: string) => void;
-  onElectricChange: (value: boolean) => void;
-  onHybridChange: (value: boolean) => void;
-  onToggleFeature: (feature: string) => void;
-  onCustomFeaturesInputChange: (value: string) => void;
+  /**
+   * Legacy mirror callback (parent-owned). When the user edits km / doors /
+   * seats, the parent updates the legacy DB columns surface / bathrooms /
+   * toilets. The function lives in PublishPage so the legacy mapping logic
+   * stays in a single place (see docs/AUTONEX_LEGACY_SCHEMA.md).
+   */
+  onApplyVehicleLegacyMirror: (inputs: {
+    mileageKmInput?: string;
+    doorsInput?: string;
+    seatsInput?: string;
+  }) => void;
 };
 
-export function PublishDetailsSection({
-  showRooms,
-  title,
-  description,
-  priceMga,
-  surface,
-  rooms,
-  bathrooms,
-  toilets,
-  make,
-  model,
-  year,
-  fuel,
-  transmission,
-  drivetrain,
-  condition,
-  sellerType,
-  rentalMode,
-  bodyStyle,
-  doors,
-  seats,
-  exteriorColor,
-  engineDisplacement,
-  interiorColor,
-  availabilityStatus,
-  whatsappPhone,
-  isElectric,
-  isHybrid,
-  selectedFeatures,
-  customFeaturesInput,
-  equipmentOptions,
-  labels,
-  onTitleChange,
-  onDescriptionChange,
-  onPriceMgaChange,
-  onSurfaceChange,
-  onRoomsChange,
-  onBathroomsChange,
-  onToiletsChange,
-  onMakeChange,
-  onModelChange,
-  onYearChange,
-  onFuelChange,
-  onTransmissionChange,
-  onDrivetrainChange,
-  onConditionChange,
-  onSellerTypeChange,
-  onRentalModeChange,
-  onBodyStyleChange,
-  onDoorsChange,
-  onSeatsChange,
-  onExteriorColorChange,
-  onEngineDisplacementChange,
-  onInteriorColorChange,
-  onAvailabilityStatusChange,
-  onWhatsappPhoneChange,
-  onElectricChange,
-  onHybridChange,
-  onToggleFeature,
-  onCustomFeaturesInputChange,
-}: PublishDetailsSectionProps) {
+/**
+ * Step 1 of the publish flow — title, description, pricing, vehicle attributes,
+ * equipment selection.
+ *
+ * Phase 6.4.c: form-aware via useFormContext. Reads/writes 27 form fields
+ * directly through the parent FormProvider; only `labels` and the legacy
+ * mirror callback are passed as props.
+ *
+ * The two `useState` (showAdvancedDetails, showAllEquipment) are local UI
+ * state (collapse panes), unrelated to the form schema.
+ */
+export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: PublishDetailsSectionProps) {
   const { t } = useTranslation();
+  const form = useFormContext<PublishFormValues>();
+  const title = form.watch("title");
+  const description = form.watch("description");
+  const priceMga = form.watch("priceMga");
+  const surface = form.watch("surface");
+  const rooms = form.watch("rooms");
+  const bathrooms = form.watch("bathrooms");
+  const toilets = form.watch("toilets");
+  const make = form.watch("vehicleMake");
+  const model = form.watch("vehicleModel");
+  const year = form.watch("vehicleYear");
+  const fuel = form.watch("vehicleFuel");
+  const transmission = form.watch("vehicleTransmission");
+  const drivetrain = form.watch("vehicleDrivetrain");
+  const condition = form.watch("vehicleCondition");
+  const sellerType = form.watch("vehicleSellerType");
+  const rentalMode = form.watch("vehicleRentalMode");
+  const bodyStyle = form.watch("vehicleBodyStyle");
+  const doors = form.watch("vehicleDoors");
+  const seats = form.watch("vehicleSeats");
+  const exteriorColor = form.watch("vehicleExteriorColor");
+  const engineDisplacement = form.watch("vehicleEngineDisplacement");
+  const interiorColor = form.watch("vehicleInteriorColor");
+  const availabilityStatus = form.watch("vehicleAvailabilityStatus");
+  const whatsappPhone = form.watch("vehicleWhatsappPhone");
+  const isElectric = form.watch("vehicleIsElectric");
+  const isHybrid = form.watch("vehicleIsHybrid");
+  const selectedFeatures = form.watch("selectedFeatures");
+  const customFeaturesInput = form.watch("customFeaturesInput");
+  const listingType = form.watch("listingType");
+
+  const showRooms =
+    listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
+
   const modelSuggestions = BRAND_MODEL_HINTS[make] ?? [];
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
   const [showAllEquipment, setShowAllEquipment] = useState(false);
   const hasCustomExteriorColor =
     exteriorColor.trim().length > 0 &&
     !EXTERIOR_COLOR_OPTIONS.some((option) => option.value === exteriorColor.trim().toLowerCase());
+
+  const toggleFeature = (f: string) => {
+    if (!LISTING_EQUIPMENT_OPTIONS.includes(f)) return;
+    const current = form.getValues("selectedFeatures");
+    form.setValue(
+      "selectedFeatures",
+      current.includes(f) ? current.filter((x) => x !== f) : [...current, f],
+    );
+  };
 
   return (
     <div className="space-y-5 form-surface">
@@ -244,14 +195,14 @@ export function PublishDetailsSection({
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.listingTitle} *</Label>
-        <Input value={title} onChange={(e) => onTitleChange(e.target.value)} className="font-sans" maxLength={120} />
-        <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">{t("publish.titleExample", "Exemple: Toyota RAV4 2021 — automatique, 68 000 km")}</p>
+          <Input value={title} onChange={(e) => form.setValue("title", e.target.value)} className="font-sans" maxLength={120} />
+          <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">{t("publish.titleExample", "Exemple: Toyota RAV4 2021 — automatique, 68 000 km")}</p>
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.descriptionFr} *</Label>
           <Textarea
             value={description}
-            onChange={(e) => onDescriptionChange(e.target.value)}
+            onChange={(e) => form.setValue("description", e.target.value)}
             className="font-sans"
             rows={6}
             maxLength={5000}
@@ -263,14 +214,20 @@ export function PublishDetailsSection({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
           <div className="space-y-2">
             <Label className="font-sans">Prix (Ar) *</Label>
-            <Input type="number" value={priceMga} onChange={(e) => onPriceMgaChange(e.target.value)} className="font-sans" min={0} />
+            <Input type="number" value={priceMga} onChange={(e) => form.setValue("priceMga", e.target.value)} className="font-sans" min={0} />
             {labels.priceDealHint ? (
               <p className="text-xs text-muted-foreground font-sans">{labels.priceDealHint}</p>
             ) : null}
           </div>
           <div className="space-y-2">
             <Label className="font-sans">{labels.listingSurface} (km)</Label>
-            <Input type="number" value={surface} onChange={(e) => onSurfaceChange(e.target.value)} className="font-sans" min={0} />
+            <Input
+              type="number"
+              value={surface}
+              onChange={(e) => onApplyVehicleLegacyMirror({ mileageKmInput: e.target.value })}
+              className="font-sans"
+              min={0}
+            />
           </div>
         </div>
       </section>
@@ -282,58 +239,65 @@ export function PublishDetailsSection({
             {t("publish.vehicleIdentityDesc", "Choisissez une marque référencée AutoNex, puis précisez le modèle.")}
           </p>
         </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
-        <div className="space-y-2">
-          <Label className="font-sans">Marque *</Label>
-          <Input
-            list="publish-brand-options"
-            value={make}
-            onChange={(e) => onMakeChange(e.target.value)}
-            className="font-sans"
-            placeholder={t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}
-          />
-          <datalist id="publish-brand-options">
-            {AUTO_BRANDS.map((brand) => (
-              <option key={brand} value={brand} />
-            ))}
-          </datalist>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Modèle *</Label>
-          <Input
-            list="publish-model-hints"
-            value={model}
-            onChange={(e) => onModelChange(e.target.value)}
-            className="font-sans"
-            placeholder={make ? t("publish.modelPlaceholderWithBrand", "Modèle {{brand}}", { brand: make }) : t("publish.modelPlaceholder", "Ex: RAV4, Hilux, Ranger...")}
-          />
-          <datalist id="publish-model-hints">
-            {modelSuggestions.map((modelHint) => (
-              <option key={modelHint} value={modelHint} />
-            ))}
-          </datalist>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Année</Label>
-          <Input type="number" min={1950} max={2100} value={year} onChange={(e) => onYearChange(e.target.value)} className="font-sans" />
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">État</Label>
-          <Select value={condition || EMPTY_OPTION} onValueChange={(v) => onConditionChange(v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder={t("publish.selectCondition", "Sélectionner un état")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {CONDITION_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
+          <div className="space-y-2">
+            <Label className="font-sans">Marque *</Label>
+            <Input
+              list="publish-brand-options"
+              value={make}
+              onChange={(e) => form.setValue("vehicleMake", e.target.value)}
+              className="font-sans"
+              placeholder={t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}
+            />
+            <datalist id="publish-brand-options">
+              {AUTO_BRANDS.map((brand) => (
+                <option key={brand} value={brand} />
               ))}
-            </SelectContent>
-          </Select>
+            </datalist>
+          </div>
+          <div className="space-y-2">
+            <Label className="font-sans">Modèle *</Label>
+            <Input
+              list="publish-model-hints"
+              value={model}
+              onChange={(e) => form.setValue("vehicleModel", e.target.value)}
+              className="font-sans"
+              placeholder={make ? t("publish.modelPlaceholderWithBrand", "Modèle {{brand}}", { brand: make }) : t("publish.modelPlaceholder", "Ex: RAV4, Hilux, Ranger...")}
+            />
+            <datalist id="publish-model-hints">
+              {modelSuggestions.map((modelHint) => (
+                <option key={modelHint} value={modelHint} />
+              ))}
+            </datalist>
+          </div>
+          <div className="space-y-2">
+            <Label className="font-sans">Année</Label>
+            <Input
+              type="number"
+              min={1950}
+              max={2100}
+              value={year}
+              onChange={(e) => form.setValue("vehicleYear", e.target.value)}
+              className="font-sans"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-sans">État</Label>
+            <Select value={condition || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleCondition", v === EMPTY_OPTION ? "" : v)}>
+              <SelectTrigger className="font-sans">
+                <SelectValue placeholder={t("publish.selectCondition", "Sélectionner un état")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                {CONDITION_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
       </section>
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
@@ -342,21 +306,39 @@ export function PublishDetailsSection({
             {t("publish.mainFeaturesDesc", "Ces éléments aident les acheteurs à filtrer rapidement votre annonce.")}
           </p>
         </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
-        <div className="space-y-2">
-          <Label className="font-sans">Portes</Label>
-          <Input type="number" min={0} value={doors} onChange={(e) => onDoorsChange(e.target.value)} className="font-sans" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
+          <div className="space-y-2">
+            <Label className="font-sans">Portes</Label>
+            <Input
+              type="number"
+              min={0}
+              value={doors}
+              onChange={(e) => {
+                form.setValue("vehicleDoors", e.target.value);
+                onApplyVehicleLegacyMirror({ doorsInput: e.target.value });
+              }}
+              className="font-sans"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-sans">Places</Label>
+            <Input
+              type="number"
+              min={0}
+              value={seats}
+              onChange={(e) => {
+                form.setValue("vehicleSeats", e.target.value);
+                onApplyVehicleLegacyMirror({ seatsInput: e.target.value });
+              }}
+              className="font-sans"
+            />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Places</Label>
-          <Input type="number" min={0} value={seats} onChange={(e) => onSeatsChange(e.target.value)} className="font-sans" />
-        </div>
-      </div>
       </section>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4 rounded-xl border border-border/70 bg-background/70 p-4">
         <div className="space-y-2">
           <Label className="font-sans">Carburant</Label>
-          <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => onFuelChange(v === EMPTY_OPTION ? "" : v)}>
+          <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleFuel", v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
               <SelectValue placeholder={t("publish.selectFuel", "Sélectionner un carburant")} />
             </SelectTrigger>
@@ -372,7 +354,7 @@ export function PublishDetailsSection({
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Boîte</Label>
-          <Select value={transmission || EMPTY_OPTION} onValueChange={(v) => onTransmissionChange(v === EMPTY_OPTION ? "" : v)}>
+          <Select value={transmission || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleTransmission", v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
               <SelectValue placeholder={t("publish.selectTransmission", "Sélectionner une boîte")} />
             </SelectTrigger>
@@ -388,7 +370,7 @@ export function PublishDetailsSection({
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Motricité</Label>
-          <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => onDrivetrainChange(v === EMPTY_OPTION ? "" : v)}>
+          <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleDrivetrain", v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
               <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
             </SelectTrigger>
@@ -404,7 +386,7 @@ export function PublishDetailsSection({
         </div>
         <div className="space-y-2">
           <Label className="font-sans">Type vendeur</Label>
-          <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => onSellerTypeChange(v === EMPTY_OPTION ? "" : v)}>
+          <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleSellerType", v === EMPTY_OPTION ? "" : v)}>
             <SelectTrigger className="font-sans">
               <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
             </SelectTrigger>
@@ -440,22 +422,22 @@ export function PublishDetailsSection({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <Label className="font-sans">{labels.listingRooms}</Label>
-                  <Input value={rooms} onChange={(e) => onRoomsChange(e.target.value)} className="font-sans" />
+                  <Input value={rooms} onChange={(e) => form.setValue("rooms", e.target.value)} className="font-sans" />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-sans">{labels.listingBathrooms}</Label>
-                  <Input value={bathrooms} onChange={(e) => onBathroomsChange(e.target.value)} className="font-sans" />
+                  <Input value={bathrooms} onChange={(e) => form.setValue("bathrooms", e.target.value)} className="font-sans" />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-sans">{labels.toilets}</Label>
-                  <Input value={toilets} onChange={(e) => onToiletsChange(e.target.value)} className="font-sans" />
+                  <Input value={toilets} onChange={(e) => form.setValue("toilets", e.target.value)} className="font-sans" />
                 </div>
               </div>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
               <div className="space-y-2">
                 <Label className="font-sans">Carrosserie</Label>
-                <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => onBodyStyleChange(v === EMPTY_OPTION ? "" : v)}>
+                <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleBodyStyle", v === EMPTY_OPTION ? "" : v)}>
                   <SelectTrigger className="font-sans">
                     <SelectValue placeholder={t("publish.selectBodyStyle", "Sélectionner une carrosserie")} />
                   </SelectTrigger>
@@ -471,7 +453,7 @@ export function PublishDetailsSection({
               </div>
               <div className="space-y-2">
                 <Label className="font-sans">Mode location</Label>
-                <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => onRentalModeChange(v === EMPTY_OPTION ? "" : v)}>
+                <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleRentalMode", v === EMPTY_OPTION ? "" : v)}>
                   <SelectTrigger className="font-sans">
                     <SelectValue placeholder={t("publish.selectRentalMode", "Sélectionner un mode")} />
                   </SelectTrigger>
@@ -489,7 +471,7 @@ export function PublishDetailsSection({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
               <div className="space-y-2">
                 <Label className="font-sans">{t("publish.exteriorColor", "Couleur extérieure")}</Label>
-                <Select value={exteriorColor || EMPTY_OPTION} onValueChange={(v) => onExteriorColorChange(v === EMPTY_OPTION ? "" : v)}>
+                <Select value={exteriorColor || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleExteriorColor", v === EMPTY_OPTION ? "" : v)}>
                   <SelectTrigger className="font-sans">
                     <SelectValue placeholder={t("publish.selectExteriorColor", "Sélectionner une couleur")} />
                   </SelectTrigger>
@@ -514,18 +496,18 @@ export function PublishDetailsSection({
                   max={20}
                   step="0.1"
                   value={engineDisplacement}
-                  onChange={(e) => onEngineDisplacementChange(e.target.value)}
+                  onChange={(e) => form.setValue("vehicleEngineDisplacement", e.target.value)}
                   className="font-sans"
                   placeholder={t("publish.engineDisplacementPlaceholder", "Ex: 1.5")}
                 />
               </div>
               <div className="space-y-2">
                 <Label className="font-sans">{t("publish.interiorColor", "Couleur intérieure")}</Label>
-                <Input value={interiorColor} onChange={(e) => onInteriorColorChange(e.target.value)} className="font-sans" />
+                <Input value={interiorColor} onChange={(e) => form.setValue("vehicleInteriorColor", e.target.value)} className="font-sans" />
               </div>
               <div className="space-y-2">
                 <Label className="font-sans">Disponibilité</Label>
-                <Select value={availabilityStatus || EMPTY_OPTION} onValueChange={(v) => onAvailabilityStatusChange(v === EMPTY_OPTION ? "" : v)}>
+                <Select value={availabilityStatus || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleAvailabilityStatus", v === EMPTY_OPTION ? "" : v)}>
                   <SelectTrigger className="font-sans">
                     <SelectValue placeholder={t("publish.selectAvailability", "Sélectionner une disponibilité")} />
                   </SelectTrigger>
@@ -541,16 +523,21 @@ export function PublishDetailsSection({
               </div>
               <div className="space-y-2">
                 <Label className="font-sans">WhatsApp (optionnel)</Label>
-                <Input value={whatsappPhone} onChange={(e) => onWhatsappPhoneChange(e.target.value)} className="font-sans" placeholder="+261..." />
+                <Input
+                  value={whatsappPhone}
+                  onChange={(e) => form.setValue("vehicleWhatsappPhone", e.target.value)}
+                  className="font-sans"
+                  placeholder="+261..."
+                />
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border/70 px-4 py-3">
               <label className="inline-flex items-center gap-2 font-sans text-sm">
-                <Switch checked={isElectric} onCheckedChange={onElectricChange} />
+                <Switch checked={isElectric} onCheckedChange={(v) => form.setValue("vehicleIsElectric", v)} />
                 Électrique
               </label>
               <label className="inline-flex items-center gap-2 font-sans text-sm">
-                <Switch checked={isHybrid} onCheckedChange={onHybridChange} />
+                <Switch checked={isHybrid} onCheckedChange={(v) => form.setValue("vehicleIsHybrid", v)} />
                 Hybride
               </label>
             </div>
@@ -560,14 +547,14 @@ export function PublishDetailsSection({
       <div className="space-y-2">
         <Label className="font-sans">{labels.listingFeatures}</Label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {(showAllEquipment ? equipmentOptions : equipmentOptions.slice(0, 8)).map((f) => (
+          {(showAllEquipment ? LISTING_EQUIPMENT_OPTIONS : LISTING_EQUIPMENT_OPTIONS.slice(0, 8)).map((f) => (
             <label key={f} className="flex min-h-11 items-center gap-3 rounded-lg border border-border/70 bg-background/60 px-3 cursor-pointer font-sans text-sm touch-manipulation">
-              <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => onToggleFeature(f)} />
+              <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => toggleFeature(f)} />
               {f}
             </label>
           ))}
         </div>
-        {equipmentOptions.length > 8 && (
+        {LISTING_EQUIPMENT_OPTIONS.length > 8 && (
           <button
             type="button"
             className="sm:hidden text-xs font-sans text-primary"
@@ -581,7 +568,7 @@ export function PublishDetailsSection({
         <Label className="font-sans">{t("publish.otherFeaturesTitle", "Autres caractéristiques (optionnel)")}</Label>
         <Textarea
           value={customFeaturesInput}
-          onChange={(e) => onCustomFeaturesInputChange(e.target.value)}
+          onChange={(e) => form.setValue("customFeaturesInput", e.target.value)}
           className="font-sans"
           rows={3}
           placeholder={t("publish.otherFeaturesPlaceholder", "Ex: Suspension adaptative, sièges ventilés, affichage tête haute...")}
@@ -593,4 +580,3 @@ export function PublishDetailsSection({
     </div>
   );
 }
-

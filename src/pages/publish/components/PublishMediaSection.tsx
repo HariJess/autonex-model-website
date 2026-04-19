@@ -4,14 +4,20 @@ import { Label } from "@/components/ui/label";
 import { ChevronDown, Upload } from "lucide-react";
 import type { ServerPhoto } from "@/lib/publishDraft";
 import { useState } from "react";
+import { useFormContext } from "react-hook-form";
+import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
 
 type PendingPhoto = { file: File; preview: string };
 
 type PublishMediaSectionProps = {
+  /**
+   * Photos state lives in `usePublishMedia` (parent-owned hook). It cannot
+   * be moved into this section without splitting the source of truth that
+   * also feeds publishValidationInput and step 3's photoCount. Photos are
+   * therefore passed as props (hybrid pattern documented in Phase 6.4.a).
+   */
   serverPhotos: ServerPhoto[];
   pendingPhotos: PendingPhoto[];
-  videoUrl: string;
-  virtualTourUrl: string;
   labels: {
     mainPhotoFirst: string;
     chooseFiles: string;
@@ -26,22 +32,27 @@ type PublishMediaSectionProps = {
   onPhotoSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onMakeCoverAtIndex: (index: number) => void;
   onRemovePhotoAt: (index: number) => void;
-  onVideoUrlChange: (value: string) => void;
-  onVirtualTourUrlChange: (value: string) => void;
 };
 
+/**
+ * Step 2 of the publish flow — photos + optional video / virtual-tour URLs.
+ *
+ * Phase 6.4.d: hybrid form-aware. The 2 form fields (videoUrl, virtualTourUrl)
+ * are read/written via useFormContext; photos and their handlers stay on
+ * props because usePublishMedia is owned by PublishPage (cross-step photoCount,
+ * upload flush, validation input).
+ */
 export function PublishMediaSection({
   serverPhotos,
   pendingPhotos,
-  videoUrl,
-  virtualTourUrl,
   labels,
   onPhotoSelect,
   onMakeCoverAtIndex,
   onRemovePhotoAt,
-  onVideoUrlChange,
-  onVirtualTourUrlChange,
 }: PublishMediaSectionProps) {
+  const form = useFormContext<PublishFormValues>();
+  const videoUrl = form.watch("videoUrl");
+  const virtualTourUrl = form.watch("virtualTourUrl");
   const [showAdvancedMedia, setShowAdvancedMedia] = useState(false);
   return (
     <div className="space-y-5 form-surface">
@@ -123,11 +134,21 @@ export function PublishMediaSection({
           <div className="space-y-3 border-t border-border/70 px-4 py-4">
             <div className="space-y-2">
               <Label className="font-sans">{labels.videoUrl}</Label>
-              <Input value={videoUrl} onChange={(e) => onVideoUrlChange(e.target.value)} className="font-sans" placeholder="https://" />
+              <Input
+                value={videoUrl}
+                onChange={(e) => form.setValue("videoUrl", e.target.value)}
+                className="font-sans"
+                placeholder="https://"
+              />
             </div>
             <div className="space-y-2">
               <Label className="font-sans">{labels.tourUrl}</Label>
-              <Input value={virtualTourUrl} onChange={(e) => onVirtualTourUrlChange(e.target.value)} className="font-sans" placeholder="https://" />
+              <Input
+                value={virtualTourUrl}
+                onChange={(e) => form.setValue("virtualTourUrl", e.target.value)}
+                className="font-sans"
+                placeholder="https://"
+              />
             </div>
           </div>
         )}
@@ -135,4 +156,3 @@ export function PublishMediaSection({
     </div>
   );
 }
-

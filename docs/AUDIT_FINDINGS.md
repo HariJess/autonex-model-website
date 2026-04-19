@@ -171,4 +171,12 @@ Nécessite un projet Supabase de test dédié (ou docker-compose local).
 - Pas de `.env.example` visible à la racine
 - Pas de Content-Security-Policy dans `index.html`
 - `chart.tsx` utilise `dangerouslySetInnerHTML` (vérifier que l'input est bien contrôlé)
+- **P-rename publish sections** (post-P6) : harmoniser les paths des 4 sections du flow publish sous `src/pages/publish/sections/`. État actuel :
+  - `src/pages/publish/components/PublishBasicInfoSection.tsx` (step 0)
+  - `src/pages/publish/components/PublishDetailsSection.tsx` (step 1)
+  - `src/pages/publish/components/PublishMediaSection.tsx` (step 2)
+  - `src/components/publish/PublishStepVisibility.tsx` (step 3, dossier distinct)
+
+  Scope : 4 git mv + ~6-10 updates d'imports. Zéro risque logique. PR dédié `chore: harmonize publish sections paths` après Phase 6.
+- **Mixed i18n pattern publish sections** (post-P6) : `PublishBasicInfoSection` et `PublishDetailsSection` utilisent simultanément `useTranslation()` importé directement ET `labels` prop venant du parent. Harmoniser vers un pattern unique (tout `useTranslation()` dans les sections, `labels` prop supprimée). Scope : ~20-30 substitutions par section, zéro risque logique.
 - `Toaster` ET `Sonner` sont tous deux montés dans App.tsx — consolider
