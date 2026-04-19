@@ -167,6 +167,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "boosts_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
         ]
       }
       credit_packs: {
@@ -190,6 +197,30 @@ export type Database = {
           name?: string
           price_mga?: number
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      credit_pricing: {
+        Row: {
+          amount: number
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          amount: number
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          amount?: number
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -259,6 +290,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "favorites_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "favorites_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -306,6 +344,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "leads_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
         ]
       }
       listing_photos: {
@@ -335,6 +380,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "listing_photos_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
         ]
       }
       listing_view_events: {
@@ -359,6 +411,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_view_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
             referencedColumns: ["id"]
           },
         ]
@@ -390,8 +449,8 @@ export type Database = {
           make: string | null
           mileage_km: number | null
           model: string | null
-          owner_id: string
           original_price_mga: number | null
+          owner_id: string
           pending_boost_types: Json | null
           price_eur: number | null
           price_mga: number
@@ -447,8 +506,8 @@ export type Database = {
           make?: string | null
           mileage_km?: number | null
           model?: string | null
-          owner_id: string
           original_price_mga?: number | null
+          owner_id: string
           pending_boost_types?: Json | null
           price_eur?: number | null
           price_mga?: number
@@ -504,8 +563,8 @@ export type Database = {
           make?: string | null
           mileage_km?: number | null
           model?: string | null
-          owner_id?: string
           original_price_mga?: number | null
+          owner_id?: string
           pending_boost_types?: Json | null
           price_eur?: number | null
           price_mga?: number
@@ -544,6 +603,273 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      market_listings_clean: {
+        Row: {
+          body_style: string | null
+          city: string | null
+          comparable_cluster_key: string | null
+          confidence_score: number | null
+          created_at: string
+          duplicate_of: string | null
+          fingerprint: string | null
+          fuel_type: string | null
+          id: string
+          listing_status: string
+          mileage_km: number | null
+          normalized_generation: string | null
+          normalized_make: string | null
+          normalized_model: string | null
+          normalized_trim: string | null
+          outlier_flag: boolean
+          parsing_notes: Json
+          posted_at: string | null
+          price_mga: number | null
+          raw_listing_id: string
+          seller_type: string | null
+          source: string
+          source_listing_id: string | null
+          source_url: string
+          transmission: string | null
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          body_style?: string | null
+          city?: string | null
+          comparable_cluster_key?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          duplicate_of?: string | null
+          fingerprint?: string | null
+          fuel_type?: string | null
+          id?: string
+          listing_status?: string
+          mileage_km?: number | null
+          normalized_generation?: string | null
+          normalized_make?: string | null
+          normalized_model?: string | null
+          normalized_trim?: string | null
+          outlier_flag?: boolean
+          parsing_notes?: Json
+          posted_at?: string | null
+          price_mga?: number | null
+          raw_listing_id: string
+          seller_type?: string | null
+          source: string
+          source_listing_id?: string | null
+          source_url: string
+          transmission?: string | null
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          body_style?: string | null
+          city?: string | null
+          comparable_cluster_key?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          duplicate_of?: string | null
+          fingerprint?: string | null
+          fuel_type?: string | null
+          id?: string
+          listing_status?: string
+          mileage_km?: number | null
+          normalized_generation?: string | null
+          normalized_make?: string | null
+          normalized_model?: string | null
+          normalized_trim?: string | null
+          outlier_flag?: boolean
+          parsing_notes?: Json
+          posted_at?: string | null
+          price_mga?: number | null
+          raw_listing_id?: string
+          seller_type?: string | null
+          source?: string
+          source_listing_id?: string | null
+          source_url?: string
+          transmission?: string | null
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_listings_clean_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "market_listings_clean"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_listings_clean_raw_listing_id_fkey"
+            columns: ["raw_listing_id"]
+            isOneToOne: true
+            referencedRelation: "market_listings_raw"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_listings_raw: {
+        Row: {
+          body_style_raw: string | null
+          city_raw: string | null
+          created_at: string
+          currency_raw: string | null
+          description_raw: string | null
+          fuel_type_raw: string | null
+          html_snapshot: string | null
+          id: string
+          last_seen_at: string
+          mileage_raw: string | null
+          payload: Json
+          phone_raw: string | null
+          posted_at_raw: string | null
+          price_raw: string | null
+          scraped_at: string
+          seller_name_raw: string | null
+          seller_type_raw: string | null
+          source: string
+          source_listing_id: string | null
+          source_url: string
+          title: string | null
+          transmission_raw: string | null
+          updated_at: string
+          year_raw: string | null
+        }
+        Insert: {
+          body_style_raw?: string | null
+          city_raw?: string | null
+          created_at?: string
+          currency_raw?: string | null
+          description_raw?: string | null
+          fuel_type_raw?: string | null
+          html_snapshot?: string | null
+          id?: string
+          last_seen_at?: string
+          mileage_raw?: string | null
+          payload?: Json
+          phone_raw?: string | null
+          posted_at_raw?: string | null
+          price_raw?: string | null
+          scraped_at?: string
+          seller_name_raw?: string | null
+          seller_type_raw?: string | null
+          source: string
+          source_listing_id?: string | null
+          source_url: string
+          title?: string | null
+          transmission_raw?: string | null
+          updated_at?: string
+          year_raw?: string | null
+        }
+        Update: {
+          body_style_raw?: string | null
+          city_raw?: string | null
+          created_at?: string
+          currency_raw?: string | null
+          description_raw?: string | null
+          fuel_type_raw?: string | null
+          html_snapshot?: string | null
+          id?: string
+          last_seen_at?: string
+          mileage_raw?: string | null
+          payload?: Json
+          phone_raw?: string | null
+          posted_at_raw?: string | null
+          price_raw?: string | null
+          scraped_at?: string
+          seller_name_raw?: string | null
+          seller_type_raw?: string | null
+          source?: string
+          source_listing_id?: string | null
+          source_url?: string
+          title?: string | null
+          transmission_raw?: string | null
+          updated_at?: string
+          year_raw?: string | null
+        }
+        Relationships: []
+      }
+      market_price_stats: {
+        Row: {
+          avg_mileage_km: number | null
+          avg_price_mga: number | null
+          avg_year: number | null
+          body_style: string | null
+          city: string | null
+          comparable_cluster_key: string
+          confidence_score: number | null
+          created_at: string
+          fuel_type: string | null
+          id: string
+          last_calculated_at: string
+          make: string
+          max_price_mga: number | null
+          median_price_mga: number | null
+          min_price_mga: number | null
+          model: string
+          p25_price_mga: number | null
+          p75_price_mga: number | null
+          price_stddev: number | null
+          sample_size: number
+          transmission: string | null
+          updated_at: string
+          year_max: number | null
+          year_min: number | null
+        }
+        Insert: {
+          avg_mileage_km?: number | null
+          avg_price_mga?: number | null
+          avg_year?: number | null
+          body_style?: string | null
+          city?: string | null
+          comparable_cluster_key: string
+          confidence_score?: number | null
+          created_at?: string
+          fuel_type?: string | null
+          id?: string
+          last_calculated_at?: string
+          make: string
+          max_price_mga?: number | null
+          median_price_mga?: number | null
+          min_price_mga?: number | null
+          model: string
+          p25_price_mga?: number | null
+          p75_price_mga?: number | null
+          price_stddev?: number | null
+          sample_size?: number
+          transmission?: string | null
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Update: {
+          avg_mileage_km?: number | null
+          avg_price_mga?: number | null
+          avg_year?: number | null
+          body_style?: string | null
+          city?: string | null
+          comparable_cluster_key?: string
+          confidence_score?: number | null
+          created_at?: string
+          fuel_type?: string | null
+          id?: string
+          last_calculated_at?: string
+          make?: string
+          max_price_mga?: number | null
+          median_price_mga?: number | null
+          min_price_mga?: number | null
+          model?: string
+          p25_price_mga?: number | null
+          p75_price_mga?: number | null
+          price_stddev?: number | null
+          sample_size?: number
+          transmission?: string | null
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Relationships: []
       }
       packs: {
         Row: {
@@ -633,6 +959,45 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      phone_reveal_events: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phone_reveal_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "phone_reveal_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
             referencedColumns: ["id"]
           },
         ]
@@ -808,6 +1173,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
             referencedColumns: ["id"]
           },
           {
@@ -1139,6 +1511,139 @@ export type Database = {
           },
         ]
       }
+      vehicle_generations: {
+        Row: {
+          created_at: string
+          end_year: number | null
+          id: string
+          model_id: string
+          name: string
+          start_year: number | null
+        }
+        Insert: {
+          created_at?: string
+          end_year?: number | null
+          id?: string
+          model_id: string
+          name: string
+          start_year?: number | null
+        }
+        Update: {
+          created_at?: string
+          end_year?: number | null
+          id?: string
+          model_id?: string
+          name?: string
+          start_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_generations_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_listing_price_history: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          price: number
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          price: number
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          price?: number
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_listing_price_history_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_listing_price_history_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_makes: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      vehicle_models: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          make_id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          make_id: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          make_id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_models_make_id_fkey"
+            columns: ["make_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_makes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_price_reference_profiles: {
         Row: {
           annual_depreciation_rate: number
@@ -1187,9 +1692,94 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_trims: {
+        Row: {
+          body_type: string | null
+          created_at: string
+          drivetrain: string | null
+          engine_label: string | null
+          fuel_type: string | null
+          generation_id: string
+          id: string
+          name: string
+          transmission_type: string | null
+        }
+        Insert: {
+          body_type?: string | null
+          created_at?: string
+          drivetrain?: string | null
+          engine_label?: string | null
+          fuel_type?: string | null
+          generation_id: string
+          id?: string
+          name: string
+          transmission_type?: string | null
+        }
+        Update: {
+          body_type?: string | null
+          created_at?: string
+          drivetrain?: string | null
+          engine_label?: string | null
+          fuel_type?: string | null
+          generation_id?: string
+          id?: string
+          name?: string
+          transmission_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_trims_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_generations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      listings_vehicle_semantics: {
+        Row: {
+          doors_effective: number | null
+          doors_native: number | null
+          id: string | null
+          legacy_bathrooms_doors: number | null
+          legacy_surface_km: number | null
+          legacy_toilets_seats: number | null
+          mileage_km_effective: number | null
+          mileage_km_native: number | null
+          seats_effective: number | null
+          seats_native: number | null
+          trim_version_index: number | null
+        }
+        Insert: {
+          doors_effective?: never
+          doors_native?: number | null
+          id?: string | null
+          legacy_bathrooms_doors?: number | null
+          legacy_surface_km?: number | null
+          legacy_toilets_seats?: number | null
+          mileage_km_effective?: never
+          mileage_km_native?: number | null
+          seats_effective?: never
+          seats_native?: number | null
+          trim_version_index?: number | null
+        }
+        Update: {
+          doors_effective?: never
+          doors_native?: number | null
+          id?: string | null
+          legacy_bathrooms_doors?: number | null
+          legacy_surface_km?: number | null
+          legacy_toilets_seats?: number | null
+          mileage_km_effective?: never
+          mileage_km_native?: number | null
+          seats_effective?: never
+          seats_native?: number | null
+          trim_version_index?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_credits: {
@@ -1228,6 +1818,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_active_listing_counts_by_ville: {
+        Args: { p_villes: string[] }
+        Returns: {
+          count: number
+          ville: string
+        }[]
+      }
       get_active_partner_campaign: {
         Args: { p_placement_key: string }
         Returns: {
@@ -1238,13 +1835,6 @@ export type Database = {
           image_url: string
           media_type: string
           placement_key: string
-        }[]
-      }
-      get_active_listing_counts_by_ville: {
-        Args: { p_villes: string[] }
-        Returns: {
-          ville: string
-          count: number
         }[]
       }
       get_listing_owner_phone: {
@@ -1259,7 +1849,7 @@ export type Database = {
         Args: never
         Returns: {
           amount: number
-          description: string | null
+          description: string
           key: string
         }[]
       }
@@ -1298,6 +1888,15 @@ export type Database = {
         }
         Returns: unknown
       }
+      pricing_for: { Args: { p_key: string }; Returns: number }
+      publish_listing_with_credits: {
+        Args: { p_listing_id: string }
+        Returns: Json
+      }
+      purchase_listing_boosts: {
+        Args: { p_boost_types: string[]; p_listing_id: string }
+        Returns: Json
+      }
       record_vehicle_estimation_event: {
         Args: {
           p_estimation_request_id: string
@@ -1325,14 +1924,6 @@ export type Database = {
           p_submission_secret: string
         }
         Returns: string
-      }
-      purchase_listing_boosts: {
-        Args: { p_boost_types: string[]; p_listing_id: string }
-        Returns: Json
-      }
-      publish_listing_with_credits: {
-        Args: { p_listing_id: string }
-        Returns: Json
       }
     }
     Enums: {
