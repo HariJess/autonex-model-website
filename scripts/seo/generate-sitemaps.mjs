@@ -381,7 +381,7 @@ async function main() {
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabase
       .from("agencies")
-      .select(["slug", "updated_at", "name", "bio", "logo_url", "city", "area"].join(","))
+      .select(["slug", "updated_at", "name", "bio", "logo_url", "address"].join(","))
       .not("slug", "is", null)
       .order("updated_at", { ascending: false })
       .range(from, from + PAGE_SIZE - 1);
@@ -408,14 +408,13 @@ async function main() {
           slug,
           canonical: loc,
           title: row.name ? `${row.name} — AutoNex` : "Concessionnaire — AutoNex",
-          description: truncateText([row.city, row.area].filter(Boolean).join(", ") + " — " + (row.bio || ""), 160) || "Profil concessionnaire AutoNex.",
+          description: truncateText([row.address, row.bio].filter(Boolean).join(" — "), 160) || "Profil concessionnaire AutoNex.",
           imageUrl: row.logo_url
             ? row.logo_url.startsWith("http")
               ? row.logo_url
               : `${SITE_URL}${row.logo_url}`
             : undefined,
-          city: row.city,
-          area: row.area,
+          address: row.address,
           name: row.name,
           bio: row.bio,
         };
