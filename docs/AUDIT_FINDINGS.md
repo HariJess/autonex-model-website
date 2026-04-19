@@ -179,4 +179,10 @@ Nécessite un projet Supabase de test dédié (ou docker-compose local).
 
   Scope : 4 git mv + ~6-10 updates d'imports. Zéro risque logique. PR dédié `chore: harmonize publish sections paths` après Phase 6.
 - **Mixed i18n pattern publish sections** (post-P6) : `PublishBasicInfoSection` et `PublishDetailsSection` utilisent simultanément `useTranslation()` importé directement ET `labels` prop venant du parent. Harmoniser vers un pattern unique (tout `useTranslation()` dans les sections, `labels` prop supprimée). Scope : ~20-30 substitutions par section, zéro risque logique.
+- **P-test publish integration** (post-P6) : ajouter 3 tests d'intégration sur flows publish non couverts par les 236 tests Vitest existants :
+  1. autosave debounced avec `lastSavedAt` visible UI,
+  2. cleanup unmount qui DELETE un draft <4 chars et PRÉSERVE un draft ≥4 chars (pattern stale closure du commit `aff1c30`),
+  3. publish success flow avec `pending_review` en DB.
+
+  Également à envisager : snapshot tests sur contenu dropdowns publish (`BODY_STYLE_OPTIONS`, `FUEL_OPTIONS`, etc.) pour attraper les omissions accidentelles type "moto" (cf rapport 6.4.c).
 - `Toaster` ET `Sonner` sont tous deux montés dans App.tsx — consolider
