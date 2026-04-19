@@ -99,7 +99,7 @@ export function DashboardCreditsSection({
               ))}
             </ul>
 
-            <Link to="/publier" className="block">
+            <Link to="/credits" className="block">
               <Button
                 type="button"
                 className="h-12 w-full gap-2 border-0 font-sans text-base font-semibold shadow-md transition-[transform,box-shadow] hover:shadow-lg active:scale-[0.99] gradient-primary"

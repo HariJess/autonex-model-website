@@ -185,4 +185,8 @@ Nécessite un projet Supabase de test dédié (ou docker-compose local).
   3. publish success flow avec `pending_review` en DB.
 
   Également à envisager : snapshot tests sur contenu dropdowns publish (`BODY_STYLE_OPTIONS`, `FUEL_OPTIONS`, etc.) pour attraper les omissions accidentelles type "moto" (cf rapport 6.4.c).
+- **P-email-transactional-boost-expiry** (P11) : infra email transactionnel à valider avant Q6 email J-1 expiration boost. Fallback MVP = toast in-app only.
+- **P-refund-boost-on-delete** (P11) : pas de refund boost sur suppression annonce (décision produit alignée Jiji 10+ ans). Mitigation UI : message "crédits non remboursables" clairement affiché à la confirmation boost. Possibilité `add_credits` admin manuel pour gestes commerciaux exceptionnels.
+- **P-credits-expiration-12mo** (P11) : expiration crédits 12 mois depuis achat (modèle Jiji). À implémenter : colonne `expires_at` dans `credits_ledger` positive entries + `consume_credits` RPC skip entries expirées + UI warning "vos crédits expirent le DD/MM/YYYY" sur `/credits`. À clarifier dans T&C et FAQ.
+- **P-tcs-credits-clauses** (P11) : rédaction des clauses T&C à faire en parallèle (juriste/rédacteur) — "crédits sans valeur monétaire / non remboursables / non transférables / non échangeables / expiration 12 mois / no refund boost actif". Liens vers T&C à intégrer à chaque achat dès P11.b.
 - `Toaster` ET `Sonner` sont tous deux montés dans App.tsx — consolider
