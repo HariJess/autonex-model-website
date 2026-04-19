@@ -6,20 +6,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { Loader2 } from "lucide-react";
-import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType, type TransactionType } from "@/types/listing";
+import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
   LISTING_EQUIPMENT_OPTIONS,
   sanitizeListingEquipment,
   parseCustomFeaturesInput,
   encodeCustomFeature,
-  extractCustomFeatures,
 } from "@/data/listing-equipment";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
-import {
-  listingTypesForTransaction,
-  sanitizeListingTypeForTransaction,
-} from "@/lib/listingRules";
+import { listingTypesForTransaction } from "@/lib/listingRules";
 import {
   formatAriary,
   type PurchasableBoostType,
@@ -55,7 +51,7 @@ import { PublishStepGuideCard } from "@/pages/publish/components/PublishStepGuid
 import { PublishGuidanceAside } from "@/pages/publish/components/PublishGuidanceAside";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
-import { buildVehicleMetaTags, parseVehicleMetaTags } from "@/lib/vehicleMetaTags";
+import { buildVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
 import {
   AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
@@ -73,6 +69,12 @@ import { usePublishStepValidation } from "@/hooks/publish/usePublishStepValidati
 import { usePublishBootstrap } from "@/hooks/publish/usePublishBootstrap";
 import { usePublishDraftLifecycle } from "@/hooks/publish/usePublishDraftLifecycle";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { publishFormSchema, type PublishFormValues } from "@/pages/publish/publishFormSchema";
+import { PUBLISH_FORM_DEFAULTS } from "@/pages/publish/publishFormDefaults";
+import { mapDbRowToFormValues } from "@/pages/publish/mapDbRowToFormValues";
+import { computeProgressFingerprint } from "@/pages/publish/publishProgressFingerprint";
 
 const PublishPage = () => {
   const { t } = useTranslation();
@@ -83,6 +85,20 @@ const PublishPage = () => {
   const spEdit = searchParams.get("edit");
   const { user, profile, refreshProfile } = useAuth();
   const queryClient = useQueryClient();
+
+  /**
+   * Phase 6.3.a: form instance co-exists with the legacy useState block below.
+   * `mode: 'onBlur'` keeps resolver overhead minimal — RHF errors are not
+   * surfaced yet (usePublishStepValidation remains the source of truth for
+   * step-advancement gating). Subsequent sub-phases (6.3.b, 6.3.c) will
+   * progressively delete the duplicated useState and read from this form.
+   */
+  const form = useForm<PublishFormValues>({
+    resolver: zodResolver(publishFormSchema),
+    defaultValues: PUBLISH_FORM_DEFAULTS,
+    mode: "onBlur",
+  });
+
   const [step, setStep] = useState(0);
   const [stepErrors, setStepErrors] = useState<string[]>([]);
   const [draftListingId, setDraftListingId] = useState<string | null>(null);
@@ -131,51 +147,57 @@ const PublishPage = () => {
     },
   ] as const;
 
-  const [transaction, setTransaction] = useState<TransactionType | "">("");
-  const [listingType, setListingType] = useState<ListingType | "">("");
-  const [isNewProgram, setIsNewProgram] = useState(false);
-  const [internalRef, setInternalRef] = useState("");
-  const [ville, setVille] = useState("");
-  const [arrondissement, setArrondissement] = useState("");
-  const [quartier, setQuartier] = useState("");
-  const [quartierLibre, setQuartierLibre] = useState("");
-  const [pinLat, setPinLat] = useState<number | null>(null);
-  const [pinLng, setPinLng] = useState<number | null>(null);
+  // Phase 6.3.b: identity + location fields migrated to RHF.
+  const transaction = form.watch("transaction");
+  const listingType = form.watch("listingType");
+  const isNewProgram = form.watch("isNewProgram");
+  const internalRef = form.watch("internalRef");
+  const ville = form.watch("ville");
+  const arrondissement = form.watch("arrondissement");
+  const quartier = form.watch("quartier");
+  const quartierLibre = form.watch("quartierLibre");
+  const pinLat = form.watch("pinLat");
+  const pinLng = form.watch("pinLng");
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priceMga, setPriceMga] = useState("");
-  const [surface, setSurface] = useState("");
-  const [rooms, setRooms] = useState("");
-  const [bathrooms, setBathrooms] = useState("");
-  const [toilets, setToilets] = useState("");
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
-  const [customFeaturesInput, setCustomFeaturesInput] = useState("");
-  const [vehicleMake, setVehicleMake] = useState("");
-  const [vehicleModel, setVehicleModel] = useState("");
-  const [vehicleYear, setVehicleYear] = useState("");
-  const [vehicleFuel, setVehicleFuel] = useState("");
-  const [vehicleTransmission, setVehicleTransmission] = useState("");
-  const [vehicleDrivetrain, setVehicleDrivetrain] = useState("");
-  const [vehicleCondition, setVehicleCondition] = useState("");
-  const [vehicleSellerType, setVehicleSellerType] = useState("");
-  const [vehicleRentalMode, setVehicleRentalMode] = useState("");
-  const [vehicleBodyStyle, setVehicleBodyStyle] = useState("");
-  const [vehicleDoors, setVehicleDoors] = useState("");
-  const [vehicleSeats, setVehicleSeats] = useState("");
-  const [vehicleExteriorColor, setVehicleExteriorColor] = useState("");
-  const [vehicleEngineDisplacement, setVehicleEngineDisplacement] = useState("");
-  const [vehicleInteriorColor, setVehicleInteriorColor] = useState("");
-  const [vehicleAvailabilityStatus, setVehicleAvailabilityStatus] = useState("");
-  const [vehicleWhatsappPhone, setVehicleWhatsappPhone] = useState("");
-  const [vehicleIsElectric, setVehicleIsElectric] = useState(false);
-  const [vehicleIsHybrid, setVehicleIsHybrid] = useState(false);
+  // Phase 6.3.b: description + pricing + legacy-specs migrated to RHF.
+  const title = form.watch("title");
+  const description = form.watch("description");
+  const priceMga = form.watch("priceMga");
+  const surface = form.watch("surface");
+  const rooms = form.watch("rooms");
+  const bathrooms = form.watch("bathrooms");
+  const toilets = form.watch("toilets");
+  // Phase 6.3.b: features migrated to RHF.
+  const selectedFeatures = form.watch("selectedFeatures");
+  const customFeaturesInput = form.watch("customFeaturesInput");
+  // Phase 6.3.b: 19 vehicle attributes migrated to RHF.
+  const vehicleMake = form.watch("vehicleMake");
+  const vehicleModel = form.watch("vehicleModel");
+  const vehicleYear = form.watch("vehicleYear");
+  const vehicleFuel = form.watch("vehicleFuel");
+  const vehicleTransmission = form.watch("vehicleTransmission");
+  const vehicleDrivetrain = form.watch("vehicleDrivetrain");
+  const vehicleCondition = form.watch("vehicleCondition");
+  const vehicleSellerType = form.watch("vehicleSellerType");
+  const vehicleRentalMode = form.watch("vehicleRentalMode");
+  const vehicleBodyStyle = form.watch("vehicleBodyStyle");
+  const vehicleDoors = form.watch("vehicleDoors");
+  const vehicleSeats = form.watch("vehicleSeats");
+  const vehicleExteriorColor = form.watch("vehicleExteriorColor");
+  const vehicleEngineDisplacement = form.watch("vehicleEngineDisplacement");
+  const vehicleInteriorColor = form.watch("vehicleInteriorColor");
+  const vehicleAvailabilityStatus = form.watch("vehicleAvailabilityStatus");
+  const vehicleWhatsappPhone = form.watch("vehicleWhatsappPhone");
+  const vehicleIsElectric = form.watch("vehicleIsElectric");
+  const vehicleIsHybrid = form.watch("vehicleIsHybrid");
 
-  const [videoUrl, setVideoUrl] = useState("");
-  const [virtualTourUrl, setVirtualTourUrl] = useState("");
+  // Phase 6.3.b: media fields migrated to RHF.
+  const videoUrl = form.watch("videoUrl");
+  const virtualTourUrl = form.watch("virtualTourUrl");
 
-  const [selectedBoosts, setSelectedBoosts] = useState<PurchasableBoostType[]>([]);
-  const [agencySpotlight, setAgencySpotlight] = useState(false);
+  // Phase 6.3.b: boosts migrated to RHF (permissive sub-schema in publishFormSchema).
+  const selectedBoosts = form.watch("selectedBoosts");
+  const agencySpotlight = form.watch("agencySpotlight");
   const [creditPackPurchase, setCreditPackPurchase] = useState("");
   const [purchasePaymentMethod, setPurchasePaymentMethod] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
@@ -241,11 +263,11 @@ const PublishPage = () => {
   const applyVehicleLegacyMirrorFromInputs = useCallback(
     (nextVehicle: { mileageKmInput?: string; doorsInput?: string; seatsInput?: string }) => {
       const mirrored = buildLegacyMirrorPatchFromVehicleInputs(nextVehicle);
-      if (mirrored.surface != null) setSurface(mirrored.surface);
-      if (mirrored.bathrooms != null) setBathrooms(mirrored.bathrooms);
-      if (mirrored.toilets != null) setToilets(mirrored.toilets);
+      if (mirrored.surface != null) form.setValue("surface", mirrored.surface);
+      if (mirrored.bathrooms != null) form.setValue("bathrooms", mirrored.bathrooms);
+      if (mirrored.toilets != null) form.setValue("toilets", mirrored.toilets);
     },
-    [],
+    [form],
   );
 
   const showRooms =
@@ -301,59 +323,18 @@ const PublishPage = () => {
 
   const applyListingRowToFormState = useCallback((row: Tables<"listings">) => {
     hydratingRef.current = true;
+    // Phase 6.3.a: hydrate the new RHF form. The legacy useState setters
+    // below are still called so the JSX (which still reads useState values)
+    // stays in sync. 6.3.b will remove the useState and read via form.watch.
+    form.reset(mapDbRowToFormValues(row));
     const fs = listingRowToFormState(row);
-    setTransaction(fs.transaction);
-    setListingType(sanitizeListingTypeForTransaction(fs.transaction, fs.listingType));
-    setIsNewProgram(fs.isNewProgram);
-    setInternalRef(fs.internalRef);
-    setVille(fs.ville);
-    setArrondissement(fs.arrondissement);
-    setQuartier(fs.quartier);
-    setQuartierLibre(fs.quartierLibre);
-    setPinLat(fs.pinLat);
-    setPinLng(fs.pinLng);
+    // Phase 6.3.b: identity + location now hydrated by form.reset above.
     lastAutoVilleRef.current = fs.ville || "";
-    setTitle(fs.title);
-    setDescription(fs.description);
-    setPriceMga(fs.priceMga);
-    setSurface(fs.surface);
-    setRooms(fs.rooms);
-    setBathrooms(fs.bathrooms);
-    setToilets(fs.toilets);
-    setSelectedFeatures(sanitizeListingEquipment(fs.selectedFeatures));
-    setCustomFeaturesInput(
-      extractCustomFeatures(
-        Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
-      ).join(", "),
-    );
-    const meta = parseVehicleMetaTags(
-      Array.isArray(row.features) ? row.features.filter((x): x is string => typeof x === "string") : [],
-    );
-    setVehicleMake(fs.vehicleMake || meta.make || "");
-    setVehicleModel(fs.vehicleModel || meta.model || "");
-    setVehicleYear(fs.vehicleYear || (meta.year != null ? String(meta.year) : ""));
-    setVehicleFuel(fs.vehicleFuel || meta.fuel || "");
-    setVehicleTransmission(fs.vehicleTransmission || meta.transmission || "");
-    setVehicleDrivetrain(fs.vehicleDrivetrain || meta.drivetrain || "");
-    setVehicleCondition(fs.vehicleCondition || meta.condition || "");
-    setVehicleSellerType(fs.vehicleSellerType || meta.sellerType || "");
-    setVehicleRentalMode(fs.vehicleRentalMode);
-    setVehicleBodyStyle(fs.vehicleBodyStyle);
-    setVehicleDoors(fs.vehicleDoors);
-    setVehicleSeats(fs.vehicleSeats);
-    setVehicleExteriorColor(fs.vehicleExteriorColor);
-    setVehicleEngineDisplacement(
-      fs.vehicleEngineDisplacement || (meta.engineDisplacementL != null ? String(meta.engineDisplacementL) : ""),
-    );
-    setVehicleInteriorColor(fs.vehicleInteriorColor);
-    setVehicleAvailabilityStatus(fs.vehicleAvailabilityStatus);
-    setVehicleWhatsappPhone(fs.vehicleWhatsappPhone);
-    setVehicleIsElectric(fs.vehicleIsElectric);
-    setVehicleIsHybrid(fs.vehicleIsHybrid);
-    setVideoUrl(fs.videoUrl);
-    setVirtualTourUrl(fs.virtualTourUrl);
-    setSelectedBoosts(fs.selectedBoosts);
-    setAgencySpotlight(fs.agencySpotlight);
+    // Phase 6.3.b: description + pricing + legacy-specs + features + 19 vehicle attributes
+    // are hydrated by form.reset above (mapDbRowToFormValues handles sanitization
+    // + customFeaturesInput extraction + meta-tag fallbacks).
+    // Phase 6.3.b: videoUrl + virtualTourUrl now hydrated by form.reset above.
+    // Phase 6.3.b: boosts hydrated by form.reset above.
     setStep(fs.step);
     setDraftListingId(row.id);
     editPriceBaselineRef.current =
@@ -362,7 +343,7 @@ const PublishPage = () => {
       typeof row.original_price_mga === "number" && Number.isFinite(row.original_price_mga)
         ? row.original_price_mga
         : null;
-  }, []);
+  }, [form]);
 
   const currentPriceNumeric = useMemo(() => {
     const value = Number(priceMga);
@@ -452,191 +433,58 @@ const PublishPage = () => {
     ],
   );
 
-  /** Snapshot stabilisé pour la persistance serveur / backup (évite les divergences avec les champs bruts). */
+  /**
+   * Snapshot stabilisé pour la persistance serveur / backup.
+   * Phase 6.3.c: spread of `form.getValues()` collapses the explicit 40-field
+   * mapping to one line; `selectedFeatures` is overridden with the merged
+   * equipment + custom-input + vehicle-meta version (single source of truth
+   * for what hits the DB).
+   */
   const persistDraftForm = useMemo<PersistDraftFormSnapshot>(
     () => ({
-      transaction,
-      listingType,
-      isNewProgram,
-      internalRef,
-      ville,
-      arrondissement,
-      quartier,
-      quartierLibre,
-      pinLat,
-      pinLng,
-      title,
-      description,
-      priceMga,
-      surface,
-      rooms,
-      bathrooms,
-      toilets,
-      vehicleMake,
-      vehicleModel,
-      vehicleYear,
-      vehicleFuel,
-      vehicleTransmission,
-      vehicleDrivetrain,
-      vehicleCondition,
-      vehicleSellerType,
-      vehicleRentalMode,
-      vehicleBodyStyle,
-      vehicleDoors,
-      vehicleSeats,
-      vehicleExteriorColor,
-      vehicleEngineDisplacement,
-      vehicleInteriorColor,
-      vehicleAvailabilityStatus,
-      vehicleWhatsappPhone,
-      vehicleIsElectric,
-      vehicleIsHybrid,
+      ...form.getValues(),
       selectedFeatures: selectedFeaturesWithVehicleMeta,
-      videoUrl,
-      virtualTourUrl,
-      selectedBoosts,
-      agencySpotlight,
     }),
     [
-      transaction,
-      listingType,
-      isNewProgram,
-      internalRef,
-      ville,
-      arrondissement,
-      quartier,
-      quartierLibre,
-      pinLat,
-      pinLng,
-      title,
-      description,
-      priceMga,
-      surface,
-      rooms,
-      bathrooms,
-      toilets,
-      vehicleMake,
-      vehicleModel,
-      vehicleYear,
-      vehicleFuel,
-      vehicleTransmission,
-      vehicleDrivetrain,
-      vehicleCondition,
-      vehicleSellerType,
-      vehicleRentalMode,
-      vehicleBodyStyle,
-      vehicleDoors,
-      vehicleSeats,
-      vehicleExteriorColor,
-      vehicleEngineDisplacement,
-      vehicleInteriorColor,
-      vehicleAvailabilityStatus,
-      vehicleWhatsappPhone,
-      vehicleIsElectric,
-      vehicleIsHybrid,
-      selectedFeaturesWithVehicleMeta,
-      videoUrl,
-      virtualTourUrl,
-      selectedBoosts,
-      agencySpotlight,
+      transaction, listingType, isNewProgram, internalRef,
+      ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
+      title, description, priceMga, surface, rooms, bathrooms, toilets,
+      vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
+      vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
+      vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,
+      vehicleEngineDisplacement, vehicleInteriorColor, vehicleAvailabilityStatus,
+      vehicleWhatsappPhone, vehicleIsElectric, vehicleIsHybrid,
+      videoUrl, virtualTourUrl, selectedBoosts, agencySpotlight,
+      selectedFeaturesWithVehicleMeta, form,
     ],
   );
 
+  /**
+   * Phase 6.3.c: change-detection hash computed by `computeProgressFingerprint`
+   * helper (preserves the exact trim/sort normalization). Deps mirror the
+   * fields it reads so the memo recomputes on any meaningful change.
+   */
   const progressFingerprint = useMemo(
     () =>
-      JSON.stringify({
+      computeProgressFingerprint(
+        form.getValues(),
         step,
-        transaction,
-        listingType,
-        isNewProgram,
-        internalRef: internalRef.trim(),
-        ville: ville.trim(),
-        arrondissement: arrondissement.trim(),
-        quartier: quartier.trim(),
-        quartierLibre: quartierLibre.trim(),
-        pinLat,
-        pinLng,
-        title: title.trim(),
-        description: description.trim(),
-        priceMga: priceMga.trim(),
-        surface: surface.trim(),
-        rooms: rooms.trim(),
-        bathrooms: bathrooms.trim(),
-        toilets: toilets.trim(),
-        vehicleMake: vehicleMake.trim(),
-        vehicleModel: vehicleModel.trim(),
-        vehicleYear: vehicleYear.trim(),
-        vehicleFuel: vehicleFuel.trim(),
-        vehicleTransmission: vehicleTransmission.trim(),
-        vehicleDrivetrain: vehicleDrivetrain.trim(),
-        vehicleCondition: vehicleCondition.trim(),
-        vehicleSellerType: vehicleSellerType.trim(),
-        vehicleRentalMode: vehicleRentalMode.trim(),
-        vehicleBodyStyle: vehicleBodyStyle.trim(),
-        vehicleDoors: vehicleDoors.trim(),
-        vehicleSeats: vehicleSeats.trim(),
-        vehicleExteriorColor: vehicleExteriorColor.trim(),
-        vehicleEngineDisplacement: vehicleEngineDisplacement.trim(),
-        vehicleInteriorColor: vehicleInteriorColor.trim(),
-        vehicleAvailabilityStatus: vehicleAvailabilityStatus.trim(),
-        vehicleWhatsappPhone: vehicleWhatsappPhone.trim(),
-        vehicleIsElectric,
-        vehicleIsHybrid,
-        selectedFeatures: [...selectedFeatures].sort(),
-        customFeaturesInput: customFeaturesInput.trim(),
-        videoUrl: videoUrl.trim(),
-        virtualTourUrl: virtualTourUrl.trim(),
-        selectedBoosts: [...selectedBoosts].sort(),
-        agencySpotlight,
-        serverPhotoIds: serverPhotos.map((p) => p.id),
-        pendingPhotoCount: pendingPhotos.length,
-      }),
+        serverPhotos.map((p) => p.id),
+        pendingPhotos.length,
+      ),
     [
       step,
-      transaction,
-      listingType,
-      isNewProgram,
-      internalRef,
-      ville,
-      arrondissement,
-      quartier,
-      quartierLibre,
-      pinLat,
-      pinLng,
-      title,
-      description,
-      priceMga,
-      surface,
-      rooms,
-      bathrooms,
-      toilets,
-      vehicleMake,
-      vehicleModel,
-      vehicleYear,
-      vehicleFuel,
-      vehicleTransmission,
-      vehicleDrivetrain,
-      vehicleCondition,
-      vehicleSellerType,
-      vehicleRentalMode,
-      vehicleBodyStyle,
-      vehicleDoors,
-      vehicleSeats,
-      vehicleExteriorColor,
-      vehicleEngineDisplacement,
-      vehicleInteriorColor,
-      vehicleAvailabilityStatus,
-      vehicleWhatsappPhone,
-      vehicleIsElectric,
-      vehicleIsHybrid,
-      selectedFeatures,
-      customFeaturesInput,
-      videoUrl,
-      virtualTourUrl,
-      selectedBoosts,
-      agencySpotlight,
-      serverPhotos,
-      pendingPhotos.length,
+      transaction, listingType, isNewProgram, internalRef,
+      ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
+      title, description, priceMga, surface, rooms, bathrooms, toilets,
+      vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
+      vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
+      vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,
+      vehicleEngineDisplacement, vehicleInteriorColor, vehicleAvailabilityStatus,
+      vehicleWhatsappPhone, vehicleIsElectric, vehicleIsHybrid,
+      selectedFeatures, customFeaturesInput,
+      videoUrl, virtualTourUrl, selectedBoosts, agencySpotlight,
+      serverPhotos, pendingPhotos.length, form,
     ],
   );
 
@@ -673,99 +521,31 @@ const PublishPage = () => {
   const hasUnsavedMeaningfulChanges =
     hasMeaningfulDraftProgress && progressFingerprint !== lastPersistedFingerprintRef.current;
 
-  /** Signal unique pour l’autosave debouncé (équivalent aux dépendances listées individuellement avant refactor). */
+  /**
+   * Signal unique pour l'autosave debouncé. Phase 6.3.c: this is now just a
+   * spread of the form values + step + the merged equipment list. The hook
+   * `usePublishDraftLifecycle` only cares that the reference changes when a
+   * persistable field changes — the field-by-field listing was redundant
+   * with `form.watch` subscriptions already in place.
+   */
   const draftAutosaveSignal = useMemo(
     () => ({
-      transaction,
-      listingType,
-      isNewProgram,
-      internalRef,
-      ville,
-      arrondissement,
-      quartier,
-      quartierLibre,
-      pinLat,
-      pinLng,
-      title,
-      description,
-      priceMga,
-      surface,
-      rooms,
-      bathrooms,
-      toilets,
-      vehicleMake,
-      vehicleModel,
-      vehicleYear,
-      vehicleFuel,
-      vehicleTransmission,
-      vehicleDrivetrain,
-      vehicleCondition,
-      vehicleSellerType,
-      vehicleRentalMode,
-      vehicleBodyStyle,
-      vehicleDoors,
-      vehicleSeats,
-      vehicleExteriorColor,
-      vehicleEngineDisplacement,
-      vehicleInteriorColor,
-      vehicleAvailabilityStatus,
-      vehicleWhatsappPhone,
-      vehicleIsElectric,
-      vehicleIsHybrid,
+      ...form.getValues(),
       selectedFeaturesWithVehicleMeta,
-      selectedFeatures,
-      customFeaturesInput,
-      videoUrl,
-      virtualTourUrl,
-      selectedBoosts,
-      agencySpotlight,
       step,
     }),
     [
-      transaction,
-      listingType,
-      isNewProgram,
-      internalRef,
-      ville,
-      arrondissement,
-      quartier,
-      quartierLibre,
-      pinLat,
-      pinLng,
-      title,
-      description,
-      priceMga,
-      surface,
-      rooms,
-      bathrooms,
-      toilets,
-      vehicleMake,
-      vehicleModel,
-      vehicleYear,
-      vehicleFuel,
-      vehicleTransmission,
-      vehicleDrivetrain,
-      vehicleCondition,
-      vehicleSellerType,
-      vehicleRentalMode,
-      vehicleBodyStyle,
-      vehicleDoors,
-      vehicleSeats,
-      vehicleExteriorColor,
-      vehicleEngineDisplacement,
-      vehicleInteriorColor,
-      vehicleAvailabilityStatus,
-      vehicleWhatsappPhone,
-      vehicleIsElectric,
-      vehicleIsHybrid,
-      selectedFeaturesWithVehicleMeta,
-      selectedFeatures,
-      customFeaturesInput,
-      videoUrl,
-      virtualTourUrl,
-      selectedBoosts,
-      agencySpotlight,
-      step,
+      transaction, listingType, isNewProgram, internalRef,
+      ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
+      title, description, priceMga, surface, rooms, bathrooms, toilets,
+      vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
+      vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
+      vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,
+      vehicleEngineDisplacement, vehicleInteriorColor, vehicleAvailabilityStatus,
+      vehicleWhatsappPhone, vehicleIsElectric, vehicleIsHybrid,
+      selectedFeatures, customFeaturesInput,
+      videoUrl, virtualTourUrl, selectedBoosts, agencySpotlight,
+      selectedFeaturesWithVehicleMeta, step, form,
     ],
   );
 
@@ -774,8 +554,8 @@ const PublishPage = () => {
   }, [refreshProfile]);
 
   useEffect(() => {
-    if (!profile?.agency_id) setAgencySpotlight(false);
-  }, [profile?.agency_id]);
+    if (!profile?.agency_id) form.setValue("agencySpotlight", false);
+  }, [profile?.agency_id, form]);
 
   useEffect(() => {
     if (!draftHydrated) return;
@@ -788,16 +568,16 @@ const PublishPage = () => {
     ) {
       return;
     }
-    setVehicleSellerType(inferredSellerType);
-  }, [draftHydrated, profile, vehicleSellerType]);
+    form.setValue("vehicleSellerType", inferredSellerType);
+  }, [draftHydrated, profile, vehicleSellerType, form]);
 
   /** Centre-ville suggéré uniquement quand la ville change — pas à chaque arrondissement/quartier (évite d’écraser la position choisie sur la carte). */
   const lastAutoVilleRef = useRef<string>("");
   useEffect(() => {
     if (hydratingRef.current) return;
     if (!ville) {
-      setPinLat(null);
-      setPinLng(null);
+      form.setValue("pinLat", null);
+      form.setValue("pinLng", null);
       lastAutoVilleRef.current = "";
       return;
     }
@@ -805,13 +585,13 @@ const PublishPage = () => {
     lastAutoVilleRef.current = ville;
     const s = getSuggestedListingCoordinates(ville);
     if (s) {
-      setPinLat(s.lat);
-      setPinLng(s.lng);
+      form.setValue("pinLat", s.lat);
+      form.setValue("pinLng", s.lng);
     } else {
-      setPinLat(null);
-      setPinLng(null);
+      form.setValue("pinLat", null);
+      form.setValue("pinLng", null);
     }
-  }, [ville]);
+  }, [ville, form]);
 
   usePublishBootstrap({
     userId: user?.id,
@@ -920,11 +700,11 @@ const PublishPage = () => {
 
   useEffect(() => {
     if (listingType && !LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType)) {
-      setRooms("");
-      setBathrooms("");
-      setToilets("");
+      form.setValue("rooms", "");
+      form.setValue("bathrooms", "");
+      form.setValue("toilets", "");
     }
-  }, [listingType]);
+  }, [listingType, form]);
 
   const { data: creditsBalance = 0, isPending: creditsBalancePending } = useCreditsBalance();
   const { prices: livePrices, totalPublication } = usePricing();
@@ -934,20 +714,28 @@ const PublishPage = () => {
 
   const toggleFeature = (f: string) => {
     if (!LISTING_EQUIPMENT_OPTIONS.includes(f)) return;
-    setSelectedFeatures((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
+    const current = form.getValues("selectedFeatures");
+    form.setValue(
+      "selectedFeatures",
+      current.includes(f) ? current.filter((x) => x !== f) : [...current, f],
+    );
   };
 
   const toggleBoost = (b: PurchasableBoostType) => {
-    setSelectedBoosts((prev) => (prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b]));
+    const current = form.getValues("selectedBoosts");
+    form.setValue(
+      "selectedBoosts",
+      current.includes(b) ? current.filter((x) => x !== b) : [...current, b],
+    );
   };
 
   useEffect(() => {
     const autoTitle = [vehicleMake.trim(), vehicleModel.trim(), vehicleYear.trim()].filter(Boolean).join(" ");
     if (!autoTitle) return;
     if (title.trim().length === 0) {
-      setTitle(autoTitle.slice(0, 120));
+      form.setValue("title", autoTitle.slice(0, 120));
     }
-  }, [vehicleMake, vehicleModel, vehicleYear, title]);
+  }, [vehicleMake, vehicleModel, vehicleYear, title, form]);
 
   const handleNext = async () => {
     const errors = validateStep(step);
@@ -1007,48 +795,14 @@ const PublishPage = () => {
           }
         }
 
+        // Phase 6.3.c: form.getValues() supplies all 40 listing fields in one spread;
+        // pinLat/pinLng + selectedFeatures are overridden with computed values.
+        const formValues = form.getValues();
         const patchBase = formToListingUpdate({
-          transaction,
-          listingType,
-          isNewProgram,
-          internalRef,
-          ville,
-          arrondissement,
-          quartier,
-          quartierLibre,
+          ...formValues,
           pinLat: finalLat,
           pinLng: finalLng,
-          title,
-          description,
-          priceMga,
-          surface,
-          rooms,
-          bathrooms,
-          toilets,
-          vehicleMake,
-          vehicleModel,
-          vehicleYear,
-          vehicleFuel,
-          vehicleTransmission,
-          vehicleDrivetrain,
-          vehicleCondition,
-          vehicleSellerType,
-          vehicleRentalMode,
-          vehicleBodyStyle,
-          vehicleDoors,
-          vehicleSeats,
-          vehicleExteriorColor,
-          vehicleEngineDisplacement,
-          vehicleInteriorColor,
-          vehicleAvailabilityStatus,
-          vehicleWhatsappPhone,
-          vehicleIsElectric,
-          vehicleIsHybrid,
           selectedFeatures: selectedFeaturesWithVehicleMeta,
-          videoUrl,
-          virtualTourUrl,
-          selectedBoosts,
-          agencySpotlight,
           draftStep: step,
           isDraftSave: false,
         });
@@ -1065,45 +819,10 @@ const PublishPage = () => {
         const photoIdsOrdered = nextPhotos.map((p) => p.id);
         const currentSnap = buildListingMaterialSnapshotFromForm(
           {
-            transaction,
-            listingType,
-            isNewProgram,
-            internalRef,
-            ville,
-            arrondissement,
-            quartier,
-            quartierLibre,
+            ...formValues,
             pinLat: finalLat,
             pinLng: finalLng,
-            title,
-            description,
-            priceMga,
-            surface,
-            rooms,
-            bathrooms,
-            toilets,
-              vehicleMake,
-              vehicleModel,
-              vehicleYear,
-              vehicleFuel,
-              vehicleTransmission,
-              vehicleDrivetrain,
-              vehicleCondition,
-              vehicleSellerType,
-              vehicleRentalMode,
-              vehicleBodyStyle,
-              vehicleDoors,
-              vehicleSeats,
-              vehicleExteriorColor,
-              vehicleEngineDisplacement,
-              vehicleInteriorColor,
-              vehicleAvailabilityStatus,
-              vehicleWhatsappPhone,
-              vehicleIsElectric,
-              vehicleIsHybrid,
             selectedFeatures: selectedFeaturesWithVehicleMeta,
-            videoUrl,
-            virtualTourUrl,
           },
           photoIdsOrdered,
           0,
@@ -1282,7 +1001,7 @@ const PublishPage = () => {
   const progress = ((step + 1) / steps.length) * 100;
 
   return (
-    <>
+    <FormProvider {...form}>
       <Helmet>
         <title>
           {(isPublishedListingEdit ? t("publish.editTitle", "Modifier l’annonce") : t("publish.title"))} — AutoNex
@@ -1392,20 +1111,27 @@ const PublishPage = () => {
               listingLocationHint: t("publish.listingLocationHint", "La ville et un point sur carte sont requis pour publier."),
             }}
             onTransactionChange={(v) => {
-              setTransaction(v);
-              setListingType((prev) => {
-                const allowed = new Set(listingTypesForTransaction(v));
-                return allowed.has(prev as ListingType) ? prev : "";
-              });
-              setVehicleBodyStyle((prev) => {
-                if (!prev) return prev;
+              form.setValue("transaction", v);
+              const currentListingType = form.getValues("listingType");
+              const allowed = new Set(listingTypesForTransaction(v));
+              form.setValue(
+                "listingType",
+                allowed.has(currentListingType as ListingType) ? currentListingType : "",
+              );
+              const currentBodyStyle = form.getValues("vehicleBodyStyle");
+              if (currentBodyStyle) {
                 const nextOptions = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((option) => {
                   if (!option.listingTypes?.length) return true;
-                  const allowed = new Set(listingTypesForTransaction(v));
-                  return option.listingTypes.some((listingTypeOption) => allowed.has(listingTypeOption as ListingType));
+                  const allowedInner = new Set(listingTypesForTransaction(v));
+                  return option.listingTypes.some((listingTypeOption) =>
+                    allowedInner.has(listingTypeOption as ListingType),
+                  );
                 });
-                return nextOptions.some((option) => option.id === prev) ? prev : "";
-              });
+                form.setValue(
+                  "vehicleBodyStyle",
+                  nextOptions.some((option) => option.id === currentBodyStyle) ? currentBodyStyle : "",
+                );
+              }
             }}
             onVehicleTypeChange={(vehicleTypeId) => {
               const option = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((entry) => entry.id === vehicleTypeId);
@@ -1413,29 +1139,29 @@ const PublishPage = () => {
               const mappedType =
                 option?.listingTypes?.find((entry) => allowed.has(entry as ListingType)) ?? null;
 
-              setVehicleBodyStyle(vehicleTypeId);
+              form.setValue("vehicleBodyStyle", vehicleTypeId);
               if (mappedType) {
-                setListingType(mappedType as ListingType);
+                form.setValue("listingType", mappedType as ListingType);
               } else if (!listingType) {
-                setListingType(typeOptions[0] ?? "");
+                form.setValue("listingType", typeOptions[0] ?? "");
               }
               if (option?.fuels?.length) {
-                setVehicleFuel(option.fuels[0]);
+                form.setValue("vehicleFuel", option.fuels[0]);
                 const isElectric = option.fuels.includes("Électrique");
                 const isHybrid = option.fuels.some((fuelOption) => fuelOption.includes("Hybride"));
-                setVehicleIsElectric(isElectric);
-                setVehicleIsHybrid(isHybrid);
+                form.setValue("vehicleIsElectric", isElectric);
+                form.setValue("vehicleIsHybrid", isHybrid);
               }
             }}
-            onNewProgramChange={setIsNewProgram}
-            onInternalRefChange={setInternalRef}
-            onVilleChange={setVille}
-            onArrondissementChange={setArrondissement}
-            onQuartierChange={setQuartier}
-            onQuartierLibreChange={setQuartierLibre}
+            onNewProgramChange={(v) => form.setValue("isNewProgram", v)}
+            onInternalRefChange={(v) => form.setValue("internalRef", v)}
+            onVilleChange={(v) => form.setValue("ville", v)}
+            onArrondissementChange={(v) => form.setValue("arrondissement", v)}
+            onQuartierChange={(v) => form.setValue("quartier", v)}
+            onQuartierLibreChange={(v) => form.setValue("quartierLibre", v)}
             onMapPositionChange={(la, ln) => {
-              setPinLat(la);
-              setPinLng(ln);
+              form.setValue("pinLat", la);
+              form.setValue("pinLng", ln);
             }}
           />
         )}
@@ -1482,40 +1208,40 @@ const PublishPage = () => {
               listingFeatures: t("listing.features", "Équipements"),
               priceDealHint: priceDealHelperText,
             }}
-            onTitleChange={setTitle}
-            onDescriptionChange={setDescription}
-            onPriceMgaChange={setPriceMga}
+            onTitleChange={(v) => form.setValue("title", v)}
+            onDescriptionChange={(v) => form.setValue("description", v)}
+            onPriceMgaChange={(v) => form.setValue("priceMga", v)}
             onSurfaceChange={(value) => applyVehicleLegacyMirrorFromInputs({ mileageKmInput: value })}
-            onRoomsChange={setRooms}
-            onBathroomsChange={setBathrooms}
-            onToiletsChange={setToilets}
-            onMakeChange={setVehicleMake}
-            onModelChange={setVehicleModel}
-            onYearChange={setVehicleYear}
-            onFuelChange={setVehicleFuel}
-            onTransmissionChange={setVehicleTransmission}
-            onDrivetrainChange={setVehicleDrivetrain}
-            onConditionChange={setVehicleCondition}
-            onSellerTypeChange={setVehicleSellerType}
-            onRentalModeChange={setVehicleRentalMode}
-            onBodyStyleChange={setVehicleBodyStyle}
+            onRoomsChange={(v) => form.setValue("rooms", v)}
+            onBathroomsChange={(v) => form.setValue("bathrooms", v)}
+            onToiletsChange={(v) => form.setValue("toilets", v)}
+            onMakeChange={(v) => form.setValue("vehicleMake", v)}
+            onModelChange={(v) => form.setValue("vehicleModel", v)}
+            onYearChange={(v) => form.setValue("vehicleYear", v)}
+            onFuelChange={(v) => form.setValue("vehicleFuel", v)}
+            onTransmissionChange={(v) => form.setValue("vehicleTransmission", v)}
+            onDrivetrainChange={(v) => form.setValue("vehicleDrivetrain", v)}
+            onConditionChange={(v) => form.setValue("vehicleCondition", v)}
+            onSellerTypeChange={(v) => form.setValue("vehicleSellerType", v)}
+            onRentalModeChange={(v) => form.setValue("vehicleRentalMode", v)}
+            onBodyStyleChange={(v) => form.setValue("vehicleBodyStyle", v)}
             onDoorsChange={(value) => {
-              setVehicleDoors(value);
+              form.setValue("vehicleDoors", value);
               applyVehicleLegacyMirrorFromInputs({ doorsInput: value });
             }}
             onSeatsChange={(value) => {
-              setVehicleSeats(value);
+              form.setValue("vehicleSeats", value);
               applyVehicleLegacyMirrorFromInputs({ seatsInput: value });
             }}
-            onExteriorColorChange={setVehicleExteriorColor}
-            onEngineDisplacementChange={setVehicleEngineDisplacement}
-            onInteriorColorChange={setVehicleInteriorColor}
-            onAvailabilityStatusChange={setVehicleAvailabilityStatus}
-            onWhatsappPhoneChange={setVehicleWhatsappPhone}
-            onElectricChange={setVehicleIsElectric}
-            onHybridChange={setVehicleIsHybrid}
+            onExteriorColorChange={(v) => form.setValue("vehicleExteriorColor", v)}
+            onEngineDisplacementChange={(v) => form.setValue("vehicleEngineDisplacement", v)}
+            onInteriorColorChange={(v) => form.setValue("vehicleInteriorColor", v)}
+            onAvailabilityStatusChange={(v) => form.setValue("vehicleAvailabilityStatus", v)}
+            onWhatsappPhoneChange={(v) => form.setValue("vehicleWhatsappPhone", v)}
+            onElectricChange={(v) => form.setValue("vehicleIsElectric", v)}
+            onHybridChange={(v) => form.setValue("vehicleIsHybrid", v)}
             onToggleFeature={toggleFeature}
-            onCustomFeaturesInputChange={setCustomFeaturesInput}
+            onCustomFeaturesInputChange={(v) => form.setValue("customFeaturesInput", v)}
           />
         )}
 
@@ -1539,8 +1265,8 @@ const PublishPage = () => {
             onPhotoSelect={handlePhotoSelect}
             onMakeCoverAtIndex={(i) => void makeCoverAtIndex(i)}
             onRemovePhotoAt={(i) => void removePhotoAt(i)}
-            onVideoUrlChange={setVideoUrl}
-            onVirtualTourUrlChange={setVirtualTourUrl}
+            onVideoUrlChange={(v) => form.setValue("videoUrl", v)}
+            onVirtualTourUrlChange={(v) => form.setValue("virtualTourUrl", v)}
           />
         )}
 
@@ -1561,7 +1287,7 @@ const PublishPage = () => {
             toggleBoost={toggleBoost}
             hasAgency={Boolean(profile?.agency_id)}
             agencySpotlight={agencySpotlight}
-            setAgencySpotlight={setAgencySpotlight}
+            setAgencySpotlight={(v) => form.setValue("agencySpotlight", v)}
             agencySpotlightActive={agencySpotlightActive}
             publishing={publishing}
             onPublish={handlePublish}
@@ -1621,7 +1347,7 @@ const PublishPage = () => {
       <div className="hidden sm:block">
         <Footer />
       </div>
-    </>
+    </FormProvider>
   );
 };
 
