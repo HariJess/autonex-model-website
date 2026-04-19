@@ -54,22 +54,31 @@ const Dashboard = () => {
   const { data: leadCounts } = useQuery({
     queryKey: ["my-lead-counts", user?.id, listingIds],
     queryFn: async () => {
-      if (!user || listingIds.length === 0) return { contacts: 0, phoneReveals: 0 };
-      // Fetch all lead types for counting
-      const { data, error } = await supabase
-        .from("leads")
-        .select("type")
-        .in("listing_id", listingIds);
-      if (error) return { contacts: 0, phoneReveals: 0 };
-      const contacts = (data ?? []).filter((l) => l.type === "contact_form").length;
-      const phoneReveals = (data ?? []).filter((l) => l.type === "phone_reveal").length;
-      return { contacts, phoneReveals };
+      if (!user || listingIds.length === 0) return { contacts: 0, phoneReveals: 0, whatsappClicks: 0 };
+      const [leadRes, revealRes] = await Promise.all([
+        supabase
+          .from("leads")
+          .select("type")
+          .in("listing_id", listingIds)
+          .eq("type", "contact_form"),
+        supabase
+          .from("phone_reveal_events")
+          .select("kind")
+          .in("listing_id", listingIds),
+      ]);
+      if (leadRes.error || revealRes.error) {
+        return { contacts: 0, phoneReveals: 0, whatsappClicks: 0 };
+      }
+      const contacts = leadRes.data?.length ?? 0;
+      const phoneReveals = (revealRes.data ?? []).filter((r) => r.kind === "phone_reveal").length;
+      const whatsappClicks = (revealRes.data ?? []).filter((r) => r.kind === "whatsapp").length;
+      return { contacts, phoneReveals, whatsappClicks };
     },
     enabled: !!user && listingIds.length > 0,
     staleTime: 20_000,
   });
 
-  // Recent leads for display (limited)
+  // Recent leads for display (contact_form only; reveals live in phone_reveal_events)
   const { data: recentLeads = [], isLoading: leadsLoading } = useQuery({
     queryKey: ["my-leads-recent", user?.id, listingIds],
     queryFn: async () => {
@@ -78,6 +87,7 @@ const Dashboard = () => {
         .from("leads")
         .select("*, listings(title)")
         .in("listing_id", listingIds)
+        .eq("type", "contact_form")
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw new Error(error.message);

@@ -49,12 +49,12 @@ export function useListingDetailContact(params: {
       setRevealedPhone(listing.owner_phone ?? null);
       return;
     }
-    const { error: leadError } = await supabase.from("leads").insert({
+    const { error: revealError } = await supabase.from("phone_reveal_events").insert({
       listing_id: listing.id,
-      visitor_name: user.id,
-      type: "phone_reveal" as const,
+      user_id: user.id,
+      kind: "phone_reveal",
     });
-    if (leadError) {
+    if (revealError) {
       toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
       return;
     }
@@ -134,12 +134,12 @@ export function useListingDetailContact(params: {
     }
     const skipLead = user.id === listing.owner_id || isAdmin;
     if (!skipLead) {
-      const { error: leadError } = await supabase.from("leads").insert({
+      const { error: revealError } = await supabase.from("phone_reveal_events").insert({
         listing_id: listing.id,
-        visitor_name: user.id,
-        type: "whatsapp" as const,
+        user_id: user.id,
+        kind: "whatsapp",
       });
-      if (leadError) {
+      if (revealError) {
         toast.error(t("listing.phoneRevealError", "Impossible d'enregistrer la demande"));
         return;
       }

@@ -39,8 +39,7 @@ export function DashboardLeadsSection({
                   <div>
                     <p className="font-sans font-semibold">{lead.visitor_name || labels.visitor}</p>
                     <p className="text-xs text-muted-foreground font-sans mb-2">
-                      {lead.type === "phone_reveal" ? "📞 Numéro révélé" : lead.type === "whatsapp" ? "💬 WhatsApp" : "✉️ Message"} •{" "}
-                      {lead.listings?.title ?? labels.listing}
+                      ✉️ Message • {lead.listings?.title ?? labels.listing}
                     </p>
                     {lead.message && <p className="text-sm text-muted-foreground font-sans">{lead.message}</p>}
                     {lead.visitor_email && <p className="text-xs text-primary font-sans mt-1">{lead.visitor_email}</p>}
