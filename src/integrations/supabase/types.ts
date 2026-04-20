@@ -12,33 +12,41 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          target_entity_id: string | null
+          target_entity_type: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       agencies: {
         Row: {
           address: string | null
@@ -55,6 +63,7 @@ export type Database = {
           slug: string
           spotlight_until: string | null
           stat: string | null
+          updated_at: string
           verified: boolean | null
         }
         Insert: {
@@ -72,6 +81,7 @@ export type Database = {
           slug: string
           spotlight_until?: string | null
           stat?: string | null
+          updated_at?: string
           verified?: boolean | null
         }
         Update: {
@@ -89,6 +99,7 @@ export type Database = {
           slug?: string
           spotlight_until?: string | null
           stat?: string | null
+          updated_at?: string
           verified?: boolean | null
         }
         Relationships: []
@@ -1012,6 +1023,10 @@ export type Database = {
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           seller_type: string | null
+          suspended: boolean
+          suspended_at: string | null
+          suspended_by: string | null
+          suspended_reason: string | null
           whatsapp_phone: string | null
         }
         Insert: {
@@ -1023,6 +1038,10 @@ export type Database = {
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
+          suspended?: boolean
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspended_reason?: string | null
           whatsapp_phone?: string | null
         }
         Update: {
@@ -1034,6 +1053,10 @@ export type Database = {
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
+          suspended?: boolean
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspended_reason?: string | null
           whatsapp_phone?: string | null
         }
         Relationships: [
@@ -1800,6 +1823,21 @@ export type Database = {
         Args: { p_listing_id: string }
         Returns: Json
       }
+      admin_change_user_role: {
+        Args: {
+          p_new_role: Database["public"]["Enums"]["user_role"]
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      admin_delete_user: {
+        Args: { p_confirmation_email: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_grant_credits: {
+        Args: { p_amount: number; p_reason: string; p_user_id: string }
+        Returns: string
+      }
       admin_reject_credit_transaction: {
         Args: { p_reason: string; p_transaction_id: string }
         Returns: Json
@@ -1807,6 +1845,31 @@ export type Database = {
       admin_reject_listing_moderation: {
         Args: { p_listing_id: string; p_reason: string }
         Returns: Json
+      }
+      admin_suspend_user: {
+        Args: { p_reason: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_unsuspend_user: { Args: { p_user_id: string }; Returns: undefined }
+      admin_user_overview: {
+        Args: { p_user_id: string }
+        Returns: {
+          agency_id: string
+          created_at: string
+          credits_balance: number
+          email: string
+          full_name: string
+          last_sign_in_at: string
+          phone: string
+          role: Database["public"]["Enums"]["user_role"]
+          seller_type: string
+          suspended: boolean
+          suspended_at: string
+          suspended_by: string
+          suspended_reason: string
+          user_id: string
+          whatsapp_phone: string
+        }[]
       }
       consume_credits: {
         Args: {
@@ -1887,6 +1950,16 @@ export type Database = {
           p_title: string
         }
         Returns: unknown
+      }
+      log_admin_action: {
+        Args: {
+          p_action: string
+          p_metadata?: Json
+          p_target_entity_id?: string
+          p_target_entity_type?: string
+          p_target_user_id?: string
+        }
+        Returns: string
       }
       pricing_for: { Args: { p_key: string }; Returns: number }
       publish_listing_with_credits: {
@@ -2093,9 +2166,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       boost_type: [
