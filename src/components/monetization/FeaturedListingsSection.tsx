@@ -11,28 +11,35 @@ interface FeaturedListingsSectionProps {
   enabled?: boolean;
 }
 
-/** Rail « mis en avant » : annonces avec boost top/featured (stock réel), sinon dernières annonces. */
+/**
+ * Rail « mis en avant » : annonces avec un boost top ou featured actif (non expiré).
+ *
+ * Contrainte métier: le rail doit rester PURE monétisation. Aucune annonce
+ * ne doit apparaître ici si elle n'a pas payé un boost. Quand personne n'a
+ * encore boosté, la section est masquée entièrement (plutôt qu'un fallback
+ * « dernières annonces » qui diluerait la valeur du boost et créerait une
+ * surprise désagréable pour les vendeurs non payants).
+ */
 export function FeaturedListingsSection({
   title = "Biens mis en avant",
   limit = 8,
   enabled = true,
 }: FeaturedListingsSectionProps) {
   const { data: boostIds = [], isLoading: idLoading } = useFeaturedBoostListingIds(limit);
-  const idsReady = !idLoading;
   const hasBoosted = boostIds.length > 0;
 
   const { data: boostedListings = [], isLoading: loadBoosted } = useDbListings(
-    idsReady && hasBoosted && enabled ? { listingIds: boostIds, limit } : { limit: 0 },
+    !idLoading && hasBoosted && enabled ? { listingIds: boostIds, limit } : { limit: 0 },
   );
-
-  const { data: fallbackListings = [], isLoading: loadFallback } = useDbListings(
-    idsReady && !hasBoosted && enabled ? { limit } : { limit: 0 },
-  );
-
-  const listings = hasBoosted ? boostedListings : fallbackListings;
-  const loading = enabled && (idLoading || (hasBoosted ? loadBoosted : loadFallback));
 
   if (!enabled) return null;
+
+  // Still resolving boost IDs → hide the whole section (no flicker with fallback).
+  if (idLoading) return null;
+
+  // No paid boosts active right now → section hidden. Return null, not a placeholder,
+  // so the page flows seamlessly and users never see a half-empty monetized rail.
+  if (!hasBoosted) return null;
 
   return (
     <section className="container mx-auto px-4 py-14">
@@ -45,28 +52,20 @@ export function FeaturedListingsSection({
           Voir tout <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
-      {loading ? (
+      {loadBoosted ? (
         <div className="flex justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      ) : listings.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground font-sans">Aucune annonce à afficher pour le moment.</p>
-          <p className="text-xs text-muted-foreground font-sans mt-2">
-            Le catalogue AutoNex est prêt: publiez le premier véhicule pour lancer la vitrine.
-          </p>
-        </div>
+      ) : boostedListings.length === 0 ? (
+        // Boost IDs exist but the listings query returned nothing (listing deleted
+        // or unpublished after the boost started). Hide the rail silently.
+        null
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {listings.map((listing) => (
+          {boostedListings.map((listing) => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>
-      )}
-      {!hasBoosted && listings.length > 0 && (
-        <p className="text-center text-xs text-muted-foreground font-sans mt-6 max-w-2xl mx-auto">
-          Les annonces avec boost « top » ou « mise en avant » apparaîtront ici en priorité lorsqu’elles seront actives.
-        </p>
       )}
     </section>
   );
