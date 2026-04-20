@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { mapDbError } from "@/lib/admin/dbErrorMessages";
 import type {
   ChangeRoleInput,
   DeleteUserInput,
@@ -9,26 +10,6 @@ import type {
   UnsuspendUserInput,
 } from "@/types/admin";
 import { adminUserDetailQueryKey } from "./useAdminUserDetail";
-
-const DB_ERROR_MESSAGES: Record<string, string> = {
-  forbidden: "Action refusée : droits admin requis.",
-  cannot_self_demote: "Vous ne pouvez pas rétrograder votre propre compte.",
-  cannot_self_suspend: "Vous ne pouvez pas suspendre votre propre compte.",
-  cannot_self_delete: "Vous ne pouvez pas supprimer votre propre compte.",
-  amount_required_non_zero: "Le montant doit être différent de zéro.",
-  reason_required: "La raison est requise (au moins 3 caractères).",
-  user_not_found: "Utilisateur introuvable.",
-  confirmation_email_required: "L'email de confirmation est requis.",
-  email_mismatch: "L'email de confirmation ne correspond pas à l'email du compte.",
-};
-
-function mapDbError(err: unknown, fallback: string): string {
-  const raw = err instanceof Error ? err.message : String(err);
-  for (const key of Object.keys(DB_ERROR_MESSAGES)) {
-    if (raw.includes(key)) return DB_ERROR_MESSAGES[key];
-  }
-  return raw || fallback;
-}
 
 export function useAdminUserActions(userId: string) {
   const queryClient = useQueryClient();

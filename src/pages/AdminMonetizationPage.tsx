@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,21 @@ import { formatAriary } from "@/config/monetization";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
 import { Loader2, Check, X } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const AdminPricingEditor = lazy(
+  () => import("@/components/admin/pricing/AdminPricingEditor"),
+);
+const AdminCreditPacksEditor = lazy(
+  () => import("@/components/admin/pricing/AdminCreditPacksEditor"),
+);
+
+function EditorFallback() {
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground font-sans">
+      <Loader2 className="h-4 w-4 animate-spin" /> Chargement...
+    </div>
+  );
+}
 
 type TxRow = Tables<"transactions">;
 type ListingRow = Tables<"listings">;
@@ -346,6 +361,14 @@ const AdminMonetizationPage = () => {
             )}
           </CardContent>
         </Card>
+
+        <Suspense fallback={<EditorFallback />}>
+          <AdminPricingEditor />
+        </Suspense>
+
+        <Suspense fallback={<EditorFallback />}>
+          <AdminCreditPacksEditor />
+        </Suspense>
       </div>
     </>
   );
