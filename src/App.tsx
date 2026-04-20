@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
+import { BetaLockGate } from "@/components/auth/BetaLockGate";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -42,6 +43,7 @@ const BlogList = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default
 const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogArticle })));
 const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const BetaLoginPage = lazy(() => import("./pages/BetaLoginPage.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,7 +70,9 @@ const App = () => (
       <SentrySmokeTest />
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
+          <BetaLockGate>
           <Routes>
+            <Route path="/beta-login" element={<BetaLoginPage />} />
             <Route path="/" element={<Index />} />
             <Route path="/recherche" element={<SearchPage />} />
             <Route path="/acheter" element={<SeoLandingPage />} />
@@ -108,6 +112,7 @@ const App = () => (
             <Route path="/conseils/:slug" element={<BlogArticle />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </BetaLockGate>
         </Suspense>
       </BrowserRouter>
     </TooltipProvider>

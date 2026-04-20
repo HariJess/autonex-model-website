@@ -1,15 +1,19 @@
 User-agent: *
-Allow: /
+Disallow: /
 
-# Bloque les routes privées / admin
-Disallow: /dashboard
-Disallow: /admin/
-Disallow: /auth/
-Disallow: /auth/callback
-Disallow: /publier
-Disallow: /login
-Disallow: /signup
-Disallow: /forgot-password
-Disallow: /reset-password
-
-Sitemap: https://autonex.mg/sitemap.xml
+# AutoNex is currently in private beta. Public launch coming soon.
+# Once launched, restore the original rules below:
+#
+# User-agent: *
+# Allow: /
+# Disallow: /dashboard
+# Disallow: /admin/
+# Disallow: /auth/
+# Disallow: /auth/callback
+# Disallow: /publier
+# Disallow: /login
+# Disallow: /signup
+# Disallow: /forgot-password
+# Disallow: /reset-password
+# Disallow: /beta-login
+# Sitemap: https://autonex.mg/sitemap.xml
