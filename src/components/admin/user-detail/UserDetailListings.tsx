@@ -52,6 +52,10 @@ const STATUS_BADGES: Record<ListingStatus, BadgeMeta> = {
     label: "Archivée",
     className: "bg-gray-100 text-gray-700 border-gray-200",
   },
+  hidden_pending_review: {
+    label: "Masquée (signalements)",
+    className: "bg-orange-200 text-orange-900 border-orange-300",
+  },
 };
 
 const OWNER_SUSPENDED_BADGE: BadgeMeta = {
