@@ -19,6 +19,9 @@ const AdminPricingEditor = lazy(
 const AdminCreditPacksEditor = lazy(
   () => import("@/components/admin/pricing/AdminCreditPacksEditor"),
 );
+const AdminPromoCodesEditor = lazy(
+  () => import("@/components/admin/promo/AdminPromoCodesEditor"),
+);
 
 function EditorFallback() {
   return (
@@ -368,6 +371,10 @@ const AdminMonetizationPage = () => {
 
         <Suspense fallback={<EditorFallback />}>
           <AdminCreditPacksEditor />
+        </Suspense>
+
+        <Suspense fallback={<EditorFallback />}>
+          <AdminPromoCodesEditor />
         </Suspense>
       </div>
     </>

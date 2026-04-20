@@ -2,6 +2,7 @@ import { usePurchaseCredits } from "@/hooks/credits/usePurchaseCredits";
 import { CreditPacksGrid } from "@/pages/credits/components/CreditPacksGrid";
 import { CreditPurchaseForm } from "@/pages/credits/components/CreditPurchaseForm";
 import { CreditsTransactionsHistory } from "@/pages/credits/components/CreditsTransactionsHistory";
+import { PromoCodeInput } from "@/components/credits/PromoCodeInput";
 
 type CreditsPurchaseFlowProps = {
   /**
@@ -52,6 +53,18 @@ export function CreditsPurchaseFlow({
         selectedPackId={purchase.selectedPackId}
         onSelectPack={purchase.setSelectedPackId}
       />
+
+      {purchase.selectedPack ? (
+        <PromoCodeInput
+          selectedPackId={purchase.selectedPackId}
+          promoCode={purchase.promoCode}
+          onPromoCodeChange={purchase.setPromoCode}
+          validation={purchase.promoValidation}
+          onValidationChange={purchase.setPromoValidation}
+          packPriceMga={purchase.selectedPack.price_mga}
+          packCredits={purchase.selectedPack.credits_amount}
+        />
+      ) : null}
 
       <CreditPurchaseForm
         paymentMethod={purchase.paymentMethod}

@@ -30,6 +30,24 @@ export const DB_ERROR_MESSAGES: Record<string, string> = {
   invalid_sort_order: "L'ordre de tri doit être >= 0.",
   pricing_key_not_found: "Clé de tarification introuvable.",
   pack_not_found: "Pack introuvable.",
+
+  // promo codes module
+  auth_required: "Connexion requise pour cette action.",
+  invalid_code: "Le code est invalide (A-Z, 0-9, tirets uniquement, 50 car. max).",
+  invalid_percentage: "Le pourcentage doit être compris entre 1 et 100.",
+  invalid_bonus_credits: "Le nombre de crédits bonus doit être > 0.",
+  invalid_type_fields: "Les champs doivent correspondre au type choisi.",
+  invalid_max_redemptions: "La limite d'utilisations doit être > 0.",
+  max_redemptions_below_current: "La limite ne peut pas être inférieure au nombre d'utilisations déjà enregistrées.",
+  code_already_exists: "Ce code promo existe déjà.",
+  code_not_found: "Code promo introuvable ou désactivé.",
+  code_expired: "Ce code promo a expiré.",
+  code_exhausted: "Ce code promo a atteint sa limite d'utilisations.",
+  code_not_applicable_to_pack: "Ce code n'est pas applicable à ce pack.",
+  code_already_used: "Vous avez déjà utilisé ce code.",
+  promo_code_not_found: "Code promo introuvable.",
+  redemption_already_recorded: "Cette transaction a déjà un code promo appliqué.",
+  transaction_not_found: "Transaction introuvable.",
 };
 
 export function mapDbError(err: unknown, fallback: string): string {

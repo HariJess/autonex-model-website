@@ -5,6 +5,12 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { mergeCanonicalCreditPacks, type CreditPackRow } from "@/lib/creditPacks";
+import type { Database } from "@/integrations/supabase/types";
+import type { PromoValidationResult } from "@/types/promo";
+import { mapDbError } from "@/lib/admin/dbErrorMessages";
+
+// Typegen flags p_promo_code as non-null; the RPC accepts NULL when no promo.
+type CreateTxArgs = Database["public"]["Functions"]["create_transaction_with_promo"]["Args"];
 
 export type ManualPaymentMethod = {
   id: string;
@@ -28,6 +34,12 @@ export type UsePurchaseCreditsResult = {
   setPaymentMethod: (id: string) => void;
   proofFile: File | null;
   setProofFile: (f: File | null) => void;
+
+  // Promo code state (optional)
+  promoCode: string;
+  setPromoCode: (code: string) => void;
+  promoValidation: PromoValidationResult | null;
+  setPromoValidation: (result: PromoValidationResult | null) => void;
 
   // Data
   creditPacks: CreditPackRow[];
@@ -68,6 +80,8 @@ export function usePurchaseCredits(opts?: UsePurchaseCreditsOptions): UsePurchas
   const [paymentMethod, setPaymentMethod] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoValidation, setPromoValidation] = useState<PromoValidationResult | null>(null);
 
   const { data: creditPacks = [] } = useQuery({
     queryKey: ["credit-packs"],
@@ -122,15 +136,20 @@ export function usePurchaseCredits(opts?: UsePurchaseCreditsOptions): UsePurchas
       const { error: upErr } = await supabase.storage.from("payment-proofs").upload(path, proofFile);
       if (upErr) throw new Error(upErr.message);
 
-      const { error: txErr } = await supabase.from("transactions").insert({
-        user_id: user.id,
-        amount_mga: pack.price_mga,
-        method: paymentMethod as ManualPaymentMethodId,
-        status: "pending",
-        reference: `CR-${pack.id}-${Date.now()}`,
-        payment_proof_url: path,
-        credit_pack_id: pack.id,
-      });
+      const normalisedPromo = promoCode.trim().toUpperCase();
+      const promoToSend =
+        promoValidation?.valid === true && normalisedPromo.length > 0
+          ? normalisedPromo
+          : null;
+
+      const { error: txErr } = await supabase.rpc("create_transaction_with_promo", {
+        p_credit_pack_id: pack.id,
+        p_method: paymentMethod as ManualPaymentMethodId,
+        p_amount_mga: pack.price_mga,
+        p_payment_proof_url: path,
+        p_reference: `CR-${pack.id}-${Date.now()}`,
+        p_promo_code: promoToSend,
+      } as unknown as CreateTxArgs);
       if (txErr) throw new Error(txErr.message);
 
       await queryClient.invalidateQueries({ queryKey: ["pending-credit-purchases", user.id] });
@@ -146,9 +165,11 @@ export function usePurchaseCredits(opts?: UsePurchaseCreditsOptions): UsePurchas
       setProofFile(null);
       setSelectedPackId("");
       setPaymentMethod("");
+      setPromoCode("");
+      setPromoValidation(null);
       opts?.onSuccess?.();
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Erreur");
+      toast.error(mapDbError(e, "Erreur lors de l'envoi de la demande."));
       opts?.onError?.(e);
     } finally {
       setSubmitting(false);
@@ -162,6 +183,10 @@ export function usePurchaseCredits(opts?: UsePurchaseCreditsOptions): UsePurchas
     setPaymentMethod,
     proofFile,
     setProofFile,
+    promoCode,
+    setPromoCode,
+    promoValidation,
+    setPromoValidation,
     creditPacks,
     selectedPack,
     paymentMethods,
