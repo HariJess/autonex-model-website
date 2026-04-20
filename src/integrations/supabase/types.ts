@@ -51,56 +51,95 @@ export type Database = {
         Row: {
           address: string | null
           bio: string | null
+          city: string | null
           commercial_contact_name: string | null
+          cover_image_url: string | null
           created_at: string | null
+          description_long: string | null
           email: string | null
           id: string
           logo_url: string | null
           name: string
           nif: string | null
+          opening_hours: Json
           phone: string | null
           reg_commerce: string | null
+          region: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           slug: string
+          social_links: Json
           spotlight_until: string | null
           stat: string | null
+          status: Database["public"]["Enums"]["agency_status"]
+          submitted_at: string | null
           updated_at: string
           verified: boolean | null
+          website_url: string | null
+          whatsapp_phone: string | null
         }
         Insert: {
           address?: string | null
           bio?: string | null
+          city?: string | null
           commercial_contact_name?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
+          description_long?: string | null
           email?: string | null
           id?: string
           logo_url?: string | null
           name: string
           nif?: string | null
+          opening_hours?: Json
           phone?: string | null
           reg_commerce?: string | null
+          region?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           slug: string
+          social_links?: Json
           spotlight_until?: string | null
           stat?: string | null
+          status?: Database["public"]["Enums"]["agency_status"]
+          submitted_at?: string | null
           updated_at?: string
           verified?: boolean | null
+          website_url?: string | null
+          whatsapp_phone?: string | null
         }
         Update: {
           address?: string | null
           bio?: string | null
+          city?: string | null
           commercial_contact_name?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
+          description_long?: string | null
           email?: string | null
           id?: string
           logo_url?: string | null
           name?: string
           nif?: string | null
+          opening_hours?: Json
           phone?: string | null
           reg_commerce?: string | null
+          region?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           slug?: string
+          social_links?: Json
           spotlight_until?: string | null
           stat?: string | null
+          status?: Database["public"]["Enums"]["agency_status"]
+          submitted_at?: string | null
           updated_at?: string
           verified?: boolean | null
+          website_url?: string | null
+          whatsapp_phone?: string | null
         }
         Relationships: []
       }
@@ -1927,6 +1966,11 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_agency_detail: { Args: { p_id: string }; Returns: Json }
+      admin_approve_agency: {
+        Args: { p_id: string; p_verified: boolean }
+        Returns: undefined
+      }
       admin_approve_credit_transaction: {
         Args: { p_transaction_id: string }
         Returns: Json
@@ -1941,6 +1985,25 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
+      }
+      admin_create_agency: {
+        Args: {
+          p_address: string
+          p_bio: string
+          p_city: string
+          p_commercial_contact_name: string
+          p_email: string
+          p_logo_url: string
+          p_name: string
+          p_nif: string
+          p_phone: string
+          p_reg_commerce: string
+          p_region: string
+          p_stat: string
+          p_website_url: string
+          p_whatsapp_phone: string
+        }
+        Returns: string
       }
       admin_create_promo_code: {
         Args: {
@@ -1965,6 +2028,27 @@ export type Database = {
         Args: { p_amount: number; p_reason: string; p_user_id: string }
         Returns: string
       }
+      admin_link_user_to_agency: {
+        Args: { p_agency_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_list_agencies_with_stats: {
+        Args: never
+        Returns: {
+          active_listings_count: number
+          city: string
+          created_at: string
+          id: string
+          listings_count: number
+          logo_url: string
+          members_count: number
+          name: string
+          rejection_reason: string
+          slug: string
+          status: Database["public"]["Enums"]["agency_status"]
+          verified: boolean
+        }[]
+      }
       admin_list_promo_redemptions: {
         Args: { p_promo_code_id: string }
         Returns: {
@@ -1977,6 +2061,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_reject_agency: {
+        Args: { p_id: string; p_reason: string }
+        Returns: undefined
+      }
       admin_reject_credit_transaction: {
         Args: { p_reason: string; p_transaction_id: string }
         Returns: Json
@@ -1985,11 +2073,46 @@ export type Database = {
         Args: { p_listing_id: string; p_reason: string }
         Returns: Json
       }
+      admin_suspend_agency: {
+        Args: { p_id: string; p_reason: string }
+        Returns: undefined
+      }
       admin_suspend_user: {
         Args: { p_reason: string; p_user_id: string }
         Returns: undefined
       }
+      admin_unlink_user_from_agency: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      admin_unsuspend_agency: { Args: { p_id: string }; Returns: undefined }
       admin_unsuspend_user: { Args: { p_user_id: string }; Returns: undefined }
+      admin_update_agency: {
+        Args: {
+          p_address: string
+          p_bio: string
+          p_city: string
+          p_commercial_contact_name: string
+          p_cover_image_url: string
+          p_description_long: string
+          p_email: string
+          p_id: string
+          p_logo_url: string
+          p_name: string
+          p_nif: string
+          p_opening_hours: Json
+          p_phone: string
+          p_reg_commerce: string
+          p_region: string
+          p_slug: string
+          p_social_links: Json
+          p_stat: string
+          p_verified: boolean
+          p_website_url: string
+          p_whatsapp_phone: string
+        }
+        Returns: undefined
+      }
       admin_update_credit_pack: {
         Args: {
           p_credits_amount: number
@@ -2057,6 +2180,7 @@ export type Database = {
         }
         Returns: string
       }
+      generate_agency_slug: { Args: { p_name: string }; Returns: string }
       get_active_listing_counts_by_ville: {
         Args: { p_villes: string[] }
         Returns: {
@@ -2182,6 +2306,21 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_my_agency: {
+        Args: {
+          p_bio: string
+          p_cover_image_url: string
+          p_description_long: string
+          p_email: string
+          p_logo_url: string
+          p_opening_hours: Json
+          p_phone: string
+          p_social_links: Json
+          p_website_url: string
+          p_whatsapp_phone: string
+        }
+        Returns: undefined
+      }
       validate_promo_code: {
         Args: { p_code: string; p_credit_pack_id: string }
         Returns: {
@@ -2197,6 +2336,7 @@ export type Database = {
       }
     }
     Enums: {
+      agency_status: "pending_review" | "approved" | "rejected" | "suspended"
       boost_type:
         | "top"
         | "featured"
@@ -2366,6 +2506,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agency_status: ["pending_review", "approved", "rejected", "suspended"],
       boost_type: [
         "top",
         "featured",
