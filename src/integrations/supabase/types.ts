@@ -924,6 +924,24 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_blacklist_terms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          term: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          term: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          term?: string
+        }
+        Relationships: []
+      }
       packs: {
         Row: {
           duration_days: number | null
@@ -2162,6 +2180,15 @@ export type Database = {
           whatsapp_phone: string
         }[]
       }
+      can_publish_listing: {
+        Args: { p_user_id: string }
+        Returns: {
+          allowed: boolean
+          reason: string
+          remaining: number
+          reset_at: string
+        }[]
+      }
       consume_credits: {
         Args: {
           p_amount: number
@@ -2234,6 +2261,7 @@ export type Database = {
         Args: { p_listing_id: string; p_session_id?: string }
         Returns: undefined
       }
+      is_verified_dealer: { Args: { p_user_id: string }; Returns: boolean }
       list_agency_agent_ids: {
         Args: { p_agency_id: string }
         Returns: string[]
@@ -2272,6 +2300,10 @@ export type Database = {
       purchase_listing_boosts: {
         Args: { p_boost_types: string[]; p_listing_id: string }
         Returns: Json
+      }
+      raise_listing_validation_error: {
+        Args: { p_errors: Json }
+        Returns: undefined
       }
       record_vehicle_estimation_event: {
         Args: {
@@ -2324,6 +2356,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      validate_listing_content: {
+        Args: {
+          p_description: string
+          p_price_mga: number
+          p_title: string
+          p_whatsapp_phone: string
+        }
+        Returns: {
+          errors: Json
+          valid: boolean
+        }[]
+      }
       validate_promo_code: {
         Args: { p_code: string; p_credit_pack_id: string }
         Returns: {
@@ -2358,6 +2402,7 @@ export type Database = {
         | "rejected"
         | "pending_payment_verification"
         | "archived"
+        | "hidden_pending_review"
       listing_type:
         | "appartement"
         | "villa"
@@ -2529,6 +2574,7 @@ export const Constants = {
         "rejected",
         "pending_payment_verification",
         "archived",
+        "hidden_pending_review",
       ],
       listing_type: [
         "appartement",
