@@ -1,12 +1,14 @@
 import { Helmet } from "react-helmet-async";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 
 function AdminUsersPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-users-basic"],
@@ -90,7 +92,19 @@ function AdminUsersPage() {
                 </thead>
                 <tbody>
                   {filtered.map((u) => (
-                    <tr key={u.id} className="border-t border-border">
+                    <tr
+                      key={u.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => navigate(`/admin/utilisateurs/${u.id}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate(`/admin/utilisateurs/${u.id}`);
+                        }
+                      }}
+                      className="border-t border-border cursor-pointer hover:bg-muted/40 transition-colors"
+                    >
                       <td className="p-3">
                         <div className="space-y-0.5">
                           <p className="font-medium">{u.full_name?.trim() || "Sans nom"}</p>

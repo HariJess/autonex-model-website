@@ -28,6 +28,7 @@ const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.tsx"));
 const AdminLayout = lazy(() => import("./pages/AdminLayout.tsx"));
 const AdminOverviewPage = lazy(() => import("./pages/AdminOverviewPage.tsx"));
 const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage.tsx"));
+const AdminUserDetailPage = lazy(() => import("./pages/AdminUserDetailPage.tsx"));
 const AdminModerationPage = lazy(() => import("./pages/AdminModerationPage.tsx"));
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const CreditsPage = lazy(() => import("./pages/credits/CreditsPage.tsx"));
@@ -85,6 +86,7 @@ const App = () => (
               <Route index element={<Navigate to="/admin/overview" replace />} />
               <Route path="overview" element={<AdminOverviewPage />} />
               <Route path="utilisateurs" element={<AdminUsersPage />} />
+              <Route path="utilisateurs/:id" element={<AdminUserDetailPage />} />
               <Route path="moderation" element={<AdminModerationPage />} />
               <Route path="monetisation" element={<AdminMonetizationPage />} />
               <Route path="recherche" element={<AdminSearchInsightsPage />} />
