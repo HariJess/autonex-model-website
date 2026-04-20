@@ -1069,6 +1069,102 @@ export type Database = {
           },
         ]
       }
+      promo_code_redemptions: {
+        Row: {
+          id: string
+          promo_code_id: string
+          redeemed_at: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          promo_code_id: string
+          redeemed_at?: string
+          transaction_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          promo_code_id?: string
+          redeemed_at?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_redemptions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_code_redemptions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promo_codes: {
+        Row: {
+          active: boolean
+          applicable_pack_ids: string[] | null
+          bonus_credits: number | null
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          max_redemptions: number | null
+          one_per_user: boolean
+          percentage_off: number | null
+          times_redeemed: number
+          type: Database["public"]["Enums"]["promo_code_type"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          applicable_pack_ids?: string[] | null
+          bonus_credits?: number | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          max_redemptions?: number | null
+          one_per_user?: boolean
+          percentage_off?: number | null
+          times_redeemed?: number
+          type: Database["public"]["Enums"]["promo_code_type"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          applicable_pack_ids?: string[] | null
+          bonus_credits?: number | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          max_redemptions?: number | null
+          one_per_user?: boolean
+          percentage_off?: number | null
+          times_redeemed?: number
+          type?: Database["public"]["Enums"]["promo_code_type"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       search_analytics_events: {
         Row: {
           bathrooms: number[] | null
@@ -1149,6 +1245,9 @@ export type Database = {
           listing_id: string | null
           method: Database["public"]["Enums"]["payment_method"] | null
           payment_proof_url: string | null
+          promo_bonus_credits: number
+          promo_code_id: string | null
+          promo_discount_mga: number
           reference: string | null
           rejection_reason: string | null
           reviewed_at: string | null
@@ -1166,6 +1265,9 @@ export type Database = {
           listing_id?: string | null
           method?: Database["public"]["Enums"]["payment_method"] | null
           payment_proof_url?: string | null
+          promo_bonus_credits?: number
+          promo_code_id?: string | null
+          promo_discount_mga?: number
           reference?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
@@ -1183,6 +1285,9 @@ export type Database = {
           listing_id?: string | null
           method?: Database["public"]["Enums"]["payment_method"] | null
           payment_proof_url?: string | null
+          promo_bonus_credits?: number
+          promo_code_id?: string | null
+          promo_discount_mga?: number
           reference?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
@@ -1203,6 +1308,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
             referencedColumns: ["id"]
           },
           {
@@ -1830,6 +1942,21 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_create_promo_code: {
+        Args: {
+          p_applicable_pack_ids: string[]
+          p_bonus_credits: number
+          p_code: string
+          p_description: string
+          p_expires_at: string
+          p_max_redemptions: number
+          p_one_per_user: boolean
+          p_percentage_off: number
+          p_type: Database["public"]["Enums"]["promo_code_type"]
+        }
+        Returns: string
+      }
+      admin_delete_promo_code: { Args: { p_id: string }; Returns: undefined }
       admin_delete_user: {
         Args: { p_confirmation_email: string; p_user_id: string }
         Returns: undefined
@@ -1837,6 +1964,18 @@ export type Database = {
       admin_grant_credits: {
         Args: { p_amount: number; p_reason: string; p_user_id: string }
         Returns: string
+      }
+      admin_list_promo_redemptions: {
+        Args: { p_promo_code_id: string }
+        Returns: {
+          amount_mga: number
+          redeemed_at: string
+          redemption_id: string
+          transaction_id: string
+          user_email: string
+          user_full_name: string
+          user_id: string
+        }[]
       }
       admin_reject_credit_transaction: {
         Args: { p_reason: string; p_transaction_id: string }
@@ -1863,6 +2002,18 @@ export type Database = {
       }
       admin_update_credit_pricing: {
         Args: { p_amount: number; p_description: string; p_key: string }
+        Returns: undefined
+      }
+      admin_update_promo_code: {
+        Args: {
+          p_active: boolean
+          p_applicable_pack_ids: string[]
+          p_description: string
+          p_expires_at: string
+          p_id: string
+          p_max_redemptions: number
+          p_one_per_user: boolean
+        }
         Returns: undefined
       }
       admin_user_overview: {
@@ -1894,6 +2045,17 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      create_transaction_with_promo: {
+        Args: {
+          p_amount_mga: number
+          p_credit_pack_id: string
+          p_method: string
+          p_payment_proof_url: string
+          p_promo_code: string
+          p_reference: string
+        }
+        Returns: string
       }
       get_active_listing_counts_by_ville: {
         Args: { p_villes: string[] }
@@ -2012,6 +2174,27 @@ export type Database = {
         }
         Returns: string
       }
+      redeem_promo_code: {
+        Args: {
+          p_code: string
+          p_credit_pack_id: string
+          p_transaction_id: string
+        }
+        Returns: undefined
+      }
+      validate_promo_code: {
+        Args: { p_code: string; p_credit_pack_id: string }
+        Returns: {
+          bonus_credits: number
+          discount_mga: number
+          error_code: string
+          final_credits: number
+          final_price_mga: number
+          promo_code_id: string
+          type: Database["public"]["Enums"]["promo_code_type"]
+          valid: boolean
+        }[]
+      }
     }
     Enums: {
       boost_type:
@@ -2053,6 +2236,7 @@ export type Database = {
         | "approved"
         | "rejected"
         | "cancelled"
+      promo_code_type: "percentage" | "bonus_credits"
       transaction_type: "vente" | "location" | "location_vacances"
       user_role: "particulier" | "agence" | "promoteur" | "admin"
     }
@@ -2226,6 +2410,7 @@ export const Constants = {
         "rejected",
         "cancelled",
       ],
+      promo_code_type: ["percentage", "bonus_credits"],
       transaction_type: ["vente", "location", "location_vacances"],
       user_role: ["particulier", "agence", "promoteur", "admin"],
     },
