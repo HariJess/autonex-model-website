@@ -7,6 +7,7 @@ const navItems = [
   { to: "/admin/overview", label: "Vue d’ensemble" },
   { to: "/admin/utilisateurs", label: "Utilisateurs" },
   { to: "/admin/moderation", label: "Modération" },
+  { to: "/admin/agences", label: "Agences" },
   { to: "/admin/monetisation", label: "Monétisation" },
   { to: "/admin/partenaires", label: "Partenaires" },
   { to: "/admin/recherche", label: "Recherche" },

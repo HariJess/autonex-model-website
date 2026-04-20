@@ -29,11 +29,14 @@ const AdminLayout = lazy(() => import("./pages/AdminLayout.tsx"));
 const AdminOverviewPage = lazy(() => import("./pages/AdminOverviewPage.tsx"));
 const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage.tsx"));
 const AdminUserDetailPage = lazy(() => import("./pages/AdminUserDetailPage.tsx"));
+const AdminAgenciesPage = lazy(() => import("./pages/AdminAgenciesPage.tsx"));
+const AdminAgencyDetailPage = lazy(() => import("./pages/AdminAgencyDetailPage.tsx"));
 const AdminModerationPage = lazy(() => import("./pages/AdminModerationPage.tsx"));
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const CreditsPage = lazy(() => import("./pages/credits/CreditsPage.tsx"));
 const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
+const ConcessionnairesIndexPage = lazy(() => import("./pages/ConcessionnairesIndexPage.tsx"));
 const VehicleEstimationPage = lazy(() => import("./pages/VehicleEstimationPage.tsx"));
 const BlogList = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogList })));
 const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogArticle })));
@@ -87,6 +90,8 @@ const App = () => (
               <Route path="overview" element={<AdminOverviewPage />} />
               <Route path="utilisateurs" element={<AdminUsersPage />} />
               <Route path="utilisateurs/:id" element={<AdminUserDetailPage />} />
+              <Route path="agences" element={<AdminAgenciesPage />} />
+              <Route path="agences/:id" element={<AdminAgencyDetailPage />} />
               <Route path="moderation" element={<AdminModerationPage />} />
               <Route path="monetisation" element={<AdminMonetizationPage />} />
               <Route path="recherche" element={<AdminSearchInsightsPage />} />
@@ -97,6 +102,7 @@ const App = () => (
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/concessionnaires/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />
+            <Route path="/concessionnaires" element={<ConcessionnairesIndexPage />} />
             <Route path="/estimation" element={<VehicleEstimationPage />} />
             <Route path="/conseils" element={<BlogList />} />
             <Route path="/conseils/:slug" element={<BlogArticle />} />

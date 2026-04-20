@@ -31,6 +31,14 @@ export const DB_ERROR_MESSAGES: Record<string, string> = {
   pricing_key_not_found: "Clé de tarification introuvable.",
   pack_not_found: "Pack introuvable.",
 
+  // agencies v2 module
+  slug_already_exists: "Ce slug est déjà utilisé par une autre agence.",
+  reason_too_short: "La raison doit faire au moins 10 caractères.",
+  user_already_linked_to_agency: "Cet utilisateur est déjà lié à une autre agence.",
+  agency_not_found: "Agence introuvable.",
+  not_agency_member: "Vous n'êtes pas membre d'une agence.",
+  invalid_name: "Le nom de l'agence est requis.",
+
   // promo codes module
   auth_required: "Connexion requise pour cette action.",
   invalid_code: "Le code est invalide (A-Z, 0-9, tirets uniquement, 50 car. max).",
