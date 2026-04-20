@@ -1851,6 +1851,20 @@ export type Database = {
         Returns: undefined
       }
       admin_unsuspend_user: { Args: { p_user_id: string }; Returns: undefined }
+      admin_update_credit_pack: {
+        Args: {
+          p_credits_amount: number
+          p_id: string
+          p_name: string
+          p_price_mga: number
+          p_sort_order: number
+        }
+        Returns: undefined
+      }
+      admin_update_credit_pricing: {
+        Args: { p_amount: number; p_description: string; p_key: string }
+        Returns: undefined
+      }
       admin_user_overview: {
         Args: { p_user_id: string }
         Returns: {
