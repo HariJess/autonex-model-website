@@ -64,6 +64,25 @@ export const BRAND_ASSETS: BrandAsset[] = [
   buildAsset("cadillac", "Cadillac", "cadillac.svg"),
   buildAsset("changan", "Changan", "changan.svg"),
   buildAsset("avatr", "Avatr", "avatr.svg"),
+  // Brands without a local SVG yet — listed so resolveBrandAsset returns a
+  // BrandAsset (label) instead of null. ListingCard falls back to an
+  // initial-letter chip for these until assets land.
+  buildAsset("dacia", "Dacia"),
+  buildAsset("fiat", "Fiat"),
+  buildAsset("opel", "Opel"),
+  buildAsset("seat", "Seat"),
+  buildAsset("skoda", "Škoda", undefined, ["skoda"]),
+  buildAsset("subaru", "Subaru"),
+  buildAsset("tesla", "Tesla"),
+  buildAsset("volvo", "Volvo"),
+  buildAsset("jaguar", "Jaguar"),
+  buildAsset("bugatti", "Bugatti"),
+  buildAsset("ferrari", "Ferrari"),
+  buildAsset("lamborghini", "Lamborghini"),
+  buildAsset("maserati", "Maserati"),
+  buildAsset("alfa-romeo", "Alfa Romeo", undefined, ["alfa romeo", "alfa"]),
+  buildAsset("smart", "Smart"),
+  buildAsset("cfmoto", "CFMoto", undefined, ["cf moto"]),
 ];
 
 const brandAssetLookup = new Map<string, BrandAsset>();

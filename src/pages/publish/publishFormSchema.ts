@@ -80,6 +80,7 @@ export const vehicleDescriptionSubSchema = z.object({
   }),
   description: z.string(),
   priceMga: z.string(),
+  negotiable: z.boolean(),
 });
 export type VehicleDescriptionValues = z.infer<typeof vehicleDescriptionSubSchema>;
 

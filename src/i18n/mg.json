@@ -314,6 +314,14 @@
     "thematicUtilitySubtitle": "Fitaterana matihanina, logistika ary asam-pitaterana mpandeha.",
     "thematicUtilityTitle": "Utilitaire, Van sy Minibus"
   },
+  "listings": {
+    "negotiable": {
+      "label": "Azo ifampiresahana ny vidiny",
+      "description": "Asehoy fa mitady fifanaraham-bidy",
+      "badge": "Azo resahina",
+      "tooltip": "Manaiky fifanaraham-bidy ny mpivarotra"
+    }
+  },
   "listing": {
     "addressUnknown": "Adiresy tsy voafaritra",
     "availability": "Fahafahana",

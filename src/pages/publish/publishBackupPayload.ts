@@ -20,6 +20,7 @@ export function buildPublishLocalBackupPayload(params: {
   title: string;
   description: string;
   priceMga: string;
+  negotiable: boolean;
   surface: string;
   rooms: string;
   bathrooms: string;
@@ -65,6 +66,7 @@ export function buildPublishLocalBackupPayload(params: {
     title,
     description,
     priceMga,
+    negotiable,
     surface,
     rooms,
     bathrooms,
@@ -111,6 +113,7 @@ export function buildPublishLocalBackupPayload(params: {
     title,
     description,
     priceMga,
+    negotiable,
     surface,
     rooms,
     bathrooms,

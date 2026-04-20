@@ -103,6 +103,7 @@ export interface DisplayListing {
   price_mga: number;
   original_price_mga?: number | null;
   price_eur: number | null;
+  negotiable?: boolean;
   /** Kilométrage (km) tant que la colonne DB `surface` garde ce nom legacy. */
   surface: number | null;
   /** Indice version/finition (`rooms` en base — pas « chambres »). */

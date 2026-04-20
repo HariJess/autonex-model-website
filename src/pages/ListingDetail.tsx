@@ -32,6 +32,7 @@ import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
 import BrandLogo from "@/components/BrandLogo";
+import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { buildCanonicalUrl } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -305,9 +306,12 @@ const ListingDetail = () => {
               </p>
               <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="text-[1.65rem] md:text-[2rem] font-bold text-primary font-sans leading-tight">
-                    {formatPrice(listing.price_mga)}
-                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-[1.65rem] md:text-[2rem] font-bold text-primary font-sans leading-tight">
+                      {formatPrice(listing.price_mga)}
+                    </p>
+                    {listing.negotiable ? <NegotiableBadge size="md" /> : null}
+                  </div>
                   {activeDeal ? (
                     <p className="text-sm text-muted-foreground font-sans line-through">
                       {formatPrice(activeDeal.originalPriceMga)}

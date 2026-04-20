@@ -21,6 +21,7 @@ type ListingRowLite = Pick<
   | "transaction"
   | "price_mga"
   | "price_eur"
+  | "negotiable"
   | "surface"
   | "rooms"
   | "bathrooms"
@@ -74,6 +75,7 @@ const LISTING_SELECT_COLUMNS = [
   "transaction",
   "price_mga",
   "price_eur",
+  "negotiable",
   "surface",
   "rooms",
   "bathrooms",
@@ -194,6 +196,7 @@ function mapListingRowToDisplayListing(
     transaction: listing.transaction as TransactionType,
     price_mga: listing.price_mga,
     price_eur: listing.price_eur ? Number(listing.price_eur) : null,
+    negotiable: Boolean(listing.negotiable),
     surface: listing.surface,
     rooms: listing.rooms,
     bathrooms: listing.bathrooms,

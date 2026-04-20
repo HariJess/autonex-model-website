@@ -30,6 +30,7 @@ function emptyPayload(step: number, draftListingId: string = DRAFT_ID) {
     title: "",
     description: "",
     priceMga: "",
+    negotiable: false,
     surface: "",
     rooms: "",
     bathrooms: "",

@@ -314,6 +314,14 @@
     "thematicUtilitySubtitle": "Business transport, logistics, and passenger activity.",
     "thematicUtilityTitle": "Utility Vehicles, Vans & Minibuses"
   },
+  "listings": {
+    "negotiable": {
+      "label": "Negotiable price",
+      "description": "Display a badge to indicate you accept price negotiation",
+      "badge": "Negotiable",
+      "tooltip": "The seller accepts price negotiation"
+    }
+  },
   "listing": {
     "addressUnknown": "Address not specified",
     "availability": "Availability",

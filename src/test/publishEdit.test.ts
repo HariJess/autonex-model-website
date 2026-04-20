@@ -19,6 +19,7 @@ const baseForm = {
   title: "Bel appartement centre-ville",
   description: "Description suffisamment longue pour les validations du formulaire de publication.",
   priceMga: "100000000",
+  negotiable: false,
   surface: "80",
   rooms: "3",
   bathrooms: "2",
@@ -71,12 +72,24 @@ describe("shouldSendPublishedListingToReview", () => {
     ).toBe(false);
   });
 
-  it("returns true for active listing when title changes", () => {
+  it("returns false for active listing even when title changes (Mission 1.5 BIS: active edits stay active)", () => {
     const a = buildListingMaterialSnapshotFromForm(baseForm, ["p1"], 0);
     const b = buildListingMaterialSnapshotFromForm({ ...baseForm, title: "Autre titre" }, ["p1"], 0);
     expect(
       shouldSendPublishedListingToReview({
         moderationStatus: "active",
+        baselineSnapshot: a,
+        currentSnapshot: b,
+      }),
+    ).toBe(false);
+  });
+
+  it("returns true for rejected listing when content changes (re-submission after rejection)", () => {
+    const a = buildListingMaterialSnapshotFromForm(baseForm, ["p1"], 0);
+    const b = buildListingMaterialSnapshotFromForm({ ...baseForm, title: "Corrigé" }, ["p1"], 0);
+    expect(
+      shouldSendPublishedListingToReview({
+        moderationStatus: "rejected",
         baselineSnapshot: a,
         currentSnapshot: b,
       }),

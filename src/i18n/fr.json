@@ -314,6 +314,14 @@
     "thematicUtilitySubtitle": "Transport pro, logistique et activité passagers.",
     "thematicUtilityTitle": "Utilitaires, Vans & Minibus"
   },
+  "listings": {
+    "negotiable": {
+      "label": "Prix négociable",
+      "description": "Afficher un badge pour indiquer que vous acceptez la négociation",
+      "badge": "Négociable",
+      "tooltip": "Le vendeur accepte la négociation du prix"
+    }
+  },
   "listing": {
     "addressUnknown": "Adresse non précisée",
     "availability": "Disponibilité",

@@ -62,6 +62,7 @@ export type LocalPublishBackupV1 = {
   title: string;
   description: string;
   priceMga: string;
+  negotiable: boolean;
   surface: string;
   rooms: string;
   bathrooms: string;
@@ -293,6 +294,7 @@ export function formToListingUpdate(input: {
   title: string;
   description: string;
   priceMga: string;
+  negotiable: boolean;
   surface: string;
   rooms: string;
   bathrooms: string;
@@ -487,6 +489,7 @@ export function formToListingUpdate(input: {
     transaction: tx,
     price_mga: priceNum,
     price_eur: priceNum > 0 ? Math.round((priceNum / 5050) * 100) / 100 : 0,
+    negotiable: Boolean(input.negotiable),
     mileage_km: mileageKm,
     ...legacyMirrorFields,
     rooms: showRooms ? legacyMirrorFields.rooms : null,
@@ -542,6 +545,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
   title: string;
   description: string;
   priceMga: string;
+  negotiable: boolean;
   surface: string;
   rooms: string;
   bathrooms: string;
@@ -613,6 +617,7 @@ export function listingRowToFormState(row: Tables<"listings">): {
     title: row.title === PUBLISH_DRAFT_TITLE_PLACEHOLDER ? "" : row.title,
     description: row.description ?? "",
     priceMga: row.price_mga != null ? String(row.price_mga) : "",
+    negotiable: Boolean(row.negotiable),
     surface: mileageKmFormStringFromListingRow(row),
     rooms: row.rooms != null ? String(row.rooms) : "",
     bathrooms: row.bathrooms != null ? String(row.bathrooms) : "",
@@ -697,6 +702,7 @@ export type PublishFormFieldsForSnapshot = {
   title: string;
   description: string;
   priceMga: string;
+  negotiable: boolean;
   surface: string;
   rooms: string;
   bathrooms: string;
@@ -746,6 +752,7 @@ export function buildListingMaterialSnapshotFromRow(
     title: (row.title ?? "").trim(),
     description: (row.description ?? "").trim(),
     price_mga: row.price_mga ?? 0,
+    negotiable: Boolean(row.negotiable),
     transaction: row.transaction,
     type: row.type,
     ville: (row.ville ?? "").trim(),
@@ -824,6 +831,7 @@ export function buildListingMaterialSnapshotFromForm(
     title: input.title.trim(),
     description: input.description.trim(),
     price_mga: priceNum,
+    negotiable: Boolean(input.negotiable),
     transaction: tx,
     type: lt,
     ville: input.ville.trim(),
@@ -866,7 +874,23 @@ export function buildListingMaterialSnapshotFromForm(
   });
 }
 
-/** Si vrai, l’annonce doit repasser en modération avant d’être publique à nouveau. */
+/**
+ * Si vrai, l'annonce doit repasser en modération avant d'être publique à nouveau.
+ *
+ * Décision Mission 1.5 BIS (2026-04-20) : un edit d'annonce déjà active ne
+ * redéclenche PAS la modération — sinon toute mise à jour mineure (toggle
+ * négociable, changement de prix, retouche description) ferait disparaître
+ * l'annonce de l'accueil. Seules les annonces rejetées re-passent en
+ * pending_review à la re-soumission (correction par l'owner après rejet).
+ *
+ * pending_review et draft ne sont pas couverts ici car leurs transitions
+ * sont gérées ailleurs (le flow draft→publish passe bien par pending_review
+ * via publishListingWithCredits, pas par ce helper).
+ *
+ * Mission 2 (refonte modération complète) réintroduira une logique plus
+ * fine : champs sensibles (prix, titre, description) vs non-sensibles
+ * (horaires, contact), distinction particulier vs dealer vérifié, etc.
+ */
 export function shouldSendPublishedListingToReview(params: {
   moderationStatus: string | null | undefined;
   baselineSnapshot: string;
@@ -874,13 +898,7 @@ export function shouldSendPublishedListingToReview(params: {
 }): boolean {
   if (params.baselineSnapshot === params.currentSnapshot) return false;
   const s = params.moderationStatus ?? "";
-  return (
-    s === "active" ||
-    s === "paused" ||
-    s === "pending_review" ||
-    s === "rejected" ||
-    s === "expired"
-  );
+  return s === "rejected";
 }
 
 export function computeOriginalPriceMgaForEdit(params: {

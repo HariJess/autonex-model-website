@@ -19,6 +19,7 @@ import {
 import BrandLogo from "@/components/BrandLogo";
 import { resolveBrandAsset } from "@/data/brandAssets";
 import type { DealMeta } from "@/lib/deals";
+import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -105,18 +106,8 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
           }}
         />
-        {displayBrandAsset?.logoPath && (
-          <div className="absolute top-3 left-3">
-            <BrandLogo
-              brand={displayBrand}
-              className="h-8 w-12 rounded-md border border-border/80 bg-card/92 shadow-sm backdrop-blur-[2px]"
-              imgClassName="max-h-5"
-              showFallbackLabel={false}
-            />
-          </div>
-        )}
         {listing.badge && badgeLabels[listing.badge] && (
-          <div className={`absolute left-3 ${displayBrandAsset?.logoPath ? "top-12" : "top-3"}`}>
+          <div className="absolute top-3 left-3">
             <Badge className={`${badgeLabels[listing.badge].className} text-[11px] font-semibold px-2.5 py-1`} style={{ color: "#FAFAFA" }}>
               {badgeLabels[listing.badge].label}
             </Badge>
@@ -189,19 +180,40 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         onTouchStart={handlePrefetchDetail}
       >
         <div className={isSearchVariant ? "space-y-0.5" : ""}>
-          <p className={`font-sans tracking-tight text-primary ${isSearchVariant ? "text-[1.35rem] font-semibold leading-none" : "text-xl max-sm:text-[1.22rem] font-bold"}`}>
-            {formatPrice(listing.price_mga)}
-          </p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`font-sans tracking-tight text-primary ${isSearchVariant ? "text-[1.35rem] font-semibold leading-none" : "text-xl max-sm:text-[1.22rem] font-bold"}`}>
+              {formatPrice(listing.price_mga)}
+            </p>
+            {listing.negotiable ? <NegotiableBadge size="sm" /> : null}
+          </div>
           {dealMeta && (
             <p className="text-xs font-sans text-muted-foreground line-through">
               {formatPrice(dealMeta.originalPriceMga)}
             </p>
           )}
           <p className="text-sm text-muted-foreground/90 font-sans">{formatPriceSecondary(listing.price_mga)}</p>
+          </div>
+        <div className="flex items-start gap-2">
+          {displayBrandAsset?.logoPath ? (
+            <BrandLogo
+              brand={displayBrand}
+              className="h-6 w-9 shrink-0 rounded-md border border-border/80 bg-background p-0.5 mt-0.5"
+              imgClassName="max-h-4"
+              showFallbackLabel={false}
+            />
+          ) : displayBrandAsset?.label ? (
+            <span
+              className="h-6 w-9 shrink-0 rounded-md border border-border/80 bg-muted/60 mt-0.5 inline-flex items-center justify-center text-[11px] font-serif font-bold text-muted-foreground"
+              title={displayBrandAsset.label}
+              aria-label={displayBrandAsset.label}
+            >
+              {displayBrandAsset.label.charAt(0).toUpperCase()}
+            </span>
+          ) : null}
+          <h3 className={`flex-1 font-serif text-foreground leading-snug line-clamp-2 ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>
+            {displayTitle}
+          </h3>
         </div>
-        <h3 className={`font-serif text-foreground leading-snug line-clamp-2 ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>
-          {displayTitle}
-        </h3>
         {vehicleHeadline && (
           <p className="text-[13px] font-sans text-muted-foreground -mt-1 line-clamp-1">{vehicleHeadline}</p>
         )}

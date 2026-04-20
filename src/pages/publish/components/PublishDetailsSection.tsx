@@ -1,5 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -214,19 +215,36 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
           <div className="space-y-2">
             <Label className="font-sans">Prix (Ar) *</Label>
-            <Input type="number" value={priceMga} onChange={(e) => form.setValue("priceMga", e.target.value)} className="font-sans" min={0} />
+            <NumberInput value={priceMga} onChange={(raw) => form.setValue("priceMga", raw)} className="font-sans" />
             {labels.priceDealHint ? (
               <p className="text-xs text-muted-foreground font-sans">{labels.priceDealHint}</p>
             ) : null}
+            <label className="flex items-start gap-2 pt-1 cursor-pointer">
+              <Checkbox
+                id="negotiable"
+                checked={form.watch("negotiable")}
+                onCheckedChange={(v) => form.setValue("negotiable", v === true)}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="block text-sm font-medium font-sans">
+                  {t("listings.negotiable.label", "Prix négociable")}
+                </span>
+                <span className="block text-xs text-muted-foreground font-sans">
+                  {t(
+                    "listings.negotiable.description",
+                    "Afficher un badge pour indiquer que vous acceptez la négociation",
+                  )}
+                </span>
+              </span>
+            </label>
           </div>
           <div className="space-y-2">
             <Label className="font-sans">{labels.listingSurface} (km)</Label>
-            <Input
-              type="number"
+            <NumberInput
               value={surface}
-              onChange={(e) => onApplyVehicleLegacyMirror({ mileageKmInput: e.target.value })}
+              onChange={(raw) => onApplyVehicleLegacyMirror({ mileageKmInput: raw })}
               className="font-sans"
-              min={0}
             />
           </div>
         </div>

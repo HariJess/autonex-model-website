@@ -31,6 +31,7 @@ export const PUBLISH_FORM_DEFAULTS: PublishFormValues = {
   title: "",
   description: "",
   priceMga: "",
+  negotiable: false,
 
   // Legacy specs (vehicle semantics — see publishFormSchema.ts JSDoc)
   surface: "",

@@ -152,6 +152,7 @@ const PublishPage = () => {
   const title = form.watch("title");
   const description = form.watch("description");
   const priceMga = form.watch("priceMga");
+  const negotiable = form.watch("negotiable");
   const surface = form.watch("surface");
   const rooms = form.watch("rooms");
   const bathrooms = form.watch("bathrooms");
@@ -400,7 +401,7 @@ const PublishPage = () => {
     [
       transaction, listingType, isNewProgram, internalRef,
       ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
-      title, description, priceMga, surface, rooms, bathrooms, toilets,
+      title, description, priceMga, negotiable, surface, rooms, bathrooms, toilets,
       vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
       vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
       vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,
@@ -428,7 +429,7 @@ const PublishPage = () => {
       step,
       transaction, listingType, isNewProgram, internalRef,
       ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
-      title, description, priceMga, surface, rooms, bathrooms, toilets,
+      title, description, priceMga, negotiable, surface, rooms, bathrooms, toilets,
       vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
       vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
       vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,

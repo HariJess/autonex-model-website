@@ -44,6 +44,7 @@ export function mapDbRowToFormValues(row: Tables<"listings">): PublishFormValues
     title: fs.title,
     description: fs.description,
     priceMga: fs.priceMga,
+    negotiable: fs.negotiable,
     surface: fs.surface,
     rooms: fs.rooms,
     bathrooms: fs.bathrooms,
