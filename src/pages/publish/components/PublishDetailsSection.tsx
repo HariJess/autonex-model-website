@@ -5,12 +5,17 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { AUTO_BRANDS } from "@/data/automotiveCatalog";
+import { resolveBrandAsset } from "@/data/brandAssets";
 import { EXTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
 import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
@@ -80,23 +85,6 @@ const AVAILABILITY_OPTIONS = [
   { value: "vendu", label: "Vendu" },
   { value: "en_arrivage", label: "En arrivage" },
 ];
-
-const BRAND_MODEL_HINTS: Record<string, string[]> = {
-  Toyota: ["Hilux", "RAV4", "Land Cruiser", "Corolla", "Yaris"],
-  Nissan: ["Navara", "Patrol", "X-Trail", "Qashqai", "Sunny"],
-  Hyundai: ["Tucson", "Santa Fe", "i10", "i20", "Creta"],
-  Kia: ["Sportage", "Sorento", "Picanto", "Seltos"],
-  Suzuki: ["Swift", "Vitara", "Jimny", "Ertiga"],
-  Mitsubishi: ["L200", "Pajero", "Outlander"],
-  Ford: ["Ranger", "Everest", "Focus"],
-  Renault: ["Duster", "Kwid", "Clio"],
-  Peugeot: ["208", "3008", "Boxer"],
-  Volkswagen: ["Polo", "Golf", "Amarok", "Tiguan"],
-  "Mercedes-Benz": ["C-Class", "E-Class", "GLC", "Sprinter"],
-  BMW: ["X3", "X5", "320i"],
-  Audi: ["A3", "A4", "Q5"],
-  Honda: ["CR-V", "Civic", "HR-V"],
-};
 
 type PublishDetailsSectionProps = {
   labels: {
@@ -169,9 +157,9 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
   const showRooms =
     listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
 
-  const modelSuggestions = BRAND_MODEL_HINTS[make] ?? [];
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
   const [showAllEquipment, setShowAllEquipment] = useState(false);
+  const [makeOpen, setMakeOpen] = useState(false);
   const hasCustomExteriorColor =
     exteriorColor.trim().length > 0 &&
     !EXTERIOR_COLOR_OPTIONS.some((option) => option.value === exteriorColor.trim().toLowerCase());
@@ -260,33 +248,103 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
           <div className="space-y-2">
             <Label className="font-sans">Marque *</Label>
-            <Input
-              list="publish-brand-options"
-              value={make}
-              onChange={(e) => form.setValue("vehicleMake", e.target.value)}
-              className="font-sans"
-              placeholder={t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}
-            />
-            <datalist id="publish-brand-options">
-              {AUTO_BRANDS.map((brand) => (
-                <option key={brand} value={brand} />
-              ))}
-            </datalist>
+            <Popover open={makeOpen} onOpenChange={setMakeOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={makeOpen}
+                  className={cn(
+                    "w-full justify-between font-sans font-normal",
+                    !make && "text-muted-foreground",
+                  )}
+                >
+                  {make ? (
+                    <span className="flex items-center gap-2 min-w-0">
+                      {(() => {
+                        const asset = resolveBrandAsset(make);
+                        if (asset?.logoPath) {
+                          return (
+                            <img
+                              src={asset.logoPath}
+                              alt=""
+                              className="h-4 w-6 object-contain shrink-0"
+                              loading="lazy"
+                            />
+                          );
+                        }
+                        return null;
+                      })()}
+                      <span className="truncate">{make}</span>
+                    </span>
+                  ) : (
+                    <span>{t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}</span>
+                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                <Command>
+                  <CommandInput
+                    placeholder={t("publish.brandSearchPlaceholder", "Rechercher une marque…")}
+                    className="h-9 font-sans"
+                  />
+                  <CommandList className="max-h-[300px]">
+                    <CommandEmpty>
+                      {t("publish.brandNoMatch", "Aucune marque trouvée.")}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {AUTO_BRANDS.map((brand) => {
+                        const asset = resolveBrandAsset(brand);
+                        const isSelected = make === brand;
+                        return (
+                          <CommandItem
+                            key={brand}
+                            value={brand}
+                            onSelect={(value) => {
+                              const next = value === make ? "" : AUTO_BRANDS.find((b) => b.toLowerCase() === value.toLowerCase()) ?? value;
+                              form.setValue("vehicleMake", next);
+                              if (next !== make) {
+                                form.setValue("vehicleModel", "");
+                              }
+                              setMakeOpen(false);
+                            }}
+                            className="font-sans"
+                          >
+                            {asset?.logoPath ? (
+                              <img src={asset.logoPath} alt="" className="mr-2 h-4 w-6 object-contain shrink-0" loading="lazy" />
+                            ) : (
+                              <span className="mr-2 h-4 w-6 shrink-0 inline-flex items-center justify-center rounded border border-border/70 bg-muted/50 text-[10px] font-serif font-bold text-muted-foreground">
+                                {brand.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                            <span className="flex-1 truncate">{brand}</span>
+                            <Check className={cn("ml-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="space-y-2">
             <Label className="font-sans">Modèle *</Label>
             <Input
-              list="publish-model-hints"
+              type="text"
               value={model}
               onChange={(e) => form.setValue("vehicleModel", e.target.value)}
               className="font-sans"
-              placeholder={make ? t("publish.modelPlaceholderWithBrand", "Modèle {{brand}}", { brand: make }) : t("publish.modelPlaceholder", "Ex: RAV4, Hilux, Ranger...")}
+              disabled={!make}
+              placeholder={
+                make
+                  ? t("publish.modelPlaceholderWithBrand", "Modèle {{brand}}", { brand: make })
+                  : t("publish.modelPlaceholderNoBrand", "Choisissez d'abord une marque")
+              }
+              autoComplete="off"
             />
-            <datalist id="publish-model-hints">
-              {modelSuggestions.map((modelHint) => (
-                <option key={modelHint} value={modelHint} />
-              ))}
-            </datalist>
           </div>
           <div className="space-y-2">
             <Label className="font-sans">Année</Label>
