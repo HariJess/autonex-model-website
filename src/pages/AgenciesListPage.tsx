@@ -1,48 +1,117 @@
+import { useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, AlertCircle } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, AlertCircle, ShieldCheck } from "lucide-react";
 import { PARTNER_DEALERS } from "@/data/agencies";
+import { useAgenciesList } from "@/hooks/useAgenciesList";
 
-const AgenciesListPage = () => {
+const CITIES = [
+  "Antananarivo",
+  "Toamasina",
+  "Antsirabe",
+  "Mahajanga",
+  "Fianarantsoa",
+  "Toliara",
+];
+
+interface AgenciesListPageProps {
+  heading?: string;
+}
+
+const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
   const { t } = useTranslation();
-  const canonical = typeof window !== "undefined"
-    ? `${window.location.origin}/agences`
-    : "https://autonex.mg/agences";
+  const [search, setSearch] = useState("");
+  const [city, setCity] = useState<string>("all");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
 
-  const { data: agencies = [], isLoading, error } = useQuery({
-    queryKey: ["agencies-list"],
-    queryFn: async () => {
-      const { data, error: fetchError } = await supabase
-        .from("agencies")
-        .select("id, name, slug, logo_url, bio, verified")
-        .order("name");
-      if (fetchError) throw new Error(fetchError.message);
-      return data ?? [];
-    },
-  });
+  const filters = useMemo(
+    () => ({
+      search: search.trim(),
+      city: city === "all" ? null : city,
+      verifiedOnly,
+    }),
+    [search, city, verifiedOnly],
+  );
+
+  const { data: agencies = [], isLoading, error } = useAgenciesList(filters);
+
+  const canonical =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/agences`
+      : "https://autonex.mg/agences";
+
+  const title = heading ?? "Concessionnaires AutoNex";
 
   return (
     <>
-      <Helmet>
-        <title>{t("agencies.title")} — AutoNex</title>
-        <meta
-          name="description"
-          content="Annuaire des concessionnaires à Madagascar : comparez les professionnels, consultez leurs annonces et contactez-les directement."
-        />
-        <link rel="canonical" href={canonical} />
-      </Helmet>
+      {!heading ? (
+        <Helmet>
+          <title>{t("agencies.title")} — AutoNex</title>
+          <meta
+            name="description"
+            content="Annuaire des concessionnaires à Madagascar : comparez les professionnels, consultez leurs annonces et contactez-les directement."
+          />
+          <link rel="canonical" href={canonical} />
+        </Helmet>
+      ) : null}
       <Header />
       <div className="container mx-auto px-4 py-6 md:py-8">
-        <h1 className="font-serif text-3xl font-bold mb-2">Concessionnaires AutoNex</h1>
-        <p className="text-sm md:text-base text-muted-foreground font-sans mb-8">
-          Retrouvez nos partenaires officiels et les concessionnaires presents sur la plateforme.
+        <h1 className="font-serif text-3xl font-bold mb-2">{title}</h1>
+        <p className="text-sm md:text-base text-muted-foreground font-sans mb-6">
+          Retrouvez nos partenaires officiels et les concessionnaires présents sur la plateforme.
         </p>
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 items-end mb-8">
+          <div className="flex-1 min-w-[200px] max-w-md">
+            <Label htmlFor="ag-search" className="font-sans text-xs">Rechercher</Label>
+            <Input
+              id="ag-search"
+              placeholder="Nom de l'agence..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="font-sans"
+            />
+          </div>
+          <div className="w-48">
+            <Label className="font-sans text-xs">Ville</Label>
+            <Select value={city} onValueChange={setCity}>
+              <SelectTrigger className="font-sans">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes les villes</SelectItem>
+                {CITIES.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2 pb-2">
+            <Checkbox
+              id="ag-verified"
+              checked={verifiedOnly}
+              onCheckedChange={(v) => setVerifiedOnly(v === true)}
+            />
+            <Label htmlFor="ag-verified" className="font-sans text-sm font-normal">
+              Partenaires vérifiés uniquement
+            </Label>
+          </div>
+        </div>
 
         {error && (
           <div className="flex items-center gap-2 text-destructive mb-4">
@@ -57,14 +126,14 @@ const AgenciesListPage = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {PARTNER_DEALERS.length > 0 && (
+            {PARTNER_DEALERS.length > 0 && !search && !verifiedOnly && city === "all" ? (
               <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <h2 className="font-serif text-xl font-bold">Partenaires officiels AutoNex</h2>
                   <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground font-sans mb-4">
-                  Des concessionnaires selectionnes et mis en avant par AutoNex.
+                  Des concessionnaires sélectionnés et mis en avant par AutoNex.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {PARTNER_DEALERS.map((dealer) => (
@@ -91,22 +160,25 @@ const AgenciesListPage = () => {
                   ))}
                 </div>
               </section>
-            )}
+            ) : null}
 
             <section>
               <h2 className="font-serif text-xl font-bold mb-1">Annuaire des concessionnaires</h2>
               <p className="text-sm text-muted-foreground font-sans mb-4">
-                Tous les concessionnaires references sur AutoNex.
+                {agencies.length} concessionnaire{agencies.length > 1 ? "s" : ""} trouvé{agencies.length > 1 ? "s" : ""}.
               </p>
               {agencies.length === 0 ? (
                 <p className="text-center text-muted-foreground font-sans py-8">
-                  {t("agencies.noDirectoryAgencies", "Aucun concessionnaire inscrit dans l’annuaire pour le moment.")}
+                  {t("agencies.noDirectoryAgencies", "Aucun concessionnaire ne correspond aux critères.")}
                 </p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {agencies.map((agency) => (
-                    <Link key={agency.id} to={`/agence/${agency.slug}`}
-                      className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg transition-all flex items-start gap-4 group">
+                    <Link
+                      key={agency.id}
+                      to={`/concessionnaires/${agency.slug}`}
+                      className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg transition-all flex items-start gap-4 group"
+                    >
                       <div className="w-16 h-16 rounded-xl overflow-hidden border border-border flex-shrink-0 bg-muted flex items-center justify-center">
                         {agency.logo_url ? (
                           <img
@@ -123,9 +195,18 @@ const AgenciesListPage = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-serif font-bold group-hover:text-primary transition-colors">{agency.name}</h3>
-                          {agency.verified && <Badge className="bg-success text-xs font-sans" style={{ color: "#FAFAFA" }}>{t("listing.verified")}</Badge>}
+                          {agency.verified && (
+                            <span className="inline-flex items-center gap-0.5 rounded-md border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs font-sans font-medium text-amber-800">
+                              <ShieldCheck className="h-3 w-3" /> Partenaire
+                            </span>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground font-sans line-clamp-2">{agency.bio || t("agencies.noDescription")}</p>
+                        {agency.city ? (
+                          <p className="text-xs text-muted-foreground font-sans mb-1">📍 {agency.city}</p>
+                        ) : null}
+                        <p className="text-sm text-muted-foreground font-sans line-clamp-2">
+                          {agency.bio || t("agencies.noDescription")}
+                        </p>
                       </div>
                     </Link>
                   ))}

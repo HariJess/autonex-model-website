@@ -20,6 +20,7 @@ import { DashboardDraftListingsSection } from "@/pages/dashboard/components/Dash
 import { DashboardCreditsSection } from "@/pages/dashboard/components/DashboardCreditsSection";
 import { DashboardListingsSection } from "@/pages/dashboard/components/DashboardListingsSection";
 import { DashboardLeadsSection } from "@/pages/dashboard/components/DashboardLeadsSection";
+import { MyAgencySection } from "@/components/dashboard/MyAgencySection";
 
 type Listing = Tables<"listings">;
 
@@ -297,6 +298,8 @@ const Dashboard = () => {
           accountRoleLabel={accountRoleLabel}
           publishLabel={t("nav.publish")}
         />
+
+        {profile?.agency_id ? <MyAgencySection /> : null}
 
         <DashboardStatsCards stats={stats} />
 

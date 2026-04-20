@@ -16,6 +16,7 @@ import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescrip
 import { applyImageFallback } from "@/lib/imageFallback";
 import { getPartnerDealerBySlug } from "@/data/agencies";
 import { AGENCY_PROFILE_LISTINGS_CAP } from "@/config/searchListings";
+import { WEEKDAYS, WEEKDAY_LABELS_FR, type OpeningHours, type SocialLinks } from "@/types/agency";
 
 const AgencyProfile = () => {
   const { slug } = useParams();
@@ -121,7 +122,7 @@ const AgencyProfile = () => {
   const displayLogo = partnerDealer?.logoPath ?? agency?.logo_url ?? "/placeholder.svg";
   const displayLocation = partnerDealer ? `${partnerDealer.city}, ${partnerDealer.area}` : null;
   const displayVerified = partnerDealer?.isPartner === true || agency?.verified === true;
-  const canonical = buildCanonicalUrl(partnerDealer ? `/concessionnaires/${partnerDealer.slug}` : `/agence/${agency?.slug}`);
+  const canonical = buildCanonicalUrl(`/concessionnaires/${partnerDealer?.slug ?? agency?.slug}`);
   const seoTitle = composePageTitle(`${displayName} — Concessionnaire automobile`);
   const seoDescription = truncateMetaDescription(
     `${displayName} : ${displayBio || "concessionnaire automobile a Madagascar"} — ${listings.length} annonce${listings.length > 1 ? "s" : ""} active${listings.length > 1 ? "s" : ""}.`,
@@ -203,6 +204,65 @@ const AgencyProfile = () => {
             </p>
           </div>
         </div>
+
+        {agency?.cover_image_url ? (
+          <div className="mb-8 rounded-2xl overflow-hidden border border-border aspect-[3/1]">
+            <img
+              src={agency.cover_image_url}
+              alt={`${displayName} cover`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
+
+        {agency?.description_long ? (
+          <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
+            <h2 className="font-serif text-lg font-bold mb-2">À propos</h2>
+            <p className="font-sans text-sm text-muted-foreground whitespace-pre-wrap">
+              {agency.description_long}
+            </p>
+          </section>
+        ) : null}
+
+        {agency?.opening_hours && Object.keys(agency.opening_hours as OpeningHours).length > 0 ? (
+          <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
+            <h2 className="font-serif text-lg font-bold mb-3">Horaires d'ouverture</h2>
+            <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1.5 font-sans text-sm">
+              {WEEKDAYS.map((day) => {
+                const hours = (agency.opening_hours as OpeningHours)[day];
+                if (!hours) return null;
+                return (
+                  <div key={day} className="flex justify-between">
+                    <dt className="text-muted-foreground">{WEEKDAY_LABELS_FR[day]}</dt>
+                    <dd>{hours === "closed" ? "Fermé" : hours}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </section>
+        ) : null}
+
+        {agency?.social_links && Object.values(agency.social_links as SocialLinks).some(Boolean) ? (
+          <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
+            <h2 className="font-serif text-lg font-bold mb-3">Suivez-nous</h2>
+            <div className="flex flex-wrap gap-3 font-sans text-sm">
+              {(Object.entries(agency.social_links as SocialLinks) as Array<[keyof SocialLinks, string | null | undefined]>).map(([k, v]) =>
+                v ? (
+                  <a
+                    key={k}
+                    href={v}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg border border-border px-3 py-1.5 capitalize hover:bg-muted transition-colors"
+                  >
+                    {k}
+                  </a>
+                ) : null,
+              )}
+            </div>
+          </section>
+        ) : null}
 
         <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.listingsOf", { name: displayName })}</h2>
         {listingsLoading ? (
