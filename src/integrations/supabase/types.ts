@@ -499,6 +499,7 @@ export type Database = {
           make: string | null
           mileage_km: number | null
           model: string | null
+          negotiable: boolean
           original_price_mga: number | null
           owner_id: string
           pending_boost_types: Json | null
@@ -556,6 +557,7 @@ export type Database = {
           make?: string | null
           mileage_km?: number | null
           model?: string | null
+          negotiable?: boolean
           original_price_mga?: number | null
           owner_id: string
           pending_boost_types?: Json | null
@@ -613,6 +615,7 @@ export type Database = {
           make?: string | null
           mileage_km?: number | null
           model?: string | null
+          negotiable?: boolean
           original_price_mga?: number | null
           owner_id?: string
           pending_boost_types?: Json | null
