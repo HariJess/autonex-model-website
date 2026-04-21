@@ -40,6 +40,30 @@ Conséquences que tu dois connaître en permanence :
 - Ne JAMAIS exécuter `git push` sans demander
 - Quand on travaille sur une priorité, consulter la section correspondante de docs/AUDIT_FINDINGS.md
 
+## Database Migration Policy
+
+**CRITICAL — No auto-apply to production.**
+
+Claude Code must NEVER run the following commands against the linked production Supabase database (project `wtkedamrmtvdoippqanc`) during an autonomous session:
+- `supabase db push`
+- `supabase db reset`
+- `supabase migration up` (when linked to prod)
+- Any direct SQL execution against prod via MCP, CLI, or any other means that modifies schema, data, or policies
+
+Accepted workflow for migrations:
+1. Create migration files in `supabase/migrations/` folder with proper timestamp prefix
+2. Validate SQL syntax + logic via code review and unit tests
+3. Report the migration as "created, pending prod application" in the final report
+4. Ali applies the migration to production manually via:
+   - Supabase Dashboard SQL Editor
+   - OR `supabase db push` from his local terminal after review
+
+If a migration has already been applied to prod during a previous agent session (edge case), flag it EXPLICITLY in the report with "⚠️ MIGRATION ALREADY APPLIED TO PROD — GIT SYNC NEEDED" so Ali can verify consistency.
+
+Exception : read-only queries for investigation purposes (SELECT, information_schema lookups, schema inspection) are allowed and encouraged during pre-work findings. Any write operation (INSERT/UPDATE/DELETE/DDL) is forbidden.
+
+Rationale : prod DB is shared with autonex.mg live users. Unchecked migrations can break publications, searches, admin flows. Ali must retain full control over what hits production.
+
 ## Gotchas connus (pièges à éviter)
 
 - Les règles ESLint `@typescript-eslint/no-unused-vars: off` et `noUnusedLocals: false` sont VOLONTAIREMENT permissives aujourd'hui — les resserrer fait partie de la priorité 5
