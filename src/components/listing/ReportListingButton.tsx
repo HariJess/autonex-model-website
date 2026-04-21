@@ -9,7 +9,8 @@ import { ReportListingModal } from "./ReportListingModal";
 
 type ReportListingButtonProps = {
   listingId: string;
-  ownerId: string;
+  /** Null when the listing was anonymized (Mission 5.0 SET NULL). */
+  ownerId: string | null;
   listingStatus: string | null | undefined;
   className?: string;
 };

@@ -259,9 +259,11 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
       .select("url, position")
       .eq("listing_id", listing.id)
       .order("position", { ascending: true }),
-    supabase.rpc("get_profile_for_listing_display", {
-      p_owner_id: listing.owner_id,
-    }),
+    listing.owner_id
+      ? supabase.rpc("get_profile_for_listing_display", {
+          p_owner_id: listing.owner_id,
+        })
+      : Promise.resolve({ data: null, error: null } as const),
     supabase.from("boosts").select("type").eq("listing_id", listing.id).gte("ends_at", endsAfter),
     supabase.rpc("listing_has_whatsapp_contact", {
       p_listing_id: listing.id,

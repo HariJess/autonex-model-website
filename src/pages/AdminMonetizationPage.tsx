@@ -316,7 +316,7 @@ const AdminMonetizationPage = () => {
                         size="sm"
                         className="font-sans"
                         disabled={approveListing.isPending}
-                        onClick={() => approveListing.mutate({ id: l.id, ownerId: l.owner_id })}
+                        onClick={() => approveListing.mutate({ id: l.id, ownerId: l.owner_id ?? "" })}
                       >
                         <Check className="h-4 w-4 mr-1" /> Publier
                       </Button>
@@ -350,7 +350,7 @@ const AdminMonetizationPage = () => {
                             rejectListing.mutate({
                               id: l.id,
                               reason: rejectListingReason,
-                              ownerId: l.owner_id,
+                              ownerId: l.owner_id ?? "",
                             })
                           }
                         >

@@ -497,7 +497,7 @@ export type Database = {
           id: string
           listing_id: string
           reason: string
-          reporter_id: string
+          reporter_id: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -508,7 +508,7 @@ export type Database = {
           id?: string
           listing_id: string
           reason: string
-          reporter_id: string
+          reporter_id?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -519,7 +519,7 @@ export type Database = {
           id?: string
           listing_id?: string
           reason?: string
-          reporter_id?: string
+          reporter_id?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -603,7 +603,7 @@ export type Database = {
           model: string | null
           negotiable: boolean
           original_price_mga: number | null
-          owner_id: string
+          owner_id: string | null
           pending_boost_types: Json | null
           price_eur: number | null
           price_mga: number
@@ -661,7 +661,7 @@ export type Database = {
           model?: string | null
           negotiable?: boolean
           original_price_mga?: number | null
-          owner_id: string
+          owner_id?: string | null
           pending_boost_types?: Json | null
           price_eur?: number | null
           price_mga?: number
@@ -719,7 +719,7 @@ export type Database = {
           model?: string | null
           negotiable?: boolean
           original_price_mga?: number | null
-          owner_id?: string
+          owner_id?: string | null
           pending_boost_types?: Json | null
           price_eur?: number | null
           price_mga?: number
@@ -1142,21 +1142,21 @@ export type Database = {
           id: string
           kind: string
           listing_id: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           kind: string
           listing_id: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           kind?: string
           listing_id?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1178,10 +1178,14 @@ export type Database = {
       profiles: {
         Row: {
           agency_id: string | null
+          anonymized_at: string | null
           created_at: string | null
           credits_balance: number | null
+          deletion_requested_at: string | null
+          deletion_scheduled_for: string | null
           full_name: string | null
           id: string
+          is_anonymized: boolean
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           seller_type: string | null
@@ -1193,10 +1197,14 @@ export type Database = {
         }
         Insert: {
           agency_id?: string | null
+          anonymized_at?: string | null
           created_at?: string | null
           credits_balance?: number | null
+          deletion_requested_at?: string | null
+          deletion_scheduled_for?: string | null
           full_name?: string | null
           id: string
+          is_anonymized?: boolean
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
@@ -1208,10 +1216,14 @@ export type Database = {
         }
         Update: {
           agency_id?: string | null
+          anonymized_at?: string | null
           created_at?: string | null
           credits_balance?: number | null
+          deletion_requested_at?: string | null
+          deletion_scheduled_for?: string | null
           full_name?: string | null
           id?: string
+          is_anonymized?: boolean
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
@@ -1237,21 +1249,21 @@ export type Database = {
           promo_code_id: string
           redeemed_at: string
           transaction_id: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           id?: string
           promo_code_id: string
           redeemed_at?: string
           transaction_id: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           id?: string
           promo_code_id?: string
           redeemed_at?: string
           transaction_id?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -2307,6 +2319,10 @@ export type Database = {
         Args: { p_listing_id: string; p_rejection_reason: string }
         Returns: Json
       }
+      anonymize_user_profile: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       can_publish_listing: {
         Args: { p_user_id: string }
         Returns: {
@@ -2314,6 +2330,13 @@ export type Database = {
           reason: string
           remaining: number
           reset_at: string
+        }[]
+      }
+      cancel_account_deletion: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          success: boolean
+          was_scheduled_for: string
         }[]
       }
       consume_credits: {
@@ -2340,6 +2363,17 @@ export type Database = {
           p_reference: string
         }
         Returns: string
+      }
+      execute_scheduled_deletions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          anonymized_count: number
+          processed_user_ids: string[]
+        }[]
+      }
+      export_user_data: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       generate_agency_slug: { Args: { p_name: string }; Returns: string }
       get_active_listing_counts_by_ville: {
@@ -2471,6 +2505,15 @@ export type Database = {
           p_transaction_id: string
         }
         Returns: undefined
+      }
+      request_account_deletion: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          success: boolean
+          deletion_scheduled_for: string
+          listings_unpublished_count: number
+          already_requested: boolean
+        }[]
       }
       submit_contact_message: {
         Args: {

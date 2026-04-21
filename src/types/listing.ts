@@ -122,7 +122,8 @@ export interface DisplayListing {
   status: string | null;
   views_count: number | null;
   created_at: string | null;
-  owner_id: string;
+  /** Nullable since Mission 5.0 (ON DELETE SET NULL — RGPD right-to-erasure). */
+  owner_id: string | null;
   // optional display fields
   owner_name?: string | null;
   owner_phone?: string | null;

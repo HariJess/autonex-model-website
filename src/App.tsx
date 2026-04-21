@@ -48,6 +48,7 @@ const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const BetaLoginPage = lazy(() => import("./pages/BetaLoginPage.tsx"));
 const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage.tsx"));
 const MentionsLegalesPage = lazy(() => import("./pages/legal/MentionsLegalesPage.tsx"));
 const PolitiqueConfidentialitePage = lazy(() => import("./pages/legal/PolitiqueConfidentialitePage.tsx"));
 const CguPage = lazy(() => import("./pages/legal/CguPage.tsx"));
@@ -107,6 +108,7 @@ const App = () => {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
               <Route index element={<Navigate to="/admin/overview" replace />} />

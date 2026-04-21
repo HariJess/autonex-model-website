@@ -280,7 +280,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                   autoFocus
                   placeholder={t("publish.brandCustomPlaceholder", "Tapez la marque")}
                   onChange={(e) => {
-                    const sanitized = e.target.value.replace(/[^\p{L}\p{N}\s\-]/gu, "");
+                    const sanitized = e.target.value.replace(/[^\p{L}\p{N}\s-]/gu, "");
                     form.setValue("vehicleMake", sanitized);
                   }}
                   onBlur={(e) => {

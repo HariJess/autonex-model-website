@@ -26,6 +26,9 @@ function AdminUsersPage() {
 
       const byOwner = new Map<string, { total: number; active: number }>();
       for (const l of listingsRes.data ?? []) {
+        // Listings with null owner_id (anonymized accounts, Mission 5.0) are
+        // skipped — they have no user to attribute counts to.
+        if (!l.owner_id) continue;
         const row = byOwner.get(l.owner_id) ?? { total: 0, active: 0 };
         row.total += 1;
         if (l.status === "active") row.active += 1;

@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { User, Menu, X, LogOut, ChevronDown, Globe2 } from "lucide-react";
+import { User, Menu, X, LogOut, ChevronDown, Globe2, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -176,6 +176,10 @@ const Header = () => {
                 <>
                   <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/dashboard")}>
                     {t("nav.dashboard")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/settings")}>
+                    <SettingsIcon className="mr-2 h-4 w-4" />
+                    {t("nav.settings", "Paramètres")}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={signOut}>
                     <LogOut className="mr-2 h-4 w-4" />
