@@ -164,7 +164,18 @@ async function main() {
 
     await writePublicFile("sitemap.xml", makeSitemapIndex(sitemaps));
 
-    const staticRoutes = ["/", "/recherche", "/agences", "/estimation", "/conseils"];
+    const staticRoutes = [
+      "/",
+      "/recherche",
+      "/agences",
+      "/estimation",
+      "/conseils",
+      "/contact",
+      "/legal/mentions",
+      "/legal/confidentialite",
+      "/legal/cgu",
+      "/legal/cookies",
+    ];
     const listingRoutes = cachedListingData && typeof cachedListingData === "object"
       ? Object.keys(cachedListingData).map((id) => `/annonce/${id}`)
       : [];
@@ -445,7 +456,18 @@ async function main() {
   // Write sitemap index
   await writePublicFile("sitemap.xml", makeSitemapIndex(sitemaps));
 
-  const staticRoutes = ["/", "/recherche", "/agences", "/estimation", "/conseils"];
+  const staticRoutes = [
+    "/",
+    "/recherche",
+    "/agences",
+    "/estimation",
+    "/conseils",
+    "/contact",
+    "/legal/mentions",
+    "/legal/confidentialite",
+    "/legal/cgu",
+    "/legal/cookies",
+  ];
   const listingRoutes = listingPrerenderIds.map((id) => `/annonce/${id}`);
   const agencyRoutes = agencyPrerenderSlugs.map((slug) => canonicalAgencyPath(slug));
 

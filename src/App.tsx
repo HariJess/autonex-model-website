@@ -47,6 +47,11 @@ const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ defa
 const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const BetaLoginPage = lazy(() => import("./pages/BetaLoginPage.tsx"));
+const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
+const MentionsLegalesPage = lazy(() => import("./pages/legal/MentionsLegalesPage.tsx"));
+const PolitiqueConfidentialitePage = lazy(() => import("./pages/legal/PolitiqueConfidentialitePage.tsx"));
+const CguPage = lazy(() => import("./pages/legal/CguPage.tsx"));
+const CookiesPage = lazy(() => import("./pages/legal/CookiesPage.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -124,6 +129,11 @@ const App = () => {
             <Route path="/estimation" element={<VehicleEstimationPage />} />
             <Route path="/conseils" element={<BlogList />} />
             <Route path="/conseils/:slug" element={<BlogArticle />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/legal/mentions" element={<MentionsLegalesPage />} />
+            <Route path="/legal/confidentialite" element={<PolitiqueConfidentialitePage />} />
+            <Route path="/legal/cgu" element={<CguPage />} />
+            <Route path="/legal/cookies" element={<CookiesPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BetaLockGate>
