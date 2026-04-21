@@ -1,8 +1,22 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({ user: null, session: null, profile: null }),
+}));
+
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
+    }),
+    rpc: async () => ({ data: null, error: null }),
+  },
+}));
+
 import ListingCard from "@/components/ListingCard";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import type { DisplayListing } from "@/types/listing";
