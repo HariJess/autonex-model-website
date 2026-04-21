@@ -39,6 +39,10 @@ export const DB_ERROR_MESSAGES: Record<string, string> = {
   not_agency_member: "Vous n'êtes pas membre d'une agence.",
   invalid_name: "Le nom de l'agence est requis.",
 
+  // moderation / reports (Mission 2.B)
+  invalid_filter: "Filtre de modération invalide.",
+  listing_not_found: "Annonce introuvable.",
+
   // promo codes module
   auth_required: "Connexion requise pour cette action.",
   invalid_code: "Le code est invalide (A-Z, 0-9, tirets uniquement, 50 car. max).",
