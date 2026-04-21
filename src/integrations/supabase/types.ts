@@ -2437,6 +2437,71 @@ export type Database = {
         Args: { p_agency_id: string }
         Returns: string[]
       }
+      list_my_favorites: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          fav_listing_id: string
+          fav_created_at: string
+          lst_id: string
+          lst_title: string
+          lst_description: string | null
+          lst_type: Database["public"]["Enums"]["listing_type"]
+          lst_transaction: Database["public"]["Enums"]["transaction_type"]
+          lst_price_mga: number
+          lst_price_eur: number | null
+          lst_negotiable: boolean
+          lst_surface: number | null
+          lst_rooms: number | null
+          lst_bathrooms: number | null
+          lst_toilets: number | null
+          lst_ville: string | null
+          lst_availability_status: string | null
+          lst_body_style: string | null
+          lst_doors: number | null
+          lst_drivetrain: string | null
+          lst_exterior_color: string | null
+          lst_engine_displacement_l: number | null
+          lst_fuel: string | null
+          lst_interior_color: string | null
+          lst_is_electric: boolean | null
+          lst_is_hybrid: boolean | null
+          lst_make: string | null
+          lst_mileage_km: number | null
+          lst_model: string | null
+          lst_rental_mode: string | null
+          lst_seats: number | null
+          lst_seller_type: string | null
+          lst_transmission_gearbox: string | null
+          lst_vehicle_condition: string | null
+          lst_whatsapp_phone: string | null
+          lst_year: number | null
+          lst_region: string | null
+          lst_arrondissement: string | null
+          lst_quartier: string | null
+          lst_quartier_libre: string | null
+          lst_lat: number | null
+          lst_lng: number | null
+          lst_features: Json | null
+          lst_status: Database["public"]["Enums"]["listing_status"] | null
+          lst_views_count: number | null
+          lst_created_at: string | null
+          lst_owner_id: string | null
+          lst_original_price_mga: number | null
+          lst_video_url: string | null
+          lst_virtual_tour_url: string | null
+          lst_internal_ref: string | null
+          lst_is_new_program: boolean | null
+          lst_rejection_reason: string | null
+          lst_pending_boost_types: Json | null
+          lst_photos_urls: string[]
+          lst_active_boost_types: string[]
+          agency_name: string | null
+          agency_slug: string | null
+          agency_logo_url: string | null
+          agency_verified: boolean | null
+          owner_full_name: string | null
+        }[]
+      }
       listing_has_whatsapp_contact: {
         Args: { p_listing_id: string }
         Returns: boolean
@@ -2531,6 +2596,15 @@ export type Database = {
           p_whatsapp_phone?: string
         }
         Returns: Json
+      }
+      toggle_favorite: {
+        Args: { p_listing_id: string }
+        Returns: {
+          fav_listing_id: string
+          fav_user_id: string
+          fav_created_at: string | null
+          fav_is_favorite: boolean
+        }[]
       }
       update_my_agency: {
         Args: {
