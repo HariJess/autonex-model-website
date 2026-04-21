@@ -315,12 +315,12 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                     role="combobox"
                     aria-expanded={makeOpen}
                     className={cn(
-                      "w-full justify-between font-sans font-normal",
+                      "w-full min-w-0 justify-between font-sans font-normal",
                       !make && "text-muted-foreground",
                     )}
                   >
                     {make ? (
-                      <span className="flex items-center gap-2 min-w-0">
+                      <span className="flex min-w-0 flex-1 items-center gap-2">
                         {(() => {
                           const asset = resolveBrandAsset(make);
                           if (asset?.logoPath) {
@@ -338,7 +338,9 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                         <span className="truncate">{make}</span>
                       </span>
                     ) : (
-                      <span>{t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}</span>
+                      <span className="min-w-0 flex-1 truncate text-left">
+                        {t("publish.brandPlaceholder", "Choisissez une marque")}
+                      </span>
                     )}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -416,8 +418,8 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
               disabled={!make}
               placeholder={
                 make
-                  ? t("publish.modelPlaceholderWithBrand", "Modèle {{brand}}", { brand: make })
-                  : t("publish.modelPlaceholderNoBrand", "Choisissez d'abord une marque")
+                  ? t("publish.modelPlaceholderWithBrand", "Modèle")
+                  : t("publish.modelPlaceholderNoBrand", "Marque requise")
               }
               autoComplete="off"
             />
