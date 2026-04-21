@@ -226,6 +226,57 @@ export type Database = {
           },
         ]
       }
+      contact_messages: {
+        Row: {
+          consent_given: boolean
+          created_at: string
+          email: string
+          email_error: string | null
+          email_sent_at: string | null
+          full_name: string
+          id: string
+          message: string
+          notes: string | null
+          read_at: string | null
+          replied_at: string | null
+          status: string
+          subject: string
+          whatsapp_phone: string | null
+        }
+        Insert: {
+          consent_given?: boolean
+          created_at?: string
+          email: string
+          email_error?: string | null
+          email_sent_at?: string | null
+          full_name: string
+          id?: string
+          message: string
+          notes?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string
+          subject: string
+          whatsapp_phone?: string | null
+        }
+        Update: {
+          consent_given?: boolean
+          created_at?: string
+          email?: string
+          email_error?: string | null
+          email_sent_at?: string | null
+          full_name?: string
+          id?: string
+          message?: string
+          notes?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string
+          subject?: string
+          whatsapp_phone?: string | null
+        }
+        Relationships: []
+      }
       credit_packs: {
         Row: {
           credits_amount: number
@@ -2420,6 +2471,17 @@ export type Database = {
           p_transaction_id: string
         }
         Returns: undefined
+      }
+      submit_contact_message: {
+        Args: {
+          p_full_name: string
+          p_email: string
+          p_subject: string
+          p_message: string
+          p_consent_given: boolean
+          p_whatsapp_phone?: string
+        }
+        Returns: Json
       }
       update_my_agency: {
         Args: {
