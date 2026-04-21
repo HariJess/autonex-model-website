@@ -20,6 +20,7 @@ import BrandLogo from "@/components/BrandLogo";
 import { resolveBrandAsset } from "@/data/brandAssets";
 import type { DealMeta } from "@/lib/deals";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -114,13 +115,16 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
           </div>
         )}
         {dealMeta && (
-          <div className={`absolute right-3 ${listing.badge && badgeLabels[listing.badge] ? "top-12" : "top-3"}`}>
+          <div className={`absolute right-3 ${listing.badge && badgeLabels[listing.badge] ? "top-20" : "top-12"}`}>
             <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1" style={{ color: "#FAFAFA" }}>
               -{dealMeta.discountPercent}%
             </Badge>
           </div>
         )}
-        <div className="absolute top-3 right-3 flex gap-1.5">
+        <div className="absolute top-3 right-3 z-10">
+          <FavoriteButton listingId={listing.id} size="sm" variant="overlay" />
+        </div>
+        <div className="absolute top-12 right-3 flex gap-1.5">
           <Badge variant="secondary" className="text-[11px] font-sans bg-card/90 border border-border/50">
             {transactionBadgeLabel}
           </Badge>

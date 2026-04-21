@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 import BrandLogo from "@/components/BrandLogo";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { ReportListingButton } from "@/components/listing/ReportListingButton";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { buildCanonicalUrl } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -279,7 +280,10 @@ const ListingDetail = () => {
                   </Badge>
                 )}
               </div>
-              <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground">{displayTitle}</h1>
+              <div className="flex items-start justify-between gap-3">
+                <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground">{displayTitle}</h1>
+                <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0 mt-1" />
+              </div>
               {vehicleSummary && (
                 <p className="mt-1.5 text-[14px] text-muted-foreground font-sans leading-relaxed">{vehicleSummary}</p>
               )}
