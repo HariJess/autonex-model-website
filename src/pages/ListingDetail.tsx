@@ -33,6 +33,7 @@ import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
 import BrandLogo from "@/components/BrandLogo";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
+import { ReportListingButton } from "@/components/listing/ReportListingButton";
 import { buildCanonicalUrl } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -700,6 +701,13 @@ const ListingDetail = () => {
                   {t("listing.viewAgencyListings", { name: listing.agency_name ?? "" })}
                 </Link>
               )}
+              <div className="flex justify-center pt-2 border-t border-border/60">
+                <ReportListingButton
+                  listingId={listing.id}
+                  ownerId={listing.owner_id}
+                  listingStatus={listing.status}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -422,7 +422,35 @@
     "whatsappAria": "Contacter l’annonceur via WhatsApp",
     "whatsappReady": "Réponse WhatsApp disponible",
     "whatsappUnavailable": "Numéro WhatsApp indisponible pour cette annonce.",
-    "yourMessage": "Votre message..."
+    "yourMessage": "Votre message...",
+    "report": {
+      "button": "Signaler",
+      "title": "Signaler cette annonce",
+      "description": "Aidez-nous à maintenir la qualité des annonces AutoNex.",
+      "detailsRequired": "Détails (obligatoire)",
+      "detailsOptional": "Détails (optionnel)",
+      "detailsPlaceholder": "Décrivez ce qui vous semble problématique…",
+      "detailsMinChars": "Minimum {{count}} caractères.",
+      "submit": "Envoyer le signalement",
+      "success": "Merci, votre signalement a été envoyé. Notre équipe l'examinera rapidement.",
+      "authRequired": "Connectez-vous pour signaler une annonce.",
+      "reasons": {
+        "scam": "Arnaque / Fraude",
+        "inappropriate": "Contenu inapproprié",
+        "duplicate": "Doublon d'annonce",
+        "wrong_price": "Prix aberrant",
+        "other": "Autre"
+      },
+      "errors": {
+        "alreadyReported": "Vous avez déjà signalé cette annonce.",
+        "ownListing": "Vous ne pouvez pas signaler votre propre annonce.",
+        "notActive": "Cette annonce n'est plus active.",
+        "notFound": "Annonce introuvable.",
+        "detailsRequired": "Les détails sont obligatoires quand la raison est « Autre ».",
+        "invalidReason": "Raison de signalement invalide.",
+        "default": "Une erreur est survenue. Veuillez réessayer."
+      }
+    }
   },
   "nav": {
     "accountMenu": "Menu compte",

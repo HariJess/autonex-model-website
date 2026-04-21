@@ -422,7 +422,35 @@
     "whatsappAria": "Contact seller via WhatsApp",
     "whatsappReady": "WhatsApp response available",
     "whatsappUnavailable": "WhatsApp number unavailable for this listing.",
-    "yourMessage": "Your message..."
+    "yourMessage": "Your message...",
+    "report": {
+      "button": "Report",
+      "title": "Report this listing",
+      "description": "Help us maintain the quality of AutoNex listings.",
+      "detailsRequired": "Details (required)",
+      "detailsOptional": "Details (optional)",
+      "detailsPlaceholder": "Describe what seems problematic…",
+      "detailsMinChars": "Minimum {{count}} characters.",
+      "submit": "Send report",
+      "success": "Thank you, your report has been sent. Our team will review it shortly.",
+      "authRequired": "Sign in to report a listing.",
+      "reasons": {
+        "scam": "Scam / Fraud",
+        "inappropriate": "Inappropriate content",
+        "duplicate": "Duplicate listing",
+        "wrong_price": "Unrealistic price",
+        "other": "Other"
+      },
+      "errors": {
+        "alreadyReported": "You have already reported this listing.",
+        "ownListing": "You cannot report your own listing.",
+        "notActive": "This listing is no longer active.",
+        "notFound": "Listing not found.",
+        "detailsRequired": "Details are required when the reason is \"Other\".",
+        "invalidReason": "Invalid report reason.",
+        "default": "An error occurred. Please try again."
+      }
+    }
   },
   "nav": {
     "accountMenu": "Account menu",

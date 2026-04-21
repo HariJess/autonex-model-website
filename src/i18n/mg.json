@@ -422,7 +422,35 @@
     "whatsappAria": "Hifandray amin'ny annonceur amin'ny WhatsApp",
     "whatsappReady": "Misy valiny WhatsApp",
     "whatsappUnavailable": "Tsy misy laharana WhatsApp ho an'ity annonce ity.",
-    "yourMessage": "Hafatrao..."
+    "yourMessage": "Hafatrao...",
+    "report": {
+      "button": "Mitsikera",
+      "title": "Mitsikera ity annonce ity",
+      "description": "Ampio izahay hitazona ny kalitaon'ny annonce AutoNex.",
+      "detailsRequired": "Antsipiriany (ilaina)",
+      "detailsOptional": "Antsipiriany (tsy voatery)",
+      "detailsPlaceholder": "Soraty ny olana hitanao…",
+      "detailsMinChars": "{{count}} litera farafahakeliny.",
+      "submit": "Alefa ny fitsikerana",
+      "success": "Misaotra, voalefa ny fitsikeranao. Ho jerena tsy ho ela izany.",
+      "authRequired": "Midira aloha vao afaka mitsikera annonce.",
+      "reasons": {
+        "scam": "Halatra / Fanodinkodinana",
+        "inappropriate": "Votoaty tsy mety",
+        "duplicate": "Annonce miverimberina",
+        "wrong_price": "Vidiny tsy mitombina",
+        "other": "Hafa"
+      },
+      "errors": {
+        "alreadyReported": "Efa notsikerainao ity annonce ity.",
+        "ownListing": "Tsy afaka mitsikera ny annonce-nao ianao.",
+        "notActive": "Tsy mandeha intsony ity annonce ity.",
+        "notFound": "Tsy hita ilay annonce.",
+        "detailsRequired": "Ilaina ny antsipiriany rehefa 'Hafa' no antony.",
+        "invalidReason": "Tsy mety ny antony fitsikerana.",
+        "default": "Nisy olana. Avereno azafady."
+      }
+    }
   },
   "nav": {
     "accountMenu": "Menio kaonty",
