@@ -1428,6 +1428,12 @@ export type Database = {
           promo_bonus_credits: number
           promo_code_id: string | null
           promo_discount_mga: number
+          provider: string | null
+          provider_checkout_url: string | null
+          provider_expires_at: string | null
+          provider_initiated_at: string | null
+          provider_payment_id: string | null
+          provider_response: Json | null
           reference: string | null
           rejection_reason: string | null
           reviewed_at: string | null
@@ -1448,6 +1454,12 @@ export type Database = {
           promo_bonus_credits?: number
           promo_code_id?: string | null
           promo_discount_mga?: number
+          provider?: string | null
+          provider_checkout_url?: string | null
+          provider_expires_at?: string | null
+          provider_initiated_at?: string | null
+          provider_payment_id?: string | null
+          provider_response?: Json | null
           reference?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
@@ -1468,6 +1480,12 @@ export type Database = {
           promo_bonus_credits?: number
           promo_code_id?: string | null
           promo_discount_mga?: number
+          provider?: string | null
+          provider_checkout_url?: string | null
+          provider_expires_at?: string | null
+          provider_initiated_at?: string | null
+          provider_payment_id?: string | null
+          provider_response?: Json | null
           reference?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
@@ -2339,7 +2357,7 @@ export type Database = {
         }[]
       }
       cancel_account_deletion: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           success: boolean
           was_scheduled_for: string
@@ -2356,7 +2374,7 @@ export type Database = {
         Returns: boolean
       }
       create_listing_report: {
-        Args: { p_listing_id: string; p_reason: string; p_details?: string }
+        Args: { p_details?: string; p_listing_id: string; p_reason: string }
         Returns: Json
       }
       create_transaction_with_promo: {
@@ -2371,16 +2389,13 @@ export type Database = {
         Returns: string
       }
       execute_scheduled_deletions: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           anonymized_count: number
           processed_user_ids: string[]
         }[]
       }
-      export_user_data: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      export_user_data: { Args: never; Returns: Json }
       generate_agency_slug: { Args: { p_name: string }; Returns: string }
       get_active_listing_counts_by_ville: {
         Args: { p_villes: string[] }
@@ -2438,68 +2453,68 @@ export type Database = {
         Returns: string[]
       }
       list_my_favorites: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
-          fav_listing_id: string
+          agency_logo_url: string
+          agency_name: string
+          agency_slug: string
+          agency_verified: boolean
           fav_created_at: string
-          lst_id: string
-          lst_title: string
-          lst_description: string | null
-          lst_type: Database["public"]["Enums"]["listing_type"]
-          lst_transaction: Database["public"]["Enums"]["transaction_type"]
-          lst_price_mga: number
-          lst_price_eur: number | null
-          lst_negotiable: boolean
-          lst_surface: number | null
-          lst_rooms: number | null
-          lst_bathrooms: number | null
-          lst_toilets: number | null
-          lst_ville: string | null
-          lst_availability_status: string | null
-          lst_body_style: string | null
-          lst_doors: number | null
-          lst_drivetrain: string | null
-          lst_exterior_color: string | null
-          lst_engine_displacement_l: number | null
-          lst_fuel: string | null
-          lst_interior_color: string | null
-          lst_is_electric: boolean | null
-          lst_is_hybrid: boolean | null
-          lst_make: string | null
-          lst_mileage_km: number | null
-          lst_model: string | null
-          lst_rental_mode: string | null
-          lst_seats: number | null
-          lst_seller_type: string | null
-          lst_transmission_gearbox: string | null
-          lst_vehicle_condition: string | null
-          lst_whatsapp_phone: string | null
-          lst_year: number | null
-          lst_region: string | null
-          lst_arrondissement: string | null
-          lst_quartier: string | null
-          lst_quartier_libre: string | null
-          lst_lat: number | null
-          lst_lng: number | null
-          lst_features: Json | null
-          lst_status: Database["public"]["Enums"]["listing_status"] | null
-          lst_views_count: number | null
-          lst_created_at: string | null
-          lst_owner_id: string | null
-          lst_original_price_mga: number | null
-          lst_video_url: string | null
-          lst_virtual_tour_url: string | null
-          lst_internal_ref: string | null
-          lst_is_new_program: boolean | null
-          lst_rejection_reason: string | null
-          lst_pending_boost_types: Json | null
-          lst_photos_urls: string[]
+          fav_listing_id: string
           lst_active_boost_types: string[]
-          agency_name: string | null
-          agency_slug: string | null
-          agency_logo_url: string | null
-          agency_verified: boolean | null
-          owner_full_name: string | null
+          lst_arrondissement: string
+          lst_availability_status: string
+          lst_bathrooms: number
+          lst_body_style: string
+          lst_created_at: string
+          lst_description: string
+          lst_doors: number
+          lst_drivetrain: string
+          lst_engine_displacement_l: number
+          lst_exterior_color: string
+          lst_features: Json
+          lst_fuel: string
+          lst_id: string
+          lst_interior_color: string
+          lst_internal_ref: string
+          lst_is_electric: boolean
+          lst_is_hybrid: boolean
+          lst_is_new_program: boolean
+          lst_lat: number
+          lst_lng: number
+          lst_make: string
+          lst_mileage_km: number
+          lst_model: string
+          lst_negotiable: boolean
+          lst_original_price_mga: number
+          lst_owner_id: string
+          lst_pending_boost_types: Json
+          lst_photos_urls: string[]
+          lst_price_eur: number
+          lst_price_mga: number
+          lst_quartier: string
+          lst_quartier_libre: string
+          lst_region: string
+          lst_rejection_reason: string
+          lst_rental_mode: string
+          lst_rooms: number
+          lst_seats: number
+          lst_seller_type: string
+          lst_status: Database["public"]["Enums"]["listing_status"]
+          lst_surface: number
+          lst_title: string
+          lst_toilets: number
+          lst_transaction: Database["public"]["Enums"]["transaction_type"]
+          lst_transmission_gearbox: string
+          lst_type: Database["public"]["Enums"]["listing_type"]
+          lst_vehicle_condition: string
+          lst_video_url: string
+          lst_views_count: number
+          lst_ville: string
+          lst_virtual_tour_url: string
+          lst_whatsapp_phone: string
+          lst_year: number
+          owner_full_name: string
         }[]
       }
       listing_has_whatsapp_contact: {
@@ -2578,21 +2593,37 @@ export type Database = {
         Returns: undefined
       }
       request_account_deletion: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
-          success: boolean
+          already_requested: boolean
           deletion_scheduled_for: string
           listings_unpublished_count: number
-          already_requested: boolean
+          success: boolean
         }[]
+      }
+      service_approve_provider_transaction: {
+        Args: {
+          p_provider_payment_id: string
+          p_provider_response: Json
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      service_reject_provider_transaction: {
+        Args: {
+          p_provider_response?: Json
+          p_reason: string
+          p_transaction_id: string
+        }
+        Returns: Json
       }
       submit_contact_message: {
         Args: {
-          p_full_name: string
-          p_email: string
-          p_subject: string
-          p_message: string
           p_consent_given: boolean
+          p_email: string
+          p_full_name: string
+          p_message: string
+          p_subject: string
           p_whatsapp_phone?: string
         }
         Returns: Json
@@ -2600,10 +2631,10 @@ export type Database = {
       toggle_favorite: {
         Args: { p_listing_id: string }
         Returns: {
+          fav_created_at: string
+          fav_is_favorite: boolean
           fav_listing_id: string
           fav_user_id: string
-          fav_created_at: string | null
-          fav_is_favorite: boolean
         }[]
       }
       update_my_agency: {
@@ -2681,6 +2712,7 @@ export type Database = {
         | "airtel_money"
         | "stripe"
         | "bank_transfer"
+        | "vanilla_pay"
       payment_status:
         | "pending"
         | "success"
@@ -2855,6 +2887,7 @@ export const Constants = {
         "airtel_money",
         "stripe",
         "bank_transfer",
+        "vanilla_pay",
       ],
       payment_status: [
         "pending",
