@@ -117,4 +117,36 @@ describe("ListingCard", () => {
     const detailLink = links.find((l) => l.getAttribute("href") === "/annonce/xyz-789");
     expect(detailLink).toBeDefined();
   });
+
+  it("empile les badges transaction + condition en pills côté gauche", () => {
+    const vehicle = {
+      make: "Toyota",
+      model: "Yaris",
+      year: 2020,
+      mileageKm: 0,
+      fuel: "essence",
+      transmission: null,
+      drivetrain: null,
+      doors: null,
+      bodyStyle: null,
+      rentalMode: null,
+      seats: null,
+      exteriorColor: null,
+      engineDisplacementL: null,
+      interiorColor: null,
+      availabilityStatus: null,
+      isElectric: false,
+      isHybrid: false,
+      condition: "neuf" as const,
+      sellerType: null,
+    };
+    renderCard(
+      makeListing({
+        transaction: "location",
+        vehicle,
+      } as unknown as Partial<DisplayListing>),
+    );
+    expect(screen.getByText(/Location/i)).toBeInTheDocument();
+    expect(screen.getByText(/neuf/i)).toBeInTheDocument();
+  });
 });

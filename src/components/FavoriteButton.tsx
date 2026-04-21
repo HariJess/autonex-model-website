@@ -18,7 +18,7 @@ interface FavoriteButtonProps {
 }
 
 const SIZE_MAP: Record<Size, { button: string; icon: string }> = {
-  sm: { button: "h-9 w-9", icon: "h-4 w-4" },
+  sm: { button: "h-10 w-10", icon: "h-4 w-4" },
   md: { button: "h-11 w-11", icon: "h-5 w-5" },
   lg: { button: "h-12 w-12", icon: "h-6 w-6" },
 };
@@ -67,14 +67,10 @@ export function FavoriteButton({
 
   const sizes = SIZE_MAP[size];
 
-  const baseClasses =
-    variant === "overlay"
-      ? "inline-flex items-center justify-center rounded-full bg-card/90 backdrop-blur-sm shadow-sm border border-border/50 hover:bg-card transition-colors active:scale-95 touch-manipulation"
-      : "inline-flex items-center justify-center rounded-full border border-border/70 bg-background hover:bg-muted/60 transition-colors active:scale-95 touch-manipulation";
-
   return (
     <button
       type="button"
+      data-variant={variant}
       aria-pressed={isFavorite}
       aria-label={
         isFavorite
@@ -83,15 +79,25 @@ export function FavoriteButton({
       }
       onClick={handleClick}
       disabled={isPending}
-      className={cn(baseClasses, sizes.button, className)}
+      className={cn(
+        "inline-flex items-center justify-center rounded-full",
+        "bg-white/95 backdrop-blur-sm border border-slate-200/60",
+        "shadow-md hover:shadow-lg",
+        "transition-all duration-200",
+        "hover:scale-105 active:scale-95",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500/50",
+        "touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100",
+        sizes.button,
+        className,
+      )}
     >
       <Heart
         className={cn(
           sizes.icon,
           "transition-colors",
           isFavorite
-            ? "fill-destructive text-destructive"
-            : "text-foreground/70",
+            ? "fill-red-500 text-red-500"
+            : "text-slate-700",
         )}
       />
     </button>

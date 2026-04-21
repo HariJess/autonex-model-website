@@ -107,33 +107,34 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
           }}
         />
-        {listing.badge && badgeLabels[listing.badge] && (
-          <div className="absolute top-3 left-3">
-            <Badge className={`${badgeLabels[listing.badge].className} text-[11px] font-semibold px-2.5 py-1`} style={{ color: "#FAFAFA" }}>
+        <div className="absolute top-3 left-3 z-[2] flex flex-col gap-2 items-start">
+          {listing.badge && badgeLabels[listing.badge] && (
+            <Badge
+              className={`${badgeLabels[listing.badge].className} rounded-full text-[11px] font-semibold px-3 py-1 shadow-sm whitespace-nowrap border-transparent`}
+              style={{ color: "#FAFAFA" }}
+            >
               {badgeLabels[listing.badge].label}
             </Badge>
-          </div>
-        )}
-        {dealMeta && (
-          <div className={`absolute right-3 ${listing.badge && badgeLabels[listing.badge] ? "top-20" : "top-12"}`}>
-            <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1" style={{ color: "#FAFAFA" }}>
-              -{dealMeta.discountPercent}%
-            </Badge>
-          </div>
-        )}
-        <div className="absolute top-3 right-3 z-10">
-          <FavoriteButton listingId={listing.id} size="sm" variant="overlay" />
-        </div>
-        <div className="absolute top-12 right-3 flex gap-1.5">
-          <Badge variant="secondary" className="text-[11px] font-sans bg-card/90 border border-border/50">
+          )}
+          <Badge className="rounded-full bg-white/90 backdrop-blur-sm border border-white/40 text-xs font-medium text-slate-900 px-3 py-1.5 shadow-sm whitespace-nowrap hover:bg-white/90">
             {transactionBadgeLabel}
           </Badge>
           {!isSearchVariant && listing.vehicle?.condition && (
-            <Badge variant="outline" className="text-[11px] font-sans capitalize bg-card/85">
+            <Badge className="rounded-full bg-white/90 backdrop-blur-sm border border-white/40 text-xs font-medium text-slate-900 px-3 py-1.5 shadow-sm capitalize whitespace-nowrap hover:bg-white/90">
               {listing.vehicle.condition}
             </Badge>
           )}
         </div>
+        <div className="absolute top-3 right-3 z-10">
+          <FavoriteButton listingId={listing.id} size="sm" variant="overlay" />
+        </div>
+        {dealMeta && (
+          <div className="absolute top-14 right-3 z-[2]">
+            <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm border-transparent" style={{ color: "#FAFAFA" }}>
+              -{dealMeta.discountPercent}%
+            </Badge>
+          </div>
+        )}
         {images.length > 1 && (
           <>
             <button

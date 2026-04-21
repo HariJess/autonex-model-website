@@ -280,9 +280,9 @@ const ListingDetail = () => {
                   </Badge>
                 )}
               </div>
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center justify-between gap-3">
                 <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground">{displayTitle}</h1>
-                <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0 mt-1" />
+                <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0" />
               </div>
               {vehicleSummary && (
                 <p className="mt-1.5 text-[14px] text-muted-foreground font-sans leading-relaxed">{vehicleSummary}</p>
