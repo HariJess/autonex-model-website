@@ -7,6 +7,7 @@ import {
   SETTINGS_SECTIONS,
   type SettingsSectionId,
 } from "./settingsSections";
+import { DeletionPendingBanner } from "./DeletionPendingBanner";
 
 type SettingsLayoutProps = {
   activeSection: SettingsSectionId;
@@ -77,7 +78,10 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
             {nav}
           </div>
         </aside>
-        <main className="min-w-0">{children}</main>
+        <main className="min-w-0">
+          <DeletionPendingBanner />
+          {children}
+        </main>
       </div>
     </div>
   );

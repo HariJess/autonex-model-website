@@ -1181,6 +1181,8 @@ export type Database = {
           anonymized_at: string | null
           created_at: string | null
           credits_balance: number | null
+          deletion_email_error: string | null
+          deletion_email_sent_at: string | null
           deletion_requested_at: string | null
           deletion_scheduled_for: string | null
           full_name: string | null
@@ -1200,6 +1202,8 @@ export type Database = {
           anonymized_at?: string | null
           created_at?: string | null
           credits_balance?: number | null
+          deletion_email_error?: string | null
+          deletion_email_sent_at?: string | null
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           full_name?: string | null
@@ -1219,6 +1223,8 @@ export type Database = {
           anonymized_at?: string | null
           created_at?: string | null
           credits_balance?: number | null
+          deletion_email_error?: string | null
+          deletion_email_sent_at?: string | null
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           full_name?: string | null
