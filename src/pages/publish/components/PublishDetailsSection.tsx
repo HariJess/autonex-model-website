@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AUTO_BRANDS } from "@/data/automotiveCatalog";
@@ -14,8 +14,8 @@ import { resolveBrandAsset } from "@/data/brandAssets";
 import { EXTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
 import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
-import { useState } from "react";
-import { Check, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Check, ChevronDown, ChevronsUpDown, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
@@ -160,6 +160,30 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
   const [showAllEquipment, setShowAllEquipment] = useState(false);
   const [makeOpen, setMakeOpen] = useState(false);
+  const [useCustomBrand, setUseCustomBrand] = useState(() => {
+    const initial = form.getValues("vehicleMake").trim();
+    return initial.length > 0 && !AUTO_BRANDS.includes(initial);
+  });
+
+  // Hydration: when the form is reset with a brand outside AUTO_BRANDS
+  // (e.g. edit mode loading a legacy listing with "BYD", "Xiaomi"…), switch
+  // to custom-brand mode so the user sees the value in an editable input
+  // instead of an empty dropdown trigger. Never auto-switches back to false:
+  // the "Back to list" button owns that transition.
+  useEffect(() => {
+    if (useCustomBrand) return;
+    const trimmed = make.trim();
+    if (trimmed.length > 0 && !AUTO_BRANDS.includes(trimmed)) {
+      setUseCustomBrand(true);
+    }
+  }, [make, useCustomBrand]);
+
+  const capitalizeBrand = (raw: string) => {
+    const trimmed = raw.trim();
+    if (trimmed.length === 0) return "";
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  };
+
   const hasCustomExteriorColor =
     exteriorColor.trim().length > 0 &&
     !EXTERIOR_COLOR_OPTIONS.some((option) => option.value === exteriorColor.trim().toLowerCase());
@@ -248,87 +272,139 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
           <div className="space-y-2">
             <Label className="font-sans">Marque *</Label>
-            <Popover open={makeOpen} onOpenChange={setMakeOpen}>
-              <PopoverTrigger asChild>
-                <Button
+            {useCustomBrand ? (
+              <>
+                <Input
+                  type="text"
+                  value={make}
+                  autoFocus
+                  placeholder={t("publish.brandCustomPlaceholder", "Tapez la marque")}
+                  onChange={(e) => {
+                    const sanitized = e.target.value.replace(/[^\p{L}\p{N}\s\-]/gu, "");
+                    form.setValue("vehicleMake", sanitized);
+                  }}
+                  onBlur={(e) => {
+                    const capitalized = capitalizeBrand(e.target.value);
+                    if (capitalized !== e.target.value) {
+                      form.setValue("vehicleMake", capitalized);
+                    }
+                  }}
+                  className="font-sans"
+                  maxLength={40}
+                  autoComplete="off"
+                />
+                <button
                   type="button"
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={makeOpen}
-                  className={cn(
-                    "w-full justify-between font-sans font-normal",
-                    !make && "text-muted-foreground",
-                  )}
+                  onClick={() => {
+                    setUseCustomBrand(false);
+                    form.setValue("vehicleMake", "");
+                    form.setValue("vehicleModel", "");
+                  }}
+                  className="inline-flex items-center gap-1 text-xs font-sans text-primary hover:underline"
                 >
-                  {make ? (
-                    <span className="flex items-center gap-2 min-w-0">
-                      {(() => {
-                        const asset = resolveBrandAsset(make);
-                        if (asset?.logoPath) {
+                  <ArrowLeft className="h-3 w-3" />
+                  {t("publish.brandBackToList", "Choisir dans la liste")}
+                </button>
+              </>
+            ) : (
+              <Popover open={makeOpen} onOpenChange={setMakeOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={makeOpen}
+                    className={cn(
+                      "w-full justify-between font-sans font-normal",
+                      !make && "text-muted-foreground",
+                    )}
+                  >
+                    {make ? (
+                      <span className="flex items-center gap-2 min-w-0">
+                        {(() => {
+                          const asset = resolveBrandAsset(make);
+                          if (asset?.logoPath) {
+                            return (
+                              <img
+                                src={asset.logoPath}
+                                alt=""
+                                className="h-4 w-6 object-contain shrink-0"
+                                loading="lazy"
+                              />
+                            );
+                          }
+                          return null;
+                        })()}
+                        <span className="truncate">{make}</span>
+                      </span>
+                    ) : (
+                      <span>{t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}</span>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                  <Command>
+                    <CommandInput
+                      placeholder={t("publish.brandSearchPlaceholder", "Rechercher une marque…")}
+                      className="h-9 font-sans"
+                    />
+                    <CommandList className="max-h-[280px]">
+                      <CommandEmpty>
+                        {t("publish.brandNoMatch", "Aucune marque trouvée.")}
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {AUTO_BRANDS.map((brand) => {
+                          const asset = resolveBrandAsset(brand);
+                          const isSelected = make === brand;
                           return (
-                            <img
-                              src={asset.logoPath}
-                              alt=""
-                              className="h-4 w-6 object-contain shrink-0"
-                              loading="lazy"
-                            />
+                            <CommandItem
+                              key={brand}
+                              value={brand}
+                              onSelect={(value) => {
+                                const next = value === make ? "" : AUTO_BRANDS.find((b) => b.toLowerCase() === value.toLowerCase()) ?? value;
+                                form.setValue("vehicleMake", next);
+                                if (next !== make) {
+                                  form.setValue("vehicleModel", "");
+                                }
+                                setMakeOpen(false);
+                              }}
+                              className="font-sans"
+                            >
+                              {asset?.logoPath ? (
+                                <img src={asset.logoPath} alt="" className="mr-2 h-4 w-6 object-contain shrink-0" loading="lazy" />
+                              ) : (
+                                <span className="mr-2 h-4 w-6 shrink-0 inline-flex items-center justify-center rounded border border-border/70 bg-muted/50 text-[10px] font-serif font-bold text-muted-foreground">
+                                  {brand.charAt(0).toUpperCase()}
+                                </span>
+                              )}
+                              <span className="flex-1 truncate">{brand}</span>
+                              <Check className={cn("ml-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+                            </CommandItem>
                           );
-                        }
-                        return null;
-                      })()}
-                      <span className="truncate">{make}</span>
-                    </span>
-                  ) : (
-                    <span>{t("publish.brandPlaceholder", "Ex: Toyota, Nissan, Hyundai...")}</span>
-                  )}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                <Command>
-                  <CommandInput
-                    placeholder={t("publish.brandSearchPlaceholder", "Rechercher une marque…")}
-                    className="h-9 font-sans"
-                  />
-                  <CommandList className="max-h-[300px]">
-                    <CommandEmpty>
-                      {t("publish.brandNoMatch", "Aucune marque trouvée.")}
-                    </CommandEmpty>
-                    <CommandGroup>
-                      {AUTO_BRANDS.map((brand) => {
-                        const asset = resolveBrandAsset(brand);
-                        const isSelected = make === brand;
-                        return (
-                          <CommandItem
-                            key={brand}
-                            value={brand}
-                            onSelect={(value) => {
-                              const next = value === make ? "" : AUTO_BRANDS.find((b) => b.toLowerCase() === value.toLowerCase()) ?? value;
-                              form.setValue("vehicleMake", next);
-                              if (next !== make) {
-                                form.setValue("vehicleModel", "");
-                              }
-                              setMakeOpen(false);
-                            }}
-                            className="font-sans"
-                          >
-                            {asset?.logoPath ? (
-                              <img src={asset.logoPath} alt="" className="mr-2 h-4 w-6 object-contain shrink-0" loading="lazy" />
-                            ) : (
-                              <span className="mr-2 h-4 w-6 shrink-0 inline-flex items-center justify-center rounded border border-border/70 bg-muted/50 text-[10px] font-serif font-bold text-muted-foreground">
-                                {brand.charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                            <span className="flex-1 truncate">{brand}</span>
-                            <Check className={cn("ml-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
-                          </CommandItem>
-                        );
-                      })}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                        })}
+                      </CommandGroup>
+                    </CommandList>
+                    <CommandSeparator />
+                    <div className="p-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          form.setValue("vehicleMake", "");
+                          form.setValue("vehicleModel", "");
+                          setMakeOpen(false);
+                          setUseCustomBrand(true);
+                        }}
+                        className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm italic text-muted-foreground outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground"
+                      >
+                        <Plus className="mr-2 h-4 w-4 shrink-0" />
+                        <span>{t("publish.brandOtherOption", "Autre marque…")}</span>
+                      </button>
+                    </div>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
           <div className="space-y-2">
             <Label className="font-sans">Modèle *</Label>
