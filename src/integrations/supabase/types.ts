@@ -439,6 +439,57 @@ export type Database = {
           },
         ]
       }
+      listing_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          listing_id: string
+          reason: string
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          listing_id: string
+          reason: string
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          listing_id?: string
+          reason?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_view_events: {
         Row: {
           listing_id: string
@@ -2045,6 +2096,10 @@ export type Database = {
         Args: { p_confirmation_email: string; p_user_id: string }
         Returns: undefined
       }
+      admin_dismiss_listing_reports: {
+        Args: { p_listing_id: string }
+        Returns: Json
+      }
       admin_grant_credits: {
         Args: { p_amount: number; p_reason: string; p_user_id: string }
         Returns: string
@@ -2080,6 +2135,23 @@ export type Database = {
           user_email: string
           user_full_name: string
           user_id: string
+        }[]
+      }
+      admin_moderation_queue: {
+        Args: { p_filter?: string }
+        Returns: {
+          created_at: string
+          last_report_at: string
+          listing_id: string
+          owner_email: string
+          owner_id: string
+          price_mga: number
+          reports_count: number
+          reports_reasons: string[]
+          status: Database["public"]["Enums"]["listing_status"]
+          title: string
+          updated_at: string
+          ville: string
         }[]
       }
       admin_reject_agency: {
@@ -2180,6 +2252,10 @@ export type Database = {
           whatsapp_phone: string
         }[]
       }
+      admin_validate_listing_reports: {
+        Args: { p_listing_id: string; p_rejection_reason: string }
+        Returns: Json
+      }
       can_publish_listing: {
         Args: { p_user_id: string }
         Returns: {
@@ -2198,6 +2274,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      create_listing_report: {
+        Args: { p_listing_id: string; p_reason: string; p_details?: string }
+        Returns: Json
       }
       create_transaction_with_promo: {
         Args: {
