@@ -2,8 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import SettingsPage from "@/pages/SettingsPage";
-import { SETTINGS_SECTIONS } from "@/components/settings/settingsSections";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -13,7 +12,12 @@ vi.mock("react-i18next", () => ({
 }));
 
 vi.mock("@/contexts/AuthContext", () => ({
-  useAuth: () => ({ user: { id: "u1", email: "a@b.c" }, isAdmin: false, signOut: vi.fn() }),
+  useAuth: () => ({
+    user: { id: "u1", email: "a@b.c", last_sign_in_at: "2026-04-21T10:34:00Z" },
+    session: { user: { id: "u1", email: "a@b.c", last_sign_in_at: "2026-04-21T10:34:00Z" } },
+    isAdmin: false,
+    signOut: vi.fn(),
+  }),
 }));
 
 vi.mock("@/contexts/CurrencyContext", () => ({
@@ -23,14 +27,48 @@ vi.mock("@/contexts/CurrencyContext", () => ({
 vi.mock("@/components/Header", () => ({ default: () => <header>Header</header> }));
 vi.mock("@/components/Footer", () => ({ default: () => <footer>Footer</footer> }));
 
+// Stub supabase so the ProfilSection's useQuery resolves without hitting the
+// network. Return a minimal profile row so the form can hydrate.
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          single: async () => ({
+            data: {
+              id: "u1",
+              full_name: "Test User",
+              phone: null,
+              whatsapp_phone: null,
+              role: "particulier",
+              created_at: "2025-06-15T12:00:00Z",
+              deletion_requested_at: null,
+              deletion_scheduled_for: null,
+              is_anonymized: false,
+            },
+            error: null,
+          }),
+        }),
+      }),
+    }),
+    auth: { updateUser: async () => ({ data: null, error: null }) },
+  },
+}));
+
+import SettingsPage from "@/pages/SettingsPage";
+import { SETTINGS_SECTIONS } from "@/components/settings/settingsSections";
+
 function renderPage(initialHash = "") {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <HelmetProvider>
-      <MemoryRouter initialEntries={[`/settings${initialHash}`]}>
-        <Routes>
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={qc}>
+        <MemoryRouter initialEntries={[`/settings${initialHash}`]}>
+          <Routes>
+            <Route path="/settings" element={<SettingsPage />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     </HelmetProvider>,
   );
 }
@@ -51,9 +89,9 @@ describe("SettingsPage", () => {
     expect(screen.getAllByText(/Paramètres/i).length).toBeGreaterThan(0);
   });
 
-  it("shows the default Profil section when no hash is present", () => {
+  it("shows the default Profil section when no hash is present", async () => {
     renderPage();
-    expect(screen.getByRole("heading", { level: 2, name: /Profil/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: /Profil/i })).toBeInTheDocument();
   });
 
   it("lists the four navigation sections in the sidebar", () => {
@@ -71,9 +109,9 @@ describe("SettingsPage", () => {
     expect(screen.getByRole("heading", { level: 2, name: /Zone de danger/i })).toBeInTheDocument();
   });
 
-  it("reacts to hashchange events after mount", () => {
+  it("reacts to hashchange events after mount", async () => {
     renderPage();
-    expect(screen.getByRole("heading", { level: 2, name: /Profil/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: /Profil/i })).toBeInTheDocument();
     act(() => {
       window.location.hash = "#notifications";
       window.dispatchEvent(new HashChangeEvent("hashchange"));
@@ -81,8 +119,8 @@ describe("SettingsPage", () => {
     expect(screen.getByRole("heading", { level: 2, name: /Notifications/i })).toBeInTheDocument();
   });
 
-  it("falls back to Profil for an unknown hash fragment", () => {
+  it("falls back to Profil for an unknown hash fragment", async () => {
     renderPage("#unknown-section");
-    expect(screen.getByRole("heading", { level: 2, name: /Profil/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: /Profil/i })).toBeInTheDocument();
   });
 });
