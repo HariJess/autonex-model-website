@@ -225,6 +225,27 @@
     "whyTheseInfo": "Nahoana ireo fanazavana ireo?",
     "whyUseful": "Antony maha-ilaina azy"
   },
+  "favorites": {
+    "title": "Ny ankafiziko",
+    "subtitle": "Ireo hevitra efa notahirizinao.",
+    "empty": {
+      "title": "Mbola tsy misy ankafiziny",
+      "body": "Tsindrio ny fo eo amin'ny hevitra mba hahitana azy eto.",
+      "cta": "Hitady hevitra"
+    },
+    "loadError": "Tsy afaka nanaraka ny ankafiziny",
+    "retry": "Avereno",
+    "button": {
+      "addAria": "Ampio amin'ny ankafiziny",
+      "removeAria": "Esory amin'ny ankafiziny"
+    },
+    "toast": {
+      "added": "Nampiana tamin'ny ankafiziny",
+      "removed": "Nesorina tamin'ny ankafiziny",
+      "loginRequired": "Hidirana aloha vao afaka mitahiry",
+      "error": "Nisy olana"
+    }
+  },
   "footer": {
     "about": "À propos",
     "contact": "Contact",

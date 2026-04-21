@@ -225,6 +225,27 @@
     "whyTheseInfo": "Pourquoi ces informations ?",
     "whyUseful": "Pourquoi c'est utile"
   },
+  "favorites": {
+    "title": "Mes favoris",
+    "subtitle": "Les annonces que vous avez sauvegardées.",
+    "empty": {
+      "title": "Aucun favori pour l'instant",
+      "body": "Cliquez sur le cœur d'une annonce pour la retrouver ici.",
+      "cta": "Parcourir les annonces"
+    },
+    "loadError": "Impossible de charger vos favoris",
+    "retry": "Réessayer",
+    "button": {
+      "addAria": "Ajouter aux favoris",
+      "removeAria": "Retirer des favoris"
+    },
+    "toast": {
+      "added": "Ajouté aux favoris",
+      "removed": "Retiré des favoris",
+      "loginRequired": "Connectez-vous pour sauvegarder une annonce",
+      "error": "Une erreur est survenue"
+    }
+  },
   "footer": {
     "about": "À propos",
     "contact": "Contact",

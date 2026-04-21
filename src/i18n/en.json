@@ -225,6 +225,27 @@
     "whyTheseInfo": "Why this information matters",
     "whyUseful": "Why this is useful"
   },
+  "favorites": {
+    "title": "My favorites",
+    "subtitle": "Listings you saved.",
+    "empty": {
+      "title": "No favorites yet",
+      "body": "Tap the heart on any listing to save it here.",
+      "cta": "Browse listings"
+    },
+    "loadError": "Couldn't load your favorites",
+    "retry": "Retry",
+    "button": {
+      "addAria": "Add to favorites",
+      "removeAria": "Remove from favorites"
+    },
+    "toast": {
+      "added": "Added to favorites",
+      "removed": "Removed from favorites",
+      "loginRequired": "Sign in to save a listing",
+      "error": "Something went wrong"
+    }
+  },
   "footer": {
     "about": "About",
     "contact": "Contact",
