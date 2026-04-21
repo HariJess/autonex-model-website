@@ -40,29 +40,37 @@ Conséquences que tu dois connaître en permanence :
 - Ne JAMAIS exécuter `git push` sans demander
 - Quand on travaille sur une priorité, consulter la section correspondante de docs/AUDIT_FINDINGS.md
 
-## Database Migration Policy
+## Database Migration Policy (v2)
 
-**CRITICAL — No auto-apply to production.**
+**Non-destructive migrations** (CREATE TABLE, CREATE FUNCTION, ADD COLUMN, CREATE INDEX, CREATE POLICY, CREATE TRIGGER, GRANT, COMMENT) can be applied directly to production by Claude Code during an autonomous session, provided ALL of the following conditions are met:
 
-Claude Code must NEVER run the following commands against the linked production Supabase database (project `wtkedamrmtvdoippqanc`) during an autonomous session:
-- `supabase db push`
-- `supabase db reset`
-- `supabase migration up` (when linked to prod)
-- Any direct SQL execution against prod via MCP, CLI, or any other means that modifies schema, data, or policies
+1. All migrations are written to files in `supabase/migrations/` with proper timestamp prefix (format `YYYYMMDDHHMMSS_descriptive_name.sql`)
+2. All migrations are idempotent (use `IF NOT EXISTS`, `DROP POLICY IF EXISTS ... CREATE POLICY`, etc.)
+3. Claude Code commits the migration files to Git BEFORE applying to prod
+4. The final report explicitly flags "Applied to prod: YES" for each migration, with SQL Editor execution output
+5. Post-application smoke tests are executed (SELECT info from information_schema, basic RPC calls)
+6. Types regeneration is committed right after prod application to keep Git in sync
 
-Accepted workflow for migrations:
-1. Create migration files in `supabase/migrations/` folder with proper timestamp prefix
-2. Validate SQL syntax + logic via code review and unit tests
-3. Report the migration as "created, pending prod application" in the final report
-4. Ali applies the migration to production manually via:
-   - Supabase Dashboard SQL Editor
-   - OR `supabase db push` from his local terminal after review
+**Destructive migrations** are NEVER applied automatically. They require explicit Ali confirmation in the chat. Destructive = any of:
+- `DROP TABLE`, `DROP COLUMN`, `DROP FUNCTION`, `DROP TRIGGER`
+- `ALTER COLUMN TYPE` (even with valid casts)
+- `ALTER COLUMN SET NOT NULL` on existing column with NULL values
+- `DELETE FROM` (data removal)
+- `TRUNCATE`
+- `DROP POLICY` without immediate `CREATE POLICY` recreation
+- Any `REVOKE` of existing grants
+- Any migration that could cause data loss, schema breakage, or auth bypass
 
-If a migration has already been applied to prod during a previous agent session (edge case), flag it EXPLICITLY in the report with "⚠️ MIGRATION ALREADY APPLIED TO PROD — GIT SYNC NEEDED" so Ali can verify consistency.
+For destructive migrations, Claude Code must:
+1. Write the migration file
+2. Flag it explicitly in the report with ⚠️ DESTRUCTIVE
+3. Wait for Ali's explicit written confirmation in chat before applying
 
-Exception : read-only queries for investigation purposes (SELECT, information_schema lookups, schema inspection) are allowed and encouraged during pre-work findings. Any write operation (INSERT/UPDATE/DELETE/DDL) is forbidden.
+**Read-only queries** (SELECT, information_schema lookups, schema inspection) are always allowed during investigation.
 
-Rationale : prod DB is shared with autonex.mg live users. Unchecked migrations can break publications, searches, admin flows. Ali must retain full control over what hits production.
+**Conflict resolution** : if production DB state diverges from Git (e.g., migrations applied manually by Ali that aren't committed), flag with ⚠️ GIT/DB DESYNC DETECTED in the report and propose a reconciliation plan.
+
+**Rationale** : v1 was too slow for rapid iteration. v2 balances agent velocity for safe additive changes with strict safety on destructive ones. Ali retains full control over destructive operations.
 
 ## Gotchas connus (pièges à éviter)
 
