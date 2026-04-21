@@ -6,12 +6,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
 import { BetaLockGate } from "@/components/auth/BetaLockGate";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 // Eager load: landing page and layout
 import Index from "./pages/Index.tsx";
 import SentrySmokeTest from "./components/dev/SentrySmokeTest";
+import { CookieConsentBanner } from "@/components/cookies/CookieConsentBanner";
+import { initGA4IfConsented } from "@/lib/analytics/ga4";
+import { COOKIE_CONSENT_EVENT } from "@/lib/analytics/cookieConsentStorage";
 
 // Lazy load all other routes
 const SearchPage = lazy(() => import("./pages/SearchPage.tsx"));
@@ -62,7 +65,18 @@ const PageLoader = () => (
   </div>
 );
 
-const App = () => (
+const App = () => {
+  // Initialise GA4 once at mount (gated on consent + env var), and again
+  // every time the user updates their cookie preferences. The init helper is
+  // idempotent (sets window.__ga4Initialized).
+  useEffect(() => {
+    initGA4IfConsented();
+    const onConsentChange = () => initGA4IfConsented();
+    window.addEventListener(COOKIE_CONSENT_EVENT, onConsentChange);
+    return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onConsentChange);
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -113,10 +127,12 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BetaLockGate>
+          <CookieConsentBanner />
         </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
