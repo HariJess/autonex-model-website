@@ -231,7 +231,7 @@ const Index = () => {
   );
   const showDealsSection = !dealsLoading && discountedListings.length >= 3;
   const renderThematicSection = (title: string, subtitle: string, linksTo: string, items: typeof listings) => (
-    <section className="container mx-auto px-4 py-5 md:py-6">
+    <section className="container mx-auto py-5 md:py-6">
       <div className="flex items-start justify-between gap-3 mb-4 md:mb-5">
         <div className="min-w-0">
           <h3 className="font-serif text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
@@ -300,7 +300,7 @@ const Index = () => {
 
       <HeroSearch />
 
-      <section className="container mx-auto px-4 pt-10 md:pt-14">
+      <section className="container mx-auto pt-10 md:pt-14">
         <div className="rounded-2xl border border-border/80 bg-gradient-to-b from-slate-50/90 to-background px-3 py-4 md:px-6 md:py-5 shadow-[0_1px_3px_-1px_rgba(15,23,42,0.07)]">
           <div className="flex items-end justify-between gap-3">
             <div>
@@ -348,7 +348,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 pt-6 md:pt-8">
+      <section className="container mx-auto pt-6 md:pt-8">
         <div className="py-1 md:py-2">
           <div className="mt-1 flex items-end justify-between gap-3">
             <h2 className="font-serif text-xl md:text-[2rem] font-semibold">{t("home.popularBrands", "Marques populaires")}</h2>
@@ -403,7 +403,7 @@ const Index = () => {
       />
 
       {showDealsSection && (
-        <section className="container mx-auto px-4 pt-6 md:pt-8">
+        <section className="container mx-auto pt-6 md:pt-8">
           <div className="flex items-end justify-between gap-3 mb-4 md:mb-5">
             <div className="min-w-0">
               <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">
@@ -428,7 +428,7 @@ const Index = () => {
         </section>
       )}
 
-      <section className="container mx-auto px-4 py-6 md:py-8">
+      <section className="container mx-auto py-6 md:py-8">
         <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4 md:p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
@@ -451,7 +451,7 @@ const Index = () => {
       </section>
 
       {/* Recent feed — complementary to “À la une” */}
-      <section className="container mx-auto px-4 py-8 md:py-12">
+      <section className="container mx-auto py-8 md:py-12">
         <div className="flex items-start justify-between gap-3 mb-5 md:mb-8">
           <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">{t("sections.latest", "Nouvelles annonces auto")}</h2>
           <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline shrink-0 min-h-10 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
@@ -499,7 +499,7 @@ const Index = () => {
       )}
 
       {isLowInventory && themedSectionsToRender.length === 0 && (
-        <section className="container mx-auto px-4 py-5 md:py-6">
+        <section className="container mx-auto py-5 md:py-6">
           <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6">
             <h3 className="font-serif text-lg md:text-xl font-bold text-foreground">{t("home.marketStarting", "Le marché se lance")}</h3>
             <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">

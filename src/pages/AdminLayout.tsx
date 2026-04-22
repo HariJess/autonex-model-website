@@ -19,7 +19,7 @@ function AdminLayout() {
   return (
     <div className="min-h-screen bg-muted/20">
       <div className="border-b border-border bg-background">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="container mx-auto h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="font-serif text-lg font-bold">AutoNex Back-office</span>
             <span className="text-xs font-sans text-muted-foreground">Admin</span>
@@ -35,7 +35,7 @@ function AdminLayout() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+      <div className="container mx-auto py-6 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
         <aside className="rounded-2xl border border-border bg-card p-3 h-fit">
           <nav className="space-y-1">
             {navItems.map((item) => (

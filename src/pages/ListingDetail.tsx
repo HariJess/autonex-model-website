@@ -211,7 +211,7 @@ const ListingDetail = () => {
         </script>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-4 md:py-6 pb-32 lg:pb-6">
+      <div className="container mx-auto py-4 md:py-6 pb-32 lg:pb-6">
         <nav className="flex items-center gap-2 text-xs md:text-sm font-sans text-muted-foreground mb-4 md:mb-6 overflow-x-auto whitespace-nowrap">
           <Link to="/" className="hover:text-primary">
             {t("nav.home", "Accueil")}

@@ -103,7 +103,7 @@ export function FeaturedAgenciesSection({
 
   return (
     <section className="bg-secondary/40 py-14">
-      <div className="container mx-auto px-4">{inner}</div>
+      <div className="container mx-auto">{inner}</div>
     </section>
   );
 }

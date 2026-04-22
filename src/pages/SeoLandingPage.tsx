@@ -121,7 +121,7 @@ const SeoLandingPage = () => {
     return (
       <>
         <Header />
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto py-12">
           <PremiumStatePanel
             overline="AutoNex SEO"
             title="Page introuvable"
@@ -197,7 +197,7 @@ const SeoLandingPage = () => {
 
       <Header />
 
-      <div className="container mx-auto px-4 pt-4 pb-8">
+      <div className="container mx-auto pt-4 pb-8">
         <nav className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
           <Link to="/" className="hover:text-primary inline-flex items-center gap-1">
             <Home className="h-3 w-3" />

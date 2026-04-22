@@ -11,7 +11,7 @@ export function ListingDetailLoading() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto py-10">
         <PremiumStatePanel
           overline={t("listing.stateLoadingOverline", "AutoNex listing")}
           title={t("listing.stateLoadingTitle", "Opening this listing")}
@@ -37,7 +37,7 @@ export function ListingDetailFetchError({ onRetry }: ListingDetailFetchErrorProp
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto py-10">
         <PremiumStatePanel
           overline={t("listing.stateErrorOverline", "Listing")}
           title={t("listing.fetchErrorTitle", "Could not load this listing")}
@@ -80,7 +80,7 @@ export function ListingDetailNotFound() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto py-10">
         <PremiumStatePanel
           overline={t("listing.stateNotFoundOverline", "AutoNex catalogue")}
           title={t("listing.notFound", "Listing not found")}

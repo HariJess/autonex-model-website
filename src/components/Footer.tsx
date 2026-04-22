@@ -16,7 +16,7 @@ const Footer = () => {
 
   return (
     <footer className="border-t border-white/10" style={{ backgroundColor: "#061427", color: "#FAFAFA" }}>
-      <div className="container mx-auto px-4 py-12 md:py-16">
+      <div className="container mx-auto py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
           {/* Brand */}
           <div className="space-y-4">

@@ -889,7 +889,7 @@ const PublishPage = () => {
         </title>
       </Helmet>
       <Header />
-      <div className="container mx-auto max-w-6xl px-4 py-6 md:py-8 pb-36 sm:pb-8">
+      <div className="container mx-auto max-w-6xl py-6 md:py-8 pb-36 sm:pb-8">
         <PublishPageHeader
           moderationText={t(
             "publish.publishBannerInstant",

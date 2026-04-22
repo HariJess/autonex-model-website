@@ -44,7 +44,7 @@ export function LegalLayout({
         {jsonLd ? <script type="application/ld+json">{JSON.stringify(jsonLd)}</script> : null}
       </Helmet>
       <Header />
-      <main className="container mx-auto px-4 py-8 md:py-12">
+      <main className="container mx-auto py-8 md:py-12">
         <nav className="mb-6 flex flex-wrap gap-2 text-sm font-sans">
           {LEGAL_LINKS.map((link) => (
             <Link

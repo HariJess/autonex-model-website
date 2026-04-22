@@ -76,7 +76,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#061427]/95 backdrop-blur-md">
-      <div className="container mx-auto px-4 flex items-center justify-between h-[4rem] sm:h-[4.75rem]">
+      <div className="container mx-auto flex items-center justify-between h-[4rem] sm:h-[4.75rem]">
         <Link to="/" className="flex-shrink-0 min-h-11 flex items-center">
           <img src={logo} alt="AutoNex" className="h-11 sm:h-14 w-auto" />
         </Link>
@@ -215,7 +215,7 @@ const Header = () => {
 
       {menuOpen && (
         <div id="mobile-nav" className="lg:hidden border-t border-white/10 bg-[#061427]">
-          <div className="container mx-auto px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2.5">
+          <div className="container mx-auto pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2.5">
             <Link
               to={buyMode.href}
               onClick={() => setMenuOpen(false)}

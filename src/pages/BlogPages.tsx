@@ -32,7 +32,7 @@ const BlogList = () => {
         <link rel="canonical" href={canonical} />
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto py-6 md:py-8">
         <h1 className="font-serif text-3xl font-bold mb-6">{t("nav.advice")}</h1>
 
         {posts.length === 0 ? (
@@ -154,7 +154,7 @@ const BlogArticle = () => {
         )}
       </Helmet>
       <Header />
-      <article className="container mx-auto px-4 py-6 md:py-8 max-w-3xl">
+      <article className="container mx-auto py-6 md:py-8 max-w-3xl">
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
           <span>›</span>

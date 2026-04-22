@@ -13,7 +13,7 @@ export function PremiumBillboard({ className, enabled = true }: PremiumBillboard
   if (!enabled || !campaign) return null;
 
   return (
-    <section className={cn("container mx-auto px-4", className)}>
+    <section className={cn("container mx-auto", className)}>
       <div className="relative overflow-hidden rounded-3xl border border-border bg-card min-h-[140px] md:min-h-[180px] flex flex-col items-center justify-center text-center px-6 py-10 md:py-14 shadow-sm">
         <img
           src={campaign.image_url}

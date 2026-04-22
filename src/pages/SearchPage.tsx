@@ -510,7 +510,7 @@ const SearchPage = () => {
       </Helmet>
       <Header />
 
-      <div className="container mx-auto px-4 pt-3.5 md:pt-4 pb-2.5 md:pb-3">
+      <div className="container mx-auto pt-3.5 md:pt-4 pb-2.5 md:pb-3">
         <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3 md:px-5 md:py-3.5">
         <nav className="flex flex-wrap items-center gap-1.5 text-sm font-sans text-muted-foreground mb-2.5" aria-label="Breadcrumb">
           {breadcrumbs.map((bc, i) => (
@@ -565,7 +565,7 @@ const SearchPage = () => {
         </section>
       </div>
 
-      <div className="container mx-auto px-4 pb-8 md:pb-10">
+      <div className="container mx-auto pb-8 md:pb-10">
         <div className="flex gap-6 lg:gap-7">
           <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <FilterSidebar filters={filters} onFiltersChange={updateFilters} idPrefix="desktop" />

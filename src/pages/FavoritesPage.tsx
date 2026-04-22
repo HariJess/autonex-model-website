@@ -20,7 +20,7 @@ const FavoritesPage = () => {
       </Helmet>
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8 md:py-10">
+      <main className="flex-1 container mx-auto py-8 md:py-10">
         <section className="mb-6 md:mb-8">
           <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
             <Heart className="h-6 w-6 md:h-7 md:w-7 text-destructive fill-destructive" aria-hidden />

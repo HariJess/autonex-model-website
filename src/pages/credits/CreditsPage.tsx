@@ -29,7 +29,7 @@ const CreditsPage = () => {
         />
       </Helmet>
       <Header />
-      <main className="container mx-auto max-w-4xl px-4 py-8 space-y-6">
+      <main className="container mx-auto max-w-4xl py-8 space-y-6">
         <header className="space-y-2">
           <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
             {t("credits.pageOverline", "Espace crédits")}

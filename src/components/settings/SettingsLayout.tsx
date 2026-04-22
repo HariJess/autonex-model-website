@@ -52,7 +52,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
   );
 
   return (
-    <div className="container mx-auto px-4 py-6 md:py-10">
+    <div className="container mx-auto py-6 md:py-10">
       {/* Mobile: top bar with drawer trigger */}
       <div className="mb-4 flex items-center justify-between md:hidden">
         <h1 className="font-serif text-2xl font-bold">Paramètres</h1>

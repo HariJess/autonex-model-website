@@ -29,7 +29,7 @@ export function CookieConsentBanner() {
           aria-label="Bandeau de consentement cookies"
           className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/98 backdrop-blur-sm shadow-[0_-8px_24px_rgba(0,0,0,0.15)]"
         >
-          <div className="container mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="container mx-auto py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="max-w-3xl text-sm font-sans text-foreground">
               <p>
                 AutoNex utilise des cookies techniques nécessaires au service, ainsi que des cookies optionnels

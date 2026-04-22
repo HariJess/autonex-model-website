@@ -182,7 +182,7 @@ const PaiementRetourPage = () => {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <Header />
-      <main className="container mx-auto max-w-xl px-4 py-12 space-y-4">
+      <main className="container mx-auto max-w-xl py-12 space-y-4">
         <BetaPaymentBanner />
         <Card>
           <CardHeader className="text-center">

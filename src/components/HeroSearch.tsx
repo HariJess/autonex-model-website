@@ -218,7 +218,7 @@ const HeroSearch = () => {
       <div className="absolute inset-0 bg-[radial-gradient(1000px_420px_at_50%_-5%,rgba(255,255,255,0.14),transparent)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
 
-      <div className="relative container mx-auto px-4 text-center">
+      <div className="relative container mx-auto text-center">
         <h1
           className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight px-1"
           style={{ color: "#FAFAFA" }}

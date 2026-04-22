@@ -156,7 +156,7 @@ const AgencyProfile = () => {
         </script>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto py-6 md:py-8">
         {MONETIZATION_PLACEMENTS.agencyStrip && (
           <div className="mb-8">
             <BannerSlot

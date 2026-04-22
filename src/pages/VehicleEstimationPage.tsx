@@ -318,7 +318,7 @@ const VehicleEstimationPage = () => {
         <link rel="canonical" href={canonical} />
       </Helmet>
       <Header />
-      <main className="container mx-auto max-w-6xl px-4 py-7 md:py-14">
+      <main className="container mx-auto max-w-6xl py-7 md:py-14">
         <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-64 max-w-5xl bg-gradient-to-r from-primary/15 via-transparent to-primary/15 blur-3xl" />
         {screen === "landing" && (
           <section className="space-y-8 md:space-y-10">

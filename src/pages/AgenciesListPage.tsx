@@ -69,7 +69,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
         </Helmet>
       ) : null}
       <Header />
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto py-6 md:py-8">
         <h1 className="font-serif text-3xl font-bold mb-2">{title}</h1>
         <p className="text-sm md:text-base text-muted-foreground font-sans mb-6">
           Retrouvez nos partenaires officiels et les concessionnaires présents sur la plateforme.
