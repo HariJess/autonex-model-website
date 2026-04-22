@@ -97,7 +97,7 @@ export function CookieConsentModal({ open, onOpenChange, initial, onSave }: Cook
             return (
               <div
                 key={cat.id}
-                className="flex items-start justify-between gap-4 rounded-xl border border-border p-3"
+                className="flex items-start justify-between gap-4 rounded-xl border border-border p-4"
               >
                 <div className="min-w-0 flex-1 space-y-1">
                   <Label className="font-sans text-sm font-semibold">{cat.label}</Label>

@@ -243,7 +243,7 @@ const ListingDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2 space-y-6 md:space-y-8">
-            <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 p-4.5 md:p-6">
+            <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 p-5 md:p-6">
               <div className="flex flex-wrap items-center gap-2.5 mb-2">
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>
                   {transactionLabel}
@@ -401,7 +401,7 @@ const ListingDetail = () => {
             </div>
 
             {listingTrustProofs.length > 0 && (
-              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
                 <h2 className="font-serif text-xl font-bold">{t("listing.trustLayerTitle", "Pourquoi cette annonce inspire confiance")}</h2>
                 <p className="mt-1.5 text-sm font-sans text-muted-foreground">
                   {t("listing.trustLayerSubtitle", "Indicateurs utiles pour décider plus sereinement avant contact.")}
@@ -460,7 +460,7 @@ const ListingDetail = () => {
               )}
             </div>
             {vehicleSpecRows.length > 0 && (
-              <section className="rounded-2xl border border-border bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CarFront className="h-5 w-5 text-primary" />
                   <h2 className="font-serif text-xl font-bold">{t("listing.vehicleSpecs", "Fiche véhicule")}</h2>
@@ -486,14 +486,14 @@ const ListingDetail = () => {
             )}
 
             {listing.description && (
-              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.description")}</h2>
                 <p className="font-sans text-muted-foreground leading-relaxed whitespace-pre-line break-words">{listing.description}</p>
               </section>
             )}
 
             {allFeatureBadges.length > 0 && (
-              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
                 <div className="grid grid-cols-2 gap-2">
                   {visibleFeatureBadgesMobile.map((f) => (
@@ -603,7 +603,7 @@ const ListingDetail = () => {
             <div
               ref={contactSectionRef}
               id="listing-contact"
-              className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4.5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
+              className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
             >
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("listing.priorityContact", "Contact prioritaire")}</p>
               <div className="flex items-center gap-3">

@@ -167,7 +167,7 @@ export function MyAgencySection() {
 
       <CardContent className="space-y-5 font-sans">
         {statusBanner ? (
-          <div className={`rounded-xl border p-3 text-sm ${statusBanner.color}`}>
+          <div className={`rounded-xl border p-4 text-sm ${statusBanner.color}`}>
             {statusBanner.text}
           </div>
         ) : null}

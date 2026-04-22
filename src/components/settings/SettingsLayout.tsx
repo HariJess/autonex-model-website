@@ -73,7 +73,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 md:gap-10">
         {/* Desktop sidebar */}
         <aside className="hidden md:block">
-          <div className="sticky top-24 rounded-2xl border border-border bg-card p-3">
+          <div className="sticky top-24 rounded-2xl border border-border bg-card p-4">
             <p className="px-3 pt-1 pb-3 font-serif text-lg font-bold">Paramètres</p>
             {nav}
           </div>
