@@ -61,7 +61,7 @@ const FavoritesPage = () => {
               {t("favorites.empty.body")}
             </p>
             <div className="mt-5">
-              <Button asChild className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+              <Button asChild variant="hero" className="font-sans">
                 <Link to="/recherche">{t("favorites.empty.cta")}</Link>
               </Button>
             </div>

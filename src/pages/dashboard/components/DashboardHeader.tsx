@@ -21,7 +21,7 @@ export function DashboardHeader({
       </div>
       <div className="flex items-center gap-2">
         <Link to="/publier">
-          <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+          <Button variant="hero" className="font-sans">
             <Plus className="h-4 w-4 mr-2" /> {publishLabel}
           </Button>
         </Link>

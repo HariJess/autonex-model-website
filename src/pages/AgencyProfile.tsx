@@ -109,7 +109,7 @@ const AgencyProfile = () => {
           <h1 className="font-serif text-2xl font-bold mb-2">{t("agencies.notFound")}</h1>
           <p className="text-muted-foreground font-sans mb-6">{t("agencies.notFoundDesc")}</p>
           <Link to="/agences">
-            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>{t("agencies.viewAll")}</Button>
+            <Button variant="hero" className="font-sans">{t("agencies.viewAll")}</Button>
           </Link>
         </div>
         <Footer />

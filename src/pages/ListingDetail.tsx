@@ -689,7 +689,7 @@ const ListingDetail = () => {
                 <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans min-h-11" maxLength={255} />
                 <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans min-h-11" maxLength={30} />
                 <Textarea placeholder={t("listing.yourMessage", "Votre message...")} value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans min-h-24" rows={3} maxLength={1000} />
-                <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2" style={{ color: "#FAFAFA" }}>
+                <Button type="submit" disabled={sending} variant="hero" className="w-full font-sans focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
                   {sending ? t("common.loading") : t("listing.sendMessage", "Envoyer le message")}
                 </Button>
                 <p className="hidden sm:block text-[13px] font-sans text-muted-foreground leading-relaxed">

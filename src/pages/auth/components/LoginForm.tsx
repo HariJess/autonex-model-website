@@ -94,7 +94,7 @@ export function LoginForm({
         <Link to="/forgot-password" className="text-sm text-primary font-sans hover:underline block">
           {labels.forgotPassword}
         </Link>
-        <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
+        <Button type="submit" disabled={loading} variant="hero" className="w-full font-sans min-h-12 touch-manipulation">
           {loading ? labels.loading : labels.login}
         </Button>
       </form>

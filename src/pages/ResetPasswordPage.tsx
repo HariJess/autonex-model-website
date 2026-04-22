@@ -103,7 +103,7 @@ const ResetPasswordPage = () => {
                 />
               </div>
               {error && <p className="text-sm text-destructive font-sans">{error}</p>}
-              <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+              <Button type="submit" disabled={loading} variant="hero" className="w-full font-sans">
                 {loading ? t("auth.updating") : t("auth.updatePassword")}
               </Button>
             </form>

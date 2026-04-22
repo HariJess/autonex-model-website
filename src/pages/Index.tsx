@@ -439,7 +439,7 @@ const Index = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-2.5">
-              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+              <Button asChild variant="hero">
                 <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.launchEstimation", "Lancer l’estimation")}</Link>
               </Button>
               <Button asChild variant="outline">
@@ -476,7 +476,7 @@ const Index = () => {
             description={t("home.noListingsDesc", "Découvrez déjà la recherche et nos catégories, puis lancez votre première annonce pour activer le marché.")}
             action={
               <div className="flex flex-wrap justify-center gap-2.5">
-                <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+                <Button asChild variant="hero">
                   <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.publishVehicle", "Publier mon véhicule")}</Link>
                 </Button>
                 <Button asChild variant="outline">
@@ -506,7 +506,7 @@ const Index = () => {
               {t("home.lowInventoryDesc", "L’inventaire est encore limité. Publiez votre véhicule ou explorez les recherches pour suivre les nouvelles annonces.")}
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
-              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+              <Button asChild variant="hero">
                 <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.publishVehicle", "Publier mon véhicule")}</Link>
               </Button>
               <Button asChild variant="outline">

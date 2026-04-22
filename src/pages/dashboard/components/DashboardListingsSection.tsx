@@ -157,7 +157,7 @@ export function DashboardListingsSection({
           <CarFront className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground font-sans mb-4">{labels.noListings}</p>
           <Link to="/publier">
-            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+            <Button variant="hero" className="font-sans">
               {labels.publish}
             </Button>
           </Link>
