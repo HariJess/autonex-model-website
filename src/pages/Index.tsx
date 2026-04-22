@@ -348,16 +348,16 @@ const Index = () => {
               ))}
             </div>
 
-            {/* Desktop: grid 5 colonnes (comportement actuel) */}
-            <div className="hidden md:grid md:grid-cols-5 gap-3">
+            {/* Desktop: grid 5 colonnes centrée et compacte */}
+            <div className="hidden md:grid md:grid-cols-5 gap-3 max-w-3xl mx-auto">
               {heroCategoryShortcuts.map((shortcut) => (
                 <Link
                   key={shortcut.key}
                   to={shortcut.to}
-                  className="group rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3.5 min-h-[104px] flex flex-col items-center justify-center gap-3 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 hover:-translate-y-px hover:border-slate-300/95 hover:from-blue-50/85 hover:to-slate-50 hover:shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                  className="group rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-4 min-h-[120px] flex flex-col items-center justify-center gap-2.5 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 hover:-translate-y-px hover:border-slate-300/95 hover:from-blue-50/85 hover:to-slate-50 hover:shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
                 >
                   <span
-                    className="flex h-[3.75rem] w-[4.75rem] shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                    className="flex h-12 w-16 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
                     aria-hidden="true"
                   >
                     <img
@@ -365,7 +365,7 @@ const Index = () => {
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      className="h-10 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                      className="h-8 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
                       onError={(event) => {
                         const target = event.currentTarget;
                         if (!target.dataset.fallbackApplied) {
@@ -375,7 +375,7 @@ const Index = () => {
                       }}
                     />
                   </span>
-                  <span className="font-serif text-base text-foreground leading-tight">{shortcut.label}</span>
+                  <span className="font-serif text-sm text-foreground leading-tight">{shortcut.label}</span>
                 </Link>
               ))}
             </div>
@@ -383,9 +383,10 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="container mx-auto pt-6 md:pt-8">
-        <div className="py-1 md:py-2">
-          <div className="mt-1 flex items-end justify-between gap-3">
+      <section className="pt-6 md:pt-10">
+        {/* Header aligné container */}
+        <div className="container mx-auto">
+          <div className="flex items-end justify-between gap-3">
             <h2 className="font-serif text-xl md:text-[2rem] font-semibold">{t("home.popularBrands", "Marques populaires")}</h2>
             <Link
               to="/recherche"
@@ -394,17 +395,18 @@ const Index = () => {
               {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
+        </div>
 
-          <div className="mt-6 relative">
-            <div className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+        {/* Ruban full-bleed avec auto-scroll desktop + scroll manuel mobile */}
+        <div className="mt-5 md:mt-6 py-5 md:py-6 bg-white border-y border-border/50 overflow-hidden">
+          {/* Mobile: scroll manuel */}
+          <div className="md:hidden container mx-auto">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-4 px-4">
               {popularBrands.map((brand) => (
                 <Link
-                  key={brand.id}
+                  key={`mobile-${brand.id}`}
                   to={brand.href}
-                  className={cn(
-                    "group snap-start shrink-0 rounded-lg px-3 py-3 min-h-[104px] md:min-h-[112px] w-[112px] md:w-[128px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[3px] hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
-                    brand.wrapperClassName,
-                  )}
+                  className="group snap-start shrink-0 rounded-lg px-3 py-3 min-h-[104px] w-[112px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
                   aria-label={`Voir les annonces ${brand.label}`}
                 >
                   {brand.logoAsset ? (
@@ -413,10 +415,7 @@ const Index = () => {
                       alt={`Logo ${brand.label}`}
                       loading="lazy"
                       decoding="async"
-                      className={cn(
-                        "h-10 md:h-11 w-auto max-w-[96px] md:max-w-[112px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity",
-                        brand.logoClassName,
-                      )}
+                      className="h-10 w-auto max-w-[96px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
                     />
                   ) : (
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background text-xs font-semibold tracking-wide text-foreground/85">
@@ -424,6 +423,42 @@ const Index = () => {
                     </span>
                   )}
                   <span className="font-sans text-xs font-medium tracking-[0.01em] text-foreground/75 truncate max-w-full">
+                    {brand.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: auto-scroll infini avec pause au hover */}
+          <div className="hidden md:block group">
+            <div
+              className="flex gap-10 w-max animate-scroll-x group-hover:[animation-play-state:paused]"
+              aria-label="Défilement des marques populaires"
+            >
+              {/* Items dupliqués x2 pour boucle infinie fluide */}
+              {[...popularBrands, ...popularBrands].map((brand, idx) => (
+                <Link
+                  key={`desktop-${brand.id}-${idx}`}
+                  to={brand.href}
+                  className="shrink-0 rounded-lg px-4 py-3 flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[2px] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[144px]"
+                  aria-label={`Voir les annonces ${brand.label}`}
+                  {...(idx >= popularBrands.length ? { "aria-hidden": "true", tabIndex: -1 } : {})}
+                >
+                  {brand.logoAsset ? (
+                    <img
+                      src={brand.logoAsset}
+                      alt={idx >= popularBrands.length ? "" : `Logo ${brand.label}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-12 w-auto max-w-[120px] object-contain opacity-90 hover:opacity-100 motion-safe:transition-opacity"
+                    />
+                  ) : (
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-background text-sm font-semibold tracking-wide text-foreground/85">
+                      {brand.label.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="font-sans text-xs font-medium tracking-[0.01em] text-foreground/75">
                     {brand.label}
                   </span>
                 </Link>
@@ -466,7 +501,7 @@ const Index = () => {
       )}
 
       <section className="container mx-auto py-6 md:py-8">
-        <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4 md:p-6">
+        <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-card via-card to-primary/[0.06] p-5 md:p-7 shadow-[0_2px_20px_-12px_rgba(18,86,202,0.25)]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.estimationOverline", "Différenciateur AutoNex")}</p>

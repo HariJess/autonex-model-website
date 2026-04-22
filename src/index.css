@@ -196,6 +196,22 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  @keyframes scroll-x-infinite {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-scroll-x {
+    animation: scroll-x-infinite 25s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-scroll-x {
+      animation: none;
+    }
+  }
   .gradient-text {
     background: linear-gradient(135deg, #1256ca, #3f7fe2);
     -webkit-background-clip: text;
