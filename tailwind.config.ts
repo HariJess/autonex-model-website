@@ -72,6 +72,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        navbar: {
+          DEFAULT: "hsl(var(--navbar-bg))",
+          foreground: "hsl(var(--navbar-fg))",
+          accent: "hsl(var(--navbar-accent))",
+        },
+        "on-dark": {
+          DEFAULT: "hsl(var(--on-dark-surface-fg))",
+          muted: "hsl(var(--on-dark-surface-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
