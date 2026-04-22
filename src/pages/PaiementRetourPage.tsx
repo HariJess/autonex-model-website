@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -6,7 +7,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BetaPaymentBanner } from "@/components/payments/BetaPaymentBanner";
 import { usePollingStatus } from "@/hooks/payments/useVpiCheckStatus";
+import { captureVpiMessage } from "@/lib/monitoring";
 
 /**
  * Route: /paiement/retour?tx=<uuid>
@@ -23,6 +26,17 @@ const PaiementRetourPage = () => {
   const txId = searchParams.get("tx");
 
   const { status, isLoading, error, isTimedOut, isTerminal } = usePollingStatus(txId);
+
+  // Track anomalous arrivals (bug in redirect URL, email share of the URL, etc.).
+  useEffect(() => {
+    if (!txId) {
+      captureVpiMessage(
+        "VPI return page without tx_id",
+        "warning",
+        "return_missing_tx",
+      );
+    }
+  }, [txId]);
 
   const goToCredits = () => navigate("/credits");
   const goToDashboard = () => navigate("/dashboard");
@@ -168,7 +182,8 @@ const PaiementRetourPage = () => {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <Header />
-      <main className="container mx-auto max-w-xl px-4 py-12">
+      <main className="container mx-auto max-w-xl px-4 py-12 space-y-4">
+        <BetaPaymentBanner />
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="font-serif text-xl text-foreground">

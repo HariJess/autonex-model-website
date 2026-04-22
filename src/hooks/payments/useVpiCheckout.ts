@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { captureVpiError } from "@/lib/monitoring";
 
 export type VpiPaymentMode = "mobile_money" | "international";
 
@@ -64,6 +65,17 @@ export function useVpiCheckout() {
         throw new Error(payload?.error ?? "initiate_failed");
       }
       return payload as VpiCheckoutSuccess;
+    },
+    onError: (err, variables) => {
+      captureVpiError(
+        err,
+        "initiate",
+        { payment_mode: variables.paymentMode },
+        {
+          credit_pack_id: variables.creditPackId,
+          promo_code_used: !!variables.promoCode,
+        },
+      );
     },
   });
 }

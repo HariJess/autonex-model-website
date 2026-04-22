@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CreditsBalanceHero } from "@/pages/credits/components/CreditsBalanceHero";
 import { CreditsPurchaseFlow } from "@/components/credits/CreditsPurchaseFlow";
+import { BetaPaymentBanner } from "@/components/payments/BetaPaymentBanner";
 
 /**
  * Dedicated /credits route — auth-gated.
@@ -43,6 +44,8 @@ const CreditsPage = () => {
             )}
           </p>
         </header>
+
+        <BetaPaymentBanner />
 
         <CreditsBalanceHero />
 

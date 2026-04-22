@@ -497,6 +497,9 @@
     "vanilla": {
       "amountCapExceeded": "The amount exceeds the beta cap. Please choose a smaller pack.",
       "backToDashboardButton": "Back to dashboard",
+      "betaBannerDismiss": "Dismiss",
+      "betaBannerLabel": "Beta payment banner",
+      "betaBannerText": "Vanilla Pay payments are in beta. If you experience issues, please contact support.",
       "cardButton": "Bank card (Visa, Mastercard)",
       "checkingStatus": "Verifying...",
       "contactSupport": "Contact support",

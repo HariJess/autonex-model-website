@@ -45,3 +45,42 @@ export function captureReactError(error: Error, componentStack: string): void {
   if (!isInitialized) return;
   Sentry.captureException(error, { contexts: { react: { componentStack } } });
 }
+
+/**
+ * VPI-scoped exception capture. Auto-tags with `feature=vpi` + caller-provided
+ * `action` so events can be filtered by the payment funnel step (initiate,
+ * check_status_fetch, webhook, etc.). No-op when Sentry is not initialised.
+ *
+ * PII policy: never pass email, JWT, or user UUID in tags/extras. Internal
+ * identifiers like transaction_id or credit_pack_id are fine.
+ */
+export function captureVpiError(
+  err: unknown,
+  action: string,
+  tags: Record<string, string> = {},
+  extra: Record<string, unknown> = {},
+): void {
+  if (!isInitialized) return;
+  Sentry.captureException(err, {
+    tags: { feature: "vpi", action, ...tags },
+    extra,
+  });
+}
+
+/**
+ * VPI-scoped structured message capture (for non-exception events such as
+ * polling timeouts or unusual entry paths). Same PII policy as captureVpiError.
+ */
+export function captureVpiMessage(
+  message: string,
+  level: "warning" | "info",
+  action: string,
+  extra: Record<string, unknown> = {},
+): void {
+  if (!isInitialized) return;
+  Sentry.captureMessage(message, {
+    level,
+    tags: { feature: "vpi", action },
+    extra,
+  });
+}

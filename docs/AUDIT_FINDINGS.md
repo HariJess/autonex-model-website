@@ -198,4 +198,9 @@ Nécessite un projet Supabase de test dédié (ou docker-compose local).
 
 - 🟢 **Alignement spec ↔ code sur `vpi-check-status` response** (basse priorité) : le mega-prompt smoke test P.2 Étape 8.4 attendait un champ `source: "db_terminal"` dans la réponse JSON, mais le code actuel retourne `terminal: boolean` à la place. Le comportement métier est strictement équivalent. À décider : renommer `terminal` → `source` au prochain commit de `vpi-check-status`, ou mettre à jour la doc/spec pour refléter le champ actuel. Soft preference pour conserver `terminal` (déjà largement référencé dans les tests smoke).
 
+- 🟡 **Post-P.5 (après 7 jours stabilité VPI) — étendre Sentry VPI analytics** : l'instrumentation de base (`captureVpiError` / `captureVpiMessage` dans `src/lib/monitoring.ts`) a été ajoutée en P.4.B, avec tags `feature=vpi` + `action=initiate|check_status_fetch|check_status_timeout|return_missing_tx`. Actions à câbler une fois les volumes prod réels connus :
+  - Dashboard Sentry dédié filtré sur `feature=vpi`
+  - Alertes Slack/email sur seuils (ex: >10 erreurs `initiate`/h, >5 `check_status_timeout`/h, tout `webhook_rpc_failure` côté backend log)
+  - Calibrer les seuils après 7 jours d'observation pour éviter le bruit
+
 - `Toaster` ET `Sonner` sont tous deux montés dans App.tsx — consolider

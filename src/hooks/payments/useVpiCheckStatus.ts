@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invokeEdgeFunctionGet } from "@/lib/supabase/invokeEdgeFunctionGet";
+import { captureVpiError, captureVpiMessage } from "@/lib/monitoring";
 
 export type VpiTxStatus = "pending" | "approved" | "failed" | "rejected" | "cancelled";
 
@@ -60,6 +61,41 @@ export function useVpiCheckStatus(txId: string | null, opts?: { timeoutMs?: numb
   });
 
   const isTerminal = !!query.data?.terminal;
+
+  // Fire-once Sentry report when the polling window elapses without a terminal state.
+  const timeoutReportedRef = useRef(false);
+  useEffect(() => {
+    if (!txId) {
+      timeoutReportedRef.current = false;
+      return;
+    }
+  }, [txId]);
+  useEffect(() => {
+    if (isTimedOut && !isTerminal && !timeoutReportedRef.current) {
+      timeoutReportedRef.current = true;
+      captureVpiMessage(
+        "VPI polling timeout",
+        "warning",
+        "check_status_timeout",
+        { tx_id: txId, elapsed_ms: timeoutMs },
+      );
+    }
+    if (!isTimedOut) {
+      timeoutReportedRef.current = false;
+    }
+  }, [isTimedOut, isTerminal, txId, timeoutMs]);
+
+  // Report query errors (network or HTTP non-200) with tx_id for correlation.
+  useEffect(() => {
+    if (query.isError && query.error) {
+      captureVpiError(
+        query.error,
+        "check_status_fetch",
+        {},
+        { tx_id: txId ?? "" },
+      );
+    }
+  }, [query.isError, query.error, txId]);
 
   return {
     ...query,

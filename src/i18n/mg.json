@@ -497,6 +497,9 @@
     "vanilla": {
       "amountCapExceeded": "Mihoatra ny fetra amin'ny beta ny totalim-bola. Safidio pack (kitapo) kelikely kokoa.",
       "backToDashboardButton": "Hiverina amin'ny tableau de bord",
+      "betaBannerDismiss": "Afenina",
+      "betaBannerLabel": "Bannière beta fandoavam-bola",
+      "betaBannerText": "Mbola andrana (beta) ny fandoavam-bola amin'ny Vanilla Pay. Raha misy olana, mifandraisa amin'ny support.",
       "cardButton": "Karatra bank (Visa, Mastercard)",
       "checkingStatus": "Mijerena...",
       "contactSupport": "Mifandraisa amin'ny support",
