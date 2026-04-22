@@ -10,6 +10,7 @@ import { ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
+import BrandsRibbon from "@/components/BrandsRibbon";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
@@ -301,7 +302,7 @@ const Index = () => {
       <HeroSearch />
 
       <section className="container mx-auto pt-10 md:pt-14">
-        <div className="rounded-2xl border border-border/80 bg-gradient-to-b from-slate-50/90 to-background px-3 py-4 md:px-6 md:py-5 shadow-[0_1px_3px_-1px_rgba(15,23,42,0.07)]">
+        <div className="rounded-2xl border border-border/80 bg-gradient-to-b from-slate-50/90 to-background px-3 py-4 md:px-6 md:py-5 shadow-[0_1px_3px_-1px_rgba(15,23,42,0.07)] max-w-4xl mx-auto">
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.quickExplore", "Explorer rapidement")}</p>
@@ -349,7 +350,7 @@ const Index = () => {
             </div>
 
             {/* Desktop: grid 5 colonnes centrée et compacte */}
-            <div className="hidden md:grid md:grid-cols-5 gap-3 max-w-3xl mx-auto">
+            <div className="hidden md:grid md:grid-cols-5 gap-3">
               {heroCategoryShortcuts.map((shortcut) => (
                 <Link
                   key={shortcut.key}
@@ -430,40 +431,9 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Desktop: auto-scroll infini avec pause au hover */}
-          <div className="hidden md:block group">
-            <div
-              className="flex gap-10 w-max animate-scroll-x group-hover:[animation-play-state:paused]"
-              aria-label="Défilement des marques populaires"
-            >
-              {/* Items dupliqués x2 pour boucle infinie fluide */}
-              {[...popularBrands, ...popularBrands].map((brand, idx) => (
-                <Link
-                  key={`desktop-${brand.id}-${idx}`}
-                  to={brand.href}
-                  className="shrink-0 rounded-lg px-4 py-3 flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[2px] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[144px]"
-                  aria-label={`Voir les annonces ${brand.label}`}
-                  {...(idx >= popularBrands.length ? { "aria-hidden": "true", tabIndex: -1 } : {})}
-                >
-                  {brand.logoAsset ? (
-                    <img
-                      src={brand.logoAsset}
-                      alt={idx >= popularBrands.length ? "" : `Logo ${brand.label}`}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-12 w-auto max-w-[120px] object-contain opacity-90 hover:opacity-100 motion-safe:transition-opacity"
-                    />
-                  ) : (
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-background text-sm font-semibold tracking-wide text-foreground/85">
-                      {brand.label.slice(0, 2).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="font-sans text-xs font-medium tracking-[0.01em] text-foreground/75">
-                    {brand.label}
-                  </span>
-                </Link>
-              ))}
-            </div>
+          {/* Desktop: composant interactif pro */}
+          <div className="hidden md:block">
+            <BrandsRibbon brands={popularBrands} />
           </div>
         </div>
       </section>
