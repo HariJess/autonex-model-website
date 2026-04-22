@@ -189,7 +189,7 @@ const AgencyProfile = () => {
               {partnerDealer && <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>}
             </div>
             {displayLocation && <p className="text-sm font-sans text-muted-foreground mt-2">📍 {displayLocation}</p>}
-            <p className="text-muted-foreground font-sans mt-2">{displayBio || t("agencies.noDescription")}</p>
+            <p className="text-muted-foreground font-sans mt-2 break-words">{displayBio || t("agencies.noDescription")}</p>
             {displayPhone && <p className="text-sm font-sans text-muted-foreground mt-2">📞 {displayPhone}</p>}
             {agency?.email && <p className="text-sm font-sans text-muted-foreground">✉️ {agency.email}</p>}
             {partnerDealer && (
@@ -219,7 +219,7 @@ const AgencyProfile = () => {
         {agency?.description_long ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
             <h2 className="font-serif text-lg font-bold mb-2">À propos</h2>
-            <p className="font-sans text-sm text-muted-foreground whitespace-pre-wrap">
+            <p className="font-sans text-sm text-muted-foreground whitespace-pre-wrap break-words">
               {agency.description_long}
             </p>
           </section>

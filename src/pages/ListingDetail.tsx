@@ -281,7 +281,7 @@ const ListingDetail = () => {
                 )}
               </div>
               <div className="flex items-center justify-between gap-3">
-                <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground">{displayTitle}</h1>
+                <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground break-words">{displayTitle}</h1>
                 <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0" />
               </div>
               {vehicleSummary && (
@@ -488,7 +488,7 @@ const ListingDetail = () => {
             {listing.description && (
               <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.description")}</h2>
-                <p className="font-sans text-muted-foreground leading-relaxed whitespace-pre-line">{listing.description}</p>
+                <p className="font-sans text-muted-foreground leading-relaxed whitespace-pre-line break-words">{listing.description}</p>
               </section>
             )}
 

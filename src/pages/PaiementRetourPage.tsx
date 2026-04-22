@@ -199,9 +199,7 @@ const PaiementRetourPage = () => {
           {renderBody()}
         </Card>
       </main>
-      <div className="hidden sm:block">
-        <Footer />
-      </div>
+      <Footer />
     </>
   );
 };

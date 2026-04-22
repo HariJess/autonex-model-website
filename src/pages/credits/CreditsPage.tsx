@@ -56,9 +56,7 @@ const CreditsPage = () => {
           <CreditsPurchaseFlow variant="standalone" />
         </section>
       </main>
-      <div className="hidden sm:block">
-        <Footer />
-      </div>
+      <Footer />
     </>
   );
 };

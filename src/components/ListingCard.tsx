@@ -215,7 +215,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               {displayBrandAsset.label.charAt(0).toUpperCase()}
             </span>
           ) : null}
-          <h3 className={`flex-1 font-serif text-foreground leading-snug line-clamp-2 ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>
+          <h3 className={`flex-1 font-serif text-foreground leading-snug line-clamp-2 break-words ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>
             {displayTitle}
           </h3>
         </div>
