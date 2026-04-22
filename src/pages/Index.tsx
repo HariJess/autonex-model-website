@@ -315,35 +315,70 @@ const Index = () => {
             </Link>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
-            {heroCategoryShortcuts.map((shortcut) => (
-              <Link
-                key={shortcut.key}
-                to={shortcut.to}
-                className="group rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 md:py-3.5 min-h-[96px] md:min-h-[104px] flex flex-col items-center justify-center gap-2.5 md:gap-3 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 hover:-translate-y-px hover:border-slate-300/95 hover:from-blue-50/85 hover:to-slate-50 hover:shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
-              >
-                <span
-                  className="flex h-14 w-[4.25rem] md:h-[3.75rem] md:w-[4.75rem] shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
-                  aria-hidden="true"
+          <div className="mt-4">
+            {/* Mobile: bandeau horizontal scrollable */}
+            <div className="md:hidden flex gap-2.5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
+              {heroCategoryShortcuts.map((shortcut) => (
+                <Link
+                  key={shortcut.key}
+                  to={shortcut.to}
+                  className="group snap-start shrink-0 rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 min-h-[88px] w-[104px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
                 >
-                  <img
-                    src={shortcut.iconSrc}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    className="h-9 md:h-10 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
-                    onError={(event) => {
-                      const target = event.currentTarget;
-                      if (!target.dataset.fallbackApplied) {
-                        target.dataset.fallbackApplied = "1";
-                        target.src = "/category-icons/category-citadine.svg";
-                      }
-                    }}
-                  />
-                </span>
-                <span className="font-serif text-sm md:text-base text-foreground leading-tight">{shortcut.label}</span>
-              </Link>
-            ))}
+                  <span
+                    className="flex h-10 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                    aria-hidden="true"
+                  >
+                    <img
+                      src={shortcut.iconSrc}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-7 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                      onError={(event) => {
+                        const target = event.currentTarget;
+                        if (!target.dataset.fallbackApplied) {
+                          target.dataset.fallbackApplied = "1";
+                          target.src = "/category-icons/category-citadine.svg";
+                        }
+                      }}
+                    />
+                  </span>
+                  <span className="font-serif text-xs text-foreground leading-tight">{shortcut.label}</span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Desktop: grid 5 colonnes (comportement actuel) */}
+            <div className="hidden md:grid md:grid-cols-5 gap-3">
+              {heroCategoryShortcuts.map((shortcut) => (
+                <Link
+                  key={shortcut.key}
+                  to={shortcut.to}
+                  className="group rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3.5 min-h-[104px] flex flex-col items-center justify-center gap-3 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 hover:-translate-y-px hover:border-slate-300/95 hover:from-blue-50/85 hover:to-slate-50 hover:shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                >
+                  <span
+                    className="flex h-[3.75rem] w-[4.75rem] shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                    aria-hidden="true"
+                  >
+                    <img
+                      src={shortcut.iconSrc}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-10 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                      onError={(event) => {
+                        const target = event.currentTarget;
+                        if (!target.dataset.fallbackApplied) {
+                          target.dataset.fallbackApplied = "1";
+                          target.src = "/category-icons/category-citadine.svg";
+                        }
+                      }}
+                    />
+                  </span>
+                  <span className="font-serif text-base text-foreground leading-tight">{shortcut.label}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -360,38 +395,40 @@ const Index = () => {
             </Link>
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-5 md:gap-x-6 md:gap-y-6">
-            {popularBrands.map((brand) => (
-              <Link
-                key={brand.id}
-                to={brand.href}
-                className={cn(
-                  "group rounded-lg px-3 py-3.5 min-h-[132px] w-[144px] md:min-h-[148px] md:w-[168px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[3px] hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
-                  brand.wrapperClassName,
-                )}
-                aria-label={`Voir les annonces ${brand.label}`}
-              >
-                {brand.logoAsset ? (
-                  <img
-                    src={brand.logoAsset}
-                    alt={`Logo ${brand.label}`}
-                    loading="lazy"
-                    decoding="async"
-                    className={cn(
-                      "h-[3.1rem] md:h-[3.35rem] w-auto max-w-[168px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity",
-                      brand.logoClassName,
-                    )}
-                  />
-                ) : (
-                  <span className="inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border/60 bg-background text-xs font-semibold tracking-wide text-foreground/85">
-                    {brand.label.slice(0, 2).toUpperCase()}
+          <div className="mt-6 relative">
+            <div className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+              {popularBrands.map((brand) => (
+                <Link
+                  key={brand.id}
+                  to={brand.href}
+                  className={cn(
+                    "group snap-start shrink-0 rounded-lg px-3 py-3 min-h-[104px] md:min-h-[112px] w-[112px] md:w-[128px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[3px] hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
+                    brand.wrapperClassName,
+                  )}
+                  aria-label={`Voir les annonces ${brand.label}`}
+                >
+                  {brand.logoAsset ? (
+                    <img
+                      src={brand.logoAsset}
+                      alt={`Logo ${brand.label}`}
+                      loading="lazy"
+                      decoding="async"
+                      className={cn(
+                        "h-10 md:h-11 w-auto max-w-[96px] md:max-w-[112px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity",
+                        brand.logoClassName,
+                      )}
+                    />
+                  ) : (
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background text-xs font-semibold tracking-wide text-foreground/85">
+                      {brand.label.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="font-sans text-xs font-medium tracking-[0.01em] text-foreground/75 truncate max-w-full">
+                    {brand.label}
                   </span>
-                )}
-                <span className="font-sans text-[13px] md:text-xs font-medium tracking-[0.01em] text-foreground/75">
-                  {brand.label}
-                </span>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>

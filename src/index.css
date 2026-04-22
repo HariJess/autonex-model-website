@@ -188,6 +188,14 @@
       hsl(var(--estimation-active-to))
     );
   }
+  /* Masquer les scrollbars (bandeaux horizontaux mobile) */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
   .gradient-text {
     background: linear-gradient(135deg, #1256ca, #3f7fe2);
     -webkit-background-clip: text;
