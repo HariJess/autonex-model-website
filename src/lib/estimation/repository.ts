@@ -10,40 +10,45 @@ export { mapEstimationRpcError, type EstimationRpcErrorCode } from "@/lib/estima
 
 export async function createVehicleEstimationRequest(
   input: EstimationInput,
-  userId: string | null,
+  // NOTE: userId parameter kept for backward compatibility with callers, but
+  // now ignored: the RPC reads auth.uid() server-side to prevent spoofing.
+  // Anon users get user_id=NULL, authenticated users get user_id=auth.uid().
+  _userId: string | null,
 ): Promise<VehicleEstimationRequestCreated> {
-  const payload = {
-    user_id: userId,
-    make_id: input.makeId ?? null,
-    model_id: input.modelId ?? null,
-    make_name_snapshot: input.makeName,
-    model_name_snapshot: input.modelName,
-    year: input.year,
-    city: input.city,
-    mileage: input.mileage,
-    fuel_type: input.fuelType,
-    transmission_type: input.transmissionType,
-    body_type: input.bodyType,
-    condition_label: input.conditionLabel,
-    accident_declared: input.accidentDeclared,
-    maintenance_level: input.maintenanceLevel,
-    owner_count_label: input.ownerCountLabel,
-    usage_type: input.usageType,
-    raw_payload: toSupabaseJson(input),
-  };
-
   const { data, error } = await supabase
-    .from("vehicle_estimation_requests")
-    .insert(payload)
-    .select("id, submission_secret")
+    .rpc("create_vehicle_estimation_request", {
+      p_make_name_snapshot: input.makeName,
+      p_model_name_snapshot: input.modelName,
+      p_year: input.year,
+      p_city: input.city,
+      p_mileage: input.mileage,
+      p_fuel_type: input.fuelType,
+      p_transmission_type: input.transmissionType,
+      p_body_type: input.bodyType,
+      p_condition_label: input.conditionLabel,
+      p_accident_declared: input.accidentDeclared,
+      p_maintenance_level: input.maintenanceLevel,
+      p_owner_count_label: input.ownerCountLabel,
+      p_usage_type: input.usageType,
+      p_raw_payload: toSupabaseJson(input) as never,
+      p_make_id: input.makeId ?? null,
+      p_model_id: input.modelId ?? null,
+    })
     .single();
 
   if (error) {
     throw EstimationAppError.fromSupabaseLike(error, "create_request");
   }
-  const row = data as { id: string; submission_secret: string };
+  const row = data as { request_id: string; submission_secret: string } | null;
+  if (!row) {
+    throw new EstimationAppError(
+      "Réponse vide du serveur lors de la création de l'estimation.",
+      "create_request",
+      "unexpected_response",
+    );
+  }
   return {
-    requestId: String(row.id),
+    requestId: String(row.request_id),
     submissionSecret: String(row.submission_secret),
   };
 }
