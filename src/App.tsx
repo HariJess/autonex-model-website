@@ -38,6 +38,7 @@ const AdminAgencyDetailPage = lazy(() => import("./pages/AdminAgencyDetailPage.t
 const AdminModerationPage = lazy(() => import("./pages/AdminModerationPage.tsx"));
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const CreditsPage = lazy(() => import("./pages/credits/CreditsPage.tsx"));
+const PaiementRetourPage = lazy(() => import("./pages/PaiementRetourPage.tsx"));
 const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
 const ConcessionnairesIndexPage = lazy(() => import("./pages/ConcessionnairesIndexPage.tsx"));
@@ -126,6 +127,7 @@ const App = () => {
             </Route>
             <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
             <Route path="/credits" element={<ProtectedRoute><CreditsPage /></ProtectedRoute>} />
+            <Route path="/paiement/retour" element={<ProtectedRoute><PaiementRetourPage /></ProtectedRoute>} />
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/concessionnaires/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />

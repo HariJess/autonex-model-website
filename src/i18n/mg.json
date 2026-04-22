@@ -493,6 +493,34 @@
     "settings": "Paramètres",
     "signup": "Inscription"
   },
+  "payment": {
+    "vanilla": {
+      "amountCapExceeded": "Mihoatra ny fetra amin'ny beta ny totalim-bola. Safidio pack (kitapo) kelikely kokoa.",
+      "backToDashboardButton": "Hiverina amin'ny tableau de bord",
+      "cardButton": "Karatra bank (Visa, Mastercard)",
+      "checkingStatus": "Mijerena...",
+      "contactSupport": "Mifandraisa amin'ny support",
+      "failureHeading": "Tsy tanteraka ny fandoavana",
+      "failureMessage": "Tsy afaka vita ny fandoavam-bolanao. Tsy nisy naka vola.",
+      "initiateFailed": "Tsy afaka nanomboka ny fandoavam-bola. Andramo indray.",
+      "missingTxId": "Tsy hita ny référence amin'ny transaction. Miverena amin'ny pejin'ny crédit.",
+      "mobileMoneyButton": "Mobile Money (MVola, Orange, Airtel)",
+      "pendingHeading": "Mbola mitranga ny fandoavam-bola",
+      "pendingMessage": "Andalam-pikarakarana ny fandoavam-bolanao. Hanavao ho azy ity pejy ity.",
+      "pollingTimeout": "Lany ny fe-potoana fanamarinana. Raha voamarina ny fandoavam-bolanao, ho hita ao anatin'ny minitra vitsy ny crédit. Jereo ny tantara ao amin'ny /credits.",
+      "processingPayment": "Manomboka ny fandoavam-bola...",
+      "retryButton": "Andramo indray",
+      "returnPageIntro": "Mijerena ny toetry ny fandoavam-bolanao...",
+      "returnPageTitle": "Valim-pandoavam-bola",
+      "sectionSubtitle": "Aloavy haingana amin'ny alalan'ny Mobile Money na ny karatra bank",
+      "sectionTitle": "Fandoavam-bola haingana",
+      "sessionExpired": "Efa lany ny fotoana. Midira indray mba handoavana.",
+      "successHeading": "Voamarina ny fandoavana",
+      "successMessage": "Nampiana ao amin'ny kaontinao ny crédit {{credits}}.",
+      "unexpectedError": "Nisy olana tsy nampoizina. Andramo indray afaka kelikely.",
+      "viewCreditsButton": "Hijery ny crédit"
+    }
+  },
   "publish": {
     "activationNote": "Votre annonce sera activée après confirmation du paiement.",
     "advancedInfoDesc": "Ampio ireo antsipiriany ireo hanatsarana ny kalitaon'ny annonce-nao.",

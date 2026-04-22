@@ -493,6 +493,34 @@
     "settings": "Paramètres",
     "signup": "Inscription"
   },
+  "payment": {
+    "vanilla": {
+      "amountCapExceeded": "Le montant dépasse le plafond de la beta. Choisissez un pack plus petit.",
+      "backToDashboardButton": "Retour au tableau de bord",
+      "cardButton": "Carte bancaire (Visa, Mastercard)",
+      "checkingStatus": "Vérification en cours...",
+      "contactSupport": "Contacter le support",
+      "failureHeading": "Paiement non abouti",
+      "failureMessage": "Votre paiement n'a pas pu être finalisé. Aucun débit n'a été effectué.",
+      "initiateFailed": "Impossible d'initier le paiement. Veuillez réessayer.",
+      "missingTxId": "Référence de transaction manquante. Retournez à la page des crédits.",
+      "mobileMoneyButton": "Mobile Money (MVola, Orange, Airtel)",
+      "pendingHeading": "Paiement en cours",
+      "pendingMessage": "Votre paiement est en cours de traitement. Cette page se met à jour automatiquement.",
+      "pollingTimeout": "Le délai de vérification est dépassé. Si votre paiement a été confirmé, vos crédits apparaîtront dans quelques minutes. Vérifiez votre historique sur /credits.",
+      "processingPayment": "Initialisation du paiement...",
+      "retryButton": "Réessayer",
+      "returnPageIntro": "Nous vérifions le statut de votre paiement...",
+      "returnPageTitle": "Retour de paiement",
+      "sectionSubtitle": "Payez en quelques secondes avec Mobile Money ou votre carte bancaire",
+      "sectionTitle": "Paiement rapide",
+      "sessionExpired": "Session expirée. Reconnectez-vous pour payer.",
+      "successHeading": "Paiement confirmé",
+      "successMessage": "Vos {{credits}} crédits ont été ajoutés à votre compte.",
+      "unexpectedError": "Une erreur inattendue est survenue. Réessayez dans un instant.",
+      "viewCreditsButton": "Voir mes crédits"
+    }
+  },
   "publish": {
     "activationNote": "Votre annonce sera activée après confirmation du paiement.",
     "advancedInfoDesc": "Complétez ces détails pour renforcer la qualité perçue de votre annonce.",

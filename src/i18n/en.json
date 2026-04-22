@@ -493,6 +493,34 @@
     "settings": "Settings",
     "signup": "Sign up"
   },
+  "payment": {
+    "vanilla": {
+      "amountCapExceeded": "The amount exceeds the beta cap. Please choose a smaller pack.",
+      "backToDashboardButton": "Back to dashboard",
+      "cardButton": "Bank card (Visa, Mastercard)",
+      "checkingStatus": "Verifying...",
+      "contactSupport": "Contact support",
+      "failureHeading": "Payment unsuccessful",
+      "failureMessage": "Your payment could not be completed. No charge was made.",
+      "initiateFailed": "Unable to start the payment. Please try again.",
+      "missingTxId": "Missing transaction reference. Return to the credits page.",
+      "mobileMoneyButton": "Mobile Money (MVola, Orange, Airtel)",
+      "pendingHeading": "Payment in progress",
+      "pendingMessage": "Your payment is being processed. This page refreshes automatically.",
+      "pollingTimeout": "The verification timed out. If your payment went through, credits will appear within a few minutes. Check your history on /credits.",
+      "processingPayment": "Initiating payment...",
+      "retryButton": "Retry",
+      "returnPageIntro": "We are verifying the status of your payment...",
+      "returnPageTitle": "Payment return",
+      "sectionSubtitle": "Pay in seconds with Mobile Money or your bank card",
+      "sectionTitle": "Quick payment",
+      "sessionExpired": "Session expired. Sign in again to pay.",
+      "successHeading": "Payment confirmed",
+      "successMessage": "Your {{credits}} credits have been added to your account.",
+      "unexpectedError": "An unexpected error occurred. Please try again shortly.",
+      "viewCreditsButton": "View my credits"
+    }
+  },
   "publish": {
     "activationNote": "Your listing will be activated after payment confirmation.",
     "advancedInfoDesc": "Add these details to improve how your listing is perceived.",
