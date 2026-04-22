@@ -91,4 +91,34 @@ export const FEATURED_MAKES: FeaturedMake[] = [
     slug: "peugeot",
     logo: "/featured-makes/peugeot.png",
   },
+  {
+    name: "Chevrolet",
+    slug: "chevrolet",
+    logo: "/featured-makes/chevrolet.png",
+  },
+  {
+    name: "Dacia",
+    slug: "dacia",
+    logo: "/featured-makes/dacia.png",
+  },
+  {
+    name: "Honda",
+    slug: "honda",
+    logo: "/featured-makes/honda.png",
+  },
+  {
+    name: "Jeep",
+    slug: "jeep",
+    logo: "/featured-makes/jeep.png",
+  },
+  {
+    name: "Piaggio",
+    slug: "piaggio",
+    logo: "/featured-makes/piaggio.png",
+  },
+  {
+    name: "Renault",
+    slug: "renault",
+    logo: "/featured-makes/renault.png",
+  },
 ];
