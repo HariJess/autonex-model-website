@@ -15,7 +15,7 @@ const Footer = () => {
   } = useCookieConsent();
 
   return (
-    <footer className="border-t border-white/10" style={{ backgroundColor: "#061427", color: "#FAFAFA" }}>
+    <footer className="border-t border-white/10 bg-navbar text-navbar-foreground">
       <div className="container mx-auto py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
           {/* Brand */}
@@ -76,7 +76,7 @@ const Footer = () => {
             href="https://www.linkedin.com/company/aplisarlu/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#FAFAFA]/80 hover:text-[#FAFAFA] hover:underline underline-offset-2 transition-colors"
+            className="text-navbar-foreground/80 hover:text-navbar-foreground hover:underline underline-offset-2 transition-colors"
           >
             APli
           </a>

@@ -81,6 +81,9 @@ export default {
           DEFAULT: "hsl(var(--on-dark-surface-fg))",
           muted: "hsl(var(--on-dark-surface-muted))",
         },
+        dropdown: {
+          DEFAULT: "hsl(var(--dropdown-bg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

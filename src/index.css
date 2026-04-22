@@ -65,6 +65,13 @@
     --navbar-accent: 218 73% 26%;          /* bleu accent hover sur fond sombre */
     --on-dark-surface-fg: 216 54% 91%;     /* texte clair sur surface sombre */
     --on-dark-surface-muted: 212 40% 73%;  /* texte muted sur surface sombre */
+
+    /* Dropdown sombre (menus déroulants sur navbar) */
+    --dropdown-bg: 217 63% 14%;            /* #0D223D équivalent HSL */
+
+    /* Gradient estimation active (pill CTA dans le header) */
+    --estimation-active-from: 215 53% 26%; /* #1A3F6A */
+    --estimation-active-to: 208 55% 32%;   /* #24517F */
   }
 
   .dark {
@@ -102,6 +109,11 @@
     --navbar-accent: 218 73% 32%;
     --on-dark-surface-fg: 216 54% 93%;
     --on-dark-surface-muted: 212 40% 78%;
+
+    /* Dropdown sombre + estimation active (dark mode) */
+    --dropdown-bg: 222 50% 9%;
+    --estimation-active-from: 215 53% 30%;
+    --estimation-active-to: 208 55% 36%;
   }
 }
 
@@ -167,6 +179,13 @@
       hsl(var(--gradient-start)),
       hsl(var(--gradient-mid)) 48%,
       hsl(var(--gradient-end))
+    );
+  }
+  .gradient-estimation-active {
+    background: linear-gradient(
+      to right,
+      hsl(var(--estimation-active-from)),
+      hsl(var(--estimation-active-to))
     );
   }
   .gradient-text {
