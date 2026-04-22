@@ -302,11 +302,11 @@ const Index = () => {
       <HeroSearch />
 
       <section className="container mx-auto pt-10 md:pt-14">
-        <div className="rounded-2xl border border-border/80 bg-gradient-to-b from-slate-50/90 to-background px-3 py-4 md:px-6 md:py-5 shadow-[0_1px_3px_-1px_rgba(15,23,42,0.07)] max-w-4xl mx-auto">
-          <div className="flex items-end justify-between gap-3">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-3 mb-5 md:mb-7">
             <div>
-              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.quickExplore", "Explorer rapidement")}</p>
-              <h2 className="font-serif text-lg md:text-2xl font-semibold mt-1">{t("home.mainCategories", "Catégories principales")}</h2>
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1">{t("home.quickExplore", "Explorer rapidement")}</p>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold">{t("home.mainCategories", "Catégories principales")}</h2>
             </div>
             <Link
               to="/recherche"
@@ -316,70 +316,78 @@ const Index = () => {
             </Link>
           </div>
 
-          <div className="mt-4">
-            {/* Mobile: bandeau horizontal scrollable */}
-            <div className="md:hidden flex gap-2.5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
-              {heroCategoryShortcuts.map((shortcut) => (
-                <Link
-                  key={shortcut.key}
-                  to={shortcut.to}
-                  className="group snap-start shrink-0 rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 min-h-[88px] w-[104px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+          {/* Mobile: bandeau horizontal scrollable (inchangé Lot 2) */}
+          <div className="md:hidden flex gap-2.5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
+            {heroCategoryShortcuts.map((shortcut) => (
+              <Link
+                key={shortcut.key}
+                to={shortcut.to}
+                className="group snap-start shrink-0 rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 min-h-[88px] w-[104px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              >
+                <span
+                  className="flex h-10 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                  aria-hidden="true"
                 >
-                  <span
-                    className="flex h-10 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
-                    aria-hidden="true"
-                  >
-                    <img
-                      src={shortcut.iconSrc}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="h-7 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
-                      onError={(event) => {
-                        const target = event.currentTarget;
-                        if (!target.dataset.fallbackApplied) {
-                          target.dataset.fallbackApplied = "1";
-                          target.src = "/category-icons/category-citadine.svg";
-                        }
-                      }}
-                    />
-                  </span>
-                  <span className="font-serif text-xs text-foreground leading-tight">{shortcut.label}</span>
-                </Link>
-              ))}
-            </div>
+                  <img
+                    src={shortcut.iconSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-7 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      if (!target.dataset.fallbackApplied) {
+                        target.dataset.fallbackApplied = "1";
+                        target.src = "/category-icons/category-citadine.svg";
+                      }
+                    }}
+                  />
+                </span>
+                <span className="font-serif text-xs text-foreground leading-tight">{shortcut.label}</span>
+              </Link>
+            ))}
+          </div>
 
-            {/* Desktop: grid 5 colonnes centrée et compacte */}
-            <div className="hidden md:grid md:grid-cols-5 gap-3">
-              {heroCategoryShortcuts.map((shortcut) => (
-                <Link
-                  key={shortcut.key}
-                  to={shortcut.to}
-                  className="group rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-4 min-h-[120px] flex flex-col items-center justify-center gap-2.5 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 hover:-translate-y-px hover:border-slate-300/95 hover:from-blue-50/85 hover:to-slate-50 hover:shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+          {/* Desktop: redesign premium — cards plus grosses avec halo gradient coloré */}
+          <div className="hidden md:grid md:grid-cols-5 gap-4 lg:gap-5">
+            {heroCategoryShortcuts.map((shortcut) => (
+              <Link
+                key={shortcut.key}
+                to={shortcut.to}
+                className="group relative rounded-2xl border border-slate-200/80 bg-white px-4 pt-6 pb-5 min-h-[180px] flex flex-col items-center justify-center gap-4 text-center overflow-hidden motion-safe:transition-[transform,box-shadow,border-color] motion-safe:duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_20px_40px_-20px_rgba(15,23,42,0.2),0_8px_20px_-10px_rgba(18,86,202,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              >
+                {/* Halo gradient coloré derrière l'icône, visible au hover */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-primary/[0.04] via-primary/[0.02] to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+                />
+
+                {/* Icône avec halo gradient circulaire */}
+                <span
+                  className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_4px_12px_-4px_rgba(18,86,202,0.15)] group-hover:ring-primary/35 group-hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_8px_20px_-4px_rgba(18,86,202,0.28)] motion-safe:transition-[box-shadow,ring-color] motion-safe:duration-300"
+                  aria-hidden="true"
                 >
-                  <span
-                    className="flex h-12 w-16 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
-                    aria-hidden="true"
-                  >
-                    <img
-                      src={shortcut.iconSrc}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="h-8 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
-                      onError={(event) => {
-                        const target = event.currentTarget;
-                        if (!target.dataset.fallbackApplied) {
-                          target.dataset.fallbackApplied = "1";
-                          target.src = "/category-icons/category-citadine.svg";
-                        }
-                      }}
-                    />
-                  </span>
-                  <span className="font-serif text-sm text-foreground leading-tight">{shortcut.label}</span>
-                </Link>
-              ))}
-            </div>
+                  <img
+                    src={shortcut.iconSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-12 w-auto max-h-full object-contain opacity-95 contrast-[1.05] drop-shadow-[0_1px_2px_rgba(255,255,255,0.7)] motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-[1.06]"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      if (!target.dataset.fallbackApplied) {
+                        target.dataset.fallbackApplied = "1";
+                        target.src = "/category-icons/category-citadine.svg";
+                      }
+                    }}
+                  />
+                </span>
+
+                <span className="relative font-serif text-base font-semibold text-foreground leading-tight">
+                  {shortcut.label}
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
