@@ -221,7 +221,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
             maxLength={5000}
             placeholder={t("publish.descriptionPlaceholderLong", "Rédigez une description complète en français…")}
           />
-          <p className="text-[13px] text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 — min. 40 caractères", { count: description.trim().length })}</p>
+          <p className="text-[13px] text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 caractères", { count: description.trim().length })}</p>
           <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">{t("publish.descriptionHint", "Incluez de préférence: carburant, boîte, état général et historique d’entretien.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
