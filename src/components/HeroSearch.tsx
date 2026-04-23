@@ -95,6 +95,7 @@ const HeroSearch = () => {
   const [yearPreset, setYearPreset] = useState<(typeof HERO_YEAR_PRESETS)[number]["value"]>("all");
   const [fuels, setFuels] = useState<string[]>([]);
   const [brandSearch, setBrandSearch] = useState("");
+  const [mobileRentOpen, setMobileRentOpen] = useState(false);
 
   const selectedVehicleTypeFilters = useMemo(
     () => resolveVehicleTypeFilters(vehicleTypes),
@@ -270,7 +271,8 @@ const HeroSearch = () => {
         </p>
 
         <div className="max-w-4xl mx-auto">
-          <div className="flex md:justify-center gap-1.5 mb-2 max-w-full overflow-x-auto pb-0.5 px-4 md:px-1 [-webkit-overflow-scrolling:touch]">
+          {/* Desktop: 3 onglets visibles (Acheter / Longue / Courte) */}
+          <div className="hidden md:flex justify-center gap-1.5 mb-2 max-w-full overflow-x-auto pb-0.5 px-1 [-webkit-overflow-scrolling:touch]">
             {TRANSACTIONS.map((tr) => (
               <button
                 key={tr.value}
@@ -285,6 +287,72 @@ const HeroSearch = () => {
                 {t(tr.labelKey)}
               </button>
             ))}
+          </div>
+
+          {/* Mobile: 2 onglets (Acheter + Location en dropdown pour LLD/LCD) — Lot 5.2 */}
+          <div className="flex md:hidden justify-center gap-1.5 mb-2">
+            <button
+              type="button"
+              onClick={() => handleTransactionChange("vente")}
+              className={`shrink-0 px-3 py-2.5 rounded-xl font-sans font-semibold text-xs transition-all touch-manipulation min-h-11 border ${
+                transaction === "vente"
+                  ? "bg-white text-[#0B1C38] border-white shadow-lg"
+                  : "bg-white/10 text-white/90 border-white/20 hover:bg-white/16 backdrop-blur-sm"
+              }`}
+            >
+              {t("nav.buy")}
+            </button>
+            <Popover open={mobileRentOpen} onOpenChange={setMobileRentOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (transaction !== "location" && transaction !== "location_vacances") {
+                      handleTransactionChange("location");
+                    }
+                  }}
+                  className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl font-sans font-semibold text-xs transition-all touch-manipulation min-h-11 border ${
+                    transaction === "location" || transaction === "location_vacances"
+                      ? "bg-white text-[#0B1C38] border-white shadow-lg"
+                      : "bg-white/10 text-white/90 border-white/20 hover:bg-white/16 backdrop-blur-sm"
+                  }`}
+                  aria-label={t("hero.rentTab", "Location")}
+                >
+                  {t("hero.rentTab", "Location")}
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="center" className="w-56 p-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleTransactionChange("location");
+                    setMobileRentOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg font-sans text-sm transition-colors ${
+                    transaction === "location"
+                      ? "bg-accent text-accent-foreground font-semibold"
+                      : "hover:bg-accent/60"
+                  }`}
+                >
+                  {t("nav.rent")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleTransactionChange("location_vacances");
+                    setMobileRentOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg font-sans text-sm transition-colors ${
+                    transaction === "location_vacances"
+                      ? "bg-accent text-accent-foreground font-semibold"
+                      : "hover:bg-accent/60"
+                  }`}
+                >
+                  {t("search.vacationRental")}
+                </button>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 -mb-8 md:-mb-12 relative z-10 border border-border/70">

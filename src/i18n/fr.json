@@ -280,6 +280,7 @@
     "refineSearch": "Affiner la recherche",
     "refineSearchWithCount": "Affiner la recherche ({{count}})",
     "region": "Région",
+    "rentTab": "Location",
     "result_many": "{{count}} résultats",
     "result_one": "1 résultat",
     "rooms": "Marque",
