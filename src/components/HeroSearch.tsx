@@ -270,7 +270,7 @@ const HeroSearch = () => {
         </p>
 
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-start md:justify-center gap-1.5 mb-2 max-w-full overflow-x-auto pb-0.5 px-1 [-webkit-overflow-scrolling:touch]">
+          <div className="flex md:justify-center gap-1.5 mb-2 max-w-full overflow-x-auto pb-0.5 px-4 md:px-1 [-webkit-overflow-scrolling:touch]">
             {TRANSACTIONS.map((tr) => (
               <button
                 key={tr.value}
