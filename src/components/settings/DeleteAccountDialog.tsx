@@ -36,7 +36,12 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
       setTyped("");
       mutation.reset();
     }
-  }, [open, mutation]);
+    // Intentionally exclude `mutation` from deps: TanStack Query returns
+    // a NEW mutation object reference on every render; including it here
+    // would create an infinite loop (setState -> re-render -> new mutation
+    // ref -> effect re-fires). `mutation.reset()` is safe to call inline.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const typedTrimmed = typed.trim();
   const typedLooksPartial = typedTrimmed.length > 0 && typedTrimmed !== CONFIRM_WORD;
