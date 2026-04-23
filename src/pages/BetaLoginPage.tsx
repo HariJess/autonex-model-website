@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock } from "lucide-react";
@@ -17,11 +17,19 @@ const BetaLoginPage = () => {
   const [showCode, setShowCode] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasRedirected = useRef(false);
 
   // If the lock is disabled or the visitor is already unlocked, the
   // /beta-login page is orphan — bounce them home.
+  //
+  // Ref guard: prevents `navigate` from firing more than once per mount.
+  // Without it, any re-render (eg. iOS Safari replaceState throttling
+  // causing router state to lag) could re-fire the effect and hit the
+  // 100-calls/10s SecurityError.
   useEffect(() => {
+    if (hasRedirected.current) return;
     if (!isLockEnabled || isUnlocked) {
+      hasRedirected.current = true;
       navigate("/", { replace: true });
     }
   }, [isLockEnabled, isUnlocked, navigate]);
