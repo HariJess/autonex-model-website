@@ -31,7 +31,6 @@ export default function BrandsRibbon({ brands }: Props) {
       loop: true,
       align: "start",
       dragFree: true,
-      containScroll: "trimSnaps",
       skipSnaps: false,
     },
     [autoplayRef.current]
