@@ -127,7 +127,7 @@ export default function BrandsRibbon({ brands }: Props) {
               key={brand.id}
               to={brand.href}
               draggable={false}
-              className="flex-[0_0_auto] rounded-lg px-4 py-3 flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[2px] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[128px] md:w-[160px]"
+              className="flex-[0_0_auto] rounded-2xl border border-border bg-card p-4 min-h-[140px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[128px] md:w-[160px]"
               aria-label={`Voir les annonces ${brand.label}`}
             >
               {brand.logoAsset ? (
