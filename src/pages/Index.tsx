@@ -349,42 +349,29 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Desktop: redesign premium — cards plus grosses avec halo gradient coloré */}
+          {/* Desktop: sobre style AutoScout24 — icône directe sans container, hover minimaliste */}
           <div className="hidden md:grid md:grid-cols-5 gap-4 lg:gap-5">
             {heroCategoryShortcuts.map((shortcut) => (
               <Link
                 key={shortcut.key}
                 to={shortcut.to}
-                className="group relative rounded-2xl border border-slate-200/80 bg-white px-4 pt-6 pb-5 min-h-[180px] flex flex-col items-center justify-center gap-4 text-center overflow-hidden motion-safe:transition-[transform,box-shadow,border-color] motion-safe:duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_20px_40px_-20px_rgba(15,23,42,0.2),0_8px_20px_-10px_rgba(18,86,202,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                className="group flex flex-col items-center gap-3 text-center opacity-90 hover:opacity-100 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-lg p-2"
               >
-                {/* Halo gradient coloré derrière l'icône, visible au hover */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-primary/[0.04] via-primary/[0.02] to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+                <img
+                  src={shortcut.iconSrc}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="h-20 md:h-24 w-auto object-contain motion-safe:transition-transform motion-safe:duration-200 group-hover:scale-105"
+                  onError={(event) => {
+                    const target = event.currentTarget;
+                    if (!target.dataset.fallbackApplied) {
+                      target.dataset.fallbackApplied = "1";
+                      target.src = "/category-icons/category-citadine.svg";
+                    }
+                  }}
                 />
-
-                {/* Icône avec halo gradient circulaire */}
-                <span
-                  className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_4px_12px_-4px_rgba(18,86,202,0.15)] group-hover:ring-primary/35 group-hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_8px_20px_-4px_rgba(18,86,202,0.28)] motion-safe:transition-[box-shadow,ring-color] motion-safe:duration-300"
-                  aria-hidden="true"
-                >
-                  <img
-                    src={shortcut.iconSrc}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    className="h-12 w-auto max-h-full object-contain opacity-95 contrast-[1.05] drop-shadow-[0_1px_2px_rgba(255,255,255,0.7)] motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-[1.06]"
-                    onError={(event) => {
-                      const target = event.currentTarget;
-                      if (!target.dataset.fallbackApplied) {
-                        target.dataset.fallbackApplied = "1";
-                        target.src = "/category-icons/category-citadine.svg";
-                      }
-                    }}
-                  />
-                </span>
-
-                <span className="relative font-serif text-base font-semibold text-foreground leading-tight">
+                <span className="font-serif text-sm md:text-base text-foreground font-medium">
                   {shortcut.label}
                 </span>
               </Link>
