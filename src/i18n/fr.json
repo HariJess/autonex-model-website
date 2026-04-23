@@ -280,6 +280,8 @@
     "refineSearch": "Affiner la recherche",
     "refineSearchWithCount": "Affiner la recherche ({{count}})",
     "region": "Région",
+    "rentLongShort": "Longue durée",
+    "rentShortShort": "Courte durée",
     "rentTab": "Location",
     "result_many": "{{count}} résultats",
     "result_one": "1 résultat",

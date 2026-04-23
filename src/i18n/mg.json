@@ -280,6 +280,8 @@
     "refineSearch": "Fanakaiky ny fikarohana",
     "refineSearchWithCount": "Fanakaiky ny fikarohana ({{count}})",
     "region": "Région",
+    "rentLongShort": "Faharetana lava",
+    "rentShortShort": "Faharetana fohy",
     "rentTab": "Fampanofana",
     "result_many": "Valiny {{count}}",
     "result_one": "Valiny 1",

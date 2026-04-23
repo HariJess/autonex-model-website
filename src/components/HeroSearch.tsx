@@ -318,7 +318,11 @@ const HeroSearch = () => {
                   }`}
                   aria-label={t("hero.rentTab", "Location")}
                 >
-                  {t("hero.rentTab", "Location")}
+                  {transaction === "location"
+                    ? t("hero.rentLongShort", "Longue durée")
+                    : transaction === "location_vacances"
+                      ? t("hero.rentShortShort", "Courte durée")
+                      : t("hero.rentTab", "Location")}
                   <ChevronDown className="h-4 w-4" />
                 </button>
               </PopoverTrigger>
