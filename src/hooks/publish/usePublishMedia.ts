@@ -62,25 +62,13 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
     return { uploaded: successPreviews.size, failed };
   }, [draftListingId, pendingPhotos]);
 
-  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const files = Array.from(e.target.files).slice(0, 10);
-    if (!draftListingId || !user) {
-      setPendingPhotos((prev) => [...prev, ...files.map((file) => ({ file, preview: URL.createObjectURL(file) }))]);
-      return;
-    }
-    let nextPosition = serverPhotosRef.current.length;
-    for (const file of files) {
-      try {
-        const ph = await uploadListingPhoto(draftListingId, file, nextPosition);
-        nextPosition += 1;
-        serverPhotosRef.current = [...serverPhotosRef.current, ph];
-        setServerPhotos((s) => [...s, ph]);
-      } catch (err) {
-        setPendingPhotos((prev) => [...prev, { file, preview: URL.createObjectURL(file) }]);
-        toast.error(err instanceof Error ? err.message : "Upload impossible");
-      }
-    }
+    setPendingPhotos((prev) => [
+      ...prev,
+      ...files.map((file) => ({ file, preview: URL.createObjectURL(file) })),
+    ]);
   };
 
   const removePhotoAt = async (globalIndex: number) => {
@@ -140,6 +128,8 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
     };
   }, [draftListingId, pendingPhotos.length, user, flushPendingPhotosToServer, t]);
 
+  const isUploading = pendingPhotos.length > 0 && !!draftListingId && !!user;
+
   return {
     serverPhotos,
     setServerPhotos,
@@ -149,5 +139,6 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
     handlePhotoSelect,
     removePhotoAt,
     makeCoverAtIndex,
+    isUploading,
   };
 }

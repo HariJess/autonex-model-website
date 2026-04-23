@@ -205,6 +205,7 @@ const PublishPage = () => {
     handlePhotoSelect,
     removePhotoAt,
     makeCoverAtIndex,
+    isUploading,
   } = usePublishMedia(draftListingId, user ?? null);
 
   const publishValidationInput = useMemo<PublishValidationInput>(
@@ -1003,10 +1004,12 @@ const PublishPage = () => {
           <PublishMediaSection
             serverPhotos={serverPhotos}
             pendingPhotos={pendingPhotos}
+            isUploading={isUploading}
             labels={{
               mainPhotoFirst: t("publish.mainPhotoFirst", "La première image est la photo principale. Utilisez « Couverture » pour réorganiser."),
               chooseFiles: t("publish.chooseFiles", "Choisir des photos"),
               localOnly: t("publish.localOnly", "Local"),
+              uploading: t("publish.uploading", "Téléversement en cours…"),
               videoUrl: t("publish.videoUrl", "Lien vidéo (YouTube, etc.) — optionnel"),
               tourUrl: t("publish.tourUrl", "Visite virtuelle (URL) — optionnel"),
               mainPhotosTitle: t("publish.mainPhotosTitle", "Photos principales"),

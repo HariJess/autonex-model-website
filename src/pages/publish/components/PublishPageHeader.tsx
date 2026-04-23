@@ -74,14 +74,14 @@ export function PublishPageHeader({
               </>
             )}
           </span>
-          {lastSavedAt && saveStatus !== "saving" && (
-            <span className="text-muted-foreground">
-              {labels.lastSaved.replace(
-                "{{time}}",
-                new Date(lastSavedAt).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }),
-              )}
-            </span>
-          )}
+          <span className="text-muted-foreground">
+            {labels.lastSaved.replace(
+              "{{time}}",
+              lastSavedAt
+                ? new Date(lastSavedAt).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })
+                : "—",
+            )}
+          </span>
           {saveError && <span className="text-destructive text-[13px]">{saveError}</span>}
         </div>
       )}
