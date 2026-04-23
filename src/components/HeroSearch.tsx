@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Euro, Banknote } from "lucide-react";
+import { Search, MapPin, Euro, Banknote, ChevronDown } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
@@ -87,6 +87,7 @@ const HeroSearch = () => {
   const [desktopBudgetOpen, setDesktopBudgetOpen] = useState(false);
   const [mobileBudgetOpen, setMobileBudgetOpen] = useState(false);
   const [showMobileAdvanced, setShowMobileAdvanced] = useState(false);
+  const [showDesktopAdvanced, setShowDesktopAdvanced] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
   const [modelQuery, setModelQuery] = useState("");
   const [yearPreset, setYearPreset] = useState<(typeof HERO_YEAR_PRESETS)[number]["value"]>("all");
@@ -171,20 +172,39 @@ const HeroSearch = () => {
     );
   }, [vehicleTypes, ville, quartierLibre, priceMin, priceMax, brands, modelQuery, fuels, yearPreset]);
 
-  const countFilters = useMemo(
+  const filteredCountFilters = useMemo(
     () =>
       canEstimateResultCount ? buildSearchStrictCountFilters(searchFilters) : { limit: 0 },
     [canEstimateResultCount, searchFilters],
   );
 
-  const { data: resultCount = 0, isLoading: countLoading } = useFilteredActiveListingCount(countFilters);
-  const ctaLabel = useMemo(() => {
-    if (!canEstimateResultCount) return t("hero.search");
-    if (countLoading) return t("hero.searching", "Recherche...");
-    if (resultCount <= 0) return t("hero.seeListings", "Voir les annonces");
-    if (resultCount === 1) return t("hero.result_one", "1 résultat");
-    return t("hero.result_many", { count: resultCount, defaultValue: `${resultCount} résultats` });
-  }, [canEstimateResultCount, countLoading, resultCount, t]);
+  // Total count (no filters) — shown by default in the CTA. staleTime 30s prevents hot-loop refetch.
+  const { data: totalCount = 0, isLoading: totalLoading } = useFilteredActiveListingCount({});
+  // Filtered count — only hits the DB when user actually poses filters (early-return 0 otherwise).
+  const { data: filteredCount = 0, isLoading: filteredLoading } = useFilteredActiveListingCount(filteredCountFilters);
+
+  const ctaCount = canEstimateResultCount ? filteredCount : totalCount;
+  const ctaLoading = canEstimateResultCount ? filteredLoading : totalLoading;
+  const ctaLabel = useMemo(
+    () =>
+      ctaLoading
+        ? t("hero.searching", "Recherche...")
+        : t("hero.seeXListings", "Voir {{count}} annonces", { count: ctaCount }),
+    [ctaLoading, ctaCount, t],
+  );
+
+  const advancedFiltersActiveCount = useMemo(() => {
+    let n = 0;
+    if (brands.length > 0) n += 1;
+    if (modelQuery.trim().length > 0) n += 1;
+    if (yearPreset !== "all") n += 1;
+    if (fuels.length > 0) n += 1;
+    return n;
+  }, [brands, modelQuery, yearPreset, fuels]);
+
+  const refineLabel = advancedFiltersActiveCount > 0
+    ? t("hero.refineSearchWithCount", "Affiner la recherche ({{count}})", { count: advancedFiltersActiveCount })
+    : t("hero.refineSearch", "Affiner la recherche");
 
   const handleSearch = () => {
     navigate(searchPathFromFilters(searchFilters));
@@ -311,7 +331,7 @@ const HeroSearch = () => {
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                    className="flex-1 px-3 py-2 text-left hover:bg-muted/50 transition-colors"
                   >
                     <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
                       {t("search.budget")}
@@ -337,122 +357,141 @@ const HeroSearch = () => {
                 </PopoverContent>
               </Popover>
 
-              {showBrand && (
-                <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
-                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                    {t("search.brand", "Marque")}
+            </div>
+
+            {/* Desktop: CTA "Voir X annonces" plein-largeur juste sous la pill (Lot 4.4b) */}
+            <Button
+              type="button"
+              onClick={handleSearch}
+              className="hidden lg:flex mt-3 w-full gradient-primary border-0 font-semibold font-sans gap-2 h-12 rounded-xl"
+              style={{ color: "#FAFAFA" }}
+            >
+              <Search className="h-5 w-5" />
+              {ctaLabel}
+            </Button>
+
+            {/* Desktop: toggle accordéon "Affiner la recherche" avec badge de filtres actifs */}
+            <button
+              type="button"
+              onClick={() => setShowDesktopAdvanced((prev) => !prev)}
+              className="hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 font-sans text-sm text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              aria-expanded={showDesktopAdvanced}
+              aria-controls="hero-advanced-filters-desktop"
+            >
+              <span>{refineLabel}</span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${showDesktopAdvanced ? "rotate-180" : ""}`} />
+            </button>
+
+            {/* Desktop: contenu déplié — Marque (conditionnel) / Modèle / Année / Carburant */}
+            {showDesktopAdvanced && (
+              <div
+                id="hero-advanced-filters-desktop"
+                className={`hidden lg:grid gap-3 mt-2 rounded-xl border border-border/70 bg-background/70 p-3 ${showBrand ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}
+              >
+                {showBrand && (
+                  <div>
+                    <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                      {t("search.brand", "Marque")}
+                    </label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm h-9 truncate">
+                          {brandLabel}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-72 p-3" align="start">
+                        <div className="mb-2 flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
+                          {brands.length > 0 && (
+                            <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
+                              Effacer
+                            </button>
+                          )}
+                        </div>
+                        <Input
+                          value={brandSearch}
+                          onChange={(e) => setBrandSearch(e.target.value)}
+                          placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
+                          className="h-8 text-xs mb-2"
+                        />
+                        <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+                          {visibleTopBrands.map((b) => (
+                            <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                              <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
+                              <BrandLogo
+                                brand={b}
+                                className="h-7 w-10 rounded-md bg-background"
+                                imgClassName="max-h-4"
+                                labelClassName="text-[10px]"
+                              />
+                              <span>{b}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                )}
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                    {t("search.model", "Modèle")}
+                  </label>
+                  <Input
+                    value={modelQuery}
+                    onChange={(e) => setModelQuery(e.target.value)}
+                    placeholder={t("hero.modelPlaceholder")}
+                    className="h-9 font-sans text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                    {t("search.year", "Année")}
+                  </label>
+                  <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
+                    <SelectTrigger className="h-9 font-sans text-sm">
+                      <SelectValue placeholder={t("hero.allYears", "Toutes années")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {HERO_YEAR_PRESETS.map((yearPresetOption) => (
+                        <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
+                          {yearPresetOption.value === "all" ? t("hero.allYears", "Toutes années") : yearPresetOption.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                    {t("search.fuel", "Carburant")}
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button type="button" className="w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left truncate">{brandLabel}</button>
+                      <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm h-9 truncate">
+                        {fuelLabel}
+                      </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-72 p-3" align="start">
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
-                      {brands.length > 0 && (
-                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
-                          Effacer
-                        </button>
-                      )}
-                    </div>
-                    <Input
-                      value={brandSearch}
-                      onChange={(e) => setBrandSearch(e.target.value)}
-                      placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
-                      className="h-8 text-xs mb-2"
-                    />
-                      <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
-                        {visibleTopBrands.map((b) => (
-                          <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
-                            <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
-                            <BrandLogo
-                              brand={b}
-                              className="h-7 w-10 rounded-md bg-background"
-                              imgClassName="max-h-4"
-                              labelClassName="text-[10px]"
-                            />
-                            <span>{b}</span>
+                    <PopoverContent className="w-64 p-3" align="start">
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
+                        {fuels.length > 0 && (
+                          <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
+                            Effacer
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
+                          <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                            <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
+                            <span>{opt}</span>
                           </label>
                         ))}
                       </div>
                     </PopoverContent>
                   </Popover>
                 </div>
-              )}
-
-              <div className="px-2">
-                <Button
-                  type="button"
-                  onClick={handleSearch}
-                  className="gradient-primary border-0 font-semibold font-sans gap-2 h-12 px-6 rounded-xl"
-                  style={{ color: "#FAFAFA" }}
-                >
-                  <Search className="h-5 w-5" />
-                  {ctaLabel}
-                </Button>
               </div>
-            </div>
-
-            <div className="hidden lg:grid grid-cols-12 gap-2 mt-2 rounded-xl border border-border/70 bg-background/70 p-2">
-              <div className="col-span-6">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  {t("search.model", "Modèle")}
-                </label>
-                <Input
-                  value={modelQuery}
-                  onChange={(e) => setModelQuery(e.target.value)}
-                  placeholder={t("hero.modelPlaceholder")}
-                  className="h-9 font-sans text-sm"
-                />
-              </div>
-              <div className="col-span-3">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  {t("search.year", "Année")}
-                </label>
-                <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
-                  <SelectTrigger className="h-9 font-sans text-sm">
-                    <SelectValue placeholder={t("hero.allYears", "Toutes années")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {HERO_YEAR_PRESETS.map((yearPresetOption) => (
-                      <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
-                        {yearPresetOption.value === "all" ? t("hero.allYears", "Toutes années") : yearPresetOption.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="col-span-3">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  {t("search.fuel", "Carburant")}
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm h-9 truncate">
-                      {fuelLabel}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-3" align="start">
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
-                      {fuels.length > 0 && (
-                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
-                          Effacer
-                        </button>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
-                        <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
-                          <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
-                          <span>{opt}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+            )}
 
             <div className="lg:hidden space-y-2.5">
               <Popover>
