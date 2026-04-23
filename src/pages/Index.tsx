@@ -6,7 +6,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { Button } from "@/components/ui/button";
 import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
@@ -247,7 +248,7 @@ const Index = () => {
           overline={t("home.collectionOverline", "Collection AutoNex")}
           title={t("home.collectionLoadingTitle", "Sélection en préparation")}
           description={t("home.collectionLoadingDesc", "Nous organisons cette collection pour vous proposer les annonces les plus pertinentes.")}
-          icon={<Loader2 className="h-5 w-5 animate-spin text-primary" />}
+          icon={<WheelSpinner size="md" />}
           className="py-7"
         />
       ) : (
@@ -514,7 +515,7 @@ const Index = () => {
               overline={t("home.marketFeedOverline", "Flux marché")}
               title={t("home.marketFeedLoadingTitle", "Chargement des nouvelles annonces")}
               description={t("home.marketFeedLoadingDesc", "Nous mettons à jour les dernières publications pour vous donner une vue actuelle du marché.")}
-              icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+              icon={<WheelSpinner size="md" />}
               className="py-8"
             />
             <PremiumStateSkeletonGrid count={4} />

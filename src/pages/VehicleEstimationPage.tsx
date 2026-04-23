@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronRight, Gauge, Loader2, RefreshCw, Sparkles, Target, TrendingUp } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
@@ -468,7 +469,7 @@ const VehicleEstimationPage = () => {
                           overline={t("estimation.catalogOverline", "Catalogue estimation")}
                           title={t("estimation.catalogLoadingTitle", "Chargement des références véhicules")}
                           description={t("estimation.catalogLoadingDesc", "Nous préparons les marques et modèles pour une saisie fiable.")}
-                          icon={<Loader2 className="h-5 w-5 animate-spin text-primary" />}
+                          icon={<WheelSpinner size="md" />}
                           className="py-6"
                         />
                       </div>
@@ -763,7 +764,7 @@ const VehicleEstimationPage = () => {
               <Suspense
                 fallback={
                   <div className="rounded-2xl border border-border bg-card p-10 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
+                    <WheelSpinner size="lg" aria-hidden />
                     <p className="text-sm font-sans text-center">{t("states.pleaseWait", "Please wait")}</p>
                   </div>
                 }

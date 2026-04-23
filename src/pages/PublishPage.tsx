@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
-import { Loader2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
@@ -924,7 +924,7 @@ const PublishPage = () => {
               description={spEdit
                 ? t("publish.loadingEdit", "Chargement de l’annonce…")
                 : t("publish.loadingDraft", "Chargement du brouillon…")}
-              icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+              icon={<WheelSpinner size="md" />}
               className="py-8"
             />
           </div>

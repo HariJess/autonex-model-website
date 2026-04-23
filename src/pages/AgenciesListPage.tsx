@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, AlertCircle, ShieldCheck } from "lucide-react";
+import { AlertCircle, ShieldCheck } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { PARTNER_DEALERS } from "@/data/agencies";
 import { useAgenciesList } from "@/hooks/useAgenciesList";
 
@@ -122,7 +123,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
 
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <WheelSpinner size="lg" />
           </div>
         ) : (
           <div className="space-y-8">

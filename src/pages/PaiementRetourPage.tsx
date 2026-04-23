@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { CheckCircle2, Clock, Loader2, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -155,7 +156,7 @@ const PaiementRetourPage = () => {
     const isInitial = isLoading && !status;
     return (
       <CardContent className="flex flex-col items-center gap-4 pt-4">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" aria-hidden />
+        <WheelSpinner size="xl" aria-hidden />
         <h2 className="font-serif text-lg text-foreground">
           {isInitial
             ? t("payment.vanilla.checkingStatus", "Vérification en cours...")

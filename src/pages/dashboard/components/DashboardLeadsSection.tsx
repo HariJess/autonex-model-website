@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import type { Tables } from "@/integrations/supabase/types";
 
 type LeadRow = Tables<"leads"> & { listings?: { title: string } | null };
@@ -26,7 +26,7 @@ export function DashboardLeadsSection({
       <h2 className="font-serif text-xl font-bold mb-4">{title}</h2>
       {leadsLoading ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <WheelSpinner size="md" />
         </div>
       ) : recentLeads.length === 0 ? (
         <p className="text-muted-foreground font-sans text-center py-8">{labels.noLeads}</p>

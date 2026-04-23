@@ -66,7 +66,7 @@ export function PublishMediaSection({
       </div>
       <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center bg-background/70">
         {isUploading ? (
-          <WheelSpinner size="lg" variant="primary" className="mx-auto mb-3" />
+          <WheelSpinner size="xl" variant="primary" className="mx-auto mb-3" />
         ) : (
           <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
         )}

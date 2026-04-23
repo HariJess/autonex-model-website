@@ -18,7 +18,6 @@ import {
   ChevronLeft,
   Check,
   MapPin,
-  Loader2,
   Info,
   Video,
   ExternalLink,
@@ -31,6 +30,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import BrandLogo from "@/components/BrandLogo";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { ReportListingButton } from "@/components/listing/ReportListingButton";
@@ -573,7 +573,7 @@ const ListingDetail = () => {
                         className="h-[min(360px,55vh)] min-h-[240px] rounded-2xl bg-muted/40 flex items-center justify-center border border-border"
                         aria-busy
                       >
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <WheelSpinner size="lg" />
                       </div>
                     }
                   >

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FeaturedPill } from "./MonetizationLabels";
@@ -67,7 +67,7 @@ export function FeaturedAgenciesSection({
       </div>
       {isLoading ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <WheelSpinner size="md" />
         </div>
       ) : agencies.length === 0 ? (
         <p className="text-center text-muted-foreground font-sans">Les concessionnaires inscrits apparaîtront ici.</p>

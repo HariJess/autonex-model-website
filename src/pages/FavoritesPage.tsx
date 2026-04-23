@@ -1,7 +1,8 @@
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
@@ -33,7 +34,7 @@ const FavoritesPage = () => {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <WheelSpinner size="lg" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">

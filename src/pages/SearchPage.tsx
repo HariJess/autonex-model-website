@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { ChevronRight, Home, Loader2, Sparkles } from "lucide-react";
+import { ChevronRight, Home, Sparkles } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { useDbListings, useFilteredActiveListingCount } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -680,7 +681,7 @@ const SearchPage = () => {
                   <Suspense
                     fallback={
                       <div className="h-full min-h-[280px] flex items-center justify-center rounded-xl border border-border bg-muted/30">
-                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <WheelSpinner size="md" />
                       </div>
                     }
                   >

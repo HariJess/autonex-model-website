@@ -1,6 +1,6 @@
-import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
 export function SearchLoadingState() {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ export function SearchLoadingState() {
         overline={t("search.loadingOverline", "AutoNex search")}
         title={t("search.loadingTitle", "Searching the marketplace")}
         description={loadingDesc}
-        icon={<Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />}
+        icon={<WheelSpinner size="md" aria-hidden />}
         className="py-8 md:py-9"
         role="status"
         ariaLive="polite"

@@ -4,7 +4,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
-import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
 export function ListingDetailLoading() {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ export function ListingDetailLoading() {
             "listing.stateLoadingDesc",
             "We are loading vehicle details and contact options.",
           )}
-          icon={<Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />}
+          icon={<WheelSpinner size="md" aria-hidden />}
         />
       </div>
       <Footer />

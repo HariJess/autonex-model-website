@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
-type WheelSpinnerSize = "sm" | "md" | "lg";
+type WheelSpinnerSize = "sm" | "md" | "lg" | "xl";
 type WheelSpinnerVariant = "primary" | "white" | "muted";
 
 interface WheelSpinnerProps extends React.HTMLAttributes<SVGSVGElement> {
@@ -12,7 +12,8 @@ interface WheelSpinnerProps extends React.HTMLAttributes<SVGSVGElement> {
 const sizeMap: Record<WheelSpinnerSize, string> = {
   sm: "h-4 w-4",
   md: "h-6 w-6",
-  lg: "h-12 w-12",
+  lg: "h-8 w-8",
+  xl: "h-12 w-12",
 };
 
 const variantMap: Record<WheelSpinnerVariant, { tire: string; rim: string; hub: string }> = {

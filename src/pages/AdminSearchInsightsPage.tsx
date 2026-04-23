@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
 const AdminSearchInsightsPage = () => {
   const { data, isLoading, error } = useQuery({
@@ -44,7 +45,7 @@ const AdminSearchInsightsPage = () => {
 
         {isLoading && (
           <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <WheelSpinner size="lg" />
           </div>
         )}
 

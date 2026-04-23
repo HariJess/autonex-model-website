@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,7 +75,7 @@ const AgencyProfile = () => {
       <>
         <Header />
         <div className="min-h-[60vh] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <WheelSpinner size="lg" />
         </div>
         <Footer />
       </>
@@ -267,7 +268,7 @@ const AgencyProfile = () => {
         <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.listingsOf", { name: displayName })}</h2>
         {listingsLoading ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <WheelSpinner size="md" />
           </div>
         ) : listings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-secondary/15 px-6 py-10 text-center">
