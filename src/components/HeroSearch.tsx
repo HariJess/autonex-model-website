@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Euro, Banknote, ChevronDown, Shield, CheckCircle2 } from "lucide-react";
+import { Search, MapPin, Euro, Banknote, ChevronDown } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
@@ -702,7 +702,24 @@ const HeroSearch = () => {
           {/* Trust signals sobres sous la card search — Lot 4.4e */}
           <div className="mt-12 md:mt-16 flex flex-wrap items-center justify-center gap-x-6 md:gap-x-8 gap-y-2 text-white/80 text-sm font-sans">
             <span className="inline-flex items-center gap-2">
-              <Shield className="h-4 w-4 shrink-0" aria-hidden />
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 shrink-0"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 2 L4 5 V12 C4 17 7.5 21 12 22 C16.5 21 20 17 20 12 V5 L12 2Z"
+                  fill="#059669"
+                />
+                <path
+                  d="M8 12 L11 15 L16 9"
+                  stroke="white"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
               {t("hero.trustModerated", "Annonces modérées")}
             </span>
             <span className="inline-flex items-center gap-2">
@@ -718,7 +735,25 @@ const HeroSearch = () => {
               {t("hero.trustMadeInMg", "100% Malgache")}
             </span>
             <span className="inline-flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 shrink-0"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" fill="#F59E0B" />
+                <text
+                  x="12"
+                  y="13"
+                  textAnchor="middle"
+                  fontFamily="sans-serif"
+                  fontSize="8.5"
+                  fontWeight="700"
+                  fill="white"
+                  dominantBaseline="middle"
+                >
+                  0€
+                </text>
+              </svg>
               {t("hero.trustEstimationFree", "Estimation gratuite")}
             </span>
           </div>
