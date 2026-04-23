@@ -593,6 +593,8 @@
     "engineDisplacement": "Cylindrée (L)",
     "engineDisplacementInvalid": "Cylindrée invalide",
     "engineDisplacementPlaceholder": "Ex: 1.5",
+    "equipmentDesc": "Ajouter des équipements augmente la visibilité de votre annonce.",
+    "equipmentTitle": "Équipements (optionnel)",
     "error": "Erreur lors de la publication",
     "essentialInfoDesc": "Commencez par les champs les plus importants pour la compréhension et la conversion.",
     "essentialInfoTitle": "Informations essentielles",

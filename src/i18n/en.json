@@ -593,6 +593,8 @@
     "engineDisplacement": "Engine size (L)",
     "engineDisplacementInvalid": "Invalid engine size.",
     "engineDisplacementPlaceholder": "e.g. 1.5",
+    "equipmentDesc": "Adding equipment increases your listing's visibility.",
+    "equipmentTitle": "Equipment (optional)",
     "error": "Error while publishing",
     "essentialInfoDesc": "Start with the fields that drive understanding and conversions.",
     "essentialInfoTitle": "Essential information",
