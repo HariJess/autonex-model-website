@@ -16,7 +16,6 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
 import { FEATURED_MAKES } from "@/data/featuredMakes";
-import { buildHeroCategoryShortcuts } from "@/data/categories";
 import { cn } from "@/lib/utils";
 import { getDealMeta } from "@/lib/deals";
 
@@ -34,7 +33,46 @@ const Index = () => {
   const dealCandidates = allListings;
   const themedLoading = isLoading;
   const dealsLoading = isLoading;
-  const heroCategoryShortcuts = useMemo(() => buildHeroCategoryShortcuts(t), [t]);
+  const heroCategoryShortcuts = useMemo(
+    () => [
+      {
+        key: "suv-pickup",
+        label: t("home.categorySuvPickup", "SUV & Pick-up"),
+        to: "/recherche?vtype=suv_4x4,pick_up",
+        iconSrc: "/category-icons/category-suv-pickup.svg.svg",
+        iconAlt: t("home.categorySuvPickupAlt", "Silhouette SUV et Pick-up"),
+      },
+      {
+        key: "berline",
+        label: t("home.categorySedan", "Berline"),
+        to: "/recherche?vtype=berline",
+        iconSrc: "/category-icons/category-sedan.svg.svg",
+        iconAlt: t("home.categorySedanAlt", "Silhouette berline"),
+      },
+      {
+        key: "citadine",
+        label: t("home.categoryCity", "Citadine"),
+        to: "/recherche?vtype=citadine",
+        iconSrc: "/category-icons/category-citadine.svg",
+        iconAlt: t("home.categoryCityAlt", "Silhouette citadine"),
+      },
+      {
+        key: "utilitaire",
+        label: t("home.categoryUtility", "Utilitaire"),
+        to: "/recherche?vtype=utilitaire_leger",
+        iconSrc: "/category-icons/category-utilitaire.svg.svg",
+        iconAlt: t("home.categoryUtilityAlt", "Silhouette utilitaire"),
+      },
+      {
+        key: "scooter",
+        label: t("home.categoryMoto", "Moto"),
+        to: "/recherche?vtype=moto",
+        iconSrc: "/category-icons/category-scooter.svg.svg",
+        iconAlt: t("home.categoryMotoAlt", "Silhouette scooter"),
+      },
+    ],
+    [t],
+  );
   const popularBrands = useMemo(
     (): Array<{
       id: string;
@@ -264,7 +302,7 @@ const Index = () => {
 
       <HeroSearch />
 
-      <section className="container mx-auto pt-10 md:pt-14 md:hidden">
+      <section className="container mx-auto pt-10 md:pt-14">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-end justify-between gap-3 mb-5 md:mb-7">
             <div>
@@ -279,7 +317,7 @@ const Index = () => {
             </Link>
           </div>
 
-          {/* Mobile: bandeau horizontal scrollable (inchangé Lot 2) — desktop version déplacée dans HeroSearch (Lot 4.4b.1) */}
+          {/* Mobile: bandeau horizontal scrollable (inchangé Lot 2) */}
           <div className="md:hidden flex gap-2.5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
             {heroCategoryShortcuts.map((shortcut) => (
               <Link
@@ -311,6 +349,34 @@ const Index = () => {
             ))}
           </div>
 
+          {/* Desktop: sobre style AutoScout24 — icône directe sans container, hover minimaliste */}
+          <div className="hidden md:grid md:grid-cols-5 gap-4 lg:gap-5">
+            {heroCategoryShortcuts.map((shortcut) => (
+              <Link
+                key={shortcut.key}
+                to={shortcut.to}
+                className="group flex flex-col items-center gap-3 text-center opacity-90 hover:opacity-100 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-lg p-2"
+              >
+                <img
+                  src={shortcut.iconSrc}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="h-20 md:h-24 w-auto object-contain motion-safe:transition-transform motion-safe:duration-200 group-hover:scale-105"
+                  onError={(event) => {
+                    const target = event.currentTarget;
+                    if (!target.dataset.fallbackApplied) {
+                      target.dataset.fallbackApplied = "1";
+                      target.src = "/category-icons/category-citadine.svg";
+                    }
+                  }}
+                />
+                <span className="font-serif text-sm md:text-base text-foreground font-medium">
+                  {shortcut.label}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
