@@ -107,6 +107,14 @@ const PublishPage = () => {
   /** Skips bootstrap re-entry after we self-navigate post-create; see usePublishBootstrap. */
   const selfNavigatedDraftIdRef = useRef<string | null>(null);
 
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  }, [step]);
+
   const steps = [
     t("publish.stepMain", "Informations principales"),
     t("publish.stepDetails", "Détails du véhicule"),
@@ -695,7 +703,6 @@ const PublishPage = () => {
     if (firstInvalid) {
       toast.error(firstInvalid.errors[0]);
       setStep(firstInvalid.step);
-      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     if (!user || !transaction || !listingType) {
