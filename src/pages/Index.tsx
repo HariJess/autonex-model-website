@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
 import { ChevronRight } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
+import { ScrollAffordance } from "@/components/ui/ScrollAffordance";
 import { Button } from "@/components/ui/button";
 import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
@@ -21,6 +22,8 @@ import { getDealMeta } from "@/lib/deals";
 
 const Index = () => {
   const { t } = useTranslation();
+  const categoriesScrollRef = useRef<HTMLDivElement>(null);
+  const brandsMobileScrollRef = useRef<HTMLDivElement>(null);
   const canonical = buildCanonicalUrl("/");
   const seoTitle = "AutoNex — Automobile à Madagascar";
   const seoDescription = truncateMetaDescription(
@@ -317,8 +320,12 @@ const Index = () => {
             </Link>
           </div>
 
-          {/* Mobile: scroll horizontal harmonisé avec pattern marques — Lot 4.8 */}
-          <div className="md:hidden flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
+          {/* Mobile: scroll horizontal harmonisé avec pattern marques — Lot 4.8 + affordance Lot 5.4 */}
+          <div className="md:hidden relative">
+            <div
+              ref={categoriesScrollRef}
+              className="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4"
+            >
             {heroCategoryShortcuts.map((shortcut) => (
               <Link
                 key={shortcut.key}
@@ -347,6 +354,8 @@ const Index = () => {
                 <span className="font-serif text-sm text-foreground leading-tight">{shortcut.label}</span>
               </Link>
             ))}
+            </div>
+            <ScrollAffordance scrollRef={categoriesScrollRef} />
           </div>
 
           {/* Desktop: alignement sur style mobile (cards pastels + cercles bleus + label) — Lot 4.5 */}
@@ -401,9 +410,12 @@ const Index = () => {
             </Link>
           </div>
 
-          {/* Mobile: scroll manuel */}
-          <div className="md:hidden">
-            <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-4 px-4">
+          {/* Mobile: scroll manuel + affordance Lot 5.4 */}
+          <div className="md:hidden relative">
+            <div
+              ref={brandsMobileScrollRef}
+              className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-4 px-4"
+            >
               {popularBrands.map((brand) => (
                 <Link
                   key={`mobile-${brand.id}`}
@@ -430,6 +442,7 @@ const Index = () => {
                 </Link>
               ))}
             </div>
+            <ScrollAffordance scrollRef={brandsMobileScrollRef} />
           </div>
 
           {/* Desktop: composant interactif pro */}
