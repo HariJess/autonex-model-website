@@ -289,6 +289,9 @@
     "seeXListings": "View {{count}} listings",
     "subtitle": "Madagascar's #1 auto marketplace",
     "title": "Find the right vehicle in Madagascar",
+    "trustEstimationFree": "Free estimation",
+    "trustMadeInMg": "100% Malagasy",
+    "trustModerated": "Moderated listings",
     "type": "Vehicle type",
     "year": "Year"
   },
