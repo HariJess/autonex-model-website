@@ -19,6 +19,8 @@ import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BR
 import BrandLogo from "@/components/BrandLogo";
 import { useFilteredActiveListingCount } from "@/hooks/useListings";
 import { buildSearchStrictCountFilters } from "@/lib/searchListingFilters";
+import { HeroModelCombobox } from "@/components/hero/HeroModelCombobox";
+import { VEHICLE_UI_CATALOG_BY_MAKE } from "@/data/vehicleUiCatalog";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -114,6 +116,21 @@ const HeroSearch = () => {
     if (!q) return TOP_AUTO_BRANDS;
     return TOP_AUTO_BRANDS.filter((brand) => brand.toLowerCase().includes(q));
   }, [brandSearch]);
+
+  // Modèle options: union of models for selected brand(s), or all models if no brand selected.
+  const modelOptions = useMemo(() => {
+    const set = new Set<string>();
+    if (brands.length === 0) {
+      Object.values(VEHICLE_UI_CATALOG_BY_MAKE).forEach((models) => {
+        models.forEach((m) => set.add(m));
+      });
+    } else {
+      brands.forEach((brand) => {
+        (VEHICLE_UI_CATALOG_BY_MAKE[brand] ?? []).forEach((m) => set.add(m));
+      });
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [brands]);
 
   const searchFilters = useMemo<SearchFilters>(() => {
     const mappedTypes = selectedVehicleTypeFilters.listingTypes.filter((lt) => allowedListingTypes.has(lt as ListingType));
@@ -436,11 +453,14 @@ const HeroSearch = () => {
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
                     {t("search.model", "Modèle")}
                   </label>
-                  <Input
+                  <HeroModelCombobox
                     value={modelQuery}
-                    onChange={(e) => setModelQuery(e.target.value)}
-                    placeholder={t("hero.modelPlaceholder")}
-                    className="h-9 font-sans text-sm"
+                    options={modelOptions}
+                    onSelect={setModelQuery}
+                    placeholder={t("hero.modelPlaceholder", "Modèle (ex: RAV4, Hilux, NMAX...)")}
+                    searchPlaceholder={t("hero.modelSearchPlaceholder", "Rechercher un modèle...")}
+                    emptyLabel={t("hero.modelEmpty", "Aucun modèle trouvé")}
+                    freeTextLabel={t("hero.modelFreeText", "Utiliser « {{query}} » comme modèle")}
                   />
                 </div>
                 <div>
@@ -616,11 +636,14 @@ const HeroSearch = () => {
                     </Popover>
                   )}
 
-                  <Input
+                  <HeroModelCombobox
                     value={modelQuery}
-                    onChange={(e) => setModelQuery(e.target.value)}
-                    placeholder={t("hero.modelPlaceholder")}
-                    className="font-sans text-sm"
+                    options={modelOptions}
+                    onSelect={setModelQuery}
+                    placeholder={t("hero.modelPlaceholder", "Modèle (ex: RAV4, Hilux, NMAX...)")}
+                    searchPlaceholder={t("hero.modelSearchPlaceholder", "Rechercher un modèle...")}
+                    emptyLabel={t("hero.modelEmpty", "Aucun modèle trouvé")}
+                    freeTextLabel={t("hero.modelFreeText", "Utiliser « {{query}} » comme modèle")}
                   />
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
