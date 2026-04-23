@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, Loader2, Upload } from "lucide-react";
+import { ChevronDown, Upload } from "lucide-react";
 import type { ServerPhoto } from "@/lib/publishDraft";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
 type PendingPhoto = { file: File; preview: string };
 
@@ -65,7 +66,7 @@ export function PublishMediaSection({
       </div>
       <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center bg-background/70">
         {isUploading ? (
-          <Loader2 className="h-10 w-10 mx-auto text-primary mb-3 animate-spin" />
+          <WheelSpinner size="lg" variant="primary" className="mx-auto mb-3" />
         ) : (
           <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
         )}
@@ -107,7 +108,7 @@ export function PublishMediaSection({
               <div key={`${p.file.name}-${p.file.size}-${i}`} className="relative rounded-xl overflow-hidden border border-border aspect-square group border-dashed">
                 <img src={p.preview} alt="" className="w-full h-full object-cover opacity-80" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/40 pointer-events-none">
-                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  <WheelSpinner size="md" variant="white" />
                   <span className="text-[11px] font-sans text-white">{labels.uploading}</span>
                 </div>
                 <div className="absolute inset-x-0 bottom-0 flex gap-1.5 p-1.5 bg-background/85">
