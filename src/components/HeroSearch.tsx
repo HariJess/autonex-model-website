@@ -720,7 +720,8 @@ const HeroSearch = () => {
                   strokeLinejoin="round"
                 />
               </svg>
-              {t("hero.trustModerated", "Annonces modérées")}
+              <span className="md:hidden">{t("hero.trustModeratedShort", "Modérées")}</span>
+              <span className="hidden md:inline">{t("hero.trustModerated", "Annonces modérées")}</span>
             </span>
             <span className="inline-flex items-center gap-1.5 md:gap-2">
               <svg
