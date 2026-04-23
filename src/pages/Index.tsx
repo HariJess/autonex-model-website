@@ -349,29 +349,35 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Desktop: sobre style AutoScout24 — icône directe sans container, hover minimaliste */}
+          {/* Desktop: alignement sur style mobile (cards pastels + cercles bleus + label) — Lot 4.5 */}
           <div className="hidden md:grid md:grid-cols-5 gap-4 lg:gap-5">
             {heroCategoryShortcuts.map((shortcut) => (
               <Link
                 key={shortcut.key}
                 to={shortcut.to}
-                className="group flex flex-col items-center gap-3 text-center opacity-90 hover:opacity-100 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-lg p-2"
+                className="group flex flex-col items-center justify-center gap-3 text-center min-h-[160px] rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-4 py-4 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                aria-label={shortcut.label}
               >
-                <img
-                  src={shortcut.iconSrc}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="h-20 md:h-24 w-auto object-contain motion-safe:transition-transform motion-safe:duration-200 group-hover:scale-105"
-                  onError={(event) => {
-                    const target = event.currentTarget;
-                    if (!target.dataset.fallbackApplied) {
-                      target.dataset.fallbackApplied = "1";
-                      target.src = "/category-icons/category-citadine.svg";
-                    }
-                  }}
-                />
-                <span className="font-serif text-sm md:text-base text-foreground font-medium">
+                <span
+                  aria-hidden="true"
+                  className="flex h-16 w-16 lg:h-20 lg:w-20 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                >
+                  <img
+                    src={shortcut.iconSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-10 lg:h-12 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      if (!target.dataset.fallbackApplied) {
+                        target.dataset.fallbackApplied = "1";
+                        target.src = "/category-icons/category-citadine.svg";
+                      }
+                    }}
+                  />
+                </span>
+                <span className="font-serif text-sm md:text-base text-foreground font-medium leading-tight">
                   {shortcut.label}
                 </span>
               </Link>
