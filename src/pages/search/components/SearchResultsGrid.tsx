@@ -12,7 +12,7 @@ type SearchResultsGridProps = {
 
 export function SearchResultsGrid({ listings, showCloseMatchBadges, getCloseMatchLabel }: SearchResultsGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-5 xl:gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 md:gap-4 lg:gap-5 xl:gap-6">
       {listings.flatMap((listing, index): ReactNode[] => {
         const out: ReactNode[] = [];
         if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 5) {
@@ -23,7 +23,7 @@ export function SearchResultsGrid({ listings, showCloseMatchBadges, getCloseMatc
             key={listing.id}
             listing={listing}
             matchBadge={showCloseMatchBadges ? getCloseMatchLabel(listing) : undefined}
-            variant="search"
+            layout="compact"
           />,
         );
         return out;
