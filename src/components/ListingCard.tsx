@@ -30,11 +30,13 @@ interface ListingCardProps {
   matchBadge?: string;
   variant?: "default" | "search";
   dealMeta?: DealMeta | null;
+  /** Layout density. "compact" applies Facebook-marketplace-style density on mobile only (desktop stays default). */
+  layout?: "default" | "compact";
 }
 
 const LOCAL_PLACEHOLDER = "/placeholder.svg";
 
-const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default", dealMeta = null }: ListingCardProps) => {
+const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default", dealMeta = null, layout = "default" }: ListingCardProps) => {
   const images = useMemo(
     () => (listing.images.length > 0 ? listing.images : [LOCAL_PLACEHOLDER]),
     [listing.images],
@@ -74,6 +76,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
           ? "Location courte durée"
           : listing.transaction;
   const isSearchVariant = variant === "search";
+  const isCompactLayout = layout === "compact";
 
   const handlePrefetchDetail = () => {
     void prefetchListing(queryClient, listing.id);
@@ -90,7 +93,9 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
       {/* Image area — fully clickable */}
       <Link
         to={`/annonce/${listing.id}`}
-        className="block relative aspect-[4/3] overflow-hidden"
+        className={`block relative overflow-hidden ${
+          isCompactLayout ? "aspect-[16/9] md:aspect-[4/3]" : "aspect-[4/3]"
+        }`}
         onMouseEnter={handlePrefetchDetail}
         onFocus={handlePrefetchDetail}
         onTouchStart={handlePrefetchDetail}
@@ -179,14 +184,24 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
 
       <Link
         to={`/annonce/${listing.id}`}
-        className={`block p-4 max-lg:p-4.5 space-y-2.5 ${isSearchVariant ? "md:p-4.5" : ""}`}
+        className={`block space-y-2.5 ${
+          isCompactLayout
+            ? "p-3 md:p-4 max-lg:md:p-4.5"
+            : "p-4 max-lg:p-4.5"
+        } ${isSearchVariant ? "md:p-4.5" : ""}`}
         onMouseEnter={handlePrefetchDetail}
         onFocus={handlePrefetchDetail}
         onTouchStart={handlePrefetchDetail}
       >
         <div className={isSearchVariant ? "space-y-0.5" : ""}>
           <div className="flex items-center gap-2 flex-wrap">
-            <p className={`font-sans tracking-tight text-primary ${isSearchVariant ? "text-[1.35rem] font-semibold leading-none" : "text-xl max-sm:text-[1.22rem] font-bold"}`}>
+            <p className={`font-sans tracking-tight text-primary ${
+              isSearchVariant
+                ? "text-[1.35rem] font-semibold leading-none"
+                : isCompactLayout
+                  ? "text-lg md:text-xl font-bold"
+                  : "text-xl max-sm:text-[1.22rem] font-bold"
+            }`}>
               {formatPrice(listing.price_mga)}
             </p>
             {listing.negotiable ? <NegotiableBadge size="sm" /> : null}
@@ -202,8 +217,10 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
           {displayBrandAsset?.logoPath ? (
             <BrandLogo
               brand={displayBrand}
-              className="h-6 w-9 shrink-0 rounded-md border border-border/80 bg-background p-0.5 mt-0.5"
-              imgClassName="max-h-4"
+              className={`shrink-0 rounded-md border border-border/80 bg-background p-0.5 mt-0.5 ${
+                isCompactLayout ? "h-5 w-7 md:h-6 md:w-9" : "h-6 w-9"
+              }`}
+              imgClassName={isCompactLayout ? "max-h-3 md:max-h-4" : "max-h-4"}
               showFallbackLabel={false}
             />
           ) : displayBrandAsset?.label ? (
@@ -215,19 +232,29 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               {displayBrandAsset.label.charAt(0).toUpperCase()}
             </span>
           ) : null}
-          <h3 className={`flex-1 font-serif text-foreground leading-snug line-clamp-2 break-words ${isSearchVariant ? "font-semibold text-[1.03rem]" : "font-semibold text-base max-lg:text-[1rem]"}`}>
+          <h3 className={`flex-1 font-serif text-foreground leading-snug line-clamp-2 break-words font-semibold ${
+            isSearchVariant
+              ? "text-[1.03rem]"
+              : isCompactLayout
+                ? "text-sm md:text-base"
+                : "text-base max-lg:text-[1rem]"
+          }`}>
             {displayTitle}
           </h3>
         </div>
         {vehicleHeadline && (
-          <p className="text-[13px] font-sans text-muted-foreground -mt-1 line-clamp-1">{vehicleHeadline}</p>
+          <p className={`font-sans text-muted-foreground -mt-1 line-clamp-1 ${
+            isCompactLayout ? "text-[12px] md:text-[13px]" : "text-[13px]"
+          }`}>{vehicleHeadline}</p>
         )}
         {matchBadge && (
           <p className="text-xs font-sans text-muted-foreground border border-border/70 rounded-md px-2 py-0.5 w-fit bg-background/80">
             {matchBadge}
           </p>
         )}
-        <div className={`flex items-center gap-x-3 gap-y-1.5 text-[13px] text-muted-foreground font-sans flex-wrap ${isSearchVariant ? "pt-0.5" : ""}`}>
+        <div className={`flex items-center gap-x-3 gap-y-1.5 text-muted-foreground font-sans flex-wrap ${
+          isCompactLayout ? "text-[12px] md:text-[13px]" : "text-[13px]"
+        } ${isSearchVariant ? "pt-0.5" : ""}`}>
           {versionLabel && (
             <span className="flex items-center gap-1">
               <CircleDot className="h-3.5 w-3.5 shrink-0" aria-hidden />
