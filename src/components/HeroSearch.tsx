@@ -374,7 +374,7 @@ const HeroSearch = () => {
             <button
               type="button"
               onClick={() => setShowDesktopAdvanced((prev) => !prev)}
-              className="hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 font-sans text-sm text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              className="hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 font-sans text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
               aria-expanded={showDesktopAdvanced}
               aria-controls="hero-advanced-filters-desktop"
             >
