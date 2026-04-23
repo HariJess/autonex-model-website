@@ -700,13 +700,21 @@ const HeroSearch = () => {
           </div>
 
           {/* Trust signals sobres sous la card search — Lot 4.4e */}
-          <div className="mt-6 md:mt-8 flex flex-wrap items-center justify-center gap-x-6 md:gap-x-8 gap-y-2 text-white/80 text-sm font-sans">
+          <div className="mt-12 md:mt-16 flex flex-wrap items-center justify-center gap-x-6 md:gap-x-8 gap-y-2 text-white/80 text-sm font-sans">
             <span className="inline-flex items-center gap-2">
               <Shield className="h-4 w-4 shrink-0" aria-hidden />
               {t("hero.trustModerated", "Annonces modérées")}
             </span>
             <span className="inline-flex items-center gap-2">
-              <span aria-hidden className="text-lg leading-none">🇲🇬</span>
+              <svg
+                viewBox="0 0 24 16"
+                className="h-4 w-6 shrink-0 rounded-sm"
+                aria-hidden="true"
+              >
+                <rect x="0" y="0" width="8" height="16" fill="#FFFFFF" />
+                <rect x="8" y="0" width="16" height="8" fill="#FC3D32" />
+                <rect x="8" y="8" width="16" height="8" fill="#007E3A" />
+              </svg>
               {t("hero.trustMadeInMg", "100% Malgache")}
             </span>
             <span className="inline-flex items-center gap-2">
