@@ -58,7 +58,7 @@ export default function BrandsRibbon({ brands }: Props) {
       {canScrollPrev && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 md:w-20 z-10 bg-gradient-to-r from-background via-background/80 to-transparent"
+          className="pointer-events-none absolute left-0 top-0 bottom-0 w-20 md:w-24 z-10 bg-gradient-to-r from-background via-background/90 to-transparent"
         />
       )}
 
@@ -66,7 +66,7 @@ export default function BrandsRibbon({ brands }: Props) {
       {canScrollNext && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 md:w-20 z-10 bg-gradient-to-l from-background via-background/80 to-transparent"
+          className="pointer-events-none absolute right-0 top-0 bottom-0 w-20 md:w-24 z-10 bg-gradient-to-l from-background via-background/90 to-transparent"
         />
       )}
 
@@ -100,6 +100,16 @@ export default function BrandsRibbon({ brands }: Props) {
         <ChevronRight className="h-5 w-5 text-foreground" />
       </button>
 
+      {/* Indicateur scroll mobile (pulse) — visible uniquement au début sur mobile */}
+      {canScrollNext && !canScrollPrev && (
+        <div
+          aria-hidden="true"
+          className="md:hidden pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center h-8 w-8 rounded-full bg-white/95 shadow-md border border-border/50 motion-safe:animate-pulse"
+        >
+          <ChevronRight className="h-4 w-4 text-foreground/70" />
+        </div>
+      )}
+
       {/* Container scrollable horizontal natif */}
       <div
         ref={scrollContainerRef}
@@ -112,7 +122,7 @@ export default function BrandsRibbon({ brands }: Props) {
             key={brand.id}
             to={brand.href}
             draggable={false}
-            className="flex-[0_0_auto] snap-start rounded-lg px-4 py-3 flex flex-col items-center justify-center gap-3 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[2px] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[128px] md:w-[160px] min-h-[140px]"
+            className="flex-[0_0_auto] snap-start rounded-lg px-4 py-3 flex flex-col items-center justify-center gap-3 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[2px] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[112px] md:w-[160px] min-h-[140px]"
             aria-label={`Voir les annonces ${brand.label}`}
           >
             <span
