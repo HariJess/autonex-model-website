@@ -653,7 +653,7 @@ const HeroSearch = () => {
                       <SelectContent>
                         {HERO_YEAR_PRESETS.map((yearPresetOption) => (
                           <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
-                            {yearPresetOption.label}
+                            {yearPresetOption.value === "all" ? t("hero.allYears", "Toutes années") : yearPresetOption.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
