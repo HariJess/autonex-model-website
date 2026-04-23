@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -19,6 +19,7 @@ import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BR
 import BrandLogo from "@/components/BrandLogo";
 import { useFilteredActiveListingCount } from "@/hooks/useListings";
 import { buildSearchStrictCountFilters } from "@/lib/searchListingFilters";
+import { buildHeroCategoryShortcuts } from "@/data/categories";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -60,6 +61,7 @@ const HeroSearch = () => {
   const [transaction, setTransaction] = useState("vente");
   const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
   const heroTypeOptions = useMemo(() => AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, []);
+  const heroCategoryShortcuts = useMemo(() => buildHeroCategoryShortcuts(t), [t]);
   const allowedListingTypes = useMemo(() => new Set(listingTypesForTransaction(transaction)), [transaction]);
 
   const handleTransactionChange = (tr: string) => {
@@ -250,7 +252,7 @@ const HeroSearch = () => {
             ))}
           </div>
 
-          <div className="bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 -mb-8 md:-mb-12 relative z-10 border border-border/70">
+          <div className="bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 relative z-10 border border-border/70">
             <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border/80 overflow-hidden">
               <div className="flex-1 border-r border-border px-3 py-2">
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
@@ -634,6 +636,36 @@ const HeroSearch = () => {
                 <Search className="h-5 w-5" />
                 {ctaLabel}
               </Button>
+            </div>
+
+            {/* Desktop: catégories principales dans la même card blanche (fusion visuelle avec les champs recherche) */}
+            <div className="hidden md:block border-t border-slate-200/60 my-4 md:my-5" />
+            <div className="hidden md:grid md:grid-cols-5 gap-4 lg:gap-5 pt-1">
+              {heroCategoryShortcuts.map((shortcut) => (
+                <Link
+                  key={shortcut.key}
+                  to={shortcut.to}
+                  className="group flex flex-col items-center gap-3 text-center opacity-90 hover:opacity-100 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-lg p-2"
+                >
+                  <img
+                    src={shortcut.iconSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-16 md:h-20 w-auto object-contain motion-safe:transition-transform motion-safe:duration-200 group-hover:scale-105"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      if (!target.dataset.fallbackApplied) {
+                        target.dataset.fallbackApplied = "1";
+                        target.src = "/category-icons/category-citadine.svg";
+                      }
+                    }}
+                  />
+                  <span className="font-serif text-sm text-foreground font-medium">
+                    {shortcut.label}
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
