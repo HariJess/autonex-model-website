@@ -302,16 +302,16 @@ const Index = () => {
 
       <HeroSearch />
 
-      <section className="container mx-auto pt-10 md:pt-14">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between gap-3 mb-5 md:mb-7">
+      <section className="py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
             <div>
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1">{t("home.quickExplore", "Explorer rapidement")}</p>
-              <h2 className="font-serif text-2xl md:text-3xl font-bold">{t("home.mainCategories", "Catégories principales")}</h2>
+              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.mainCategories", "Catégories principales")}</h2>
             </div>
             <Link
               to="/recherche"
-              className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              className="hidden md:inline-flex items-center text-sm md:text-base font-medium text-primary hover:underline shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
             >
               {t("sections.viewAll", "Voir tout")}
             </Link>
@@ -386,24 +386,23 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="pt-6 md:pt-10">
-        {/* Header aligné container */}
-        <div className="container mx-auto">
-          <div className="flex items-end justify-between gap-3">
-            <h2 className="font-serif text-xl md:text-[2rem] font-semibold">{t("home.popularBrands", "Marques populaires")}</h2>
+      <section className="py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
+            <div>
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1">{t("home.popularBrandsOverline", "Découvrir")}</p>
+              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.popularBrands", "Marques populaires")}</h2>
+            </div>
             <Link
               to="/recherche"
-              className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              className="hidden md:inline-flex items-center text-sm md:text-base font-medium text-primary hover:underline shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
             >
               {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
-        </div>
 
-        {/* Ruban full-bleed avec auto-scroll desktop + scroll manuel mobile */}
-        <div className="mt-5 md:mt-6 py-5 md:py-6 bg-white border-y border-border/50 overflow-hidden">
           {/* Mobile: scroll manuel */}
-          <div className="md:hidden container mx-auto">
+          <div className="md:hidden">
             <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-4 px-4">
               {popularBrands.map((brand) => (
                 <Link

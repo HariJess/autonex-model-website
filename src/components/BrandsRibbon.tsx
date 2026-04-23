@@ -112,7 +112,7 @@ export default function BrandsRibbon({ brands }: Props) {
         ref={scrollContainerRef}
         role="region"
         aria-label={t("home.popularBrandsRibbon", "Marques populaires")}
-        className="flex gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide px-4 md:px-6"
+        className="flex gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
       >
         {brands.map((brand) => (
           <Link
