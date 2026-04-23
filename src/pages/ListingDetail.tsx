@@ -18,7 +18,6 @@ import {
   ChevronLeft,
   Check,
   MapPin,
-  Loader2,
   Info,
   Video,
   ExternalLink,
@@ -31,6 +30,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { cn } from "@/lib/utils";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import BrandLogo from "@/components/BrandLogo";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { ReportListingButton } from "@/components/listing/ReportListingButton";
@@ -211,7 +211,7 @@ const ListingDetail = () => {
         </script>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-4 md:py-6 pb-32 lg:pb-6">
+      <div className="container mx-auto py-4 md:py-6 pb-32 lg:pb-6">
         <nav className="flex items-center gap-2 text-xs md:text-sm font-sans text-muted-foreground mb-4 md:mb-6 overflow-x-auto whitespace-nowrap">
           <Link to="/" className="hover:text-primary">
             {t("nav.home", "Accueil")}
@@ -243,7 +243,7 @@ const ListingDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2 space-y-6 md:space-y-8">
-            <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 p-4.5 md:p-6">
+            <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 p-5 md:p-6">
               <div className="flex flex-wrap items-center gap-2.5 mb-2">
                 <Badge variant="outline" className={cn("font-sans normal-case", LISTING_DETAIL_BADGE_CLASS)}>
                   {transactionLabel}
@@ -281,7 +281,7 @@ const ListingDetail = () => {
                 )}
               </div>
               <div className="flex items-center justify-between gap-3">
-                <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground">{displayTitle}</h1>
+                <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground break-words">{displayTitle}</h1>
                 <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0" />
               </div>
               {vehicleSummary && (
@@ -401,7 +401,7 @@ const ListingDetail = () => {
             </div>
 
             {listingTrustProofs.length > 0 && (
-              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
                 <h2 className="font-serif text-xl font-bold">{t("listing.trustLayerTitle", "Pourquoi cette annonce inspire confiance")}</h2>
                 <p className="mt-1.5 text-sm font-sans text-muted-foreground">
                   {t("listing.trustLayerSubtitle", "Indicateurs utiles pour décider plus sereinement avant contact.")}
@@ -460,7 +460,7 @@ const ListingDetail = () => {
               )}
             </div>
             {vehicleSpecRows.length > 0 && (
-              <section className="rounded-2xl border border-border bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CarFront className="h-5 w-5 text-primary" />
                   <h2 className="font-serif text-xl font-bold">{t("listing.vehicleSpecs", "Fiche véhicule")}</h2>
@@ -486,14 +486,14 @@ const ListingDetail = () => {
             )}
 
             {listing.description && (
-              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.description")}</h2>
-                <p className="font-sans text-muted-foreground leading-relaxed whitespace-pre-line">{listing.description}</p>
+                <p className="font-sans text-muted-foreground leading-relaxed whitespace-pre-line break-words">{listing.description}</p>
               </section>
             )}
 
             {allFeatureBadges.length > 0 && (
-              <section className="rounded-2xl border border-border/75 bg-card p-4.5 md:p-6">
+              <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
                 <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
                 <div className="grid grid-cols-2 gap-2">
                   {visibleFeatureBadgesMobile.map((f) => (
@@ -573,7 +573,7 @@ const ListingDetail = () => {
                         className="h-[min(360px,55vh)] min-h-[240px] rounded-2xl bg-muted/40 flex items-center justify-center border border-border"
                         aria-busy
                       >
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <WheelSpinner size="lg" />
                       </div>
                     }
                   >
@@ -603,7 +603,7 @@ const ListingDetail = () => {
             <div
               ref={contactSectionRef}
               id="listing-contact"
-              className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4.5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
+              className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-5 md:p-6 space-y-4 lg:sticky lg:top-20 scroll-mt-24"
             >
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("listing.priorityContact", "Contact prioritaire")}</p>
               <div className="flex items-center gap-3">
@@ -689,7 +689,7 @@ const ListingDetail = () => {
                 <Input placeholder={t("auth.email")} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="font-sans min-h-11" maxLength={255} />
                 <Input placeholder={t("auth.phone")} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="font-sans min-h-11" maxLength={30} />
                 <Textarea placeholder={t("listing.yourMessage", "Votre message...")} value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} className="font-sans min-h-24" rows={3} maxLength={1000} />
-                <Button type="submit" disabled={sending} className="w-full gradient-primary border-0 font-sans focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2" style={{ color: "#FAFAFA" }}>
+                <Button type="submit" disabled={sending} variant="hero" className="w-full font-sans focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
                   {sending ? t("common.loading") : t("listing.sendMessage", "Envoyer le message")}
                 </Button>
                 <p className="hidden sm:block text-[13px] font-sans text-muted-foreground leading-relaxed">

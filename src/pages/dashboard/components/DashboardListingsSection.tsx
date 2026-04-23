@@ -14,7 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AlertCircle, CarFront, Loader2, Pause, Pencil, Play, Sparkles, Trash2 } from "lucide-react";
+import { AlertCircle, CarFront, Pause, Pencil, Play, Sparkles, Trash2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import type { Tables } from "@/integrations/supabase/types";
 import { isEditablePublishedListingStatus } from "@/lib/publishDraft";
 import {
@@ -150,14 +151,14 @@ export function DashboardListingsSection({
 
       {listingsLoading ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <WheelSpinner size="md" />
         </div>
       ) : publishedListings.length === 0 ? (
         <div className="text-center py-12">
           <CarFront className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground font-sans mb-4">{labels.noListings}</p>
           <Link to="/publier">
-            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+            <Button variant="hero" className="font-sans">
               {labels.publish}
             </Button>
           </Link>

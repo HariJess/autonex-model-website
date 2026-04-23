@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -348,7 +349,7 @@ const AdminPartnerAdsPage = () => {
               </Button>
             </div>
             {isLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <WheelSpinner size="md" />
             ) : filteredCampaigns.length === 0 ? (
               <p className="text-sm text-muted-foreground font-sans">Aucune campagne.</p>
             ) : (

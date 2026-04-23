@@ -158,6 +158,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
     listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
 
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
+  const [showEquipmentSection, setShowEquipmentSection] = useState(false);
   const [showAllEquipment, setShowAllEquipment] = useState(false);
   const [makeOpen, setMakeOpen] = useState(false);
   const [useCustomBrand, setUseCustomBrand] = useState(() => {
@@ -221,7 +222,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
             maxLength={5000}
             placeholder={t("publish.descriptionPlaceholderLong", "Rédigez une description complète en français…")}
           />
-          <p className="text-[13px] text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 — min. 40 caractères", { count: description.trim().length })}</p>
+          <p className="text-[13px] text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 caractères", { count: description.trim().length })}</p>
           <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">{t("publish.descriptionHint", "Incluez de préférence: carburant, boîte, état général et historique d’entretien.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
@@ -453,43 +454,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
           </div>
         </div>
       </section>
-      <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
-        <div>
-          <p className="font-serif font-semibold text-sm">{t("publish.mainFeaturesTitle", "Caractéristiques principales")}</p>
-          <p className="hidden sm:block text-[13px] text-muted-foreground font-sans mt-1 leading-relaxed">
-            {t("publish.mainFeaturesDesc", "Ces éléments aident les acheteurs à filtrer rapidement votre annonce.")}
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
-          <div className="space-y-2">
-            <Label className="font-sans">Portes</Label>
-            <Input
-              type="number"
-              min={0}
-              value={doors}
-              onChange={(e) => {
-                form.setValue("vehicleDoors", e.target.value);
-                onApplyVehicleLegacyMirror({ doorsInput: e.target.value });
-              }}
-              className="font-sans"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="font-sans">Places</Label>
-            <Input
-              type="number"
-              min={0}
-              value={seats}
-              onChange={(e) => {
-                form.setValue("vehicleSeats", e.target.value);
-                onApplyVehicleLegacyMirror({ seatsInput: e.target.value });
-              }}
-              className="font-sans"
-            />
-          </div>
-        </div>
-      </section>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4 rounded-xl border border-border/70 bg-background/70 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4 rounded-xl border border-border/70 bg-background/70 p-4">
         <div className="space-y-2">
           <Label className="font-sans">Carburant</Label>
           <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleFuel", v === EMPTY_OPTION ? "" : v)}>
@@ -522,38 +487,6 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Motricité</Label>
-          <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleDrivetrain", v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {DRIVETRAIN_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Type vendeur</Label>
-          <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleSellerType", v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {SELLER_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
       <section className="rounded-xl border border-border/70 bg-background/70">
         <button
@@ -572,6 +505,66 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
         </button>
         {showAdvancedDetails && (
           <div className="space-y-4 border-t border-border/70 px-4 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
+              <div className="space-y-2">
+                <Label className="font-sans">Portes</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={doors}
+                  onChange={(e) => {
+                    form.setValue("vehicleDoors", e.target.value);
+                    onApplyVehicleLegacyMirror({ doorsInput: e.target.value });
+                  }}
+                  className="font-sans"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Places</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={seats}
+                  onChange={(e) => {
+                    form.setValue("vehicleSeats", e.target.value);
+                    onApplyVehicleLegacyMirror({ seatsInput: e.target.value });
+                  }}
+                  className="font-sans"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Motricité</Label>
+                <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleDrivetrain", v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                    {DRIVETRAIN_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Type vendeur</Label>
+                <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleSellerType", v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                    {SELLER_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             {showRooms && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-2">
@@ -698,26 +691,43 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
           </div>
         )}
       </section>
-      <div className="space-y-2">
-        <Label className="font-sans">{labels.listingFeatures}</Label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {(showAllEquipment ? LISTING_EQUIPMENT_OPTIONS : LISTING_EQUIPMENT_OPTIONS.slice(0, 8)).map((f) => (
-            <label key={f} className="flex min-h-11 items-center gap-3 rounded-lg border border-border/70 bg-background/60 px-3 cursor-pointer font-sans text-sm touch-manipulation">
-              <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => toggleFeature(f)} />
-              {f}
-            </label>
-          ))}
-        </div>
-        {LISTING_EQUIPMENT_OPTIONS.length > 8 && (
-          <button
-            type="button"
-            className="sm:hidden text-xs font-sans text-primary"
-            onClick={() => setShowAllEquipment((prev) => !prev)}
-          >
-            {showAllEquipment ? t("search.showLess", "Voir moins") : t("search.showMore", "Voir plus")}
-          </button>
+      <section className="rounded-xl border border-border/70 bg-background/70">
+        <button
+          type="button"
+          onClick={() => setShowEquipmentSection((prev) => !prev)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left"
+          aria-expanded={showEquipmentSection}
+        >
+          <div>
+            <p className="font-serif text-sm text-foreground">{t("publish.equipmentTitle", "Équipements (optionnel)")}</p>
+            <p className="mt-0.5 hidden sm:block font-sans text-[13px] text-muted-foreground leading-relaxed">
+              {t("publish.equipmentDesc", "Ajouter des équipements augmente la visibilité de votre annonce.")}
+            </p>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showEquipmentSection ? "rotate-180" : ""}`} />
+        </button>
+        {showEquipmentSection && (
+          <div className="space-y-2 border-t border-border/70 px-4 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {(showAllEquipment ? LISTING_EQUIPMENT_OPTIONS : LISTING_EQUIPMENT_OPTIONS.slice(0, 8)).map((f) => (
+                <label key={f} className="flex min-h-11 items-center gap-3 rounded-lg border border-border/70 bg-background/60 px-3 cursor-pointer font-sans text-sm touch-manipulation">
+                  <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => toggleFeature(f)} />
+                  {f}
+                </label>
+              ))}
+            </div>
+            {LISTING_EQUIPMENT_OPTIONS.length > 8 && (
+              <button
+                type="button"
+                className="sm:hidden text-xs font-sans text-primary"
+                onClick={() => setShowAllEquipment((prev) => !prev)}
+              >
+                {showAllEquipment ? t("search.showLess", "Voir moins") : t("search.showMore", "Voir plus")}
+              </button>
+            )}
+          </div>
         )}
-      </div>
+      </section>
       <div className="space-y-2">
         <Label className="font-sans">{t("publish.otherFeaturesTitle", "Autres caractéristiques (optionnel)")}</Label>
         <Textarea

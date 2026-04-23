@@ -43,7 +43,7 @@ export function ForgotPasswordForm({
             <Label className="font-sans">{labels.email}</Label>
             <Input type="email" value={email} onChange={(e) => onEmailChange(e.target.value)} className="font-sans" required />
           </div>
-          <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
+          <Button type="submit" disabled={loading} variant="hero" className="w-full font-sans min-h-12 touch-manipulation">
             {loading ? labels.loading : labels.sendResetLink}
           </Button>
         </form>

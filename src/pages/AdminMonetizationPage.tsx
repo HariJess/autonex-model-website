@@ -11,6 +11,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { formatAriary } from "@/config/monetization";
 import { invalidateCreditsBalanceQueries } from "@/lib/creditsBalance";
 import { Loader2, Check, X } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { Link } from "react-router-dom";
 
 const AdminPricingEditor = lazy(
@@ -215,7 +216,7 @@ const AdminMonetizationPage = () => {
               Finalisées (historique) : <span className="font-medium text-foreground">{finalizedTxCount}</span>
             </p>
             {txLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <WheelSpinner size="md" />
             ) : pendingTx.length === 0 ? (
               <p className="text-sm text-muted-foreground font-sans">Aucune demande en attente.</p>
             ) : (
@@ -293,7 +294,7 @@ const AdminMonetizationPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {listingsLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <WheelSpinner size="md" />
             ) : pendingListings.length === 0 ? (
               <p className="text-sm text-muted-foreground font-sans">Aucune annonce en attente.</p>
             ) : (

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Euro, Banknote } from "lucide-react";
+import { Search, MapPin, Euro, Banknote, ChevronDown } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
@@ -19,6 +19,8 @@ import { AUTO_SEARCH_FUEL_OPTIONS, AUTO_SEARCH_VEHICLE_TYPE_OPTIONS, TOP_AUTO_BR
 import BrandLogo from "@/components/BrandLogo";
 import { useFilteredActiveListingCount } from "@/hooks/useListings";
 import { buildSearchStrictCountFilters } from "@/lib/searchListingFilters";
+import { HeroModelCombobox } from "@/components/hero/HeroModelCombobox";
+import { VEHICLE_UI_CATALOG_BY_MAKE } from "@/data/vehicleUiCatalog";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -87,6 +89,7 @@ const HeroSearch = () => {
   const [desktopBudgetOpen, setDesktopBudgetOpen] = useState(false);
   const [mobileBudgetOpen, setMobileBudgetOpen] = useState(false);
   const [showMobileAdvanced, setShowMobileAdvanced] = useState(false);
+  const [showDesktopAdvanced, setShowDesktopAdvanced] = useState(false);
   const [budgetCurrency, setBudgetCurrency] = useState<"MGA" | "EUR">("MGA");
   const [modelQuery, setModelQuery] = useState("");
   const [yearPreset, setYearPreset] = useState<(typeof HERO_YEAR_PRESETS)[number]["value"]>("all");
@@ -113,6 +116,21 @@ const HeroSearch = () => {
     if (!q) return TOP_AUTO_BRANDS;
     return TOP_AUTO_BRANDS.filter((brand) => brand.toLowerCase().includes(q));
   }, [brandSearch]);
+
+  // Modèle options: union of models for selected brand(s), or all models if no brand selected.
+  const modelOptions = useMemo(() => {
+    const set = new Set<string>();
+    if (brands.length === 0) {
+      Object.values(VEHICLE_UI_CATALOG_BY_MAKE).forEach((models) => {
+        models.forEach((m) => set.add(m));
+      });
+    } else {
+      brands.forEach((brand) => {
+        (VEHICLE_UI_CATALOG_BY_MAKE[brand] ?? []).forEach((m) => set.add(m));
+      });
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [brands]);
 
   const searchFilters = useMemo<SearchFilters>(() => {
     const mappedTypes = selectedVehicleTypeFilters.listingTypes.filter((lt) => allowedListingTypes.has(lt as ListingType));
@@ -171,20 +189,39 @@ const HeroSearch = () => {
     );
   }, [vehicleTypes, ville, quartierLibre, priceMin, priceMax, brands, modelQuery, fuels, yearPreset]);
 
-  const countFilters = useMemo(
+  const filteredCountFilters = useMemo(
     () =>
       canEstimateResultCount ? buildSearchStrictCountFilters(searchFilters) : { limit: 0 },
     [canEstimateResultCount, searchFilters],
   );
 
-  const { data: resultCount = 0, isLoading: countLoading } = useFilteredActiveListingCount(countFilters);
-  const ctaLabel = useMemo(() => {
-    if (!canEstimateResultCount) return t("hero.search");
-    if (countLoading) return t("hero.searching", "Recherche...");
-    if (resultCount <= 0) return t("hero.seeListings", "Voir les annonces");
-    if (resultCount === 1) return t("hero.result_one", "1 résultat");
-    return t("hero.result_many", { count: resultCount, defaultValue: `${resultCount} résultats` });
-  }, [canEstimateResultCount, countLoading, resultCount, t]);
+  // Total count (no filters) — shown by default in the CTA. staleTime 30s prevents hot-loop refetch.
+  const { data: totalCount = 0, isLoading: totalLoading } = useFilteredActiveListingCount({});
+  // Filtered count — only hits the DB when user actually poses filters (early-return 0 otherwise).
+  const { data: filteredCount = 0, isLoading: filteredLoading } = useFilteredActiveListingCount(filteredCountFilters);
+
+  const ctaCount = canEstimateResultCount ? filteredCount : totalCount;
+  const ctaLoading = canEstimateResultCount ? filteredLoading : totalLoading;
+  const ctaLabel = useMemo(
+    () =>
+      ctaLoading
+        ? t("hero.searching", "Recherche...")
+        : t("hero.seeXListings", "Voir {{count}} annonces", { count: ctaCount }),
+    [ctaLoading, ctaCount, t],
+  );
+
+  const advancedFiltersActiveCount = useMemo(() => {
+    let n = 0;
+    if (brands.length > 0) n += 1;
+    if (modelQuery.trim().length > 0) n += 1;
+    if (yearPreset !== "all") n += 1;
+    if (fuels.length > 0) n += 1;
+    return n;
+  }, [brands, modelQuery, yearPreset, fuels]);
+
+  const refineLabel = advancedFiltersActiveCount > 0
+    ? t("hero.refineSearchWithCount", "Affiner la recherche ({{count}})", { count: advancedFiltersActiveCount })
+    : t("hero.refineSearch", "Affiner la recherche");
 
   const handleSearch = () => {
     navigate(searchPathFromFilters(searchFilters));
@@ -218,7 +255,7 @@ const HeroSearch = () => {
       <div className="absolute inset-0 bg-[radial-gradient(1000px_420px_at_50%_-5%,rgba(255,255,255,0.14),transparent)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
 
-      <div className="relative container mx-auto px-4 text-center">
+      <div className="relative container mx-auto text-center">
         <h1
           className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight px-1"
           style={{ color: "#FAFAFA" }}
@@ -311,7 +348,7 @@ const HeroSearch = () => {
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                    className="flex-1 px-3 py-2 text-left hover:bg-muted/50 transition-colors"
                   >
                     <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
                       {t("search.budget")}
@@ -337,122 +374,144 @@ const HeroSearch = () => {
                 </PopoverContent>
               </Popover>
 
-              {showBrand && (
-                <div className="flex-shrink-0 w-32 border-r border-border px-3 py-2">
-                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
-                    {t("search.brand", "Marque")}
+            </div>
+
+            {/* Desktop: CTA "Voir X annonces" plein-largeur juste sous la pill (Lot 4.4b) */}
+            <Button
+              type="button"
+              onClick={handleSearch}
+              className="hidden lg:flex mt-3 w-full gradient-primary border-0 font-semibold font-sans gap-2 h-12 rounded-xl"
+              style={{ color: "#FAFAFA" }}
+            >
+              <Search className="h-5 w-5" />
+              {ctaLabel}
+            </Button>
+
+            {/* Desktop: toggle accordéon "Affiner la recherche" avec badge de filtres actifs */}
+            <button
+              type="button"
+              onClick={() => setShowDesktopAdvanced((prev) => !prev)}
+              className="hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 font-sans text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              aria-expanded={showDesktopAdvanced}
+              aria-controls="hero-advanced-filters-desktop"
+            >
+              <span>{refineLabel}</span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${showDesktopAdvanced ? "rotate-180" : ""}`} />
+            </button>
+
+            {/* Desktop: contenu déplié — Marque (conditionnel) / Modèle / Année / Carburant */}
+            {showDesktopAdvanced && (
+              <div
+                id="hero-advanced-filters-desktop"
+                className={`hidden lg:grid gap-3 mt-2 rounded-xl border border-border/70 bg-background/70 p-3 ${showBrand ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}
+              >
+                {showBrand && (
+                  <div>
+                    <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                      {t("search.brand", "Marque")}
+                    </label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm h-9 truncate">
+                          {brandLabel}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-72 p-3" align="start">
+                        <div className="mb-2 flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
+                          {brands.length > 0 && (
+                            <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
+                              Effacer
+                            </button>
+                          )}
+                        </div>
+                        <Input
+                          value={brandSearch}
+                          onChange={(e) => setBrandSearch(e.target.value)}
+                          placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
+                          className="h-8 text-xs mb-2"
+                        />
+                        <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+                          {visibleTopBrands.map((b) => (
+                            <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                              <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
+                              <BrandLogo
+                                brand={b}
+                                className="h-7 w-10 rounded-md bg-background"
+                                imgClassName="max-h-4"
+                                labelClassName="text-[10px]"
+                              />
+                              <span>{b}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                )}
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                    {t("search.model", "Modèle")}
+                  </label>
+                  <HeroModelCombobox
+                    value={modelQuery}
+                    options={modelOptions}
+                    onSelect={setModelQuery}
+                    placeholder={t("hero.modelPlaceholder", "Modèle (ex: RAV4, Hilux, NMAX...)")}
+                    searchPlaceholder={t("hero.modelSearchPlaceholder", "Rechercher un modèle...")}
+                    emptyLabel={t("hero.modelEmpty", "Aucun modèle trouvé")}
+                    freeTextLabel={t("hero.modelFreeText", "Utiliser « {{query}} » comme modèle")}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                    {t("search.year", "Année")}
+                  </label>
+                  <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
+                    <SelectTrigger className="h-9 font-sans text-sm">
+                      <SelectValue placeholder={t("hero.allYears", "Toutes années")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {HERO_YEAR_PRESETS.map((yearPresetOption) => (
+                        <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
+                          {yearPresetOption.value === "all" ? t("hero.allYears", "Toutes années") : yearPresetOption.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
+                    {t("search.fuel", "Carburant")}
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button type="button" className="w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left truncate">{brandLabel}</button>
+                      <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm h-9 truncate">
+                        {fuelLabel}
+                      </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-72 p-3" align="start">
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">{t("search.brand", "Marque")}</p>
-                      {brands.length > 0 && (
-                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setBrands([])}>
-                          Effacer
-                        </button>
-                      )}
-                    </div>
-                    <Input
-                      value={brandSearch}
-                      onChange={(e) => setBrandSearch(e.target.value)}
-                      placeholder={t("hero.brandSearchPlaceholder", "Rechercher une marque...")}
-                      className="h-8 text-xs mb-2"
-                    />
-                      <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
-                        {visibleTopBrands.map((b) => (
-                          <label key={b} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
-                            <Checkbox checked={brands.includes(b)} onCheckedChange={() => setBrands((prev) => prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b])} />
-                            <BrandLogo
-                              brand={b}
-                              className="h-7 w-10 rounded-md bg-background"
-                              imgClassName="max-h-4"
-                              labelClassName="text-[10px]"
-                            />
-                            <span>{b}</span>
+                    <PopoverContent className="w-64 p-3" align="start">
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
+                        {fuels.length > 0 && (
+                          <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
+                            Effacer
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
+                          <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
+                            <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
+                            <span>{opt}</span>
                           </label>
                         ))}
                       </div>
                     </PopoverContent>
                   </Popover>
                 </div>
-              )}
-
-              <div className="px-2">
-                <Button
-                  type="button"
-                  onClick={handleSearch}
-                  className="gradient-primary border-0 font-semibold font-sans gap-2 h-12 px-6 rounded-xl"
-                  style={{ color: "#FAFAFA" }}
-                >
-                  <Search className="h-5 w-5" />
-                  {ctaLabel}
-                </Button>
               </div>
-            </div>
-
-            <div className="hidden lg:grid grid-cols-12 gap-2 mt-2 rounded-xl border border-border/70 bg-background/70 p-2">
-              <div className="col-span-6">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  {t("search.model", "Modèle")}
-                </label>
-                <Input
-                  value={modelQuery}
-                  onChange={(e) => setModelQuery(e.target.value)}
-                  placeholder={t("hero.modelPlaceholder")}
-                  className="h-9 font-sans text-sm"
-                />
-              </div>
-              <div className="col-span-3">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  {t("search.year", "Année")}
-                </label>
-                <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
-                  <SelectTrigger className="h-9 font-sans text-sm">
-                    <SelectValue placeholder={t("hero.allYears", "Toutes années")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {HERO_YEAR_PRESETS.map((yearPresetOption) => (
-                      <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
-                        {yearPresetOption.value === "all" ? t("hero.allYears", "Toutes années") : yearPresetOption.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="col-span-3">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-1 block text-left">
-                  {t("search.fuel", "Carburant")}
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm h-9 truncate">
-                      {fuelLabel}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-3" align="start">
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground">{t("search.fuel", "Carburant")}</p>
-                      {fuels.length > 0 && (
-                        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setFuels([])}>
-                          Effacer
-                        </button>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      {AUTO_SEARCH_FUEL_OPTIONS.map((opt) => (
-                        <label key={opt} className="flex items-center gap-2 py-1 text-sm font-sans cursor-pointer">
-                          <Checkbox checked={fuels.includes(opt)} onCheckedChange={() => setFuels((prev) => prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt])} />
-                          <span>{opt}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+            )}
 
             <div className="lg:hidden space-y-2.5">
               <Popover>
@@ -577,11 +636,14 @@ const HeroSearch = () => {
                     </Popover>
                   )}
 
-                  <Input
+                  <HeroModelCombobox
                     value={modelQuery}
-                    onChange={(e) => setModelQuery(e.target.value)}
-                    placeholder={t("hero.modelPlaceholder")}
-                    className="font-sans text-sm"
+                    options={modelOptions}
+                    onSelect={setModelQuery}
+                    placeholder={t("hero.modelPlaceholder", "Modèle (ex: RAV4, Hilux, NMAX...)")}
+                    searchPlaceholder={t("hero.modelSearchPlaceholder", "Rechercher un modèle...")}
+                    emptyLabel={t("hero.modelEmpty", "Aucun modèle trouvé")}
+                    freeTextLabel={t("hero.modelFreeText", "Utiliser « {{query}} » comme modèle")}
                   />
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <Select value={yearPreset} onValueChange={(v) => setYearPreset(v as (typeof HERO_YEAR_PRESETS)[number]["value"])}>
@@ -591,7 +653,7 @@ const HeroSearch = () => {
                       <SelectContent>
                         {HERO_YEAR_PRESETS.map((yearPresetOption) => (
                           <SelectItem key={yearPresetOption.value} value={yearPresetOption.value}>
-                            {yearPresetOption.label}
+                            {yearPresetOption.value === "all" ? t("hero.allYears", "Toutes années") : yearPresetOption.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -635,6 +697,62 @@ const HeroSearch = () => {
                 {ctaLabel}
               </Button>
             </div>
+          </div>
+
+          {/* Trust signals sobres sous la card search — Lot 4.4e */}
+          <div className="mt-12 md:mt-16 flex flex-wrap items-center justify-center gap-x-4 md:gap-x-8 gap-y-2 text-white/80 text-xs md:text-sm font-sans tracking-tight md:tracking-normal px-2">
+            <span className="inline-flex items-center gap-1.5 md:gap-2">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 shrink-0"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 2 L4 5 V12 C4 17 7.5 21 12 22 C16.5 21 20 17 20 12 V5 L12 2Z"
+                  fill="#059669"
+                />
+                <path
+                  d="M8 12 L11 15 L16 9"
+                  stroke="white"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="md:hidden">{t("hero.trustModeratedShort", "Modérées")}</span>
+              <span className="hidden md:inline">{t("hero.trustModerated", "Annonces modérées")}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 md:gap-2">
+              <svg
+                viewBox="0 0 24 16"
+                className="h-4 w-6 shrink-0 rounded-sm"
+                aria-hidden="true"
+              >
+                <rect x="0" y="0" width="8" height="16" fill="#FFFFFF" />
+                <rect x="8" y="0" width="16" height="8" fill="#FC3D32" />
+                <rect x="8" y="8" width="16" height="8" fill="#007E3A" />
+              </svg>
+              {t("hero.trustMadeInMg", "100% Malgache")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 md:gap-2">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 shrink-0"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" fill="#059669" />
+                <path
+                  d="M8 12 L11 15 L16 9"
+                  stroke="white"
+                  strokeWidth="2.2"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {t("hero.trustEstimationFree", "Estimation gratuite")}
+            </span>
           </div>
         </div>
       </div>

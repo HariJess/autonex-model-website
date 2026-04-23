@@ -66,11 +66,11 @@ export function validatePublishStep(
           t("publish.titleRequired", "Titre requis (min. 8 caractères)"),
         );
       }
-      if (input.description.trim().length < 40) {
+      if (input.description.trim().length < 10) {
         errors.push(
           t(
             "publish.descFrenchRequired",
-            "Description en français requise (min. 40 caractères)",
+            "Description en français requise (min. 10 caractères)",
           ),
         );
       }

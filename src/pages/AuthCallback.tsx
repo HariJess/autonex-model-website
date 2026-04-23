@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
 /**
  * Après OAuth (Google), Supabase redirige ici. Session dans l’URL ; on s’assure qu’un profil particulier existe.
@@ -79,7 +79,7 @@ const AuthCallback = () => {
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-4">
         {!error ? (
           <>
-            <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
+            <WheelSpinner size="xl" aria-hidden />
             <p className="font-sans text-sm text-muted-foreground">Finalisation de la connexion…</p>
           </>
         ) : (

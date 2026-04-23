@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,7 +75,7 @@ const AgencyProfile = () => {
       <>
         <Header />
         <div className="min-h-[60vh] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <WheelSpinner size="lg" />
         </div>
         <Footer />
       </>
@@ -109,7 +110,7 @@ const AgencyProfile = () => {
           <h1 className="font-serif text-2xl font-bold mb-2">{t("agencies.notFound")}</h1>
           <p className="text-muted-foreground font-sans mb-6">{t("agencies.notFoundDesc")}</p>
           <Link to="/agences">
-            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>{t("agencies.viewAll")}</Button>
+            <Button variant="hero" className="font-sans">{t("agencies.viewAll")}</Button>
           </Link>
         </div>
         <Footer />
@@ -156,7 +157,7 @@ const AgencyProfile = () => {
         </script>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto py-6 md:py-8">
         {MONETIZATION_PLACEMENTS.agencyStrip && (
           <div className="mb-8">
             <BannerSlot
@@ -189,7 +190,7 @@ const AgencyProfile = () => {
               {partnerDealer && <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>}
             </div>
             {displayLocation && <p className="text-sm font-sans text-muted-foreground mt-2">📍 {displayLocation}</p>}
-            <p className="text-muted-foreground font-sans mt-2">{displayBio || t("agencies.noDescription")}</p>
+            <p className="text-muted-foreground font-sans mt-2 break-words">{displayBio || t("agencies.noDescription")}</p>
             {displayPhone && <p className="text-sm font-sans text-muted-foreground mt-2">📞 {displayPhone}</p>}
             {agency?.email && <p className="text-sm font-sans text-muted-foreground">✉️ {agency.email}</p>}
             {partnerDealer && (
@@ -219,7 +220,7 @@ const AgencyProfile = () => {
         {agency?.description_long ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
             <h2 className="font-serif text-lg font-bold mb-2">À propos</h2>
-            <p className="font-sans text-sm text-muted-foreground whitespace-pre-wrap">
+            <p className="font-sans text-sm text-muted-foreground whitespace-pre-wrap break-words">
               {agency.description_long}
             </p>
           </section>
@@ -267,7 +268,7 @@ const AgencyProfile = () => {
         <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.listingsOf", { name: displayName })}</h2>
         {listingsLoading ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <WheelSpinner size="md" />
           </div>
         ) : listings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-secondary/15 px-6 py-10 text-center">

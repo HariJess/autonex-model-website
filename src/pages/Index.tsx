@@ -6,10 +6,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSearch from "@/components/HeroSearch";
 import ListingCard from "@/components/ListingCard";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { Button } from "@/components/ui/button";
 import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
+import BrandsRibbon from "@/components/BrandsRibbon";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
@@ -231,7 +233,7 @@ const Index = () => {
   );
   const showDealsSection = !dealsLoading && discountedListings.length >= 3;
   const renderThematicSection = (title: string, subtitle: string, linksTo: string, items: typeof listings) => (
-    <section className="container mx-auto px-4 py-5 md:py-6">
+    <section className="container mx-auto py-5 md:py-6">
       <div className="flex items-start justify-between gap-3 mb-4 md:mb-5">
         <div className="min-w-0">
           <h3 className="font-serif text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
@@ -246,13 +248,13 @@ const Index = () => {
           overline={t("home.collectionOverline", "Collection AutoNex")}
           title={t("home.collectionLoadingTitle", "Sélection en préparation")}
           description={t("home.collectionLoadingDesc", "Nous organisons cette collection pour vous proposer les annonces les plus pertinentes.")}
-          icon={<Loader2 className="h-5 w-5 animate-spin text-primary" />}
+          icon={<WheelSpinner size="md" />}
           className="py-7"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
           {items.map((listing) => (
-            <ListingCard key={`${title}-${listing.id}`} listing={listing} />
+            <ListingCard key={`${title}-${listing.id}`} listing={listing} layout="compact" />
           ))}
         </div>
       )}
@@ -300,30 +302,31 @@ const Index = () => {
 
       <HeroSearch />
 
-      <section className="container mx-auto px-4 pt-10 md:pt-14">
-        <div className="rounded-2xl border border-border/80 bg-gradient-to-b from-slate-50/90 to-background px-3 py-4 md:px-6 md:py-5 shadow-[0_1px_3px_-1px_rgba(15,23,42,0.07)]">
-          <div className="flex items-end justify-between gap-3">
+      <section className="py-10 md:py-14">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
             <div>
-              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.quickExplore", "Explorer rapidement")}</p>
-              <h2 className="font-serif text-lg md:text-2xl font-semibold mt-1">{t("home.mainCategories", "Catégories principales")}</h2>
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1">{t("home.quickExplore", "Explorer rapidement")}</p>
+              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.mainCategories", "Catégories principales")}</h2>
             </div>
             <Link
               to="/recherche"
-              className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              className="hidden md:inline-flex items-center text-sm md:text-base font-medium text-primary hover:underline shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
             >
               {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+          {/* Mobile: scroll horizontal harmonisé avec pattern marques — Lot 4.8 */}
+          <div className="md:hidden flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
             {heroCategoryShortcuts.map((shortcut) => (
               <Link
                 key={shortcut.key}
                 to={shortcut.to}
-                className="group rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 md:py-3.5 min-h-[96px] md:min-h-[104px] flex flex-col items-center justify-center gap-2.5 md:gap-3 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 hover:-translate-y-px hover:border-slate-300/95 hover:from-blue-50/85 hover:to-slate-50 hover:shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                className="group snap-start shrink-0 rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 min-h-[140px] w-[112px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
               >
                 <span
-                  className="flex h-14 w-[4.25rem] md:h-[3.75rem] md:w-[4.75rem] shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
                   aria-hidden="true"
                 >
                   <img
@@ -331,7 +334,7 @@ const Index = () => {
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    className="h-9 md:h-10 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                    className="h-8 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
                     onError={(event) => {
                       const target = event.currentTarget;
                       if (!target.dataset.fallbackApplied) {
@@ -341,57 +344,97 @@ const Index = () => {
                     }}
                   />
                 </span>
-                <span className="font-serif text-sm md:text-base text-foreground leading-tight">{shortcut.label}</span>
+                <span className="font-serif text-sm text-foreground leading-tight">{shortcut.label}</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop: alignement sur style mobile (cards pastels + cercles bleus + label) — Lot 4.5 */}
+          <div className="hidden md:grid md:grid-cols-5 gap-4 lg:gap-5">
+            {heroCategoryShortcuts.map((shortcut) => (
+              <Link
+                key={shortcut.key}
+                to={shortcut.to}
+                className="group flex flex-col items-center justify-center gap-3 text-center min-h-[160px] rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-4 py-4 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                aria-label={shortcut.label}
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-16 w-16 lg:h-20 lg:w-20 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                >
+                  <img
+                    src={shortcut.iconSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-10 lg:h-12 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      if (!target.dataset.fallbackApplied) {
+                        target.dataset.fallbackApplied = "1";
+                        target.src = "/category-icons/category-citadine.svg";
+                      }
+                    }}
+                  />
+                </span>
+                <span className="font-serif text-sm md:text-base text-foreground font-medium leading-tight">
+                  {shortcut.label}
+                </span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="container mx-auto px-4 pt-6 md:pt-8">
-        <div className="py-1 md:py-2">
-          <div className="mt-1 flex items-end justify-between gap-3">
-            <h2 className="font-serif text-xl md:text-[2rem] font-semibold">{t("home.popularBrands", "Marques populaires")}</h2>
+      <section className="py-10 md:py-14">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
+            <div>
+              <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1">{t("home.popularBrandsOverline", "Découvrir")}</p>
+              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.popularBrands", "Marques populaires")}</h2>
+            </div>
             <Link
               to="/recherche"
-              className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              className="hidden md:inline-flex items-center text-sm md:text-base font-medium text-primary hover:underline shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
             >
               {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-5 md:gap-x-6 md:gap-y-6">
-            {popularBrands.map((brand) => (
-              <Link
-                key={brand.id}
-                to={brand.href}
-                className={cn(
-                  "group rounded-lg px-3 py-3.5 min-h-[132px] w-[144px] md:min-h-[148px] md:w-[168px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[3px] hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
-                  brand.wrapperClassName,
-                )}
-                aria-label={`Voir les annonces ${brand.label}`}
-              >
-                {brand.logoAsset ? (
-                  <img
-                    src={brand.logoAsset}
-                    alt={`Logo ${brand.label}`}
-                    loading="lazy"
-                    decoding="async"
-                    className={cn(
-                      "h-[3.1rem] md:h-[3.35rem] w-auto max-w-[168px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity",
-                      brand.logoClassName,
-                    )}
-                  />
-                ) : (
-                  <span className="inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border/60 bg-background text-xs font-semibold tracking-wide text-foreground/85">
-                    {brand.label.slice(0, 2).toUpperCase()}
+          {/* Mobile: scroll manuel */}
+          <div className="md:hidden">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-4 px-4">
+              {popularBrands.map((brand) => (
+                <Link
+                  key={`mobile-${brand.id}`}
+                  to={brand.href}
+                  className="group snap-start shrink-0 rounded-lg px-3 py-3 min-h-[104px] w-[112px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                  aria-label={`Voir les annonces ${brand.label}`}
+                >
+                  {brand.logoAsset ? (
+                    <img
+                      src={brand.logoAsset}
+                      alt={`Logo ${brand.label}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-10 w-auto max-w-[96px] object-contain opacity-90 group-hover:opacity-100 motion-safe:transition-opacity"
+                    />
+                  ) : (
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background text-xs font-semibold tracking-wide text-foreground/85">
+                      {brand.label.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="font-sans text-xs font-medium tracking-[0.01em] text-foreground/75 truncate max-w-full">
+                    {brand.label}
                   </span>
-                )}
-                <span className="font-sans text-[13px] md:text-xs font-medium tracking-[0.01em] text-foreground/75">
-                  {brand.label}
-                </span>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: composant interactif pro */}
+          <div className="hidden md:block">
+            <BrandsRibbon brands={popularBrands} />
           </div>
         </div>
       </section>
@@ -403,7 +446,7 @@ const Index = () => {
       />
 
       {showDealsSection && (
-        <section className="container mx-auto px-4 pt-6 md:pt-8">
+        <section className="container mx-auto pt-6 md:pt-8">
           <div className="flex items-end justify-between gap-3 mb-4 md:mb-5">
             <div className="min-w-0">
               <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">
@@ -420,16 +463,16 @@ const Index = () => {
               {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
             {discountedListings.map((entry) => (
-              <ListingCard key={`deal-${entry.listing.id}`} listing={entry.listing} dealMeta={entry.deal} />
+              <ListingCard key={`deal-${entry.listing.id}`} listing={entry.listing} dealMeta={entry.deal} layout="compact" />
             ))}
           </div>
         </section>
       )}
 
-      <section className="container mx-auto px-4 py-6 md:py-8">
-        <div className="rounded-2xl border border-border/75 bg-gradient-to-br from-card via-card to-secondary/20 p-4 md:p-6">
+      <section className="container mx-auto py-6 md:py-8">
+        <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-card via-card to-primary/[0.06] p-5 md:p-7 shadow-[0_2px_20px_-12px_rgba(18,86,202,0.25)]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.estimationOverline", "Différenciateur AutoNex")}</p>
@@ -439,7 +482,7 @@ const Index = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-2.5">
-              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+              <Button asChild variant="hero">
                 <Link to="/estimation" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.launchEstimation", "Lancer l’estimation")}</Link>
               </Button>
               <Button asChild variant="outline">
@@ -451,7 +494,7 @@ const Index = () => {
       </section>
 
       {/* Recent feed — complementary to “À la une” */}
-      <section className="container mx-auto px-4 py-8 md:py-12">
+      <section className="container mx-auto py-8 md:py-12">
         <div className="flex items-start justify-between gap-3 mb-5 md:mb-8">
           <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">{t("sections.latest", "Nouvelles annonces auto")}</h2>
           <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline shrink-0 min-h-10 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
@@ -464,7 +507,7 @@ const Index = () => {
               overline={t("home.marketFeedOverline", "Flux marché")}
               title={t("home.marketFeedLoadingTitle", "Chargement des nouvelles annonces")}
               description={t("home.marketFeedLoadingDesc", "Nous mettons à jour les dernières publications pour vous donner une vue actuelle du marché.")}
-              icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+              icon={<WheelSpinner size="md" />}
               className="py-8"
             />
             <PremiumStateSkeletonGrid count={4} />
@@ -476,7 +519,7 @@ const Index = () => {
             description={t("home.noListingsDesc", "Découvrez déjà la recherche et nos catégories, puis lancez votre première annonce pour activer le marché.")}
             action={
               <div className="flex flex-wrap justify-center gap-2.5">
-                <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+                <Button asChild variant="hero">
                   <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.publishVehicle", "Publier mon véhicule")}</Link>
                 </Button>
                 <Button asChild variant="outline">
@@ -486,9 +529,9 @@ const Index = () => {
             }
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
             {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
+              <ListingCard key={listing.id} listing={listing} layout="compact" />
             ))}
           </div>
         )}
@@ -499,14 +542,14 @@ const Index = () => {
       )}
 
       {isLowInventory && themedSectionsToRender.length === 0 && (
-        <section className="container mx-auto px-4 py-5 md:py-6">
+        <section className="container mx-auto py-5 md:py-6">
           <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6">
             <h3 className="font-serif text-lg md:text-xl font-bold text-foreground">{t("home.marketStarting", "Le marché se lance")}</h3>
             <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">
               {t("home.lowInventoryDesc", "L’inventaire est encore limité. Publiez votre véhicule ou explorez les recherches pour suivre les nouvelles annonces.")}
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
-              <Button asChild className="gradient-primary border-0" style={{ color: "#FAFAFA" }}>
+              <Button asChild variant="hero">
                 <Link to="/publier" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 rounded-md">{t("home.publishVehicle", "Publier mon véhicule")}</Link>
               </Button>
               <Button asChild variant="outline">

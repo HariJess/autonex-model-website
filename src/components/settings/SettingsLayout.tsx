@@ -52,7 +52,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
   );
 
   return (
-    <div className="container mx-auto px-4 py-6 md:py-10">
+    <div className="container mx-auto py-6 md:py-10">
       {/* Mobile: top bar with drawer trigger */}
       <div className="mb-4 flex items-center justify-between md:hidden">
         <h1 className="font-serif text-2xl font-bold">Paramètres</h1>
@@ -73,7 +73,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 md:gap-10">
         {/* Desktop sidebar */}
         <aside className="hidden md:block">
-          <div className="sticky top-24 rounded-2xl border border-border bg-card p-3">
+          <div className="sticky top-24 rounded-2xl border border-border bg-card p-4">
             <p className="px-3 pt-1 pb-3 font-serif text-lg font-bold">Paramètres</p>
             {nav}
           </div>

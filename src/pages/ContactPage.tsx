@@ -158,7 +158,7 @@ export default function ContactPage() {
         <script type="application/ld+json">{JSON.stringify(CONTACT_JSON_LD)}</script>
       </Helmet>
       <Header />
-      <main className="container mx-auto px-4 py-8 md:py-12">
+      <main className="container mx-auto py-8 md:py-12">
         <header className="mb-6 md:mb-8 space-y-2">
           <h1 className="font-serif text-3xl md:text-4xl font-bold">Nous contacter</h1>
           <p className="font-sans text-muted-foreground max-w-2xl">

@@ -19,7 +19,7 @@ const NotFound = () => {
         </p>
         <div className="flex gap-3">
           <Link to="/">
-            <Button className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+            <Button variant="hero" className="font-sans">
               Retour à l'accueil
             </Button>
           </Link>

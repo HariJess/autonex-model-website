@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
-import { Loader2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
@@ -107,6 +107,14 @@ const PublishPage = () => {
   /** Skips bootstrap re-entry after we self-navigate post-create; see usePublishBootstrap. */
   const selfNavigatedDraftIdRef = useRef<string | null>(null);
 
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  }, [step]);
+
   const steps = [
     t("publish.stepMain", "Informations principales"),
     t("publish.stepDetails", "Détails du véhicule"),
@@ -205,6 +213,7 @@ const PublishPage = () => {
     handlePhotoSelect,
     removePhotoAt,
     makeCoverAtIndex,
+    isUploading,
   } = usePublishMedia(draftListingId, user ?? null);
 
   const publishValidationInput = useMemo<PublishValidationInput>(
@@ -694,7 +703,6 @@ const PublishPage = () => {
     if (firstInvalid) {
       toast.error(firstInvalid.errors[0]);
       setStep(firstInvalid.step);
-      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     if (!user || !transaction || !listingType) {
@@ -889,7 +897,7 @@ const PublishPage = () => {
         </title>
       </Helmet>
       <Header />
-      <div className="container mx-auto max-w-6xl px-4 py-6 md:py-8 pb-36 sm:pb-8">
+      <div className="container mx-auto max-w-6xl py-6 md:py-8 pb-36 sm:pb-8">
         <PublishPageHeader
           moderationText={t(
             "publish.publishBannerInstant",
@@ -923,7 +931,7 @@ const PublishPage = () => {
               description={spEdit
                 ? t("publish.loadingEdit", "Chargement de l’annonce…")
                 : t("publish.loadingDraft", "Chargement du brouillon…")}
-              icon={<Loader2 className="h-6 w-6 animate-spin text-primary" />}
+              icon={<WheelSpinner size="md" />}
               className="py-8"
             />
           </div>
@@ -933,7 +941,7 @@ const PublishPage = () => {
         <>
         <PublishProgressSteps steps={steps} step={step} progress={progress} />
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.45fr_0.55fr] lg:gap-6">
+        <div className={`grid grid-cols-1 gap-5 ${step === 0 ? "lg:grid-cols-[1.45fr_0.55fr] lg:gap-6" : ""}`}>
           <div className="space-y-4">
             <PublishStepGuideCard
               stepGuide={stepGuides[step]}
@@ -1003,10 +1011,12 @@ const PublishPage = () => {
           <PublishMediaSection
             serverPhotos={serverPhotos}
             pendingPhotos={pendingPhotos}
+            isUploading={isUploading}
             labels={{
               mainPhotoFirst: t("publish.mainPhotoFirst", "La première image est la photo principale. Utilisez « Couverture » pour réorganiser."),
               chooseFiles: t("publish.chooseFiles", "Choisir des photos"),
               localOnly: t("publish.localOnly", "Local"),
+              uploading: t("publish.uploading", "Téléversement en cours…"),
               videoUrl: t("publish.videoUrl", "Lien vidéo (YouTube, etc.) — optionnel"),
               tourUrl: t("publish.tourUrl", "Visite virtuelle (URL) — optionnel"),
               mainPhotosTitle: t("publish.mainPhotosTitle", "Photos principales"),
@@ -1048,25 +1058,27 @@ const PublishPage = () => {
         />
           </div>
 
-          <PublishGuidanceAside
-            overline={t("publish.guidanceOverline", "Guidage AutoNex")}
-            title={t("publish.publishWithConfidence", "Publiez avec confiance")}
-            secureDraftTitle={t("publish.secureDraft", "Brouillon sécurisé")}
-            secureDraftHint={t(
-              "publish.secureDraftHint",
-              "Vos modifications sont sauvegardées automatiquement.",
-            )}
-            moderationTitle={t("publish.prePublishModeration", "Modération avant publication")}
-            moderationHint={t(
-              "publish.prePublishModerationHint",
-              "Chaque annonce est vérifiée pour protéger la qualité du catalogue.",
-            )}
-            guidedFlowTitle={t("publish.guidedFlow", "Parcours guidé")}
-            guidedFlowHint={t(
-              "publish.guidedFlowHint",
-              "Validez chaque étape pour avancer sereinement et limiter les retours arrière.",
-            )}
-          />
+          {step === 0 && (
+            <PublishGuidanceAside
+              overline={t("publish.guidanceOverline", "Guidage AutoNex")}
+              title={t("publish.publishWithConfidence", "Publiez avec confiance")}
+              secureDraftTitle={t("publish.secureDraft", "Brouillon sécurisé")}
+              secureDraftHint={t(
+                "publish.secureDraftHint",
+                "Vos modifications sont sauvegardées automatiquement.",
+              )}
+              moderationTitle={t("publish.prePublishModeration", "Modération avant publication")}
+              moderationHint={t(
+                "publish.prePublishModerationHint",
+                "Chaque annonce est vérifiée pour protéger la qualité du catalogue.",
+              )}
+              guidedFlowTitle={t("publish.guidedFlow", "Parcours guidé")}
+              guidedFlowHint={t(
+                "publish.guidedFlowHint",
+                "Validez chaque étape pour avancer sereinement et limiter les retours arrière.",
+              )}
+            />
+          )}
         </div>
         </>
         )}

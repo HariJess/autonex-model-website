@@ -208,7 +208,7 @@ const BODY_TYPE_BY_MODEL: Record<string, Record<string, BodyType[]>> = {
  * - normalization/cleanup to avoid duplicates and naming drift
  * - map shape kept simple and future-safe for model metadata extension
  */
-const VEHICLE_UI_CATALOG_BY_MAKE: Record<string, string[]> = {
+export const VEHICLE_UI_CATALOG_BY_MAKE: Record<string, string[]> = {
   Acura: ["ILX", "Integra", "MDX", "NSX", "RDX", "RLX", "TLX", "ZDX"],
   "Alfa Romeo": ["4C", "Giulia", "Giulietta", "Stelvio", "Tonale"],
   Audi: ["A1", "A3", "A4", "A5", "A6", "A7", "A8", "Q2", "Q3", "Q5", "Q7", "Q8", "RS3", "RS6", "TT"],

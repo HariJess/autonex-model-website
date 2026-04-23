@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useDbListings } from "@/hooks/useListings";
 import ListingCard from "@/components/ListingCard";
-import { Loader2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { BannerSlot } from "./BannerSlot";
 import { FeaturedAgenciesSection } from "./FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
@@ -35,7 +35,7 @@ export function ListingRelatedPromoted({ listingId, ville, transaction, type }: 
         <SponsoredPill label="Pour vous" />
       </div>
       {isLoading ? (
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <WheelSpinner size="md" />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {filtered.map((l) => (

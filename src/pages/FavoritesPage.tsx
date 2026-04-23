@@ -1,7 +1,8 @@
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
@@ -20,7 +21,7 @@ const FavoritesPage = () => {
       </Helmet>
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8 md:py-10">
+      <main className="flex-1 container mx-auto py-8 md:py-10">
         <section className="mb-6 md:mb-8">
           <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
             <Heart className="h-6 w-6 md:h-7 md:w-7 text-destructive fill-destructive" aria-hidden />
@@ -33,7 +34,7 @@ const FavoritesPage = () => {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <WheelSpinner size="lg" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">
@@ -61,7 +62,7 @@ const FavoritesPage = () => {
               {t("favorites.empty.body")}
             </p>
             <div className="mt-5">
-              <Button asChild className="gradient-primary border-0 font-sans" style={{ color: "#FAFAFA" }}>
+              <Button asChild variant="hero" className="font-sans">
                 <Link to="/recherche">{t("favorites.empty.cta")}</Link>
               </Button>
             </div>

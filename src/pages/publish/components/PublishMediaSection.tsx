@@ -6,6 +6,7 @@ import type { ServerPhoto } from "@/lib/publishDraft";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
 type PendingPhoto = { file: File; preview: string };
 
@@ -18,10 +19,12 @@ type PublishMediaSectionProps = {
    */
   serverPhotos: ServerPhoto[];
   pendingPhotos: PendingPhoto[];
+  isUploading: boolean;
   labels: {
     mainPhotoFirst: string;
     chooseFiles: string;
     localOnly: string;
+    uploading: string;
     videoUrl: string;
     tourUrl: string;
     mainPhotosTitle: string;
@@ -45,6 +48,7 @@ type PublishMediaSectionProps = {
 export function PublishMediaSection({
   serverPhotos,
   pendingPhotos,
+  isUploading,
   labels,
   onPhotoSelect,
   onMakeCoverAtIndex,
@@ -61,13 +65,20 @@ export function PublishMediaSection({
         <p className="mt-1 text-[13px] text-muted-foreground font-sans leading-relaxed">{labels.mainPhotoFirst}</p>
       </div>
       <div className="border-2 border-dashed border-border rounded-2xl p-6 sm:p-10 text-center bg-background/70">
-        <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+        {isUploading ? (
+          <WheelSpinner size="xl" variant="primary" className="mx-auto mb-3" />
+        ) : (
+          <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+        )}
         <input type="file" multiple accept="image/*" onChange={onPhotoSelect} className="hidden" id="photo-upload" />
         <label htmlFor="photo-upload">
           <Button variant="outline" className="font-sans" type="button" asChild>
             <span>{labels.chooseFiles}</span>
           </Button>
         </label>
+        {isUploading && (
+          <p className="mt-3 text-xs font-sans text-muted-foreground">{labels.uploading}</p>
+        )}
       </div>
       {(serverPhotos.length > 0 || pendingPhotos.length > 0) && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
@@ -95,7 +106,11 @@ export function PublishMediaSection({
             const gi = serverPhotos.length + i;
             return (
               <div key={`${p.file.name}-${p.file.size}-${i}`} className="relative rounded-xl overflow-hidden border border-border aspect-square group border-dashed">
-                <img src={p.preview} alt="" className="w-full h-full object-cover opacity-90" />
+                <img src={p.preview} alt="" className="w-full h-full object-cover opacity-80" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/40 pointer-events-none">
+                  <WheelSpinner size="md" variant="white" />
+                  <span className="text-[11px] font-sans text-white">{labels.uploading}</span>
+                </div>
                 <div className="absolute inset-x-0 bottom-0 flex gap-1.5 p-1.5 bg-background/85">
                   {gi > 0 && (
                     <Button type="button" size="sm" variant="secondary" className="text-xs min-h-10 flex-1 font-sans" onClick={() => onMakeCoverAtIndex(gi)}>

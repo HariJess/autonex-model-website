@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { ChevronRight, Home, Loader2, Sparkles } from "lucide-react";
+import { ChevronRight, Home, Sparkles } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { useDbListings, useFilteredActiveListingCount } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -510,7 +511,7 @@ const SearchPage = () => {
       </Helmet>
       <Header />
 
-      <div className="container mx-auto px-4 pt-3.5 md:pt-4 pb-2.5 md:pb-3">
+      <div className="container mx-auto pt-3.5 md:pt-4 pb-2.5 md:pb-3">
         <section className="rounded-2xl border border-border/70 bg-gradient-to-br from-background via-background to-secondary/20 px-4 py-3 md:px-5 md:py-3.5">
         <nav className="flex flex-wrap items-center gap-1.5 text-sm font-sans text-muted-foreground mb-2.5" aria-label="Breadcrumb">
           {breadcrumbs.map((bc, i) => (
@@ -565,7 +566,7 @@ const SearchPage = () => {
         </section>
       </div>
 
-      <div className="container mx-auto px-4 pb-8 md:pb-10">
+      <div className="container mx-auto pb-8 md:pb-10">
         <div className="flex gap-6 lg:gap-7">
           <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <FilterSidebar filters={filters} onFiltersChange={updateFilters} idPrefix="desktop" />
@@ -680,7 +681,7 @@ const SearchPage = () => {
                   <Suspense
                     fallback={
                       <div className="h-full min-h-[280px] flex items-center justify-center rounded-xl border border-border bg-muted/30">
-                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <WheelSpinner size="md" />
                       </div>
                     }
                   >

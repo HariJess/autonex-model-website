@@ -7,7 +7,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
 import { BetaLockGate } from "@/components/auth/BetaLockGate";
 import { lazy, Suspense, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
 // Eager load: landing page and layout
 import Index from "./pages/Index.tsx";
@@ -69,7 +69,7 @@ const queryClient = new QueryClient({
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
-    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    <WheelSpinner size="xl" />
   </div>
 );
 

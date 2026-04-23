@@ -123,7 +123,7 @@ export function DashboardCreditsSection({
             ) : (
               <ul className="space-y-3">
                 {pendingPurchases.map((tx) => (
-                  <li key={tx.id} className="rounded-xl border border-border bg-secondary/20 p-3 text-sm font-sans">
+                  <li key={tx.id} className="rounded-xl border border-border bg-secondary/20 p-4 text-sm font-sans">
                     <p className="font-medium">{formatAriary(tx.amount_mga)}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {labels.txRef} {tx.reference ?? tx.id.slice(0, 8)} · {tx.method ?? "—"}

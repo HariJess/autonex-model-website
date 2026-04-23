@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import ListingCard from "@/components/ListingCard";
 import { useDbListings } from "@/hooks/useListings";
 import { useFeaturedBoostListingIds } from "@/hooks/useFeaturedBoosts";
@@ -42,7 +43,7 @@ export function FeaturedListingsSection({
   if (!hasBoosted) return null;
 
   return (
-    <section className="container mx-auto px-4 py-14">
+    <section className="container mx-auto py-14">
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{title}</h2>
@@ -54,7 +55,7 @@ export function FeaturedListingsSection({
       </div>
       {loadBoosted ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <WheelSpinner size="lg" />
         </div>
       ) : boostedListings.length === 0 ? (
         // Boost IDs exist but the listings query returned nothing (listing deleted

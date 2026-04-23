@@ -8,8 +8,16 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
-      screens: { "2xl": "1400px" },
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+        md: "2rem",
+        lg: "2.5rem",
+        xl: "3rem",
+      },
+      screens: {
+        "2xl": "1480px",
+      },
     },
     extend: {
       fontFamily: {
@@ -64,6 +72,18 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        navbar: {
+          DEFAULT: "hsl(var(--navbar-bg))",
+          foreground: "hsl(var(--navbar-fg))",
+          accent: "hsl(var(--navbar-accent))",
+        },
+        "on-dark": {
+          DEFAULT: "hsl(var(--on-dark-surface-fg))",
+          muted: "hsl(var(--on-dark-surface-muted))",
+        },
+        dropdown: {
+          DEFAULT: "hsl(var(--dropdown-bg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -76,11 +96,16 @@ export default {
         "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
         "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
         "fade-in": { from: { opacity: "0", transform: "translateY(10px)" }, to: { opacity: "1", transform: "translateY(0)" } },
+        "scroll-x-infinite": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.5s ease-out",
+        "scroll-x-infinite": "scroll-x-infinite 25s linear infinite",
       },
     },
   },

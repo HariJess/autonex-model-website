@@ -221,7 +221,7 @@ export function SignupForm({
             <span>{labels.contactConsent}</span>
           </label>
         )}
-        <Button type="submit" disabled={loading} className="w-full gradient-primary border-0 font-sans min-h-12 touch-manipulation" style={{ color: "#FAFAFA" }}>
+        <Button type="submit" disabled={loading} variant="hero" className="w-full font-sans min-h-12 touch-manipulation">
           {loading ? labels.loading : labels.signup}
         </Button>
       </form>

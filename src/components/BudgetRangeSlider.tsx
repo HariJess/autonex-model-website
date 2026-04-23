@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 const EXCHANGE_RATE = 5050;
 
 const RANGES: Record<string, { max: number; step: number }> = {
-  vente: { max: 5_000_000_000, step: 10_000_000 },
+  vente: { max: 750_000_000, step: 10_000_000 },
   location: { max: 30_000_000, step: 100_000 },
   location_vacances: { max: 1_000_000, step: 10_000 },
 };
@@ -17,7 +17,7 @@ const PRESETS_MGA: Record<string, { label: string; min: number; max: number }[]>
     { label: "50-150M", min: 50_000_000, max: 150_000_000 },
     { label: "150-300M", min: 150_000_000, max: 300_000_000 },
     { label: "300-500M", min: 300_000_000, max: 500_000_000 },
-    { label: "500M+", min: 500_000_000, max: 5_000_000_000 },
+    { label: "500M+", min: 500_000_000, max: 750_000_000 },
   ],
   location: [
     { label: "< 500k", min: 0, max: 500_000 },
@@ -40,7 +40,7 @@ const PRESETS_EUR: Record<string, { label: string; min: number; max: number }[]>
     { label: "10-30k€", min: 50_500_000, max: 151_500_000 },
     { label: "30-60k€", min: 151_500_000, max: 303_000_000 },
     { label: "60-100k€", min: 303_000_000, max: 505_000_000 },
-    { label: "100k€+", min: 505_000_000, max: 5_000_000_000 },
+    { label: "100k€+", min: 505_000_000, max: 750_000_000 },
   ],
   location: [
     { label: "< 100€", min: 0, max: 505_000 },
