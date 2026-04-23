@@ -317,16 +317,16 @@ const Index = () => {
             </Link>
           </div>
 
-          {/* Mobile: bandeau horizontal scrollable (inchangé Lot 2) */}
-          <div className="md:hidden flex gap-2.5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
+          {/* Mobile: scroll horizontal harmonisé avec pattern marques — Lot 4.8 */}
+          <div className="md:hidden flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-2 -mx-4 px-4">
             {heroCategoryShortcuts.map((shortcut) => (
               <Link
                 key={shortcut.key}
                 to={shortcut.to}
-                className="group snap-start shrink-0 rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 min-h-[88px] w-[104px] flex flex-col items-center justify-center gap-1.5 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+                className="group snap-start shrink-0 rounded-xl border border-slate-200/90 bg-gradient-to-b from-blue-50/55 to-slate-50/90 px-3 py-3 min-h-[140px] w-[112px] flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-[transform,box-shadow,border-color,background-color,opacity] motion-safe:duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
               >
                 <span
-                  className="flex h-10 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
+                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-100/55 ring-1 ring-blue-200/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.65)]"
                   aria-hidden="true"
                 >
                   <img
@@ -334,7 +334,7 @@ const Index = () => {
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    className="h-7 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
+                    className="h-8 w-auto max-h-full object-contain opacity-[0.92] contrast-[1.03] drop-shadow-[0_1px_1px_rgba(255,255,255,0.65)] group-hover:opacity-100 motion-safe:transition-opacity"
                     onError={(event) => {
                       const target = event.currentTarget;
                       if (!target.dataset.fallbackApplied) {
@@ -344,7 +344,7 @@ const Index = () => {
                     }}
                   />
                 </span>
-                <span className="font-serif text-xs text-foreground leading-tight">{shortcut.label}</span>
+                <span className="font-serif text-sm text-foreground leading-tight">{shortcut.label}</span>
               </Link>
             ))}
           </div>
