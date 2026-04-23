@@ -302,7 +302,7 @@ const Index = () => {
 
       <HeroSearch />
 
-      <section className="py-12 md:py-16">
+      <section className="py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
             <div>
@@ -386,7 +386,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-12 md:py-16">
+      <section className="py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
             <div>

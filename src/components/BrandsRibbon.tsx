@@ -20,7 +20,6 @@ export default function BrandsRibbon({ brands }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
-  const [isHovering, setIsHovering] = useState(false);
 
   const updateScrollButtons = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -54,16 +53,12 @@ export default function BrandsRibbon({ brands }: Props) {
   }, [updateScrollButtons]);
 
   return (
-    <div
-      className="relative group"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
+    <div className="relative">
       {/* Gradient fade gauche */}
       {canScrollPrev && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 md:w-20 z-10 bg-gradient-to-r from-white via-white/80 to-transparent"
+          className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 md:w-20 z-10 bg-gradient-to-r from-background via-background/80 to-transparent"
         />
       )}
 
@@ -71,37 +66,35 @@ export default function BrandsRibbon({ brands }: Props) {
       {canScrollNext && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 md:w-20 z-10 bg-gradient-to-l from-white via-white/80 to-transparent"
+          className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 md:w-20 z-10 bg-gradient-to-l from-background via-background/80 to-transparent"
         />
       )}
 
-      {/* Flèche gauche */}
+      {/* Flèche gauche — toujours visible desktop sauf aux extrémités */}
       <button
         type="button"
         onClick={() => scrollBy("prev")}
         disabled={!canScrollPrev}
         aria-label={t("brands.scrollPrev", "Marques précédentes")}
         className={cn(
-          "absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-10 w-10 rounded-full bg-white shadow-lg border border-border/70 transition-opacity duration-200 hover:bg-slate-50",
+          "hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 items-center justify-center h-10 w-10 rounded-full bg-white shadow-lg border border-border/70 transition-opacity duration-200 hover:bg-slate-50",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
           "disabled:opacity-0 disabled:pointer-events-none",
-          isHovering ? "opacity-100" : "opacity-0"
         )}
       >
         <ChevronLeft className="h-5 w-5 text-foreground" />
       </button>
 
-      {/* Flèche droite */}
+      {/* Flèche droite — toujours visible desktop sauf aux extrémités */}
       <button
         type="button"
         onClick={() => scrollBy("next")}
         disabled={!canScrollNext}
         aria-label={t("brands.scrollNext", "Marques suivantes")}
         className={cn(
-          "absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-10 w-10 rounded-full bg-white shadow-lg border border-border/70 transition-opacity duration-200 hover:bg-slate-50",
+          "hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 items-center justify-center h-10 w-10 rounded-full bg-white shadow-lg border border-border/70 transition-opacity duration-200 hover:bg-slate-50",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
           "disabled:opacity-0 disabled:pointer-events-none",
-          isHovering ? "opacity-100" : "opacity-0"
         )}
       >
         <ChevronRight className="h-5 w-5 text-foreground" />
@@ -112,31 +105,36 @@ export default function BrandsRibbon({ brands }: Props) {
         ref={scrollContainerRef}
         role="region"
         aria-label={t("home.popularBrandsRibbon", "Marques populaires")}
-        className="flex gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
+        className="flex gap-6 md:gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
       >
         {brands.map((brand) => (
           <Link
             key={brand.id}
             to={brand.href}
             draggable={false}
-            className="flex-[0_0_auto] snap-start rounded-lg px-4 py-3 flex flex-col items-center justify-center gap-2 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[2px] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[128px] md:w-[160px]"
+            className="flex-[0_0_auto] snap-start rounded-lg px-4 py-3 flex flex-col items-center justify-center gap-3 text-center motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-[2px] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 w-[128px] md:w-[160px] min-h-[140px]"
             aria-label={`Voir les annonces ${brand.label}`}
           >
-            {brand.logoAsset ? (
-              <img
-                src={brand.logoAsset}
-                alt={`Logo ${brand.label}`}
-                loading="lazy"
-                decoding="async"
-                draggable={false}
-                className="h-12 md:h-14 w-auto max-w-[110px] md:max-w-[140px] object-contain opacity-90 hover:opacity-100 motion-safe:transition-opacity pointer-events-none"
-              />
-            ) : (
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-background text-sm font-semibold tracking-wide text-foreground/85 pointer-events-none">
-                {brand.label.slice(0, 2).toUpperCase()}
-              </span>
-            )}
-            <span className="font-sans text-xs font-medium tracking-[0.01em] text-foreground/75 pointer-events-none">
+            <span
+              aria-hidden="true"
+              className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-white border border-border/40 shadow-sm shrink-0"
+            >
+              {brand.logoAsset ? (
+                <img
+                  src={brand.logoAsset}
+                  alt={`Logo ${brand.label}`}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  className="h-8 md:h-10 w-auto max-w-[44px] md:max-w-[56px] object-contain pointer-events-none"
+                />
+              ) : (
+                <span className="text-sm font-semibold tracking-wide text-foreground/85 pointer-events-none">
+                  {brand.label.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+            </span>
+            <span className="font-sans text-sm md:text-base font-medium tracking-[0.01em] text-foreground/85 pointer-events-none">
               {brand.label}
             </span>
           </Link>
