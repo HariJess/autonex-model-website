@@ -934,7 +934,7 @@ const PublishPage = () => {
         <>
         <PublishProgressSteps steps={steps} step={step} progress={progress} />
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.45fr_0.55fr] lg:gap-6">
+        <div className={`grid grid-cols-1 gap-5 ${step === 0 ? "lg:grid-cols-[1.45fr_0.55fr] lg:gap-6" : ""}`}>
           <div className="space-y-4">
             <PublishStepGuideCard
               stepGuide={stepGuides[step]}
@@ -1051,25 +1051,27 @@ const PublishPage = () => {
         />
           </div>
 
-          <PublishGuidanceAside
-            overline={t("publish.guidanceOverline", "Guidage AutoNex")}
-            title={t("publish.publishWithConfidence", "Publiez avec confiance")}
-            secureDraftTitle={t("publish.secureDraft", "Brouillon sécurisé")}
-            secureDraftHint={t(
-              "publish.secureDraftHint",
-              "Vos modifications sont sauvegardées automatiquement.",
-            )}
-            moderationTitle={t("publish.prePublishModeration", "Modération avant publication")}
-            moderationHint={t(
-              "publish.prePublishModerationHint",
-              "Chaque annonce est vérifiée pour protéger la qualité du catalogue.",
-            )}
-            guidedFlowTitle={t("publish.guidedFlow", "Parcours guidé")}
-            guidedFlowHint={t(
-              "publish.guidedFlowHint",
-              "Validez chaque étape pour avancer sereinement et limiter les retours arrière.",
-            )}
-          />
+          {step === 0 && (
+            <PublishGuidanceAside
+              overline={t("publish.guidanceOverline", "Guidage AutoNex")}
+              title={t("publish.publishWithConfidence", "Publiez avec confiance")}
+              secureDraftTitle={t("publish.secureDraft", "Brouillon sécurisé")}
+              secureDraftHint={t(
+                "publish.secureDraftHint",
+                "Vos modifications sont sauvegardées automatiquement.",
+              )}
+              moderationTitle={t("publish.prePublishModeration", "Modération avant publication")}
+              moderationHint={t(
+                "publish.prePublishModerationHint",
+                "Chaque annonce est vérifiée pour protéger la qualité du catalogue.",
+              )}
+              guidedFlowTitle={t("publish.guidedFlow", "Parcours guidé")}
+              guidedFlowHint={t(
+                "publish.guidedFlowHint",
+                "Validez chaque étape pour avancer sereinement et limiter les retours arrière.",
+              )}
+            />
+          )}
         </div>
         </>
         )}
