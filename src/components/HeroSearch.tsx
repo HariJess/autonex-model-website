@@ -740,19 +740,15 @@ const HeroSearch = () => {
                 className="h-5 w-5 shrink-0"
                 aria-hidden="true"
               >
-                <circle cx="12" cy="12" r="10" fill="#F59E0B" />
-                <text
-                  x="12"
-                  y="13"
-                  textAnchor="middle"
-                  fontFamily="sans-serif"
-                  fontSize="8.5"
-                  fontWeight="700"
-                  fill="white"
-                  dominantBaseline="middle"
-                >
-                  0€
-                </text>
+                <circle cx="12" cy="12" r="10" fill="#059669" />
+                <path
+                  d="M8 12 L11 15 L16 9"
+                  stroke="white"
+                  strokeWidth="2.2"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               {t("hero.trustEstimationFree", "Estimation gratuite")}
             </span>
