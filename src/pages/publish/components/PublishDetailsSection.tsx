@@ -453,43 +453,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
           </div>
         </div>
       </section>
-      <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
-        <div>
-          <p className="font-serif font-semibold text-sm">{t("publish.mainFeaturesTitle", "Caractéristiques principales")}</p>
-          <p className="hidden sm:block text-[13px] text-muted-foreground font-sans mt-1 leading-relaxed">
-            {t("publish.mainFeaturesDesc", "Ces éléments aident les acheteurs à filtrer rapidement votre annonce.")}
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
-          <div className="space-y-2">
-            <Label className="font-sans">Portes</Label>
-            <Input
-              type="number"
-              min={0}
-              value={doors}
-              onChange={(e) => {
-                form.setValue("vehicleDoors", e.target.value);
-                onApplyVehicleLegacyMirror({ doorsInput: e.target.value });
-              }}
-              className="font-sans"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="font-sans">Places</Label>
-            <Input
-              type="number"
-              min={0}
-              value={seats}
-              onChange={(e) => {
-                form.setValue("vehicleSeats", e.target.value);
-                onApplyVehicleLegacyMirror({ seatsInput: e.target.value });
-              }}
-              className="font-sans"
-            />
-          </div>
-        </div>
-      </section>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4 rounded-xl border border-border/70 bg-background/70 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4 rounded-xl border border-border/70 bg-background/70 p-4">
         <div className="space-y-2">
           <Label className="font-sans">Carburant</Label>
           <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleFuel", v === EMPTY_OPTION ? "" : v)}>
@@ -522,38 +486,6 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Motricité</Label>
-          <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleDrivetrain", v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {DRIVETRAIN_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="font-sans">Type vendeur</Label>
-          <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleSellerType", v === EMPTY_OPTION ? "" : v)}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-              {SELLER_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
       <section className="rounded-xl border border-border/70 bg-background/70">
         <button
@@ -572,6 +504,66 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
         </button>
         {showAdvancedDetails && (
           <div className="space-y-4 border-t border-border/70 px-4 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
+              <div className="space-y-2">
+                <Label className="font-sans">Portes</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={doors}
+                  onChange={(e) => {
+                    form.setValue("vehicleDoors", e.target.value);
+                    onApplyVehicleLegacyMirror({ doorsInput: e.target.value });
+                  }}
+                  className="font-sans"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Places</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={seats}
+                  onChange={(e) => {
+                    form.setValue("vehicleSeats", e.target.value);
+                    onApplyVehicleLegacyMirror({ seatsInput: e.target.value });
+                  }}
+                  className="font-sans"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Motricité</Label>
+                <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleDrivetrain", v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                    {DRIVETRAIN_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-sans">Type vendeur</Label>
+                <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleSellerType", v === EMPTY_OPTION ? "" : v)}>
+                  <SelectTrigger className="font-sans">
+                    <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                    {SELLER_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             {showRooms && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-2">
