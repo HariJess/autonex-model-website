@@ -251,9 +251,9 @@ const Index = () => {
           className="py-7"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
           {items.map((listing) => (
-            <ListingCard key={`${title}-${listing.id}`} listing={listing} />
+            <ListingCard key={`${title}-${listing.id}`} listing={listing} layout="compact" />
           ))}
         </div>
       )}
@@ -470,9 +470,9 @@ const Index = () => {
               {t("sections.viewAll", "Voir tout")}
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
             {discountedListings.map((entry) => (
-              <ListingCard key={`deal-${entry.listing.id}`} listing={entry.listing} dealMeta={entry.deal} />
+              <ListingCard key={`deal-${entry.listing.id}`} listing={entry.listing} dealMeta={entry.deal} layout="compact" />
             ))}
           </div>
         </section>
