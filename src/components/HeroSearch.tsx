@@ -270,7 +270,7 @@ const HeroSearch = () => {
         </p>
 
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-center gap-1.5 mb-2 max-w-full overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch]">
+          <div className="flex justify-start md:justify-center gap-1.5 mb-2 max-w-full overflow-x-auto pb-0.5 px-1 [-webkit-overflow-scrolling:touch]">
             {TRANSACTIONS.map((tr) => (
               <button
                 key={tr.value}
@@ -700,8 +700,8 @@ const HeroSearch = () => {
           </div>
 
           {/* Trust signals sobres sous la card search — Lot 4.4e */}
-          <div className="mt-12 md:mt-16 flex flex-wrap items-center justify-center gap-x-4 md:gap-x-8 gap-y-2 text-white/80 text-xs md:text-sm font-sans tracking-tight md:tracking-normal px-2">
-            <span className="inline-flex items-center gap-1.5 md:gap-2">
+          <div className="mt-12 md:mt-16 flex flex-nowrap items-center justify-center gap-x-2.5 md:gap-x-8 text-white/80 text-[11px] md:text-sm font-sans tracking-tight md:tracking-normal px-2">
+            <span className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
               <svg
                 viewBox="0 0 24 24"
                 className="h-5 w-5 shrink-0"
@@ -723,7 +723,7 @@ const HeroSearch = () => {
               <span className="md:hidden">{t("hero.trustModeratedShort", "Modérées")}</span>
               <span className="hidden md:inline">{t("hero.trustModerated", "Annonces modérées")}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 md:gap-2">
+            <span className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
               <svg
                 viewBox="0 0 24 16"
                 className="h-4 w-6 shrink-0 rounded-sm"
@@ -733,9 +733,10 @@ const HeroSearch = () => {
                 <rect x="8" y="0" width="16" height="8" fill="#FC3D32" />
                 <rect x="8" y="8" width="16" height="8" fill="#007E3A" />
               </svg>
-              {t("hero.trustMadeInMg", "100% Malgache")}
+              <span className="md:hidden">{t("hero.trustMadeInMgShort", "Malgache")}</span>
+              <span className="hidden md:inline">{t("hero.trustMadeInMg", "100% Malgache")}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 md:gap-2">
+            <span className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
               <svg
                 viewBox="0 0 24 24"
                 className="h-5 w-5 shrink-0"
@@ -751,7 +752,8 @@ const HeroSearch = () => {
                   strokeLinejoin="round"
                 />
               </svg>
-              {t("hero.trustEstimationFree", "Estimation gratuite")}
+              <span className="md:hidden">{t("hero.trustEstimationFreeShort", "Estimation")}</span>
+              <span className="hidden md:inline">{t("hero.trustEstimationFree", "Estimation gratuite")}</span>
             </span>
           </div>
         </div>
