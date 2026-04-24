@@ -72,12 +72,21 @@ export async function publishListingWithCredits(
     }),
   );
 
+  // Lot 9.1d — Logs temporaires pour diagnostiquer le bug "publication fantôme".
+  // À retirer au Lot 9.1e une fois le fix confirmé.
+  // eslint-disable-next-line no-console
+  console.log("[DEBUG 9.1d] RPC data:", data);
+  // eslint-disable-next-line no-console
+  console.log("[DEBUG 9.1d] RPC error:", error);
+
   if (error) {
     const code = mapPublishWithCreditsError(error.message);
     return { ok: false, code, message: error.message };
   }
 
   const parsed = parsePublishWithCreditsPayload(data as RpcPublishPayload, listingId);
+  // eslint-disable-next-line no-console
+  console.log("[DEBUG 9.1d] parsePublishWithCreditsPayload returned:", parsed);
   if (!parsed) {
     return { ok: false, code: "unknown", message: "publish_listing_with_credits returned invalid payload" };
   }

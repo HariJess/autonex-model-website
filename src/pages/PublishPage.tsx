@@ -851,6 +851,17 @@ const PublishPage = () => {
       draftPublishedRef.current = true;
 
       const publishResult = await publishListingWithCredits(draftListingId);
+
+      // Lot 9.1d — Logs temporaires. À retirer au Lot 9.1e.
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG 9.1d] publishResult raw:", publishResult);
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG 9.1d] publishResult type:", typeof publishResult);
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG 9.1d] publishResult JSON:", JSON.stringify(publishResult, null, 2));
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG 9.1d] isPublishWithCreditsFailure result:", isPublishWithCreditsFailure(publishResult));
+
       if (isPublishWithCreditsFailure(publishResult)) {
         draftPublishedRef.current = false;
         if (publishResult.code === "insufficient_credits") {
@@ -899,6 +910,17 @@ const PublishPage = () => {
       // (autosave sur une ligne non-draft → 406 en boucle).
       navigate(`/dashboard?published=${draftListingId}`, { replace: true });
     } catch (err: unknown) {
+      // Lot 9.1d — Logs temporaires. À retirer au Lot 9.1e.
+      // eslint-disable-next-line no-console
+      console.error("[DEBUG 9.1d] caught error:", err);
+      // eslint-disable-next-line no-console
+      console.error("[DEBUG 9.1d] error type:", typeof err);
+      // eslint-disable-next-line no-console
+      console.error(
+        "[DEBUG 9.1d] error JSON:",
+        JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2),
+      );
+
       // Si on a levé une exception AVANT le RPC (flushPhotos, persistDraft),
       // l'autosave doit reprendre. Si on a levé APRÈS, le flag a déjà été
       // réarmé lors du check `isPublishWithCreditsFailure`.
