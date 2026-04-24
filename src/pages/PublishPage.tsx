@@ -852,16 +852,6 @@ const PublishPage = () => {
 
       const publishResult = await publishListingWithCredits(draftListingId);
 
-      // Lot 9.1d — Logs temporaires. À retirer au Lot 9.1e.
-      // eslint-disable-next-line no-console
-      console.log("[DEBUG 9.1d] publishResult raw:", publishResult);
-      // eslint-disable-next-line no-console
-      console.log("[DEBUG 9.1d] publishResult type:", typeof publishResult);
-      // eslint-disable-next-line no-console
-      console.log("[DEBUG 9.1d] publishResult JSON:", JSON.stringify(publishResult, null, 2));
-      // eslint-disable-next-line no-console
-      console.log("[DEBUG 9.1d] isPublishWithCreditsFailure result:", isPublishWithCreditsFailure(publishResult));
-
       if (isPublishWithCreditsFailure(publishResult)) {
         draftPublishedRef.current = false;
         if (publishResult.code === "insufficient_credits") {
@@ -900,27 +890,35 @@ const PublishPage = () => {
       await queryClient.invalidateQueries({ queryKey: ["my-listings", user.id] });
       clearLocalPublishBackup(user.id, draftListingId);
       exitBypassRef.current = true;
-      toast.success(
-        t(
-          "publish.successPublishedInstant",
-          "Annonce publiée avec succès. Elle est maintenant visible sur AutoNex."
-        )
-      );
+      // Lot 9.1e — Toast différencié selon le statut final renvoyé par la RPC.
+      // `active` = dealer fast-track (visible immédiatement), `pending_review`
+      // = particulier (modération manuelle sous 24h).
+      if (publishResult.finalStatus === "active") {
+        toast.success(
+          t("publish.successPublishedActive", "Annonce publiée avec succès !"),
+          {
+            description: t(
+              "publish.successPublishedActiveDesc",
+              "Votre annonce est désormais visible publiquement sur AutoNex.",
+            ),
+          },
+        );
+      } else {
+        toast.success(
+          t("publish.successPublishedReview", "Annonce envoyée en vérification"),
+          {
+            description: t(
+              "publish.successPublishedReviewDesc",
+              "Notre équipe va vérifier votre annonce sous 24h. Vous serez notifié dès qu'elle sera visible.",
+            ),
+          },
+        );
+      }
+
       // Lot 9.1c — `replace: true` évite que Back revienne sur /publier
       // (autosave sur une ligne non-draft → 406 en boucle).
       navigate(`/dashboard?published=${draftListingId}`, { replace: true });
     } catch (err: unknown) {
-      // Lot 9.1d — Logs temporaires. À retirer au Lot 9.1e.
-      // eslint-disable-next-line no-console
-      console.error("[DEBUG 9.1d] caught error:", err);
-      // eslint-disable-next-line no-console
-      console.error("[DEBUG 9.1d] error type:", typeof err);
-      // eslint-disable-next-line no-console
-      console.error(
-        "[DEBUG 9.1d] error JSON:",
-        JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2),
-      );
-
       // Si on a levé une exception AVANT le RPC (flushPhotos, persistDraft),
       // l'autosave doit reprendre. Si on a levé APRÈS, le flag a déjà été
       // réarmé lors du check `isPublishWithCreditsFailure`.

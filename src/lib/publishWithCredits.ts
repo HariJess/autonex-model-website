@@ -10,10 +10,19 @@ export type PublishWithCreditsErrorCode =
   | "already_published"
   | "unknown";
 
+/**
+ * Statuts finaux légitimes renvoyés par la RPC `publish_listing_with_credits`.
+ * - `active` : dealer vérifié (fast-track sans modération).
+ * - `pending_review` : particulier ou compte non-dealer (modération manuelle).
+ * Voir migration `20260420190000_moderation_triggers.sql` pour la logique DB.
+ */
+export const ACCEPTED_FINAL_STATUSES = ["active", "pending_review"] as const;
+export type AcceptedFinalStatus = (typeof ACCEPTED_FINAL_STATUSES)[number];
+
 export type PublishWithCreditsSuccess = {
   ok: true;
   listingId: string;
-  finalStatus: string;
+  finalStatus: AcceptedFinalStatus;
   spentCredits: number;
   message: string;
 };
@@ -53,11 +62,16 @@ export function parsePublishWithCreditsPayload(
   data: RpcPublishPayload,
   fallbackListingId: string,
 ): PublishWithCreditsSuccess | null {
-  if (!data || data.ok !== true || data.status !== "active") return null;
+  if (!data || data.ok !== true) return null;
+  // Lot 9.1e — Le statut final légitime est `active` (dealer fast-track)
+  // OU `pending_review` (particulier → modération manuelle). Avant ce fix,
+  // seul `active` était accepté, ce qui faisait paraître les publications
+  // particulier comme des échecs alors qu'elles avaient réussi en DB.
+  if (!ACCEPTED_FINAL_STATUSES.includes(data.status as AcceptedFinalStatus)) return null;
   return {
     ok: true,
     listingId: data.listing_id ?? fallbackListingId,
-    finalStatus: data.status,
+    finalStatus: data.status as AcceptedFinalStatus,
     spentCredits: Number(data.spent_credits ?? 0),
     message: data.message ?? "Listing published",
   };
@@ -72,21 +86,12 @@ export async function publishListingWithCredits(
     }),
   );
 
-  // Lot 9.1d — Logs temporaires pour diagnostiquer le bug "publication fantôme".
-  // À retirer au Lot 9.1e une fois le fix confirmé.
-  // eslint-disable-next-line no-console
-  console.log("[DEBUG 9.1d] RPC data:", data);
-  // eslint-disable-next-line no-console
-  console.log("[DEBUG 9.1d] RPC error:", error);
-
   if (error) {
     const code = mapPublishWithCreditsError(error.message);
     return { ok: false, code, message: error.message };
   }
 
   const parsed = parsePublishWithCreditsPayload(data as RpcPublishPayload, listingId);
-  // eslint-disable-next-line no-console
-  console.log("[DEBUG 9.1d] parsePublishWithCreditsPayload returned:", parsed);
   if (!parsed) {
     return { ok: false, code: "unknown", message: "publish_listing_with_credits returned invalid payload" };
   }
