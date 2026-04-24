@@ -30,9 +30,18 @@ export function mapDbRowToFormValues(row: Tables<"listings">): PublishFormValues
   const customFeaturesInput = extractCustomFeatures(features).join(", ");
   const meta = parseVehicleMetaTags(features);
 
+  // Lot 9.2 — backfill listingType depuis la colonne legacy `body_style`
+  // si le draft a été créé avant la fusion des deux champs (Bug A5 audit).
+  const sanitizedListingType = sanitizeListingTypeForTransaction(
+    fs.transaction,
+    fs.listingType,
+  ) as ListingType | "";
+  const backfilledListingType: ListingType | "" = sanitizedListingType ||
+    (fs.vehicleBodyStyle ? (fs.vehicleBodyStyle as ListingType) : "");
+
   return {
     transaction: fs.transaction,
-    listingType: sanitizeListingTypeForTransaction(fs.transaction, fs.listingType) as ListingType | "",
+    listingType: backfilledListingType,
     isNewProgram: fs.isNewProgram,
     internalRef: fs.internalRef,
     ville: fs.ville,

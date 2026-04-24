@@ -673,13 +673,8 @@ const PublishPage = () => {
   // usePricing kept here for livePrices.publish_listing (consumed by header).
   const { prices: livePrices } = usePricing();
 
-  useEffect(() => {
-    const autoTitle = [vehicleMake.trim(), vehicleModel.trim(), vehicleYear.trim()].filter(Boolean).join(" ");
-    if (!autoTitle) return;
-    if (title.trim().length === 0) {
-      form.setValue("title", autoTitle.slice(0, 120));
-    }
-  }, [vehicleMake, vehicleModel, vehicleYear, title, form]);
+  // Lot 9.2 — L'auto-title intelligent vit désormais dans PublishDetailsSection
+  // (flag autoTitleEnabled + bouton « Régénérer »). Ne plus dupliquer la logique ici.
 
   const handleNext = async () => {
     const errors = validateStep(step);

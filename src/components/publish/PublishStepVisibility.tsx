@@ -4,7 +4,9 @@ import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Coins, Sparkles, ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Coins, MessageCircle, Sparkles, ChevronDown } from "lucide-react";
 import { getVehicleTypeLabel } from "@/data/vehicleTypes";
 import {
   BOOST_ORDER,
@@ -64,6 +66,9 @@ const PublishStepVisibility = ({
   const ville = form.watch("ville");
   const selectedBoosts = form.watch("selectedBoosts");
   const agencySpotlight = form.watch("agencySpotlight");
+  // Lot 9.2 — WhatsApp a été déplacé depuis l'Étape 1 vers l'Étape 3 (contact
+  // principal proche du bouton Publier).
+  const whatsappPhone = form.watch("vehicleWhatsappPhone");
 
   // Pricing & credits — kept here for cost display + canPublish gating.
   const { prices, boostPrice, totalPublication } = usePricing();
@@ -117,6 +122,38 @@ const PublishStepVisibility = ({
           )}
         </p>
       </div>
+
+      {/* Lot 9.2 — Contact et coordonnées (WhatsApp déplacé depuis l'Étape 1) */}
+      <Card className="rounded-2xl border-border">
+        <CardHeader>
+          <CardTitle className="font-serif flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" /> {t("publish.contactTitle", "Contact et coordonnées")}
+          </CardTitle>
+          <CardDescription className="font-sans">
+            {t(
+              "publish.contactDesc",
+              "Ce numéro est le principal point de contact acheteurs sur votre annonce.",
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Label className="font-sans">{t("publish.whatsappLabel", "Numéro WhatsApp (optionnel)")}</Label>
+          <Input
+            value={whatsappPhone}
+            onChange={(e) => form.setValue("vehicleWhatsappPhone", e.target.value)}
+            className="font-sans"
+            placeholder="+261 34 XX XXX XX"
+            autoComplete="tel"
+            inputMode="tel"
+          />
+          <p className="text-xs text-muted-foreground font-sans">
+            {t(
+              "publish.whatsappHint",
+              "Si renseigné, un bouton WhatsApp apparaîtra sur votre fiche comme CTA principal.",
+            )}
+          </p>
+        </CardContent>
+      </Card>
 
       <Card className="rounded-2xl border-border">
         <CardHeader>
