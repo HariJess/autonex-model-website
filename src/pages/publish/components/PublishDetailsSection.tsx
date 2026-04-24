@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
@@ -11,10 +10,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AUTO_BRANDS } from "@/data/automotiveCatalog";
 import { resolveBrandAsset } from "@/data/brandAssets";
-import { EXTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
+import { EXTERIOR_COLOR_OPTIONS, INTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
 import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, ChevronDown, ChevronsUpDown, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
@@ -123,14 +123,13 @@ type PublishDetailsSectionProps = {
  */
 export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: PublishDetailsSectionProps) {
   const { t } = useTranslation();
+  const { profile } = useAuth();
   const form = useFormContext<PublishFormValues>();
   const title = form.watch("title");
   const description = form.watch("description");
   const priceMga = form.watch("priceMga");
   const surface = form.watch("surface");
   const rooms = form.watch("rooms");
-  const bathrooms = form.watch("bathrooms");
-  const toilets = form.watch("toilets");
   const make = form.watch("vehicleMake");
   const model = form.watch("vehicleModel");
   const year = form.watch("vehicleYear");
@@ -148,14 +147,42 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
   const interiorColor = form.watch("vehicleInteriorColor");
   const availabilityStatus = form.watch("vehicleAvailabilityStatus");
   const whatsappPhone = form.watch("vehicleWhatsappPhone");
-  const isElectric = form.watch("vehicleIsElectric");
-  const isHybrid = form.watch("vehicleIsHybrid");
   const selectedFeatures = form.watch("selectedFeatures");
   const customFeaturesInput = form.watch("customFeaturesInput");
   const listingType = form.watch("listingType");
+  const transaction = form.watch("transaction");
 
   const showRooms =
     listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
+  const isRentalTransaction = transaction === "location" || transaction === "location_vacances";
+  const isAdmin = profile?.role === "admin";
+  const sellerTypeLabel =
+    sellerType === "concessionnaire"
+      ? t("publish.sellerTypeConcessionnaire", "Concessionnaire")
+      : t("publish.sellerTypeParticulier", "Particulier");
+
+  // Bug A2 — Reset rentalMode quand on repasse en « Vente ».
+  useEffect(() => {
+    if (!isRentalTransaction && form.getValues("vehicleRentalMode")) {
+      form.setValue("vehicleRentalMode", "", { shouldDirty: true });
+    }
+  }, [isRentalTransaction, form]);
+
+  // Bug A6 + A7 — `vehicleFuel` est la source unique de vérité ; les booléens
+  // `isElectric` et `isHybrid` sont dérivés automatiquement (anciens Switches
+  // retirés de l'UI, colonnes DB conservées pour rétrocompat).
+  useEffect(() => {
+    if (fuel === "Électrique") {
+      form.setValue("vehicleIsElectric", true);
+      form.setValue("vehicleIsHybrid", false);
+    } else if (fuel === "Hybride" || fuel === "Hybride rechargeable") {
+      form.setValue("vehicleIsElectric", false);
+      form.setValue("vehicleIsHybrid", true);
+    } else {
+      form.setValue("vehicleIsElectric", false);
+      form.setValue("vehicleIsHybrid", false);
+    }
+  }, [fuel, form]);
 
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
   const [showEquipmentSection, setShowEquipmentSection] = useState(false);
@@ -165,6 +192,49 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
     const initial = form.getValues("vehicleMake").trim();
     return initial.length > 0 && !AUTO_BRANDS.includes(initial);
   });
+  // Bug A4 — Cylindrée en cm³ (convention malgache) par défaut, convertible
+  // en L à la volée. Le form continue de stocker en litres (colonne DB
+  // `engine_displacement_l`).
+  const [displacementUnit, setDisplacementUnit] = useState<"cc" | "L">("cc");
+  const [useCustomInteriorColor, setUseCustomInteriorColor] = useState(() => {
+    const initial = form.getValues("vehicleInteriorColor").trim();
+    return (
+      initial.length > 0 &&
+      !INTERIOR_COLOR_OPTIONS.some((opt) => opt.value === initial.toLowerCase())
+    );
+  });
+
+  const engineDisplacementDisplay = useMemo(() => {
+    if (!engineDisplacement) return "";
+    const n = Number(engineDisplacement);
+    if (!Number.isFinite(n) || n <= 0) return engineDisplacement;
+    return displacementUnit === "cc" ? String(Math.round(n * 1000)) : String(n);
+  }, [engineDisplacement, displacementUnit]);
+
+  const engineDisplacementEquivalence = useMemo(() => {
+    if (!engineDisplacement) return null;
+    const n = Number(engineDisplacement);
+    if (!Number.isFinite(n) || n <= 0) return null;
+    const cc = Math.round(n * 1000);
+    const litres = Math.round(n * 10) / 10;
+    return `${cc} cc · ${litres.toFixed(1)} L`;
+  }, [engineDisplacement]);
+
+  const handleEngineDisplacementChange = (raw: string) => {
+    if (!raw) {
+      form.setValue("vehicleEngineDisplacement", "");
+      return;
+    }
+    const normalized = raw.replace(",", ".");
+    const n = Number(normalized);
+    if (!Number.isFinite(n)) {
+      // Conserve la saisie brute pour que la validation la rattrape.
+      form.setValue("vehicleEngineDisplacement", normalized);
+      return;
+    }
+    const litres = displacementUnit === "cc" ? n / 1000 : n;
+    form.setValue("vehicleEngineDisplacement", String(litres));
+  };
 
   // Hydration: when the form is reset with a brand outside AUTO_BRANDS
   // (e.g. edit mode loading a legacy listing with "BYD", "Xiaomi"…), switch
@@ -549,20 +619,34 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="font-sans">Type vendeur</Label>
-                <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleSellerType", v === EMPTY_OPTION ? "" : v)}>
-                  <SelectTrigger className="font-sans">
-                    <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-                    {SELLER_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="font-sans">{t("publish.sellerTypeLabel", "Type vendeur")}</Label>
+                {isAdmin ? (
+                  <Select value={sellerType || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleSellerType", v === EMPTY_OPTION ? "" : v)}>
+                    <SelectTrigger className="font-sans">
+                      <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                      {SELLER_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <>
+                    <div className="flex h-10 items-center rounded-md border border-input bg-muted/40 px-3 text-sm font-sans text-muted-foreground" aria-readonly="true">
+                      {sellerTypeLabel}
+                    </div>
+                    <p className="text-xs text-muted-foreground font-sans">
+                      {t(
+                        "publish.sellerTypeAutoHint",
+                        "Défini automatiquement selon votre profil. Modifiable depuis vos paramètres de compte.",
+                      )}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
             {showRooms && (
@@ -571,17 +655,9 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                   <Label className="font-sans">{labels.listingRooms}</Label>
                   <Input value={rooms} onChange={(e) => form.setValue("rooms", e.target.value)} className="font-sans" />
                 </div>
-                <div className="space-y-2">
-                  <Label className="font-sans">{labels.listingBathrooms}</Label>
-                  <Input value={bathrooms} onChange={(e) => form.setValue("bathrooms", e.target.value)} className="font-sans" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-sans">{labels.toilets}</Label>
-                  <Input value={toilets} onChange={(e) => form.setValue("toilets", e.target.value)} className="font-sans" />
-                </div>
               </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
+            <div className={cn("grid grid-cols-1 gap-3.5 md:gap-4", isRentalTransaction ? "sm:grid-cols-2" : "")}>
               <div className="space-y-2">
                 <Label className="font-sans">Carrosserie</Label>
                 <Select value={bodyStyle || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleBodyStyle", v === EMPTY_OPTION ? "" : v)}>
@@ -598,22 +674,24 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label className="font-sans">Mode location</Label>
-                <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleRentalMode", v === EMPTY_OPTION ? "" : v)}>
-                  <SelectTrigger className="font-sans">
-                    <SelectValue placeholder={t("publish.selectRentalMode", "Sélectionner un mode")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
-                    {RENTAL_MODE_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {isRentalTransaction && (
+                <div className="space-y-2">
+                  <Label className="font-sans">Mode location</Label>
+                  <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleRentalMode", v === EMPTY_OPTION ? "" : v)}>
+                    <SelectTrigger className="font-sans">
+                      <SelectValue placeholder={t("publish.selectRentalMode", "Sélectionner un mode")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                      {RENTAL_MODE_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
               <div className="space-y-2">
@@ -636,21 +714,86 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="font-sans">{t("publish.engineDisplacement", "Cylindrée (L)")}</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={20}
-                  step="0.1"
-                  value={engineDisplacement}
-                  onChange={(e) => form.setValue("vehicleEngineDisplacement", e.target.value)}
-                  className="font-sans"
-                  placeholder={t("publish.engineDisplacementPlaceholder", "Ex: 1.5")}
-                />
+                <Label className="font-sans">{t("publish.engineDisplacement", "Cylindrée")}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    min={displacementUnit === "cc" ? 50 : 0.05}
+                    max={displacementUnit === "cc" ? 20000 : 20}
+                    step={displacementUnit === "cc" ? "10" : "0.1"}
+                    value={engineDisplacementDisplay}
+                    onChange={(e) => handleEngineDisplacementChange(e.target.value)}
+                    className="font-sans flex-1"
+                    placeholder={
+                      displacementUnit === "cc"
+                        ? t("publish.engineDisplacementPlaceholderCc", "Ex : 1500")
+                        : t("publish.engineDisplacementPlaceholderL", "Ex : 1.5")
+                    }
+                  />
+                  <Select value={displacementUnit} onValueChange={(v) => setDisplacementUnit(v as "cc" | "L")}>
+                    <SelectTrigger className="font-sans w-[80px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cc">cm³</SelectItem>
+                      <SelectItem value="L">L</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {engineDisplacementEquivalence && (
+                  <p className="text-xs text-muted-foreground font-sans">
+                    {t("publish.engineDisplacementEquivalence", "Équivalent : {{value}}", { value: engineDisplacementEquivalence })}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label className="font-sans">{t("publish.interiorColor", "Couleur intérieure")}</Label>
-                <Input value={interiorColor} onChange={(e) => form.setValue("vehicleInteriorColor", e.target.value)} className="font-sans" />
+                {useCustomInteriorColor ? (
+                  <div className="flex gap-2">
+                    <Input
+                      value={interiorColor}
+                      onChange={(e) => form.setValue("vehicleInteriorColor", e.target.value)}
+                      className="font-sans flex-1"
+                      placeholder={t("publish.interiorColorCustomPlaceholder", "Tapez une couleur")}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setUseCustomInteriorColor(false);
+                        form.setValue("vehicleInteriorColor", "");
+                      }}
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Select
+                    value={interiorColor || EMPTY_OPTION}
+                    onValueChange={(v) => {
+                      if (v === "__custom__") {
+                        setUseCustomInteriorColor(true);
+                        form.setValue("vehicleInteriorColor", "");
+                        return;
+                      }
+                      form.setValue("vehicleInteriorColor", v === EMPTY_OPTION ? "" : v);
+                    }}
+                  >
+                    <SelectTrigger className="font-sans">
+                      <SelectValue placeholder={t("publish.selectInteriorColor", "Sélectionner une couleur")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
+                      {INTERIOR_COLOR_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {t(option.labelKey, option.fallback)}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="__custom__">{t("publish.interiorColorOther", "Autre…")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
               <div className="space-y-2">
                 <Label className="font-sans">Disponibilité</Label>
@@ -678,16 +821,10 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
                 />
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border/70 px-4 py-3">
-              <label className="inline-flex items-center gap-2 font-sans text-sm">
-                <Switch checked={isElectric} onCheckedChange={(v) => form.setValue("vehicleIsElectric", v)} />
-                Électrique
-              </label>
-              <label className="inline-flex items-center gap-2 font-sans text-sm">
-                <Switch checked={isHybrid} onCheckedChange={(v) => form.setValue("vehicleIsHybrid", v)} />
-                Hybride
-              </label>
-            </div>
+            {/* Bug A6 + A7 — Les Switches « Électrique » et « Hybride » sont retirés
+                de l'UI : ils sont désormais dérivés automatiquement de `vehicleFuel`
+                via l'effect de synchronisation au-dessus. Les colonnes DB
+                `is_electric` / `is_hybrid` restent renseignées pour rétrocompat. */}
           </div>
         )}
       </section>

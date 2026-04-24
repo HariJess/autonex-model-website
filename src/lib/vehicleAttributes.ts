@@ -14,6 +14,16 @@ export const EXTERIOR_COLOR_OPTIONS = [
   { value: "yellow", labelKey: "vehicleColor.yellow", fallback: "Jaune" },
 ] as const;
 
+export const INTERIOR_COLOR_OPTIONS = [
+  { value: "black", labelKey: "vehicleInteriorColor.black", fallback: "Noir" },
+  { value: "beige", labelKey: "vehicleInteriorColor.beige", fallback: "Beige" },
+  { value: "gray", labelKey: "vehicleInteriorColor.gray", fallback: "Gris" },
+  { value: "brown", labelKey: "vehicleInteriorColor.brown", fallback: "Marron" },
+  { value: "white", labelKey: "vehicleInteriorColor.white", fallback: "Blanc" },
+  { value: "bordeaux", labelKey: "vehicleInteriorColor.bordeaux", fallback: "Bordeaux" },
+  { value: "blue", labelKey: "vehicleInteriorColor.blue", fallback: "Bleu" },
+] as const;
+
 export function normalizeEngineDisplacementInput(value: string | null | undefined): number | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim().replace(",", ".");
@@ -35,6 +45,18 @@ export function getExteriorColorLabel(value: string | null | undefined, t: TFunc
   const normalized = value.trim().toLowerCase();
   if (!normalized) return null;
   for (const option of EXTERIOR_COLOR_OPTIONS) {
+    if (option.value === normalized) {
+      return t(option.labelKey, option.fallback);
+    }
+  }
+  return value.trim();
+}
+
+export function getInteriorColorLabel(value: string | null | undefined, t: TFunction): string | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+  for (const option of INTERIOR_COLOR_OPTIONS) {
     if (option.value === normalized) {
       return t(option.labelKey, option.fallback);
     }
