@@ -123,6 +123,19 @@ export const AUTO_BRANDS = [...new Set(AUTO_BRAND_GROUPS.flatMap((g) => g.brands
   a.localeCompare(b, "fr"),
 );
 
+/**
+ * Retourne la capitalisation officielle de la marque (depuis AUTO_BRANDS)
+ * à partir d'une valeur saisie ou stockée. Fallback : capitalisation par
+ * première lettre.
+ */
+export function getVehicleMakeLabel(value: string | null | undefined): string {
+  if (!value) return "";
+  const normalized = value.trim().toLowerCase();
+  const match = AUTO_BRANDS.find((b) => b.toLowerCase() === normalized);
+  if (match) return match;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 export const TOP_AUTO_BRANDS = [
   "Toyota",
   "Nissan",

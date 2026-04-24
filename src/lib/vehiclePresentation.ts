@@ -9,6 +9,8 @@ import {
   trimVersionNumericLooseFromDisplayListing,
 } from "@/lib/legacyListingVehicleMapping";
 import type { DisplayListing } from "@/types/listing";
+import { getVehicleMakeLabel } from "@/data/automotiveCatalog";
+import { getVehicleModelLabel } from "@/data/vehicleModelsCatalog";
 
 export function formatVehicleMileage(value: number | null | undefined): string | null {
   if (value == null || value <= 0) return null;
@@ -32,14 +34,29 @@ export function formatVehicleEngineDisplacement(value: number | null | undefined
 }
 
 export function getVehicleDisplayTitle(listing: DisplayListing): string {
-  const vehicleHeadline = [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year]
+  // Lot 9.3 — Capitalisation officielle via catalogues marque + modèle.
+  const make = listing.vehicle?.make;
+  const model = listing.vehicle?.model;
+  const vehicleHeadline = [
+    getVehicleMakeLabel(make),
+    getVehicleModelLabel(make, model),
+    listing.vehicle?.year,
+  ]
     .filter(Boolean)
     .join(" ");
   return vehicleHeadline || listing.title;
 }
 
 export function getVehicleHeadline(listing: DisplayListing): string {
-  return [listing.vehicle?.make, listing.vehicle?.model, listing.vehicle?.year].filter(Boolean).join(" ");
+  const make = listing.vehicle?.make;
+  const model = listing.vehicle?.model;
+  return [
+    getVehicleMakeLabel(make),
+    getVehicleModelLabel(make, model),
+    listing.vehicle?.year,
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 /** Kilométrage : JSON `vehicle` puis colonne legacy `surface` (= km). */

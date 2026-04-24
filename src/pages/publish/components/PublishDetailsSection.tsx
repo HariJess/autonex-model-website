@@ -8,11 +8,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AUTO_BRANDS } from "@/data/automotiveCatalog";
+import { AUTO_BRANDS, getVehicleMakeLabel } from "@/data/automotiveCatalog";
 import { resolveBrandAsset } from "@/data/brandAssets";
 import { EXTERIOR_COLOR_OPTIONS, INTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
 import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
+import { VehicleModelCombobox } from "@/components/listings/VehicleModelCombobox";
+import {
+  getModelsForBrand,
+  getVehicleModelLabel,
+} from "@/data/vehicleModelsCatalog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, ChevronDown, ChevronsUpDown, Plus } from "lucide-react";
@@ -192,6 +197,21 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
     }
   }, [listingType, form]);
 
+  // Lot 9.3 — Reset automatique du modèle quand la marque change et que le
+  // modèle courant n'existe pas dans le nouveau catalogue (évite « Mazda
+  // MX-5 » qui reste en mémoire après passage à « Toyota »).
+  useEffect(() => {
+    if (!make) return;
+    const currentModel = form.getValues("vehicleModel");
+    if (!currentModel) return;
+    const models = getModelsForBrand(make);
+    if (models.length === 0) return; // marque custom, on ne touche pas
+    const matches = models.some((m) => m.value === currentModel.toLowerCase());
+    if (!matches) {
+      form.setValue("vehicleModel", "", { shouldDirty: true });
+    }
+  }, [make, form]);
+
   const [showEquipmentSection, setShowEquipmentSection] = useState(false);
   const [showAllEquipment, setShowAllEquipment] = useState(false);
   const [showComplementaryInfo, setShowComplementaryInfo] = useState(false);
@@ -250,9 +270,17 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
     form.setValue("vehicleEngineDisplacement", String(litres));
   };
 
-  // Lot 9.2 — Auto-title : « {Marque} {Modèle} {Version} {Année} ».
+  // Lot 9.2 + 9.3 — Auto-title avec capitalisation officielle :
+  // « {Marque officielle} {Modèle officiel} {Version} {Année} ».
+  // Utilise getVehicleMakeLabel / getVehicleModelLabel pour convertir
+  // « toyota » → « Toyota » et « rav4 » → « RAV4 ».
   const computedAutoTitle = useMemo(() => {
-    const parts = [make.trim(), model.trim(), rooms.trim(), year.trim()].filter(Boolean);
+    const parts = [
+      getVehicleMakeLabel(make).trim(),
+      getVehicleModelLabel(make, model).trim(),
+      rooms.trim(),
+      year.trim(),
+    ].filter(Boolean);
     return parts.join(" ").slice(0, 120);
   }, [make, model, rooms, year]);
 
@@ -548,18 +576,11 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
           </div>
           <div className="space-y-2">
             <Label className="font-sans">Modèle *</Label>
-            <Input
-              type="text"
+            <VehicleModelCombobox
+              brand={make}
               value={model}
-              onChange={(e) => form.setValue("vehicleModel", e.target.value)}
-              className="font-sans"
-              disabled={!make}
-              placeholder={
-                make
-                  ? t("publish.modelPlaceholderWithBrand", "Modèle")
-                  : t("publish.modelPlaceholderNoBrand", "Marque requise")
-              }
-              autoComplete="off"
+              onChange={(next) => form.setValue("vehicleModel", next)}
+              placeholder={t("publish.modelPlaceholderWithBrand", "Modèle")}
             />
           </div>
           <div className="space-y-2">
