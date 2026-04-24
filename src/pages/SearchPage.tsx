@@ -8,6 +8,7 @@ import FilterSidebar from "@/components/FilterSidebar";
 import { ChevronRight, Home, Sparkles } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
+import { getVehicleTypeLabel } from "@/data/vehicleTypes";
 import { useDbListings, useFilteredActiveListingCount } from "@/hooks/useListings";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useCallback, useState, useEffect, useRef, lazy, Suspense } from "react";
@@ -354,7 +355,7 @@ const SearchPage = () => {
   const pageTitle = useMemo(() => {
     const parts: string[] = [];
     if (filters.types.length === 1) {
-      parts.push(LISTING_TYPE_LABELS_PLURAL[filters.types[0] as keyof typeof LISTING_TYPE_LABELS_PLURAL] || filters.types[0]);
+      parts.push(LISTING_TYPE_LABELS_PLURAL[filters.types[0]] || getVehicleTypeLabel(filters.types[0]));
     } else {
       parts.push(t("search.properties", "Véhicules"));
     }
@@ -368,7 +369,7 @@ const SearchPage = () => {
   const metaDescription = useMemo(() => {
     const typePart =
       filters.types.length === 1
-        ? LISTING_TYPE_LABELS_PLURAL[filters.types[0] as keyof typeof LISTING_TYPE_LABELS_PLURAL] || filters.types[0]
+        ? LISTING_TYPE_LABELS_PLURAL[filters.types[0]] || getVehicleTypeLabel(filters.types[0])
         : "véhicules";
     const transactionPart =
       filters.transaction === "vente"

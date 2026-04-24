@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Coins, Sparkles, ChevronDown } from "lucide-react";
-import { LISTING_TYPE_LABELS, type ListingType } from "@/types/listing";
+import { getVehicleTypeLabel } from "@/data/vehicleTypes";
 import {
   BOOST_ORDER,
   BOOST_LABELS_FR,
@@ -296,7 +296,7 @@ const PublishStepVisibility = ({
         <CardContent className="font-sans text-sm space-y-1 text-muted-foreground">
           <p><strong className="text-foreground">{title || t("common.none", "—")}</strong></p>
           <p>
-            {listingType ? LISTING_TYPE_LABELS[listingType as ListingType] : ""} · {transactionLabel} · {ville}
+            {getVehicleTypeLabel(listingType)} · {transactionLabel} · {ville}
           </p>
           <p>
             {photoCount} {t("publish.photoCount", "photo(s)")}

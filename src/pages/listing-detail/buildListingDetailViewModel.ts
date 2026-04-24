@@ -1,5 +1,6 @@
 import type { TFunction } from "i18next";
-import { LISTING_TYPE_LABELS, TRANSACTION_LABELS, type DisplayListing } from "@/types/listing";
+import { TRANSACTION_LABELS, type DisplayListing } from "@/types/listing";
+import { getVehicleTypeLabel } from "@/data/vehicleTypes";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { toApproximatePublicCoordinates } from "@/lib/mapPrivacy";
 import { buildCanonicalUrl, composePageTitle, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
@@ -83,7 +84,7 @@ export function buildListingDetailViewModel(params: BuildListingDetailViewModelP
         : listing.transaction === "location_vacances"
           ? t("publish.shortTermRental", "Location courte durée")
           : TRANSACTION_LABELS[listing.transaction] ?? listing.transaction;
-  const typeLabel = LISTING_TYPE_LABELS[listing.type] ?? listing.type;
+  const typeLabel = getVehicleTypeLabel(listing.type);
   const addressLine = [listing.ville, listing.arrondissement, listing.quartier, listing.region].filter(Boolean).join(", ");
   const hasExactCoords =
     listing.lat != null && listing.lng != null && isValidListingCoordinates(listing.lat, listing.lng);

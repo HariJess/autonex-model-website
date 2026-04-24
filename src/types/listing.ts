@@ -1,6 +1,18 @@
 /**
- * Canonical listing types — single source of truth.
- * These match the DB enum `listing_type` exactly.
+ * Listing.type est désormais un TEXT libre en base (migration
+ * Lot 8) — fini l'enum immobilier rigide. Le catalogue officiel
+ * de suggestions vit dans `src/data/vehicleTypes.ts` et est
+ * affiché via `getVehicleTypeLabel()`.
+ *
+ * Les constantes ci-dessous gardent leur nom historique pour
+ * éviter un refacto massif des 20+ consommateurs, mais leur
+ * sémantique a changé :
+ * - LISTING_TYPES : tableau de valeurs legacy immobilières
+ *   (rétrocompat — encore présentes sur des listings existants)
+ *   + valeurs véhicule courantes.
+ * - LISTING_TYPE_LABELS : lookup best-effort ; pour un rendu UI
+ *   propre sur n'importe quelle valeur (y compris custom user),
+ *   préférer `getVehicleTypeLabel()`.
  */
 export const LISTING_TYPES = [
   "appartement",
@@ -11,10 +23,10 @@ export const LISTING_TYPES = [
   "bureau",
 ] as const;
 
-export type ListingType = (typeof LISTING_TYPES)[number];
+export type ListingType = string;
 
 /** Types for which bedroom / bathroom filters are usually irrelevant in search UI */
-export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly ListingType[] = [
+export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly string[] = [
   "terrain",
   "local_commercial",
   "bureau",
@@ -25,9 +37,9 @@ export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly ListingType[] = [
  * `rooms` (= finition/version) et `bathrooms` (= portes). Nom historique « rooms » = immobilier ;
  * préférer cette constante à un libellé trompeur type `TYPES_WITH_ROOMS`.
  */
-export const LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS: readonly ListingType[] = ["appartement", "villa", "maison"];
+export const LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS: readonly string[] = ["appartement", "villa", "maison"];
 
-export const LISTING_TYPE_LABELS: Record<ListingType, string> = {
+export const LISTING_TYPE_LABELS: Record<string, string> = {
   appartement: "Citadine",
   villa: "SUV / 4x4",
   maison: "Berline",
@@ -36,7 +48,7 @@ export const LISTING_TYPE_LABELS: Record<ListingType, string> = {
   bureau: "Camion",
 };
 
-export const LISTING_TYPE_LABELS_PLURAL: Record<ListingType, string> = {
+export const LISTING_TYPE_LABELS_PLURAL: Record<string, string> = {
   appartement: "Citadines",
   villa: "SUV / 4x4",
   maison: "Berlines",

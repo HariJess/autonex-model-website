@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import LocationPicker from "@/components/LocationPicker";
 import PublishLocationMap from "@/components/PublishLocationMap";
@@ -6,12 +5,10 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { TransactionType, ListingType } from "@/types/listing";
-import {
-  AUTO_SEARCH_VEHICLE_TYPE_OPTIONS,
-  inferVehicleTypeOptionIdFromFilters,
-} from "@/data/automotiveCatalog";
-import { listingTypesForTransaction } from "@/lib/listingRules";
+import { VehicleTypeCombobox } from "@/components/listings/VehicleTypeCombobox";
+import type { TransactionType } from "@/types/listing";
+import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
+import { normalizeVehicleType } from "@/data/vehicleTypes";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
 
@@ -60,76 +57,17 @@ export function PublishBasicInfoSection({ labels }: PublishBasicInfoSectionProps
   const quartierLibre = form.watch("quartierLibre");
   const pinLat = form.watch("pinLat");
   const pinLng = form.watch("pinLng");
-  const vehicleBodyStyle = form.watch("vehicleBodyStyle");
-  const vehicleFuel = form.watch("vehicleFuel");
-
-  const typeOptions = useMemo(() => listingTypesForTransaction(transaction), [transaction]);
-
-  const vehicleTypeOptions = useMemo(() => {
-    const allowed = new Set(typeOptions);
-    return AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((option) => {
-      if (!option.listingTypes?.length) return true;
-      return option.listingTypes.some((listingTypeOption) => allowed.has(listingTypeOption as ListingType));
-    });
-  }, [typeOptions]);
-
-  const vehicleTypeId = useMemo(() => {
-    if (vehicleBodyStyle && vehicleTypeOptions.some((opt) => opt.id === vehicleBodyStyle)) {
-      return vehicleBodyStyle;
-    }
-    const inferred = inferVehicleTypeOptionIdFromFilters({
-      types: listingType ? [listingType] : [],
-      modelQuery: vehicleBodyStyle,
-      fuels: vehicleFuel ? [vehicleFuel] : [],
-    });
-    if (inferred && vehicleTypeOptions.some((opt) => opt.id === inferred)) {
-      return inferred;
-    }
-    return "";
-  }, [vehicleBodyStyle, vehicleTypeOptions, listingType, vehicleFuel]);
-
   const handleTransactionChange = (v: TransactionType) => {
     form.setValue("transaction", v);
+    // Legacy rule: the immobilier value "terrain" (land) cannot be rented.
+    // Kept for backward compat with existing listings; free-text vehicle
+    // types (pickup, suv, moto, …) are preserved across transaction changes.
     const currentListingType = form.getValues("listingType");
-    const allowed = new Set(listingTypesForTransaction(v));
-    form.setValue(
-      "listingType",
-      allowed.has(currentListingType as ListingType) ? currentListingType : "",
-    );
-    const currentBodyStyle = form.getValues("vehicleBodyStyle");
-    if (currentBodyStyle) {
-      const nextOptions = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.filter((option) => {
-        if (!option.listingTypes?.length) return true;
-        const allowedInner = new Set(listingTypesForTransaction(v));
-        return option.listingTypes.some((listingTypeOption) =>
-          allowedInner.has(listingTypeOption as ListingType),
-        );
-      });
-      form.setValue(
-        "vehicleBodyStyle",
-        nextOptions.some((option) => option.id === currentBodyStyle) ? currentBodyStyle : "",
-      );
-    }
-  };
-
-  const handleVehicleTypeChange = (vehicleTypeIdInput: string) => {
-    const option = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((entry) => entry.id === vehicleTypeIdInput);
-    const allowed = new Set(typeOptions);
-    const mappedType =
-      option?.listingTypes?.find((entry) => allowed.has(entry as ListingType)) ?? null;
-
-    form.setValue("vehicleBodyStyle", vehicleTypeIdInput);
-    if (mappedType) {
-      form.setValue("listingType", mappedType as ListingType);
-    } else if (!listingType) {
-      form.setValue("listingType", typeOptions[0] ?? "");
-    }
-    if (option?.fuels?.length) {
-      form.setValue("vehicleFuel", option.fuels[0]);
-      const isElectric = option.fuels.includes("Électrique");
-      const isHybrid = option.fuels.some((fuelOption) => fuelOption.includes("Hybride"));
-      form.setValue("vehicleIsElectric", isElectric);
-      form.setValue("vehicleIsHybrid", isHybrid);
+    if (
+      currentListingType === "terrain" &&
+      (v === "location" || v === "location_vacances")
+    ) {
+      form.setValue("listingType", "");
     }
   };
 
@@ -152,18 +90,30 @@ export function PublishBasicInfoSection({ labels }: PublishBasicInfoSectionProps
         </div>
         <div className="space-y-2">
           <Label className="font-sans">{labels.propertyType} *</Label>
-          <Select value={vehicleTypeId} onValueChange={handleVehicleTypeChange} disabled={!transaction}>
-            <SelectTrigger className="font-sans">
-              <SelectValue placeholder={labels.select} />
-            </SelectTrigger>
-            <SelectContent>
-              {vehicleTypeOptions.map((typeOption) => (
-                <SelectItem key={typeOption.id} value={typeOption.id}>
-                  {typeOption.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <VehicleTypeCombobox
+            value={listingType}
+            onChange={(next) => {
+              const normalized = normalizeVehicleType(next);
+              form.setValue("listingType", normalized);
+              // Mirror into vehicleBodyStyle so downstream code using body-style
+              // (search, SEO, cascades) keeps a value. Preserves match with
+              // AUTO_SEARCH_VEHICLE_TYPE_OPTIONS ids when they line up.
+              form.setValue("vehicleBodyStyle", normalized);
+              // Best-effort fuel preset when the chosen type maps to a catalog
+              // option with fuels (électrique / hybride).
+              const option = AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.find((entry) => entry.id === normalized);
+              if (option?.fuels?.length) {
+                form.setValue("vehicleFuel", option.fuels[0]);
+                form.setValue("vehicleIsElectric", option.fuels.includes("Électrique"));
+                form.setValue(
+                  "vehicleIsHybrid",
+                  option.fuels.some((fuelOption) => fuelOption.includes("Hybride")),
+                );
+              }
+            }}
+            disabled={!transaction}
+            placeholder={labels.select}
+          />
         </div>
       </div>
       <div className="flex items-center justify-between gap-4 rounded-xl border-2 border-border/90 bg-muted/30 px-4 py-3.5 shadow-sm">

@@ -161,22 +161,25 @@ export const AUTO_SEARCH_CONDITION_OPTIONS = ["Neuf", "Occasion"] as const;
 
 export const AUTO_SEARCH_SELLER_OPTIONS = ["Particulier", "Concessionnaire"] as const;
 
+// Post Lot 8 : listing.type est free-text. Les `listingTypes` ci-dessous
+// incluent les nouvelles valeurs véhicule (src/data/vehicleTypes.ts) en plus
+// des anciennes valeurs immobilières — rétrocompat pour des listings legacy.
 export const AUTO_SEARCH_VEHICLE_TYPE_OPTIONS: HeroVehicleTypeOption[] = [
-  { id: "citadine", label: "Citadine", listingTypes: ["appartement"], modelQuery: "citadine" },
-  { id: "berline", label: "Berline", listingTypes: ["maison"], modelQuery: "berline" },
-  { id: "suv_4x4", label: "SUV / 4x4", listingTypes: ["villa", "local_commercial"], modelQuery: "suv" },
-  { id: "crossover", label: "Crossover", listingTypes: ["villa"], modelQuery: "crossover" },
-  { id: "pick_up", label: "Pick-up", listingTypes: ["local_commercial"], modelQuery: "pick-up" },
-  { id: "coupe", label: "Coupé", listingTypes: ["maison"], modelQuery: "coupe" },
-  { id: "cabriolet", label: "Cabriolet", listingTypes: ["maison"], modelQuery: "cabriolet" },
-  { id: "utilitaire_leger", label: "Utilitaire léger", listingTypes: ["local_commercial"], modelQuery: "utilitaire" },
-  { id: "van_fourgon", label: "Van / Fourgon", listingTypes: ["local_commercial", "bureau"], modelQuery: "fourgon" },
-  { id: "minibus_bus", label: "Minibus / Bus", listingTypes: ["bureau"], modelQuery: "minibus" },
-  { id: "camion", label: "Camion", listingTypes: ["bureau"], modelQuery: "camion" },
-  { id: "moto", label: "Moto", listingTypes: ["terrain"], modelQuery: "moto" },
-  { id: "scooter", label: "Scooter", listingTypes: ["terrain"], modelQuery: "scooter" },
-  { id: "quad", label: "Quad", listingTypes: ["terrain"], modelQuery: "quad" },
-  { id: "buggy", label: "Buggy", listingTypes: ["terrain"], modelQuery: "buggy" },
+  { id: "citadine", label: "Citadine", listingTypes: ["citadine", "appartement"], modelQuery: "citadine" },
+  { id: "berline", label: "Berline", listingTypes: ["berline", "maison"], modelQuery: "berline" },
+  { id: "suv_4x4", label: "SUV / 4x4", listingTypes: ["suv", "4x4", "villa"], modelQuery: "suv" },
+  { id: "crossover", label: "Crossover", listingTypes: ["suv", "villa"], modelQuery: "crossover" },
+  { id: "pick_up", label: "Pick-up", listingTypes: ["pickup", "local_commercial"], modelQuery: "pick-up" },
+  { id: "coupe", label: "Coupé", listingTypes: ["coupe", "maison"], modelQuery: "coupe" },
+  { id: "cabriolet", label: "Cabriolet", listingTypes: ["cabriolet", "maison"], modelQuery: "cabriolet" },
+  { id: "utilitaire_leger", label: "Utilitaire léger", listingTypes: ["fourgon", "local_commercial"], modelQuery: "utilitaire" },
+  { id: "van_fourgon", label: "Van / Fourgon", listingTypes: ["fourgon", "local_commercial", "bureau"], modelQuery: "fourgon" },
+  { id: "minibus_bus", label: "Minibus / Bus", listingTypes: ["minibus", "bureau"], modelQuery: "minibus" },
+  { id: "camion", label: "Camion", listingTypes: ["camion", "bureau"], modelQuery: "camion" },
+  { id: "moto", label: "Moto", listingTypes: ["moto", "terrain"], modelQuery: "moto" },
+  { id: "scooter", label: "Scooter", listingTypes: ["scooter", "terrain"], modelQuery: "scooter" },
+  { id: "quad", label: "Quad", listingTypes: ["quad", "terrain"], modelQuery: "quad" },
+  { id: "buggy", label: "Buggy", listingTypes: ["quad", "terrain"], modelQuery: "buggy" },
   { id: "electrique", label: "Électrique", fuels: ["Électrique"] },
   { id: "hybride", label: "Hybride", fuels: ["Hybride", "Hybride rechargeable"] },
 ];

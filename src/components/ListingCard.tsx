@@ -5,7 +5,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { DisplayListing } from "@/types/listing";
-import { LISTING_TYPE_LABELS } from "@/types/listing";
+import { getVehicleTypeLabel } from "@/data/vehicleTypes";
 import { prefetchListing } from "@/hooks/useListings";
 import { applyImageFallback } from "@/lib/imageFallback";
 import {
@@ -275,7 +275,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               {mileageLabel}
             </span>
           )}
-          {!isSearchVariant && !isCompactLayout && <span className="capitalize">{LISTING_TYPE_LABELS[listing.type] ?? listing.type}</span>}
+          {!isSearchVariant && !isCompactLayout && <span className="capitalize">{getVehicleTypeLabel(listing.type)}</span>}
           {!isCompactLayout && listing.vehicle?.fuel && <span className={isSearchVariant ? "hidden sm:inline" : ""}>{listing.vehicle.fuel}</span>}
           {!isCompactLayout && listing.vehicle?.transmission && <span className={isSearchVariant ? "hidden sm:inline" : ""}>{listing.vehicle.transmission}</span>}
         </div>

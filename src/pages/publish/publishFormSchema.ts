@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LISTING_TYPES, TRANSACTION_TYPES, type ListingType, type TransactionType } from "@/types/listing";
+import { TRANSACTION_TYPES, type TransactionType } from "@/types/listing";
 import type { PurchasableBoostType } from "@/config/monetization";
 
 /**
@@ -36,10 +36,10 @@ const transactionField = z.union([
   z.enum(TRANSACTION_TYPES as unknown as [TransactionType, ...TransactionType[]]),
 ]);
 
-const listingTypeField = z.union([
-  z.literal(""),
-  z.enum(LISTING_TYPES as unknown as [ListingType, ...ListingType[]]),
-]);
+// listing.type est désormais du TEXT libre en base (migration Lot 8) : la
+// validation front accepte toute chaîne. La string vide représente « non
+// renseigné » et est rattrapée par publishValidation qui affiche l'erreur.
+const listingTypeField = z.string();
 
 /**
  * Local enum tuple mirroring PurchasableBoostType from @/config/monetization.

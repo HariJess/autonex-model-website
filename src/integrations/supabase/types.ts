@@ -623,7 +623,7 @@ export type Database = {
           toilets: number | null
           transaction: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox: string | null
-          type: Database["public"]["Enums"]["listing_type"]
+          type: string | null
           updated_at: string
           vehicle_condition: string | null
           video_url: string | null
@@ -681,7 +681,7 @@ export type Database = {
           toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
-          type?: Database["public"]["Enums"]["listing_type"]
+          type?: string | null
           updated_at?: string
           vehicle_condition?: string | null
           video_url?: string | null
@@ -739,7 +739,7 @@ export type Database = {
           toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
-          type?: Database["public"]["Enums"]["listing_type"]
+          type?: string | null
           updated_at?: string
           vehicle_condition?: string | null
           video_url?: string | null
@@ -2506,7 +2506,7 @@ export type Database = {
           lst_toilets: number
           lst_transaction: Database["public"]["Enums"]["transaction_type"]
           lst_transmission_gearbox: string
-          lst_type: Database["public"]["Enums"]["listing_type"]
+          lst_type: string
           lst_vehicle_condition: string
           lst_video_url: string
           lst_views_count: number
