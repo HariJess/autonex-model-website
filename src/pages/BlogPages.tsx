@@ -5,8 +5,59 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
-import { seedBlogPosts } from "@/data/seed-listings";
+import { AlertCircle, AlertTriangle, Info, Lightbulb } from "lucide-react";
+import { seedBlogPosts, type SeedBlogCallout } from "@/data/seed-listings";
+
+const slugify = (text: string) =>
+  text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const calloutStyles: Record<
+  SeedBlogCallout["type"],
+  { border: string; bg: string; iconColor: string; Icon: typeof Info; defaultTitle: string }
+> = {
+  tip: {
+    border: "border-l-emerald-500",
+    bg: "bg-emerald-500/10",
+    iconColor: "text-emerald-600",
+    Icon: Lightbulb,
+    defaultTitle: "Astuce",
+  },
+  warning: {
+    border: "border-l-amber-500",
+    bg: "bg-amber-500/10",
+    iconColor: "text-amber-600",
+    Icon: AlertTriangle,
+    defaultTitle: "Attention",
+  },
+  info: {
+    border: "border-l-sky-500",
+    bg: "bg-sky-500/10",
+    iconColor: "text-sky-600",
+    Icon: Info,
+    defaultTitle: "À savoir",
+  },
+};
+
+const Callout = ({ callout }: { callout: SeedBlogCallout }) => {
+  const style = calloutStyles[callout.type];
+  const Icon = style.Icon;
+  return (
+    <div className={`rounded-r-xl border-l-4 ${style.border} ${style.bg} p-4 sm:p-5`}>
+      <div className="flex gap-3">
+        <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${style.iconColor}`} aria-hidden="true" />
+        <div className="space-y-1">
+          <p className="font-serif font-semibold text-foreground">{callout.title ?? style.defaultTitle}</p>
+          <p className="text-sm sm:text-base text-muted-foreground leading-7">{callout.text}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 /**
  * Blog uses seed data consistently (no hybrid DB/seed).
@@ -191,36 +242,96 @@ const BlogArticle = () => {
         )}
         <div className="space-y-7 md:space-y-8 font-sans">
           <p className="text-base sm:text-lg leading-relaxed text-foreground font-medium">{post.intro}</p>
-          {post.sections.map((section) => (
-            <section key={section.heading} className="space-y-4">
-              <h2 className="font-serif text-2xl font-bold text-foreground">{section.heading}</h2>
-              {section.paragraphs?.map((paragraph, idx) => (
-                <p key={idx} className="text-muted-foreground leading-7 sm:leading-8">{paragraph}</p>
-              ))}
-              {section.bulletsTitle && (
-                <h3 className="font-serif text-lg font-semibold text-foreground">{section.bulletsTitle}</h3>
-              )}
-              {section.bullets && section.bullets.length > 0 && (
-                <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                  {section.bullets.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              )}
-              {section.checklistTitle && (
-                <h3 className="font-serif text-lg font-semibold text-foreground">{section.checklistTitle}</h3>
-              )}
-              {section.checklist && section.checklist.length > 0 && (
-                <ul className="space-y-2">
-                  {section.checklist.map((item) => (
-                    <li key={item} className="rounded-xl border border-border bg-secondary/30 px-3 py-2 text-muted-foreground">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ))}
+
+          {post.sections.length > 1 && (
+            <nav aria-label={t("blog.toc", "Sommaire")} className="rounded-2xl border border-border bg-secondary/30 p-4 sm:p-5">
+              <p className="font-serif font-semibold text-foreground mb-2">{t("blog.toc", "Sommaire")}</p>
+              <ol className="list-decimal pl-5 space-y-1 text-sm text-muted-foreground">
+                {post.sections.map((section) => (
+                  <li key={section.heading}>
+                    <a href={`#${slugify(section.heading)}`} className="hover:text-primary hover:underline">
+                      {section.heading}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
+
+          {post.sections.map((section) => {
+            const sectionId = slugify(section.heading);
+            const ListTag = section.numbered ? "ol" : "ul";
+            const bulletListClass = section.numbered
+              ? "list-decimal pl-5 space-y-3 text-muted-foreground marker:font-semibold marker:text-foreground"
+              : "list-disc pl-5 space-y-2 text-muted-foreground";
+            return (
+              <section key={section.heading} id={sectionId} className="space-y-4 scroll-mt-24">
+                <h2 className="font-serif text-2xl font-bold text-foreground">{section.heading}</h2>
+                {section.paragraphs?.map((paragraph, idx) => (
+                  <p key={idx} className="text-muted-foreground leading-7 sm:leading-8">{paragraph}</p>
+                ))}
+
+                {section.table && (
+                  <figure className="space-y-2">
+                    <div className="overflow-x-auto rounded-xl border border-border">
+                      <table className="w-full border-collapse text-sm">
+                        <thead className="bg-secondary/50">
+                          <tr>
+                            {section.table.headers.map((header) => (
+                              <th key={header} className="px-3 py-2.5 text-left font-serif font-semibold text-foreground border-b border-border">
+                                {header}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {section.table.rows.map((row, rowIdx) => (
+                            <tr key={rowIdx} className="even:bg-secondary/20">
+                              {row.map((cell, cellIdx) => (
+                                <td key={cellIdx} className="px-3 py-2.5 text-muted-foreground border-b border-border last:border-b-0 align-top">
+                                  {cell}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {section.table.caption && (
+                      <figcaption className="text-xs text-muted-foreground italic text-center">
+                        {section.table.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                )}
+
+                {section.bulletsTitle && (
+                  <h3 className="font-serif text-lg font-semibold text-foreground">{section.bulletsTitle}</h3>
+                )}
+                {section.bullets && section.bullets.length > 0 && (
+                  <ListTag className={bulletListClass}>
+                    {section.bullets.map((item, idx) => (
+                      <li key={idx} className="leading-7 sm:leading-8 pl-1">{item}</li>
+                    ))}
+                  </ListTag>
+                )}
+                {section.checklistTitle && (
+                  <h3 className="font-serif text-lg font-semibold text-foreground">{section.checklistTitle}</h3>
+                )}
+                {section.checklist && section.checklist.length > 0 && (
+                  <ul className="space-y-2">
+                    {section.checklist.map((item) => (
+                      <li key={item} className="rounded-xl border border-border bg-secondary/30 px-3 py-2 text-muted-foreground">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {section.callout && <Callout callout={section.callout} />}
+              </section>
+            );
+          })}
 
           {post.faq.length > 0 && (
             <section className="space-y-4">
