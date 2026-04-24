@@ -234,6 +234,69 @@ Le pragma SQL `COMMENT ON FUNCTION create_notification` (migration Lot 10.2)
 rappelle cette convention directement dans le schéma pour les devs qui
 consulteraient la fonction via `\df+` ou le Dashboard Supabase.
 
+### ⚠️ Les triggers sur `credits_ledger` doivent matcher le schéma réel
+
+La table `credits_ledger` a le schéma suivant (source de vérité) :
+
+| column | type |
+|---|---|
+| `id` | `uuid` |
+| `user_id` | `uuid` |
+| `delta` | `integer` (signé : positif = crédit, négatif = débit) |
+| `reason` | `text` |
+| `ref_type` | `text` |
+| `ref_id` | `uuid` |
+| `created_at` | `timestamptz` |
+
+**Elle N'A PAS** de colonnes `entry_type`, `balance_after`, `transaction_id`
+(malgré des noms qu'on pourrait supposer par convention).
+
+Valeurs `ref_type` observées en production (grep sur les migrations) :
+
+| `ref_type` | Usage | Delta |
+|---|---|---|
+| `'transaction'` | Achat de crédits via VPI webhook ou admin approve | `+` |
+| `'admin_adjustment'` | Grant/débit admin manuel | `+` ou `-` |
+| `'listing_publish'` | Débit pour publication d'annonce | `-` |
+| `'listing_reject_refund'` | Remboursement technique après refus modération | `+` |
+
+**Tout trigger / fonction qui lit `NEW.xxx` sur `credits_ledger` doit
+impérativement utiliser les colonnes réelles ci-dessus.** Un mismatch
+lève une erreur Postgres `42703 (record "new" has no field "xxx")` qui
+**rollback la transaction entière**. En pratique, cela casse à la fois :
+
+- l'achat de crédits (webhook VPI qui plante en aval),
+- toute publication d'annonce (débit `listing_publish` qui plante),
+- tout grant admin (idem),
+- donc **l'app entière** dès que l'utilisateur essaie de payer quoi que ce soit.
+
+**Checklist avant d'écrire un trigger sur `credits_ledger`** :
+
+```sql
+-- Vérifier les colonnes effectivement présentes :
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'credits_ledger'
+ORDER BY ordinal_position;
+
+-- Et les valeurs ref_type réellement insérées :
+SELECT ref_type, COUNT(*), SUM(delta)
+FROM public.credits_ledger
+GROUP BY ref_type
+ORDER BY COUNT(*) DESC;
+```
+
+**Protection supplémentaire** — envelopper l'appel à `create_notification`
+(ou toute logique side-effect) dans un bloc `EXCEPTION WHEN OTHERS` qui
+ne `RAISE` pas, mais `RAISE WARNING` + `RETURN NEW`. Ainsi, un bug dans
+la notification ne casse jamais la transaction de crédit.
+
+**Incident de référence** — 25 avril 2026 : le trigger d'origine
+`notify_credits_purchased` (Lot 10.1) lisait `NEW.entry_type`,
+`NEW.balance_after`, `NEW.transaction_id`. Chaque INSERT plantait, toute
+publication échouait en prod. Fix dans la migration
+`20260425110000_hotfix_notify_credits_purchased.sql`.
+
 ## TODOs post-Lot 10.2
 
 - **Bouton « Se désabonner »** — générer un token signé par notif dans le pied
