@@ -13,12 +13,19 @@ import type { Notification } from "@/types/notification";
  *   buffer limité).
  * - Actions : markAsRead, markAllAsRead, archive — toutes via RPCs serveur qui
  *   appliquent la RLS côté DB.
- *
- * Note types : la table `notifications` vient d'être ajoutée via la migration
- * Lot 10.1 ; les types Supabase générés ne sont pas encore régénérés. On
- * utilise un cast localisé `supabase.from("notifications" as any)` jusqu'à la
- * prochaine régénération (supabase gen types).
  */
+
+// Hotfix Sentry issue 5602e03b :
+// Cf. `useNotificationPreferences.ts` pour le contexte. On cast le client
+// ENTIER (préserve le `this`) plutôt que d'extraire `supabase.from` comme
+// méthode détachée, ce qui cassait `this.rest` à l'intérieur de supabase-js.
+//
+// TODO Lot 10.1.5 : régénérer les types Supabase
+// `npx supabase gen types typescript --project-id wtkedamrmtvdoippqanc`
+// pour supprimer ce cast as unknown as.
+const supabaseExtended = supabase as unknown as {
+  from: (table: string) => ReturnType<typeof supabase.from>;
+};
 
 type UseNotificationsReturn = {
   notifications: Notification[];
@@ -54,9 +61,8 @@ export function useNotifications(limit: number = 20): UseNotificationsReturn {
       return;
     }
 
-    const { data } = await (supabase.from as unknown as (table: string) => ReturnType<typeof supabase.from>)(
-      "notifications",
-    )
+    const { data } = await supabaseExtended
+      .from("notifications")
       .select("*")
       .eq("user_id", user.id)
       .is("archived_at", null)

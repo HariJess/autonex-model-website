@@ -10,6 +10,21 @@ import {
   type NotificationPreferences,
 } from "@/types/notification";
 
+// Hotfix Sentry issue 5602e03b :
+// Extraire `supabase.from` comme méthode détachée (`const client = supabase.from`)
+// casse `this.rest` à l'intérieur de supabase-js → `TypeError: Cannot read
+// properties of undefined (reading 'rest')` observé en prod sur
+// /settings/notifications.
+// Solution : caster le client ENTIER et appeler `.from()` comme méthode, ce
+// qui préserve le binding `this` du SupabaseClient.
+//
+// TODO Lot 10.1.5 : régénérer les types Supabase
+// `npx supabase gen types typescript --project-id wtkedamrmtvdoippqanc`
+// pour supprimer ce cast as unknown as une fois les tables Lot 10.1 typées.
+const supabaseExtended = supabase as unknown as {
+  from: (table: string) => ReturnType<typeof supabase.from>;
+};
+
 type UseNotificationPreferencesReturn = {
   preferences: NotificationPreferences | null;
   loading: boolean;
@@ -43,8 +58,8 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
     setLoading(true);
     setError(null);
 
-    const client = supabase.from as unknown as (table: string) => ReturnType<typeof supabase.from>;
-    const { data, error: readError } = await client("notification_preferences")
+    const { data, error: readError } = await supabaseExtended
+      .from("notification_preferences")
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
@@ -70,7 +85,8 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
         userId: user.id,
       }),
     };
-    const { data: inserted, error: insertError } = await client("notification_preferences")
+    const { data: inserted, error: insertError } = await supabaseExtended
+      .from("notification_preferences")
       .insert(defaultsPayload as never)
       .select()
       .single();
@@ -94,9 +110,9 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       if (!user) return;
       setSaving(true);
       setError(null);
-      const client = supabase.from as unknown as (table: string) => ReturnType<typeof supabase.from>;
       const dbPatch = notificationPreferencesToDbPatch(patch);
-      const { data, error: updateError } = await client("notification_preferences")
+      const { data, error: updateError } = await supabaseExtended
+        .from("notification_preferences")
         .update({ ...dbPatch, updated_at: new Date().toISOString() } as never)
         .eq("user_id", user.id)
         .select()
