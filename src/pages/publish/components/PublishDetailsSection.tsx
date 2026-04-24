@@ -6,12 +6,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AUTO_BRANDS, getVehicleMakeLabel } from "@/data/automotiveCatalog";
 import { resolveBrandAsset } from "@/data/brandAssets";
 import { EXTERIOR_COLOR_OPTIONS, INTERIOR_COLOR_OPTIONS } from "@/lib/vehicleAttributes";
-import { LISTING_EQUIPMENT_OPTIONS } from "@/data/listing-equipment";
+import {
+  LISTING_EQUIPMENT_GROUPS,
+  classifyEquipmentValues,
+  getEquipmentOptionLabel,
+  type ListingEquipmentIconName,
+} from "@/data/listing-equipment";
 import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { VehicleModelCombobox } from "@/components/listings/VehicleModelCombobox";
 import {
@@ -20,7 +26,21 @@ import {
 } from "@/data/vehicleModelsCatalog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Check, ChevronDown, ChevronsUpDown, Plus } from "lucide-react";
+import {
+  ArrowLeft,
+  Armchair,
+  Check,
+  ChevronDown,
+  ChevronsUpDown,
+  Leaf,
+  Navigation,
+  Package,
+  Plus,
+  Shield,
+  Smartphone,
+  Sun,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import type { PublishFormValues } from "@/pages/publish/publishFormSchema";
@@ -213,7 +233,6 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
   }, [make, form]);
 
   const [showEquipmentSection, setShowEquipmentSection] = useState(false);
-  const [showAllEquipment, setShowAllEquipment] = useState(false);
   const [showComplementaryInfo, setShowComplementaryInfo] = useState(false);
   const [makeOpen, setMakeOpen] = useState(false);
   // Lot 9.2 — Auto-title intelligent : activé par défaut sur un brouillon
@@ -333,14 +352,37 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
     exteriorColor.trim().length > 0 &&
     !EXTERIOR_COLOR_OPTIONS.some((option) => option.value === exteriorColor.trim().toLowerCase());
 
+  // Lot 9.4 — Plus de contrôle strict sur LISTING_EQUIPMENT_OPTIONS : les
+  // valeurs legacy (Lot < 9.4, ex: "Climatisation") peuvent encore transiter
+  // par selectedFeatures jusqu'à ce qu'elles soient migrées vers leur clé
+  // snake_case. Le rendu UI les affiche dans « Autres (conservées) ».
   const toggleFeature = (f: string) => {
-    if (!LISTING_EQUIPMENT_OPTIONS.includes(f)) return;
     const current = form.getValues("selectedFeatures");
     form.setValue(
       "selectedFeatures",
       current.includes(f) ? current.filter((x) => x !== f) : [...current, f],
     );
   };
+
+  // Lot 9.4 — Icônes Lucide par groupe d'équipements (cf `iconName` du catalogue).
+  const EQUIPMENT_ICONS: Record<ListingEquipmentIconName, LucideIcon> = {
+    Armchair,
+    Smartphone,
+    Shield,
+    Navigation,
+    Sun,
+    Package,
+    Leaf,
+  };
+
+  // Classification sélection courante (Lot 9.4) : sépare les valeurs connues
+  // (migrées vers snake_case) des valeurs legacy inconnues à préserver dans
+  // la section « Autres (conservées) ». Memoisé pour éviter de recalculer à
+  // chaque render.
+  const classifiedEquipment = useMemo(
+    () => classifyEquipmentValues(selectedFeatures),
+    [selectedFeatures],
+  );
 
   return (
     <div className="space-y-5 form-surface">
@@ -896,7 +938,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
         </div>
       </section>
 
-      {/* Bloc 6 — Équipements (sera redesigné Lot 9.4) */}
+      {/* Bloc 6 — Équipements (Lot 9.4 : 7 groupes en accordéon) */}
       <section className="rounded-xl border border-border/70 bg-background/70">
         <button
           type="button"
@@ -913,24 +955,87 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showEquipmentSection ? "rotate-180" : ""}`} />
         </button>
         {showEquipmentSection && (
-          <div className="space-y-2 border-t border-border/70 px-4 py-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {(showAllEquipment ? LISTING_EQUIPMENT_OPTIONS : LISTING_EQUIPMENT_OPTIONS.slice(0, 8)).map((f) => (
-                <label key={f} className="flex min-h-11 items-center gap-3 rounded-lg border border-border/70 bg-background/60 px-3 cursor-pointer font-sans text-sm touch-manipulation">
-                  <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => toggleFeature(f)} />
-                  {f}
-                </label>
-              ))}
-            </div>
-            {LISTING_EQUIPMENT_OPTIONS.length > 8 && (
-              <button
-                type="button"
-                className="sm:hidden text-xs font-sans text-primary"
-                onClick={() => setShowAllEquipment((prev) => !prev)}
-              >
-                {showAllEquipment ? t("search.showLess", "Voir moins") : t("search.showMore", "Voir plus")}
-              </button>
-            )}
+          <div className="border-t border-border/70 px-2 py-2">
+            <Accordion type="multiple" defaultValue={["confort", "securite", "technologie"]}>
+              {LISTING_EQUIPMENT_GROUPS.map((group) => {
+                const Icon = group.iconName ? EQUIPMENT_ICONS[group.iconName] : null;
+                const selectedInGroup = group.options.filter((o) =>
+                  selectedFeatures.includes(o.value),
+                ).length;
+                return (
+                  <AccordionItem key={group.id} value={group.id} className="border-border/60">
+                    <AccordionTrigger className="px-2 py-3 hover:no-underline [&>svg]:shrink-0">
+                      <div className="flex items-center gap-3 flex-1 pr-3 text-left">
+                        {Icon && <Icon className="h-4 w-4 text-muted-foreground shrink-0" />}
+                        <span className="font-sans font-medium text-sm text-foreground">{group.label}</span>
+                        {selectedInGroup > 0 && (
+                          <span className="ml-auto text-[11px] font-sans px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                            {selectedInGroup} sélectionné{selectedInGroup > 1 ? "s" : ""}
+                          </span>
+                        )}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-1 pb-3 px-2">
+                      {group.description && (
+                        <p className="hidden sm:block text-[12px] font-sans text-muted-foreground mb-2">
+                          {group.description}
+                        </p>
+                      )}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        {group.options.map((option) => (
+                          <label
+                            key={option.value}
+                            className="flex min-h-11 items-center gap-3 rounded-md border border-border/60 bg-background/60 px-3 py-1.5 cursor-pointer font-sans text-sm touch-manipulation hover:bg-muted/40"
+                          >
+                            <Checkbox
+                              checked={selectedFeatures.includes(option.value)}
+                              onCheckedChange={() => toggleFeature(option.value)}
+                            />
+                            <span className="truncate">{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+              {classifiedEquipment.legacyUnknown.length > 0 && (
+                <AccordionItem value="legacy-preserved" className="border-border/60">
+                  <AccordionTrigger className="px-2 py-3 hover:no-underline [&>svg]:shrink-0">
+                    <div className="flex items-center gap-3 flex-1 pr-3 text-left">
+                      <span className="font-sans font-medium text-sm text-foreground">
+                        {t("publish.equipmentLegacyTitle", "Autres (conservées)")}
+                      </span>
+                      <span className="ml-auto text-[11px] font-sans px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                        {classifiedEquipment.legacyUnknown.length}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-1 pb-3 px-2">
+                    <p className="hidden sm:block text-[12px] font-sans text-muted-foreground mb-2">
+                      {t(
+                        "publish.equipmentLegacyDesc",
+                        "Valeurs héritées d'une ancienne version du catalogue. Décochez-les pour les retirer de l'annonce.",
+                      )}
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {classifiedEquipment.legacyUnknown.map((value) => (
+                        <label
+                          key={value}
+                          className="flex min-h-11 items-center gap-3 rounded-md border border-border/60 bg-background/60 px-3 py-1.5 cursor-pointer font-sans text-sm touch-manipulation hover:bg-muted/40"
+                        >
+                          <Checkbox
+                            checked={true}
+                            onCheckedChange={() => toggleFeature(value)}
+                          />
+                          <span className="truncate">{getEquipmentOptionLabel(value)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </Accordion>
           </div>
         )}
       </section>

@@ -18,7 +18,11 @@ import {
   getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
 import { getExteriorColorLabel } from "@/lib/vehicleAttributes";
-import { sanitizeListingEquipment, extractCustomFeatures } from "@/data/listing-equipment";
+import {
+  sanitizeListingEquipment,
+  extractCustomFeatures,
+  getEquipmentOptionLabel,
+} from "@/data/listing-equipment";
 import { resolveBrandAsset } from "@/data/brandAssets";
 import {
   buildContactTrustHints,
@@ -129,7 +133,10 @@ export function buildListingDetailViewModel(params: BuildListingDetailViewModelP
   const ownerStatusHint = getOwnerStatusHint(listing, isOwner, t);
   const displayBrand = canonicalVehicle.make ?? (displayTitle.trim() || null);
   const displayBrandAsset = resolveBrandAsset(displayBrand);
-  const listingFeatureBadges = sanitizeListingEquipment(listing.features);
+  // Lot 9.4 — sanitizeListingEquipment renvoie désormais des clés snake_case
+  // (post-migration des libellés legacy). On les convertit en libellés FR via
+  // getEquipmentOptionLabel pour l'affichage des badges.
+  const listingFeatureBadges = sanitizeListingEquipment(listing.features).map(getEquipmentOptionLabel);
   const customFeatureBadges = extractCustomFeatures(listing.features);
   const allFeatureBadges = [...listingFeatureBadges, ...customFeatureBadges];
   const visibleFeatureBadgesMobile = showAllFeaturesMobile ? allFeatureBadges : allFeatureBadges.slice(0, 8);
