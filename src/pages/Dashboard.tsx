@@ -8,7 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
 import { useCreditsBalance } from "@/hooks/useCreditsBalance";
 import { BOOST_LABELS_FR } from "@/config/monetization";
@@ -29,6 +30,26 @@ const Dashboard = () => {
   const { user, profile } = useAuth();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
+  // Lot 9.1c — Lecture du param `?published=<id>` passé après une publication
+  // réussie (cf. PublishPage.handlePublish). Sert à scroller vers l'annonce
+  // fraîchement publiée et à nettoyer l'URL pour éviter que Reload la rejoue.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const publishedListingId = searchParams.get("published");
+
+  useEffect(() => {
+    if (!publishedListingId) return;
+    const scrollTimer = window.setTimeout(() => {
+      const el = document.querySelector(`[data-listing-id="${publishedListingId}"]`);
+      if (el && "scrollIntoView" in el) {
+        (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 250);
+    // Retire le param de l'URL (replace, pas de nouvelle entrée d'historique).
+    const next = new URLSearchParams(searchParams);
+    next.delete("published");
+    setSearchParams(next, { replace: true });
+    return () => window.clearTimeout(scrollTimer);
+  }, [publishedListingId, searchParams, setSearchParams]);
 
   const { data: myListings = [], isLoading: listingsLoading, error: listingsError } = useQuery({
     queryKey: ["my-listings", user?.id],

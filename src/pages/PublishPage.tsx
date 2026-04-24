@@ -58,6 +58,7 @@ import { usePublishStepValidation } from "@/hooks/publish/usePublishStepValidati
 import { usePublishBootstrap } from "@/hooks/publish/usePublishBootstrap";
 import { usePublishDraftLifecycle } from "@/hooks/publish/usePublishDraftLifecycle";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
+import { parseSupabaseError } from "@/lib/parseSupabaseError";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { publishFormSchema, type PublishFormValues } from "@/pages/publish/publishFormSchema";
@@ -203,6 +204,11 @@ const PublishPage = () => {
   const exitBypassRef = useRef(false);
   const lastPersistedFingerprintRef = useRef("");
   const fingerprintInitializedRef = useRef(false);
+  // Lot 9.1c — Flag « draft publié avec succès ». Bloque toute tentative
+  // d'autosave ultérieure (debounce en vol après le RPC → PATCH sur une ligne
+  // dont le statut est déjà `pending_review` → PGRST116). Reset à false si la
+  // publication échoue réellement pour redonner la main à l'autosave.
+  const draftPublishedRef = useRef(false);
 
   const {
     serverPhotos,
@@ -580,8 +586,11 @@ const PublishPage = () => {
   });
 
   const persistDraft = useCallback(
-    async (stepOverride?: number) =>
-      runPersistDraftOperation({
+    async (stepOverride?: number) => {
+      // Lot 9.1c — Stop d'office toute sauvegarde si l'annonce a déjà été
+      // publiée avec succès. Évite le bruit 406 en arrière-plan.
+      if (draftPublishedRef.current) return true;
+      return runPersistDraftOperation({
         stepOverride,
         step,
         userId: user?.id,
@@ -603,7 +612,8 @@ const PublishPage = () => {
         setLastSavedAt,
         setListingModerationStatus,
         form: persistDraftForm,
-      }),
+      });
+    },
     [
       step,
       user?.id,
@@ -711,6 +721,9 @@ const PublishPage = () => {
 
     if (isPublishedListingEdit) {
       setPublishing(true);
+      // Lot 9.1c — Geler l'autosave pendant toute la phase de publication
+      // édition. Tout debounce en vol sera court-circuité par persistDraft.
+      draftPublishedRef.current = true;
       try {
         if (pendingPhotos.length > 0) {
           const { failed } = await flushPendingPhotosToServer();
@@ -804,9 +817,12 @@ const PublishPage = () => {
               )
             : t("publish.editSuccess", "Modifications enregistrées."),
         );
-        navigate("/dashboard");
+        navigate(`/dashboard?published=${draftListingId}`, { replace: true });
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : t("publish.error", "Erreur lors de la publication");
+        // Lot 9.1c — Redonner la main à l'autosave si la sauvegarde édition
+        // a vraiment échoué (l'annonce est probablement toujours publiée telle quelle).
+        draftPublishedRef.current = false;
+        const message = parseSupabaseError(err);
         toast.error(message);
       } finally {
         setPublishing(false);
@@ -828,8 +844,15 @@ const PublishPage = () => {
         throw new Error(t("publish.draftSaveFailed", "Échec de la sauvegarde"));
       }
 
+      // Lot 9.1c — À partir d'ici, on « gèle » l'autosave : le RPC va
+      // basculer le statut de `draft` à `pending_review`, tout PATCH ulté-
+      // rieur filtré sur `status = 'draft'` renverrait 406 PGRST116. On
+      // réarme le flag si la publication échoue réellement.
+      draftPublishedRef.current = true;
+
       const publishResult = await publishListingWithCredits(draftListingId);
       if (isPublishWithCreditsFailure(publishResult)) {
+        draftPublishedRef.current = false;
         if (publishResult.code === "insufficient_credits") {
           throw new Error(
             t(
@@ -872,9 +895,15 @@ const PublishPage = () => {
           "Annonce publiée avec succès. Elle est maintenant visible sur AutoNex."
         )
       );
-      navigate("/dashboard");
+      // Lot 9.1c — `replace: true` évite que Back revienne sur /publier
+      // (autosave sur une ligne non-draft → 406 en boucle).
+      navigate(`/dashboard?published=${draftListingId}`, { replace: true });
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t("publish.error", "Erreur lors de la publication");
+      // Si on a levé une exception AVANT le RPC (flushPhotos, persistDraft),
+      // l'autosave doit reprendre. Si on a levé APRÈS, le flag a déjà été
+      // réarmé lors du check `isPublishWithCreditsFailure`.
+      draftPublishedRef.current = false;
+      const message = parseSupabaseError(err);
       toast.error(message);
     }
     setPublishing(false);

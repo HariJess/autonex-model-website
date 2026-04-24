@@ -14,6 +14,7 @@ import {
   type ServerPhoto,
 } from "@/lib/publishDraft";
 import { buildPublishLocalBackupPayload } from "@/pages/publish/publishBackupPayload";
+import { isDraftNoLongerDraftError } from "@/lib/parseSupabaseError";
 
 /**
  * Champs nécessaires à `formToListingUpdate` hors `draftStep` / `isDraftSave`.
@@ -277,6 +278,16 @@ export async function runPersistDraftOperation(input: PersistDraftOperationInput
     await queryClient.invalidateQueries({ queryKey: ["my-listings", userId] });
     return true;
   } catch (e) {
+    // Lot 9.1c — Race condition : un autosave debouncé peut encore se
+    // déclencher juste après qu'une publication ait basculé le statut en
+    // `pending_review`. Le filtre `.eq("status", "draft")` renvoie alors 0
+    // ligne (PGRST116). On ne prévient pas l'utilisateur — la publication a
+    // en réalité réussi.
+    if (isDraftNoLongerDraftError(e)) {
+      setSaveStatus("idle");
+      setSaveError(null);
+      return false;
+    }
     setSaveStatus("error");
     const msg = e instanceof Error ? e.message : "Erreur";
     setSaveError(msg);
