@@ -207,44 +207,4 @@ export const seedBlogPosts: SeedBlogPost[] = [
     ],
     conclusion: "Un véhicule suivi régulièrement reste plus sûr, plus économique et se revend mieux.",
   },
-  {
-    id: "b4",
-    slug: "choisir-4x4-madagascar-guide",
-    title: "Comment choisir un 4x4 à Madagascar : guide terrain",
-    seoTitle: "Choisir un 4x4 à Madagascar : guide terrain et budget",
-    metaDescription: "Critères techniques et budgétaires pour choisir un 4x4 adapté aux routes de Madagascar.",
-    excerpt: "Transmission, garde au sol, entretien et disponibilité des pièces : les clés d’un bon choix.",
-    category: "4x4 & utilitaires",
-    published_at: "2026-02-10",
-    updated_at: "2026-04-13",
-    readingTime: "9 min",
-    cover: "/blog-covers/nosy-be-investissement.jpg",
-    coverAlt: "4x4 sur route",
-    tags: ["4x4 madagascar", "suv", "utilitaire"],
-    intro: "Le bon 4x4 dépend de votre usage réel : ville, route nationale, piste ou activité professionnelle.",
-    sections: [
-      {
-        heading: "Critères techniques prioritaires",
-        paragraphs: [
-          "Privilégiez une bonne garde au sol, une transmission adaptée et des pièces disponibles localement.",
-          "Vérifiez la consommation réelle et la qualité du réseau d’entretien dans votre région.",
-        ],
-        bulletsTitle: "Priorités achat 4x4",
-        bullets: [
-          "Transmission adaptée",
-          "Garde au sol",
-          "Coût des pièces",
-          "Historique d’entretien",
-        ],
-      },
-    ],
-    faq: [
-      {
-        question: "Faut-il forcément un 4x4 permanent ?",
-        answer:
-          "Pas toujours. Choisissez selon vos trajets réels et votre budget d’usage.",
-      },
-    ],
-    conclusion: "Un 4x4 pertinent est celui qui répond à votre usage quotidien avec un coût d’entretien soutenable.",
-  },
 ];
