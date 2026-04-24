@@ -26,6 +26,30 @@
 BEGIN;
 
 -- =============================================================================
+-- 0. INVARIANT — convention d'écriture dans `notifications`
+-- =============================================================================
+--
+-- Tous les INSERT dans `notifications` DOIVENT transiter par la RPC
+-- `create_notification(...)` (définie en Lot 10.1). C'est elle qui calcule
+-- `email_queued_for` selon la priorité + les préférences utilisateur.
+--
+-- Un INSERT direct dans la table contourne ce calcul et l'email ne partira
+-- jamais. Voir `docs/notifications-email.md` section « Gotchas » pour le
+-- détail du pattern à suivre (et la logique à reproduire manuellement si un
+-- INSERT bulk est incontournable).
+
+COMMENT ON FUNCTION create_notification(
+  UUID, notification_type, notification_category, notification_priority,
+  TEXT, TEXT, JSONB, TEXT, TEXT
+) IS
+  'Lot 10.1 + 10.2 — Point d''entrée UNIQUE pour l''insertion de notifications. '
+  'Calcule `email_queued_for` selon la priorité et les préférences utilisateur '
+  '(critical → NOW() si email_immediate activé ; high|normal → calculate_next_digest_time() '
+  'si email_digest activé ; low → NULL). '
+  'Convention : tout INSERT direct dans `notifications` depuis l''application '
+  'contourne ce routing et doit être évité. Voir docs/notifications-email.md.';
+
+-- =============================================================================
 -- 1. TABLE email_log
 -- =============================================================================
 
@@ -148,6 +172,15 @@ BEGIN
     AND n.email_queued_for IS NOT NULL
     AND n.email_queued_for <= NOW()
     AND u.email IS NOT NULL
+    -- Routage priorité → canal (convention Lot 10.1/10.2) :
+    --   * critical          → mode 'immediate' (cron */5 min)
+    --   * high + normal     → mode 'digest'    (cron daily 18h EAT / 15h UTC)
+    --   * low               → jamais d'email  (email_queued_for reste NULL
+    --                         dès l'insert dans create_notification)
+    -- Ce mapping reste ALIGNÉ avec le CASE `v_email_queued_for` de la RPC
+    -- `create_notification` (migration Lot 10.1) qui fixe la valeur de
+    -- `email_queued_for` au moment de l'insertion de la notif. Changer l'un
+    -- des deux sans l'autre casse la queue email.
     AND (
       (p_mode = 'immediate' AND n.priority = 'critical')
       OR (p_mode = 'digest' AND n.priority IN ('high', 'normal'))

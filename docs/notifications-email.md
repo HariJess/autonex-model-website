@@ -27,6 +27,27 @@
                                                           └──────────────┘
 ```
 
+## Routage priorité → canal → délai
+
+| Priorité | Canal | Délai d'envoi | Exemples de types |
+|---|---|---|---|
+| `critical` | immediate | **≤ 5 minutes** (cron `*/5 * * * *`) | `listing_published`, `listing_rejected`, `credits_purchased` |
+| `high` | digest | **Daily 18h EAT** (cron `0 15 * * *` UTC) | `listing_expiring_soon` |
+| `normal` | digest | Daily 18h EAT (agrégé avec les `high`) | futurs types non urgents |
+| `low` | — (in-app seul) | Jamais d'email — `email_queued_for` reste `NULL` | `welcome`, `system` info |
+
+Ce routage est posé à deux endroits qui doivent rester synchronisés :
+
+1. **Lot 10.1 / `create_notification`** — fixe `notifications.email_queued_for`
+   au moment de l'INSERT (CASE sur `priority` + préférences catégorie).
+2. **Lot 10.2 / `list_notification_emails_ready`** — filtre les notifs éligibles
+   pour le worker (`WHERE (p_mode = 'immediate' AND priority = 'critical') OR
+   (p_mode = 'digest' AND priority IN ('high','normal'))`).
+
+Si tu veux basculer `high` en immediate un jour, il faut modifier les **deux**
+endroits simultanément, sinon les emails `high` seront invisibles pour le
+worker (queue fixée en digest_time, WHERE qui ne les voit pas en immediate).
+
 ## Cycle de vie d'un email
 
 1. **Déclenchement DB** — un `INSERT` / `UPDATE` sur `listings` ou `credits_ledger`
@@ -151,6 +172,67 @@ supabase secrets set NOTIFICATIONS_EMAIL_FROM=notifications@autonex.mg --project
   « skippé-quota ». Pas de re-tentative automatique pour l'instant — le retry
   peut être fait manuellement en remettant `email_sent_at = NULL` sur les
   rows en échec.
+
+## Gotchas
+
+### ⚠️ Tout INSERT dans `notifications` DOIT passer par `create_notification(...)`
+
+La colonne `notifications.email_queued_for` est calculée **inline dans la RPC
+`create_notification`** (Lot 10.1), pas via un trigger `AFTER INSERT`.
+
+**Conséquence** : un `INSERT INTO notifications (...)` direct (admin tool,
+import batch, script ad-hoc, seed) laissera `email_queued_for = NULL`.
+L'email ne partira **jamais**, même si les préférences email sont activées
+côté utilisateur.
+
+**Pattern correct** (à utiliser systématiquement depuis n'importe quel call-site) :
+
+```sql
+SELECT create_notification(
+  p_user_id := '<uuid>',
+  p_type := 'system',
+  p_category := 'system',
+  p_priority := 'normal',
+  p_title := 'Titre',
+  p_body := 'Corps...',
+  p_metadata := jsonb_build_object('foo', 'bar'),
+  p_action_url := '/dashboard',
+  p_icon := 'Bell'
+);
+```
+
+**Pattern INTERDIT** :
+
+```sql
+-- ⛔ email_queued_for reste NULL → email jamais envoyé
+INSERT INTO notifications (user_id, type, category, priority, title, ...)
+VALUES (...);
+```
+
+**Si un INSERT direct est vraiment incontournable** (migration bulk, backfill
+manuel), il faut reproduire LOGIQUEMENT le CASE de `create_notification` :
+
+```sql
+INSERT INTO notifications (user_id, type, category, priority, title, email_queued_for)
+SELECT
+  '<uuid>', 'system', 'system', 'normal', 'Titre',
+  CASE
+    WHEN 'normal' IN ('high', 'normal')
+         AND EXISTS (SELECT 1 FROM notification_preferences
+                     WHERE user_id = '<uuid>' AND system_email_digest = TRUE)
+      THEN calculate_next_digest_time(
+             (SELECT p FROM notification_preferences p WHERE user_id = '<uuid>'))
+    ELSE NULL
+  END;
+```
+
+À terme, un trigger `AFTER INSERT ON notifications` qui appelle un helper
+`route_notification_to_email()` serait plus robuste (couvrirait tous les
+INSERT indépendamment du call-site). Reporté à un lot futur — voir TODOs.
+
+Le pragma SQL `COMMENT ON FUNCTION create_notification` (migration Lot 10.2)
+rappelle cette convention directement dans le schéma pour les devs qui
+consulteraient la fonction via `\df+` ou le Dashboard Supabase.
 
 ## TODOs post-Lot 10.2
 
