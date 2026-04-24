@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const Header = () => {
   const { t } = useTranslation();
@@ -165,6 +166,7 @@ const Header = () => {
           <Button onClick={() => navigate("/publier")} className="gradient-primary border-0 text-sm font-semibold text-navbar-foreground">
             {t("nav.publish")}
           </Button>
+          {user && <NotificationBell />}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-navbar-foreground" aria-label={t("nav.accountMenu")}>

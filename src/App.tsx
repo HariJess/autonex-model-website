@@ -51,6 +51,8 @@ const BetaLoginPage = lazy(() => import("./pages/BetaLoginPage.tsx"));
 const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage.tsx"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage.tsx"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage.tsx"));
+const SettingsNotificationsPage = lazy(() => import("./pages/SettingsNotificationsPage.tsx"));
 const MentionsLegalesPage = lazy(() => import("./pages/legal/MentionsLegalesPage.tsx"));
 const PolitiqueConfidentialitePage = lazy(() => import("./pages/legal/PolitiqueConfidentialitePage.tsx"));
 const CguPage = lazy(() => import("./pages/legal/CguPage.tsx"));
@@ -112,6 +114,8 @@ const App = () => {
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/favoris" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+            <Route path="/settings/notifications" element={<ProtectedRoute><SettingsNotificationsPage /></ProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
               <Route index element={<Navigate to="/admin/overview" replace />} />
