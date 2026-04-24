@@ -393,7 +393,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
             {t("publish.essentialInfoDesc", "Commencez par les champs qui influencent le plus la compréhension et la conversion.")}
           </p>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2" data-field-error="title">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <Label className="font-sans">{labels.listingTitle} *</Label>
             {!autoTitleEnabled && computedAutoTitle && (
@@ -409,32 +409,56 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
           <Input
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
+            onBlur={() => void form.trigger("title")}
             className="font-sans"
             maxLength={120}
           />
-          <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">
-            {autoTitleEnabled
-              ? t("publish.titleAutoHint", "Généré automatiquement à partir de la marque, du modèle, de la version et de l’année.")
-              : t("publish.titleExample", "Exemple: Toyota RAV4 2021 — automatique, 68 000 km")}
-          </p>
+          {form.formState.errors.title ? (
+            <p className="text-xs font-sans text-destructive" role="alert">
+              {String(form.formState.errors.title.message ?? "")}
+            </p>
+          ) : (
+            <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">
+              {autoTitleEnabled
+                ? t("publish.titleAutoHint", "Généré automatiquement à partir de la marque, du modèle, de la version et de l’année.")
+                : t("publish.titleExample", "Exemple: Toyota RAV4 2021 — automatique, 68 000 km")}
+            </p>
+          )}
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2" data-field-error="description">
           <Label className="font-sans">{labels.descriptionFr} *</Label>
           <Textarea
             value={description}
             onChange={(e) => form.setValue("description", e.target.value)}
+            onBlur={() => void form.trigger("description")}
             className="font-sans"
             rows={6}
             maxLength={5000}
             placeholder={t("publish.descriptionPlaceholderLong", "Rédigez une description complète en français…")}
           />
           <p className="text-[13px] text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 caractères", { count: description.trim().length })}</p>
-          <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">{t("publish.descriptionHint", "Incluez de préférence: carburant, boîte, état général et historique d’entretien.")}</p>
+          {form.formState.errors.description ? (
+            <p className="text-xs font-sans text-destructive" role="alert">
+              {String(form.formState.errors.description.message ?? "")}
+            </p>
+          ) : (
+            <p className="hidden sm:block text-[13px] text-muted-foreground font-sans leading-relaxed">{t("publish.descriptionHint", "Incluez de préférence: carburant, boîte, état général et historique d’entretien.")}</p>
+          )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
-          <div className="space-y-2">
+          <div className="space-y-2" data-field-error="priceMga">
             <Label className="font-sans">Prix (Ar) *</Label>
-            <NumberInput value={priceMga} onChange={(raw) => form.setValue("priceMga", raw)} className="font-sans" />
+            <NumberInput
+              value={priceMga}
+              onChange={(raw) => form.setValue("priceMga", raw)}
+              onBlur={() => void form.trigger("priceMga")}
+              className="font-sans"
+            />
+            {form.formState.errors.priceMga ? (
+              <p className="text-xs font-sans text-destructive" role="alert">
+                {String(form.formState.errors.priceMga.message ?? "")}
+              </p>
+            ) : null}
             {labels.priceDealHint ? (
               <p className="text-xs text-muted-foreground font-sans">{labels.priceDealHint}</p>
             ) : null}

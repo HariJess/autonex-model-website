@@ -73,13 +73,50 @@ export const vehicleLocationSubSchema = z.object({
 });
 export type VehicleLocationValues = z.infer<typeof vehicleLocationSubSchema>;
 
-/** Description, body copy, listing price (kept as string — user types it raw). */
+/**
+ * Description, body copy, listing price (kept as string — user types it raw).
+ *
+ * Lot 9.9 — Alignement avec `validate_listing_content()` (DB, migration
+ * `20260420180000_moderation_helpers.sql`). L'empty string est admise pour
+ * garder le brouillon éditable ; les rules firent dès qu'un contenu non vide
+ * est saisi. L'exigence « champ requis » est portée par `publishValidation.ts`
+ * au moment du `handleNext` et par la RPC `validate_listing_content` en DB.
+ */
+export const PRICE_MIN_MGA = 100_000;
+export const PRICE_MAX_MGA = 10_000_000_000;
+
 export const vehicleDescriptionSubSchema = z.object({
-  title: z.string().refine((v) => v.length === 0 || v.trim().length >= 3, {
-    message: "publish.validation.title.min",
-  }),
-  description: z.string(),
-  priceMga: z.string(),
+  title: z
+    .string()
+    .refine((v) => v.length === 0 || v.trim().length >= 5, {
+      message: "Le titre doit faire au moins 5 caractères.",
+    })
+    .refine((v) => v.length === 0 || v.length <= 120, {
+      message: "Le titre ne peut pas dépasser 120 caractères.",
+    }),
+  description: z
+    .string()
+    .refine((v) => v.length === 0 || v.trim().length >= 40, {
+      message: "La description doit faire au moins 40 caractères.",
+    }),
+  priceMga: z
+    .string()
+    .refine(
+      (v) => {
+        if (v === "") return true;
+        const n = Number(v);
+        return Number.isFinite(n) && n >= PRICE_MIN_MGA;
+      },
+      { message: "Le prix doit être au moins 100 000 Ar." },
+    )
+    .refine(
+      (v) => {
+        if (v === "") return true;
+        const n = Number(v);
+        return !Number.isFinite(n) || n <= PRICE_MAX_MGA;
+      },
+      { message: "Le prix ne peut pas dépasser 10 milliards d'Ariary." },
+    ),
   negotiable: z.boolean(),
 });
 export type VehicleDescriptionValues = z.infer<typeof vehicleDescriptionSubSchema>;
@@ -135,10 +172,14 @@ export const vehicleAttrsSubSchema = z.object({
   vehicleEngineDisplacement: z.string(),
   vehicleInteriorColor: z.string(),
   vehicleAvailabilityStatus: z.string(),
-  /** WhatsApp phone for direct chat CTA. Permissive shape: digits/spaces/+/(). */
+  /**
+   * WhatsApp phone for direct chat CTA.
+   * Lot 9.9 — format E.164 strict aligné sur `validate_listing_content()`
+   * (DB) : `^\+[1-9]\d{6,14}$`. Pas d'espaces ni parenthèses côté persistance.
+   */
   vehicleWhatsappPhone: z.string().refine(
-    (v) => v === "" || /^[\d+\s().-]{6,20}$/.test(v),
-    { message: "publish.validation.phone.format" },
+    (v) => v === "" || /^\+[1-9]\d{6,14}$/.test(v),
+    { message: "Le numéro WhatsApp doit être au format international (+261…)." },
   ),
   vehicleIsElectric: z.boolean(),
   vehicleIsHybrid: z.boolean(),

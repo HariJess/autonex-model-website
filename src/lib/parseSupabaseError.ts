@@ -11,9 +11,23 @@ type SupabaseLikeError = {
   hint?: string | null;
 };
 
+/**
+ * Lot 9.9 — Messages strictement alignés avec `validate_listing_content()`
+ * côté DB (migration `20260420180000_moderation_helpers.sql`). Toute
+ * divergence entre ce tableau et les messages DB est un bug UX (l'utilisateur
+ * voit deux messages contradictoires selon le point d'échec).
+ */
 const CHECK_CONSTRAINT_MAP: Array<{ needle: string; message: string }> = [
-  { needle: "description_too_short", message: "La description doit contenir au moins 20 caractères." },
-  { needle: "title_too_short", message: "Le titre doit contenir au moins 8 caractères." },
+  { needle: "title_too_short", message: "Le titre doit faire au moins 5 caractères." },
+  { needle: "title_too_long", message: "Le titre ne peut pas dépasser 120 caractères." },
+  { needle: "description_too_short", message: "La description doit faire au moins 40 caractères." },
+  { needle: "price_too_low", message: "Le prix doit être au moins 100 000 Ar." },
+  { needle: "price_too_high", message: "Le prix ne peut pas dépasser 10 milliards d'Ariary." },
+  { needle: "whatsapp_invalid", message: "Le numéro WhatsApp doit être au format international (+261…)." },
+  { needle: "rate_limit_exceeded", message: "Vous avez publié 20 annonces dans les dernières 24 h. Réessayez plus tard." },
+  { needle: "blacklisted_term", message: "Le contenu contient un terme non autorisé. Contactez le support si c'est une erreur." },
+  // Contraintes héritées (anciens codes / alias) — conservées pour ne pas
+  // casser les messages si la DB évolue.
   { needle: "price_invalid", message: "Le prix doit être supérieur à 0." },
   { needle: "price_mga_positive", message: "Le prix doit être supérieur à 0." },
 ];
@@ -39,13 +53,18 @@ export function parseSupabaseError(err: unknown): string {
     return "Impossible de finaliser la sauvegarde. Rafraîchissez la page puis réessayez.";
   }
 
-  // 23514 — CHECK constraint violation. On tente de reconnaître les
-  // contraintes nommées explicitement dans le schéma.
+  // Lot 9.9 — Reconnaissance needle-based des codes DB, indépendamment du
+  // Postgres error code. `validate_listing_content()` emit les codes via
+  // `RAISE EXCEPTION '<code>'` (P0001), les CHECK constraints via 23514, et
+  // on n'est jamais sûr duquel on hérite selon le chemin (RPC directe,
+  // trigger, UPDATE, INSERT). On inspecte donc le texte.
+  const combined = `${error.code ?? ""} ${error.message ?? ""} ${error.details ?? ""}`.toLowerCase();
+  for (const entry of CHECK_CONSTRAINT_MAP) {
+    if (combined.includes(entry.needle.toLowerCase())) return entry.message;
+  }
+
+  // 23514 — CHECK constraint violation non mappée.
   if (error.code === "23514") {
-    const combined = `${error.message ?? ""} ${error.details ?? ""}`;
-    for (const entry of CHECK_CONSTRAINT_MAP) {
-      if (combined.includes(entry.needle)) return entry.message;
-    }
     return `Données invalides : ${error.message ?? "contrainte de base violée"}.`;
   }
 
@@ -61,10 +80,10 @@ export function parseSupabaseError(err: unknown): string {
 
   // 42501 — insufficient_privilege
   if (error.code === "42501") {
-    return "Vous n’avez pas les droits pour effectuer cette action.";
+    return "Vous n'avez pas les droits pour effectuer cette action.";
   }
 
-  // P0001 — RAISE EXCEPTION (triggers custom Supabase)
+  // P0001 — RAISE EXCEPTION sans needle reconnu.
   if (error.code === "P0001") {
     return error.message || "Action refusée par la validation serveur.";
   }

@@ -136,22 +136,29 @@ const PublishStepVisibility = ({
             )}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-2" data-field-error="vehicleWhatsappPhone">
           <Label className="font-sans">{t("publish.whatsappLabel", "Numéro WhatsApp (optionnel)")}</Label>
           <Input
             value={whatsappPhone}
             onChange={(e) => form.setValue("vehicleWhatsappPhone", e.target.value)}
+            onBlur={() => void form.trigger("vehicleWhatsappPhone")}
             className="font-sans"
-            placeholder="+261 34 XX XXX XX"
+            placeholder="+261341234567"
             autoComplete="tel"
             inputMode="tel"
           />
-          <p className="text-xs text-muted-foreground font-sans">
-            {t(
-              "publish.whatsappHint",
-              "Si renseigné, un bouton WhatsApp apparaîtra sur votre fiche comme CTA principal.",
-            )}
-          </p>
+          {form.formState.errors.vehicleWhatsappPhone ? (
+            <p className="text-xs font-sans text-destructive" role="alert">
+              {String(form.formState.errors.vehicleWhatsappPhone.message ?? "")}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground font-sans">
+              {t(
+                "publish.whatsappHint",
+                "Format international sans espaces (+261341234567). Un bouton WhatsApp apparaîtra sur votre fiche comme CTA principal.",
+              )}
+            </p>
+          )}
         </CardContent>
       </Card>
 

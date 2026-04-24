@@ -686,7 +686,61 @@ const PublishPage = () => {
   // Lot 9.2 — L'auto-title intelligent vit désormais dans PublishDetailsSection
   // (flag autoTitleEnabled + bouton « Régénérer »). Ne plus dupliquer la logique ici.
 
+  // Lot 9.9 — Mapping étape → champs Zod à valider avant d'autoriser le « Suivant ».
+  // Seuls les champs typés dans le schéma Zod sont listés (photos, pinLat/Lng et
+  // photoCount restent gérés par `validateStep` qui lit `publishValidationInput`).
+  const getFieldsForStep = (s: number): Array<keyof PublishFormValues> => {
+    switch (s) {
+      case 0:
+        return ["transaction", "listingType", "ville"];
+      case 1:
+        return [
+          "title",
+          "description",
+          "priceMga",
+          "surface",
+          "vehicleMake",
+          "vehicleModel",
+          "vehicleYear",
+          "vehicleDoors",
+          "vehicleSeats",
+          "vehicleEngineDisplacement",
+        ];
+      case 2:
+        return [];
+      case 3:
+        return ["vehicleWhatsappPhone"];
+      default:
+        return [];
+    }
+  };
+
+  const scrollToFirstError = (fields: Array<keyof PublishFormValues>) => {
+    const errors = form.formState.errors as Record<string, unknown>;
+    const firstErrorField = fields.find((f) => errors[f] !== undefined);
+    if (!firstErrorField) return;
+    const el = document.querySelector<HTMLElement>(
+      `[data-field-error="${String(firstErrorField)}"]`,
+    );
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      const input = el.querySelector<HTMLElement>("input, textarea, [role='combobox']");
+      input?.focus();
+    }
+  };
+
   const handleNext = async () => {
+    // Lot 9.9 — Trigger Zod sur les champs de l'étape avant toute chose.
+    // Retourne false si un format DB-incompatible est saisi (ex: titre 3 chars,
+    // description 20 chars, prix hors range, whatsapp non-E.164).
+    const fieldsForStep = getFieldsForStep(step);
+    if (fieldsForStep.length > 0) {
+      const zodValid = await form.trigger(fieldsForStep);
+      if (!zodValid) {
+        scrollToFirstError(fieldsForStep);
+        return;
+      }
+    }
     const errors = validateStep(step);
     setStepErrors(errors);
     if (errors.length > 0) {
@@ -708,6 +762,29 @@ const PublishPage = () => {
     if (firstInvalid) {
       toast.error(firstInvalid.errors[0]);
       setStep(firstInvalid.step);
+      return;
+    }
+    // Lot 9.9 — Garde finale Zod sur l'intégralité des champs typés (y compris
+    // whatsapp en étape 3 qui n'est pas couvert par validateStep).
+    const allZodFields: Array<keyof PublishFormValues> = [
+      "title",
+      "description",
+      "priceMga",
+      "vehicleYear",
+      "vehicleWhatsappPhone",
+    ];
+    const allValid = await form.trigger(allZodFields);
+    if (!allValid) {
+      const fieldErrors = form.formState.errors as Record<string, { message?: string }>;
+      const firstInvalidField = allZodFields.find((f) => fieldErrors[f]);
+      const firstMessage = firstInvalidField
+        ? fieldErrors[firstInvalidField]?.message ?? "Données invalides"
+        : "Données invalides";
+      toast.error(firstMessage);
+      // Si l'erreur est sur whatsapp (étape 3), on reste ; sinon on renvoie en étape 1.
+      if (firstInvalidField && firstInvalidField !== "vehicleWhatsappPhone") {
+        setStep(1);
+      }
       return;
     }
     if (!user || !transaction || !listingType) {

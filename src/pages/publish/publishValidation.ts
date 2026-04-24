@@ -61,21 +61,39 @@ export function validatePublishStep(
       }
       break;
     case 1:
-      if (!input.title.trim() || input.title.trim().length < 8) {
+      // Lot 9.9 — Alignement sur `validate_listing_content()` (DB).
+      //   title : trim >= 5 AND len <= 120
+      //   description : trim >= 40
+      //   priceMga : 100 000 ≤ p ≤ 10 000 000 000
+      if (!input.title.trim() || input.title.trim().length < 5) {
         errors.push(
-          t("publish.titleRequired", "Titre requis (min. 8 caractères)"),
+          t("publish.titleRequired", "Le titre doit faire au moins 5 caractères."),
         );
       }
-      if (input.description.trim().length < 10) {
+      if (input.title.length > 120) {
+        errors.push(
+          t("publish.titleTooLong", "Le titre ne peut pas dépasser 120 caractères."),
+        );
+      }
+      if (input.description.trim().length < 40) {
         errors.push(
           t(
             "publish.descFrenchRequired",
-            "Description en français requise (min. 10 caractères)",
+            "La description doit faire au moins 40 caractères.",
           ),
         );
       }
-      if (!input.priceMga || Number(input.priceMga) <= 0) {
-        errors.push(t("publish.priceRequired", "Prix valide requis"));
+      {
+        const priceNumeric = Number(input.priceMga);
+        if (!input.priceMga || !Number.isFinite(priceNumeric) || priceNumeric <= 0) {
+          errors.push(t("publish.priceRequired", "Le prix est requis."));
+        } else if (priceNumeric < 100000) {
+          errors.push(t("publish.priceTooLow", "Le prix doit être au moins 100 000 Ar."));
+        } else if (priceNumeric > 10000000000) {
+          errors.push(
+            t("publish.priceTooHigh", "Le prix ne peut pas dépasser 10 milliards d'Ariary."),
+          );
+        }
       }
       if (input.surface && Number(input.surface) < 0) {
         errors.push(t("publish.surfaceInvalid", "Kilométrage invalide"));
