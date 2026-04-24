@@ -1,53 +1,21 @@
 /**
  * Helpers purs utilisés par les hooks et composants de notifications (Lot 10.1).
  *
- * Gardés stateless / testables (pas d'imports React / Supabase) pour faciliter
- * les tests unitaires.
+ * Gardés stateless / testables (pas d'imports React / Supabase client) pour
+ * faciliter les tests unitaires. Les types de Row sont importés depuis le
+ * fichier de types Supabase régénéré (Lot 10.1.5) — plus de duplication de
+ * schéma en dur.
  */
 
+import type { Database } from "@/integrations/supabase/types";
 import type {
   Notification,
   NotificationPreferences,
 } from "@/types/notification";
 
-type NotificationRow = {
-  id: string;
-  user_id: string;
-  type: Notification["type"];
-  category: Notification["category"];
-  priority: Notification["priority"];
-  title: string;
-  body: string | null;
-  metadata: Record<string, unknown> | null;
-  action_url: string | null;
-  icon: string | null;
-  read_at: string | null;
-  archived_at: string | null;
-  email_sent_at: string | null;
-  created_at: string;
-};
-
-type NotificationPreferencesRow = {
-  user_id: string;
-  listings_in_app: boolean;
-  listings_email_immediate: boolean;
-  listings_email_digest: boolean;
-  payments_in_app: boolean;
-  payments_email_immediate: boolean;
-  payments_email_digest: boolean;
-  activity_in_app: boolean;
-  activity_email_immediate: boolean;
-  activity_email_digest: boolean;
-  searches_in_app: boolean;
-  searches_email_immediate: boolean;
-  searches_email_digest: boolean;
-  system_in_app: boolean;
-  system_email_immediate: boolean;
-  system_email_digest: boolean;
-  digest_frequency: "daily" | "weekly" | "never";
-  digest_time: string;
-  max_emails_per_day: number;
-};
+type NotificationRow = Database["public"]["Tables"]["notifications"]["Row"];
+type NotificationPreferencesRow = Database["public"]["Tables"]["notification_preferences"]["Row"];
+type NotificationPreferencesUpdate = Database["public"]["Tables"]["notification_preferences"]["Update"];
 
 export function mapDbRowToNotification(row: NotificationRow): Notification {
   return {
@@ -58,7 +26,7 @@ export function mapDbRowToNotification(row: NotificationRow): Notification {
     priority: row.priority,
     title: row.title,
     body: row.body,
-    metadata: row.metadata ?? {},
+    metadata: (row.metadata ?? {}) as Record<string, unknown>,
     actionUrl: row.action_url,
     icon: row.icon ?? "Bell",
     readAt: row.read_at,
@@ -88,7 +56,8 @@ export function mapDbRowToNotificationPreferences(
     systemInApp: row.system_in_app,
     systemEmailImmediate: row.system_email_immediate,
     systemEmailDigest: row.system_email_digest,
-    digestFrequency: row.digest_frequency,
+    // La contrainte CHECK en DB garantit l'une des 3 valeurs : narrow safe.
+    digestFrequency: row.digest_frequency as NotificationPreferences["digestFrequency"],
     digestTime: row.digest_time,
     maxEmailsPerDay: row.max_emails_per_day,
   };
@@ -96,8 +65,8 @@ export function mapDbRowToNotificationPreferences(
 
 export function notificationPreferencesToDbPatch(
   prefs: Partial<NotificationPreferences>,
-): Partial<NotificationPreferencesRow> {
-  const patch: Partial<NotificationPreferencesRow> = {};
+): NotificationPreferencesUpdate {
+  const patch: NotificationPreferencesUpdate = {};
   if (prefs.listingsInApp !== undefined) patch.listings_in_app = prefs.listingsInApp;
   if (prefs.listingsEmailImmediate !== undefined) patch.listings_email_immediate = prefs.listingsEmailImmediate;
   if (prefs.listingsEmailDigest !== undefined) patch.listings_email_digest = prefs.listingsEmailDigest;

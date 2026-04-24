@@ -13,19 +13,11 @@ import type { Notification } from "@/types/notification";
  *   buffer limité).
  * - Actions : markAsRead, markAllAsRead, archive — toutes via RPCs serveur qui
  *   appliquent la RLS côté DB.
+ *
+ * Historique : les casts `as unknown as` (Lot 10.1 hotfix #1) et `as never` sur
+ * les noms de RPC ont été retirés au Lot 10.1.5 suite à la régénération des
+ * types Supabase. Les signatures RPC et tables sont maintenant typées.
  */
-
-// Hotfix Sentry issue 5602e03b :
-// Cf. `useNotificationPreferences.ts` pour le contexte. On cast le client
-// ENTIER (préserve le `this`) plutôt que d'extraire `supabase.from` comme
-// méthode détachée, ce qui cassait `this.rest` à l'intérieur de supabase-js.
-//
-// TODO Lot 10.1.5 : régénérer les types Supabase
-// `npx supabase gen types typescript --project-id wtkedamrmtvdoippqanc`
-// pour supprimer ce cast as unknown as.
-const supabaseExtended = supabase as unknown as {
-  from: (table: string) => ReturnType<typeof supabase.from>;
-};
 
 type UseNotificationsReturn = {
   notifications: Notification[];
@@ -50,7 +42,7 @@ export function useNotifications(limit: number = 20): UseNotificationsReturn {
     if (!user) return;
     if (welcomeCheckedRef.current === user.id) return;
     welcomeCheckedRef.current = user.id;
-    void supabase.rpc("send_welcome_notification_if_needed" as never);
+    void supabase.rpc("send_welcome_notification_if_needed");
   }, [user]);
 
   const fetchNotifications = useCallback(async () => {
@@ -61,7 +53,7 @@ export function useNotifications(limit: number = 20): UseNotificationsReturn {
       return;
     }
 
-    const { data } = await supabaseExtended
+    const { data } = await supabase
       .from("notifications")
       .select("*")
       .eq("user_id", user.id)
@@ -69,14 +61,10 @@ export function useNotifications(limit: number = 20): UseNotificationsReturn {
       .order("created_at", { ascending: false })
       .limit(limit);
 
-    const rows = Array.isArray(data) ? (data as unknown as Parameters<typeof mapDbRowToNotification>[0][]) : [];
-    setNotifications(rows.map(mapDbRowToNotification));
+    setNotifications((data ?? []).map(mapDbRowToNotification));
 
-    const { data: countData } = await supabase.rpc(
-      "get_unread_notifications_count" as never,
-    );
-    const count = typeof countData === "number" ? countData : 0;
-    setUnreadCount(count);
+    const { data: countData } = await supabase.rpc("get_unread_notifications_count");
+    setUnreadCount(typeof countData === "number" ? countData : 0);
 
     setLoading(false);
   }, [user, limit]);
@@ -136,21 +124,17 @@ export function useNotifications(limit: number = 20): UseNotificationsReturn {
   }, [user, fetchNotifications]);
 
   const markAsRead = useCallback(async (id: string) => {
-    await supabase.rpc("mark_notification_read" as never, {
-      p_notification_id: id,
-    } as never);
+    await supabase.rpc("mark_notification_read", { p_notification_id: id });
     await fetchNotifications();
   }, [fetchNotifications]);
 
   const markAllAsRead = useCallback(async () => {
-    await supabase.rpc("mark_all_notifications_read" as never);
+    await supabase.rpc("mark_all_notifications_read");
     await fetchNotifications();
   }, [fetchNotifications]);
 
   const archive = useCallback(async (id: string) => {
-    await supabase.rpc("archive_notification" as never, {
-      p_notification_id: id,
-    } as never);
+    await supabase.rpc("archive_notification", { p_notification_id: id });
     await fetchNotifications();
   }, [fetchNotifications]);
 

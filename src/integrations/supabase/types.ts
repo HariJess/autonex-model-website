@@ -1044,6 +1044,132 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          activity_email_digest: boolean
+          activity_email_immediate: boolean
+          activity_in_app: boolean
+          digest_frequency: string
+          digest_time: string
+          listings_email_digest: boolean
+          listings_email_immediate: boolean
+          listings_in_app: boolean
+          max_emails_per_day: number
+          payments_email_digest: boolean
+          payments_email_immediate: boolean
+          payments_in_app: boolean
+          searches_email_digest: boolean
+          searches_email_immediate: boolean
+          searches_in_app: boolean
+          system_email_digest: boolean
+          system_email_immediate: boolean
+          system_in_app: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_email_digest?: boolean
+          activity_email_immediate?: boolean
+          activity_in_app?: boolean
+          digest_frequency?: string
+          digest_time?: string
+          listings_email_digest?: boolean
+          listings_email_immediate?: boolean
+          listings_in_app?: boolean
+          max_emails_per_day?: number
+          payments_email_digest?: boolean
+          payments_email_immediate?: boolean
+          payments_in_app?: boolean
+          searches_email_digest?: boolean
+          searches_email_immediate?: boolean
+          searches_in_app?: boolean
+          system_email_digest?: boolean
+          system_email_immediate?: boolean
+          system_in_app?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_email_digest?: boolean
+          activity_email_immediate?: boolean
+          activity_in_app?: boolean
+          digest_frequency?: string
+          digest_time?: string
+          listings_email_digest?: boolean
+          listings_email_immediate?: boolean
+          listings_in_app?: boolean
+          max_emails_per_day?: number
+          payments_email_digest?: boolean
+          payments_email_immediate?: boolean
+          payments_in_app?: boolean
+          searches_email_digest?: boolean
+          searches_email_immediate?: boolean
+          searches_in_app?: boolean
+          system_email_digest?: boolean
+          system_email_immediate?: boolean
+          system_in_app?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          archived_at: string | null
+          body: string | null
+          category: Database["public"]["Enums"]["notification_category"]
+          created_at: string
+          email_queued_for: string | null
+          email_sent_at: string | null
+          icon: string
+          id: string
+          metadata: Json
+          priority: Database["public"]["Enums"]["notification_priority"]
+          read_at: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          archived_at?: string | null
+          body?: string | null
+          category: Database["public"]["Enums"]["notification_category"]
+          created_at?: string
+          email_queued_for?: string | null
+          email_sent_at?: string | null
+          icon?: string
+          id?: string
+          metadata?: Json
+          priority?: Database["public"]["Enums"]["notification_priority"]
+          read_at?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          archived_at?: string | null
+          body?: string | null
+          category?: Database["public"]["Enums"]["notification_category"]
+          created_at?: string
+          email_queued_for?: string | null
+          email_sent_at?: string | null
+          icon?: string
+          id?: string
+          metadata?: Json
+          priority?: Database["public"]["Enums"]["notification_priority"]
+          read_at?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       packs: {
         Row: {
           duration_days: number | null
@@ -1195,6 +1321,7 @@ export type Database = {
           suspended_at: string | null
           suspended_by: string | null
           suspended_reason: string | null
+          welcome_notification_sent: boolean
           whatsapp_phone: string | null
         }
         Insert: {
@@ -1216,6 +1343,7 @@ export type Database = {
           suspended_at?: string | null
           suspended_by?: string | null
           suspended_reason?: string | null
+          welcome_notification_sent?: boolean
           whatsapp_phone?: string | null
         }
         Update: {
@@ -1237,6 +1365,7 @@ export type Database = {
           suspended_at?: string | null
           suspended_by?: string | null
           suspended_reason?: string | null
+          welcome_notification_sent?: boolean
           whatsapp_phone?: string | null
         }
         Relationships: [
@@ -2347,6 +2476,16 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      archive_notification: {
+        Args: { p_notification_id: string }
+        Returns: undefined
+      }
+      calculate_next_digest_time: {
+        Args: {
+          p_prefs: Database["public"]["Tables"]["notification_preferences"]["Row"]
+        }
+        Returns: string
+      }
       can_publish_listing: {
         Args: { p_user_id: string }
         Returns: {
@@ -2377,6 +2516,20 @@ export type Database = {
         Args: { p_details?: string; p_listing_id: string; p_reason: string }
         Returns: Json
       }
+      create_notification: {
+        Args: {
+          p_action_url?: string
+          p_body?: string
+          p_category: Database["public"]["Enums"]["notification_category"]
+          p_icon?: string
+          p_metadata?: Json
+          p_priority: Database["public"]["Enums"]["notification_priority"]
+          p_title: string
+          p_type: Database["public"]["Enums"]["notification_type"]
+          p_user_id: string
+        }
+        Returns: string
+      }
       create_transaction_with_promo: {
         Args: {
           p_amount_mga: number
@@ -2387,6 +2540,30 @@ export type Database = {
           p_reference: string
         }
         Returns: string
+      }
+      create_vehicle_estimation_request: {
+        Args: {
+          p_accident_declared: boolean
+          p_body_type: string
+          p_city: string
+          p_condition_label: string
+          p_fuel_type: string
+          p_maintenance_level: string
+          p_make_id?: string
+          p_make_name_snapshot: string
+          p_mileage: number
+          p_model_id?: string
+          p_model_name_snapshot: string
+          p_owner_count_label: string
+          p_raw_payload: Json
+          p_transmission_type: string
+          p_usage_type: string
+          p_year: number
+        }
+        Returns: {
+          request_id: string
+          submission_secret: string
+        }[]
       }
       execute_scheduled_deletions: {
         Args: never
@@ -2441,11 +2618,26 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
         }[]
       }
+      get_unread_notifications_count: { Args: never; Returns: number }
       immonex_is_admin: { Args: never; Returns: boolean }
       increment_views: { Args: { listing_uuid: string }; Returns: undefined }
       increment_views_public: {
         Args: { p_listing_id: string; p_session_id?: string }
         Returns: undefined
+      }
+      is_category_email_digest_enabled: {
+        Args: {
+          p_category: Database["public"]["Enums"]["notification_category"]
+          p_prefs: Database["public"]["Tables"]["notification_preferences"]["Row"]
+        }
+        Returns: boolean
+      }
+      is_category_email_immediate_enabled: {
+        Args: {
+          p_category: Database["public"]["Enums"]["notification_category"]
+          p_prefs: Database["public"]["Tables"]["notification_preferences"]["Row"]
+        }
+        Returns: boolean
       }
       is_verified_dealer: { Args: { p_user_id: string }; Returns: boolean }
       list_agency_agent_ids: {
@@ -2506,7 +2698,7 @@ export type Database = {
           lst_toilets: number
           lst_transaction: Database["public"]["Enums"]["transaction_type"]
           lst_transmission_gearbox: string
-          lst_type: string
+          lst_type: Database["public"]["Enums"]["listing_type"]
           lst_vehicle_condition: string
           lst_video_url: string
           lst_views_count: number
@@ -2543,6 +2735,12 @@ export type Database = {
         }
         Returns: string
       }
+      mark_all_notifications_read: { Args: never; Returns: number }
+      mark_notification_read: {
+        Args: { p_notification_id: string }
+        Returns: undefined
+      }
+      notify_expiring_listings: { Args: never; Returns: number }
       pricing_for: { Args: { p_key: string }; Returns: number }
       publish_listing_with_credits: {
         Args: { p_listing_id: string }
@@ -2601,6 +2799,7 @@ export type Database = {
           success: boolean
         }[]
       }
+      send_welcome_notification_if_needed: { Args: never; Returns: string }
       service_approve_provider_transaction: {
         Args: {
           p_provider_payment_id: string
@@ -2706,6 +2905,24 @@ export type Database = {
         | "terrain"
         | "local_commercial"
         | "bureau"
+      notification_category:
+        | "listings"
+        | "payments"
+        | "activity"
+        | "searches"
+        | "admin"
+        | "system"
+      notification_priority: "critical" | "high" | "normal" | "low"
+      notification_type:
+        | "listing_published"
+        | "listing_rejected"
+        | "listing_expiring_soon"
+        | "listing_expired"
+        | "credits_purchased"
+        | "credits_low"
+        | "welcome"
+        | "admin_moderation_needed"
+        | "system"
       payment_method:
         | "mvola"
         | "orange_money"
@@ -2880,6 +3097,26 @@ export const Constants = {
         "terrain",
         "local_commercial",
         "bureau",
+      ],
+      notification_category: [
+        "listings",
+        "payments",
+        "activity",
+        "searches",
+        "admin",
+        "system",
+      ],
+      notification_priority: ["critical", "high", "normal", "low"],
+      notification_type: [
+        "listing_published",
+        "listing_rejected",
+        "listing_expiring_soon",
+        "listing_expired",
+        "credits_purchased",
+        "credits_low",
+        "welcome",
+        "admin_moderation_needed",
+        "system",
       ],
       payment_method: [
         "mvola",

@@ -10,21 +10,6 @@ import {
   type NotificationPreferences,
 } from "@/types/notification";
 
-// Hotfix Sentry issue 5602e03b :
-// Extraire `supabase.from` comme méthode détachée (`const client = supabase.from`)
-// casse `this.rest` à l'intérieur de supabase-js → `TypeError: Cannot read
-// properties of undefined (reading 'rest')` observé en prod sur
-// /settings/notifications.
-// Solution : caster le client ENTIER et appeler `.from()` comme méthode, ce
-// qui préserve le binding `this` du SupabaseClient.
-//
-// TODO Lot 10.1.5 : régénérer les types Supabase
-// `npx supabase gen types typescript --project-id wtkedamrmtvdoippqanc`
-// pour supprimer ce cast as unknown as une fois les tables Lot 10.1 typées.
-const supabaseExtended = supabase as unknown as {
-  from: (table: string) => ReturnType<typeof supabase.from>;
-};
-
 type UseNotificationPreferencesReturn = {
   preferences: NotificationPreferences | null;
   loading: boolean;
@@ -38,9 +23,13 @@ type UseNotificationPreferencesReturn = {
  * Hook de lecture/écriture des préférences de notifications de l'user courant.
  *
  * À l'inscription, le trigger Supabase `on_auth_user_created_notification_prefs`
- * pose déjà une row avec les defaults. Pour les users pré-Lot 10.1, la RPC
- * `create_notification` crée les préférences à la demande ; ici on fait un
+ * pose déjà une row avec les defaults. Pour les users pré-Lot 10.1, on fait un
  * INSERT explicite idempotent côté client si le SELECT renvoie vide.
+ *
+ * Historique : les casts `as unknown as` et le wrapper `supabaseExtended` ont
+ * été retirés au Lot 10.1.5 suite à la régénération des types Supabase
+ * (Sentry issue 5602e03b). Les appels `.from()` sont maintenant typés et
+ * binding `this` préservé naturellement.
  */
 export function useNotificationPreferences(): UseNotificationPreferencesReturn {
   const { user } = useAuth();
@@ -58,7 +47,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
     setLoading(true);
     setError(null);
 
-    const { data, error: readError } = await supabaseExtended
+    const { data, error: readError } = await supabase
       .from("notification_preferences")
       .select("*")
       .eq("user_id", user.id)
@@ -71,7 +60,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
     }
 
     if (data) {
-      setPreferences(mapDbRowToNotificationPreferences(data as Parameters<typeof mapDbRowToNotificationPreferences>[0]));
+      setPreferences(mapDbRowToNotificationPreferences(data));
       setLoading(false);
       return;
     }
@@ -85,9 +74,9 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
         userId: user.id,
       }),
     };
-    const { data: inserted, error: insertError } = await supabaseExtended
+    const { data: inserted, error: insertError } = await supabase
       .from("notification_preferences")
-      .insert(defaultsPayload as never)
+      .insert(defaultsPayload)
       .select()
       .single();
 
@@ -97,7 +86,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       return;
     }
 
-    setPreferences(mapDbRowToNotificationPreferences(inserted as Parameters<typeof mapDbRowToNotificationPreferences>[0]));
+    setPreferences(mapDbRowToNotificationPreferences(inserted));
     setLoading(false);
   }, [user]);
 
@@ -111,9 +100,9 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       setSaving(true);
       setError(null);
       const dbPatch = notificationPreferencesToDbPatch(patch);
-      const { data, error: updateError } = await supabaseExtended
+      const { data, error: updateError } = await supabase
         .from("notification_preferences")
-        .update({ ...dbPatch, updated_at: new Date().toISOString() } as never)
+        .update({ ...dbPatch, updated_at: new Date().toISOString() })
         .eq("user_id", user.id)
         .select()
         .single();
@@ -125,7 +114,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       }
 
       if (data) {
-        setPreferences(mapDbRowToNotificationPreferences(data as Parameters<typeof mapDbRowToNotificationPreferences>[0]));
+        setPreferences(mapDbRowToNotificationPreferences(data));
       }
       setSaving(false);
     },
