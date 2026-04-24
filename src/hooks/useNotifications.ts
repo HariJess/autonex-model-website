@@ -85,27 +85,53 @@ export function useNotifications(limit: number = 20): UseNotificationsReturn {
     void fetchNotifications();
   }, [fetchNotifications]);
 
+  // Hotfix Sentry issue ee5c93534c2a4a808aa06838962a2c77 :
+  // Un nom de channel déterministe (`notifications:${user.id}`) entre en
+  // collision avec le registre interne supabase-js quand le useEffect
+  // re-run : `removeChannel` est async, et `supabase.channel(sameName)`
+  // renvoie un channel fantôme déjà « subscribed ». Appeler `.on()` dessus
+  // throw synchronement "cannot add postgres_changes callbacks … after
+  // subscribe()" et remonte jusqu'à l'ErrorBoundary.
+  //
+  // Fix :
+  //  1) Nom unique par montage (suffixe `Date.now()`) pour forcer un
+  //     nouveau channel à chaque run.
+  //  2) try/catch défensif : si le setup Realtime échoue (pour n'importe
+  //     quelle raison), la page reste fonctionnelle en mode REST seul.
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
-      .channel(`notifications:${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          void fetchNotifications();
-        },
-      )
-      .subscribe();
+    const channelName = `notifications:${user.id}:${Date.now()}`;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    try {
+      channel = supabase
+        .channel(channelName)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            void fetchNotifications();
+          },
+        )
+        .subscribe();
+    } catch (err) {
+      // Degraded mode : on continue sans Realtime, le fetch REST couvre
+      // les chargements. Ne casse pas la page.
+      // eslint-disable-next-line no-console
+      console.warn("[useNotifications] realtime subscription failed", err);
+      return;
+    }
 
     return () => {
-      void supabase.removeChannel(channel);
+      if (channel) {
+        void supabase.removeChannel(channel);
+      }
     };
   }, [user, fetchNotifications]);
 
