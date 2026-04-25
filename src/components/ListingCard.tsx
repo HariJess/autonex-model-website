@@ -150,23 +150,23 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         <div className="absolute top-3 right-3 z-10">
           <FavoriteButton listingId={listing.id} size="sm" variant="overlay" />
         </div>
-        {(dealMeta || images.length > 1) && (
-          <div className="absolute top-14 right-3 z-[2] flex flex-col items-end gap-1.5">
-            {dealMeta && (
-              <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm border-transparent" style={{ color: "#FAFAFA" }}>
-                -{dealMeta.discountPercent}%
-              </Badge>
-            )}
-            {images.length > 1 && (
-              <span
-                className="lg:hidden inline-flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
-                aria-label={`${images.length} photos`}
-              >
-                <Camera className="h-3.5 w-3.5" aria-hidden />
-                {images.length}
-              </span>
-            )}
+        {dealMeta && (
+          <div className="absolute top-14 right-3 z-[2]">
+            <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm border-transparent" style={{ color: "#FAFAFA" }}>
+              -{dealMeta.discountPercent}%
+            </Badge>
           </div>
+        )}
+        {images.length > 1 && (
+          <span
+            className={`lg:hidden absolute bottom-2 z-[2] inline-flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm ${
+              displayAgencyLogo ? "left-2" : "right-2"
+            }`}
+            aria-label={`${images.length} photos`}
+          >
+            <Camera className="h-3.5 w-3.5" aria-hidden />
+            {images.length}
+          </span>
         )}
         {images.length > 1 && (
           <>

@@ -17,10 +17,10 @@ interface FavoriteButtonProps {
   className?: string;
 }
 
-const SIZE_MAP: Record<Size, { button: string; icon: string }> = {
-  sm: { button: "h-10 w-10", icon: "h-4 w-4" },
-  md: { button: "h-11 w-11", icon: "h-5 w-5" },
-  lg: { button: "h-12 w-12", icon: "h-6 w-6" },
+const SIZE_MAP: Record<Size, { button: string; icon: string; overlayIcon: string }> = {
+  sm: { button: "h-10 w-10", icon: "h-4 w-4", overlayIcon: "h-6 w-6" },
+  md: { button: "h-11 w-11", icon: "h-5 w-5", overlayIcon: "h-7 w-7" },
+  lg: { button: "h-12 w-12", icon: "h-6 w-6", overlayIcon: "h-8 w-8" },
 };
 
 export function FavoriteButton({
@@ -66,6 +66,7 @@ export function FavoriteButton({
   );
 
   const sizes = SIZE_MAP[size];
+  const isOverlay = variant === "overlay";
 
   return (
     <button
@@ -81,23 +82,30 @@ export function FavoriteButton({
       disabled={isPending}
       className={cn(
         "inline-flex items-center justify-center rounded-full",
-        "bg-white/95 backdrop-blur-sm border border-slate-200/60",
-        "shadow-md hover:shadow-lg",
         "transition-all duration-200",
-        "hover:scale-105 active:scale-95",
+        "active:scale-95",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500/50",
         "touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100",
-        sizes.button,
+        isOverlay
+          ? "p-1.5 hover:scale-110"
+          : cn(
+              "bg-white/95 backdrop-blur-sm border border-slate-200/60",
+              "shadow-md hover:shadow-lg hover:scale-105",
+              sizes.button,
+            ),
         className,
       )}
     >
       <Heart
         className={cn(
-          sizes.icon,
+          isOverlay ? sizes.overlayIcon : sizes.icon,
           "transition-colors",
+          isOverlay && "stroke-[2.5] drop-shadow-md",
           isFavorite
             ? "fill-red-500 text-red-500"
-            : "text-slate-700",
+            : isOverlay
+              ? "text-white"
+              : "text-slate-700",
         )}
       />
     </button>
