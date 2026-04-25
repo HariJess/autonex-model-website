@@ -147,7 +147,9 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             </Badge>
           )}
         </div>
-        <div className="absolute top-3 right-3 z-10">
+        <div className={`absolute z-10 ${
+          isCompactLayout ? "top-2 right-2 md:top-3 md:right-3" : "top-3 right-3"
+        }`}>
           <FavoriteButton listingId={listing.id} size="sm" variant="overlay" />
         </div>
         {dealMeta && (

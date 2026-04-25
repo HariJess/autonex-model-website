@@ -17,11 +17,13 @@ interface FavoriteButtonProps {
   className?: string;
 }
 
-const SIZE_MAP: Record<Size, { button: string; icon: string; overlayButton: string; overlayIcon: string }> = {
-  sm: { button: "h-10 w-10", icon: "h-4 w-4", overlayButton: "h-9 w-9", overlayIcon: "h-5 w-5" },
-  md: { button: "h-11 w-11", icon: "h-5 w-5", overlayButton: "h-10 w-10", overlayIcon: "h-5 w-5" },
-  lg: { button: "h-12 w-12", icon: "h-6 w-6", overlayButton: "h-12 w-12", overlayIcon: "h-6 w-6" },
+const SIZE_MAP: Record<Size, { button: string; icon: string }> = {
+  sm: { button: "h-10 w-10", icon: "h-4 w-4" },
+  md: { button: "h-11 w-11", icon: "h-5 w-5" },
+  lg: { button: "h-12 w-12", icon: "h-6 w-6" },
 };
+
+const OVERLAY_DROP_SHADOW = "drop-shadow(0 2px 4px rgba(0,0,0,0.4))";
 
 export function FavoriteButton({
   listingId,
@@ -84,31 +86,40 @@ export function FavoriteButton({
         "inline-flex items-center justify-center rounded-full",
         "transition-all duration-200",
         "active:scale-95",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500/50",
         "touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100",
         isOverlay
           ? cn(
-              "bg-white shadow-md hover:shadow-lg hover:scale-110",
-              sizes.overlayButton,
+              "p-2 hover:scale-110",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white",
             )
           : cn(
               "bg-white/95 backdrop-blur-sm border border-slate-200/60",
               "shadow-md hover:shadow-lg hover:scale-105",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500/50",
               sizes.button,
             ),
         className,
       )}
     >
-      <Heart
-        className={cn(
-          isOverlay ? sizes.overlayIcon : sizes.icon,
-          "transition-colors",
-          isOverlay && "stroke-[2]",
-          isFavorite
-            ? "fill-red-500 text-red-500"
-            : "text-slate-700",
-        )}
-      />
+      {isOverlay ? (
+        <Heart
+          className={cn(
+            "w-7 h-7 stroke-white",
+            isFavorite
+              ? "stroke-[2] fill-red-500 text-red-500"
+              : "stroke-[2.5] fill-black/20",
+          )}
+          style={{ filter: OVERLAY_DROP_SHADOW }}
+        />
+      ) : (
+        <Heart
+          className={cn(
+            sizes.icon,
+            "transition-colors",
+            isFavorite ? "fill-red-500 text-red-500" : "text-slate-700",
+          )}
+        />
+      )}
     </button>
   );
 }
