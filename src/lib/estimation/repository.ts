@@ -31,8 +31,8 @@ export async function createVehicleEstimationRequest(
       p_owner_count_label: input.ownerCountLabel,
       p_usage_type: input.usageType,
       p_raw_payload: toSupabaseJson(input) as never,
-      p_make_id: input.makeId ?? null,
-      p_model_id: input.modelId ?? null,
+      p_make_id: input.makeId ?? undefined,
+      p_model_id: input.modelId ?? undefined,
     })
     .single();
 

@@ -84,26 +84,6 @@ const RENTAL_MODE_OPTIONS = [
   { value: "long_term", label: "Longue durée" },
 ];
 
-const BODY_STYLE_OPTIONS = [
-  { value: "citadine", label: "Citadine" },
-  { value: "berline", label: "Berline" },
-  { value: "suv_4x4", label: "SUV / 4x4" },
-  { value: "crossover", label: "Crossover" },
-  { value: "pick_up", label: "Pick-up" },
-  { value: "coupe", label: "Coupé" },
-  { value: "cabriolet", label: "Cabriolet" },
-  { value: "utilitaire_leger", label: "Utilitaire léger" },
-  { value: "van_fourgon", label: "Van / Fourgon" },
-  { value: "minibus_bus", label: "Minibus / Bus" },
-  { value: "camion", label: "Camion" },
-  { value: "moto", label: "Moto" },
-  { value: "scooter", label: "Scooter" },
-  { value: "quad", label: "Quad" },
-  { value: "buggy", label: "Buggy" },
-  { value: "electrique", label: "Électrique" },
-  { value: "hybride", label: "Hybride" },
-];
-
 const AVAILABILITY_OPTIONS = [
   { value: "disponible", label: "Disponible" },
   { value: "reserve", label: "Réservé" },

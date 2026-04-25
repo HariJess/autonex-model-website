@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import {
-  NOTIFICATION_CATEGORIES,
   NOTIFICATION_CATEGORY_LABELS,
   type NotificationCategory,
   type NotificationPreferences,

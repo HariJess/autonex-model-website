@@ -17,7 +17,6 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
 import { PremiumStatePanel, PremiumStateSkeletonGrid } from "@/components/ui/premium-state";
 import { FEATURED_MAKES } from "@/data/featuredMakes";
-import { cn } from "@/lib/utils";
 import { getDealMeta } from "@/lib/deals";
 
 const Index = () => {

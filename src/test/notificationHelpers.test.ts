@@ -68,8 +68,10 @@ describe("mapDbRowToNotification", () => {
       icon: "CheckCircle",
       read_at: null,
       archived_at: null,
+      email_queued_for: null,
       email_sent_at: null,
       created_at: "2026-04-25T10:00:00Z",
+      updated_at: "2026-04-25T10:00:00Z",
     };
     const notif = mapDbRowToNotification(row);
     expect(notif.id).toBe("n1");
@@ -91,11 +93,13 @@ describe("mapDbRowToNotification", () => {
       body: null,
       metadata: null,
       action_url: null,
-      icon: null,
+      icon: null as unknown as string,
       read_at: null,
       archived_at: null,
+      email_queued_for: null,
       email_sent_at: null,
       created_at: "2026-04-25T10:00:00Z",
+      updated_at: "2026-04-25T10:00:00Z",
     };
     const notif = mapDbRowToNotification(row);
     expect(notif.icon).toBe("Bell");
@@ -125,6 +129,7 @@ describe("mapDbRowToNotificationPreferences", () => {
       digest_frequency: "daily" as const,
       digest_time: "18:00:00",
       max_emails_per_day: 5,
+      updated_at: "2026-04-25T10:00:00Z",
     };
     const prefs = mapDbRowToNotificationPreferences(row);
     expect(prefs.userId).toBe("u1");
