@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Gauge, CircleDot, ChevronLeft, ChevronRight } from "lucide-react";
+import { Gauge, CircleDot, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
@@ -100,10 +100,23 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         onFocus={handlePrefetchDetail}
         onTouchStart={handlePrefetchDetail}
       >
+        {/* Mobile + tablet cover (< lg): single first photo, no carousel */}
+        <img
+          src={images[0]}
+          alt={displayTitle}
+          className="lg:hidden w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
+          }}
+        />
+        {/* Desktop (>= lg): carousel-driven image (mobile cover already conveys alt) */}
         <img
           src={images[imgIndex]}
-          alt={displayTitle}
-          className={`w-full h-full object-cover transition-transform duration-500 ${
+          alt=""
+          aria-hidden="true"
+          className={`hidden lg:block w-full h-full object-cover transition-transform duration-500 ${
             isSearchVariant ? "group-hover:scale-[1.045]" : "group-hover:scale-105"
           }`}
           loading="lazy"
@@ -137,33 +150,47 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         <div className="absolute top-3 right-3 z-10">
           <FavoriteButton listingId={listing.id} size="sm" variant="overlay" />
         </div>
-        {dealMeta && (
-          <div className="absolute top-14 right-3 z-[2]">
-            <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm border-transparent" style={{ color: "#FAFAFA" }}>
-              -{dealMeta.discountPercent}%
-            </Badge>
+        {(dealMeta || images.length > 1) && (
+          <div className="absolute top-14 right-3 z-[2] flex flex-col items-end gap-1.5">
+            {dealMeta && (
+              <Badge className="bg-destructive text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm border-transparent" style={{ color: "#FAFAFA" }}>
+                -{dealMeta.discountPercent}%
+              </Badge>
+            )}
+            {images.length > 1 && (
+              <span
+                className="lg:hidden inline-flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
+                aria-label={`${images.length} photos`}
+              >
+                <Camera className="h-3.5 w-3.5" aria-hidden />
+                {images.length}
+              </span>
+            )}
           </div>
         )}
         {images.length > 1 && (
           <>
+            {/* Desktop-only carousel controls (>= lg), arrows revealed on card hover */}
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i > 0 ? i - 1 : images.length - 1)); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
+              className="hidden lg:inline-flex absolute left-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 active:scale-95"
               aria-label="Photo précédente"
+              tabIndex={-1}
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i < images.length - 1 ? i + 1 : 0)); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 inline-flex items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-manipulation active:scale-95"
+              className="hidden lg:inline-flex absolute right-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 active:scale-95"
               aria-label="Photo suivante"
+              tabIndex={-1}
             >
               <ChevronRight className="h-5 w-5" />
             </button>
-            {/* Dot indicators */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {/* Dot indicators (desktop only) */}
+            <div className="hidden lg:flex absolute bottom-2 left-1/2 -translate-x-1/2 gap-1">
               {indicatorIndexes.map((idx) => (
                 <span key={idx} className={`w-1.5 h-1.5 rounded-full transition-colors ${idx === imgIndex ? "bg-white" : "bg-white/50"}`} />
               ))}
