@@ -45,11 +45,13 @@ const Dashboard = () => {
       }
     }, 250);
     // Retire le param de l'URL (replace, pas de nouvelle entrée d'historique).
-    const next = new URLSearchParams(searchParams);
-    next.delete("published");
-    setSearchParams(next, { replace: true });
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("published");
+      return next;
+    }, { replace: true });
     return () => window.clearTimeout(scrollTimer);
-  }, [publishedListingId, searchParams, setSearchParams]);
+  }, [publishedListingId, setSearchParams]);
 
   const { data: myListings = [], isLoading: listingsLoading, error: listingsError } = useQuery({
     queryKey: ["my-listings", user?.id],
