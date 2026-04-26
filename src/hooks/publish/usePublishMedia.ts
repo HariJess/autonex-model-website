@@ -95,7 +95,7 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
         await deleteListingPhotoRow(ph.id, ph.url);
         setServerPhotos((s) => s.filter((x) => x.id !== ph.id));
       } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Erreur");
+        toast.error(e instanceof Error ? e.message : t("publish.unknownError"));
       }
     } else {
       const pi = globalIndex - nServer;
@@ -116,7 +116,7 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
         const next = await fetchListingPhotos(draftListingId);
         setServerPhotos(next);
       } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Erreur");
+        toast.error(e instanceof Error ? e.message : t("publish.unknownError"));
       }
     } else {
       const pendingIdx = globalIndex - nServer;

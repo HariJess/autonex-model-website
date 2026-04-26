@@ -759,6 +759,7 @@
     "transactionRequired": "Transaction type is required",
     "transactionType": "Transaction type",
     "typeRequired": "Vehicle type is required",
+    "unknownError": "Error",
     "unlimited": "Unlimited",
     "uploadRetryNeeded": "Some photos failed to upload. Please retry.",
     "vehicleIdentityDesc": "Pick a make from the AutoNex catalog, then specify the model.",

@@ -759,6 +759,7 @@
     "transactionRequired": "Type de transaction requis",
     "transactionType": "Type de transaction",
     "typeRequired": "Type de véhicule requis",
+    "unknownError": "Erreur",
     "unlimited": "Illimité",
     "uploadRetryNeeded": "Certaines photos n'ont pas pu être envoyées. Réessayez.",
     "vehicleIdentityDesc": "Choisissez une marque du catalogue AutoNex, puis précisez le modèle.",
