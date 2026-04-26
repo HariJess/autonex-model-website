@@ -196,31 +196,33 @@ export function applyListingFilters(query: FilterableListingQuery, filters: List
       }
     }
   }
+  // Audit fix M-LEGACY-1 / Phase B1 (2026-04-26) — la data migration
+  // 20260426170000_align_legacy_doors_seats.sql + le tee bidirectionnel dans
+  // publishDraft.ts garantissent désormais que `doors` (colonne native) est
+  // peuplé partout où `bathrooms` (legacy) l'était. Le fallback
+  // `or(doors.is.null, bathrooms…)` retiré. La colonne legacy `bathrooms`
+  // reste en DB jusqu'à B4 (DROP COLUMN final).
   if (filters.bathrooms && filters.bathrooms.length > 0) {
     if (relaxed) {
       const expanded = expandBathroomsForRelaxedQuery(filters.bathrooms);
       const under4 = [...new Set(expanded.filter((b) => b < 4))].sort((a, b) => a - b);
       const hasGte4 = expanded.some((b) => b >= 4);
       if (hasGte4 && under4.length > 0) {
-        q = q.or(
-          `doors.in.(${under4.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${under4.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
-        );
+        q = q.or(`doors.in.(${under4.join(",")}),doors.gte.4`);
       } else if (hasGte4) {
-        q = q.or("doors.gte.3,and(doors.is.null,bathrooms.gte.3)");
+        q = q.gte("doors", 3);
       } else {
-        q = q.or(`doors.in.(${under4.join(",")}),and(doors.is.null,bathrooms.in.(${under4.join(",")}))`);
+        q = q.in("doors", under4);
       }
     } else {
       const hasPlus = filters.bathrooms.includes(4);
       const others = filters.bathrooms.filter((b) => b < 4);
       if (hasPlus && others.length > 0) {
-        q = q.or(
-          `doors.in.(${others.join(",")}),doors.gte.4,and(doors.is.null,bathrooms.in.(${others.join(",")})),and(doors.is.null,bathrooms.gte.4)`,
-        );
+        q = q.or(`doors.in.(${others.join(",")}),doors.gte.4`);
       } else if (hasPlus) {
-        q = q.or("doors.gte.4,and(doors.is.null,bathrooms.gte.4)");
+        q = q.gte("doors", 4);
       } else {
-        q = q.or(`doors.in.(${others.join(",")}),and(doors.is.null,bathrooms.in.(${others.join(",")}))`);
+        q = q.in("doors", others);
       }
     }
   }
