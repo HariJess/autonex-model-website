@@ -65,11 +65,16 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const all = Array.from(e.target.files);
-    const files = all.slice(0, 10);
+    // Audit fix M-PHOTOS-CAP : on cap sur le TOTAL (déjà sélectionnées +
+    // nouvelles), pas seulement la batch courante. Sans ça, un user qui fait
+    // 8 puis 5 finit avec 13 photos même si l'i18n promet "max 10 par annonce".
+    const remaining = Math.max(0, 10 - pendingPhotos.length);
+    const files = all.slice(0, remaining);
     const rejectedCount = all.length - files.length;
     if (rejectedCount > 0) {
       toast.warning(t("publish.maxPhotosWarning", { count: rejectedCount }));
     }
+    if (files.length === 0) return;
     setPendingPhotos((prev) => [
       ...prev,
       ...files.map((file) => ({ file, preview: URL.createObjectURL(file) })),
