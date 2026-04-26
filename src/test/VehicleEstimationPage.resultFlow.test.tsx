@@ -10,8 +10,14 @@ const runVehicleEstimationMock = vi.fn();
 
 vi.mock("@/components/Header", () => ({ default: () => <div>Header</div> }));
 vi.mock("@/components/Footer", () => ({ default: () => <div>Footer</div> }));
-vi.mock("@/hooks/use-toast", () => ({
-  useToast: () => ({ toast: vi.fn() }),
+vi.mock("sonner", () => ({
+  toast: Object.assign(vi.fn(), {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+  }),
+  Toaster: () => null,
 }));
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: null }),

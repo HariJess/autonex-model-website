@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Search, X, MapPin } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export type LocationSelection = {
@@ -253,8 +253,7 @@ const LocationSelector = forwardRef<HTMLDivElement, LocationSelectorProps>((prop
     if (isApplyMode(props)) {
       props.onCommit(draft);
       if (!suppressApplyToast) {
-        toast({
-          title: t("search.locationAppliedTitle", "Localisation appliquée"),
+        toast.success(t("search.locationAppliedTitle", "Localisation appliquée"), {
           description: t(
             "search.locationAppliedBody",
             "Les filtres de lieu ont été mis à jour. Les résultats se rechargent.",

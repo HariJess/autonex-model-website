@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   ESTIMATION_BODY_OPTIONS,
@@ -119,7 +119,6 @@ const ESTIMATION_UI = {
 const VehicleEstimationPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user } = useAuth();
   const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">("landing");
   const [form, setForm] = useState<EstimationInput>(EMPTY_FORM);
@@ -209,12 +208,10 @@ const VehicleEstimationPage = () => {
       setScreen("result");
     },
     onError: (error) => {
-      toast({
-        title: t("estimation.unavailableTitle", "Estimation indisponible"),
+      toast.error(t("estimation.unavailableTitle", "Estimation indisponible"), {
         description: describeEstimationErrorForUi(error, (key, defaultValue) =>
           defaultValue !== undefined ? t(key, defaultValue) : t(key),
         ),
-        variant: "destructive",
       });
     },
   });
