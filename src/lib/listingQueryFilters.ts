@@ -226,13 +226,19 @@ export function applyListingFilters(query: FilterableListingQuery, filters: List
       }
     }
   }
+  // Audit fix M-LEGACY-2 / Phase B2 (2026-04-26) — la data migration
+  // 20260426180000_align_legacy_mileage_km.sql + le tee bidirectionnel dans
+  // publishDraft.ts garantissent que `mileage_km` (colonne native) est peuplé
+  // partout où `surface` (legacy) l'était. Les fallbacks
+  // `or(mileage_km.is.null, surface…)` retirés. La colonne legacy `surface`
+  // reste en DB jusqu'à B4 (DROP COLUMN final).
   if (filters.surfaceMin) {
     const sm = relaxed ? Math.max(0, Math.floor(filters.surfaceMin * 0.88)) : filters.surfaceMin;
-    q = q.or(`mileage_km.gte.${sm},and(mileage_km.is.null,surface.gte.${sm})`);
+    q = q.gte("mileage_km", sm);
   }
   if (filters.surfaceMax && filters.surfaceMax > 0) {
     const cap = relaxed ? Math.ceil(filters.surfaceMax * CLOSE_MATCH_SURFACE_MAX_FACTOR) : filters.surfaceMax;
-    q = q.or(`mileage_km.lte.${cap},and(mileage_km.is.null,surface.lte.${cap})`);
+    q = q.lte("mileage_km", cap);
   }
   if (filters.brands && filters.brands.length > 0) {
     q = q.in("make", filters.brands);

@@ -15,7 +15,15 @@ function nonNegativeNumberOrNull(value: number | null | undefined): number | nul
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
 }
 
-/** Lecture affichage carte / liste — alignée sur l’ancien comportement `vehiclePresentation` (pas de clamp). */
+/**
+ * Lecture affichage carte / liste — alignée sur l’ancien comportement `vehiclePresentation` (pas de clamp).
+ *
+ * Audit fix M-LEGACY-2 / Phase B2 (2026-04-26) : `vehicle.mileageKm` est désormais
+ * la source primaire (issu du `mileage_km` natif via `deriveVehicleFromLegacy`,
+ * cf. `vehicleModel.ts:69-73` qui prefère mileageKm > 0 sur surface > 0).
+ * Le `?? listing.surface` final reste comme defensive fallback ultime jusqu'à
+ * B4 (DROP COLUMN final), au cas où le pipeline derive serait court-circuité.
+ */
 export function mileageKmLooseFromDisplayListing(listing: Pick<DisplayListing, "surface" | "vehicle">): number | null {
   return listing.vehicle?.mileageKm ?? listing.surface ?? null;
 }
@@ -31,6 +39,10 @@ export function trimVersionNumericLooseFromDisplayListing(listing: Pick<DisplayL
 
 /**
  * Kilométrage pour attributs canoniques / estimation : JSON véhicule d’abord, sinon colonne `surface` (km).
+ *
+ * Audit fix M-LEGACY-2 / Phase B2 (2026-04-26) : `vehicle.mileageKm` vient déjà
+ * du `mileage_km` natif (cf. `mileageKmLooseFromDisplayListing` ci-dessus).
+ * Le repli `legacySurfaceKm` reste comme defensive fallback jusqu'à B4.
  */
 export function mileageKmCanonicalFromDisplayListing(listing: DisplayListing): number | null {
   const fromVehicle = nonNegativeNumberOrNull(listing.vehicle?.mileageKm);
@@ -56,6 +68,10 @@ export function seatsCanonicalFromDisplayListing(listing: DisplayListing): numbe
 
 /**
  * Chaîne formulaire publication : préfère `mileage_km` si présent, sinon repli `surface` (legacy).
+ *
+ * Audit fix M-LEGACY-2 / Phase B2 (2026-04-26) : ordre déjà nominal (mileage_km
+ * primary, surface fallback). Conservation du repli jusqu'à B4 où la colonne
+ * `surface` sera dropée.
  */
 export function mileageKmFormStringFromListingRow(row: Pick<Tables<"listings">, "mileage_km" | "surface">): string {
   if (row.mileage_km != null) return String(row.mileage_km);
