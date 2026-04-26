@@ -12,62 +12,12 @@ import {
 
 export type { ListingsFilters } from "@/lib/listingQueryFilters";
 
-type ListingRowLite = Pick<
-  Tables<"listings">,
-  | "id"
-  | "title"
-  | "description"
-  | "type"
-  | "transaction"
-  | "price_mga"
-  | "price_eur"
-  | "negotiable"
-  | "surface"
-  | "rooms"
-  | "bathrooms"
-  | "toilets"
-  | "ville"
-  | "availability_status"
-  | "body_style"
-  | "doors"
-  | "drivetrain"
-  | "exterior_color"
-  | "engine_displacement_l"
-  | "fuel"
-  | "interior_color"
-  | "is_electric"
-  | "is_hybrid"
-  | "make"
-  | "mileage_km"
-  | "model"
-  | "rental_mode"
-  | "seats"
-  | "seller_type"
-  | "transmission_gearbox"
-  | "vehicle_condition"
-  | "whatsapp_phone"
-  | "year"
-  | "region"
-  | "arrondissement"
-  | "quartier"
-  | "quartier_libre"
-  | "lat"
-  | "lng"
-  | "features"
-  | "status"
-  | "views_count"
-  | "created_at"
-  | "owner_id"
-  | "original_price_mga"
-  | "video_url"
-  | "virtual_tour_url"
-  | "internal_ref"
-  | "is_new_program"
-  | "rejection_reason"
-  | "pending_boost_types"
->;
-
-const LISTING_SELECT_COLUMNS = [
+// Audit fix M12 — single source of truth for the listing column subset used
+// by useDbListings + useListingById. Both the runtime `.select()` string and
+// the compile-time `ListingRowLite` Pick are derived from this one array, so
+// adding a column means editing exactly one place. Without this, the array
+// and the Pick had to be kept in sync manually (51 entries × 2).
+const LISTING_SELECT_COLUMN_NAMES = [
   "id",
   "title",
   "description",
@@ -119,7 +69,11 @@ const LISTING_SELECT_COLUMNS = [
   "is_new_program",
   "rejection_reason",
   "pending_boost_types",
-].join(",");
+] as const satisfies readonly (keyof Tables<"listings">)[];
+
+type ListingRowLite = Pick<Tables<"listings">, typeof LISTING_SELECT_COLUMN_NAMES[number]>;
+
+const LISTING_SELECT_COLUMNS = LISTING_SELECT_COLUMN_NAMES.join(",");
 
 function isListingRowLite(row: unknown): row is ListingRowLite {
   if (typeof row !== "object" || row === null) return false;
