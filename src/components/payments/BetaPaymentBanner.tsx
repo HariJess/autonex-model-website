@@ -30,10 +30,15 @@ export function BetaPaymentBanner({
 }: BetaPaymentBannerProps) {
   const { t } = useTranslation();
 
-  const flagRaw = (import.meta.env.VITE_PAYMENT_BETA_BANNER_ENABLED ?? "true")
+  // Audit fix M-LAUNCH-MODE (2026-04-26): default OFF for public launch.
+  // The banner now only renders when the env var is explicitly "true" — so
+  // a fresh deploy (no env var set) ships without the beta warning. To
+  // re-enable temporarily during a controlled rollout, set the var to
+  // "true" on Vercel.
+  const flagRaw = (import.meta.env.VITE_PAYMENT_BETA_BANNER_ENABLED ?? "false")
     .toString()
     .toLowerCase();
-  const enabled = flagRaw !== "false";
+  const enabled = flagRaw === "true";
 
   const [dismissed, setDismissed] = useState<boolean>(() => {
     if (!dismissible) return false;

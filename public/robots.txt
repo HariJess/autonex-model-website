@@ -1,23 +1,17 @@
+# AutoNex — robots.txt
+# Public indexation autorisée (Sprint 2 / M-LAUNCH-MODE 2026-04-26).
+# Les zones privées et techniques restent interdites.
+
 User-agent: *
-Disallow: /
+
+# Zones privées / techniques — pas d'indexation
 Disallow: /admin/
-Disallow: /auth/callback
+Disallow: /auth/
+Disallow: /beta-login
+Disallow: /dashboard/
+Disallow: /publier
+Disallow: /api/
+
+# Reste autorisé par défaut
 
 Sitemap: https://autonex.mg/sitemap.xml
-
-# AutoNex is currently in private beta. Public launch coming soon.
-# Once launched, restore the original rules below:
-#
-# User-agent: *
-# Allow: /
-# Disallow: /dashboard
-# Disallow: /admin/
-# Disallow: /auth/
-# Disallow: /auth/callback
-# Disallow: /publier
-# Disallow: /login
-# Disallow: /signup
-# Disallow: /forgot-password
-# Disallow: /reset-password
-# Disallow: /beta-login
-# Sitemap: https://autonex.mg/sitemap.xml
