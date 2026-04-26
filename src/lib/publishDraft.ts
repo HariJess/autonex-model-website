@@ -1,12 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
-import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType, type TransactionType } from "@/types/listing";
+import type { ListingType, TransactionType } from "@/types/listing";
 import { getRegionForVille } from "@/data/madagascar-locations";
 import type { PurchasableBoostType } from "@/config/monetization";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
-import { buildLegacyMirrorFieldsFromVehicle } from "@/lib/vehicleCanonical";
 import {
   mileageKmFormStringFromListingRow,
   parseMileageKmFromPublishSurfaceField,
@@ -278,10 +277,6 @@ function effectiveListingType(t: ListingType | ""): ListingType {
   return t || "appartement";
 }
 
-function showRoomsForType(listingType: ListingType | ""): boolean {
-  return listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
-}
-
 /** Map wizard form to a listings UPDATE payload (draft or final). */
 export function formToListingUpdate(input: {
   transaction: TransactionType | "";
@@ -367,7 +362,6 @@ export function formToListingUpdate(input: {
   };
   const tx = effectiveTransaction(input.transaction);
   const lt = effectiveListingType(input.listingType);
-  const showRooms = showRoomsForType(lt);
   const priceNum = Math.max(0, Math.floor(Number(input.priceMga) || 0));
   const region = input.ville ? getRegionForVille(input.ville) : null;
 
@@ -383,7 +377,6 @@ export function formToListingUpdate(input: {
     titleTrim.length > 0 ? titleTrim.slice(0, 120) : PUBLISH_DRAFT_TITLE_PLACEHOLDER;
   const currentYear = new Date().getFullYear() + 1;
   const mileageKm = parseMileageKmFromPublishSurfaceField(input.surface, normalizeInt);
-  const versionOrTrim = normalizeInt(input.rooms ?? "", 0);
   const doorsLegacy = normalizeInt(input.bathrooms, 0);
   const seats = normalizeInt(input.toilets, 0);
   const year = normalizeInt(input.vehicleYear, 1950, currentYear);
@@ -481,13 +474,6 @@ export function formToListingUpdate(input: {
 
   const pendingBoostJson = boostPayload as unknown as Json;
 
-  const legacyMirrorFields = buildLegacyMirrorFieldsFromVehicle({
-    mileageKm,
-    trimOrVersion: versionOrTrim,
-    doors: doorsLegacy,
-    seats,
-  });
-
   return {
     title: titleOut,
     description: input.description.trim() || (input.isDraftSave ? "" : ""),
@@ -497,10 +483,6 @@ export function formToListingUpdate(input: {
     price_eur: priceNum > 0 ? Math.round((priceNum / 5050) * 100) / 100 : 0,
     negotiable: Boolean(input.negotiable),
     mileage_km: mileageKm,
-    ...legacyMirrorFields,
-    rooms: showRooms ? legacyMirrorFields.rooms : null,
-    bathrooms: showRooms ? legacyMirrorFields.bathrooms : null,
-    toilets: showRooms ? legacyMirrorFields.toilets : null,
     make,
     model,
     year,
@@ -814,7 +796,6 @@ export function buildListingMaterialSnapshotFromForm(
 ): string {
   const tx = effectiveTransaction(input.transaction);
   const lt = effectiveListingType(input.listingType);
-  const showRooms = showRoomsForType(lt);
   const priceNum = Math.max(0, Math.floor(Number(input.priceMga) || 0));
   let finalLat: string | null = null;
   let finalLng: string | null = null;
@@ -832,12 +813,6 @@ export function buildListingMaterialSnapshotFromForm(
     return intVal;
   };
   const mileageKm = parseMileageKmFromPublishSurfaceField(input.surface, normalizeInt);
-  const legacyMirrorFields = buildLegacyMirrorFieldsFromVehicle({
-    mileageKm,
-    trimOrVersion: showRooms && input.rooms ? Number(input.rooms) || null : null,
-    doors: showRooms ? (input.bathrooms ? Number(input.bathrooms) || null : null) : null,
-    seats: showRooms && input.toilets ? Number(input.toilets) || null : null,
-  });
 
   return JSON.stringify({
     title: input.title.trim(),
@@ -852,10 +827,6 @@ export function buildListingMaterialSnapshotFromForm(
     quartier_libre: input.quartierLibre.trim(),
     lat: finalLat,
     lng: finalLng,
-    surface: legacyMirrorFields.surface ?? null,
-    rooms: showRooms ? legacyMirrorFields.rooms : null,
-    bathrooms: showRooms ? legacyMirrorFields.bathrooms : null,
-    toilets: showRooms ? (legacyMirrorFields.toilets ?? null) : null,
     make: input.vehicleMake.trim(),
     model: input.vehicleModel.trim(),
     year: input.vehicleYear ? Number(input.vehicleYear) || null : null,

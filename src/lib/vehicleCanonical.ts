@@ -1,4 +1,3 @@
-import type { TablesUpdate } from "@/integrations/supabase/types";
 import {
   doorsCanonicalFromDisplayListing,
   mileageKmCanonicalFromDisplayListing,
@@ -12,8 +11,6 @@ export type CanonicalVehicleAttributes = CanonicalVehicleInfo & {
   city: string | null;
   locality: string | null;
 };
-
-export type LegacyVehicleMirrorFields = Pick<TablesUpdate<"listings">, "surface" | "rooms" | "bathrooms" | "toilets">;
 
 function nonNegativeNumberOrNull(value: number | null | undefined): number | null {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
@@ -54,17 +51,3 @@ export function getCanonicalVehicleAttributes(listing: DisplayListing): Canonica
   };
 }
 
-/** Écrit les valeurs véhicule dans les colonnes DB encore nommées à l’ancienne ; voir `legacyListingsDbColumns.ts`. */
-export function buildLegacyMirrorFieldsFromVehicle(params: {
-  mileageKm: number | null;
-  trimOrVersion: number | null;
-  doors: number | null;
-  seats: number | null;
-}): LegacyVehicleMirrorFields {
-  return {
-    surface: params.mileageKm,
-    rooms: params.trimOrVersion,
-    bathrooms: params.doors,
-    toilets: params.seats,
-  };
-}
