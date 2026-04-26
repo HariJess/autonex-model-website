@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Supabase Edge Function — vpi-initiate-payment
 // -----------------------------------------------------------------------------
 // Mission P.2 — Vanilla Pay integration, user-side orchestrator.
@@ -125,7 +124,10 @@ Deno.serve(async (req: Request) => {
     }
 
     // 5. User client (anon key + forwarded JWT)
-    const userClient = createClient(supabaseUrl, anonKey, {
+    // `!` justifié : la garde missing-env (lignes 102-112) a déjà retourné
+    // 500 si supabaseUrl ou anonKey étaient absents — TS ne traverse pas le
+    // filter(Boolean) tableau pour le narrowing.
+    const userClient = createClient(supabaseUrl!, anonKey!, {
       global: { headers: { Authorization: `Bearer ${jwt}` } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
@@ -176,8 +178,8 @@ Deno.serve(async (req: Request) => {
       if (promoCode === "") promoCode = null;
     }
 
-    // 8. Service client
-    const svcClient = createClient(supabaseUrl, serviceRoleKey, {
+    // 8. Service client (cf. note `!` plus haut)
+    const svcClient = createClient(supabaseUrl!, serviceRoleKey!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 

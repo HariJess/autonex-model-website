@@ -28,6 +28,7 @@
     "test:watch": "vitest",
     "test:rls": "dotenv -e .env.test -- vitest run --config vitest.rls.config.ts",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "typecheck:edge": "deno check supabase/functions/_shared/vpi-hmac.ts supabase/functions/vpi-initiate-payment/index.ts supabase/functions/vpi-webhook/index.ts",
     "catalog:import:vpic": "node ./scripts/catalog/import-vpic-catalog.mjs",
     "catalog:enrich:fueleconomy": "node ./scripts/catalog/enrich-fueleconomy-catalog.mjs",
     "catalog:report": "node ./scripts/catalog/catalog-report.mjs",

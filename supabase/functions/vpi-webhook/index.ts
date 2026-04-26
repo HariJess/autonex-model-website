@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Supabase Edge Function — vpi-webhook
 // -----------------------------------------------------------------------------
 // Mission P.2 — Vanilla Pay callback receiver (server-to-server).
@@ -185,9 +184,12 @@ Deno.serve(async (req: Request) => {
     }
 
     // 7. Verify HMAC
+    // `!` justifié : la garde missing-env (lignes 153-163) a déjà retourné
+    // un 200 ok=false si keySecret était absent — TS ne traverse pas le
+    // filter(Boolean) tableau pour le narrowing.
     let isValid = false;
     try {
-      isValid = await verifyVpiSignature(rawBody, signature, keySecret);
+      isValid = await verifyVpiSignature(rawBody, signature, keySecret!);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "unknown";
       console.error(
@@ -264,8 +266,8 @@ Deno.serve(async (req: Request) => {
     const providerPaymentId = String(referenceVpi).trim();
     const normalizedEtat = String(etat).toUpperCase().trim();
 
-    // 10. Service-role client
-    const svcClient = createClient(supabaseUrl, serviceRoleKey, {
+    // 10. Service-role client (cf. note `!` plus haut sur missing-env guard)
+    const svcClient = createClient(supabaseUrl!, serviceRoleKey!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 

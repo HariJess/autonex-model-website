@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Supabase Edge Function helper — HMAC-SHA256 compute + verify for VPI webhook
 // -----------------------------------------------------------------------------
 // Mission P.2 — shared by vpi-webhook (verification) and vpi-dry-run-checkout
