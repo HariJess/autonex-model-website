@@ -654,6 +654,7 @@
     "mapRequired": "Position sur la carte requise",
     "mapTitle": "Emplacement approximatif sur la carte",
     "maxPhotos": "ou cliquez pour sélectionner (max 10 photos)",
+    "maxPhotosWarning": "Vous pouvez ajouter jusqu'à 10 photos par annonce. {{count}} photo(s) ignorée(s).",
     "modelPlaceholder": "Ex. RAV4, Hilux, Ranger…",
     "modelPlaceholderNoBrand": "Marque requise",
     "modelPlaceholderWithBrand": "Modèle",

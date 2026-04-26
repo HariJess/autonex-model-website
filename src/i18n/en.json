@@ -654,6 +654,7 @@
     "mapRequired": "Map position is required.",
     "mapTitle": "Map position",
     "maxPhotos": "or click to select (max 10 photos)",
+    "maxPhotosWarning": "You can add up to 10 photos per listing. {{count}} photo(s) skipped.",
     "modelPlaceholder": "e.g. RAV4, Hilux, Ranger…",
     "modelPlaceholderNoBrand": "Brand required",
     "modelPlaceholderWithBrand": "Model",

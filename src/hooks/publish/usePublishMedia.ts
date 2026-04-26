@@ -64,7 +64,12 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    const files = Array.from(e.target.files).slice(0, 10);
+    const all = Array.from(e.target.files);
+    const files = all.slice(0, 10);
+    const rejectedCount = all.length - files.length;
+    if (rejectedCount > 0) {
+      toast.warning(t("publish.maxPhotosWarning", { count: rejectedCount }));
+    }
     setPendingPhotos((prev) => [
       ...prev,
       ...files.map((file) => ({ file, preview: URL.createObjectURL(file) })),

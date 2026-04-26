@@ -654,6 +654,7 @@
     "mapRequired": "Ilaina ny teboka amin'ny sarintany",
     "mapTitle": "Toerana eo amin'ny sarintany",
     "maxPhotos": "ou cliquez pour sélectionner (max 10 photos)",
+    "maxPhotosWarning": "Vous pouvez ajouter jusqu'à 10 photos par annonce. {{count}} photo(s) ignorée(s).",
     "modelPlaceholder": "Ohatra: RAV4, Hilux, Ranger...",
     "modelPlaceholderNoBrand": "Marika ilaina",
     "modelPlaceholderWithBrand": "Modely",
