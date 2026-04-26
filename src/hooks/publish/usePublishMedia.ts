@@ -74,6 +74,12 @@ export function usePublishMedia(draftListingId: string | null, user: User | null
     if (rejectedCount > 0) {
       toast.warning(t("publish.maxPhotosWarning", { count: rejectedCount }));
     }
+    // Audit fix M-INPUT-RESET : sans ce reset, re-sélectionner les MÊMES
+    // fichiers ne déclenche pas onChange (la value de l'input n'a pas
+    // changé). Posé AVANT l'early return pour couvrir aussi le cas
+    // "déjà 10 photos, tout rejeté" — sinon le bug persiste pile dans le
+    // scénario qui motive ce fix.
+    e.target.value = "";
     if (files.length === 0) return;
     setPendingPhotos((prev) => [
       ...prev,

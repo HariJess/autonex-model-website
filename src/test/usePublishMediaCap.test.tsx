@@ -42,11 +42,14 @@ function makeFiles(n: number): File[] {
 }
 
 function fireSelect(handler: (e: React.ChangeEvent<HTMLInputElement>) => void, files: File[]) {
-  // FileList-like minimal stub. The hook only does Array.from(e.target.files).
+  // FileList-like minimal stub. The hook does Array.from(e.target.files) and
+  // also `e.target.value = ""` for the M-INPUT-RESET fix — we expose `value`
+  // as a string property and return the target so callers can inspect it.
   const fileList = files as unknown as FileList;
-  handler({
-    target: { files: fileList },
-  } as unknown as React.ChangeEvent<HTMLInputElement>);
+  const target = { files: fileList, value: "non-empty-initial" } as unknown as
+    HTMLInputElement;
+  handler({ target } as unknown as React.ChangeEvent<HTMLInputElement>);
+  return target;
 }
 
 beforeEach(() => {
@@ -122,5 +125,37 @@ describe("usePublishMedia — handlePhotoSelect 10-photos cap (M-PHOTOS-CAP)", (
     expect(result.current.pendingPhotos).toHaveLength(10);
     expect(toastWarning).toHaveBeenCalledTimes(1);
     expect(toastWarning).toHaveBeenCalledWith("max-photos-warning:1");
+  });
+});
+
+describe("usePublishMedia — handlePhotoSelect input reset (M-INPUT-RESET)", () => {
+  it("resets input.value after a normal add (so re-selecting same files re-fires onChange)", () => {
+    const { result } = renderHook(() => usePublishMedia(null, null));
+
+    let target!: HTMLInputElement;
+    act(() => {
+      target = fireSelect(result.current.handlePhotoSelect, makeFiles(2));
+    });
+    expect(result.current.pendingPhotos).toHaveLength(2);
+    expect(target.value).toBe("");
+  });
+
+  it("resets input.value even when ALL files are rejected (already at 10)", () => {
+    const { result } = renderHook(() => usePublishMedia(null, null));
+
+    act(() => {
+      fireSelect(result.current.handlePhotoSelect, makeFiles(10));
+    });
+    expect(result.current.pendingPhotos).toHaveLength(10);
+
+    let target!: HTMLInputElement;
+    act(() => {
+      target = fireSelect(result.current.handlePhotoSelect, makeFiles(3));
+    });
+    expect(result.current.pendingPhotos).toHaveLength(10);
+    expect(toastWarning).toHaveBeenCalledWith("max-photos-warning:3");
+    // The reset must happen BEFORE the early return — without this, the user
+    // re-selecting the same 3 rejected files would see no toast / no event.
+    expect(target.value).toBe("");
   });
 });
