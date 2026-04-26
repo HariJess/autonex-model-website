@@ -65,6 +65,16 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
+  // SECURITY: dangerouslySetInnerHTML is safe here because every interpolated
+  // value comes from internal callers, not from user-generated content:
+  //   - `id` is `chart-${id || useId()}` and any caller-supplied id flows
+  //     from ChartContainer props in app code (no UGC-to-id paths exist).
+  //   - `prefix` is from the local THEMES constant (`""` or `.dark`).
+  //   - `key` is a ChartConfig object key declared in app code.
+  //   - `color` is a ChartConfig color string declared in app code.
+  // If a future caller binds any of these to UGC, switch to a CSS API that
+  // does not require innerHTML (e.g. CSSStyleSheet.insertRule or inline
+  // CSS custom properties on the container).
   return (
     <style
       dangerouslySetInnerHTML={{
