@@ -9,6 +9,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    // RLS integration tests live under src/test/rls and require a real
+    // staging Supabase + .env.test credentials. Run them via `npm run test:rls`.
+    exclude: ["src/test/rls/**", "node_modules/**", "dist/**"],
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
