@@ -10,12 +10,10 @@ import {
   formatVehicleDoors,
   formatVehicleEngineDisplacement,
   formatVehicleMileage,
-  formatVehicleVersion,
   getVehicleDisplayTitle,
   getVehicleHeadline,
   getVehicleDoorsValue,
   getVehicleMileageValue,
-  getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
 import { getExteriorColorLabel } from "@/lib/vehicleAttributes";
 import {
@@ -42,7 +40,6 @@ export type ListingDetailViewModel = {
   hasApproxMap: boolean;
   canonicalVehicle: ReturnType<typeof getCanonicalVehicleAttributes>;
   displayTitle: string;
-  versionLabel: string | null;
   mileageLabel: string | null;
   doorsLabel: string | null;
   engineDisplacementLabel: string | null;
@@ -101,7 +98,6 @@ export function buildListingDetailViewModel(params: BuildListingDetailViewModelP
 
   const canonicalVehicle = getCanonicalVehicleAttributes(listing);
   const displayTitle = getVehicleDisplayTitle(listing);
-  const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
   const mileageKmForJson = canonicalVehicle.mileageKm ?? getVehicleMileageValue(listing);
   const mileageLabel = formatVehicleMileage(mileageKmForJson);
   const doorsValue = canonicalVehicle.doors ?? getVehicleDoorsValue(listing);
@@ -201,7 +197,6 @@ export function buildListingDetailViewModel(params: BuildListingDetailViewModelP
     hasApproxMap,
     canonicalVehicle,
     displayTitle,
-    versionLabel,
     mileageLabel,
     doorsLabel,
     engineDisplacementLabel,

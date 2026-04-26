@@ -124,7 +124,6 @@ const ListingDetail = () => {
     hasApproxMap,
     canonicalVehicle,
     displayTitle,
-    versionLabel,
     mileageLabel,
     doorsLabel,
     vehicleSummary,
@@ -420,17 +419,6 @@ const ListingDetail = () => {
             )}
 
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
-              {versionLabel && (
-                <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
-                  <CarFront className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-semibold font-sans">{versionLabel}</p>
-                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans leading-relaxed">
-                      {t("listing.rooms", "Version")} / {t("listing.trimFinish", "Finition")}
-                    </p>
-                  </div>
-                </div>
-              )}
               {mileageLabel && (
                 <div className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4">
                   <Gauge className="h-5 w-5 text-primary" />

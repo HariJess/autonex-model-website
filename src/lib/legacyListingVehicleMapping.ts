@@ -1,9 +1,10 @@
 /**
  * Couche unique legacy → sémantique véhicule pour les colonnes/table `listings` héritées d’Immonex.
  *
- * - Les **noms SQL** (`surface`, `rooms`, `bathrooms`, `toilets`) restent inchangés côté DB.
+ * - Les **noms SQL** (`surface`, `bathrooms`, `toilets`) restent inchangés côté DB.
+ *   La colonne legacy `rooms` reste en DB jusqu'à B4b mais n'est plus lue côté code (B4a).
  * - Ce module concentre la **lecture** et les **formules** pour que le reste du code préfère
- *   les intitulés véhicule (kilométrage, portes, finition…) via des fonctions nommées.
+ *   les intitulés véhicule (kilométrage, portes…) via des fonctions nommées.
  *
  * @see `docs/AUTONEX_LEGACY_SCHEMA.md`
  * @see `LEGACY_LISTINGS_COLUMN_SEMANTICS` dans `legacyListingsDbColumns.ts`
@@ -30,11 +31,6 @@ export function mileageKmLooseFromDisplayListing(listing: Pick<DisplayListing, "
 
 export function doorsLooseFromDisplayListing(listing: Pick<DisplayListing, "bathrooms" | "vehicle">): number | null {
   return listing.vehicle?.doors ?? listing.bathrooms ?? null;
-}
-
-/** Indice finition/version numérique stocké dans la colonne legacy `rooms`. */
-export function trimVersionNumericLooseFromDisplayListing(listing: Pick<DisplayListing, "rooms">): number | null {
-  return listing.rooms ?? null;
 }
 
 /**

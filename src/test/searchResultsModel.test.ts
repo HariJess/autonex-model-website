@@ -13,7 +13,6 @@ function minimalListing(over: Partial<DisplayListing>): DisplayListing {
     price_mga: 1,
     price_eur: null,
     surface: null,
-    rooms: null,
     bathrooms: null,
     toilets: null,
     ville: "Antananarivo",

@@ -8,12 +8,10 @@ import { prefetchListing } from "@/hooks/useListings";
 import {
   formatVehicleDoors,
   formatVehicleMileage,
-  formatVehicleVersion,
   getVehicleDisplayTitle,
   getVehicleHeadline,
   getVehicleDoorsValue,
   getVehicleMileageValue,
-  getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
 
 type SearchResultsListProps = {
@@ -39,7 +37,6 @@ export function SearchResultsList({
       {listings.map((listing) => {
         const displayTitle = getVehicleDisplayTitle(listing);
         const mileageLabel = formatVehicleMileage(getVehicleMileageValue(listing));
-        const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
         const doorsLabel = formatVehicleDoors(getVehicleDoorsValue(listing));
         const vehicleHeadline = getVehicleHeadline(listing);
         return (
@@ -85,7 +82,6 @@ export function SearchResultsList({
               <p className="text-sm text-muted-foreground font-sans mt-1 line-clamp-2">{listing.description}</p>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-sm font-sans text-muted-foreground">
                 {mileageLabel && <span>{mileageLabel}</span>}
-                {versionLabel && <span>{versionLabel}</span>}
                 {doorsLabel && <span>{doorsLabel}</span>}
                 <span className="hidden sm:inline">{listing.vehicle?.fuel}</span>
                 <span className="hidden sm:inline">{listing.vehicle?.transmission}</span>

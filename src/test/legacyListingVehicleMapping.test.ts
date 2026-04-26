@@ -7,7 +7,6 @@ import {
   doorsLooseFromDisplayListing,
   parseMileageKmFromPublishSurfaceField,
   seatsCanonicalFromDisplayListing,
-  trimVersionNumericLooseFromDisplayListing,
 } from "@/lib/legacyListingVehicleMapping";
 import type { DisplayListing } from "@/types/listing";
 
@@ -21,7 +20,6 @@ function baseListing(partial: Partial<DisplayListing>): DisplayListing {
     price_mga: 1,
     price_eur: null,
     surface: null,
-    rooms: null,
     bathrooms: null,
     ville: null,
     region: null,
@@ -76,11 +74,6 @@ describe("legacyListingVehicleMapping", () => {
   it("seatsCanonical merges vehicle seats and legacy toilets", () => {
     expect(seatsCanonicalFromDisplayListing(baseListing({ toilets: 7 }))).toBe(7);
     expect(seatsCanonicalFromDisplayListing(baseListing({ toilets: 7, vehicle: { seats: 5 } as NonNullable<DisplayListing["vehicle"]> }))).toBe(5);
-  });
-
-  it("trimVersionNumericLoose exposes rooms column as numeric", () => {
-    expect(trimVersionNumericLooseFromDisplayListing(baseListing({ rooms: 3 }))).toBe(3);
-    expect(trimVersionNumericLooseFromDisplayListing(baseListing({ rooms: null }))).toBe(null);
   });
 
   it("mileageKmFormStringFromListingRow prefers mileage_km", () => {

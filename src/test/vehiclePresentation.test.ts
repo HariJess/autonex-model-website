@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DisplayListing } from "@/types/listing";
-import { getVehicleDoorsValue, getVehicleMileageValue, getVehicleVersionValue } from "@/lib/vehiclePresentation";
+import { getVehicleDoorsValue, getVehicleMileageValue } from "@/lib/vehiclePresentation";
 
 function minimalListing(partial: Partial<DisplayListing>): DisplayListing {
   return {
@@ -12,7 +12,6 @@ function minimalListing(partial: Partial<DisplayListing>): DisplayListing {
     price_mga: 1,
     price_eur: null,
     surface: null,
-    rooms: null,
     bathrooms: null,
     ville: null,
     region: null,
@@ -50,8 +49,4 @@ describe("vehiclePresentation legacy fallbacks", () => {
     expect(getVehicleDoorsValue(listing)).toBe(5);
   });
 
-  it("uses rooms as version index", () => {
-    const listing = minimalListing({ rooms: 3 });
-    expect(getVehicleVersionValue(listing)).toBe(3);
-  });
 });

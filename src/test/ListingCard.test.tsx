@@ -46,7 +46,6 @@ function makeListing(overrides: Partial<DisplayListing> = {}): DisplayListing {
     price_mga: 120_000_000,
     price_eur: null,
     surface: 180,
-    rooms: 4,
     bathrooms: 2,
     toilets: null,
     ville: "Antananarivo",
@@ -82,16 +81,6 @@ describe("ListingCard", () => {
   it("affiche le kilométrage quand défini", () => {
     renderCard(makeListing({ surface: 200 }));
     expect(screen.getByText(/200 km/)).toBeInTheDocument();
-  });
-
-  it("masque la version quand la valeur legacy est 0", () => {
-    renderCard(makeListing({ type: "appartement", rooms: 0 }));
-    expect(screen.queryByText(/Base/i)).not.toBeInTheDocument();
-  });
-
-  it("n'affiche pas 'Studio' pour un terrain", () => {
-    renderCard(makeListing({ type: "terrain", rooms: 0 }));
-    expect(screen.queryByText(/Studio/i)).not.toBeInTheDocument();
   });
 
   it("utilise une image placeholder si aucune photo", () => {

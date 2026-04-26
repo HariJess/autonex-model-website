@@ -1,8 +1,8 @@
 /**
  * État filtres recherche — **sémantique véhicule** côté frontend.
  *
- * Sérialisation URL : `mileage_min` / `mileage_max` / `trim` / `doors` (`searchUrl.ts`).
- * Pont SQL PostgREST : `ListingsFilters` garde encore les noms colonnes legacy (`surface`, `rooms`, `bathrooms`) dans `listingQueryFilters.ts`.
+ * Sérialisation URL : `mileage_min` / `mileage_max` / `doors` (`searchUrl.ts`).
+ * Pont SQL PostgREST : `ListingsFilters` garde encore les noms colonnes legacy (`surface`, `bathrooms`) dans `listingQueryFilters.ts`.
  * Événements analytics : colonnes table `surface_min` inchangées ; mapping dans `searchAnalytics.ts`.
  *
  * Hydratation depuis ancienne forme objet : `hydrateSearchFilters` dans `searchFiltersCompat.ts`.
@@ -20,8 +20,6 @@ export interface SearchFilters {
   priceMax: number;
   mileageMinKm: number;
   mileageMaxKm: number;
-  /** Indices finition/version (colonne DB `rooms`). */
-  trimVersionIndices: number[];
   /** Sélection nombre de portes (colonne DB `bathrooms` / `doors`). */
   doorCounts: number[];
   equipments: string[];
@@ -51,7 +49,6 @@ export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   priceMax: 0,
   mileageMinKm: 0,
   mileageMaxKm: 0,
-  trimVersionIndices: [],
   doorCounts: [],
   equipments: [],
   fuels: [],

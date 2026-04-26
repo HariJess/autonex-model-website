@@ -1,6 +1,6 @@
 /**
  * Pont **SearchFilters** (canon véhicule, `types/search.ts`) → **ListingsFilters** (forme PostgREST /
- * colonnes inchangées : `surface*` = km, `rooms`, `bathrooms`).
+ * colonnes inchangées : `surface*` = km, `bathrooms`).
  */
 import type { ListingsFilters } from "@/lib/listingQueryFilters";
 import { SEARCH_RELAXED_DB_ROW_CAP } from "@/config/searchListings";
@@ -20,7 +20,6 @@ function coreListingFiltersFromSearch(filters: SearchFilters): Omit<
     freeText: qTrim.length >= 1 ? qTrim : undefined,
     priceMin: filters.priceMin || undefined,
     priceMax: filters.priceMax || undefined,
-    rooms: filters.trimVersionIndices.length > 0 ? filters.trimVersionIndices : undefined,
     bathrooms: filters.doorCounts.length > 0 ? filters.doorCounts : undefined,
     surfaceMin: filters.mileageMinKm || undefined,
     surfaceMax: filters.mileageMaxKm || undefined,

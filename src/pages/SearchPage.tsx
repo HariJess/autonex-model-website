@@ -248,9 +248,6 @@ const SearchPage = () => {
         key: "mileageKm",
       });
     }
-    filters.trimVersionIndices.forEach((r) =>
-      chips.push({ label: `${r === 0 ? t("search.trimBase", "Base") : t("search.versionN", "Version {{count}}", { count: r })}`, key: `room-${r}` })
-    );
     filters.doorCounts.forEach((b) =>
       chips.push({ label: `${b}${b === 4 ? "+" : ""} ${t("listing.bathrooms", "Portes")}`, key: `bath-${b}` })
     );
@@ -303,9 +300,7 @@ const SearchPage = () => {
     } else if (key === "mileageKm") {
       newFilters.mileageMinKm = 0;
       newFilters.mileageMaxKm = 0;
-    } else if (key.startsWith("room-"))
-      newFilters.trimVersionIndices = newFilters.trimVersionIndices.filter((r) => r !== Number(key.slice(5)));
-    else if (key.startsWith("bath-"))
+    } else if (key.startsWith("bath-"))
       newFilters.doorCounts = newFilters.doorCounts.filter((b) => b !== Number(key.slice(5)));
     else if (key.startsWith("eq-")) newFilters.equipments = newFilters.equipments.filter((e) => e !== key.slice(3));
     else if (key.startsWith("fuel-")) newFilters.fuels = newFilters.fuels.filter((f) => f !== key.slice(5));
@@ -428,7 +423,6 @@ const SearchPage = () => {
     if (filters.quartierLibre.trim()) count += 1;
     if (filters.priceMin > 0 || filters.priceMax > 0) count += 1;
     if (filters.mileageMinKm > 0 || filters.mileageMaxKm > 0) count += 1;
-    if (filters.trimVersionIndices.length > 0) count += 1;
     if (filters.doorCounts.length > 0) count += 1;
     if (filters.equipments.length > 0) count += 1;
     if (filters.fuels.length > 0) count += 1;

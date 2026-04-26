@@ -32,7 +32,6 @@ function emptyPayload(step: number, draftListingId: string = DRAFT_ID) {
     priceMga: "",
     negotiable: false,
     surface: "",
-    rooms: "",
     bathrooms: "",
     toilets: "",
     vehicleMake: "",

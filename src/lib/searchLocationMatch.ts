@@ -3,7 +3,7 @@
  *
  * **Canonique véhicule** : les filtres utilisateur viennent de `SearchFilters` (mileage km, indices finition, portes).
  *
- * **Legacy DB** : les annonces exposent encore `DisplayListing.surface` (= km), `rooms` (= indice finition/version),
+ * **Legacy DB** : les annonces exposent encore `DisplayListing.surface` (= km),
  * `bathrooms` (= portes). Ces helpers comparent des **nombres**, pas les colonnes SQL ; les noms de paramètres
  * le signalent quand la valeur provient d’une colonne historique.
  *
@@ -34,22 +34,6 @@ export function matchesLocationSubareas(l: DisplayListing, f: SearchFilters): bo
   });
 
   return arrOk || qOk;
-}
-
-/**
- * Indice finition/version : même logique que les puces recherche (base 0 … luxe 5+).
- * `listingTrimIndex` lit typiquement `listing.rooms` (nom de colonne DB historique).
- */
-export function matchesTrimVersionFilterStrict(
-  listingTrimIndex: number | null,
-  selectedTrimIndices: number[],
-): boolean {
-  if (selectedTrimIndices.length === 0) return true;
-  const r = listingTrimIndex ?? -1;
-  return selectedTrimIndices.some((fr) => {
-    if (fr === 5) return r >= 5;
-    return r === fr;
-  });
 }
 
 /**

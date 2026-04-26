@@ -8,18 +8,15 @@ describe("hydrateSearchFilters", () => {
       hydrateSearchFilters({
         mileageMinKm: 10,
         mileageMaxKm: 20,
-        trimVersionIndices: [1],
         doorCounts: [3],
         surfaceMin: 999,
         surfaceMax: 888,
-        rooms: [9],
         bathrooms: [8],
       }),
     ).toEqual({
       ...EMPTY_SEARCH_FILTERS,
       mileageMinKm: 10,
       mileageMaxKm: 20,
-      trimVersionIndices: [1],
       doorCounts: [3],
     });
   });
@@ -29,13 +26,11 @@ describe("hydrateSearchFilters", () => {
       hydrateSearchFilters({
         surfaceMin: 5000,
         surfaceMax: 120000,
-        rooms: [2, 3],
         bathrooms: [4],
       }),
     ).toMatchObject({
       mileageMinKm: 5000,
       mileageMaxKm: 120000,
-      trimVersionIndices: [2, 3],
       doorCounts: [4],
     });
   });

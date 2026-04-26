@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   matchesLocationSubareas,
-  matchesTrimVersionFilterStrict,
   matchesDoorCountFilterStrict,
   matchesPriceMaxStrict,
   matchesPriceMinStrict,
@@ -22,7 +21,6 @@ function makeListing(overrides: Partial<DisplayListing> = {}): DisplayListing {
     price_mga: 10_000_000,
     price_eur: null,
     surface: 50,
-    rooms: 2,
     bathrooms: 1,
     toilets: null,
     ville: "Antananarivo",
@@ -91,45 +89,6 @@ describe("matchesLocationSubareas", () => {
       quartiers: ["Ambatobe"],
     });
     expect(matchesLocationSubareas(l, f)).toBe(false);
-  });
-});
-
-describe("matchesTrimVersionFilterStrict", () => {
-  it("match si aucun filtre", () => {
-    expect(matchesTrimVersionFilterStrict(3, [])).toBe(true);
-  });
-
-  it("match nombre exact", () => {
-    expect(matchesTrimVersionFilterStrict(3, [3])).toBe(true);
-  });
-
-  it("ne match pas nombre différent", () => {
-    expect(matchesTrimVersionFilterStrict(3, [2])).toBe(false);
-  });
-
-  it("match studio (0)", () => {
-    expect(matchesTrimVersionFilterStrict(0, [0])).toBe(true);
-  });
-
-  it("5+ filter : match 5", () => {
-    expect(matchesTrimVersionFilterStrict(5, [5])).toBe(true);
-  });
-
-  it("5+ filter : match 10", () => {
-    expect(matchesTrimVersionFilterStrict(10, [5])).toBe(true);
-  });
-
-  it("5+ filter : ne match pas 4", () => {
-    expect(matchesTrimVersionFilterStrict(4, [5])).toBe(false);
-  });
-
-  it("match si l'une des valeurs du filtre match", () => {
-    expect(matchesTrimVersionFilterStrict(3, [1, 2, 3])).toBe(true);
-  });
-
-  it("indice null ne match rien (sauf filtre vide)", () => {
-    expect(matchesTrimVersionFilterStrict(null, [2])).toBe(false);
-    expect(matchesTrimVersionFilterStrict(null, [])).toBe(true);
   });
 });
 

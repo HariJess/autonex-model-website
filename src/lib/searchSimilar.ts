@@ -1,6 +1,6 @@
 /**
- * Score « biens similaires » — utilise encore `listing.rooms` / `listing.bathrooms` pour la lecture ligne
- * (colonnes legacy), alors que les filtres sont `SearchFilters` canoniques.
+ * Score « biens similaires » — utilise encore `listing.bathrooms` pour la lecture ligne
+ * (colonne legacy), alors que les filtres sont `SearchFilters` canoniques.
  */
 import type { DisplayListing } from "@/types/listing";
 import type { SearchFilters } from "@/types/search";
@@ -18,16 +18,6 @@ export function arrondissementForQuartier(villeName: string, quartierName: strin
     }
   }
   return null;
-}
-
-/** Similarité « relax » : indices finition (colonne DB `rooms`). */
-function relaxedTrimVersionMatch(listingTrimIndex: number | null, filterIndices: number[]): boolean {
-  if (filterIndices.length === 0) return true;
-  const r = listingTrimIndex ?? -1;
-  return filterIndices.some((fr) => {
-    if (fr === 5) return r >= 5;
-    return r === fr || r === fr - 1 || r === fr + 1;
-  });
 }
 
 /** Similarité « relax » : portes (colonne DB `bathrooms` / `doors`). */
@@ -144,7 +134,6 @@ export function similarListingScore(
   score -= priceTolerance(price, filters.priceMin, filters.priceMax);
   score -= mileageKmTolerancePenalty(resolveVehicleMileageKm(listing), filters.mileageMinKm, filters.mileageMaxKm);
 
-  if (!relaxedTrimVersionMatch(listing.rooms, filters.trimVersionIndices)) score -= 35;
   if (!relaxedDoorCountMatch(listing.bathrooms, filters.doorCounts)) score -= 20;
 
   const created = listing.created_at ? new Date(listing.created_at).getTime() : 0;

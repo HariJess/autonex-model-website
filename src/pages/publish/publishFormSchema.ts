@@ -125,9 +125,14 @@ export type VehicleDescriptionValues = z.infer<typeof vehicleDescriptionSubSchem
  * LEGACY ImmoNex specs columns — names kept for SQL alignment.
  * Vehicle-side semantics:
  *   - `surface`     → kilométrage (km)
- *   - `rooms`       → version / finition (index)
  *   - `bathrooms`   → nombre de portes
  *   - `toilets`     → nombre de sièges / places
+ *
+ * Note (B4a, 2026-04-26): the `rooms` field has been removed from the form
+ * schema since the Version/Trim concept was dead in prod (rooms_distinct=[0]
+ * in mini-B3 audit). The DB column `listings.rooms` remains until B4b drops
+ * it. The publishDraft.ts tee continues to write `null` to the column for
+ * new listings.
  *
  * See docs/AUTONEX_LEGACY_SCHEMA.md and src/lib/legacyListingsDbColumns.ts
  * for the full mapping. Renaming requires a coordinated DB migration.
@@ -135,8 +140,6 @@ export type VehicleDescriptionValues = z.infer<typeof vehicleDescriptionSubSchem
 export const vehicleSpecsLegacySubSchema = z.object({
   /** Kilométrage véhicule (km). Legacy column name `surface`. */
   surface: z.string(),
-  /** Index version / finition véhicule. Legacy column name `rooms`. */
-  rooms: z.string(),
   /** Nombre de portes. Legacy column name `bathrooms`. */
   bathrooms: z.string(),
   /** Nombre de sièges / places. Legacy column name `toilets`. */

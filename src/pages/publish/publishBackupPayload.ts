@@ -22,7 +22,6 @@ export function buildPublishLocalBackupPayload(params: {
   priceMga: string;
   negotiable: boolean;
   surface: string;
-  rooms: string;
   bathrooms: string;
   toilets: string;
   vehicleMake: string;
@@ -68,7 +67,6 @@ export function buildPublishLocalBackupPayload(params: {
     priceMga,
     negotiable,
     surface,
-    rooms,
     bathrooms,
     toilets,
     vehicleMake,
@@ -115,7 +113,6 @@ export function buildPublishLocalBackupPayload(params: {
     priceMga,
     negotiable,
     surface,
-    rooms,
     bathrooms,
     toilets,
     vehicleMake,

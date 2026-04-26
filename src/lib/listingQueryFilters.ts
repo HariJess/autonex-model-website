@@ -31,7 +31,6 @@ export interface ListingsFilters {
   freeText?: string;
   priceMin?: number;
   priceMax?: number;
-  rooms?: number[];
   bathrooms?: number[];
   surfaceMin?: number;
   surfaceMax?: number;
@@ -68,21 +67,6 @@ export function sanitizeIlikeTerm(raw: string): string {
 
 export const CLOSE_MATCH_PRICE_FACTOR = 1.25;
 export const CLOSE_MATCH_SURFACE_MAX_FACTOR = 1.15;
-
-/** ±1 chambre (et voisinage « 5+ ») pour élargir la requête SQL */
-export function expandRoomsForRelaxedQuery(rooms: number[]): number[] {
-  const out = new Set<number>();
-  for (const r of rooms) {
-    if (r === 5) {
-      for (let i = 4; i <= 20; i++) out.add(i);
-    } else {
-      out.add(Math.max(0, r - 1));
-      out.add(r);
-      out.add(Math.min(99, r + 1));
-    }
-  }
-  return Array.from(out);
-}
 
 export function expandBathroomsForRelaxedQuery(bathrooms: number[]): number[] {
   const out = new Set<number>();
@@ -169,32 +153,6 @@ export function applyListingFilters(query: FilterableListingQuery, filters: List
   if (filters.priceMax) {
     const cap = relaxed ? Math.ceil(filters.priceMax * CLOSE_MATCH_PRICE_FACTOR) : filters.priceMax;
     q = q.lte("price_mga", cap);
-  }
-  if (filters.rooms && filters.rooms.length > 0) {
-    if (relaxed) {
-      const expanded = expandRoomsForRelaxedQuery(filters.rooms);
-      const under5 = [...new Set(expanded.filter((r) => r < 5))].sort((a, b) => a - b);
-      const hasGte5 = expanded.some((r) => r >= 5);
-      if (hasGte5 && under5.length > 0) {
-        q = q.or(`rooms.in.(${under5.join(",")}),rooms.gte.5`);
-      } else if (hasGte5) {
-        q = q.gte("rooms", 4);
-      } else {
-        q = q.in("rooms", under5);
-      }
-    } else {
-      const hasHighEnd = filters.rooms.includes(5);
-      if (hasHighEnd) {
-        const otherRooms = filters.rooms.filter((r) => r < 5);
-        if (otherRooms.length > 0) {
-          q = q.or(`rooms.in.(${otherRooms.join(",")}),rooms.gte.5`);
-        } else {
-          q = q.gte("rooms", 5);
-        }
-      } else {
-        q = q.in("rooms", filters.rooms);
-      }
-    }
   }
   // Audit fix M-LEGACY-1 / Phase B1 (2026-04-26) — la data migration
   // 20260426170000_align_legacy_doors_seats.sql + le tee bidirectionnel dans

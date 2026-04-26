@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Gauge, CircleDot, ChevronLeft, ChevronRight, Camera } from "lucide-react";
+import { Gauge, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
@@ -10,11 +10,9 @@ import { prefetchListing } from "@/hooks/useListings";
 import { applyImageFallback } from "@/lib/imageFallback";
 import {
   formatVehicleMileage,
-  formatVehicleVersion,
   getVehicleDisplayTitle,
   getVehicleHeadline,
   getVehicleMileageValue,
-  getVehicleVersionValue,
 } from "@/lib/vehiclePresentation";
 import BrandLogo from "@/components/BrandLogo";
 import { resolveBrandAsset } from "@/data/brandAssets";
@@ -62,7 +60,6 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
   const city = listing.ville ?? "";
   const region = listing.region ?? "";
   const displayTitle = getVehicleDisplayTitle(listing);
-  const versionLabel = formatVehicleVersion(getVehicleVersionValue(listing));
   const mileageLabel = formatVehicleMileage(getVehicleMileageValue(listing));
   const vehicleHeadline = getVehicleHeadline(listing);
   const displayBrand = listing.vehicle?.make || displayTitle;
@@ -292,12 +289,6 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         <div className={`flex items-center gap-x-2 md:gap-x-3 gap-y-1 md:gap-y-1.5 text-muted-foreground font-sans flex-wrap ${
           isCompactLayout ? "text-[11px] md:text-[13px]" : "text-[13px]"
         } ${isSearchVariant ? "pt-0.5" : ""}`}>
-          {versionLabel && (
-            <span className="flex items-center gap-1">
-              <CircleDot className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {versionLabel}
-            </span>
-          )}
           {mileageLabel && (
             <span className="flex items-center gap-1">
               <Gauge className="h-3.5 w-3.5 shrink-0" aria-hidden />

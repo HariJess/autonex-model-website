@@ -18,7 +18,6 @@ import {
   getEquipmentOptionLabel,
   type ListingEquipmentIconName,
 } from "@/data/listing-equipment";
-import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { VehicleModelCombobox } from "@/components/listings/VehicleModelCombobox";
 import {
   getModelsForBrand,
@@ -96,7 +95,6 @@ type PublishDetailsSectionProps = {
     listingTitle: string;
     descriptionFr: string;
     listingSurface: string;
-    listingRooms: string;
     listingBathrooms: string;
     toilets: string;
     listingFeatures: string;
@@ -134,7 +132,6 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
   const description = form.watch("description");
   const priceMga = form.watch("priceMga");
   const surface = form.watch("surface");
-  const rooms = form.watch("rooms");
   const make = form.watch("vehicleMake");
   const model = form.watch("vehicleModel");
   const year = form.watch("vehicleYear");
@@ -155,8 +152,6 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
   const listingType = form.watch("listingType");
   const transaction = form.watch("transaction");
 
-  const showRooms =
-    listingType === "" || LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType);
   const isRentalTransaction = transaction === "location" || transaction === "location_vacances";
   const isAdmin = profile?.role === "admin";
   const sellerTypeLabel =
@@ -277,11 +272,10 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
     const parts = [
       getVehicleMakeLabel(make).trim(),
       getVehicleModelLabel(make, model).trim(),
-      rooms.trim(),
       year.trim(),
     ].filter(Boolean);
     return parts.join(" ").slice(0, 120);
-  }, [make, model, rooms, year]);
+  }, [make, model, year]);
 
   // Sync automatique : quand le flag est actif ET qu'au moins une source est
   // renseignée, on met à jour le titre. Ne clobbers plus le titre s'il a été
@@ -481,7 +475,7 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
             {t("publish.vehicleIdentityDesc", "Marque, modèle, année et version de votre véhicule.")}
           </p>
         </div>
-        <div className={cn("grid grid-cols-1 gap-3.5 md:gap-4", showRooms ? "sm:grid-cols-2 md:grid-cols-5" : "sm:grid-cols-2 md:grid-cols-4")}>
+        <div className="grid grid-cols-1 gap-3.5 md:gap-4 sm:grid-cols-2 md:grid-cols-4">
           <div className="space-y-2">
             <Label className="font-sans">Marque *</Label>
             {useCustomBrand ? (
@@ -640,18 +634,6 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
               className="font-sans"
             />
           </div>
-          {showRooms && (
-            <div className="space-y-2">
-              <Label className="font-sans">{labels.listingRooms}</Label>
-              <Input
-                value={rooms}
-                onChange={(e) => form.setValue("rooms", e.target.value)}
-                className="font-sans"
-                placeholder={t("publish.roomsPlaceholder", "Ex : GT, Sport, 2.0L…")}
-                maxLength={40}
-              />
-            </div>
-          )}
           <div className="space-y-2">
             <Label className="font-sans">État</Label>
             <Select value={condition || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleCondition", v === EMPTY_OPTION ? "" : v)}>

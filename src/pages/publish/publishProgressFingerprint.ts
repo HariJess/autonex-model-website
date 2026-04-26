@@ -32,7 +32,6 @@ export function computeProgressFingerprint(
     description: v.description.trim(),
     priceMga: v.priceMga.trim(),
     surface: v.surface.trim(),
-    rooms: v.rooms.trim(),
     bathrooms: v.bathrooms.trim(),
     toilets: v.toilets.trim(),
     vehicleMake: v.vehicleMake.trim(),

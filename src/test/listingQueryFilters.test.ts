@@ -3,7 +3,6 @@ import {
   applyListingFilters,
   buildLocationSubareaOrFilter,
   sanitizeIlikeTerm,
-  expandRoomsForRelaxedQuery,
   type FilterableListingQuery,
 } from "@/lib/listingQueryFilters";
 
@@ -24,14 +23,6 @@ describe("buildLocationSubareaOrFilter", () => {
     expect(s).toContain("arrondissement.ilike.%Premier%");
     expect(s).toContain("quartier.ilike.%Mahamasina%");
     expect(s).toContain("quartier_libre.ilike.%Mahamasina%");
-  });
-});
-
-describe("expandRoomsForRelaxedQuery", () => {
-  it("expands 5+ bucket", () => {
-    const r = expandRoomsForRelaxedQuery([5]);
-    expect(r).toContain(4);
-    expect(r).toContain(20);
   });
 });
 

@@ -637,7 +637,6 @@ const PublishPage = () => {
 
   useEffect(() => {
     if (listingType && !LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType)) {
-      form.setValue("rooms", "");
       form.setValue("bathrooms", "");
       form.setValue("toilets", "");
     }
@@ -1083,7 +1082,6 @@ const PublishPage = () => {
               listingTitle: t("publish.listingTitle", "Titre"),
               descriptionFr: t("publish.descriptionFr", "Description (français)"),
               listingSurface: t("listing.surface", "Kilométrage"),
-              listingRooms: t("listing.rooms", "Version / finition"),
               listingBathrooms: t("listing.bathrooms", "Portes"),
               toilets: t("publish.toilets", "Places / capacité (optionnel)"),
               listingFeatures: t("listing.features", "Équipements"),

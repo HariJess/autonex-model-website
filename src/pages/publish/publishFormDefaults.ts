@@ -35,7 +35,6 @@ export const PUBLISH_FORM_DEFAULTS: PublishFormValues = {
 
   // Legacy specs (vehicle semantics — see publishFormSchema.ts JSDoc)
   surface: "",
-  rooms: "",
   bathrooms: "",
   toilets: "",
 

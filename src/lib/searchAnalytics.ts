@@ -47,7 +47,7 @@ export function recordSearchAnalytics(payload: SearchAnalyticsPayload): void {
     price_max: f.priceMax || null,
     surface_min: f.mileageMinKm || null,
     surface_max: f.mileageMaxKm || null,
-    rooms: f.trimVersionIndices.length ? f.trimVersionIndices : null,
+    rooms: null,
     bathrooms: f.doorCounts.length ? f.doorCounts : null,
     equipments: f.equipments.length ? f.equipments : null,
     exact_result_count: payload.exactResultCount,

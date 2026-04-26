@@ -10,7 +10,6 @@ import {
   appendVehicleSemanticQueryParams,
   parseDoorCountsFromSearchParams,
   parseMileageKmBoundsFromSearchParams,
-  parseTrimVersionIndicesFromSearchParams,
 } from "@/lib/searchVehicleUrlParams";
 
 export { VEHICLE_SEARCH_QUERY_KEYS } from "@/lib/searchVehicleUrlParams";
@@ -51,7 +50,6 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
   const types = sanitizeListingTypes(rawTypes).filter((t) => allowed.has(t as ListingType));
 
   const { min: mileageMinKm, max: mileageMaxKm } = parseMileageKmBoundsFromSearchParams(sp);
-  const trimVersionIndices = parseTrimVersionIndicesFromSearchParams(sp);
   const doorCounts = parseDoorCountsFromSearchParams(sp);
 
   const quartiers = parseMultiValueParam(sp, "quartiers");
@@ -68,7 +66,6 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     priceMax: parseFiniteNumber(sp.get("prix_max")),
     mileageMinKm,
     mileageMaxKm,
-    trimVersionIndices,
     doorCounts,
     equipments: parseMultiValueParam(sp, "equip"),
     fuels: parseMultiValueParam(sp, "fuel"),

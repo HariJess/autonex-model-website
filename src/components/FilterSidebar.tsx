@@ -400,34 +400,6 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           </AccordionItem>
 
           {hasResidentialType && (
-            <AccordionItem value="rooms" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-              <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.rooms", "Version")}</AccordionTrigger>
-              <AccordionContent className="pb-3">
-                <div className="flex flex-wrap gap-2">
-                  {[{ label: t("search.trimBase", "Base"), value: 0 }, { label: t("search.trimComfort", "Confort"), value: 1 }, { label: t("search.trimPremium", "Premium"), value: 2 }, { label: t("search.trimSport", "Sport"), value: 3 }, { label: "4x4", value: 4 }, { label: t("search.trimLuxury", "Luxe"), value: 5 }].map((r) => (
-                    <Button
-                      key={r.value}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "font-sans touch-manipulation",
-                        isMobile ? "min-h-11 px-4 text-sm" : "text-xs h-8 px-3",
-                        filters.trimVersionIndices.includes(r.value) ? "border-primary bg-primary/10 text-primary" : "",
-                      )}
-                      onClick={() =>
-                        update({ trimVersionIndices: toggleInNumArray(filters.trimVersionIndices, r.value) })
-                      }
-                    >
-                      {r.label}
-                    </Button>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-
-          {hasResidentialType && (
             <AccordionItem value="bathrooms" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
               <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.bathrooms", "Portes")}</AccordionTrigger>
               <AccordionContent className="pb-3">

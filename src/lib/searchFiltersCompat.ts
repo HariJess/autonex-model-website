@@ -11,19 +11,17 @@ import { EMPTY_SEARCH_FILTERS, type SearchFilters } from "@/types/search";
 export type LegacySearchFiltersShape = {
   surfaceMin?: number;
   surfaceMax?: number;
-  rooms?: number[];
   bathrooms?: number[];
 };
 
 export type SearchFiltersHydrateInput = Partial<SearchFilters> & LegacySearchFiltersShape;
 
-/** Fusion vers l’état canonique véhicule (`mileage*Km`, `trimVersionIndices`, `doorCounts`). */
+/** Fusion vers l’état canonique véhicule (`mileage*Km`, `doorCounts`). */
 export function hydrateSearchFilters(input: SearchFiltersHydrateInput): SearchFilters {
   const merged = { ...EMPTY_SEARCH_FILTERS, ...input };
   const {
     surfaceMin: _legacySm,
     surfaceMax: _legacySx,
-    rooms: _legacyRooms,
     bathrooms: _legacyBath,
     ...rest
   } = merged as SearchFiltersHydrateInput & Record<string, unknown>;
@@ -36,10 +34,6 @@ export function hydrateSearchFilters(input: SearchFiltersHydrateInput): SearchFi
     input.mileageMaxKm ??
     input.surfaceMax ??
     EMPTY_SEARCH_FILTERS.mileageMaxKm;
-  const trimVersionIndices =
-    input.trimVersionIndices ??
-    input.rooms ??
-    EMPTY_SEARCH_FILTERS.trimVersionIndices;
   const doorCounts =
     input.doorCounts ??
     input.bathrooms ??
@@ -49,7 +43,6 @@ export function hydrateSearchFilters(input: SearchFiltersHydrateInput): SearchFi
     ...(rest as SearchFilters),
     mileageMinKm,
     mileageMaxKm,
-    trimVersionIndices,
     doorCounts,
   };
 }

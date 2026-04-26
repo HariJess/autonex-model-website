@@ -34,8 +34,9 @@ export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly string[] = [
 
 /**
  * Valeurs `listing_type` où le flux publication/recherche expose encore les champs DB legacy
- * `rooms` (= finition/version) et `bathrooms` (= portes). Nom historique « rooms » = immobilier ;
- * préférer cette constante à un libellé trompeur type `TYPES_WITH_ROOMS`.
+ * `bathrooms` (= portes). La portion "TRIM" du nom est désormais cosmétique : Version/Trim a été
+ * retiré en B4a (2026-04-26, dead data en prod, rooms_distinct=[0]). Renommage prévu en B4b
+ * quand la colonne SQL `rooms` sera dropée et la fonction publishDraft.ts simplifiée.
  */
 export const LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS: readonly string[] = ["appartement", "villa", "maison"];
 
@@ -68,7 +69,7 @@ export const TRANSACTION_LABELS: Record<TransactionType, string> = {
 
 /**
  * Canonical vehicle-native business attributes used by the product.
- * DB legacy mirrors (`surface`, `rooms`, `bathrooms`, `toilets`) remain temporary compatibility fields.
+ * DB legacy mirrors (`surface`, `bathrooms`, `toilets`) remain temporary compatibility fields.
  * @see `legacyListingVehicleMapping.ts` for read/mapping rules.
  */
 export type CanonicalVehicleInfo = {
@@ -96,7 +97,6 @@ export type CanonicalVehicleInfo = {
 /** Temporary legacy mirrors from historical property-style schema. */
 export type LegacyListingMirrorFields = {
   surface: number | null;
-  rooms: number | null;
   bathrooms: number | null;
   /** Sièges / places côté véhicule. */
   toilets?: number | null;
@@ -118,10 +118,14 @@ export interface DisplayListing {
   negotiable?: boolean;
   /** Kilométrage (km) tant que la colonne DB `surface` garde ce nom legacy. */
   surface: number | null;
-  /** Indice version/finition (`rooms` en base — pas « chambres »). */
-  rooms: number | null;
   /** Portes (`bathrooms` en base — pas salles de bain). */
   bathrooms: number | null;
+  /**
+   * Legacy DB column reflecting Version/Trim. Plus exposé en UI/recherche depuis B4a (2026-04-26).
+   * Conservé optionnel uniquement pour compat avec quelques consommateurs (vehicleCanonical, useFavorites,
+   * useListings) ; sera dropé en B4b avec la colonne SQL.
+   */
+  rooms?: number | null;
   ville: string | null;
   region: string | null;
   arrondissement: string | null;

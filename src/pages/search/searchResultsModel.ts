@@ -4,7 +4,6 @@ import {
   matchesLocationSubareas,
   matchesPriceMaxStrict,
   matchesPriceMinStrict,
-  matchesTrimVersionFilterStrict,
 } from "@/lib/searchLocationMatch";
 import { getCanonicalVehicleAttributes } from "@/lib/vehicleCanonical";
 import type { DisplayListing } from "@/types/listing";
@@ -102,11 +101,6 @@ export function buildSearchResultsModel(params: {
   if (filters.mileageMaxKm > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
       matchesVehicleMileageMaxStrict(l, filters.mileageMaxKm),
-    );
-  }
-  if (filters.trimVersionIndices.length > 0) {
-    exactMatchListings = exactMatchListings.filter((l) =>
-      matchesTrimVersionFilterStrict(l.rooms, filters.trimVersionIndices),
     );
   }
   if (filters.doorCounts.length > 0) {
