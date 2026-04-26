@@ -1,5 +1,9 @@
 User-agent: *
 Disallow: /
+Disallow: /admin/
+Disallow: /auth/callback
+
+Sitemap: https://autonex.mg/sitemap.xml
 
 # AutoNex is currently in private beta. Public launch coming soon.
 # Once launched, restore the original rules below:
