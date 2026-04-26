@@ -47,20 +47,35 @@ describe("RLS — leads", () => {
     expect(data ?? []).toHaveLength(0);
   });
 
-  // S16 — Public CAN insert a lead. Si erreur, vérifier que ce n'est PAS un
-  // refus RLS (rate-limit ou validation autre = OK; "policy" / "denied" / "rls"
-  // dans le message = la policy publique a été cassée).
-  it("S16 — Anon client CAN insert a lead (public-fillable contact form)", async () => {
+  // S16 — Anon CAN insert a lead sur un listing actif.
+  // La policy INSERT exige EXISTS (listings.status = 'active'). Le seed met
+  // bien `status='active'` mais le trigger de modération
+  // (tr_enforce_listing_moderation_insert dans 20260420190000) peut
+  // reroute vers `pending_review`. On force `status='active'` post-seed via
+  // service_role pour bypass triggers + RLS et tester strictement la policy
+  // INSERT publique sur leads.
+  it("S16 — Anon client CAN insert a lead on an active listing (public form preserved)", async () => {
     const aliceListing = await seedListingForUser(alice.id);
+
+    const service = createServiceClient();
+    const { error: updateError } = await service
+      .from("listings")
+      .update({ status: "active" })
+      .eq("id", aliceListing.id);
+    expect(updateError).toBeNull();
+
     const anon = createAnonClient();
     const { error } = await anon.from("leads").insert({
       listing_id: aliceListing.id,
-      visitor_name: "Anonymous Bob",
+      visitor_name: "Anonymous Visitor",
       visitor_phone: "+261340000333",
-      message: "From anon",
+      message: "From anon test",
     });
+
     if (error) {
-      expect(error.message.toLowerCase()).not.toMatch(/policy|denied|rls/);
+      expect(error.message.toLowerCase()).not.toMatch(/policy|denied|rls|row-level/);
+    } else {
+      expect(error).toBeNull();
     }
   });
 });

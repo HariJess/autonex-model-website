@@ -60,6 +60,51 @@ export async function deleteTestUser(userId: string): Promise<void> {
 }
 
 /**
+ * Cleanup users from previous test runs that crashed before afterEach.
+ * "Orphan" = email matches the test pattern AND created more than 5 minutes
+ * ago (so we never delete a user from a currently-running parallel test).
+ *
+ * Called once via beforeAll global setup so each run starts from a clean
+ * staging DB and Supabase Auth rate limits don't accumulate over time.
+ *
+ * Returns the number of users actually deleted.
+ */
+export async function cleanupOrphanTestUsers(): Promise<number> {
+  const service = createServiceClient();
+  const cutoff = Date.now() - 5 * 60 * 1000;
+  let page = 1;
+  let totalDeleted = 0;
+
+  while (true) {
+    const { data: pageData, error: pageError } = await service.auth.admin.listUsers({
+      page,
+      perPage: 100,
+    });
+    if (pageError) {
+      console.warn(`cleanupOrphanTestUsers list error page ${page}: ${pageError.message}`);
+      break;
+    }
+    if (!pageData?.users?.length) break;
+
+    const candidates = pageData.users.filter(
+      (u) =>
+        u.email?.endsWith("@autonex-rls-test.local") &&
+        u.created_at &&
+        new Date(u.created_at).getTime() < cutoff,
+    );
+    for (const candidate of candidates) {
+      const { error: delError } = await service.auth.admin.deleteUser(candidate.id);
+      if (!delError) totalDeleted += 1;
+    }
+
+    if (pageData.users.length < 100) break;
+    page += 1;
+  }
+
+  return totalDeleted;
+}
+
+/**
  * Insère un listing détenu par `ownerId` en bypass RLS via service_role.
  * Schema véhicule (post-2026-04-24): `type` est TEXT libre — on utilise des
  * valeurs auto natives (suv, berline...). Les champs surface/rooms/etc. sont

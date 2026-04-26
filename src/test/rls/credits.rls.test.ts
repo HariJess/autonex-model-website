@@ -47,18 +47,20 @@ describe("RLS — credits_ledger / credits_balance", () => {
     expect(error).toBeTruthy();
   });
 
-  // S6 — Bob ne peut PAS lire le balance d'Alice
-  // NOTE: profiles SELECT est `USING (true)` (public). Si ce test échoue,
-  // c'est un finding : credits_balance est lisible cross-user. Mitigation
-  // possible: restreindre la policy SELECT aux colonnes non-sensibles ou
-  // utiliser une vue publique distincte.
-  it("S6 — Bob cannot SELECT alice's profile.credits_balance", async () => {
+  // S6 — Bob ne peut PAS lire le balance d'Alice via la row profiles.
+  // Diagnostic SQL : RLS scopée à auth.uid sur profiles (cf. S1). Même
+  // anti-pattern que S1 : `data?.credits_balance ?? null` ne distinguait
+  // pas "RLS bloque" (data=null) de "Bob lit son propre balance=0" (le
+  // default des freshly-created users). On valide via count + data.length.
+  it("S6 — Bob cannot SELECT alice's profile.credits_balance via profiles row", async () => {
     await seedCreditsForUser(alice.id, 500);
-    const { data } = await bobClient
+    const { data, count, error } = await bobClient
       .from("profiles")
-      .select("credits_balance")
-      .eq("id", alice.id)
-      .maybeSingle();
-    expect(data?.credits_balance ?? null).toBeNull();
+      .select("id, credits_balance", { count: "exact" })
+      .eq("id", alice.id);
+
+    expect(error).toBeNull();
+    expect(count).toBe(0);
+    expect(data ?? []).toHaveLength(0);
   });
 });

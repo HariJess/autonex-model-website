@@ -19,17 +19,22 @@ describe("RLS — profiles", () => {
     await deleteTestUser(bob.id);
   });
 
-  // S1 — Bob ne peut PAS lire le profile.phone d'Alice (PII)
-  // NOTE: la policy actuelle est `SELECT USING (true)` (public). Si ce test
-  // passe en "blocked", la policy a été durcie. S'il échoue, c'est un finding
-  // réel : la phone est lisible par tout authentifié.
-  it("S1 — Bob cannot SELECT alice's profile.phone (PII protected)", async () => {
-    const { data } = await bobClient
+  // S1 — Bob ne peut PAS lire le profile d'Alice (RLS scopée à auth.uid).
+  // Diagnostic SQL sur staging : les policies SELECT sur profiles sont toutes
+  // scopées (`auth.uid() = id`, `immonex_is_admin()`, anti-anonymized self).
+  // Le test précédent comparait `data?.phone` à null mais ne distinguait pas
+  // "RLS bloque" (data=null) de "Bob lit son propre profile par erreur" (où
+  // le téléphone seed est le même hardcodé pour tous les users de test).
+  // On vérifie maintenant `count` et `data.length` qui sont sans ambiguïté.
+  it("S1 — Bob cannot SELECT alice's profile (RLS scope to auth.uid)", async () => {
+    const { data, count, error } = await bobClient
       .from("profiles")
-      .select("phone")
-      .eq("id", alice.id)
-      .maybeSingle();
-    expect(data?.phone ?? null).toBeNull();
+      .select("id, phone, full_name", { count: "exact" })
+      .eq("id", alice.id);
+
+    expect(error).toBeNull();
+    expect(count).toBe(0);
+    expect(data ?? []).toHaveLength(0);
   });
 
   // S2 — Bob ne peut PAS modifier le profile d'Alice

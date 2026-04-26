@@ -17,9 +17,9 @@ export default defineConfig({
   },
   test: {
     include: ["src/test/rls/**/*.rls.test.ts"],
-    setupFiles: [],
+    setupFiles: ["./src/test/rls/global-setup.ts"],
     testTimeout: 30000,
-    hookTimeout: 30000,
+    hookTimeout: 60000,
     pool: "forks",
     poolOptions: { forks: { singleFork: true } },
     globals: true,
