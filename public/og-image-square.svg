@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Square variant of og-image.svg (M9, 2026-04-26) for LinkedIn / Instagram /
+  WhatsApp link previews where 1:1 framing renders best. Same palette + type
+  + brand mark as the base; layout reflowed to centred-stack since the wide
+  side-by-side composition doesn't fit a square. NOT wired to og:image (the
+  1200×630 stays canonical) — kept available for newsletters or platforms
+  that pull a square via og:image:secure_url variants.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img" aria-label="AutoNex — Marketplace automobile à Madagascar">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#071226"/>
+      <stop offset="55%" stop-color="#0D1E3E"/>
+      <stop offset="100%" stop-color="#1A3560"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="20%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#bg)"/>
+  <rect width="1200" height="1200" fill="url(#glow)"/>
+
+  <!-- Decorative diagonal accent (rescaled to fill 1200×1200 footer band) -->
+  <g opacity="0.08" stroke="#FFFFFF" stroke-width="1" fill="none">
+    <line x1="0" y1="1060" x2="1200" y2="740"/>
+    <line x1="0" y1="1100" x2="1200" y2="780"/>
+    <line x1="0" y1="1140" x2="1200" y2="820"/>
+  </g>
+
+  <!-- Brand mark: "X" inside subtle circle, centred horizontally up top -->
+  <g transform="translate(520 280)">
+    <circle cx="80" cy="80" r="80" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="1.5"/>
+    <text x="80" y="111" font-family="Georgia, 'Times New Roman', serif" font-size="100" font-weight="700" text-anchor="middle" fill="#FFFFFF">X</text>
+  </g>
+
+  <!-- Wordmark, centred -->
+  <text x="600" y="640" font-family="Georgia, 'Times New Roman', serif" font-size="168" font-weight="700" letter-spacing="-3" text-anchor="middle" fill="#FFFFFF">AutoNex</text>
+
+  <!-- Subtitle, centred -->
+  <text x="600" y="720" font-family="'Helvetica Neue', Arial, sans-serif" font-size="36" font-weight="400" text-anchor="middle" fill="#FFFFFF" fill-opacity="0.85">Marketplace automobile à Madagascar</text>
+
+  <!-- Footer URL, centred -->
+  <text x="600" y="1110" font-family="'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="500" letter-spacing="2" text-anchor="middle" fill="#FFFFFF" fill-opacity="0.55">AUTONEX.MG</text>
+
+  <!-- Top-right BETA tag (same coords as base — top-right anchor) -->
+  <g transform="translate(1010 90)">
+    <rect x="0" y="0" width="110" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.10" stroke="#FFFFFF" stroke-opacity="0.30"/>
+    <text x="55" y="22" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="2" text-anchor="middle" fill="#FFFFFF">BETA</text>
+  </g>
+</svg>
