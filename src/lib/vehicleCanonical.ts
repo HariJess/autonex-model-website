@@ -31,7 +31,7 @@ export function getCanonicalVehicleAttributes(listing: DisplayListing): Canonica
   return {
     make: textOrNull(v?.make),
     model: textOrNull(v?.model),
-    trimOrVersion: listing.rooms != null ? String(listing.rooms) : null,
+    trimOrVersion: null,
     year: nonNegativeNumberOrNull(v?.year),
     mileageKm: mileageKmCanonicalFromDisplayListing(listing),
     fuel: textOrNull(v?.fuel),

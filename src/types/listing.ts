@@ -94,14 +94,6 @@ export type CanonicalVehicleInfo = {
   sellerType: "concessionnaire" | "particulier" | null;
 };
 
-/** Temporary legacy mirrors from historical property-style schema. */
-export type LegacyListingMirrorFields = {
-  surface: number | null;
-  bathrooms: number | null;
-  /** Sièges / places côté véhicule. */
-  toilets?: number | null;
-};
-
 /**
  * Normalized listing for display across the app.
  * Works for both DB listings and seed data.
@@ -116,16 +108,13 @@ export interface DisplayListing {
   original_price_mga?: number | null;
   price_eur: number | null;
   negotiable?: boolean;
-  /** Kilométrage (km) tant que la colonne DB `surface` garde ce nom legacy. */
-  surface: number | null;
-  /** Portes (`bathrooms` en base — pas salles de bain). */
-  bathrooms: number | null;
   /**
-   * Legacy DB column reflecting Version/Trim. Plus exposé en UI/recherche depuis B4a (2026-04-26).
-   * Conservé optionnel uniquement pour compat avec quelques consommateurs (vehicleCanonical, useFavorites,
-   * useListings) ; sera dropé en B4b avec la colonne SQL.
+   * Legacy DB column kept on `DisplayListing` jusqu'au DROP COLUMN final (B4b).
+   * Post-DROP : à supprimer de l'interface entièrement.
    */
-  rooms?: number | null;
+  surface: number | null;
+  /** Portes (`bathrooms` en base — pas salles de bain). À supprimer post-DROP COLUMN B4b. */
+  bathrooms: number | null;
   ville: string | null;
   region: string | null;
   arrondissement: string | null;

@@ -13,7 +13,6 @@ function minimalDisplayListing(overrides: Partial<DisplayListing>): DisplayListi
     price_mga: overrides.price_mga ?? 10_000_000,
     price_eur: null,
     surface: null,
-    rooms: null,
     bathrooms: null,
     toilets: null,
     ville: overrides.ville ?? "Antananarivo",
