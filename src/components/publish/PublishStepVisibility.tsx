@@ -83,7 +83,17 @@ const PublishStepVisibility = ({
   const [showCreditPurchase, setShowCreditPurchase] = useState(!editMode && !canPublishWithCredits);
   const [showMobileOptions, setShowMobileOptions] = useState(false);
 
-  const publishAllowed = true;
+  // Audit fix M-PUBLISH-DISABLED (2026-04-26): le bouton ne doit pas être
+  // cliquable si l'utilisateur n'a pas les crédits. Le RPC backend rejette
+  // déjà avec insufficient_credits, mais l'UX silencieuse était frustrante.
+  // Edit mode bypasse le gate: pas de débit lors de la sauvegarde d'une
+  // annonce déjà publiée.
+  const publishAllowed = editMode || canPublishWithCredits;
+  // Show explanation only after the credits balance has actually loaded —
+  // during the initial pending state, canPublishWithCredits is also false
+  // and we don't want to flash "solde insuffisant" before knowing.
+  const showInsufficientCreditsHint =
+    !editMode && !creditsBalancePending && !canPublishWithCredits;
 
   const transactionLabel =
     transaction === "vente"
@@ -347,6 +357,18 @@ const PublishStepVisibility = ({
           </p>
         </CardContent>
       </Card>
+
+      {showInsufficientCreditsHint && (
+        <p
+          role="status"
+          className="text-sm font-sans text-muted-foreground text-center -mb-2"
+        >
+          {t(
+            "publish.needMoreCredits",
+            "Solde insuffisant pour envoyer cette annonce avec les options sélectionnées.",
+          )}
+        </p>
+      )}
 
       <Button
         type="button"
