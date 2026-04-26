@@ -2,6 +2,12 @@ import * as Sentry from "@sentry/react";
 
 let isInitialized = false;
 
+// 5% sample in prod, off in dev/test. 5% is the recommended starting point
+// for a pre-launch app: enough signal on real-user latency without flooding
+// the Sentry quota or making dev runs noisy. Revisit post-launch once we
+// know the actual transaction volume.
+export const SENTRY_TRACES_SAMPLE_RATE = import.meta.env.PROD ? 0.05 : 0;
+
 export function initMonitoring(): void {
   if (isInitialized) return;
   const dsn = import.meta.env.VITE_SENTRY_DSN;
@@ -11,7 +17,7 @@ export function initMonitoring(): void {
     dsn,
     environment: import.meta.env.VITE_SENTRY_ENVIRONMENT ?? import.meta.env.MODE,
     release: import.meta.env.VITE_SENTRY_RELEASE,
-    tracesSampleRate: 0,
+    tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE,
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 0,
   });
