@@ -1,1 +1,8 @@
 project_id = "vdarzzevkgcstmwytyht"
+
+# vpi-webhook receives callbacks from Vanilla Pay which never send a Supabase
+# JWT — authenticity is proven by the HMAC-SHA256 header (cf. vpi-hmac.ts).
+# Without verify_jwt = false the gateway 401s every VPI callback before the
+# function code can run. Caught during the M1+M2 deploy on 2026-04-26.
+[functions.vpi-webhook]
+verify_jwt = false
