@@ -47,9 +47,6 @@ supabase/.temp/
 /public/sitemaps/prerender-routes.json
 /public/sitemaps/listings-*.xml
 /public/sitemaps/agencies-*.xml
-/public/sitemaps/listings-prerender-data.json
-/public/sitemaps/listings-prerender-data-cache.json
-/public/sitemaps/agencies-prerender-data.json
-/public/sitemaps/agencies-prerender-data-cache.json
-/public/sitemaps/listings-html-data.jsonl
-/public/sitemaps/listings-html-data-cache.jsonl
+/public/sitemaps/agencies-prerender-data*.json
+/public/sitemaps/listings-prerender-data*.json
+/public/sitemaps/listings-html-data*.jsonl
