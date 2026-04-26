@@ -2,9 +2,11 @@
 
 Audit réalisé avril 2026. Notes pour référence lors des améliorations.
 
+> **État au 26/04/2026 après audit externe complet (6 sessions)** — la majorité des priorités initiales ont été traitées. Voir les marqueurs ✅ RÉSOLU / 🟡 PARTIEL / 🟡 EN COURS devant chaque section.
+
 ---
 
-## Priorité 1 — Route regex cassée
+## ✅ RÉSOLU — Priorité 1 — Route regex cassée
 
 **Fichier :** `src/App.tsx` ligne ~70
 
@@ -32,7 +34,7 @@ Cette syntaxe fonctionnait en React Router v5 mais **n'est pas supportée en v6*
 
 ---
 
-## Priorité 3 — i18n chargé en synchrone dans le bundle principal
+## ✅ RÉSOLU — Priorité 3 — i18n chargé en synchrone dans le bundle principal
 
 **Fichier :** `src/i18n/index.ts`
 
@@ -57,7 +59,7 @@ Protéger `localStorage` par `typeof window !== "undefined"`.
 
 ---
 
-## Priorité 4 — Sur-fetching homepage
+## ✅ RÉSOLU — Priorité 4 — Sur-fetching homepage
 
 **Fichier :** `src/pages/Index.tsx` lignes ~28-30
 
@@ -67,7 +69,7 @@ Protéger `localStorage` par `typeof window !== "undefined"`.
 
 ---
 
-## Priorité 5 — ESLint et TypeScript strict
+## ✅ RÉSOLU — Priorité 5 — ESLint et TypeScript strict
 
 **Fichiers :** `eslint.config.js`, `tsconfig.json`, `tsconfig.app.json`
 
@@ -86,7 +88,10 @@ Sur 271 fichiers TS/TSX, c'est quasi certain qu'il y a du code mort (imports, va
 
 ---
 
-## Priorité 6 — PublishPage.tsx monstrueux
+## 🟡 PARTIEL — Priorité 6 — PublishPage.tsx monstrueux
+
+> **État 26/04/2026 :** refacto à 70-80% — passage à `react-hook-form`, découpage en 4 sections (`PublishBasicInfoSection`, `PublishDetailsSection`, `PublishMediaSection`, `PublishStepVisibility`), extraction de 4 hooks dédiés (`hooks/publish/`). Reste à finaliser : harmonisation des paths sections + pattern i18n unique (cf. notes secondaires).
+
 
 **Fichier :** `src/pages/PublishPage.tsx`
 
@@ -101,7 +106,10 @@ Sur 271 fichiers TS/TSX, c'est quasi certain qu'il y a du code mort (imports, va
 
 ---
 
-## Priorité 7 — Prix crédits dupliqués
+## ✅ RÉSOLU — Priorité 7 — Prix crédits dupliqués
+
+> **État 26/04/2026 :** table `credit_pricing` créée + RPC `pricing_for` + module admin pour la gestion. Front et SQL lisent depuis la même source de vérité.
+
 
 **Fichiers concernés :**
 - `src/config/monetization.ts` (front)
@@ -120,7 +128,10 @@ Sur 271 fichiers TS/TSX, c'est quasi certain qu'il y a du code mort (imports, va
 
 ---
 
-## Priorité 8 — Hack visitor_name = auth.uid()
+## ✅ RÉSOLU — Priorité 8 — Hack visitor_name = auth.uid()
+
+> **État 26/04/2026 :** table `phone_reveal_events` créée avec RLS dédié, migration de données effectuée, hack `visitor_name=auth.uid()::text` retiré.
+
 
 **Fichier :** `supabase/migrations/20260413194500_phone_reveal_and_views_hardening.sql`
 
@@ -135,7 +146,10 @@ Sur 271 fichiers TS/TSX, c'est quasi certain qu'il y a du code mort (imports, va
 
 ---
 
-## Priorité 9 — Tests RLS manquants
+## 🟡 PARTIEL — Priorité 9 — Tests RLS manquants
+
+> **État 26/04/2026 :** tests sanity sur les migrations (regex sur les fichiers SQL pour repérer les anti-patterns RLS classiques). Tests d'intégration runtime contre un projet Supabase de test = encore à faire.
+
 
 **Problème :** aucun test ne vérifie que les policies RLS font bien leur travail. Un user B pourrait techniquement lire les crédits de A si une policy régresse.
 
@@ -148,7 +162,10 @@ Nécessite un projet Supabase de test dédié (ou docker-compose local).
 
 ---
 
-## Priorité 10 — Monitoring erreurs absent
+## ✅ RÉSOLU — Priorité 10 — Monitoring erreurs absent
+
+> **État 26/04/2026 :** Sentry installé et configuré (cf. `src/lib/monitoring.ts`). Helpers `captureVpiError` / `captureVpiMessage` câblés sur les RPCs critiques.
+
 
 **Problème :** aucun outil de monitoring dans le repo. Un bug silencieux sur `publish_listing_with_credits` = perte de revenus sans alerte.
 
@@ -162,6 +179,13 @@ Nécessite un projet Supabase de test dédié (ou docker-compose local).
 
 ## Notes secondaires (à traiter opportunément)
 
+- 🟡 **EN COURS — Legacy ImmoNex schema migration** : le `listings.type` enum (valeurs `appartement`/`villa`/`maison`/...) a été migré en colonne TEXT le 24/04/2026, ouvrant la voie à des valeurs véhicule natives. Reste à migrer la sémantique détournée des colonnes :
+  - `surface` (réellement = kilométrage en km)
+  - `bathrooms` (réellement = nombre de portes)
+  - `toilets` (réellement = nombre de sièges)
+  - `rooms` (réellement = index de version/finition)
+
+  Chaque colonne nécessite une migration coordonnée + un sweep des fichiers `src/lib/legacyListingVehicleMapping.ts` et `src/lib/legacyListingsDbColumns.ts` + mise à jour de la doc `docs/AUTONEX_LEGACY_SCHEMA.md`. Renommage de `immonex_is_admin()` à prévoir dans le même chantier.
 - `og:image` de la home = cover d'un article de blog → créer une vraie image OG 1200x630
 - Fichiers `public/category-icons/*.svg.svg` : double extension, vérifier si intentionnel
 - Favicon `public/favicon.ico` fait 20K, devrait faire <5K
