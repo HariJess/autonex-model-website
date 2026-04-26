@@ -59,7 +59,7 @@ import { usePublishBootstrap } from "@/hooks/publish/usePublishBootstrap";
 import { usePublishDraftLifecycle } from "@/hooks/publish/usePublishDraftLifecycle";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
 import { parseSupabaseError } from "@/lib/parseSupabaseError";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { publishFormSchema, type PublishFormValues } from "@/pages/publish/publishFormSchema";
 import { PUBLISH_FORM_DEFAULTS } from "@/pages/publish/publishFormDefaults";
@@ -88,6 +88,32 @@ const PublishPage = () => {
     defaultValues: PUBLISH_FORM_DEFAULTS,
     mode: "onBlur",
   });
+
+  /**
+   * Audit fix U6 (2026-04-26) — single subscription to ALL form values.
+   *
+   * useWatch returns a new reference whenever any tracked field changes,
+   * which lets the three bulk-snapshot useMemos below (persistDraftForm,
+   * progressFingerprint, draftAutosaveSignal) depend on `formValues` alone
+   * instead of mirroring 40+ form.watch(...) calls in their deps arrays.
+   *
+   * Adding a new field to publishFormSchema now propagates automatically;
+   * the previous pattern silently dropped new fields from the autosave
+   * snapshot if a dev forgot to update every memo's deps array.
+   *
+   * Body uses form.getValues() (strictly typed PublishFormValues, all
+   * defaults applied) rather than the watched value (DeepPartialSkipArrayKey)
+   * so downstream typing stays strict; watchedValues is in deps purely as
+   * the change-trigger.
+   */
+  const watchedValues = useWatch({ control: form.control });
+  const formValues = useMemo<PublishFormValues>(
+    () => {
+      void watchedValues;
+      return form.getValues();
+    },
+    [watchedValues, form],
+  );
 
   const [step, setStep] = useState(0);
   const [stepErrors, setStepErrors] = useState<string[]>([]);
@@ -148,28 +174,22 @@ const PublishPage = () => {
   // Phase 6.3.b: identity + location fields migrated to RHF.
   const transaction = form.watch("transaction");
   const listingType = form.watch("listingType");
-  const isNewProgram = form.watch("isNewProgram");
-  const internalRef = form.watch("internalRef");
   const ville = form.watch("ville");
   const arrondissement = form.watch("arrondissement");
   const quartier = form.watch("quartier");
-  const quartierLibre = form.watch("quartierLibre");
   const pinLat = form.watch("pinLat");
   const pinLng = form.watch("pinLng");
 
-  // Phase 6.3.b: description + pricing + legacy-specs migrated to RHF.
+  // Granular watches kept only for fields read inline (conditions, effects,
+  // useMemo bodies elsewhere in this file). Audit fix U6 removed the watches
+  // that were declared solely to feed the bulk-snapshot useMemo deps arrays
+  // — those memos now depend on `formValues` (useWatch above).
   const title = form.watch("title");
   const description = form.watch("description");
   const priceMga = form.watch("priceMga");
-  const negotiable = form.watch("negotiable");
   const surface = form.watch("surface");
-  const rooms = form.watch("rooms");
-  const bathrooms = form.watch("bathrooms");
-  const toilets = form.watch("toilets");
-  // Phase 6.3.b: features migrated to RHF.
   const selectedFeatures = form.watch("selectedFeatures");
   const customFeaturesInput = form.watch("customFeaturesInput");
-  // Phase 6.3.b: 19 vehicle attributes migrated to RHF.
   const vehicleMake = form.watch("vehicleMake");
   const vehicleModel = form.watch("vehicleModel");
   const vehicleYear = form.watch("vehicleYear");
@@ -178,25 +198,9 @@ const PublishPage = () => {
   const vehicleDrivetrain = form.watch("vehicleDrivetrain");
   const vehicleCondition = form.watch("vehicleCondition");
   const vehicleSellerType = form.watch("vehicleSellerType");
-  const vehicleRentalMode = form.watch("vehicleRentalMode");
-  const vehicleBodyStyle = form.watch("vehicleBodyStyle");
   const vehicleDoors = form.watch("vehicleDoors");
   const vehicleSeats = form.watch("vehicleSeats");
-  const vehicleExteriorColor = form.watch("vehicleExteriorColor");
   const vehicleEngineDisplacement = form.watch("vehicleEngineDisplacement");
-  const vehicleInteriorColor = form.watch("vehicleInteriorColor");
-  const vehicleAvailabilityStatus = form.watch("vehicleAvailabilityStatus");
-  const vehicleWhatsappPhone = form.watch("vehicleWhatsappPhone");
-  const vehicleIsElectric = form.watch("vehicleIsElectric");
-  const vehicleIsHybrid = form.watch("vehicleIsHybrid");
-
-  // Phase 6.3.b: media fields migrated to RHF.
-  const videoUrl = form.watch("videoUrl");
-  const virtualTourUrl = form.watch("virtualTourUrl");
-
-  // Phase 6.3.b: boosts migrated to RHF (permissive sub-schema in publishFormSchema).
-  const selectedBoosts = form.watch("selectedBoosts");
-  const agencySpotlight = form.watch("agencySpotlight");
   // Phase 6.4.e: 4 purchase useState (creditPackPurchase, purchasePaymentMethod,
   // proofFile, purchaseSubmitting) moved into PublishStepVisibility. publishing
   // stays here because handlePublish (parent) toggles it across the publish flow.
@@ -403,57 +407,32 @@ const PublishPage = () => {
 
   /**
    * Snapshot stabilisé pour la persistance serveur / backup.
-   * Phase 6.3.c: spread of `form.getValues()` collapses the explicit 40-field
-   * mapping to one line; `selectedFeatures` is overridden with the merged
-   * equipment + custom-input + vehicle-meta version (single source of truth
-   * for what hits the DB).
+   * `selectedFeatures` is overridden with the merged equipment + custom-input
+   * + vehicle-meta version (single source of truth for what hits the DB).
+   * Audit fix U6: deps collapsed to formValues + the merged feature list.
    */
   const persistDraftForm = useMemo<PersistDraftFormSnapshot>(
     () => ({
-      ...form.getValues(),
+      ...formValues,
       selectedFeatures: selectedFeaturesWithVehicleMeta,
     }),
-    [
-      transaction, listingType, isNewProgram, internalRef,
-      ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
-      title, description, priceMga, negotiable, surface, rooms, bathrooms, toilets,
-      vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
-      vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
-      vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,
-      vehicleEngineDisplacement, vehicleInteriorColor, vehicleAvailabilityStatus,
-      vehicleWhatsappPhone, vehicleIsElectric, vehicleIsHybrid,
-      videoUrl, virtualTourUrl, selectedBoosts, agencySpotlight,
-      selectedFeaturesWithVehicleMeta, form,
-    ],
+    [formValues, selectedFeaturesWithVehicleMeta],
   );
 
   /**
-   * Phase 6.3.c: change-detection hash computed by `computeProgressFingerprint`
-   * helper (preserves the exact trim/sort normalization). Deps mirror the
-   * fields it reads so the memo recomputes on any meaningful change.
+   * Change-detection hash computed by `computeProgressFingerprint` helper
+   * (preserves the exact trim/sort normalization).
+   * Audit fix U6: deps collapsed to formValues + step + photo counters.
    */
   const progressFingerprint = useMemo(
     () =>
       computeProgressFingerprint(
-        form.getValues(),
+        formValues,
         step,
         serverPhotos.map((p) => p.id),
         pendingPhotos.length,
       ),
-    [
-      step,
-      transaction, listingType, isNewProgram, internalRef,
-      ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
-      title, description, priceMga, negotiable, surface, rooms, bathrooms, toilets,
-      vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
-      vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
-      vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,
-      vehicleEngineDisplacement, vehicleInteriorColor, vehicleAvailabilityStatus,
-      vehicleWhatsappPhone, vehicleIsElectric, vehicleIsHybrid,
-      selectedFeatures, customFeaturesInput,
-      videoUrl, virtualTourUrl, selectedBoosts, agencySpotlight,
-      serverPhotos, pendingPhotos.length, form,
-    ],
+    [formValues, step, serverPhotos, pendingPhotos.length],
   );
 
   const hasMeaningfulDraftProgress = useMemo(() => {
@@ -490,31 +469,17 @@ const PublishPage = () => {
     hasMeaningfulDraftProgress && progressFingerprint !== lastPersistedFingerprintRef.current;
 
   /**
-   * Signal unique pour l'autosave debouncé. Phase 6.3.c: this is now just a
-   * spread of the form values + step + the merged equipment list. The hook
-   * `usePublishDraftLifecycle` only cares that the reference changes when a
-   * persistable field changes — the field-by-field listing was redundant
-   * with `form.watch` subscriptions already in place.
+   * Signal unique pour l'autosave debouncé. The hook `usePublishDraftLifecycle`
+   * only cares that the reference changes when a persistable field changes.
+   * Audit fix U6: deps collapsed to formValues + merged features + step.
    */
   const draftAutosaveSignal = useMemo(
     () => ({
-      ...form.getValues(),
+      ...formValues,
       selectedFeaturesWithVehicleMeta,
       step,
     }),
-    [
-      transaction, listingType, isNewProgram, internalRef,
-      ville, arrondissement, quartier, quartierLibre, pinLat, pinLng,
-      title, description, priceMga, surface, rooms, bathrooms, toilets,
-      vehicleMake, vehicleModel, vehicleYear, vehicleFuel, vehicleTransmission,
-      vehicleDrivetrain, vehicleCondition, vehicleSellerType, vehicleRentalMode,
-      vehicleBodyStyle, vehicleDoors, vehicleSeats, vehicleExteriorColor,
-      vehicleEngineDisplacement, vehicleInteriorColor, vehicleAvailabilityStatus,
-      vehicleWhatsappPhone, vehicleIsElectric, vehicleIsHybrid,
-      selectedFeatures, customFeaturesInput,
-      videoUrl, virtualTourUrl, selectedBoosts, agencySpotlight,
-      selectedFeaturesWithVehicleMeta, step, form,
-    ],
+    [formValues, selectedFeaturesWithVehicleMeta, step],
   );
 
   useEffect(() => {
