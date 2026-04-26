@@ -44,6 +44,30 @@
 // -----------------------------------------------------------------------------
 
 /**
+ * Comparaison à temps constant de deux chaînes de même longueur.
+ *
+ * Audit fix M2 (2026-04-26) — la comparaison `===` JavaScript court-circuit
+ * au premier mismatch ; un attaquant peut donc dériver octet par octet la
+ * signature attendue en mesurant le temps de réponse du webhook public.
+ * Ici on parcourt TOUJOURS les deux chaînes en entier via XOR-OR, le temps
+ * d'exécution ne dépend que de la longueur, pas du contenu.
+ *
+ * Si les longueurs diffèrent on retourne false immédiatement : ça leak
+ * "longueur ≠" mais pas le contenu, et les digests SHA-256 hex font
+ * toujours 64 chars donc la branche n'est jamais empruntée en pratique.
+ *
+ * Pure TypeScript (pas de dépendance Deno std) → testable côté Vitest.
+ */
+export function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+/**
  * Convertit un ArrayBuffer en chaîne HEX UPPERCASE (ex. "AB12EF...").
  * Implémentation locale pour éviter une dépendance à un lib tiers.
  * Résultat : 2 chars par byte → SHA-256 donne 32 bytes → 64 chars.
@@ -110,7 +134,7 @@ export async function verifyVpiSignature(
   // Normalisation casing. trim() au cas où VPI ajouterait un espace parasite.
   const received = signatureHeader.trim().toUpperCase();
 
-  // Chaînes HEX de taille fixe et déterministe → comparaison directe OK.
-  // Pas de crypto.subtle.timingSafeEqual disponible en Deno standard.
-  return received === expected;
+  // Comparaison constant-time pour résister aux timing attacks sur le
+  // webhook public (cf. constantTimeEqual ci-dessus).
+  return constantTimeEqual(received, expected);
 }
