@@ -7,6 +7,10 @@ ALTER TABLE public.partner_ad_campaigns
 COMMENT ON COLUMN public.partner_ad_campaigns.image_url_mobile IS
   'Optional mobile-specific creative. If NULL, image_url is used for all viewports.';
 
+-- Drop the existing function before recreating with new return type.
+-- Required because CREATE OR REPLACE cannot change return type (RETURNS TABLE columns).
+DROP FUNCTION IF EXISTS public.get_active_partner_campaign(TEXT);
+
 -- Update the read RPC to return the new column.
 CREATE OR REPLACE FUNCTION public.get_active_partner_campaign(p_placement_key TEXT)
 RETURNS TABLE (
