@@ -1,7 +1,7 @@
-import {
-  HomeSponsorStripView,
-} from "@/components/monetization/HomeSponsorStrip";
+import { HomeSponsorStripView } from "@/components/monetization/HomeSponsorStrip";
+import { ListingSponsorBlockView } from "@/components/monetization/ListingDetailPlacements";
 import { PremiumBillboardView } from "@/components/monetization/PremiumBillboard";
+import { SearchTopBannerView } from "@/components/monetization/SearchTopBanner";
 import type { PartnerAdPlacementKey, PublicPartnerCampaign } from "@/lib/partnerAds";
 
 const PLACEMENT_RATIOS: Record<
@@ -96,14 +96,9 @@ export function PartnerCampaignPreview({
       case "homeSponsorStrip":
         return <HomeSponsorStripView campaign={mockCampaign} />;
       case "searchTopBanner":
+        return <SearchTopBannerView campaign={mockCampaign} />;
       case "listingSponsor":
-        return (
-          <PreviewPlaceholder
-            placement={placement}
-            variant={variant}
-            message={`Aperçu non disponible pour ce placement (rendu spécifique). Format recommandé : ${label}.`}
-          />
-        );
+        return <ListingSponsorBlockView campaign={mockCampaign} />;
       default:
         return null;
     }
@@ -152,13 +147,13 @@ const PLACEMENT_SPECS: Record<
   },
   searchTopBanner: {
     desktop: "1920×240 px (ratio 8:1)",
-    mobile: "Pas de visuel mobile dédié pour ce placement.",
-    tip: "S’affiche en haut de la page Recherche.",
+    mobile: "1200×480 px (ratio 2.5:1)",
+    tip: "S’affiche en haut de la page Recherche. Visuel mobile dédié recommandé pour préserver le branding latéral.",
   },
   listingSponsor: {
-    desktop: "À définir (placement dans la page fiche annonce)",
-    mobile: "Idem desktop.",
-    tip: "S’affiche dans la sidebar/bas de la page d’une fiche annonce.",
+    desktop: "1920×640 px (ratio 3:1)",
+    mobile: "1200×600 px (ratio 2:1)",
+    tip: "S’affiche dans la page Fiche annonce. Format plus carré que les bandeaux Home.",
   },
 };
 
