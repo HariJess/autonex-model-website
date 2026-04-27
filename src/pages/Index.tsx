@@ -12,6 +12,8 @@ import { ScrollAffordance } from "@/components/ui/ScrollAffordance";
 import { Button } from "@/components/ui/button";
 import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
+import { PremiumBillboard } from "@/components/monetization/PremiumBillboard";
+import { HomeSponsorStrip } from "@/components/monetization/HomeSponsorStrip";
 import BrandsRibbon from "@/components/BrandsRibbon";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
@@ -304,6 +306,8 @@ const Index = () => {
 
       <HeroSearch />
 
+      <PremiumBillboard className="my-6 md:my-8" enabled={MONETIZATION_PLACEMENTS.homeBillboard} />
+
       <section className="py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
@@ -456,6 +460,8 @@ const Index = () => {
         title={t("sections.featured", "À la une")}
         limit={8}
       />
+
+      <HomeSponsorStrip />
 
       {showDealsSection && (
         <section className="container mx-auto pt-6 md:pt-8">
