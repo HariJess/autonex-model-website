@@ -32,13 +32,8 @@ export const LISTING_TYPES_WITHOUT_ROOM_FILTERS: readonly string[] = [
   "bureau",
 ] as const;
 
-/**
- * Valeurs `listing_type` où le flux publication/recherche expose encore les champs DB legacy
- * `bathrooms` (= portes). La portion "TRIM" du nom est désormais cosmétique : Version/Trim a été
- * retiré en B4a (2026-04-26, dead data en prod, rooms_distinct=[0]). Renommage prévu en B4b
- * quand la colonne SQL `rooms` sera dropée et la fonction publishDraft.ts simplifiée.
- */
-export const LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS: readonly string[] = ["appartement", "villa", "maison"];
+/** Valeurs `listing_type` qui exposent les champs portes / sièges dans le formulaire de publication. */
+export const LISTING_TYPES_WITH_DOORS_FIELDS: readonly string[] = ["appartement", "villa", "maison"];
 
 export const LISTING_TYPE_LABELS: Record<string, string> = {
   appartement: "Citadine",
@@ -69,8 +64,6 @@ export const TRANSACTION_LABELS: Record<TransactionType, string> = {
 
 /**
  * Canonical vehicle-native business attributes used by the product.
- * DB legacy mirrors (`surface`, `bathrooms`, `toilets`) remain temporary compatibility fields.
- * @see `legacyListingVehicleMapping.ts` for read/mapping rules.
  */
 export type CanonicalVehicleInfo = {
   make: string | null;
@@ -108,13 +101,6 @@ export interface DisplayListing {
   original_price_mga?: number | null;
   price_eur: number | null;
   negotiable?: boolean;
-  /**
-   * Legacy DB column kept on `DisplayListing` jusqu'au DROP COLUMN final (B4b).
-   * Post-DROP : à supprimer de l'interface entièrement.
-   */
-  surface: number | null;
-  /** Portes (`bathrooms` en base — pas salles de bain). À supprimer post-DROP COLUMN B4b. */
-  bathrooms: number | null;
   ville: string | null;
   region: string | null;
   arrondissement: string | null;
@@ -139,8 +125,6 @@ export interface DisplayListing {
   agency_logo?: string | null;
   agency_verified?: boolean;
   badge?: "boost" | "coup_de_coeur" | "nouveau" | "urgent" | null;
-  /** Places / sièges lorsque reflété par la colonne legacy `toilets`. */
-  toilets?: number | null;
   video_url?: string | null;
   virtual_tour_url?: string | null;
   internal_ref?: string | null;

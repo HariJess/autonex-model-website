@@ -4,18 +4,11 @@ Marketplace automobile Madagascar. Stack : React 18 + Vite + TypeScript + Supaba
 
 ## ⚠️ Contexte historique CRITIQUE
 
-Le schéma DB est hérité d'une ancienne app immobilière (ImmoNex) jamais nettoyée.
-Conséquences que tu dois connaître en permanence :
+Le schéma DB et le `listing_type` enum legacy ImmoNex ont été **nettoyés** par le sprint M-LEGACY-4b (terminé 2026-04-27). Les colonnes legacy `surface` / `rooms` / `bathrooms` / `toilets` ont été DROP, l'enum `listing_type` aussi. La table `public.listings` utilise désormais ses colonnes véhicule natives : `mileage_km`, `doors`, `seats`, `body_style`, etc. Form fields renommés en `mileageKmInput` / `doorsInput` / `seatsInput`.
 
-- `listing_type` enum = valeurs real-estate : `appartement`, `villa`, `maison`, `terrain`, `local_commercial`, `bureau` (PAS de types véhicule natifs)
-- Les colonnes SQL ont une sémantique véhicule détournée :
-  - `surface` → kilométrage (km)
-  - `rooms` → index de version/finition
-  - `bathrooms` → nombre de portes
-  - `toilets` → nombre de sièges
-- Fonction `immonex_is_admin()` toujours utilisée (renommage = migration coordonnée)
-- Fichiers `src/lib/legacyListingVehicleMapping.ts` + `src/lib/legacyListingsDbColumns.ts` gèrent la traduction
-- Documentation officielle : `docs/AUTONEX_LEGACY_SCHEMA.md`
+Le seul identifiant `immonex_*` qui subsiste est la fonction `public.immonex_is_admin()` — utilisée par les RLS policies, son renommage est planifié dans un sprint dédié (M-LEGACY-5) post-launch.
+
+Documentation officielle : `docs/AUTONEX_LEGACY_SCHEMA.md` (section « Migration history (closed) »).
 
 ## Priorités (détails complets dans docs/AUDIT_FINDINGS.md)
 
@@ -75,6 +68,5 @@ For destructive migrations, Claude Code must:
 ## Gotchas connus (pièges à éviter)
 
 - Les règles ESLint `@typescript-eslint/no-unused-vars: off` et `noUnusedLocals: false` sont VOLONTAIREMENT permissives aujourd'hui — les resserrer fait partie de la priorité 5
-- La colonne DB `surface` NE veut PAS dire m² — c'est le kilométrage véhicule (legacy)
 - Les prix crédits sont dupliqués en 3 endroits (src/config/monetization.ts + 2 migrations SQL) — voir priorité 7
 - react-hook-form EST déjà dans les dépendances mais PAS utilisé dans PublishPage — voir priorité 6

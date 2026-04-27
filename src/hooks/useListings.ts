@@ -112,9 +112,7 @@ function mapListingRowToDisplayListing(
 
   const vehicle = deriveVehicleFromLegacy({
     title: listing.title,
-    surface: null,
     mileageKm: listing.mileage_km,
-    bathrooms: null,
     doors: listing.doors,
     make: listing.make,
     model: listing.model,
@@ -147,9 +145,6 @@ function mapListingRowToDisplayListing(
     price_mga: listing.price_mga,
     price_eur: listing.price_eur ? Number(listing.price_eur) : null,
     negotiable: Boolean(listing.negotiable),
-    surface: null,
-    bathrooms: null,
-    toilets: null,
     ville: listing.ville,
     region: listing.region,
     arrondissement: listing.arrondissement,

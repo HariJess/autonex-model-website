@@ -15,7 +15,7 @@ export type PublishValidationInput = {
   title: string;
   description: string;
   priceMga: string;
-  surface: string;
+  mileageKmInput: string;
   vehicleYear: string;
   vehicleDoors: string;
   vehicleSeats: string;
@@ -95,8 +95,8 @@ export function validatePublishStep(
           );
         }
       }
-      if (input.surface && Number(input.surface) < 0) {
-        errors.push(t("publish.surfaceInvalid", "Kilométrage invalide"));
+      if (input.mileageKmInput && Number(input.mileageKmInput) < 0) {
+        errors.push(t("publish.mileageKmInvalid", "Kilométrage invalide"));
       }
       if (input.vehicleYear) {
         const y = Number(input.vehicleYear);

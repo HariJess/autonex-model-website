@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
-import { LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS, type ListingType } from "@/types/listing";
+import { LISTING_TYPES_WITH_DOORS_FIELDS, type ListingType } from "@/types/listing";
 import { getSuggestedListingCoordinates } from "@/data/madagascar-locations";
 import {
   sanitizeListingEquipment,
@@ -46,7 +46,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
 import { buildVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
-import { buildLegacyMirrorPatchFromVehicleInputs } from "@/pages/publish/publishVehicleLegacyMirror";
 import type { PublishValidationInput } from "@/pages/publish/publishValidation";
 import { buildPublishLocalBackupPayload } from "@/pages/publish/publishBackupPayload";
 import {
@@ -187,7 +186,7 @@ const PublishPage = () => {
   const title = form.watch("title");
   const description = form.watch("description");
   const priceMga = form.watch("priceMga");
-  const surface = form.watch("surface");
+  const mileageKmInput = form.watch("mileageKmInput");
   const selectedFeatures = form.watch("selectedFeatures");
   const customFeaturesInput = form.watch("customFeaturesInput");
   const vehicleMake = form.watch("vehicleMake");
@@ -236,7 +235,7 @@ const PublishPage = () => {
       title,
       description,
       priceMga,
-      surface,
+      mileageKmInput,
       vehicleYear,
       vehicleDoors,
       vehicleSeats,
@@ -254,7 +253,7 @@ const PublishPage = () => {
       title,
       description,
       priceMga,
-      surface,
+      mileageKmInput,
       vehicleYear,
       vehicleDoors,
       vehicleSeats,
@@ -267,16 +266,6 @@ const PublishPage = () => {
   );
 
   const { validateStep, getFirstInvalidStep } = usePublishStepValidation(publishValidationInput, t);
-
-  const applyVehicleLegacyMirrorFromInputs = useCallback(
-    (nextVehicle: { mileageKmInput?: string; doorsInput?: string; seatsInput?: string }) => {
-      const mirrored = buildLegacyMirrorPatchFromVehicleInputs(nextVehicle);
-      if (mirrored.surface != null) form.setValue("surface", mirrored.surface);
-      if (mirrored.bathrooms != null) form.setValue("bathrooms", mirrored.bathrooms);
-      if (mirrored.toilets != null) form.setValue("toilets", mirrored.toilets);
-    },
-    [form],
-  );
 
   // Phase 6.4.c: showRooms moved into PublishDetailsSection (computed locally from watch("listingType")).
   // Phase 6.4.e: manualPaymentMethods moved into PublishStepVisibility.
@@ -636,9 +625,9 @@ const PublishPage = () => {
   });
 
   useEffect(() => {
-    if (listingType && !LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(listingType as ListingType)) {
-      form.setValue("bathrooms", "");
-      form.setValue("toilets", "");
+    if (listingType && !LISTING_TYPES_WITH_DOORS_FIELDS.includes(listingType as ListingType)) {
+      form.setValue("doorsInput", "");
+      form.setValue("seatsInput", "");
     }
   }, [listingType, form]);
 
@@ -662,7 +651,7 @@ const PublishPage = () => {
           "title",
           "description",
           "priceMga",
-          "surface",
+          "mileageKmInput",
           "vehicleMake",
           "vehicleModel",
           "vehicleYear",
@@ -1081,13 +1070,12 @@ const PublishPage = () => {
             labels={{
               listingTitle: t("publish.listingTitle", "Titre"),
               descriptionFr: t("publish.descriptionFr", "Description (français)"),
-              listingSurface: t("listing.surface", "Kilométrage"),
-              listingBathrooms: t("listing.bathrooms", "Portes"),
-              toilets: t("publish.toilets", "Places / capacité (optionnel)"),
+              mileageKmLabel: t("listing.mileageKm", "Kilométrage"),
+              doorsLabel: t("publish.doors", "Portes"),
+              seatsLabel: t("publish.seats", "Places / capacité (optionnel)"),
               listingFeatures: t("listing.features", "Équipements"),
               priceDealHint: priceDealHelperText,
             }}
-            onApplyVehicleLegacyMirror={applyVehicleLegacyMirrorFromInputs}
           />
         )}
 

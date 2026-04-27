@@ -94,23 +94,12 @@ type PublishDetailsSectionProps = {
   labels: {
     listingTitle: string;
     descriptionFr: string;
-    listingSurface: string;
-    listingBathrooms: string;
-    toilets: string;
+    mileageKmLabel: string;
+    doorsLabel: string;
+    seatsLabel: string;
     listingFeatures: string;
     priceDealHint?: string;
   };
-  /**
-   * Legacy mirror callback (parent-owned). When the user edits km / doors /
-   * seats, the parent updates the legacy DB columns surface / bathrooms /
-   * toilets. The function lives in PublishPage so the legacy mapping logic
-   * stays in a single place (see docs/AUTONEX_LEGACY_SCHEMA.md).
-   */
-  onApplyVehicleLegacyMirror: (inputs: {
-    mileageKmInput?: string;
-    doorsInput?: string;
-    seatsInput?: string;
-  }) => void;
 };
 
 /**
@@ -118,20 +107,19 @@ type PublishDetailsSectionProps = {
  * equipment selection.
  *
  * Phase 6.4.c: form-aware via useFormContext. Reads/writes 27 form fields
- * directly through the parent FormProvider; only `labels` and the legacy
- * mirror callback are passed as props.
+ * directly through the parent FormProvider; only `labels` are passed as props.
  *
  * The two `useState` (showAdvancedDetails, showAllEquipment) are local UI
  * state (collapse panes), unrelated to the form schema.
  */
-export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: PublishDetailsSectionProps) {
+export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
   const { t } = useTranslation();
   const { profile } = useAuth();
   const form = useFormContext<PublishFormValues>();
   const title = form.watch("title");
   const description = form.watch("description");
   const priceMga = form.watch("priceMga");
-  const surface = form.watch("surface");
+  const mileageKmInput = form.watch("mileageKmInput");
   const make = form.watch("vehicleMake");
   const model = form.watch("vehicleModel");
   const year = form.watch("vehicleYear");
@@ -457,10 +445,10 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
             </label>
           </div>
           <div className="space-y-2">
-            <Label className="font-sans">{labels.listingSurface} (km)</Label>
+            <Label className="font-sans">{labels.mileageKmLabel} (km)</Label>
             <NumberInput
-              value={surface}
-              onChange={(raw) => onApplyVehicleLegacyMirror({ mileageKmInput: raw })}
+              value={mileageKmInput}
+              onChange={(raw) => form.setValue("mileageKmInput", raw)}
               className="font-sans"
             />
           </div>
@@ -755,27 +743,27 @@ export function PublishDetailsSection({ labels, onApplyVehicleLegacyMirror }: Pu
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
           <div className="space-y-2">
-            <Label className="font-sans">Portes</Label>
+            <Label className="font-sans">{labels.doorsLabel}</Label>
             <Input
               type="number"
               min={0}
               value={doors}
               onChange={(e) => {
                 form.setValue("vehicleDoors", e.target.value);
-                onApplyVehicleLegacyMirror({ doorsInput: e.target.value });
+                form.setValue("doorsInput", e.target.value);
               }}
               className="font-sans"
             />
           </div>
           <div className="space-y-2">
-            <Label className="font-sans">Places</Label>
+            <Label className="font-sans">{labels.seatsLabel}</Label>
             <Input
               type="number"
               min={0}
               value={seats}
               onChange={(e) => {
                 form.setValue("vehicleSeats", e.target.value);
-                onApplyVehicleLegacyMirror({ seatsInput: e.target.value });
+                form.setValue("seatsInput", e.target.value);
               }}
               className="font-sans"
             />

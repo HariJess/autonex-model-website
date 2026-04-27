@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       admin_audit_log: {
@@ -366,6 +391,56 @@ export type Database = {
           },
         ]
       }
+      email_log: {
+        Row: {
+          created_at: string
+          email_to: string
+          error_message: string | null
+          id: string
+          notification_id: string | null
+          resend_message_id: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["email_log_status"]
+          subject: string
+          template: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_to: string
+          error_message?: string | null
+          id?: string
+          notification_id?: string | null
+          resend_message_id?: string | null
+          sent_at?: string | null
+          status: Database["public"]["Enums"]["email_log_status"]
+          subject: string
+          template: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_to?: string
+          error_message?: string | null
+          id?: string
+          notification_id?: string | null
+          resend_message_id?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["email_log_status"]
+          subject?: string
+          template?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_log_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string | null
@@ -578,7 +653,6 @@ export type Database = {
         Row: {
           arrondissement: string | null
           availability_status: string | null
-          bathrooms: number | null
           body_style: string | null
           created_at: string | null
           description: string | null
@@ -613,14 +687,11 @@ export type Database = {
           region: string | null
           rejection_reason: string | null
           rental_mode: string | null
-          rooms: number | null
           search_vector: unknown
           seats: number | null
           seller_type: string | null
           status: Database["public"]["Enums"]["listing_status"] | null
-          surface: number | null
           title: string
-          toilets: number | null
           transaction: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox: string | null
           type: string | null
@@ -636,7 +707,6 @@ export type Database = {
         Insert: {
           arrondissement?: string | null
           availability_status?: string | null
-          bathrooms?: number | null
           body_style?: string | null
           created_at?: string | null
           description?: string | null
@@ -671,14 +741,11 @@ export type Database = {
           region?: string | null
           rejection_reason?: string | null
           rental_mode?: string | null
-          rooms?: number | null
           search_vector?: unknown
           seats?: number | null
           seller_type?: string | null
           status?: Database["public"]["Enums"]["listing_status"] | null
-          surface?: number | null
           title: string
-          toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
           type?: string | null
@@ -694,7 +761,6 @@ export type Database = {
         Update: {
           arrondissement?: string | null
           availability_status?: string | null
-          bathrooms?: number | null
           body_style?: string | null
           created_at?: string | null
           description?: string | null
@@ -729,14 +795,11 @@ export type Database = {
           region?: string | null
           rejection_reason?: string | null
           rental_mode?: string | null
-          rooms?: number | null
           search_vector?: unknown
           seats?: number | null
           seller_type?: string | null
           status?: Database["public"]["Enums"]["listing_status"] | null
-          surface?: number | null
           title?: string
-          toilets?: number | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
           type?: string | null
@@ -2205,40 +2268,28 @@ export type Database = {
           doors_effective: number | null
           doors_native: number | null
           id: string | null
-          legacy_bathrooms_doors: number | null
-          legacy_surface_km: number | null
-          legacy_toilets_seats: number | null
           mileage_km_effective: number | null
           mileage_km_native: number | null
           seats_effective: number | null
           seats_native: number | null
-          trim_version_index: number | null
         }
         Insert: {
-          doors_effective?: never
+          doors_effective?: number | null
           doors_native?: number | null
           id?: string | null
-          legacy_bathrooms_doors?: number | null
-          legacy_surface_km?: number | null
-          legacy_toilets_seats?: number | null
-          mileage_km_effective?: never
+          mileage_km_effective?: number | null
           mileage_km_native?: number | null
-          seats_effective?: never
+          seats_effective?: number | null
           seats_native?: number | null
-          trim_version_index?: number | null
         }
         Update: {
-          doors_effective?: never
+          doors_effective?: number | null
           doors_native?: number | null
           id?: string | null
-          legacy_bathrooms_doors?: number | null
-          legacy_surface_km?: number | null
-          legacy_toilets_seats?: number | null
-          mileage_km_effective?: never
+          mileage_km_effective?: number | null
           mileage_km_native?: number | null
-          seats_effective?: never
+          seats_effective?: number | null
           seats_native?: number | null
-          trim_version_index?: number | null
         }
         Relationships: []
       }
@@ -2619,6 +2670,10 @@ export type Database = {
         }[]
       }
       get_unread_notifications_count: { Args: never; Returns: number }
+      get_user_email_sent_today_count: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       immonex_is_admin: { Args: never; Returns: boolean }
       increment_views: { Args: { listing_uuid: string }; Returns: undefined }
       increment_views_public: {
@@ -2656,7 +2711,6 @@ export type Database = {
           lst_active_boost_types: string[]
           lst_arrondissement: string
           lst_availability_status: string
-          lst_bathrooms: number
           lst_body_style: string
           lst_created_at: string
           lst_description: string
@@ -2689,16 +2743,13 @@ export type Database = {
           lst_region: string
           lst_rejection_reason: string
           lst_rental_mode: string
-          lst_rooms: number
           lst_seats: number
           lst_seller_type: string
           lst_status: Database["public"]["Enums"]["listing_status"]
-          lst_surface: number
           lst_title: string
-          lst_toilets: number
           lst_transaction: Database["public"]["Enums"]["transaction_type"]
           lst_transmission_gearbox: string
-          lst_type: Database["public"]["Enums"]["listing_type"]
+          lst_type: string
           lst_vehicle_condition: string
           lst_video_url: string
           lst_views_count: number
@@ -2707,6 +2758,25 @@ export type Database = {
           lst_whatsapp_phone: string
           lst_year: number
           owner_full_name: string
+        }[]
+      }
+      list_notification_emails_ready: {
+        Args: { p_limit?: number; p_mode: string }
+        Returns: {
+          action_url: string
+          body: string
+          category: Database["public"]["Enums"]["notification_category"]
+          created_at: string
+          email_to: string
+          icon: string
+          metadata: Json
+          notification_id: string
+          priority: Database["public"]["Enums"]["notification_priority"]
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_emails_sent_today: number
+          user_id: string
+          user_max_emails_per_day: number
         }[]
       }
       listing_has_whatsapp_contact: {
@@ -2736,6 +2806,30 @@ export type Database = {
         Returns: string
       }
       mark_all_notifications_read: { Args: never; Returns: number }
+      mark_notification_email_failed: {
+        Args: {
+          p_email_to: string
+          p_error_message: string
+          p_notification_id: string
+          p_subject: string
+          p_template: string
+        }
+        Returns: string
+      }
+      mark_notification_email_sent: {
+        Args: {
+          p_email_to: string
+          p_notification_id: string
+          p_resend_message_id: string
+          p_subject: string
+          p_template: string
+        }
+        Returns: string
+      }
+      mark_notification_email_skipped_quota: {
+        Args: { p_email_to: string; p_notification_id: string }
+        Returns: string
+      }
       mark_notification_read: {
         Args: { p_notification_id: string }
         Returns: undefined
@@ -2886,6 +2980,7 @@ export type Database = {
         | "urgent"
         | "daily_bump"
         | "agency_spotlight"
+      email_log_status: "sent" | "failed" | "skipped_quota"
       lead_type: "contact_form" | "phone_reveal" | "whatsapp"
       listing_status:
         | "draft"
@@ -2898,13 +2993,6 @@ export type Database = {
         | "pending_payment_verification"
         | "archived"
         | "hidden_pending_review"
-      listing_type:
-        | "appartement"
-        | "villa"
-        | "maison"
-        | "terrain"
-        | "local_commercial"
-        | "bureau"
       notification_category:
         | "listings"
         | "payments"
@@ -3066,6 +3154,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       agency_status: ["pending_review", "approved", "rejected", "suspended"],
@@ -3077,6 +3168,7 @@ export const Constants = {
         "daily_bump",
         "agency_spotlight",
       ],
+      email_log_status: ["sent", "failed", "skipped_quota"],
       lead_type: ["contact_form", "phone_reveal", "whatsapp"],
       listing_status: [
         "draft",
@@ -3089,14 +3181,6 @@ export const Constants = {
         "pending_payment_verification",
         "archived",
         "hidden_pending_review",
-      ],
-      listing_type: [
-        "appartement",
-        "villa",
-        "maison",
-        "terrain",
-        "local_commercial",
-        "bureau",
       ],
       notification_category: [
         "listings",

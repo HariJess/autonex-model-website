@@ -121,31 +121,13 @@ export const vehicleDescriptionSubSchema = z.object({
 });
 export type VehicleDescriptionValues = z.infer<typeof vehicleDescriptionSubSchema>;
 
-/**
- * LEGACY ImmoNex specs columns — names kept for SQL alignment.
- * Vehicle-side semantics:
- *   - `surface`     → kilométrage (km)
- *   - `bathrooms`   → nombre de portes
- *   - `toilets`     → nombre de sièges / places
- *
- * Note (B4a, 2026-04-26): the `rooms` field has been removed from the form
- * schema since the Version/Trim concept was dead in prod (rooms_distinct=[0]
- * in mini-B3 audit). The DB column `listings.rooms` remains until B4b drops
- * it. The publishDraft.ts tee continues to write `null` to the column for
- * new listings.
- *
- * See docs/AUTONEX_LEGACY_SCHEMA.md and src/lib/legacyListingsDbColumns.ts
- * for the full mapping. Renaming requires a coordinated DB migration.
- */
-export const vehicleSpecsLegacySubSchema = z.object({
-  /** Kilométrage véhicule (km). Legacy column name `surface`. */
-  surface: z.string(),
-  /** Nombre de portes. Legacy column name `bathrooms`. */
-  bathrooms: z.string(),
-  /** Nombre de sièges / places. Legacy column name `toilets`. */
-  toilets: z.string(),
+/** Vehicle specs string inputs (km / doors / seats). Coercion to numbers happens at persist time. */
+export const vehicleSpecsSubSchema = z.object({
+  mileageKmInput: z.string(),
+  doorsInput: z.string(),
+  seatsInput: z.string(),
 });
-export type VehicleSpecsLegacyValues = z.infer<typeof vehicleSpecsLegacySubSchema>;
+export type VehicleSpecsValues = z.infer<typeof vehicleSpecsSubSchema>;
 
 /** Vehicle-native attributes (make/model/year/...). All string-typed at form level
  *  (UI inputs produce strings); coercion happens at persist time. */
@@ -221,7 +203,7 @@ export type BoostsFormValues = z.infer<typeof boostsSubSchema>;
 export const publishFormSchema = vehicleIdentitySubSchema
   .merge(vehicleLocationSubSchema)
   .merge(vehicleDescriptionSubSchema)
-  .merge(vehicleSpecsLegacySubSchema)
+  .merge(vehicleSpecsSubSchema)
   .merge(vehicleAttrsSubSchema)
   .merge(vehicleFeaturesSubSchema)
   .merge(mediaSubSchema)

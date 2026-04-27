@@ -249,7 +249,7 @@ const SearchPage = () => {
       });
     }
     filters.doorCounts.forEach((b) =>
-      chips.push({ label: `${b}${b === 4 ? "+" : ""} ${t("listing.bathrooms", "Portes")}`, key: `bath-${b}` })
+      chips.push({ label: `${b}${b === 4 ? "+" : ""} ${t("listing.doors", "Portes")}`, key: `bath-${b}` })
     );
     filters.equipments.forEach((e) => chips.push({ label: e, key: `eq-${e}` }));
     filters.fuels.forEach((f) => chips.push({ label: f, key: `fuel-${f}` }));

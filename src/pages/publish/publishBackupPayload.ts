@@ -21,9 +21,9 @@ export function buildPublishLocalBackupPayload(params: {
   description: string;
   priceMga: string;
   negotiable: boolean;
-  surface: string;
-  bathrooms: string;
-  toilets: string;
+  mileageKmInput: string;
+  doorsInput: string;
+  seatsInput: string;
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
@@ -66,9 +66,9 @@ export function buildPublishLocalBackupPayload(params: {
     description,
     priceMga,
     negotiable,
-    surface,
-    bathrooms,
-    toilets,
+    mileageKmInput,
+    doorsInput,
+    seatsInput,
     vehicleMake,
     vehicleModel,
     vehicleYear,
@@ -112,9 +112,9 @@ export function buildPublishLocalBackupPayload(params: {
     description,
     priceMga,
     negotiable,
-    surface,
-    bathrooms,
-    toilets,
+    mileageKmInput,
+    doorsInput,
+    seatsInput,
     vehicleMake,
     vehicleModel,
     vehicleYear,

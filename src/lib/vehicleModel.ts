@@ -38,9 +38,7 @@ function pickFromFeatures(features: string[], candidates: readonly string[]): st
 
 export function deriveVehicleFromLegacy(input: {
   title: string;
-  surface: number | null | undefined;
   mileageKm?: number | null | undefined;
-  bathrooms: number | null | undefined;
   doors?: number | null | undefined;
   make?: string | null | undefined;
   model?: string | null | undefined;
@@ -66,18 +64,8 @@ export function deriveVehicleFromLegacy(input: {
   const features = Array.isArray(input.features) ? input.features : [];
   const tagged = parseVehicleMetaTags(features);
   const parsed = parseMakeModelYear(input.title);
-  const mileageKm =
-    input.mileageKm != null && input.mileageKm > 0
-      ? input.mileageKm
-      : input.surface != null && input.surface > 0
-        ? input.surface
-        : null;
-  const doors =
-    input.doors != null && input.doors > 0
-      ? input.doors
-      : input.bathrooms != null && input.bathrooms > 0
-        ? input.bathrooms
-        : null;
+  const mileageKm = input.mileageKm != null && input.mileageKm > 0 ? input.mileageKm : null;
+  const doors = input.doors != null && input.doors > 0 ? input.doors : null;
   const fuel =
     input.fuel ??
     tagged.fuel ??

@@ -1,13 +1,6 @@
-import {
-  doorsCanonicalFromDisplayListing,
-  mileageKmCanonicalFromDisplayListing,
-  seatsCanonicalFromDisplayListing,
-} from "@/lib/legacyListingVehicleMapping";
 import type { CanonicalVehicleInfo, DisplayListing } from "@/types/listing";
 
 export type CanonicalVehicleAttributes = CanonicalVehicleInfo & {
-  /** Legacy trim/version mirror (historical schema used `rooms` as string holder). */
-  trimOrVersion: string | null;
   city: string | null;
   locality: string | null;
 };
@@ -28,15 +21,14 @@ export function getCanonicalVehicleAttributes(listing: DisplayListing): Canonica
   return {
     make: textOrNull(v?.make),
     model: textOrNull(v?.model),
-    trimOrVersion: null,
     year: nonNegativeNumberOrNull(v?.year),
-    mileageKm: mileageKmCanonicalFromDisplayListing(listing),
+    mileageKm: nonNegativeNumberOrNull(v?.mileageKm),
     fuel: textOrNull(v?.fuel),
     transmission: textOrNull(v?.transmission),
     bodyStyle: textOrNull(v?.bodyStyle),
     drivetrain: textOrNull(v?.drivetrain),
-    doors: doorsCanonicalFromDisplayListing(listing),
-    seats: seatsCanonicalFromDisplayListing(listing),
+    doors: nonNegativeNumberOrNull(v?.doors),
+    seats: nonNegativeNumberOrNull(v?.seats),
     engineDisplacementL: nonNegativeNumberOrNull(v?.engineDisplacementL),
     exteriorColor: textOrNull(v?.exteriorColor),
     interiorColor: textOrNull(v?.interiorColor),
@@ -50,4 +42,3 @@ export function getCanonicalVehicleAttributes(listing: DisplayListing): Canonica
     locality: textOrNull(listing.quartier ?? listing.quartier_libre ?? null),
   };
 }
-

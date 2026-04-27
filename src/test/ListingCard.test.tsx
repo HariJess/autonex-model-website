@@ -45,9 +45,6 @@ function makeListing(overrides: Partial<DisplayListing> = {}): DisplayListing {
     transaction: "vente",
     price_mga: 120_000_000,
     price_eur: null,
-    surface: 180,
-    bathrooms: 2,
-    toilets: null,
     ville: "Antananarivo",
     region: "Analamanga",
     arrondissement: null,
@@ -79,7 +76,31 @@ describe("ListingCard", () => {
   });
 
   it("affiche le kilométrage quand défini", () => {
-    renderCard(makeListing({ surface: 200 }));
+    renderCard(
+      makeListing({
+        vehicle: {
+          make: null,
+          model: null,
+          year: null,
+          mileageKm: 200,
+          fuel: null,
+          transmission: null,
+          drivetrain: null,
+          doors: null,
+          bodyStyle: null,
+          rentalMode: null,
+          seats: null,
+          exteriorColor: null,
+          engineDisplacementL: null,
+          interiorColor: null,
+          availabilityStatus: null,
+          isElectric: false,
+          isHybrid: false,
+          condition: null,
+          sellerType: null,
+        },
+      }),
+    );
     expect(screen.getByText(/200 km/)).toBeInTheDocument();
   });
 

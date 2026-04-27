@@ -33,10 +33,10 @@ export const PUBLISH_FORM_DEFAULTS: PublishFormValues = {
   priceMga: "",
   negotiable: false,
 
-  // Legacy specs (vehicle semantics — see publishFormSchema.ts JSDoc)
-  surface: "",
-  bathrooms: "",
-  toilets: "",
+  // Vehicle specs (km / portes / sièges)
+  mileageKmInput: "",
+  doorsInput: "",
+  seatsInput: "",
 
   // Vehicle attributes
   vehicleMake: "",

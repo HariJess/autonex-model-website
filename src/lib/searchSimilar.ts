@@ -1,6 +1,6 @@
 /**
- * Score « biens similaires » — utilise encore `listing.bathrooms` pour la lecture ligne
- * (colonne legacy), alors que les filtres sont `SearchFilters` canoniques.
+ * Score « biens similaires » — lit le nombre de portes depuis le JSON véhicule canonique,
+ * alors que les filtres sont `SearchFilters` canoniques.
  */
 import type { DisplayListing } from "@/types/listing";
 import type { SearchFilters } from "@/types/search";
@@ -20,7 +20,7 @@ export function arrondissementForQuartier(villeName: string, quartierName: strin
   return null;
 }
 
-/** Similarité « relax » : portes (colonne DB `bathrooms` / `doors`). */
+/** Similarité « relax » : portes véhicule. */
 function relaxedDoorCountMatch(listingDoors: number | null, filterDoorCounts: number[]): boolean {
   if (filterDoorCounts.length === 0) return true;
   const b = listingDoors ?? -1;
@@ -58,6 +58,10 @@ function mileageKmTolerancePenalty(mileageKm: number | null, minKm: number, maxK
 
 function resolveVehicleMileageKm(listing: DisplayListing): number | null {
   return getCanonicalVehicleAttributes(listing).mileageKm;
+}
+
+function resolveVehicleDoors(listing: DisplayListing): number | null {
+  return getCanonicalVehicleAttributes(listing).doors;
 }
 
 /**
@@ -134,7 +138,7 @@ export function similarListingScore(
   score -= priceTolerance(price, filters.priceMin, filters.priceMax);
   score -= mileageKmTolerancePenalty(resolveVehicleMileageKm(listing), filters.mileageMinKm, filters.mileageMaxKm);
 
-  if (!relaxedDoorCountMatch(listing.bathrooms, filters.doorCounts)) score -= 20;
+  if (!relaxedDoorCountMatch(resolveVehicleDoors(listing), filters.doorCounts)) score -= 20;
 
   const created = listing.created_at ? new Date(listing.created_at).getTime() : 0;
   score += Math.min(created / 1e12, 15);

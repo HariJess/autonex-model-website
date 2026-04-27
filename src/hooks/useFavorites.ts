@@ -30,9 +30,7 @@ function mapFavoriteRowToDisplayListing(row: FavoriteListRow): DisplayListing {
 
   const vehicle = deriveVehicleFromLegacy({
     title: row.lst_title,
-    surface: null,
     mileageKm: row.lst_mileage_km,
-    bathrooms: null,
     doors: row.lst_doors,
     make: row.lst_make,
     model: row.lst_model,
@@ -67,9 +65,6 @@ function mapFavoriteRowToDisplayListing(row: FavoriteListRow): DisplayListing {
     price_mga: row.lst_price_mga,
     price_eur: row.lst_price_eur != null ? Number(row.lst_price_eur) : null,
     negotiable: Boolean(row.lst_negotiable),
-    surface: null,
-    bathrooms: null,
-    toilets: null,
     ville: row.lst_ville,
     region: row.lst_region,
     arrondissement: row.lst_arrondissement,

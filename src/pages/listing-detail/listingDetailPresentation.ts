@@ -32,14 +32,14 @@ export function buildVehicleSpecRows(
     { label: t("search.brand", "Marque"), value: cleanSpec(canonicalVehicle.make) },
     { label: t("search.model", "Modèle"), value: cleanSpec(canonicalVehicle.model) },
     { label: t("search.year", "Année"), value: cleanSpec(canonicalVehicle.year) },
-    { label: t("search.surface", "Kilométrage"), value: cleanSpec(mileageLabel) },
+    { label: t("search.mileageKm", "Kilométrage"), value: cleanSpec(mileageLabel) },
     { label: t("search.fuel", "Carburant"), value: cleanSpec(canonicalVehicle.fuel) },
     {
       label: t("search.transmission", "Boîte de vitesse"),
       value: cleanSpec(canonicalVehicle.transmission),
     },
     { label: t("listing.drivetrain", "Motricité"), value: cleanSpec(canonicalVehicle.drivetrain) },
-    { label: t("listing.bathrooms", "Portes"), value: cleanSpec(doorsLabel) },
+    { label: t("listing.doors", "Portes"), value: cleanSpec(doorsLabel) },
     {
       label: t("listing.seats", "Places"),
       value:

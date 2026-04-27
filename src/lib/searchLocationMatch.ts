@@ -1,13 +1,7 @@
 /**
  * Correspondances **strictes** pour le raffinage client (après fetch SQL).
- *
- * **Canonique véhicule** : les filtres utilisateur viennent de `SearchFilters` (mileage km, indices finition, portes).
- *
- * **Legacy DB** : les annonces exposent encore `DisplayListing.surface` (= km),
- * `bathrooms` (= portes). Ces helpers comparent des **nombres**, pas les colonnes SQL ; les noms de paramètres
- * le signalent quand la valeur provient d’une colonne historique.
- *
- * @see `docs/AUTONEX_LEGACY_SCHEMA.md`
+ * Les filtres utilisateur viennent de `SearchFilters` (mileage km, portes). Les helpers
+ * comparent des **nombres** : les valeurs proviennent du JSON véhicule canonique côté annonce.
  */
 import type { DisplayListing } from "@/types/listing";
 import type { SearchFilters } from "@/types/search";
@@ -38,7 +32,7 @@ export function matchesLocationSubareas(l: DisplayListing, f: SearchFilters): bo
 
 /**
  * Nombre de portes : même logique que les puces (dont « 4+ »).
- * `listingDoorCount` lit typiquement `listing.bathrooms` ou `vehicle.doors` selon le contexte appelant.
+ * `listingDoorCount` provient typiquement de `vehicle.doors` (résolu via canonicalVehicleAttributes).
  */
 export function matchesDoorCountFilterStrict(
   listingDoorCount: number | null,
@@ -62,9 +56,7 @@ export function matchesPriceMinStrict(priceMga: number, priceMin: number): boole
   return priceMga >= priceMin;
 }
 
-/**
- * Kilométrage max : `listingMileageKm` est en pratique `listing.surface` ou JSON véhicule résolu en amont.
- */
+/** Kilométrage max : `listingMileageKm` provient du JSON véhicule canonique. */
 export function matchesMileageKmMaxStrict(listingMileageKm: number | null, maxKm: number): boolean {
   if (!maxKm || maxKm <= 0) return true;
   if (listingMileageKm == null || listingMileageKm <= 0) return true;

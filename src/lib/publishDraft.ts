@@ -6,10 +6,6 @@ import type { PurchasableBoostType } from "@/config/monetization";
 import { isValidListingCoordinates } from "@/lib/mapCoordinates";
 import { stripVehicleMetaTags } from "@/lib/vehicleMetaTags";
 import { normalizeEngineDisplacementInput } from "@/lib/vehicleAttributes";
-import {
-  mileageKmFormStringFromListingRow,
-  parseMileageKmFromPublishSurfaceField,
-} from "@/lib/legacyListingVehicleMapping";
 import { getDraft, removeDraft, setDraft } from "@/lib/draftStorage";
 
 export const PUBLISH_DRAFT_TITLE_PLACEHOLDER = "Brouillon — AutoNex";
@@ -62,13 +58,9 @@ export type LocalPublishBackupV1 = {
   description: string;
   priceMga: string;
   negotiable: boolean;
-  surface: string;
-  /** Legacy ImmoNex column — Version/Trim concept removed in B4a. Kept optional
-   *  for backwards-compat with old localStorage drafts. Phase B4b will drop both
-   *  the form key and the `listings.rooms` SQL column in one pass. */
-  rooms?: string;
-  bathrooms: string;
-  toilets: string;
+  mileageKmInput: string;
+  doorsInput: string;
+  seatsInput: string;
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
@@ -293,13 +285,9 @@ export function formToListingUpdate(input: {
   description: string;
   priceMga: string;
   negotiable: boolean;
-  surface: string;
-  /** Legacy ImmoNex column — Version/Trim concept removed in B4a. Kept optional
-   *  for backwards-compat with old localStorage drafts. Phase B4b will drop both
-   *  the form key and the `listings.rooms` SQL column in one pass. */
-  rooms?: string;
-  bathrooms: string;
-  toilets: string;
+  mileageKmInput: string;
+  doorsInput: string;
+  seatsInput: string;
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
@@ -376,11 +364,11 @@ export function formToListingUpdate(input: {
   const titleOut =
     titleTrim.length > 0 ? titleTrim.slice(0, 120) : PUBLISH_DRAFT_TITLE_PLACEHOLDER;
   const currentYear = new Date().getFullYear() + 1;
-  const mileageKm = parseMileageKmFromPublishSurfaceField(input.surface, normalizeInt);
-  const doorsLegacy = normalizeInt(input.bathrooms, 0);
-  const seats = normalizeInt(input.toilets, 0);
+  const mileageKm = normalizeInt(input.mileageKmInput, 0);
+  const doorsFromLegacyInput = normalizeInt(input.doorsInput, 0);
+  const seats = normalizeInt(input.seatsInput, 0);
   const year = normalizeInt(input.vehicleYear, 1950, currentYear);
-  const doors = normalizeInt(input.vehicleDoors, 0, 8) ?? doorsLegacy;
+  const doors = normalizeInt(input.vehicleDoors, 0, 8) ?? doorsFromLegacyInput;
   const make = normalizeText(input.vehicleMake, 80);
   const model = normalizeText(input.vehicleModel, 100);
   const fuel =
@@ -534,13 +522,9 @@ export function listingRowToFormState(row: Tables<"listings">): {
   description: string;
   priceMga: string;
   negotiable: boolean;
-  surface: string;
-  /** Legacy ImmoNex column — Version/Trim concept removed in B4a. Kept optional
-   *  for backwards-compat with old localStorage drafts. Phase B4b will drop both
-   *  the form key and the `listings.rooms` SQL column in one pass. */
-  rooms?: string;
-  bathrooms: string;
-  toilets: string;
+  mileageKmInput: string;
+  doorsInput: string;
+  seatsInput: string;
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
@@ -609,10 +593,9 @@ export function listingRowToFormState(row: Tables<"listings">): {
     description: row.description ?? "",
     priceMga: row.price_mga != null ? String(row.price_mga) : "",
     negotiable: Boolean(row.negotiable),
-    surface: mileageKmFormStringFromListingRow(row),
-    rooms: row.rooms != null ? String(row.rooms) : "",
-    bathrooms: row.bathrooms != null ? String(row.bathrooms) : "",
-    toilets: row.toilets != null ? String(row.toilets) : "",
+    mileageKmInput: row.mileage_km != null ? String(row.mileage_km) : "",
+    doorsInput: row.doors != null ? String(row.doors) : "",
+    seatsInput: row.seats != null ? String(row.seats) : "",
     vehicleMake: row.make ?? "",
     vehicleModel: row.model ?? "",
     vehicleYear: row.year != null ? String(row.year) : "",
@@ -694,13 +677,9 @@ export type PublishFormFieldsForSnapshot = {
   description: string;
   priceMga: string;
   negotiable: boolean;
-  surface: string;
-  /** Legacy ImmoNex column — Version/Trim concept removed in B4a. Kept optional
-   *  for backwards-compat with old localStorage drafts. Phase B4b will drop both
-   *  the form key and the `listings.rooms` SQL column in one pass. */
-  rooms?: string;
-  bathrooms: string;
-  toilets: string;
+  mileageKmInput: string;
+  doorsInput: string;
+  seatsInput: string;
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
@@ -755,10 +734,6 @@ export function buildListingMaterialSnapshotFromRow(
     quartier_libre: (row.quartier_libre ?? "").trim(),
     lat,
     lng,
-    surface: row.surface ?? null,
-    rooms: row.rooms ?? null,
-    bathrooms: row.bathrooms ?? null,
-    toilets: row.toilets ?? null,
     make: (row.make ?? "").trim(),
     model: (row.model ?? "").trim(),
     year: row.year ?? null,
@@ -812,7 +787,7 @@ export function buildListingMaterialSnapshotFromForm(
     if (typeof max === "number" && intVal > max) return null;
     return intVal;
   };
-  const mileageKm = parseMileageKmFromPublishSurfaceField(input.surface, normalizeInt);
+  const mileageKm = normalizeInt(input.mileageKmInput, 0);
 
   return JSON.stringify({
     title: input.title.trim(),

@@ -3,7 +3,7 @@ import {
   LISTING_TYPES,
   LISTING_TYPE_LABELS,
   LISTING_TYPES_WITHOUT_ROOM_FILTERS,
-  LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS,
+  LISTING_TYPES_WITH_DOORS_FIELDS,
   TRANSACTION_LABELS,
   TRANSACTION_TYPES,
 } from "@/types/listing";
@@ -90,16 +90,16 @@ describe("Filter URL serialization", () => {
   });
 });
 
-describe("Type-aware field logic (legacy DB columns as trim/doors)", () => {
-  it("trim/doors fields apply to citadine / SUV / berline categories", () => {
-    for (const type of LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS) {
-      expect(LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(type)).toBe(true);
+describe("Type-aware field logic (doors)", () => {
+  it("doors fields apply to citadine / SUV / berline categories", () => {
+    for (const type of LISTING_TYPES_WITH_DOORS_FIELDS) {
+      expect(LISTING_TYPES_WITH_DOORS_FIELDS.includes(type)).toBe(true);
     }
   });
 
-  it("types without trim/doors filters exclude those categories", () => {
+  it("types without doors filters exclude those categories", () => {
     for (const type of LISTING_TYPES_WITHOUT_ROOM_FILTERS) {
-      expect(LISTING_TYPES_WITH_TRIM_AND_DOORS_FIELDS.includes(type)).toBe(false);
+      expect(LISTING_TYPES_WITH_DOORS_FIELDS.includes(type)).toBe(false);
     }
   });
 });

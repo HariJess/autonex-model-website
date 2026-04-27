@@ -82,6 +82,29 @@ Ce document résume la dette **connue et assumée** après une passe code (sans 
 ### Suite recommandée (étape 6+ / DB)
 
 1. Migration SQL **optionnelle** : colonnes générées persistées si besoin de perf indexée sur synonymes uniquement vue.
-2. Renommage **`immonex_is_admin`** → fonction neutre (`autonex_is_staff` ou équivalent) **après** recherche exhaustive dans les migrations et policies.
+2. Renommage **`immonex_is_admin`** → fonction neutre (`autonex_is_staff` ou équivalent) **après** recherche exhaustive dans les migrations et policies. Sprint dédié M-LEGACY-5.
 3. Réduction progressive des fallbacks dans `vehiclePresentation` lorsque `listing.vehicle` est garanti rempli pour toutes les annonces actives.
-4. Renommage **SQL** des colonnes `surface` / `rooms` / `bathrooms` (ou vues dédiées) lorsque les clients et migrations le permettront.
+
+## Migration history (closed)
+
+Le drift de schéma legacy ImmoNex a été résorbé progressivement entre 2026-04-26 et 2026-04-27 :
+
+| Phase    | Date       | Commits                                                      | Changements                                                              |
+|----------|------------|--------------------------------------------------------------|--------------------------------------------------------------------------|
+| B1       | 2026-04-26 | bc13582                                                      | Alignement data `doors`/`seats` avec `bathrooms`/`toilets`              |
+| B2       | 2026-04-26 | 21e9b12                                                      | Alignement data `mileage_km` avec `surface`                              |
+| mini-B3  | 2026-04-26 | (audit only)                                                 | `rooms` confirmé dead en prod (rooms_distinct=[0])                       |
+| B4a      | 2026-04-26 | 5475309                                                      | UX cleanup : retrait du concept Version/Trim                             |
+| B4b      | 2026-04-26 / 2026-04-27 | 7beb7f0, 6d4bda5, a3aa19e, 66bd8a4, _ce commit_ | RPC patch + DROP COLUMN `surface`/`rooms`/`bathrooms`/`toilets` + DROP enum `listing_type` + cleanup TS final |
+
+**Statut : ✅ COMPLETE.** Toutes les colonnes legacy ImmoNex ont été droppées de `public.listings`, l'enum `listing_type` n'existe plus en DB, et le code TS ne contient plus aucune référence aux noms legacy hors les zones gelées documentées.
+
+Le seul identifiant `immonex_*` qui subsiste est la fonction `public.immonex_is_admin()` — utilisée par les RLS policies, son renommage est planifié dans un sprint dédié (M-LEGACY-5) post-launch.
+
+Form fields renommés (Option 2) : `surface` → `mileageKmInput`, `bathrooms` → `doorsInput`, `toilets` → `seatsInput`. Les labels UI affichés à l'utilisateur (« Kilométrage », « Portes », « Sièges ») sont inchangés.
+
+Fichiers TS supprimés en B4b cleanup :
+- `src/lib/legacyListingVehicleMapping.ts`
+- `src/lib/legacyListingsDbColumns.ts`
+- `src/pages/publish/publishVehicleLegacyMirror.ts`
+- `src/test/legacyListingVehicleMapping.test.ts`

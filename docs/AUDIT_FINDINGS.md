@@ -179,18 +179,12 @@ Nécessite un projet Supabase de test dédié (ou docker-compose local).
 
 ## Notes secondaires (à traiter opportunément)
 
-- 🟡 **EN COURS — Legacy ImmoNex schema migration** : le `listings.type` enum (valeurs `appartement`/`villa`/`maison`/...) a été migré en colonne TEXT le 24/04/2026, ouvrant la voie à des valeurs véhicule natives. Reste à migrer la sémantique détournée des colonnes :
-  - `surface` (réellement = kilométrage en km)
-  - `bathrooms` (réellement = nombre de portes)
-  - `toilets` (réellement = nombre de sièges)
-  - `rooms` (réellement = index de version/finition)
-
-  Chaque colonne nécessite une migration coordonnée + un sweep des fichiers `src/lib/legacyListingVehicleMapping.ts` et `src/lib/legacyListingsDbColumns.ts` + mise à jour de la doc `docs/AUTONEX_LEGACY_SCHEMA.md`. Renommage de `immonex_is_admin()` à prévoir dans le même chantier.
+- ✅ **COMPLETE — Legacy ImmoNex schema migration (sprint M-LEGACY, 2026-04-26 → 2026-04-27)** : enum `listings.type` migré en TEXT (24/04/2026), puis colonnes legacy `surface` / `rooms` / `bathrooms` / `toilets` DROP de `public.listings` + DROP de l'enum `listing_type` (B4b). TS / form fields renommés vers la sémantique véhicule (`mileageKmInput` / `doorsInput` / `seatsInput`). Voir section « Migration history (closed) » dans `docs/AUTONEX_LEGACY_SCHEMA.md`. Le renommage de `immonex_is_admin()` reste à faire dans un sprint dédié post-launch (M-LEGACY-5).
 - `og:image` de la home = cover d'un article de blog → créer une vraie image OG 1200x630
 - Fichiers `public/category-icons/*.svg.svg` : double extension, vérifier si intentionnel
 - Favicon `public/favicon.ico` fait 20K, devrait faire <5K
 - `strictPort: true` dans vite.config.ts : dev bloqué si port 8091 pris
-- Seed listings `src/data/seed-listings.ts` : valeurs `type: "villa"` pour des voitures (conséquence du legacy)
+- Le fichier `src/data/seed-listings.ts` ne contient plus que des seed posts blog (les seeds listings dead code ont été retirés en B4b cleanup) — renommage en `seed-blog.ts` à prévoir dans un cleanup futur (hors scope B4b)
 - Scripts `scripts/catalog/reports/*.json` commités = bruit dans le repo
 - Pas de `.env.example` visible à la racine
 - Pas de Content-Security-Policy dans `index.html`

@@ -424,7 +424,7 @@ const ListingDetail = () => {
                   <Gauge className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{mileageLabel}</p>
-                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("search.surface", "Kilométrage")}</p>
+                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("search.mileageKm", "Kilométrage")}</p>
                   </div>
                 </div>
               )}
@@ -433,7 +433,7 @@ const ListingDetail = () => {
                   <DoorOpen className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-semibold font-sans">{doorsLabel}</p>
-                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("listing.bathrooms", "Portes")}</p>
+                    <p className="text-[13px] md:text-xs text-muted-foreground font-sans">{t("listing.doors", "Portes")}</p>
                   </div>
                 </div>
               )}

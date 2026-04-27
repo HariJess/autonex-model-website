@@ -356,11 +356,11 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           )}
 
           <AccordionItem value="mileageKm" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.surface", "Kilométrage")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.mileageKm", "Kilométrage")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="space-y-3">
                 <p className="text-xs text-muted-foreground font-sans">
-                  {t("search.surfaceHint", "Glissez le maximum à droite pour élargir le kilométrage.")}
+                  {t("search.mileageKmHint", "Glissez le maximum à droite pour élargir le kilométrage.")}
                 </p>
                 <Slider
                   min={0}
@@ -401,7 +401,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
 
           {hasResidentialType && (
             <AccordionItem value="bathrooms" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-              <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.bathrooms", "Portes")}</AccordionTrigger>
+              <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.doors", "Portes")}</AccordionTrigger>
               <AccordionContent className="pb-3">
                 <p className="text-xs text-muted-foreground font-sans mb-2">{t("search.bathroomsHint", "« 4+ » inclut les véhicules avec au moins 4 portes.")}</p>
                 <div className="flex flex-wrap gap-2">

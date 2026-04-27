@@ -1,12 +1,3 @@
-/**
- * Affichage carte annonce — préfère `listing.vehicle` lorsque présent ; sinon repli vers les colonnes DB
- * encore nommées comme à l’époque immobilière (`surface`, `bathrooms`).
- * La lecture détaillée est centralisée dans `legacyListingVehicleMapping.ts`.
- */
-import {
-  doorsLooseFromDisplayListing,
-  mileageKmLooseFromDisplayListing,
-} from "@/lib/legacyListingVehicleMapping";
 import type { DisplayListing } from "@/types/listing";
 import { getVehicleMakeLabel } from "@/data/automotiveCatalog";
 import { getVehicleModelLabel } from "@/data/vehicleModelsCatalog";
@@ -28,7 +19,6 @@ export function formatVehicleEngineDisplacement(value: number | null | undefined
 }
 
 export function getVehicleDisplayTitle(listing: DisplayListing): string {
-  // Lot 9.3 — Capitalisation officielle via catalogues marque + modèle.
   const make = listing.vehicle?.make;
   const model = listing.vehicle?.model;
   const vehicleHeadline = [
@@ -53,12 +43,10 @@ export function getVehicleHeadline(listing: DisplayListing): string {
     .join(" ");
 }
 
-/** Kilométrage : JSON `vehicle` puis colonne legacy `surface` (= km). */
 export function getVehicleMileageValue(listing: DisplayListing): number | null {
-  return mileageKmLooseFromDisplayListing(listing);
+  return listing.vehicle?.mileageKm ?? null;
 }
 
-/** Portes : JSON `vehicle` puis colonne legacy `bathrooms`. */
 export function getVehicleDoorsValue(listing: DisplayListing): number | null {
-  return doorsLooseFromDisplayListing(listing);
+  return listing.vehicle?.doors ?? null;
 }

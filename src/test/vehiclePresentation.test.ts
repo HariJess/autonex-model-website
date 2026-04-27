@@ -11,8 +11,6 @@ function minimalListing(partial: Partial<DisplayListing>): DisplayListing {
     transaction: "vente",
     price_mga: 1,
     price_eur: null,
-    surface: null,
-    bathrooms: null,
     ville: null,
     region: null,
     arrondissement: null,
@@ -30,23 +28,23 @@ function minimalListing(partial: Partial<DisplayListing>): DisplayListing {
   };
 }
 
-describe("vehiclePresentation legacy fallbacks", () => {
-  it("prefers vehicle JSON over legacy columns", () => {
+describe("vehiclePresentation", () => {
+  it("returns vehicle.mileageKm when present", () => {
     const listing = minimalListing({
-      surface: 99999,
       vehicle: { mileageKm: 12000 } as DisplayListing["vehicle"],
     });
     expect(getVehicleMileageValue(listing)).toBe(12000);
   });
 
-  it("falls back surface → mileage when vehicle absent", () => {
-    const listing = minimalListing({ surface: 45000 });
-    expect(getVehicleMileageValue(listing)).toBe(45000);
+  it("returns null when vehicle is absent", () => {
+    const listing = minimalListing({});
+    expect(getVehicleMileageValue(listing)).toBe(null);
   });
 
-  it("falls back bathrooms → doors when vehicle absent", () => {
-    const listing = minimalListing({ bathrooms: 5 });
+  it("returns vehicle.doors when present", () => {
+    const listing = minimalListing({
+      vehicle: { doors: 5 } as DisplayListing["vehicle"],
+    });
     expect(getVehicleDoorsValue(listing)).toBe(5);
   });
-
 });

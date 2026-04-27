@@ -23,6 +23,10 @@ function resolveVehicleMileageKm(listing: DisplayListing): number | null {
   return getCanonicalVehicleAttributes(listing).mileageKm;
 }
 
+function resolveVehicleDoors(listing: DisplayListing): number | null {
+  return getCanonicalVehicleAttributes(listing).doors;
+}
+
 function matchesVehicleMileageMinStrict(listing: DisplayListing, mileageMin: number): boolean {
   if (!mileageMin || mileageMin <= 0) return true;
   const mileageKm = resolveVehicleMileageKm(listing);
@@ -105,7 +109,7 @@ export function buildSearchResultsModel(params: {
   }
   if (filters.doorCounts.length > 0) {
     exactMatchListings = exactMatchListings.filter((l) =>
-      matchesDoorCountFilterStrict(l.bathrooms, filters.doorCounts),
+      matchesDoorCountFilterStrict(resolveVehicleDoors(l), filters.doorCounts),
     );
   }
 

@@ -553,7 +553,7 @@ const VehicleEstimationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="mileage">{t("search.surface", "Kilométrage")} (km)</Label>
+                  <Label htmlFor="mileage">{t("search.mileageKm", "Kilométrage")} (km)</Label>
                   <Input
                     id="mileage"
                     type="number"
