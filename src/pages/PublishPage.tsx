@@ -526,10 +526,27 @@ const PublishPage = () => {
       // delays the call by 1s after the last setValue; reading form.getValues()
       // here ensures we capture the post-flush state, defeating the RHF v7
       // race where setValue without shouldDirty defers _formValues flush.
+      const gv = form.getValues();
       const persistDraftForm: PersistDraftFormSnapshot = {
-        ...form.getValues(),
+        ...gv,
         selectedFeatures: selectedFeaturesWithVehicleMeta,
       };
+      // 🔬 DEBUG TEMPORAIRE — à retirer après diagnostic Étape 2 stale
+      // eslint-disable-next-line no-console
+      console.log("[autosave-debug] persistDraft fire", {
+        step,
+        stepOverride,
+        getValues_title: gv.title,
+        getValues_description: gv.description,
+        getValues_priceMga: gv.priceMga,
+        getValues_mileageKmInput: gv.mileageKmInput,
+        getValues_vehicleMake: gv.vehicleMake,
+        watch_title: form.watch("title"),
+        watch_description: form.watch("description"),
+        watch_priceMga: form.watch("priceMga"),
+        formStateIsDirty: form.formState.isDirty,
+        dirtyFieldKeys: Object.keys(form.formState.dirtyFields ?? {}),
+      });
       return runPersistDraftOperation({
         stepOverride,
         step,
