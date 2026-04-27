@@ -1,6 +1,6 @@
 'use client'
 
-import { Heart } from 'lucide-react'
+import { ChevronRight, Heart } from 'lucide-react'
 import { useState } from 'react'
 
 interface Car {
@@ -69,7 +69,7 @@ const cars: Car[] = [
   },
 ]
 
-function CarCard({ car }: { car: Car }) {
+export function CarCard({ car }: { car: Car }) {
   const [favorited, setFavorited] = useState(false)
   const [currentImg, setCurrentImg] = useState(0)
 
@@ -156,8 +156,8 @@ export default function FeaturedCars() {
             Véhicules en vedette
           </h2>
         </div>
-        <a href="#" className="text-sm font-semibold text-sky-600 hover:text-sky-700 hover:underline transition-colors">
-          Voir tout
+        <a href="#" className="flex items-center gap-1 text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors">
+          Voir tout <ChevronRight className="w-4 h-4" />
         </a>
       </div>
 

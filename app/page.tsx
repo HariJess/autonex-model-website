@@ -4,7 +4,8 @@ import VehicleCategories from '@/components/home/VehicleCategories'
 import PopularBrands from '@/components/home/PopularBrands'
 import AdBanner from '@/components/home/AdBanner'
 import EstimationBanner from '@/components/home/EstimationBanner'
-import FeaturedCars from '@/components/FeaturedCars'
+import FeaturedCars from '@/components/home/FeaturedCars'
+import PickUpCategory from '@/components/home/PickUpCategory'
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       />
       <EstimationBanner />
       <FeaturedCars />
+      <PickUpCategory />
     </main>
   )
 }
