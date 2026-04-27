@@ -116,6 +116,11 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
   const { t } = useTranslation();
   const { profile } = useAuth();
   const form = useFormContext<PublishFormValues>();
+  // Destructure stable function refs (RHF v7 memoizes these via internal
+  // useRef in useForm). Using `form` directly in useEffect deps would re-fire
+  // every render because <FormProvider {...form}> creates a new context value
+  // object via JSX spread → infinite render loop with setValue inside effects.
+  const { setValue, getValues } = form;
   const title = form.watch("title");
   const description = form.watch("description");
   const priceMga = form.watch("priceMga");
@@ -149,51 +154,51 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
 
   // Bug A2 — Reset rentalMode quand on repasse en « Vente ».
   useEffect(() => {
-    if (!isRentalTransaction && form.getValues("vehicleRentalMode")) {
-      form.setValue("vehicleRentalMode", "", { shouldDirty: true });
+    if (!isRentalTransaction && getValues("vehicleRentalMode")) {
+      setValue("vehicleRentalMode", "", { shouldDirty: true });
     }
-  }, [isRentalTransaction, form]);
+  }, [isRentalTransaction, getValues, setValue]);
 
   // Bug A6 + A7 — `vehicleFuel` est la source unique de vérité ; les booléens
   // `isElectric` et `isHybrid` sont dérivés automatiquement (anciens Switches
   // retirés de l'UI, colonnes DB conservées pour rétrocompat).
   useEffect(() => {
     if (fuel === "Électrique") {
-      form.setValue("vehicleIsElectric", true);
-      form.setValue("vehicleIsHybrid", false);
+      setValue("vehicleIsElectric", true);
+      setValue("vehicleIsHybrid", false);
     } else if (fuel === "Hybride" || fuel === "Hybride rechargeable") {
-      form.setValue("vehicleIsElectric", false);
-      form.setValue("vehicleIsHybrid", true);
+      setValue("vehicleIsElectric", false);
+      setValue("vehicleIsHybrid", true);
     } else {
-      form.setValue("vehicleIsElectric", false);
-      form.setValue("vehicleIsHybrid", false);
+      setValue("vehicleIsElectric", false);
+      setValue("vehicleIsHybrid", false);
     }
-  }, [fuel, form]);
+  }, [fuel, setValue]);
 
   // Lot 9.2 — Bug A5 : `listingType` (source de vérité, Lot 8) est mirroré vers
   // la colonne DB legacy `body_style` pour back-compat. Le Select Carrosserie
   // a été retiré de l'UI ; la colonne DB reste alignée automatiquement.
   // TODO (lot futur) : supprimer la colonne `body_style` une fois les drafts legacy migrés.
   useEffect(() => {
-    if (listingType && form.getValues("vehicleBodyStyle") !== listingType) {
-      form.setValue("vehicleBodyStyle", listingType);
+    if (listingType && getValues("vehicleBodyStyle") !== listingType) {
+      setValue("vehicleBodyStyle", listingType);
     }
-  }, [listingType, form]);
+  }, [listingType, getValues, setValue]);
 
   // Lot 9.3 — Reset automatique du modèle quand la marque change et que le
   // modèle courant n'existe pas dans le nouveau catalogue (évite « Mazda
   // MX-5 » qui reste en mémoire après passage à « Toyota »).
   useEffect(() => {
     if (!make) return;
-    const currentModel = form.getValues("vehicleModel");
+    const currentModel = getValues("vehicleModel");
     if (!currentModel) return;
     const models = getModelsForBrand(make);
     if (models.length === 0) return; // marque custom, on ne touche pas
     const matches = models.some((m) => m.value === currentModel.toLowerCase());
     if (!matches) {
-      form.setValue("vehicleModel", "", { shouldDirty: true });
+      setValue("vehicleModel", "", { shouldDirty: true });
     }
-  }, [make, form]);
+  }, [make, getValues, setValue]);
 
   const [showEquipmentSection, setShowEquipmentSection] = useState(false);
   const [showComplementaryInfo, setShowComplementaryInfo] = useState(false);
@@ -272,8 +277,8 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
     if (!autoTitleEnabled) return;
     if (!computedAutoTitle) return;
     if (computedAutoTitle === title) return;
-    form.setValue("title", computedAutoTitle);
-  }, [autoTitleEnabled, computedAutoTitle, title, form]);
+    setValue("title", computedAutoTitle);
+  }, [autoTitleEnabled, computedAutoTitle, title, setValue]);
 
   const handleTitleChange = (value: string) => {
     form.setValue("title", value);
