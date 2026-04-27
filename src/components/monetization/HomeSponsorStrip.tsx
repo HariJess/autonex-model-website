@@ -1,6 +1,7 @@
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { cn } from "@/lib/utils";
+import type { PublicPartnerCampaign } from "@/lib/partnerAds";
 
 interface HomeSponsorStripProps {
   className?: string;
@@ -8,7 +9,7 @@ interface HomeSponsorStripProps {
 
 /**
  * Bandeau sponsor full-image inline (format leaderboard étendu).
- * Ratio 4:1 mobile / 8:1 desktop. L'image contient tout le visuel.
+ * Ratio 2.5:1 mobile / 8:1 desktop. L'image contient tout le visuel.
  */
 export function HomeSponsorStrip({ className }: HomeSponsorStripProps) {
   const enabled = MONETIZATION_PLACEMENTS.homeSponsorStrip;
@@ -16,6 +17,16 @@ export function HomeSponsorStrip({ className }: HomeSponsorStripProps) {
 
   if (!enabled || !campaign) return null;
 
+  return <HomeSponsorStripView campaign={campaign} className={className} />;
+}
+
+interface HomeSponsorStripViewProps {
+  campaign: PublicPartnerCampaign;
+  className?: string;
+}
+
+/** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
+export function HomeSponsorStripView({ campaign, className }: HomeSponsorStripViewProps) {
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {

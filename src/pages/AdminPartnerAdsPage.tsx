@@ -21,6 +21,10 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 import { PARTNER_AD_PLACEMENT_KEYS, type PartnerAdPlacementKey } from "@/lib/partnerAds";
+import {
+  PartnerCampaignPreview,
+  PlacementSpecsPanel,
+} from "@/pages/admin/PartnerCampaignPreview";
 
 type CampaignRow = Tables<"partner_ad_campaigns">;
 type StatusFilter = "all" | "active" | "inactive";
@@ -260,6 +264,9 @@ const AdminPartnerAdsPage = () => {
                 onChange={(e) => setForm((p) => ({ ...p, priority: Number(e.target.value) || 0 }))}
               />
             </div>
+            <div className="md:col-span-2">
+              <PlacementSpecsPanel placement={form.placement_key} />
+            </div>
             <div className="space-y-2 md:col-span-2">
               <Label>Image desktop *</Label>
               <p className="text-xs text-muted-foreground font-sans">
@@ -358,6 +365,17 @@ const AdminPartnerAdsPage = () => {
                 onCheckedChange={(v) => setForm((p) => ({ ...p, is_active: v }))}
               />
               <Label>Campagne active</Label>
+            </div>
+            <div className="md:col-span-2 space-y-2">
+              <p className="text-sm font-semibold font-sans">Aperçu</p>
+              <PartnerCampaignPreview
+                placement={form.placement_key}
+                imageUrl={form.image_url}
+                imageUrlMobile={form.image_url_mobile}
+                advertiserName={form.advertiser_name}
+                destinationUrl={form.destination_url}
+                ctaLabel={form.cta_label}
+              />
             </div>
             <div className="md:col-span-2 flex items-center gap-2">
               <Button className="font-sans" onClick={() => saveCampaign.mutate()} disabled={saveCampaign.isPending}>

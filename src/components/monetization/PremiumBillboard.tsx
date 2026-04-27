@@ -1,5 +1,6 @@
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { cn } from "@/lib/utils";
+import type { PublicPartnerCampaign } from "@/lib/partnerAds";
 
 interface PremiumBillboardProps {
   enabled?: boolean;
@@ -8,7 +9,7 @@ interface PremiumBillboardProps {
 
 /**
  * Billboard sponsor full-image (standard IAB display).
- * Affiche l'image fournie par l'annonceur en plein cadre, ratio 6:1 desktop / 3:1 mobile.
+ * Affiche l'image fournie par l'annonceur en plein cadre, ratio 6:1 desktop / 2:1 mobile.
  * L'image doit contenir tout le visuel (texte/CTA inclus). Aucun overlay côté AutoNex.
  */
 export function PremiumBillboard({ enabled = true, className }: PremiumBillboardProps) {
@@ -16,6 +17,16 @@ export function PremiumBillboard({ enabled = true, className }: PremiumBillboard
 
   if (!enabled || !campaign) return null;
 
+  return <PremiumBillboardView campaign={campaign} className={className} />;
+}
+
+interface PremiumBillboardViewProps {
+  campaign: PublicPartnerCampaign;
+  className?: string;
+}
+
+/** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
+export function PremiumBillboardView({ campaign, className }: PremiumBillboardViewProps) {
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
