@@ -351,20 +351,6 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
     [selectedFeatures],
   );
 
-  // 🔬 DEBUG TEMPORAIRE — à retirer après diagnostic Étape 2 stale
-  // eslint-disable-next-line no-console
-  console.log("[step2-debug] PublishDetailsSection render", {
-    watch_title: form.watch("title"),
-    watch_description: form.watch("description"),
-    watch_priceMga: form.watch("priceMga"),
-    getValues_title: form.getValues("title"),
-    getValues_description: form.getValues("description"),
-    getValues_priceMga: form.getValues("priceMga"),
-    title_local_var: title,
-    description_local_var: description,
-    priceMga_local_var: priceMga,
-  });
-
   return (
     <div className="space-y-5 form-surface">
       <section className="space-y-3 rounded-xl border border-border/75 bg-gradient-to-br from-card to-secondary/15 p-4">
