@@ -58,7 +58,7 @@ import { usePublishBootstrap } from "@/hooks/publish/usePublishBootstrap";
 import { usePublishDraftLifecycle } from "@/hooks/publish/usePublishDraftLifecycle";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
 import { parseSupabaseError } from "@/lib/parseSupabaseError";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { publishFormSchema, type PublishFormValues } from "@/pages/publish/publishFormSchema";
 import { PUBLISH_FORM_DEFAULTS } from "@/pages/publish/publishFormDefaults";
@@ -105,7 +105,7 @@ const PublishPage = () => {
    * so downstream typing stays strict; watchedValues is in deps purely as
    * the change-trigger.
    */
-  const watchedValues = useWatch({ control: form.control });
+  const watchedValues = form.watch();
   const formValues = useMemo<PublishFormValues>(
     () => {
       void watchedValues;
