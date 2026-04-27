@@ -106,6 +106,14 @@ const PublishPage = () => {
   useWatch({ control: form.control });
   const formValues: PublishFormValues = form.getValues();
 
+  // 🔬 DEBUG TEMPORAIRE — à retirer après diagnostic Étape 2 stale
+  // eslint-disable-next-line no-console
+  console.log("[publishpage-debug] PublishPage render", {
+    formValues_title: formValues.title,
+    formValues_description: formValues.description,
+    formValues_priceMga: formValues.priceMga,
+  });
+
   const [step, setStep] = useState(0);
   const [stepErrors, setStepErrors] = useState<string[]>([]);
   const [draftListingId, setDraftListingId] = useState<string | null>(null);
