@@ -20,7 +20,11 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
-import { PARTNER_AD_PLACEMENT_KEYS, type PartnerAdPlacementKey } from "@/lib/partnerAds";
+import {
+  PARTNER_AD_PLACEMENT_KEYS,
+  type PartnerAdAudience,
+  type PartnerAdPlacementKey,
+} from "@/lib/partnerAds";
 import {
   PartnerCampaignPreview,
   PlacementSpecsPanel,
@@ -34,6 +38,7 @@ const placementLabels: Record<PartnerAdPlacementKey, string> = {
   homeSponsorStrip: "Accueil — Bandeau sponsor",
   searchTopBanner: "Recherche — Bandeau haut",
   listingSponsor: "Fiche annonce — Bloc sponsor",
+  homeModal: "Accueil — Pop-up modal",
 };
 
 function toLocalInputValue(iso: string | null): string {
@@ -70,6 +75,7 @@ const emptyForm = {
   ends_at: "",
   is_active: true,
   priority: 0,
+  audience: "all" as PartnerAdAudience,
 };
 
 const AdminPartnerAdsPage = () => {
@@ -113,6 +119,7 @@ const AdminPartnerAdsPage = () => {
         ends_at: fromLocalInputValue(form.ends_at),
         is_active: form.is_active,
         priority: Number(form.priority) || 0,
+        audience: form.audience,
       };
       if (!payload.advertiser_name || !payload.internal_title || !payload.image_url) {
         throw new Error("Champs obligatoires manquants (annonceur, titre interne, image).");
@@ -165,6 +172,7 @@ const AdminPartnerAdsPage = () => {
       ends_at: toLocalInputValue(c.ends_at),
       is_active: c.is_active,
       priority: c.priority ?? 0,
+      audience: ((c.audience ?? "all") as PartnerAdAudience),
     });
   };
 
@@ -267,6 +275,29 @@ const AdminPartnerAdsPage = () => {
             <div className="md:col-span-2">
               <PlacementSpecsPanel placement={form.placement_key} />
             </div>
+            {form.placement_key === "homeModal" ? (
+              <div className="space-y-2 md:col-span-2">
+                <Label>Audience cible</Label>
+                <p className="text-xs text-muted-foreground font-sans">
+                  Détermine qui voit ce pop-up sur la page d’accueil.
+                </p>
+                <Select
+                  value={form.audience}
+                  onValueChange={(v) =>
+                    setForm((p) => ({ ...p, audience: v as PartnerAdAudience }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tout le monde</SelectItem>
+                    <SelectItem value="guests">Visiteurs non-connectés uniquement</SelectItem>
+                    <SelectItem value="authenticated">Utilisateurs connectés uniquement</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
             <div className="space-y-2 md:col-span-2">
               <Label>Image desktop *</Label>
               <p className="text-xs text-muted-foreground font-sans">

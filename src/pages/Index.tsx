@@ -14,6 +14,7 @@ import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { PremiumBillboard } from "@/components/monetization/PremiumBillboard";
 import { HomeSponsorStrip } from "@/components/monetization/HomeSponsorStrip";
+import { HomePopupModal } from "@/components/monetization/HomePopupModal";
 import BrandsRibbon from "@/components/BrandsRibbon";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
@@ -579,6 +580,7 @@ const Index = () => {
       )}
 
       <Footer />
+      <HomePopupModal />
     </>
   );
 };

@@ -1263,6 +1263,7 @@ export type Database = {
       partner_ad_campaigns: {
         Row: {
           advertiser_name: string
+          audience: string
           created_at: string
           created_by: string | null
           cta_label: string | null
@@ -1282,6 +1283,7 @@ export type Database = {
         }
         Insert: {
           advertiser_name: string
+          audience?: string
           created_at?: string
           created_by?: string | null
           cta_label?: string | null
@@ -1301,6 +1303,7 @@ export type Database = {
         }
         Update: {
           advertiser_name?: string
+          audience?: string
           created_at?: string
           created_by?: string | null
           cta_label?: string | null
@@ -2639,6 +2642,7 @@ export type Database = {
         Args: { p_placement_key: string }
         Returns: {
           advertiser_name: string
+          audience: string
           cta_label: string
           destination_url: string
           id: string

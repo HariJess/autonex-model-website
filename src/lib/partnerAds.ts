@@ -5,9 +5,13 @@ export const PARTNER_AD_PLACEMENT_KEYS = [
   "homeSponsorStrip",
   "searchTopBanner",
   "listingSponsor",
+  "homeModal",
 ] as const;
 
 export type PartnerAdPlacementKey = (typeof PARTNER_AD_PLACEMENT_KEYS)[number];
+
+export const PARTNER_AD_AUDIENCES = ["all", "guests", "authenticated"] as const;
+export type PartnerAdAudience = (typeof PARTNER_AD_AUDIENCES)[number];
 
 export type PublicPartnerCampaign = {
   id: string;
@@ -18,6 +22,7 @@ export type PublicPartnerCampaign = {
   image_url_mobile: string | null;
   destination_url: string | null;
   cta_label: string | null;
+  audience: PartnerAdAudience;
 };
 
 export function isPartnerAdPlacementKey(value: string): value is PartnerAdPlacementKey {

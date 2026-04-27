@@ -1,3 +1,4 @@
+import { HomePopupModalView } from "@/components/monetization/HomePopupModal";
 import { HomeSponsorStripView } from "@/components/monetization/HomeSponsorStrip";
 import { ListingSponsorBlockView } from "@/components/monetization/ListingDetailPlacements";
 import { PremiumBillboardView } from "@/components/monetization/PremiumBillboard";
@@ -27,6 +28,11 @@ const PLACEMENT_RATIOS: Record<
     desktop: "aspect-[3/1]",
     mobile: "aspect-[2/1]",
     label: "Bloc Fiche annonce, ratio 3:1",
+  },
+  homeModal: {
+    desktop: "aspect-[4/5]",
+    mobile: "aspect-[4/5]",
+    label: "Pop-up modal, format vertical 4:5",
   },
 };
 
@@ -77,6 +83,7 @@ export function PartnerCampaignPreview({
     image_url_mobile: imageUrlMobile.trim() || null,
     destination_url: destinationUrl.trim() || null,
     cta_label: ctaLabel.trim() || null,
+    audience: "all",
   };
 
   const renderView = (variant: "desktop" | "mobile") => {
@@ -99,6 +106,8 @@ export function PartnerCampaignPreview({
         return <SearchTopBannerView campaign={mockCampaign} />;
       case "listingSponsor":
         return <ListingSponsorBlockView campaign={mockCampaign} />;
+      case "homeModal":
+        return <HomePopupModalView campaign={mockCampaign} />;
       default:
         return null;
     }
@@ -154,6 +163,11 @@ const PLACEMENT_SPECS: Record<
     desktop: "1920×640 px (ratio 3:1)",
     mobile: "1200×600 px (ratio 2:1)",
     tip: "S’affiche dans la page Fiche annonce. Format plus carré que les bandeaux Home.",
+  },
+  homeModal: {
+    desktop: "1080×1350 px (ratio 4:5) ou 1080×1080 (carré)",
+    mobile: "1080×1350 px (idem desktop)",
+    tip: "Pop-up plein écran centré sur la home, apparaît 2 secondes après le chargement, fermable. Limité à 1× par session.",
   },
 };
 
