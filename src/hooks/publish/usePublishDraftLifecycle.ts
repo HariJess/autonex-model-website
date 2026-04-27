@@ -11,8 +11,6 @@ export type PublishDraftLifecycleOptions = {
   progressFingerprint: string;
   fingerprintInitializedRef: MutableRefObject<boolean>;
   lastPersistedFingerprintRef: MutableRefObject<string>;
-  /** Objet mémoïsé : tout changement déclenche l’autosave debouncé (équivalent aux deps listées individuellement avant refactor). */
-  draftAutosaveSignal: unknown;
 
   hasUnsavedMeaningfulChanges: boolean;
   onBeforeUnloadBackup: () => void;
@@ -39,7 +37,6 @@ export function usePublishDraftLifecycle(opts: PublishDraftLifecycleOptions): vo
     progressFingerprint,
     fingerprintInitializedRef,
     lastPersistedFingerprintRef,
-    draftAutosaveSignal,
     hasUnsavedMeaningfulChanges,
     onBeforeUnloadBackup,
     exitBypassRef,
@@ -64,7 +61,7 @@ export function usePublishDraftLifecycle(opts: PublishDraftLifecycleOptions): vo
     draftListingId,
     userId,
     isPublishedListingEdit,
-    draftAutosaveSignal,
+    progressFingerprint,
   ]);
 
   useEffect(() => {

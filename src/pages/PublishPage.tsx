@@ -97,8 +97,10 @@ const PublishPage = () => {
    * no memo to cache stale defaults.
    *
    * Adding a new field to publishFormSchema propagates automatically;
-   * downstream useMemos (progressFingerprint, draftAutosaveSignal)
-   * depend on `formValues` alone. The persistDraft / onBeforeUnloadBackup
+   * the downstream useMemo `progressFingerprint` depends on `formValues`
+   * alone. The autosave useEffect uses `progressFingerprint` (string,
+   * stable by value) as its trigger, so re-renders without content change
+   * don't re-fire the debouncer. The persistDraft / onBeforeUnloadBackup
    * callbacks read `form.getValues()` directly at fire time to defeat
    * an RHF v7 race where setValue without `shouldDirty: true` defers
    * the _formValues flush past the render that armed the snapshot.
@@ -435,20 +437,6 @@ const PublishPage = () => {
   const hasUnsavedMeaningfulChanges =
     hasMeaningfulDraftProgress && progressFingerprint !== lastPersistedFingerprintRef.current;
 
-  /**
-   * Signal unique pour l'autosave debouncé. The hook `usePublishDraftLifecycle`
-   * only cares that the reference changes when a persistable field changes.
-   * Audit fix U6: deps collapsed to formValues + merged features + step.
-   */
-  const draftAutosaveSignal = useMemo(
-    () => ({
-      ...formValues,
-      selectedFeaturesWithVehicleMeta,
-      step,
-    }),
-    [formValues, selectedFeaturesWithVehicleMeta, step],
-  );
-
   useEffect(() => {
     refreshProfile();
   }, [refreshProfile]);
@@ -605,7 +593,6 @@ const PublishPage = () => {
     progressFingerprint,
     fingerprintInitializedRef,
     lastPersistedFingerprintRef,
-    draftAutosaveSignal,
     hasUnsavedMeaningfulChanges,
     onBeforeUnloadBackup,
     exitBypassRef,
