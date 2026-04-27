@@ -97,8 +97,11 @@ const PublishPage = () => {
    * no memo to cache stale defaults.
    *
    * Adding a new field to publishFormSchema propagates automatically;
-   * downstream useMemos (persistDraftForm, progressFingerprint,
-   * draftAutosaveSignal) depend on `formValues` alone.
+   * downstream useMemos (progressFingerprint, draftAutosaveSignal)
+   * depend on `formValues` alone. The persistDraft / onBeforeUnloadBackup
+   * callbacks read `form.getValues()` directly at fire time to defeat
+   * an RHF v7 race where setValue without `shouldDirty: true` defers
+   * the _formValues flush past the render that armed the snapshot.
    */
   useWatch({ control: form.control });
   const formValues: PublishFormValues = form.getValues();
@@ -384,20 +387,6 @@ const PublishPage = () => {
   );
 
   /**
-   * Snapshot stabilisé pour la persistance serveur / backup.
-   * `selectedFeatures` is overridden with the merged equipment + custom-input
-   * + vehicle-meta version (single source of truth for what hits the DB).
-   * Audit fix U6: deps collapsed to formValues + the merged feature list.
-   */
-  const persistDraftForm = useMemo<PersistDraftFormSnapshot>(
-    () => ({
-      ...formValues,
-      selectedFeatures: selectedFeaturesWithVehicleMeta,
-    }),
-    [formValues, selectedFeaturesWithVehicleMeta],
-  );
-
-  /**
    * Change-detection hash computed by `computeProgressFingerprint` helper
    * (preserves the exact trim/sort normalization).
    * Audit fix U6: deps collapsed to formValues + step + photo counters.
@@ -533,6 +522,14 @@ const PublishPage = () => {
       // Lot 9.1c — Stop d'office toute sauvegarde si l'annonce a déjà été
       // publiée avec succès. Évite le bruit 406 en arrière-plan.
       if (draftPublishedRef.current) return true;
+      // Build fresh snapshot AT FIRE TIME (not at render time). The debouncer
+      // delays the call by 1s after the last setValue; reading form.getValues()
+      // here ensures we capture the post-flush state, defeating the RHF v7
+      // race where setValue without shouldDirty defers _formValues flush.
+      const persistDraftForm: PersistDraftFormSnapshot = {
+        ...form.getValues(),
+        selectedFeatures: selectedFeaturesWithVehicleMeta,
+      };
       return runPersistDraftOperation({
         stepOverride,
         step,
@@ -568,7 +565,8 @@ const PublishPage = () => {
       progressFingerprint,
       queryClient,
       t,
-      persistDraftForm,
+      form,
+      selectedFeaturesWithVehicleMeta,
     ],
   );
 
@@ -582,6 +580,11 @@ const PublishPage = () => {
 
   const onBeforeUnloadBackup = useCallback(() => {
     if (!user?.id || !draftListingId) return;
+    // Build fresh at fire time — same rationale as persistDraft above.
+    const persistDraftForm = {
+      ...form.getValues(),
+      selectedFeatures: selectedFeaturesWithVehicleMeta,
+    };
     saveLocalPublishBackup(
       user.id,
       draftListingId,
@@ -591,7 +594,7 @@ const PublishPage = () => {
         ...persistDraftForm,
       }),
     );
-  }, [user?.id, draftListingId, step, persistDraftForm]);
+  }, [user?.id, draftListingId, step, form, selectedFeaturesWithVehicleMeta]);
 
   usePublishDraftLifecycle({
     persistDraft,
