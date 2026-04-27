@@ -4,6 +4,32 @@ import {
 import { PremiumBillboardView } from "@/components/monetization/PremiumBillboard";
 import type { PartnerAdPlacementKey, PublicPartnerCampaign } from "@/lib/partnerAds";
 
+const PLACEMENT_RATIOS: Record<
+  PartnerAdPlacementKey,
+  { desktop: string; mobile: string; label: string }
+> = {
+  homeBillboard: {
+    desktop: "aspect-[6/1]",
+    mobile: "aspect-[2/1]",
+    label: "Billboard, ratio 6:1",
+  },
+  homeSponsorStrip: {
+    desktop: "aspect-[8/1]",
+    mobile: "aspect-[2.5/1]",
+    label: "Bandeau, ratio 8:1",
+  },
+  searchTopBanner: {
+    desktop: "aspect-[8/1]",
+    mobile: "aspect-[2.5/1]",
+    label: "Bandeau Recherche, ratio 8:1",
+  },
+  listingSponsor: {
+    desktop: "aspect-[3/1]",
+    mobile: "aspect-[2/1]",
+    label: "Bloc Fiche annonce, ratio 3:1",
+  },
+};
+
 interface PartnerCampaignPreviewProps {
   placement: PartnerAdPlacementKey;
   imageUrl: string;
@@ -11,6 +37,27 @@ interface PartnerCampaignPreviewProps {
   advertiserName: string;
   destinationUrl: string;
   ctaLabel: string;
+}
+
+function PreviewPlaceholder({
+  placement,
+  variant,
+  message,
+}: {
+  placement: PartnerAdPlacementKey;
+  variant: "desktop" | "mobile";
+  message: string;
+}) {
+  const ratios = PLACEMENT_RATIOS[placement];
+  const aspectClass = variant === "desktop" ? ratios.desktop : ratios.mobile;
+
+  return (
+    <div
+      className={`flex w-full ${aspectClass} items-center justify-center rounded-lg border border-dashed border-border px-4 text-center text-sm text-muted-foreground font-sans`}
+    >
+      {message}
+    </div>
+  );
 }
 
 export function PartnerCampaignPreview({
@@ -32,13 +79,15 @@ export function PartnerCampaignPreview({
     cta_label: ctaLabel.trim() || null,
   };
 
-  const renderView = () => {
+  const renderView = (variant: "desktop" | "mobile") => {
+    const label = PLACEMENT_RATIOS[placement].label;
+
     if (!imageUrl) {
-      return (
-        <div className="flex items-center justify-center h-32 rounded-lg border border-dashed border-border text-sm text-muted-foreground font-sans">
-          Uploadez une image desktop pour voir l’aperçu.
-        </div>
-      );
+      const message =
+        variant === "desktop"
+          ? `Uploadez une image desktop pour voir l’aperçu — format ${label}.`
+          : `Uploadez une image mobile (ou desktop en fallback) pour voir l’aperçu mobile.`;
+      return <PreviewPlaceholder placement={placement} variant={variant} message={message} />;
     }
 
     switch (placement) {
@@ -49,9 +98,11 @@ export function PartnerCampaignPreview({
       case "searchTopBanner":
       case "listingSponsor":
         return (
-          <div className="flex items-center justify-center h-32 rounded-lg border border-dashed border-border text-sm text-muted-foreground font-sans">
-            Aperçu non disponible pour ce placement (rendu spécifique à la page concernée).
-          </div>
+          <PreviewPlaceholder
+            placement={placement}
+            variant={variant}
+            message={`Aperçu non disponible pour ce placement (rendu spécifique). Format recommandé : ${label}.`}
+          />
         );
       default:
         return null;
@@ -64,7 +115,7 @@ export function PartnerCampaignPreview({
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 font-sans">
           Aperçu desktop
         </p>
-        <div className="rounded-lg border bg-background p-4">{renderView()}</div>
+        <div className="rounded-lg border bg-background p-4">{renderView("desktop")}</div>
       </div>
 
       <div>
@@ -73,7 +124,7 @@ export function PartnerCampaignPreview({
         </p>
         <div className="rounded-lg border bg-background p-4">
           <div className="mx-auto" style={{ maxWidth: "375px" }}>
-            {renderView()}
+            {renderView("mobile")}
           </div>
         </div>
         <p className="text-xs italic text-muted-foreground mt-2 font-sans">
