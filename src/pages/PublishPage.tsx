@@ -58,7 +58,7 @@ import { usePublishBootstrap } from "@/hooks/publish/usePublishBootstrap";
 import { usePublishDraftLifecycle } from "@/hooks/publish/usePublishDraftLifecycle";
 import { isPublishWithCreditsFailure, publishListingWithCredits } from "@/lib/publishWithCredits";
 import { parseSupabaseError } from "@/lib/parseSupabaseError";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { publishFormSchema, type PublishFormValues } from "@/pages/publish/publishFormSchema";
 import { PUBLISH_FORM_DEFAULTS } from "@/pages/publish/publishFormDefaults";
@@ -89,30 +89,19 @@ const PublishPage = () => {
   });
 
   /**
-   * Audit fix U6 (2026-04-26) — single subscription to ALL form values.
+   * Single subscription to ALL form values (audit fix U6 + step-2 autosave fix).
    *
-   * useWatch returns a new reference whenever any tracked field changes,
-   * which lets the three bulk-snapshot useMemos below (persistDraftForm,
-   * progressFingerprint, draftAutosaveSignal) depend on `formValues` alone
-   * instead of mirroring 40+ form.watch(...) calls in their deps arrays.
+   * `useWatch({ control })` subscribes the parent component to every field
+   * change so any setValue triggers a re-render. `form.getValues()` then
+   * returns the current strictly-typed PublishFormValues at this render —
+   * no memo to cache stale defaults.
    *
-   * Adding a new field to publishFormSchema now propagates automatically;
-   * the previous pattern silently dropped new fields from the autosave
-   * snapshot if a dev forgot to update every memo's deps array.
-   *
-   * Body uses form.getValues() (strictly typed PublishFormValues, all
-   * defaults applied) rather than the watched value (DeepPartialSkipArrayKey)
-   * so downstream typing stays strict; watchedValues is in deps purely as
-   * the change-trigger.
+   * Adding a new field to publishFormSchema propagates automatically;
+   * downstream useMemos (persistDraftForm, progressFingerprint,
+   * draftAutosaveSignal) depend on `formValues` alone.
    */
-  const watchedValues = form.watch();
-  const formValues = useMemo<PublishFormValues>(
-    () => {
-      void watchedValues;
-      return form.getValues();
-    },
-    [watchedValues, form],
-  );
+  useWatch({ control: form.control });
+  const formValues: PublishFormValues = form.getValues();
 
   const [step, setStep] = useState(0);
   const [stepErrors, setStepErrors] = useState<string[]>([]);
