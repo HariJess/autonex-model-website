@@ -59,6 +59,7 @@ const emptyForm = {
   internal_description: "",
   placement_key: "homeBillboard" as PartnerAdPlacementKey,
   image_url: "",
+  image_url_mobile: "",
   destination_url: "",
   cta_label: "",
   starts_at: "",
@@ -71,7 +72,8 @@ const AdminPartnerAdsPage = () => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [form, setForm] = useState({ ...emptyForm });
-  const [uploading, setUploading] = useState(false);
+  const [uploadingDesktop, setUploadingDesktop] = useState(false);
+  const [uploadingMobile, setUploadingMobile] = useState(false);
 
   const { data: campaigns = [], isLoading } = useQuery({
     queryKey: ["admin-partner-campaigns"],
@@ -100,6 +102,7 @@ const AdminPartnerAdsPage = () => {
         placement_key: form.placement_key,
         media_type: "image",
         image_url: form.image_url.trim(),
+        image_url_mobile: form.image_url_mobile.trim() || null,
         destination_url: form.destination_url.trim() || null,
         cta_label: form.cta_label.trim() || null,
         starts_at: fromLocalInputValue(form.starts_at) ?? new Date().toISOString(),
@@ -151,6 +154,7 @@ const AdminPartnerAdsPage = () => {
       internal_description: c.internal_description ?? "",
       placement_key: c.placement_key as PartnerAdPlacementKey,
       image_url: c.image_url,
+      image_url_mobile: c.image_url_mobile ?? "",
       destination_url: c.destination_url ?? "",
       cta_label: c.cta_label ?? "",
       starts_at: toLocalInputValue(c.starts_at),
@@ -160,7 +164,8 @@ const AdminPartnerAdsPage = () => {
     });
   };
 
-  const uploadImage = async (file: File) => {
+  const uploadImage = async (file: File, target: "desktop" | "mobile") => {
+    const setUploading = target === "desktop" ? setUploadingDesktop : setUploadingMobile;
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() ?? "jpg";
@@ -171,7 +176,11 @@ const AdminPartnerAdsPage = () => {
       });
       if (uploadError) throw new Error(uploadError.message);
       const { data } = supabase.storage.from("partner-ads").getPublicUrl(path);
-      setForm((prev) => ({ ...prev, image_url: data.publicUrl }));
+      setForm((prev) =>
+        target === "desktop"
+          ? { ...prev, image_url: data.publicUrl }
+          : { ...prev, image_url_mobile: data.publicUrl },
+      );
       toast.success("Image chargée.");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erreur lors du chargement d’image.");
@@ -252,7 +261,10 @@ const AdminPartnerAdsPage = () => {
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label>Image URL</Label>
+              <Label>Image desktop *</Label>
+              <p className="text-xs text-muted-foreground font-sans">
+                Format recommandé : 1920×320 px (ratio 6:1) pour Billboard, 1456×180 px (ratio 8:1) pour Bandeau.
+              </p>
               <Input
                 value={form.image_url}
                 onChange={(e) => setForm((p) => ({ ...p, image_url: e.target.value }))}
@@ -260,20 +272,50 @@ const AdminPartnerAdsPage = () => {
               />
               <div className="flex items-center gap-2">
                 <Label
-                  htmlFor="partner-ad-file"
+                  htmlFor="partner-ad-file-desktop"
                   className="inline-flex items-center gap-2 text-xs cursor-pointer rounded-md border px-2 py-1 hover:bg-muted"
                 >
                   <Upload className="h-3.5 w-3.5" />
-                  {uploading ? "Chargement..." : "Charger une image"}
+                  {uploadingDesktop ? "Chargement..." : "Charger une image"}
                 </Label>
                 <input
-                  id="partner-ad-file"
+                  id="partner-ad-file-desktop"
                   type="file"
                   accept="image/*"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) void uploadImage(file);
+                    if (file) void uploadImage(file, "desktop");
+                  }}
+                />
+              </div>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Image mobile (optionnel)</Label>
+              <p className="text-xs text-muted-foreground font-sans">
+                Format recommandé : 1200×600 px (ratio 2:1) ou 800×800 (carré). Si non fournie, l’image desktop sera utilisée et croppée sur mobile.
+              </p>
+              <Input
+                value={form.image_url_mobile}
+                onChange={(e) => setForm((p) => ({ ...p, image_url_mobile: e.target.value }))}
+                placeholder="https://..."
+              />
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="partner-ad-file-mobile"
+                  className="inline-flex items-center gap-2 text-xs cursor-pointer rounded-md border px-2 py-1 hover:bg-muted"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  {uploadingMobile ? "Chargement..." : "Charger une image"}
+                </Label>
+                <input
+                  id="partner-ad-file-mobile"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void uploadImage(file, "mobile");
                   }}
                 />
               </div>

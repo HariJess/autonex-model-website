@@ -15,6 +15,7 @@ export type PublicPartnerCampaign = {
   placement_key: string;
   media_type: string;
   image_url: string;
+  image_url_mobile: string | null;
   destination_url: string | null;
   cta_label: string | null;
 };

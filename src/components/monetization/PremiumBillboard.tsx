@@ -32,13 +32,18 @@ export function PremiumBillboard({ enabled = true, className }: PremiumBillboard
         className="relative block w-full overflow-hidden rounded-xl bg-muted/40 group"
         aria-label={`Publicité ${campaign.advertiser_name}`}
       >
-        <div className="relative w-full aspect-[3/1] md:aspect-[6/1]">
-          <img
-            src={campaign.image_url}
-            alt={campaign.advertiser_name}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-            loading="lazy"
-          />
+        <div className="relative w-full aspect-[2/1] md:aspect-[6/1]">
+          <picture>
+            {campaign.image_url_mobile ? (
+              <source media="(max-width: 768px)" srcSet={campaign.image_url_mobile} />
+            ) : null}
+            <img
+              src={campaign.image_url}
+              alt={campaign.advertiser_name}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              loading="lazy"
+            />
+          </picture>
         </div>
 
         <span className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">

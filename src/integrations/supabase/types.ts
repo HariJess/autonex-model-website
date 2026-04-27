@@ -1270,6 +1270,7 @@ export type Database = {
           ends_at: string | null
           id: string
           image_url: string
+          image_url_mobile: string | null
           internal_description: string | null
           internal_title: string
           is_active: boolean
@@ -1288,6 +1289,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           image_url: string
+          image_url_mobile?: string | null
           internal_description?: string | null
           internal_title: string
           is_active?: boolean
@@ -1306,6 +1308,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           image_url?: string
+          image_url_mobile?: string | null
           internal_description?: string | null
           internal_title?: string
           is_active?: boolean
@@ -2640,6 +2643,7 @@ export type Database = {
           destination_url: string
           id: string
           image_url: string
+          image_url_mobile: string
           media_type: string
           placement_key: string
         }[]
