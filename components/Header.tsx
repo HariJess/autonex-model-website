@@ -44,7 +44,7 @@ export default function Header() {
           <a href="/agences" className="text-sm font-semibold text-gray-500 hover:text-slate-900 transition-colors px-2.5 py-2 rounded-lg hover:bg-gray-50">
             Concessionnaires
           </a>
-          <a href="#" className="text-sm font-semibold text-gray-500 hover:text-slate-900 transition-colors px-2.5 py-2 rounded-lg hover:bg-gray-50">
+          <a href="/conseils" className="text-sm font-semibold text-gray-500 hover:text-slate-900 transition-colors px-2.5 py-2 rounded-lg hover:bg-gray-50">
             Conseils
           </a>
           <a href="#" className="inline-flex items-center rounded-full border border-white/45 bg-white/10 px-3.5 py-1.5 text-sm font-semibold text-white transition-all opacity-80 hover:opacity-100">
@@ -145,7 +145,7 @@ export default function Header() {
             <a href="/agences" className="flex items-center min-h-11 px-3 py-2.5 rounded-xl bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100">
               Concessionnaires
             </a>
-            <a href="#" className="flex items-center min-h-11 px-3 py-2.5 rounded-xl bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100">
+            <a href="/conseils" className="flex items-center min-h-11 px-3 py-2.5 rounded-xl bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100">
               Conseils
             </a>
             <a href="#" className="flex items-center justify-between min-h-11 px-3 py-2.5 rounded-xl bg-sky-50 border border-sky-500/35 text-sm font-semibold text-sky-600">
