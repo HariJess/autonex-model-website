@@ -50,12 +50,12 @@ export function HeroCinematic() {
       <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-28 pb-12 md:pb-20 lg:pb-24">
         <div className="flex flex-col gap-8 md:gap-10 max-w-5xl mx-auto items-center">
           <div className="max-w-4xl text-center">
-            <h1 className="font-sans font-bold text-5xl sm:text-6xl lg:text-7xl text-white leading-[1.1] tracking-tight">
+            <h1 className="font-sans font-bold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-white leading-[1.1] tracking-tight">
               {t("hero.title.line1Prefix", "Trouvez le ")}
               <span className="text-sky-400">{t("hero.title.accent", "véhicule")}</span>
               {t("hero.title.line2Suffix", " qui vous correspond à Madagascar")}
             </h1>
-            <p className="mt-4 md:mt-5 font-sans text-lg sm:text-xl lg:text-2xl text-white/90">
+            <p className="mt-4 md:mt-5 font-sans text-base sm:text-lg lg:text-xl text-white/90">
               {t("hero.subtitle", "Le portail auto N°1 de Madagascar")}
             </p>
           </div>

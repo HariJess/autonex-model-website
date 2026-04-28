@@ -273,7 +273,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
   const pillIconClass = hideBackground ? "text-white/70" : "text-accent";
   const pillHoverClass = hideBackground ? "hover:bg-white/10 transition-colors" : "hover:bg-muted/50 transition-colors";
   const ctaClass = hideBackground
-    ? "bg-sky-400 hover:bg-sky-300 text-slate-900 font-semibold font-sans gap-2 shadow-lg shadow-sky-400/20"
+    ? "bg-white hover:bg-white/90 text-slate-900 font-semibold font-sans gap-2 shadow-lg shadow-black/20"
     : "gradient-primary border-0 font-semibold font-sans gap-2";
   const ctaStyle: CSSProperties | undefined = hideBackground ? undefined : { color: "#FAFAFA" };
   const mobileOutlineClass = hideBackground
