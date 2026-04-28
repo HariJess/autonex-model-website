@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useMemo, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import HeroSearch from "@/components/HeroSearch";
+import HeroCinematic from "@/components/HeroCinematic";
 import ListingCard from "@/components/ListingCard";
 import { ChevronRight } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
@@ -305,7 +305,7 @@ const Index = () => {
       </Helmet>
       <Header />
 
-      <HeroSearch />
+      <HeroCinematic />
 
       <PremiumBillboard className="my-6 md:my-8" enabled={MONETIZATION_PLACEMENTS.homeBillboard} />
 

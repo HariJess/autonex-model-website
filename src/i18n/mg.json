@@ -293,8 +293,24 @@
     "searching": "Mikaroka...",
     "seeListings": "Hijery annonce",
     "seeXListings": "Hijery annonce {{count}}",
-    "subtitle": "Tsena fiara azo itokisana ho an'i Madagasikara",
-    "title": "Mitadiava fiara mety aminao eto Madagasikara",
+    "subtitle": "Annonce voamarina manerana an'i Madagasikara. Mpivarotra fantatra, fifampiraharahana mora kokoa.",
+    "title": {
+      "accent": "fiara",
+      "line1Prefix": "Mitadiava ny ",
+      "line2": "mifanaraka aminao"
+    },
+    "aria": "Fikarohana fiara amin'AutoNex",
+    "linkBuy": "Hividy",
+    "linkEstimate": "Tombano ny fiarako",
+    "linkRent": "Hampanofa",
+    "searchAria": "Mikaroka fiara",
+    "searchButton": "Mikaroka",
+    "searchPlaceholder": "Marika, modely, karazana fiara…",
+    "secondaryNav": "Hetsika hafa",
+    "stats": {
+      "activeListings": "{{count}} annonce mavitrika",
+      "verifiedSellers": "{{count}} mpivarotra voamarina"
+    },
     "trustEstimationFree": "Tombana maimaim-poana",
     "trustEstimationFreeShort": "Tombana",
     "trustMadeInMg": "100% Malagasy",

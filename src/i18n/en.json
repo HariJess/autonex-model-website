@@ -293,8 +293,24 @@
     "searching": "Searching...",
     "seeListings": "View listings",
     "seeXListings": "View {{count}} listings",
-    "subtitle": "Madagascar's #1 auto marketplace",
-    "title": "Find the right vehicle in Madagascar",
+    "subtitle": "Verified listings across Madagascar. Identified sellers, simplified negotiation.",
+    "title": {
+      "accent": "vehicle",
+      "line1Prefix": "Find the ",
+      "line2": "that fits you"
+    },
+    "aria": "Vehicle search on AutoNex",
+    "linkBuy": "Buy",
+    "linkEstimate": "Estimate my car",
+    "linkRent": "Rent",
+    "searchAria": "Search for a vehicle",
+    "searchButton": "Search",
+    "searchPlaceholder": "Brand, model, vehicle type…",
+    "secondaryNav": "Other actions",
+    "stats": {
+      "activeListings": "{{count}} active listings",
+      "verifiedSellers": "{{count}} verified sellers"
+    },
     "trustEstimationFree": "Free estimation",
     "trustEstimationFreeShort": "Estimation",
     "trustMadeInMg": "100% Malagasy",
