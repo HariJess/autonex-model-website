@@ -18,6 +18,12 @@ dist
 dist-ssr
 *.local
 
+# Playwright
+/playwright-report/
+/playwright/.cache/
+/test-results/
+/blob-report/
+
 # Environment (secrets — never commit)
 .env
 .env.*
