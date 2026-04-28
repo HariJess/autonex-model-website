@@ -19,6 +19,7 @@ const LEGAL_LINKS: { to: string; label: string }[] = [
   { to: "/legal/confidentialite", label: "Politique de confidentialité" },
   { to: "/legal/cgu", label: "CGU" },
   { to: "/legal/cookies", label: "Cookies" },
+  { to: "/legal/suppression-donnees", label: "Suppression des données" },
 ];
 
 export function LegalLayout({
