@@ -36,7 +36,25 @@ test.describe("Publish path: buyer with credits creates a listing", () => {
     }
   });
 
-  test("buyer creates a listing using credits", async ({ page }) => {
+  test.fixme("buyer creates a listing using credits", async ({ page }) => {
+    // TODO E2E-PUBLISH: rewrite this test for the real PublishPage flow.
+    //
+    // Current state (2026-04-29): this test was written assuming a flat form
+    // with a "Titre" field at step 1. Reality is a 4-step wizard:
+    //   Step 1: Type de transaction + Type de véhicule + flags
+    //   Step 2: Marque + Modèle + Année + Prix
+    //   Step 3: Photos
+    //   Step 4: Visibilité & envoi
+    // The listing title is auto-generated from brand/model/year, not typed.
+    //
+    // PublishPage is scheduled for refacto (1144 lines / 58 useState ->
+    // react-hook-form + Zod wizard). Rewriting selectors against the current
+    // chaotic structure would be wasted effort: every selector breaks again
+    // at refacto.
+    //
+    // Action: re-enable this test (remove .fixme) when the refacto is merged
+    // and add data-testid attributes to each wizard step's primary inputs
+    // (publish-step1-type-transaction, publish-step2-brand, etc.).
     test.skip(!SUPABASE_URL || !SERVICE_ROLE, "missing SUPABASE env vars");
 
     await loginAs(page, "buyer");

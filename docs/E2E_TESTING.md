@@ -51,10 +51,24 @@ Variables requises dans `.env.test` à la racine du repo :
 |---------|-----------|
 | `e2e/happy-path.spec.ts` | Achat pack → admin approve → 200 crédits crédités |
 | `e2e/reject-path.spec.ts` | Achat pack → admin rejette → solde inchangé |
-| `e2e/publish-path.spec.ts` | Buyer avec 100 crédits publie une annonce |
+| `e2e/publish-path.spec.ts` | Buyer avec 100 crédits publie une annonce (FIXME — voir section Tests skipped) |
 | `e2e/happy-path.mobile.spec.ts` | Initiation achat sur viewport iPhone 13 |
 
 Les tests sont **séquentiels** (`workers: 1`) pour éviter les races sur le buyer/admin partagés. Auto-skippent si `SUPABASE_URL` ou `SUPABASE_SERVICE_ROLE_KEY` manquent en env.
+
+## Tests skipped
+
+### `publish-path.spec.ts` — `buyer creates a listing using credits`
+
+Marqué en `test.fixme()` parce que la PublishPage actuelle (1144 lignes, 58 useState) est un wizard 4-étapes avec génération automatique du titre depuis marque/modèle/année. Le test supposait un champ "Titre" éditable directement.
+
+**À ré-implémenter** lors du sprint refacto PublishPage (planifié), où la page sera réécrite en `react-hook-form` + Zod. Ajouter alors des `data-testid` sur les inputs principaux de chaque étape (`publish-step1-type-transaction`, `publish-step2-brand`, etc.).
+
+**Status courant des E2E** :
+- `happy-path` : PASSING
+- `reject-path` : PASSING
+- `happy-path.mobile` : à valider
+- `publish-path` : FIXME (voir ci-dessus)
 
 ## Mocks vanilla_pay
 
