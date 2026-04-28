@@ -5,9 +5,9 @@ import { Search, MapPin, ChevronDown, Car, Banknote } from "lucide-react"
 export function HeroSearch() {
   return (
     // Supprimé mt-24 — le positionnement est géré par le parent
-    <div className="z-50 relative w-full">
+    <div className="mt-28 z-10 relative w-full ">
       {/* Transaction Tabs */}
-      <div className="flex justify-center gap-2 mb-3 flex-wrap mx-4">
+      <div className="flex justify-start gap-2 mb-3 flex-wrap mx-4">
         <button
           type="button"
           className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all min-h-11 border bg-sky-500 text-white border-sky-500 shadow-lg"
@@ -78,7 +78,7 @@ export function HeroSearch() {
 
         <button
           type="button"
-          className="hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-slate-900 hover:bg-gray-50 rounded-lg transition-colors"
+          className="hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 text-sm bg-gray-50 text-slate-900 hover:opacity-75 cursor-pointer rounded-lg transition-colors"
         >
           <span>Recherche avancée</span>
           <ChevronDown className="h-4 w-4" />
@@ -128,7 +128,7 @@ export function HeroSearch() {
       </div>
 
       {/* Trust signals */}
-      <div className="flex flex-nowrap items-center justify-center gap-x-3 md:gap-x-8 text-gray-500 text-[11px] md:text-sm px-2">
+      <div className="flex flex-nowrap items-center justify-center gap-x-3 md:gap-x-8 text-white/80 text-[11px] md:text-sm px-2">
         {[
           { short: "Vérifiés", long: "Annonces vérifiées" },
           { short: "Fiables", long: "Vendeurs fiables" },
@@ -136,8 +136,8 @@ export function HeroSearch() {
         ].map((item, i) => (
           <span key={i} className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
             <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" aria-hidden="true">
-              <path d="M12 2 L4 5 V12 C4 17 7.5 21 12 22 C16.5 21 20 17 20 12 V5 L12 2Z" fill="#0a142f" />
-              <path d="M8 12 L11 15 L16 9" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 2 L4 5 V12 C4 17 7.5 21 12 22 C16.5 21 20 17 20 12 V5 L12 2Z" fill="white" />
+              <path d="M8 12 L11 15 L16 9" stroke="#0a142f" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="md:hidden">{item.short}</span>
             <span className="hidden md:inline">{item.long}</span>

@@ -7,7 +7,7 @@ export default function HeroSection() {
     <div className="relative max-w-7xl mx-auto px-4 sm:px-6 mt-6 pb-16">
       
       {/* Image de fond — overflow-hidden uniquement sur la card image */}
-      <div className="relative h-[500px] sm:h-[560px] lg:h-[620px] bg-cover bg-center overflow-hidden rounded-3xl">
+      <div className="relative h-[500px] sm:h-[560px] lg:h-[700px] bg-cover bg-center overflow-hidden rounded-3xl">
         {/* Background Image */}
         <div
           className="absolute inset-0"
@@ -36,13 +36,14 @@ export default function HeroSection() {
               Le portail auto N°1 de Madagascar
             </p>
           </div>
+          <HeroSearch />
         </div>
       </div>
 
       {/* HeroSearch — en dehors du overflow-hidden, chevauche le bas de la card */}
-      <div className="relative -mt-16 sm:-mt-40 z-10 px-2 sm:px-4 lg:px-0 mx-0 md:mx-4 lg:mx-12 bg-white rounded-2xl shadow-2xl border border-gray-100 py-4">
+      {/* <div className="relative -mt-16 sm:-mt-40 z-10 px-2 sm:px-4 lg:px-0 mx-0 md:mx-4 lg:mx-12 bg-white rounded-2xl shadow-2xl border border-gray-100 py-4">
         <HeroSearch />
-      </div>
+      </div> */}
     </div>
   )
 }
