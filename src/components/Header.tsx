@@ -76,6 +76,13 @@ const Header = () => {
     : "text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center justify-between touch-manipulation border border-navbar-accent/35 bg-white/[0.03] text-navbar-foreground active:bg-white/[0.1]";
 
   return (
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:shadow-lg focus:ring-2 focus:ring-ring"
+      >
+        {t("a11y.skipToContent", "Aller au contenu principal")}
+      </a>
     <header className="sticky top-0 z-50 border-b border-white/10 bg-navbar/95 backdrop-blur-md">
       <div className="container mx-auto flex items-center justify-between h-[4rem] sm:h-[4.75rem]">
         <Link to="/" className="flex-shrink-0 min-h-11 flex items-center">
@@ -332,6 +339,12 @@ const Header = () => {
         </div>
       )}
     </header>
+    {/* Skip-link target. tabIndex=-1 lets the browser focus this element on hash
+        navigation without making it a Tab stop in normal flow. Pages render
+        their main content directly after Header, so this lands the user past
+        the navigation. */}
+    <div id="main-content" tabIndex={-1} className="sr-only" aria-hidden="true" />
+    </>
   );
 };
 
