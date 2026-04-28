@@ -293,24 +293,13 @@
     "searching": "Recherche...",
     "seeListings": "Voir les annonces",
     "seeXListings": "Voir {{count}} annonces",
-    "subtitle": "Annonces vérifiées partout à Madagascar. Vendeurs identifiés, négociation simplifiée.",
+    "subtitle": "Le portail auto N°1 de Madagascar",
     "title": {
       "accent": "véhicule",
       "line1Prefix": "Trouvez le ",
-      "line2": "qui vous correspond"
+      "line2Suffix": " qui vous correspond à Madagascar"
     },
     "aria": "Recherche de véhicule sur AutoNex",
-    "linkBuy": "Acheter",
-    "linkEstimate": "Estimer ma voiture",
-    "linkRent": "Louer",
-    "searchAria": "Rechercher un véhicule",
-    "searchButton": "Rechercher",
-    "searchPlaceholder": "Marque, modèle, type de véhicule…",
-    "secondaryNav": "Autres actions",
-    "stats": {
-      "activeListings": "{{count}} annonces actives",
-      "verifiedSellers": "{{count}} vendeurs vérifiés"
-    },
     "trustEstimationFree": "Estimation gratuite",
     "trustEstimationFreeShort": "Estimation",
     "trustMadeInMg": "100% Malgache",

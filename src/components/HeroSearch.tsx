@@ -56,7 +56,7 @@ function summarizeSelection(
   return `${labels[0]}${joiner}${labels[1]} +${labels.length - 2}`;
 }
 
-const HeroSearch = () => {
+const HeroSearch = ({ hideHeader = false }: { hideHeader?: boolean } = {}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
@@ -257,18 +257,22 @@ const HeroSearch = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
 
       <div className="relative container mx-auto text-center">
-        <h1
-          className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight px-1"
-          style={{ color: "#FAFAFA" }}
-        >
-          {t("hero.title")}
-        </h1>
-        <p
-          className="text-sm sm:text-lg md:text-xl mb-5 md:mb-9 font-sans max-w-2xl mx-auto px-1 leading-relaxed"
-          style={{ color: "rgba(250,250,250,0.85)" }}
-        >
-          {t("hero.subtitle")}
-        </p>
+        {!hideHeader ? (
+          <>
+            <h1
+              className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight px-1"
+              style={{ color: "#FAFAFA" }}
+            >
+              {t("hero.title")}
+            </h1>
+            <p
+              className="text-sm sm:text-lg md:text-xl mb-5 md:mb-9 font-sans max-w-2xl mx-auto px-1 leading-relaxed"
+              style={{ color: "rgba(250,250,250,0.85)" }}
+            >
+              {t("hero.subtitle")}
+            </p>
+          </>
+        ) : null}
 
         <div className="max-w-4xl mx-auto">
           {/* Desktop: 3 onglets visibles (Acheter / Longue / Courte) */}
