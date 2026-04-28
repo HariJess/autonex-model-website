@@ -13,6 +13,9 @@ Variables requises dans `.env.test` à la racine du repo :
 - `VITE_SUPABASE_URL_TEST` — URL du projet staging
 - `VITE_SUPABASE_PUBLISHABLE_KEY_TEST` — anon key du staging
 - `SUPABASE_SERVICE_ROLE_KEY_TEST` — service-role du staging (NEVER commit)
+- `VITE_BETA_ACCESS_CODE` — code beta utilisé par le bundle staging pour vérifier l'unlock dans `useBetaAccess`
+- `VITE_BETA_LOCK_ENABLED` — `"true"` ou `"false"`. Si `"false"`, le gate est désactivé et `passBetaGate` est un no-op
+- `E2E_BETA_ACCESS_CODE` — même valeur que `VITE_BETA_ACCESS_CODE`. Lu par le helper Playwright pour le saisir dans le formulaire `/beta-login`. Si absent, le helper retombe sur `VITE_BETA_ACCESS_CODE`
 
 `playwright.config.ts` charge ces vars puis les remappe vers les noms attendus par les specs (`SUPABASE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`). Le bloc `webServer` rebuild le front à chaque run (`npm run build && npm run preview`) pour que le bundle soit fait avec les vars staging et non avec les vars du `.env` local (prod).
 
