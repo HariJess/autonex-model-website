@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { AuthGoogleButton } from "@/pages/auth/components/AuthGoogleButton";
+import { AuthOAuthButtons } from "@/pages/auth/components/AuthOAuthButtons";
 import type { ReactNode } from "react";
 
 type SignupFormProps = {
@@ -34,8 +34,9 @@ type SignupFormProps = {
     signupParticulierDesc: string;
     signupProCta: string;
     signupProDesc: string;
-    continueWithGoogle: string;
-    googleSignupParticulierOnly: string;
+    google: string;
+    facebook: string;
+    oauthHint: string;
     orWithEmail: string;
     firstName: string;
     lastName: string;
@@ -56,8 +57,10 @@ type SignupFormProps = {
     login: string;
   };
   googleIcon: ReactNode;
+  facebookIcon: ReactNode;
   onSetRole: (role: "particulier" | "agence") => void;
   onGoogleSignup: () => void;
+  onFacebookSignup: () => void;
   onSubmit: (e: React.FormEvent) => void;
   onFieldChange: (field: keyof SignupFormProps["form"], value: string | boolean) => void;
   onSwitchToParticulier: () => void;
@@ -70,8 +73,10 @@ export function SignupForm({
   form,
   labels,
   googleIcon,
+  facebookIcon,
   onSetRole,
   onGoogleSignup,
+  onFacebookSignup,
   onSubmit,
   onFieldChange,
   onSwitchToParticulier,
@@ -114,13 +119,16 @@ export function SignupForm({
         </div>
 
         {role === "particulier" && (
-          <AuthGoogleButton
+          <AuthOAuthButtons
             disabled={loading}
-            label={labels.continueWithGoogle}
-            hint={labels.googleSignupParticulierOnly}
+            googleLabel={labels.google}
+            facebookLabel={labels.facebook}
+            hint={labels.oauthHint}
             orLabel={labels.orWithEmail}
-            onClick={onGoogleSignup}
-            icon={googleIcon}
+            onGoogle={onGoogleSignup}
+            onFacebook={onFacebookSignup}
+            googleIcon={googleIcon}
+            facebookIcon={facebookIcon}
           />
         )}
 

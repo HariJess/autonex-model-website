@@ -55,6 +55,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   /** OAuth Google — réservé au parcours particulier (profil `particulier`, pas d’agence). */
   signInWithGoogle: () => Promise<{ error: Error | null }>;
+  /** OAuth Facebook — réservé au parcours particulier, même contrat que `signInWithGoogle`. */
+  signInWithFacebook: () => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, metadata: SignUpMetadata) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -190,6 +192,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error: error as Error | null };
   };
 
+  const signInWithFacebook = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    return { error: error as Error | null };
+  };
+
   const signUp = async (email: string, password: string, metadata: SignUpMetadata) => {
     const { error } = await supabase.auth.signUp({
       email,
@@ -236,6 +248,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading,
         signIn,
         signInWithGoogle,
+        signInWithFacebook,
         signUp,
         signOut,
         refreshProfile,

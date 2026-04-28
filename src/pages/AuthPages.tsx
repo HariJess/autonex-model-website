@@ -52,11 +52,22 @@ function GoogleLogo() {
   );
 }
 
+function FacebookLogo() {
+  return (
+    <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" aria-hidden>
+      <path
+        fill="#1877F2"
+        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+      />
+    </svg>
+  );
+}
+
 const LoginPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, signInWithFacebook } = useAuth();
   const [loginKind, setLoginKind] = useState<"particulier" | "agence">("particulier");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,6 +77,16 @@ const LoginPage = () => {
     if (loginKind !== "particulier") return;
     setLoading(true);
     const { error } = await signInWithGoogle();
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleFacebook = async () => {
+    if (loginKind !== "particulier") return;
+    setLoading(true);
+    const { error } = await signInWithFacebook();
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -102,8 +123,9 @@ const LoginPage = () => {
           login: t("auth.login"),
           loginKindParticulier: t("auth.loginKindParticulier", "Particulier"),
           loginKindAgence: t("auth.loginKindAgence", "Agence"),
-          continueWithGoogle: t("auth.continueWithGoogle", "Continuer avec Google"),
-          googleLoginParticulierOnly: t("auth.googleLoginParticulierOnly", "Réservé aux comptes particuliers. Les agences utilisent email et mot de passe."),
+          google: t("auth.google", "Google"),
+          facebook: t("auth.facebook", "Facebook"),
+          oauthHint: t("auth.googleLoginParticulierOnly", "Réservé aux comptes particuliers. Les agences utilisent email et mot de passe."),
           orWithEmail: t("auth.orWithEmail", "ou"),
           agencyLoginEmailOnly: t("auth.agencyLoginEmailOnly", "Connexion agence : utilisez l’email et le mot de passe de votre compte professionnel."),
           email: t("auth.email"),
@@ -114,8 +136,10 @@ const LoginPage = () => {
           loading: t("common.loading"),
         }}
         googleIcon={<GoogleLogo />}
+        facebookIcon={<FacebookLogo />}
         onSetLoginKind={setLoginKind}
         onGoogle={handleGoogle}
+        onFacebook={handleFacebook}
         onSubmit={handleLogin}
         onEmailChange={setEmail}
         onPasswordChange={setPassword}
@@ -127,7 +151,7 @@ const LoginPage = () => {
 const SignupPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, signInWithFacebook } = useAuth();
   const [role, setRole] = useState<"particulier" | "agence">("particulier");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -150,6 +174,16 @@ const SignupPage = () => {
     if (role !== "particulier") return;
     setLoading(true);
     const { error } = await signInWithGoogle();
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleFacebookSignup = async () => {
+    if (role !== "particulier") return;
+    setLoading(true);
+    const { error } = await signInWithFacebook();
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -277,8 +311,9 @@ const SignupPage = () => {
           signupParticulierDesc: t("auth.signupParticulierDesc", "Particulier ou vendeur indépendant"),
           signupProCta: t("auth.signupProCta", "Professionnel / agence"),
           signupProDesc: t("auth.signupProDesc", "Concessionnaire ou activité structurée"),
-          continueWithGoogle: t("auth.continueWithGoogle", "Continuer avec Google"),
-          googleSignupParticulierOnly: t("auth.googleSignupParticulierOnly", "Compte particulier uniquement — pas d’inscription agence via Google."),
+          google: t("auth.google", "Google"),
+          facebook: t("auth.facebook", "Facebook"),
+          oauthHint: t("auth.googleSignupParticulierOnly", "Compte particulier uniquement — pas d’inscription agence via Google."),
           orWithEmail: t("auth.orWithEmail", "ou"),
           firstName: t("auth.firstName", "Prénom"),
           lastName: t("auth.lastName", "Nom"),
@@ -299,8 +334,10 @@ const SignupPage = () => {
           login: t("auth.login"),
         }}
         googleIcon={<GoogleLogo />}
+        facebookIcon={<FacebookLogo />}
         onSetRole={setRole}
         onGoogleSignup={handleGoogleSignup}
+        onFacebookSignup={handleFacebookSignup}
         onSubmit={handleSignup}
         onFieldChange={(field, value) => {
           switch (field) {

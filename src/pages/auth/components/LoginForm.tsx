@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AuthGoogleButton } from "@/pages/auth/components/AuthGoogleButton";
+import { AuthOAuthButtons } from "@/pages/auth/components/AuthOAuthButtons";
 import type { ReactNode } from "react";
 
 type LoginFormProps = {
@@ -14,8 +14,9 @@ type LoginFormProps = {
     login: string;
     loginKindParticulier: string;
     loginKindAgence: string;
-    continueWithGoogle: string;
-    googleLoginParticulierOnly: string;
+    google: string;
+    facebook: string;
+    oauthHint: string;
     orWithEmail: string;
     agencyLoginEmailOnly: string;
     email: string;
@@ -26,8 +27,10 @@ type LoginFormProps = {
     loading: string;
   };
   googleIcon: ReactNode;
+  facebookIcon: ReactNode;
   onSetLoginKind: (kind: "particulier" | "agence") => void;
   onGoogle: () => void;
+  onFacebook: () => void;
   onSubmit: (e: React.FormEvent) => void;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
@@ -40,8 +43,10 @@ export function LoginForm({
   loading,
   labels,
   googleIcon,
+  facebookIcon,
   onSetLoginKind,
   onGoogle,
+  onFacebook,
   onSubmit,
   onEmailChange,
   onPasswordChange,
@@ -72,13 +77,16 @@ export function LoginForm({
         </button>
       </div>
       {loginKind === "particulier" && (
-        <AuthGoogleButton
+        <AuthOAuthButtons
           disabled={loading}
-          label={labels.continueWithGoogle}
-          hint={labels.googleLoginParticulierOnly}
+          googleLabel={labels.google}
+          facebookLabel={labels.facebook}
+          hint={labels.oauthHint}
           orLabel={labels.orWithEmail}
-          onClick={onGoogle}
-          icon={googleIcon}
+          onGoogle={onGoogle}
+          onFacebook={onFacebook}
+          googleIcon={googleIcon}
+          facebookIcon={facebookIcon}
         />
       )}
       {loginKind === "agence" && <p className="text-xs text-muted-foreground font-sans text-center">{labels.agencyLoginEmailOnly}</p>}
@@ -107,4 +115,3 @@ export function LoginForm({
     </>
   );
 }
-
