@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Euro, Banknote, ChevronDown } from "lucide-react";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, type CSSProperties } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -256,6 +256,39 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
   const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency);
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
 
+  // Class forks for the glass / on-dark variant used inside HeroCinematic.
+  // Default rendering (hideBackground=false) is unchanged.
+  const outerCardClass = hideBackground
+    ? "bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl shadow-black/20 p-4 md:p-6 relative z-10"
+    : "bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 -mb-8 md:-mb-12 relative z-10 border border-border/70";
+  const desktopPillClass = hideBackground
+    ? "hidden lg:flex items-center gap-0 bg-white/10 backdrop-blur-sm rounded-xl border border-white/15 overflow-hidden"
+    : "hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border/80 overflow-hidden";
+  const pillBorderClass = hideBackground ? "border-white/15" : "border-border";
+  const pillLabelClass = hideBackground
+    ? "text-[10px] uppercase tracking-wider text-white/60 font-sans font-medium mb-0.5 block text-left"
+    : "text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left";
+  const pillValueIdleClass = hideBackground ? "text-white/60" : "text-muted-foreground";
+  const pillValueSetClass = hideBackground ? "text-white" : "text-foreground";
+  const pillIconClass = hideBackground ? "text-white/70" : "text-accent";
+  const pillHoverClass = hideBackground ? "hover:bg-white/10 transition-colors" : "hover:bg-muted/50 transition-colors";
+  const ctaClass = hideBackground
+    ? "bg-sky-400 hover:bg-sky-300 text-slate-900 font-semibold font-sans gap-2 shadow-lg shadow-sky-400/20"
+    : "gradient-primary border-0 font-semibold font-sans gap-2";
+  const ctaStyle: CSSProperties | undefined = hideBackground ? undefined : { color: "#FAFAFA" };
+  const mobileOutlineClass = hideBackground
+    ? "bg-white/10 hover:bg-white/15 border-white/15 text-white backdrop-blur-sm"
+    : "";
+  const mobileAdvancedShellClass = hideBackground
+    ? "space-y-2.5 rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm p-2.5"
+    : "space-y-2.5 rounded-xl border border-border/70 bg-background/60 p-2.5";
+  const desktopAdvancedShellBaseClass = hideBackground
+    ? "hidden lg:grid gap-3 mt-2 rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm p-3"
+    : "hidden lg:grid gap-3 mt-2 rounded-xl border border-border/70 bg-background/70 p-3";
+  const trustWrapperClass = hideBackground
+    ? "mt-4 md:mt-6 flex flex-nowrap items-center justify-center gap-x-2.5 md:gap-x-8 text-white/80 text-[11px] md:text-sm font-sans tracking-tight md:tracking-normal px-2"
+    : "mt-12 md:mt-16 flex flex-nowrap items-center justify-center gap-x-2.5 md:gap-x-8 text-white/80 text-[11px] md:text-sm font-sans tracking-tight md:tracking-normal px-2";
+
   return (
     <section
       className={cn(
@@ -378,15 +411,23 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
             </Popover>
           </div>
 
-          <div className="bg-card/98 rounded-2xl shadow-2xl p-3 md:p-4 -mb-8 md:-mb-12 relative z-10 border border-border/70">
-            <div className="hidden lg:flex items-center gap-0 bg-background rounded-xl border border-border/80 overflow-hidden">
-              <div className="flex-1 border-r border-border px-3 py-2">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block text-left">
+          <div className={outerCardClass}>
+            <div className={desktopPillClass}>
+              <div className={cn("flex-1 border-r px-3 py-2", pillBorderClass)}>
+                <label className={pillLabelClass}>
                   {t("hero.type")}
                 </label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left truncate">{typeLabel}</button>
+                    <button
+                      type="button"
+                      className={cn(
+                        "w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left truncate",
+                        hideBackground && "text-white",
+                      )}
+                    >
+                      {typeLabel}
+                    </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-72 p-3" align="start">
                     <div className="mb-2 flex items-center justify-between">
@@ -413,14 +454,14 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex-1 border-r border-border px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                    className={cn("flex-1 border-r px-3 py-2 text-left", pillBorderClass, pillHoverClass)}
                   >
-                    <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
+                    <label className={cn(pillLabelClass, "text-left")}>
                       {t("hero.location")}
                     </label>
                     <div className="flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5 text-accent shrink-0" />
-                      <span className={`font-sans text-sm truncate ${locationLabel ? "text-foreground" : "text-muted-foreground"}`}>
+                      <MapPin className={cn("h-3.5 w-3.5 shrink-0", pillIconClass)} />
+                      <span className={cn("font-sans text-sm truncate", locationLabel ? pillValueSetClass : pillValueIdleClass)}>
                         {locationLabel || t("hero.location")}
                       </span>
                     </div>
@@ -439,14 +480,14 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex-1 px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                    className={cn("flex-1 px-3 py-2 text-left", pillHoverClass)}
                   >
-                    <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans font-medium mb-0.5 block">
+                    <label className={cn(pillLabelClass, "text-left")}>
                       {t("search.budget")}
                     </label>
                     <div className="flex items-center gap-1.5">
-                      <BudgetIcon className="h-3.5 w-3.5 text-accent shrink-0" />
-                      <span className={`font-sans text-sm truncate ${budgetLabel ? "text-foreground" : "text-muted-foreground"}`}>
+                      <BudgetIcon className={cn("h-3.5 w-3.5 shrink-0", pillIconClass)} />
+                      <span className={cn("font-sans text-sm truncate", budgetLabel ? pillValueSetClass : pillValueIdleClass)}>
                         {budgetLabel || t("search.budget")}
                       </span>
                     </div>
@@ -471,8 +512,8 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
             <Button
               type="button"
               onClick={handleSearch}
-              className="hidden lg:flex mt-3 w-full gradient-primary border-0 font-semibold font-sans gap-2 h-12 rounded-xl"
-              style={{ color: "#FAFAFA" }}
+              className={cn("hidden lg:flex mt-3 w-full h-12 rounded-xl", ctaClass)}
+              style={ctaStyle}
             >
               <Search className="h-5 w-5" />
               {ctaLabel}
@@ -482,7 +523,12 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
             <button
               type="button"
               onClick={() => setShowDesktopAdvanced((prev) => !prev)}
-              className="hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 font-sans text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
+              className={cn(
+                "hidden lg:flex mt-2 w-full items-center justify-center gap-2 px-3 py-2 font-sans text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2",
+                hideBackground
+                  ? "text-white/80 hover:text-white hover:bg-white/10"
+                  : "text-foreground/70 hover:text-foreground hover:bg-muted/50",
+              )}
               aria-expanded={showDesktopAdvanced}
               aria-controls="hero-advanced-filters-desktop"
             >
@@ -494,7 +540,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
             {showDesktopAdvanced && (
               <div
                 id="hero-advanced-filters-desktop"
-                className={`hidden lg:grid gap-3 mt-2 rounded-xl border border-border/70 bg-background/70 p-3 ${showBrand ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}
+                className={cn(desktopAdvancedShellBaseClass, showBrand ? "lg:grid-cols-4" : "lg:grid-cols-3")}
               >
                 {showBrand && (
                   <div>
@@ -607,7 +653,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
             <div className="lg:hidden space-y-2.5">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate">
+                  <Button type="button" variant="outline" className={cn("w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate", mobileOutlineClass)}>
                     {typeLabel}
                   </Button>
                 </PopoverTrigger>
@@ -633,8 +679,8 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
 
               <Popover open={mobileLocationOpen} onOpenChange={setMobileLocationOpen}>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation">
-                    <MapPin className="h-4 w-4 text-accent" />
+                  <Button type="button" variant="outline" className={cn("w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation", mobileOutlineClass)}>
+                    <MapPin className={cn("h-4 w-4", hideBackground ? "text-white/70" : "text-accent")} />
                     {locationLabel || t("hero.location")}
                   </Button>
                 </PopoverTrigger>
@@ -653,8 +699,8 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
 
               <Popover open={mobileBudgetOpen} onOpenChange={setMobileBudgetOpen}>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation">
-                    <BudgetIcon className="h-4 w-4 text-accent shrink-0" />
+                  <Button type="button" variant="outline" className={cn("w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation", mobileOutlineClass)}>
+                    <BudgetIcon className={cn("h-4 w-4 shrink-0", hideBackground ? "text-white/70" : "text-accent")} />
                     {budgetLabel || t("search.budget", "Budget")}
                   </Button>
                 </PopoverTrigger>
@@ -678,7 +724,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
                 type="button"
                 variant="outline"
                 onClick={() => setShowMobileAdvanced((prev) => !prev)}
-                className="w-full justify-center font-sans text-sm min-h-11"
+                className={cn("w-full justify-center font-sans text-sm min-h-11", mobileOutlineClass)}
               >
                 {showMobileAdvanced
                   ? t("hero.hideAdvancedMobile", "Masquer les filtres avancés")
@@ -686,7 +732,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
               </Button>
 
               {showMobileAdvanced && (
-                <div className="space-y-2.5 rounded-xl border border-border/70 bg-background/60 p-2.5">
+                <div className={mobileAdvancedShellClass}>
                   {showBrand && (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -781,8 +827,8 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
               <Button
                 type="button"
                 onClick={handleSearch}
-                className="w-full gradient-primary border-0 font-semibold font-sans gap-2 h-12 touch-manipulation min-h-12"
-                style={{ color: "#FAFAFA" }}
+                className={cn("w-full h-12 touch-manipulation min-h-12", ctaClass)}
+                style={ctaStyle}
               >
                 <Search className="h-5 w-5" />
                 {ctaLabel}
@@ -791,7 +837,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
           </div>
 
           {/* Trust signals sobres sous la card search — Lot 4.4e */}
-          <div className="mt-12 md:mt-16 flex flex-nowrap items-center justify-center gap-x-2.5 md:gap-x-8 text-white/80 text-[11px] md:text-sm font-sans tracking-tight md:tracking-normal px-2">
+          <div className={trustWrapperClass}>
             <span className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
               <svg
                 viewBox="0 0 24 24"
