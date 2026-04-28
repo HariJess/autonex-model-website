@@ -1,4 +1,4 @@
-import { parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js";
+import { parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js/min";
 
 const DEFAULT_REGION: CountryCode = "MG";
 

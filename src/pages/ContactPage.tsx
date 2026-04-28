@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
-import { isValidPhoneNumber } from "libphonenumber-js";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
 import { Mail, MapPin, Clock } from "lucide-react";
 
 import Header from "@/components/Header";

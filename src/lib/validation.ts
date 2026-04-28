@@ -1,4 +1,4 @@
-import { parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js";
+import { parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js/min";
 import { z } from "zod";
 
 const EMAIL_MAX = 255;
