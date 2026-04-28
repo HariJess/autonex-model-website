@@ -1,4 +1,38 @@
 import { defineConfig, devices } from "@playwright/test";
+import { config as dotenvConfig } from "dotenv";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+// Resolve __dirname under ESM (Vite/Node loader). Required because this config
+// is loaded as ESM by Playwright.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env.test BEFORE reading any process.env in this file.
+// This routes every E2E run to the staging Supabase project so we can never
+// pollute prod data by accident.
+dotenvConfig({ path: path.resolve(__dirname, ".env.test") });
+
+// Map the *_TEST suffixed vars to the names the test code expects.
+// .env.test owns the staging credentials; the test code stays env-agnostic.
+if (process.env.VITE_SUPABASE_URL_TEST && !process.env.SUPABASE_URL) {
+  process.env.SUPABASE_URL = process.env.VITE_SUPABASE_URL_TEST;
+}
+if (process.env.VITE_SUPABASE_URL_TEST && !process.env.VITE_SUPABASE_URL) {
+  process.env.VITE_SUPABASE_URL = process.env.VITE_SUPABASE_URL_TEST;
+}
+if (process.env.VITE_SUPABASE_PUBLISHABLE_KEY_TEST && !process.env.VITE_SUPABASE_ANON_KEY) {
+  process.env.VITE_SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY_TEST;
+}
+if (
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY_TEST &&
+  !process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+) {
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY_TEST;
+}
+if (process.env.SUPABASE_SERVICE_ROLE_KEY_TEST && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY_TEST;
+}
 
 const PORT = process.env.E2E_PORT ? parseInt(process.env.E2E_PORT, 10) : 4173;
 const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
@@ -6,7 +40,7 @@ const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 /**
  * Playwright config for AutoNex E2E tests.
  *
- * Tests target a real Supabase project (URL via SUPABASE_URL or VITE_SUPABASE_URL).
+ * Tests target the staging Supabase project (loaded from .env.test above).
  * The vanilla_pay edge function is intercepted via Playwright's route() — the
  * tests never hit the real vanilla-pay.net portal.
  *
@@ -18,9 +52,10 @@ const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
  * Run UI mode:  npm run e2e:ui
  * Run debug:    npm run e2e:debug
  *
- * Required env vars (see docs/E2E_TESTING.md):
- *   - VITE_SUPABASE_URL or SUPABASE_URL
- *   - SUPABASE_SERVICE_ROLE_KEY (for global-setup seeding only — NEVER bundle)
+ * Required vars in .env.test (see docs/E2E_TESTING.md):
+ *   - VITE_SUPABASE_URL_TEST
+ *   - VITE_SUPABASE_PUBLISHABLE_KEY_TEST
+ *   - SUPABASE_SERVICE_ROLE_KEY_TEST  (for global-setup seeding only — NEVER bundle)
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -63,9 +98,16 @@ export default defineConfig({
     process.env.CI || process.env.E2E_USE_RUNNING_SERVER
       ? undefined
       : {
-          command: "npm run preview -- --port 4173",
+          // Rebuild before preview so the bundle picks up the staging vars
+          // mapped above (npm run preview serves dist/ as-is).
+          command: "npm run build && npm run preview -- --port 4173",
           port: 4173,
-          timeout: 120_000,
+          timeout: 180_000,
           reuseExistingServer: !process.env.CI,
+          env: {
+            VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL ?? "",
+            VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY ?? "",
+            VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "",
+          },
         },
 });

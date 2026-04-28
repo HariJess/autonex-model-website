@@ -4,7 +4,21 @@
 
 Les 4 specs ajoutées dans le sprint C n'ont pas encore été lancées par Claude (l'agent qui les a écrites). La première exécution doit être faite par Ali en local pour itérer les sélecteurs si besoin et confirmer la stabilité avant d'activer le workflow CI.
 
-**Cible Supabase** : par défaut, les tests tapent l'instance pointée par `VITE_SUPABASE_URL` dans le `.env` local. Aujourd'hui c'est l'instance **prod**. Les tests créent un user `e2e-buyer@autonex-test.local` + un user admin `e2e-admin@autonex-test.local` + des transactions et un listing de test. **Recommandation** : créer un projet Supabase staging dédié et faire pointer les tests E2E vers lui (variables `VITE_SUPABASE_URL_TEST` / `SUPABASE_SERVICE_ROLE_KEY_TEST` chargées par un `.env.test`).
+## Cible Supabase staging (par défaut)
+
+Les tests E2E pointent automatiquement vers le projet Supabase **staging** via `.env.test` (chargé par `playwright.config.ts` au démarrage de Playwright).
+
+Variables requises dans `.env.test` à la racine du repo :
+
+- `VITE_SUPABASE_URL_TEST` — URL du projet staging
+- `VITE_SUPABASE_PUBLISHABLE_KEY_TEST` — anon key du staging
+- `SUPABASE_SERVICE_ROLE_KEY_TEST` — service-role du staging (NEVER commit)
+
+`playwright.config.ts` charge ces vars puis les remappe vers les noms attendus par les specs (`SUPABASE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`). Le bloc `webServer` rebuild le front à chaque run (`npm run build && npm run preview`) pour que le bundle soit fait avec les vars staging et non avec les vars du `.env` local (prod).
+
+**Garde de sécurité** : `e2e/global-setup.ts` refuse de tourner si l'URL Supabase résolue contient le fragment du projet prod. Impossible de polluer la DB prod par accident, même si `.env.test` est mal configuré.
+
+`.env.test` est gitignoré via le pattern `.env.*` du `.gitignore`. Ne jamais le commit.
 
 ## Setup local
 
@@ -13,12 +27,11 @@ Les 4 specs ajoutées dans le sprint C n'ont pas encore été lancées par Claud
    npx playwright install chromium
    ```
 
-2. `.env` local — variables nécessaires :
+2. `.env.test` à la racine — variables staging :
    ```
-   VITE_SUPABASE_URL=https://xxx.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJ...
-   VITE_SUPABASE_PUBLISHABLE_KEY=eyJ...
-   SUPABASE_SERVICE_ROLE_KEY=eyJ...   # JAMAIS commit. JAMAIS dans le bundle client.
+   VITE_SUPABASE_URL_TEST=https://<staging-ref>.supabase.co
+   VITE_SUPABASE_PUBLISHABLE_KEY_TEST=eyJ...
+   SUPABASE_SERVICE_ROLE_KEY_TEST=eyJ...
    ```
 
 3. Lancer :
