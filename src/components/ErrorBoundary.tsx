@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Frown } from "lucide-react";
 import { captureReactError } from "@/lib/monitoring";
 
 interface ErrorBoundaryProps {
@@ -41,7 +42,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       return (
         <main className="min-h-screen flex items-center justify-center bg-background px-4" role="alert" aria-live="assertive">
           <section className="max-w-md w-full text-center space-y-4">
-            <div className="text-6xl">😕</div>
+            <Frown className="mx-auto h-16 w-16 text-muted-foreground" aria-hidden="true" />
             <h1 className="text-2xl font-semibold">Oups, une erreur est survenue</h1>
             <p className="text-muted-foreground text-sm">
               Nous sommes désolés pour la gêne occasionnée. Vous pouvez réessayer ou revenir à l'accueil.
