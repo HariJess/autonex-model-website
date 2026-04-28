@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Loader2, Upload } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +29,7 @@ import {
   PartnerCampaignPreview,
   PlacementSpecsPanel,
 } from "@/pages/admin/PartnerCampaignPreview";
+import { CampaignStatsPanel } from "@/pages/admin/CampaignStatsPanel";
 
 type CampaignRow = Tables<"partner_ad_campaigns">;
 type StatusFilter = "all" | "active" | "inactive";
@@ -446,32 +447,12 @@ const AdminPartnerAdsPage = () => {
             ) : (
               <ul className="space-y-3">
                 {filteredCampaigns.map((c) => (
-                  <li key={c.id} className="rounded-xl border border-border p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <p className="font-medium font-sans">{c.advertiser_name}</p>
-                        <p className="text-xs text-muted-foreground font-sans">
-                          {placementLabels[c.placement_key as PartnerAdPlacementKey] ?? c.placement_key} · priorité {c.priority}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-sans">
-                          {new Date(c.starts_at).toLocaleString("fr-MG")}
-                          {c.ends_at ? ` → ${new Date(c.ends_at).toLocaleString("fr-MG")}` : " → sans fin"}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={() => onEdit(c)}>
-                          Modifier
-                        </Button>
-                        <Button
-                          variant={c.is_active ? "destructive" : "default"}
-                          size="sm"
-                          onClick={() => toggleActive.mutate({ id: c.id, next: !c.is_active })}
-                        >
-                          {c.is_active ? "Désactiver" : "Activer"}
-                        </Button>
-                      </div>
-                    </div>
-                  </li>
+                  <CampaignListItem
+                    key={c.id}
+                    campaign={c}
+                    onEdit={onEdit}
+                    onToggleActive={(next) => toggleActive.mutate({ id: c.id, next })}
+                  />
                 ))}
               </ul>
             )}
@@ -481,5 +462,66 @@ const AdminPartnerAdsPage = () => {
     </>
   );
 };
+
+interface CampaignListItemProps {
+  campaign: CampaignRow;
+  onEdit: (c: CampaignRow) => void;
+  onToggleActive: (next: boolean) => void;
+}
+
+function CampaignListItem({ campaign, onEdit, onToggleActive }: CampaignListItemProps) {
+  const [statsOpen, setStatsOpen] = useState(false);
+  const placementLabel =
+    placementLabels[campaign.placement_key as PartnerAdPlacementKey] ?? campaign.placement_key;
+
+  return (
+    <li className="rounded-xl border border-border p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="font-medium font-sans">{campaign.advertiser_name}</p>
+          <p className="text-xs text-muted-foreground font-sans">
+            {placementLabel} · priorité {campaign.priority}
+          </p>
+          <p className="text-xs text-muted-foreground font-sans">
+            {new Date(campaign.starts_at).toLocaleString("fr-MG")}
+            {campaign.ends_at ? ` → ${new Date(campaign.ends_at).toLocaleString("fr-MG")}` : " → sans fin"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => onEdit(campaign)}>
+            Modifier
+          </Button>
+          <Button
+            variant={campaign.is_active ? "destructive" : "default"}
+            size="sm"
+            onClick={() => onToggleActive(!campaign.is_active)}
+          >
+            {campaign.is_active ? "Désactiver" : "Activer"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-3 flex justify-end">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setStatsOpen((v) => !v)}
+          className="font-sans"
+        >
+          {statsOpen ? (
+            <ChevronUp className="mr-1 h-3 w-3" />
+          ) : (
+            <ChevronDown className="mr-1 h-3 w-3" />
+          )}
+          {statsOpen ? "Masquer les stats" : "Voir les stats"}
+        </Button>
+      </div>
+
+      {statsOpen ? (
+        <CampaignStatsPanel campaignId={campaign.id} campaignTitle={campaign.internal_title} />
+      ) : null}
+    </li>
+  );
+}
 
 export default AdminPartnerAdsPage;
