@@ -7,7 +7,7 @@ export function HeroSearch() {
     // Supprimé mt-24 — le positionnement est géré par le parent
     <div className="z-50 relative w-full">
       {/* Transaction Tabs */}
-      <div className="flex justify-start gap-2 mb-3 flex-wrap mx-4">
+      <div className="flex justify-center gap-2 mb-3 flex-wrap mx-4">
         <button
           type="button"
           className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all min-h-11 border bg-sky-500 text-white border-sky-500 shadow-lg"
@@ -71,7 +71,7 @@ export function HeroSearch() {
               className="hidden lg:flex my-2 px-4 w-full bg-sky-500 hover:bg-sky-600 text-white border-0 font-semibold gap-2 h-12 rounded-xl items-center justify-center transition-colors"
             >
               <Search className="h-5 w-5" />
-              Rechercher
+              Voir 8 annonce
             </button>
           </div>
         </div>
@@ -122,7 +122,7 @@ export function HeroSearch() {
             className="w-full bg-sky-500 hover:bg-sky-600 text-white border-0 font-semibold gap-2 h-12 min-h-12 rounded-lg flex items-center justify-center transition-colors"
           >
             <Search className="h-5 w-5" />
-            Rechercher
+            Voir 8 annonce
           </button>
         </div>
       </div>

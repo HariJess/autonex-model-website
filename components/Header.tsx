@@ -12,8 +12,8 @@ export default function Header() {
   const [accountOpen, setAccountOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-100 bg-[#0a142f]/95 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-[4.75rem] px-4 sm:px-8">
+    <header className="max-w-7xl mx-auto sticky top-0 z-50 border-b border-gray-100 bg-[#0a142f] backdrop-blur-md rounded-b-xl">
+      <div className="flex items-center justify-between h-16 sm:h-[4.75rem] px-4 sm:px-8">
 
         {/* Logo */}
         <a href="/" className="flex items-center gap-2 flex-shrink-0">

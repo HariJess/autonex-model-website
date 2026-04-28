@@ -1,4 +1,5 @@
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 import HeroSection from '@/components/home/HeroSection'
 import VehicleCategories from '@/components/home/VehicleCategories'
 import PopularBrands from '@/components/home/PopularBrands'
@@ -24,6 +25,7 @@ export default function Home() {
       <EstimationBanner />
       <FeaturedCars />
       <PickUpCategory />
+      <Footer />
     </main>
   )
 }

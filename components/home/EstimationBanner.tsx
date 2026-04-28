@@ -11,7 +11,7 @@ interface EstimationBannerProps {
 }
 
 export default function EstimationBanner({
-  eyebrow = 'Différenciateur AutoMada',
+  eyebrow = 'Différenciateur AutoNex',
   title = 'Estimation : votre repère avant négociation',
   description = 'Obtenez une fourchette argumentée, un niveau de confiance explicite et un rapport utile pour cadrer votre décision d\'achat ou de vente.',
   primaryLabel = "Lancer l'estimation",
