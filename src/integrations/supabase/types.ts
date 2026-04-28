@@ -2721,6 +2721,61 @@ export type Database = {
         Args: { p_listing_id: string }
         Returns: string
       }
+      get_monetization_breakdowns: {
+        Args: { p_days: number }
+        Returns: {
+          approved_count: number
+          dimension: string
+          label: string
+          total_net_revenue_mga: number
+        }[]
+      }
+      get_monetization_overview: {
+        Args: { p_days: number }
+        Returns: {
+          approved_count: number
+          day: string
+          gross_revenue_mga: number
+          net_revenue_mga: number
+          pending_count: number
+          promo_discount_mga: number
+          rejected_count: number
+        }[]
+      }
+      get_monetization_summary: {
+        Args: never
+        Returns: {
+          approval_rate_pct: number
+          approved_count_alltime: number
+          approved_count_last_month: number
+          approved_count_this_month: number
+          avg_basket_mga: number
+          credits_in_circulation: number
+          credits_purchased_alltime: number
+          credits_spent_alltime: number
+          net_revenue_alltime: number
+          net_revenue_last_month: number
+          net_revenue_this_month: number
+          pending_count_alltime: number
+          rejected_count_alltime: number
+          total_promo_bonus_credits: number
+          total_promo_discount_mga: number
+        }[]
+      }
+      get_monetization_top_users: {
+        Args: {
+          p_days: number
+          p_limit: number
+        }
+        Returns: {
+          approved_count: number
+          email: string | null
+          full_name: string | null
+          last_purchase_at: string
+          total_net_revenue_mga: number
+          user_id: string
+        }[]
+      }
       get_partner_ad_events_export: {
         Args: {
           p_campaign_id: string
