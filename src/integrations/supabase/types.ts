@@ -1331,6 +1331,51 @@ export type Database = {
           },
         ]
       }
+      partner_ad_events: {
+        Row: {
+          campaign_id: string
+          event_type: string
+          id: string
+          occurred_at: string
+          placement_key: string
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          campaign_id: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          placement_key: string
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          placement_key?: string
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_ad_events_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "partner_ad_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_ad_events_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "partner_ad_campaign_stats"
+            referencedColumns: ["campaign_id"]
+          },
+        ]
+      }
       phone_reveal_events: {
         Row: {
           created_at: string
@@ -2299,6 +2344,22 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_ad_campaign_stats: {
+        Row: {
+          advertiser_name: string | null
+          campaign_id: string | null
+          ends_at: string | null
+          internal_title: string | null
+          is_active: boolean | null
+          placement_key: string | null
+          starts_at: string | null
+          total_clicks: number | null
+          total_impressions: number | null
+          unique_clicks: number | null
+          unique_impressions: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_credits: {
@@ -2937,6 +2998,15 @@ export type Database = {
           fav_listing_id: string
           fav_user_id: string
         }[]
+      }
+      track_partner_ad_event: {
+        Args: {
+          p_campaign_id: string
+          p_event_type: string
+          p_placement_key: string
+          p_session_id: string
+        }
+        Returns: undefined
       }
       update_my_agency: {
         Args: {
