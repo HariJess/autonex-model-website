@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, AlertTriangle, Info, Lightbulb } from "lucide-react";
-import { seedBlogPosts, type SeedBlogCallout } from "@/data/seed-listings";
+import { seedBlogPosts, type SeedBlogCallout } from "@/data/seed-blog";
 
 const slugify = (text: string) =>
   text
