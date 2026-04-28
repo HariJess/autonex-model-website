@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
+import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
 
 const POPUP_DELAY_MS = 2000;
 const SESSION_KEY_PREFIX = "autonex.popup.dismissed.";
@@ -26,6 +27,16 @@ export function HomePopupModal() {
     return () => clearTimeout(timer);
   }, [campaign]);
 
+  // Impression fires only when modal is actually visible to the user.
+  useEffect(() => {
+    if (!isOpen || !campaign?.id) return;
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "homeModal",
+      eventType: "impression",
+    });
+  }, [isOpen, campaign?.id]);
+
   const handleClose = () => {
     if (campaign && typeof window !== "undefined") {
       window.sessionStorage.setItem(`${SESSION_KEY_PREFIX}${campaign.id}`, "1");
@@ -34,6 +45,14 @@ export function HomePopupModal() {
   };
 
   if (!enabled || !campaign) return null;
+
+  const handleClick = () => {
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "homeModal",
+      eventType: "click",
+    });
+  };
 
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -52,7 +71,7 @@ export function HomePopupModal() {
           >
             <X className="h-4 w-4" />
           </DialogPrimitive.Close>
-          <HomePopupModalView campaign={campaign} />
+          <HomePopupModalView campaign={campaign} onClick={handleClick} />
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
@@ -61,16 +80,18 @@ export function HomePopupModal() {
 
 interface HomePopupModalViewProps {
   campaign: PublicPartnerCampaign;
+  onClick?: () => void;
 }
 
 /** Rendu visuel pur. Utilisable en preview admin (sans Dialog ni timer). */
-export function HomePopupModalView({ campaign }: HomePopupModalViewProps) {
+export function HomePopupModalView({ campaign, onClick }: HomePopupModalViewProps) {
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
         href: campaign.destination_url,
         target: "_blank" as const,
         rel: "noopener noreferrer sponsored",
+        onClick,
       }
     : {};
 

@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { cn } from "@/lib/utils";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
+import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
 
 interface SearchTopBannerProps {
   className?: string;
@@ -15,24 +17,43 @@ export function SearchTopBanner({ className }: SearchTopBannerProps) {
   const enabled = MONETIZATION_PLACEMENTS.searchTopBanner;
   const { data: campaign } = usePartnerCampaign("searchTopBanner", enabled);
 
+  useEffect(() => {
+    if (!campaign?.id) return;
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "searchTopBanner",
+      eventType: "impression",
+    });
+  }, [campaign?.id]);
+
   if (!enabled || !campaign) return null;
 
-  return <SearchTopBannerView campaign={campaign} className={className} />;
+  const handleClick = () => {
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "searchTopBanner",
+      eventType: "click",
+    });
+  };
+
+  return <SearchTopBannerView campaign={campaign} className={className} onClick={handleClick} />;
 }
 
 interface SearchTopBannerViewProps {
   campaign: PublicPartnerCampaign;
   className?: string;
+  onClick?: () => void;
 }
 
 /** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
-export function SearchTopBannerView({ campaign, className }: SearchTopBannerViewProps) {
+export function SearchTopBannerView({ campaign, className, onClick }: SearchTopBannerViewProps) {
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
         href: campaign.destination_url,
         target: "_blank" as const,
         rel: "noopener noreferrer sponsored",
+        onClick,
       }
     : {};
 

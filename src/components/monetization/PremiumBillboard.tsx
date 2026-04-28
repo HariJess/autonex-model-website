@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { cn } from "@/lib/utils";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
+import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
 
 interface PremiumBillboardProps {
   enabled?: boolean;
@@ -15,24 +17,43 @@ interface PremiumBillboardProps {
 export function PremiumBillboard({ enabled = true, className }: PremiumBillboardProps) {
   const { data: campaign } = usePartnerCampaign("homeBillboard", enabled);
 
+  useEffect(() => {
+    if (!campaign?.id) return;
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "homeBillboard",
+      eventType: "impression",
+    });
+  }, [campaign?.id]);
+
   if (!enabled || !campaign) return null;
 
-  return <PremiumBillboardView campaign={campaign} className={className} />;
+  const handleClick = () => {
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "homeBillboard",
+      eventType: "click",
+    });
+  };
+
+  return <PremiumBillboardView campaign={campaign} className={className} onClick={handleClick} />;
 }
 
 interface PremiumBillboardViewProps {
   campaign: PublicPartnerCampaign;
   className?: string;
+  onClick?: () => void;
 }
 
 /** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
-export function PremiumBillboardView({ campaign, className }: PremiumBillboardViewProps) {
+export function PremiumBillboardView({ campaign, className, onClick }: PremiumBillboardViewProps) {
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
         href: campaign.destination_url,
         target: "_blank" as const,
         rel: "noopener noreferrer sponsored",
+        onClick,
       }
     : {};
 

@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { cn } from "@/lib/utils";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
+import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
 
 interface HomeSponsorStripProps {
   className?: string;
@@ -15,24 +17,43 @@ export function HomeSponsorStrip({ className }: HomeSponsorStripProps) {
   const enabled = MONETIZATION_PLACEMENTS.homeSponsorStrip;
   const { data: campaign } = usePartnerCampaign("homeSponsorStrip", enabled);
 
+  useEffect(() => {
+    if (!campaign?.id) return;
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "homeSponsorStrip",
+      eventType: "impression",
+    });
+  }, [campaign?.id]);
+
   if (!enabled || !campaign) return null;
 
-  return <HomeSponsorStripView campaign={campaign} className={className} />;
+  const handleClick = () => {
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "homeSponsorStrip",
+      eventType: "click",
+    });
+  };
+
+  return <HomeSponsorStripView campaign={campaign} className={className} onClick={handleClick} />;
 }
 
 interface HomeSponsorStripViewProps {
   campaign: PublicPartnerCampaign;
   className?: string;
+  onClick?: () => void;
 }
 
 /** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
-export function HomeSponsorStripView({ campaign, className }: HomeSponsorStripViewProps) {
+export function HomeSponsorStripView({ campaign, className, onClick }: HomeSponsorStripViewProps) {
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
         href: campaign.destination_url,
         target: "_blank" as const,
         rel: "noopener noreferrer sponsored",
+        onClick,
       }
     : {};
 

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDbListings } from "@/hooks/useListings";
 import ListingCard from "@/components/ListingCard";
@@ -9,6 +10,7 @@ import type { ListingType, TransactionType } from "@/types/listing";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { cn } from "@/lib/utils";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
+import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
 
 interface RelatedPromotedProps {
   listingId: string;
@@ -65,23 +67,44 @@ interface ListingSponsorBlockProps {
 export function ListingSponsorBlock({ className }: ListingSponsorBlockProps = {}) {
   const enabled = MONETIZATION_PLACEMENTS.listingSponsor;
   const { data: campaign } = usePartnerCampaign("listingSponsor", enabled);
+
+  useEffect(() => {
+    if (!campaign?.id) return;
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "listingSponsor",
+      eventType: "impression",
+    });
+  }, [campaign?.id]);
+
   if (!enabled || !campaign) return null;
-  return <ListingSponsorBlockView campaign={campaign} className={className} />;
+
+  const handleClick = () => {
+    void trackPartnerAdEvent({
+      campaignId: campaign.id,
+      placementKey: "listingSponsor",
+      eventType: "click",
+    });
+  };
+
+  return <ListingSponsorBlockView campaign={campaign} className={className} onClick={handleClick} />;
 }
 
 interface ListingSponsorBlockViewProps {
   campaign: PublicPartnerCampaign;
   className?: string;
+  onClick?: () => void;
 }
 
 /** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
-export function ListingSponsorBlockView({ campaign, className }: ListingSponsorBlockViewProps) {
+export function ListingSponsorBlockView({ campaign, className, onClick }: ListingSponsorBlockViewProps) {
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
         href: campaign.destination_url,
         target: "_blank" as const,
         rel: "noopener noreferrer sponsored",
+        onClick,
       }
     : {};
 
