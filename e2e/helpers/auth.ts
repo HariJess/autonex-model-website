@@ -76,8 +76,10 @@ export async function loginAs(page: Page, role: "buyer" | "admin") {
     await page.goto(loginPath);
   }
 
-  await page.getByLabel(/email/i).first().fill(user.email);
-  await page.getByLabel(/mot de passe|password/i).first().fill(user.password);
+  // AutoNex's login form uses non-htmlFor labels, so getByLabel() doesn't match.
+  // Use the input type attribute instead — stable and unique per page.
+  await page.locator('input[type="email"]').first().fill(user.email);
+  await page.locator('input[type="password"]').first().fill(user.password);
   await page
     .getByRole("button", { name: /se connecter|connexion|sign in/i })
     .first()
