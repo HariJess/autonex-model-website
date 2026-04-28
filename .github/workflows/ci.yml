@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Typecheck + Lint + Test + Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npx eslint --quiet "src/**/*.{ts,tsx}"
+
+      - name: Test
+        run: npm run test -- --run
+        env:
+          CI: true
+
+      - name: Build
+        run: npm run build
+        env:
+          # Vite needs these at build time. CI placeholders are fine: the
+          # bundle compiles without ever talking to Supabase. For a fidelity
+          # build, configure VITE_SUPABASE_URL_CI / VITE_SUPABASE_ANON_KEY_CI
+          # in repo Settings > Secrets and variables > Actions.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL_CI || 'https://placeholder.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY_CI || 'placeholder' }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY_CI || 'placeholder' }}

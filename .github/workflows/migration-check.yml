@@ -1,0 +1,54 @@
+name: Migration Sanity Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+
+jobs:
+  migration-check:
+    name: Validate migration files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check migration filename convention
+        run: |
+          set -e
+          fail=0
+          for f in supabase/migrations/*.sql; do
+            basename=$(basename "$f")
+            if ! [[ "$basename" =~ ^[0-9]{14}_[a-z0-9_]+\.sql$ ]]; then
+              echo "ERROR: Migration filename does not match convention: $basename"
+              echo "Expected: YYYYMMDDHHMMSS_snake_case_description.sql"
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then exit 1; fi
+          echo "All migration filenames valid."
+
+      - name: Check for forbidden destructive patterns in changed migrations
+        run: |
+          set -e
+          fail=0
+          # Compare against the PR base
+          base="origin/${{ github.base_ref }}"
+          for f in $(git diff --name-only "$base"...HEAD -- 'supabase/migrations/*.sql'); do
+            if [ ! -f "$f" ]; then continue; fi
+            if grep -E "^\s*DROP TABLE [^I]" "$f"; then
+              echo "ERROR: $f contains DROP TABLE without IF EXISTS — destructive risk"
+              fail=1
+            fi
+            if grep -E "^\s*TRUNCATE " "$f"; then
+              echo "ERROR: $f contains TRUNCATE — destructive risk"
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then exit 1; fi
+          echo "No forbidden destructive patterns in changed migrations."
