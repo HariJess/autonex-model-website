@@ -62,8 +62,16 @@ export async function loginAs(page: Page, role: "buyer" | "admin") {
 
   await page.goto(loginPath);
 
-  // BetaLockGate may redirect to /beta-login. Pass it, then re-navigate.
+  // BetaLockGate may redirect to /beta-login. Pass it.
   await passBetaGate(page);
+
+  // After passBetaGate, BetaLoginPage triggers window.location.replace("/").
+  // Wait for that redirect to fully settle before re-navigating, otherwise
+  // the next page.goto races with the in-flight replace() and Playwright
+  // throws "Navigation is interrupted by another navigation".
+  await page.waitForLoadState("networkidle", { timeout: 15_000 });
+
+  // Now safely re-navigate to the intended login route.
   if (!page.url().includes(loginPath)) {
     await page.goto(loginPath);
   }
