@@ -47,7 +47,7 @@ export function HeroCinematic() {
         className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-transparent to-transparent md:hidden"
       />
 
-      <div className="container mx-auto px-4 pt-12 md:pt-20 lg:pt-24 flex flex-col">
+      <div className="container mx-auto px-4 py-12 md:py-20 lg:py-24 flex flex-col gap-8 md:gap-10">
         <div className="max-w-3xl text-center md:text-left">
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-white leading-[1.05] tracking-tight">
             {t("hero.title.line1Prefix", "Trouvez le ")}
@@ -59,9 +59,9 @@ export function HeroCinematic() {
             {t("hero.subtitle", "Le portail auto N°1 de Madagascar")}
           </p>
         </div>
-      </div>
 
-      <HeroSearch hideHeader />
+        <HeroSearch hideHeader hideBackground />
+      </div>
     </section>
   );
 }

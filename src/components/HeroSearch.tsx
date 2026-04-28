@@ -21,6 +21,7 @@ import { useFilteredActiveListingCount } from "@/hooks/useListings";
 import { buildSearchStrictCountFilters } from "@/lib/searchListingFilters";
 import { HeroModelCombobox } from "@/components/hero/HeroModelCombobox";
 import { VEHICLE_UI_CATALOG_BY_MAKE } from "@/data/vehicleUiCatalog";
+import { cn } from "@/lib/utils";
 
 const TRANSACTIONS = [
   { value: "vente", labelKey: "nav.buy" },
@@ -56,7 +57,12 @@ function summarizeSelection(
   return `${labels[0]}${joiner}${labels[1]} +${labels.length - 2}`;
 }
 
-const HeroSearch = ({ hideHeader = false }: { hideHeader?: boolean } = {}) => {
+type HeroSearchProps = {
+  hideHeader?: boolean;
+  hideBackground?: boolean;
+};
+
+const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchProps = {}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState("vente");
@@ -251,10 +257,19 @@ const HeroSearch = ({ hideHeader = false }: { hideHeader?: boolean } = {}) => {
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
 
   return (
-    <section className="relative overflow-hidden py-10 sm:py-16 lg:py-28">
-      <div className="absolute inset-0 gradient-primary" />
-      <div className="absolute inset-0 bg-[radial-gradient(1000px_420px_at_50%_-5%,rgba(255,255,255,0.14),transparent)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
+    <section
+      className={cn(
+        "relative overflow-hidden",
+        !hideBackground && "py-10 sm:py-16 lg:py-28",
+      )}
+    >
+      {!hideBackground ? (
+        <>
+          <div className="absolute inset-0 gradient-primary" />
+          <div className="absolute inset-0 bg-[radial-gradient(1000px_420px_at_50%_-5%,rgba(255,255,255,0.14),transparent)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
+        </>
+      ) : null}
 
       <div className="relative container mx-auto text-center">
         {!hideHeader ? (
