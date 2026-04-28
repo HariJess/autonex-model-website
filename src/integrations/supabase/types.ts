@@ -2721,6 +2721,32 @@ export type Database = {
         Args: { p_listing_id: string }
         Returns: string
       }
+      get_partner_ad_events_export: {
+        Args: {
+          p_campaign_id: string
+          p_days: number
+        }
+        Returns: {
+          event_type: string
+          occurred_at: string
+          placement_key: string
+          session_id: string
+          user_id: string | null
+        }[]
+      }
+      get_partner_ad_stats_timeseries: {
+        Args: {
+          p_campaign_id: string
+          p_days: number
+        }
+        Returns: {
+          day: string
+          total_clicks: number
+          total_impressions: number
+          unique_clicks: number
+          unique_impressions: number
+        }[]
+      }
       get_pricing: {
         Args: never
         Returns: {
