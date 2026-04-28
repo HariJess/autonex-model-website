@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { loginAs } from "./helpers/auth";
-import { grantE2ECredits } from "./fixtures/seedDatabase";
+import {
+  cleanupE2EData,
+  grantE2ECredits,
+  resetBuyerCredits,
+} from "./fixtures/seedDatabase";
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "";
 const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
@@ -8,9 +12,9 @@ const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 /**
  * Publish path test.
  *
- * Pre-requisite: the buyer must have enough credits to publish. We grant 100
- * credits via the ledger directly (idempotent, marked reason="e2e_test_grant"
- * so the cleanup helper preserves it across runs).
+ * Pre-requisite: the buyer must have exactly 100 credits at the start of the
+ * test. We reset the ledger then grant 100 in beforeEach so each run starts
+ * from the same balance regardless of what previous specs did.
  *
  * NOTE: PublishPage is a 1144-line / 58-useState beast (slated for refacto in
  * a future sprint). Selectors here are best-effort; iterate locally if any
@@ -19,9 +23,17 @@ const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
  * tweak shouldn't break it.
  */
 test.describe("Publish path: buyer with credits creates a listing", () => {
-  test.beforeAll(async () => {
-    test.skip(!SUPABASE_URL || !SERVICE_ROLE, "missing SUPABASE env vars");
-    await grantE2ECredits(SUPABASE_URL, SERVICE_ROLE, 100);
+  test.beforeEach(async () => {
+    if (SUPABASE_URL && SERVICE_ROLE) {
+      await resetBuyerCredits(SUPABASE_URL, SERVICE_ROLE);
+      await grantE2ECredits(SUPABASE_URL, SERVICE_ROLE, 100);
+    }
+  });
+
+  test.afterEach(async () => {
+    if (SUPABASE_URL && SERVICE_ROLE) {
+      await cleanupE2EData(SUPABASE_URL, SERVICE_ROLE);
+    }
   });
 
   test("buyer creates a listing using credits", async ({ page }) => {

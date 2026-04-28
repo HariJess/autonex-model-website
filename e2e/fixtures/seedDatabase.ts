@@ -125,6 +125,45 @@ export async function grantE2ECredits(
 }
 
 /**
+ * Reset the E2E buyer's credits to zero by removing every ledger row.
+ *
+ * More aggressive than cleanupE2EData (which is bounded to the last hour and
+ * preserves rows tagged "e2e_test_grant"). Call this from a beforeEach when
+ * the test asserts on the absolute credit balance and needs a known starting
+ * point. Idempotent: a no-op when the buyer has no ledger rows or has not
+ * been seeded yet.
+ */
+export async function resetBuyerCredits(
+  supabaseUrl: string,
+  serviceRoleKey: string,
+): Promise<void> {
+  const admin = adminClient(supabaseUrl, serviceRoleKey);
+  const buyerId = await findUserByEmail(admin, TEST_USERS.buyer.email);
+  if (!buyerId) {
+    console.warn("[E2E] resetBuyerCredits: buyer not seeded yet, skipping");
+    return;
+  }
+
+  const { error: ledgerErr } = await admin
+    .from("credits_ledger")
+    .delete()
+    .eq("user_id", buyerId);
+  if (ledgerErr) {
+    console.error("[E2E] resetBuyerCredits ledger delete failed:", ledgerErr);
+    throw ledgerErr;
+  }
+
+  // Also drop recent transactions so a re-running test doesn't see stale
+  // "pending" rows from a previous attempt and skip its own insert.
+  const oneHourAgo = new Date(Date.now() - 3_600_000).toISOString();
+  await admin
+    .from("transactions")
+    .delete()
+    .eq("user_id", buyerId)
+    .gte("created_at", oneHourAgo);
+}
+
+/**
  * Insert a fake `pending` transaction so admin-approval tests can run without
  * actually triggering the vpi-initiate-payment edge function (which would talk
  * to vanilla-pay.net). Returns the inserted transaction id.

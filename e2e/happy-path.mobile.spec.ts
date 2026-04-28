@@ -4,6 +4,7 @@ import { mockVpiInitiateSuccess } from "./fixtures/mockVanillaPay";
 import {
   cleanupE2EData,
   insertPendingTransaction,
+  resetBuyerCredits,
 } from "./fixtures/seedDatabase";
 import { TEST_PACK } from "./fixtures/testUsers";
 
@@ -21,6 +22,12 @@ const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
  * confirming the BUYER side works on a phone.
  */
 test.describe("Happy path on mobile viewport (iPhone 13)", () => {
+  test.beforeEach(async () => {
+    if (SUPABASE_URL && SERVICE_ROLE) {
+      await resetBuyerCredits(SUPABASE_URL, SERVICE_ROLE);
+    }
+  });
+
   test.afterEach(async () => {
     if (SUPABASE_URL && SERVICE_ROLE) {
       await cleanupE2EData(SUPABASE_URL, SERVICE_ROLE);
