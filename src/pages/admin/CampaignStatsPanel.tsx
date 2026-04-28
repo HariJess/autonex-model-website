@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { usePartnerCampaignStats, type StatsPeriod } from "@/hooks/usePartnerCampaignStats";
@@ -114,7 +115,7 @@ export function CampaignStatsPanel({ campaignId, campaignTitle }: CampaignStatsP
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("[stats-export]", err);
-      alert("L'export a échoué. Réessaie dans un instant.");
+      toast.error("L'export a échoué. Réessaie dans un instant.");
     } finally {
       setExporting(false);
     }
