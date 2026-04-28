@@ -17,6 +17,11 @@ const links = [
     desc: "Paiements crédits, décisions et contrôle opérationnel.",
   },
   {
+    to: "/admin/revenus",
+    title: "Revenus",
+    desc: "Dashboard analytics : KPIs, graphique, top acheteurs, packs, méthodes.",
+  },
+  {
     to: "/admin/partenaires",
     title: "Partenaires",
     desc: "Campagnes publicitaires externes (placements partenaires).",

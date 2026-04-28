@@ -25,6 +25,7 @@ const AuthCallback = lazy(() => import("./pages/AuthCallback.tsx"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const AdminMonetizationPage = lazy(() => import("./pages/AdminMonetizationPage.tsx"));
+const AdminRevenuesPage = lazy(() => import("./pages/AdminRevenuesPage.tsx"));
 const AdminSearchInsightsPage = lazy(() => import("./pages/AdminSearchInsightsPage.tsx"));
 const AdminPartnerAdsPage = lazy(() => import("./pages/AdminPartnerAdsPage.tsx"));
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.tsx"));
@@ -124,6 +125,7 @@ const App = () => {
               <Route path="agences/:id" element={<AdminAgencyDetailPage />} />
               <Route path="moderation" element={<AdminModerationPage />} />
               <Route path="monetisation" element={<AdminMonetizationPage />} />
+              <Route path="revenus" element={<AdminRevenuesPage />} />
               <Route path="recherche" element={<AdminSearchInsightsPage />} />
               <Route path="partenaires" element={<AdminPartnerAdsPage />} />
             </Route>
