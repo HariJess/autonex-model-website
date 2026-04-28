@@ -40,6 +40,7 @@
     "catalog:clean:quality": "node ./scripts/catalog/clean-catalog-quality.mjs",
     "catalog:canonicalize:display": "node ./scripts/catalog/canonicalize-display-targeted.mjs",
     "catalog:overrides:apply": "node ./scripts/catalog/apply-manual-overrides.mjs",
+    "optimize:hero": "node ./scripts/optimize-hero.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
