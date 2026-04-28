@@ -54,6 +54,7 @@ const Footer = () => {
               <Link to="/legal/confidentialite" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Politique de confidentialité</Link>
               <Link to="/legal/cgu" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Conditions générales d'utilisation</Link>
               <Link to="/legal/cookies" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Gestion des cookies</Link>
+              <Link to="/legal/suppression-donnees" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Suppression des données</Link>
               <button
                 type="button"
                 onClick={openPreferences}

@@ -57,6 +57,7 @@ const MentionsLegalesPage = lazy(() => import("./pages/legal/MentionsLegalesPage
 const PolitiqueConfidentialitePage = lazy(() => import("./pages/legal/PolitiqueConfidentialitePage.tsx"));
 const CguPage = lazy(() => import("./pages/legal/CguPage.tsx"));
 const CookiesPage = lazy(() => import("./pages/legal/CookiesPage.tsx"));
+const SuppressionDonneesPage = lazy(() => import("./pages/legal/SuppressionDonneesPage.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -144,6 +145,7 @@ const App = () => {
             <Route path="/legal/confidentialite" element={<PolitiqueConfidentialitePage />} />
             <Route path="/legal/cgu" element={<CguPage />} />
             <Route path="/legal/cookies" element={<CookiesPage />} />
+            <Route path="/legal/suppression-donnees" element={<SuppressionDonneesPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BetaLockGate>
