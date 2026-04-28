@@ -61,7 +61,7 @@ export default function ConseilsAutoPage() {
         <div className="relative h-44 sm:h-52 rounded-2xl overflow-hidden">
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('/home/hero-bg.png')" }}
+            style={{ backgroundImage: "url('/conseils/conseils-bg.png')" }}
           />
           <div className="absolute inset-0 bg-black/55" />
           {/* Grain */}

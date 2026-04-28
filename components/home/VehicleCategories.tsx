@@ -28,49 +28,70 @@ const categories = [
 
 export default function VehicleCategories() {
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* Header */}
-      <div className="flex items-end justify-between mb-6">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
-            Explorer rapidement
-          </p>
-          <h2 className="text-3xl font-bold text-slate-900">
-            Catégories principales
-          </h2>
-        </div>
-        <a
-          href="#"
-          className="flex items-center gap-1 text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors"
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    {/* Header */}
+    <div className="flex items-end justify-between mb-6">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
+          Explorer rapidement
+        </p>
+        <h2 className="text-3xl font-bold text-slate-900">
+          Catégories principales
+        </h2>
+      </div>
+      <a
+        href="#"
+        className="flex items-center gap-1 text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors"
+      >
+        Voir tout <ChevronRight className="w-4 h-4" />
+      </a>
+    </div>
+
+    {/* Mobile carousel */}
+    <div className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 lg:hidden scrollbar-hide">
+      {categories.map((cat) => (
+        <button
+          key={cat.label}
+          type="button"
+          className="group shrink-0 snap-start w-40 flex flex-col items-center gap-4 p-5 rounded-2xl border border-gray-200 bg-white hover:border-sky-400 hover:shadow-md transition-all duration-200 cursor-pointer"
         >
-          Voir tout <ChevronRight className="w-4 h-4" />
-        </a>
-      </div>
+          <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden group-hover:bg-sky-50 transition-colors duration-200">
+            <img
+              src={cat.image}
+              alt={cat.label}
+              className="w-20 h-14 object-contain"
+            />
+          </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {categories.map((cat) => (
-          <button
-            key={cat.label}
-            type="button"
-            className="group flex flex-col items-center gap-4 p-5 rounded-2xl border border-gray-200 bg-white hover:border-sky-400 hover:shadow-md transition-all duration-200 cursor-pointer"
-          >
-            {/* Icon circle */}
-            <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden group-hover:bg-sky-50 transition-colors duration-200">
-              <img
-                src={cat.image}
-                alt={cat.label}
-                className="w-20 h-14 object-contain"
-              />
-            </div>
+          <span className="text-sm font-medium text-gray-700 group-hover:text-sky-700 transition-colors text-center">
+            {cat.label}
+          </span>
+        </button>
+      ))}
+    </div>
 
-            {/* Label */}
-            <span className="text-sm font-medium text-gray-700 group-hover:text-sky-700 transition-colors">
-              {cat.label}
-            </span>
-          </button>
-        ))}
-      </div>
-    </section>
+    {/* Desktop grid */}
+    <div className="hidden lg:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      {categories.map((cat) => (
+        <button
+          key={cat.label}
+          type="button"
+          className="group flex flex-col items-center gap-4 p-5 rounded-2xl border border-gray-200 bg-white hover:border-sky-400 hover:shadow-md transition-all duration-200 cursor-pointer"
+        >
+          <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden group-hover:bg-sky-50 transition-colors duration-200">
+            <img
+              src={cat.image}
+              alt={cat.label}
+              className="w-20 h-14 object-contain"
+            />
+          </div>
+
+          <span className="text-sm font-medium text-gray-700 group-hover:text-sky-700 transition-colors">
+            {cat.label}
+          </span>
+        </button>
+      ))}
+    </div>
+  </section>
   )
 }
