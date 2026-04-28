@@ -41,8 +41,8 @@ export default function Header() {
             )}
           </div>
 
-          <a href="#" className="text-sm font-semibold text-gray-500 hover:text-slate-900 transition-colors px-2.5 py-2 rounded-lg hover:bg-gray-50">
-            Agences
+          <a href="/agences" className="text-sm font-semibold text-gray-500 hover:text-slate-900 transition-colors px-2.5 py-2 rounded-lg hover:bg-gray-50">
+            Concessionnaires
           </a>
           <a href="#" className="text-sm font-semibold text-gray-500 hover:text-slate-900 transition-colors px-2.5 py-2 rounded-lg hover:bg-gray-50">
             Conseils
@@ -142,8 +142,8 @@ export default function Header() {
               )}
             </div>
 
-            <a href="#" className="flex items-center min-h-11 px-3 py-2.5 rounded-xl bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100">
-              Agences
+            <a href="/agences" className="flex items-center min-h-11 px-3 py-2.5 rounded-xl bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100">
+              Concessionnaires
             </a>
             <a href="#" className="flex items-center min-h-11 px-3 py-2.5 rounded-xl bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100">
               Conseils

@@ -69,7 +69,7 @@ export default function PopularBrands() {
             <button
               key={brand.label}
               type="button"
-              className="group flex-shrink-0 flex flex-col items-center mx-14 cursor-pointer"
+              className="group flex-shrink-0 flex flex-col items-center mx-4 md:mx-8 lg:mx-14 cursor-pointer"
             >
               {/* Circle */}
               <div className="w-24 h-24 rounded-full border border-gray-200 bg-white flex items-center justify-center overflow-hidden group-hover:border-sky-400 group-hover:shadow-md transition-all duration-200">

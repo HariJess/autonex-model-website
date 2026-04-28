@@ -27,7 +27,7 @@ export default function AdBanner({
         className="relative block w-full overflow-hidden rounded-xl bg-muted/40 group"
       >
         {/* Banner image */}
-        <div className="relative w-full aspect-[2.5/1] md:aspect-[8/1]">
+        <div className="relative w-full aspect-[2.5/1] md:aspect-[4/1] lg:aspect-[8/1]">
           <picture>
             <source media="(max-width: 768px)" srcSet={mobileImageUrl} />
             <img

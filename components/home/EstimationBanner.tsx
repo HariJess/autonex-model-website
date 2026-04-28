@@ -22,7 +22,7 @@ export default function EstimationBanner({
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
       <div className="rounded-2xl border border-sky-500/25 bg-gradient-to-br from-white via-white to-sky-500/[0.06] p-5 md:p-7 shadow-[0_2px_20px_-12px_rgba(20,184,166,0.25)]">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row md:items-end md:justify-between">
 
           {/* Text block */}
           <div className="max-w-2xl">
