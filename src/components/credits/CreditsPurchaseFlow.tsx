@@ -133,6 +133,7 @@ export function CreditsPurchaseFlow({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <Button
             type="button"
+            data-testid="pay-mobile-money"
             className="w-full font-sans min-h-11 touch-manipulation gap-2"
             disabled={vpiDisabled}
             onClick={() => handleVpiPay("mobile_money")}
@@ -146,6 +147,7 @@ export function CreditsPurchaseFlow({
           </Button>
           <Button
             type="button"
+            data-testid="pay-international"
             variant="outline"
             className="w-full font-sans min-h-11 touch-manipulation gap-2"
             disabled={vpiDisabled}

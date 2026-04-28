@@ -222,7 +222,7 @@ const AdminMonetizationPage = () => {
             ) : (
               <ul className="space-y-4">
                 {pendingTx.map((tx) => (
-                  <li key={tx.id} className="rounded-xl border border-border p-4 space-y-2 font-sans text-sm">
+                  <li key={tx.id} data-testid={`tx-row-${tx.id}`} data-tx-user={tx.user_id} className="rounded-xl border border-border p-4 space-y-2 font-sans text-sm">
                     <div className="flex flex-wrap gap-2 justify-between">
                       <span className="font-medium">{formatAriary(tx.amount_mga)}</span>
                       <span className="text-muted-foreground text-xs">{tx.reference ?? tx.id.slice(0, 8)}</span>
@@ -239,6 +239,7 @@ const AdminMonetizationPage = () => {
                       <Button
                         type="button"
                         size="sm"
+                        data-testid="approve-tx-btn"
                         className="font-sans"
                         disabled={approveTx.isPending}
                         onClick={() => approveTx.mutate({ id: tx.id, buyerId: tx.user_id })}
@@ -248,6 +249,7 @@ const AdminMonetizationPage = () => {
                       <Button
                         type="button"
                         size="sm"
+                        data-testid="reject-tx-btn"
                         variant="destructive"
                         className="font-sans"
                         onClick={() => setRejectTxId(tx.id)}
@@ -268,6 +270,7 @@ const AdminMonetizationPage = () => {
                           type="button"
                           variant="outline"
                           size="sm"
+                          data-testid="confirm-reject-tx-btn"
                           className="font-sans"
                           disabled={rejectTx.isPending}
                           onClick={() =>

@@ -26,6 +26,7 @@ export function CreditPacksGrid({ creditPacks, selectedPackId, onSelectPack }: C
           <button
             key={p.id}
             type="button"
+            data-testid={`pack-${p.id}`}
             onClick={() => onSelectPack(p.id)}
             aria-pressed={isSelected}
             className={`rounded-xl border p-4 min-h-24 text-left font-sans transition-colors touch-manipulation ${

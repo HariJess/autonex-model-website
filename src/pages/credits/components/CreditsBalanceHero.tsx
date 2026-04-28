@@ -97,7 +97,9 @@ export function CreditsBalanceHero() {
               {t("credits.balanceLabel", "Votre solde")}
             </p>
             <p className="font-serif text-3xl md:text-4xl text-foreground">
-              {balanceLoading ? "…" : balance.toLocaleString("fr-FR")}{" "}
+              <span data-testid="credits-balance">
+                {balanceLoading ? "…" : balance.toLocaleString("fr-FR")}
+              </span>{" "}
               <span className="text-base text-muted-foreground">
                 {t("credits.unit", "crédits")}
               </span>
