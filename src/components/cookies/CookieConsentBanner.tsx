@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 import { CookieConsentModal } from "./CookieConsentModal";
+import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 
 /**
  * First-visit cookie consent banner. Appears only until the user makes a
@@ -11,6 +12,7 @@ import { CookieConsentModal } from "./CookieConsentModal";
  */
 export function CookieConsentBanner() {
   const { t } = useTranslation();
+  const { isEmbedded } = useYasContext();
   const {
     consent,
     hasDecided,
@@ -21,6 +23,11 @@ export function CookieConsentBanner() {
     rejectAll,
     savePreferences,
   } = useCookieConsent();
+
+  // Mode mini-app YAS & Moi : on ne rend rien à l'écran (le hook
+  // useCookieConsent reste monté pour préserver la logique de stockage).
+  // YAS gère son propre consentement via l'app native côté partenaire.
+  if (isEmbedded) return null;
 
   return (
     <>

@@ -5,6 +5,7 @@ import { User, Menu, X, LogOut, ChevronDown, Globe2, Settings as SettingsIcon, H
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 import logo from "@/assets/logo.png";
 import { AUTO_TRANSACTION_MODES } from "@/data/automotiveCatalog";
 import {
@@ -19,6 +20,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const Header = () => {
   const { t } = useTranslation();
+  const { isEmbedded } = useYasContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileRentOpen, setMobileRentOpen] = useState(false);
   const navigate = useNavigate();
@@ -61,6 +63,11 @@ const Header = () => {
   useEffect(() => {
     if (!menuOpen) setMobileRentOpen(false);
   }, [menuOpen]);
+
+  // Mode mini-app YAS & Moi (WebView) : pas de header desktop ni mobile.
+  // L'expérience embedded utilise YasAppLayout qui rend ses propres affordances.
+  // L'early-return est volontairement APRÈS tous les hooks (rules-of-hooks).
+  if (isEmbedded) return null;
 
   const navLinkClass = (active: boolean) =>
     `text-sm font-semibold transition-colors ${active ? "text-white" : "text-navbar-foreground/90 hover:text-white"}`;

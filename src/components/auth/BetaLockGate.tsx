@@ -30,8 +30,14 @@ export function BetaLockGate({ children }: BetaLockGateProps) {
   const navigate = useNavigate();
   const hasRedirected = useRef(false);
 
+  // /yas-app est exposée à un partenaire externe (YAS & Moi) via WebView.
+  // Le beta lock ne doit jamais bloquer cette route, sinon le partenaire est
+  // redirigé vers /beta-login dont il ne possède pas le code.
   const shouldRedirect =
-    isLockEnabled && !isUnlocked && location.pathname !== "/beta-login";
+    isLockEnabled &&
+    !isUnlocked &&
+    location.pathname !== "/beta-login" &&
+    location.pathname !== "/yas-app";
 
   useEffect(() => {
     if (!shouldRedirect) {

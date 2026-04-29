@@ -2298,5 +2298,65 @@
     "minutesAgo": "{{count}} min ago",
     "hoursAgo": "{{count}} h ago",
     "daysAgo": "{{count}} d ago"
+  },
+  "yas": {
+    "partnerBadge": "× YAS & Moi",
+    "heroTitle": "Buy, sell or value a car in Madagascar",
+    "heroSubtitle": "Madagascar's #1 car portal — accessible directly from YAS & Moi.",
+    "actions": {
+      "sectionAria": "Main actions",
+      "buy": {
+        "label": "Buy a car",
+        "helper": "Browse AutoNex verified listings."
+      },
+      "sell": {
+        "label": "Sell my car",
+        "helper": "Publish your vehicle in a few steps."
+      },
+      "estimate": {
+        "label": "Value my car",
+        "helper": "Get an argued price range."
+      },
+      "deals": {
+        "label": "See top deals",
+        "helper": "Listings with genuinely reduced prices."
+      }
+    },
+    "why": {
+      "sectionAria": "Why AutoNex",
+      "heading": "Why AutoNex?",
+      "moderated": {
+        "title": "Moderated listings",
+        "body": "Each listing is reviewed before publication."
+      },
+      "estimation": {
+        "title": "Transparent valuation",
+        "body": "An argued range with an explicit confidence level."
+      },
+      "local": {
+        "title": "100% Madagascar",
+        "body": "Designed for the Malagasy market: MGA, cities, local dealers."
+      },
+      "fast": {
+        "title": "Fast to use",
+        "body": "Smooth mini-app embedded in YAS & Moi, no app to install."
+      }
+    },
+    "deals": {
+      "sectionAria": "Top deals preview",
+      "heading": "Top deals",
+      "subtitle": "Listings with genuinely reduced prices, verified on AutoNex.",
+      "seeAll": "See all"
+    },
+    "cta": {
+      "sectionAria": "Publish a listing",
+      "title": "Sell your car on AutoNex",
+      "body": "Guided publishing, moderation before going live, secure MGA payment.",
+      "button": "Publish my vehicle"
+    },
+    "footer": {
+      "tagline": "AutoNex — Madagascar's reference car marketplace.",
+      "copyright": "© 2026 APLi SARLU — AutoNex"
+    }
   }
 }

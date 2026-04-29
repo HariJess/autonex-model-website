@@ -2298,5 +2298,65 @@
     "minutesAgo": "il y a {{count}} min",
     "hoursAgo": "il y a {{count}} h",
     "daysAgo": "il y a {{count}} j"
+  },
+  "yas": {
+    "partnerBadge": "× YAS & Moi",
+    "heroTitle": "Acheter, vendre ou estimer une voiture à Madagascar",
+    "heroSubtitle": "Le portail auto N°1 de Madagascar — accessible directement depuis YAS & Moi.",
+    "actions": {
+      "sectionAria": "Actions principales",
+      "buy": {
+        "label": "Acheter une voiture",
+        "helper": "Parcourir les annonces vérifiées AutoNex."
+      },
+      "sell": {
+        "label": "Vendre ma voiture",
+        "helper": "Publier votre véhicule en quelques étapes."
+      },
+      "estimate": {
+        "label": "Estimer ma voiture",
+        "helper": "Obtenir une fourchette de prix argumentée."
+      },
+      "deals": {
+        "label": "Voir les bonnes affaires",
+        "helper": "Annonces avec prix réellement réduits."
+      }
+    },
+    "why": {
+      "sectionAria": "Pourquoi AutoNex",
+      "heading": "Pourquoi AutoNex ?",
+      "moderated": {
+        "title": "Annonces modérées",
+        "body": "Chaque annonce est vérifiée avant publication."
+      },
+      "estimation": {
+        "title": "Estimation transparente",
+        "body": "Une fourchette argumentée, un niveau de confiance explicite."
+      },
+      "local": {
+        "title": "100% Madagascar",
+        "body": "Pensé pour le marché malgache : MGA, villes, concessionnaires locaux."
+      },
+      "fast": {
+        "title": "Rapide à utiliser",
+        "body": "Mini-app fluide intégrée à YAS & Moi, pas d'app à installer."
+      }
+    },
+    "deals": {
+      "sectionAria": "Aperçu bonnes affaires",
+      "heading": "Bonnes affaires",
+      "subtitle": "Annonces avec prix réellement réduits, vérifiés sur AutoNex.",
+      "seeAll": "Voir tout"
+    },
+    "cta": {
+      "sectionAria": "Publier une annonce",
+      "title": "Vendez votre voiture sur AutoNex",
+      "body": "Publication guidée, modération avant mise en ligne, paiement sécurisé en MGA.",
+      "button": "Publier mon véhicule"
+    },
+    "footer": {
+      "tagline": "AutoNex — la marketplace automobile de référence à Madagascar.",
+      "copyright": "© 2026 APLi SARLU — AutoNex"
+    }
   }
 }

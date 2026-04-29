@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 import logo from "@/assets/logo.png";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 import { CookieConsentModal } from "@/components/cookies/CookieConsentModal";
+import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { isEmbedded } = useYasContext();
   const {
     consent,
     preferencesOpen,
@@ -13,6 +15,10 @@ const Footer = () => {
     closePreferences,
     savePreferences,
   } = useCookieConsent();
+
+  // Mode mini-app YAS & Moi : footer long masqué. La page YAS rend son propre
+  // YasFooterMini pour conserver les liens légaux essentiels.
+  if (isEmbedded) return null;
 
   return (
     <footer className="border-t border-white/10 bg-navbar text-navbar-foreground">

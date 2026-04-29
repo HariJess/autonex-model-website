@@ -2298,5 +2298,65 @@
     "minutesAgo": "{{count}} min lasa",
     "hoursAgo": "{{count}} ora lasa",
     "daysAgo": "{{count}} andro lasa"
+  },
+  "yas": {
+    "partnerBadge": "× YAS & Moi",
+    "heroTitle": "Hividy, hivarotra na hanombatombana fiara eto Madagasikara",
+    "heroSubtitle": "Ny portail auto laharana voalohany eto Madagasikara — azo idirana mivantana avy ao YAS & Moi.",
+    "actions": {
+      "sectionAria": "Hetsika fototra",
+      "buy": {
+        "label": "Hividy fiara",
+        "helper": "Hijery ireo filazana voamarina ao AutoNex."
+      },
+      "sell": {
+        "label": "Hivarotra ny fiarako",
+        "helper": "Hamoaka ny fiaranao amin'ny dingana vitsivitsy."
+      },
+      "estimate": {
+        "label": "Hanombatombana ny fiarako",
+        "helper": "Hahazoana refy vidiny manana antony."
+      },
+      "deals": {
+        "label": "Hijery ny varotra tsara",
+        "helper": "Filazana misy fihenam-bidy marina."
+      }
+    },
+    "why": {
+      "sectionAria": "Nahoana AutoNex",
+      "heading": "Nahoana ny AutoNex ?",
+      "moderated": {
+        "title": "Filazana voasivana",
+        "body": "Voamarina alohan'ny famoahana ny filazana tsirairay."
+      },
+      "estimation": {
+        "title": "Tombana mangarahara",
+        "body": "Refy manana antony sy haavon'ny fitokisana mazava."
+      },
+      "local": {
+        "title": "100% Madagasikara",
+        "body": "Natao ho an'ny tsenan'i Madagasikara : MGA, tanàna, concessionnaires Malagasy."
+      },
+      "fast": {
+        "title": "Haingana ampiasaina",
+        "body": "Mini-app malefaka tafiditra ao YAS & Moi, tsy mila apetraka app."
+      }
+    },
+    "deals": {
+      "sectionAria": "Famintinana ny varotra tsara",
+      "heading": "Varotra tsara",
+      "subtitle": "Filazana misy fihenam-bidy marina, voamarina ao AutoNex.",
+      "seeAll": "Hijery rehetra"
+    },
+    "cta": {
+      "sectionAria": "Hamoaka filazana",
+      "title": "Amidio ao AutoNex ny fiaranao",
+      "body": "Famoahana voatari-dalana, fanaraha-maso alohan'ny famoahana, fandoavam-bola voaaro amin'ny MGA.",
+      "button": "Hamoaka ny fiarako"
+    },
+    "footer": {
+      "tagline": "AutoNex — ny tsena fiara fototra eto Madagasikara.",
+      "copyright": "© 2026 APLi SARLU — AutoNex"
+    }
   }
 }

@@ -58,6 +58,7 @@ const PolitiqueConfidentialitePage = lazy(() => import("./pages/legal/PolitiqueC
 const CguPage = lazy(() => import("./pages/legal/CguPage.tsx"));
 const CookiesPage = lazy(() => import("./pages/legal/CookiesPage.tsx"));
 const SuppressionDonneesPage = lazy(() => import("./pages/legal/SuppressionDonneesPage.tsx"));
+const YasAppPage = lazy(() => import("./features/yas-app/YasAppPage.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -146,6 +147,7 @@ const App = () => {
             <Route path="/legal/cgu" element={<CguPage />} />
             <Route path="/legal/cookies" element={<CookiesPage />} />
             <Route path="/legal/suppression-donnees" element={<SuppressionDonneesPage />} />
+            <Route path="/yas-app" element={<YasAppPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BetaLockGate>
