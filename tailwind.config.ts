@@ -23,6 +23,7 @@ export default {
       fontFamily: {
         serif: ["Playfair Display", "serif"],
         sans: ["Inter", "sans-serif"],
+        geist: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

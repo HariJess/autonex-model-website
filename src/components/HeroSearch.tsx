@@ -273,7 +273,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
   const pillIconClass = hideBackground ? "text-white/70" : "text-accent";
   const pillHoverClass = hideBackground ? "hover:bg-white/10 transition-colors" : "hover:bg-muted/50 transition-colors";
   const ctaClass = hideBackground
-    ? "bg-white hover:bg-white/90 text-slate-900 font-semibold font-sans gap-2 shadow-lg shadow-black/20"
+    ? "bg-white hover:bg-white/90 text-slate-900 font-semibold font-sans gap-2"
     : "gradient-primary border-0 font-semibold font-sans gap-2";
   const ctaStyle: CSSProperties | undefined = hideBackground ? undefined : { color: "#FAFAFA" };
   const mobileOutlineClass = hideBackground
@@ -285,9 +285,6 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
   const desktopAdvancedShellBaseClass = hideBackground
     ? "hidden lg:grid gap-3 mt-2 rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm p-3"
     : "hidden lg:grid gap-3 mt-2 rounded-xl border border-border/70 bg-background/70 p-3";
-  const trustWrapperClass = hideBackground
-    ? "mt-4 md:mt-6 flex flex-nowrap items-center justify-center gap-x-2.5 md:gap-x-8 text-white/80 text-[11px] md:text-sm font-sans tracking-tight md:tracking-normal px-2"
-    : "mt-12 md:mt-16 flex flex-nowrap items-center justify-center gap-x-2.5 md:gap-x-8 text-white/80 text-[11px] md:text-sm font-sans tracking-tight md:tracking-normal px-2";
 
   return (
     <section
@@ -834,64 +831,6 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
                 {ctaLabel}
               </Button>
             </div>
-          </div>
-
-          {/* Trust signals sobres sous la card search — Lot 4.4e */}
-          <div className={trustWrapperClass}>
-            <span className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 shrink-0"
-                aria-hidden="true"
-              >
-                <path
-                  d="M12 2 L4 5 V12 C4 17 7.5 21 12 22 C16.5 21 20 17 20 12 V5 L12 2Z"
-                  fill="#059669"
-                />
-                <path
-                  d="M8 12 L11 15 L16 9"
-                  stroke="white"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="md:hidden">{t("hero.trustModeratedShort", "Modérées")}</span>
-              <span className="hidden md:inline">{t("hero.trustModerated", "Annonces modérées")}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
-              <svg
-                viewBox="0 0 24 16"
-                className="h-4 w-6 shrink-0 rounded-sm"
-                aria-hidden="true"
-              >
-                <rect x="0" y="0" width="8" height="16" fill="#FFFFFF" />
-                <rect x="8" y="0" width="16" height="8" fill="#FC3D32" />
-                <rect x="8" y="8" width="16" height="8" fill="#007E3A" />
-              </svg>
-              <span className="md:hidden">{t("hero.trustMadeInMgShort", "Malgache")}</span>
-              <span className="hidden md:inline">{t("hero.trustMadeInMg", "100% Malgache")}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 shrink-0"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" fill="#059669" />
-                <path
-                  d="M8 12 L11 15 L16 9"
-                  stroke="white"
-                  strokeWidth="2.2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="md:hidden">{t("hero.trustEstimationFreeShort", "Estimation")}</span>
-              <span className="hidden md:inline">{t("hero.trustEstimationFree", "Estimation gratuite")}</span>
-            </span>
           </div>
         </div>
       </div>
