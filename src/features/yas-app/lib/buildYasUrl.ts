@@ -16,7 +16,7 @@ export type YasQueryParams = {
   entry_point?: string | null;
 };
 
-export function buildYasUrl(targetUrl: string, params: YasQueryParams): string {
+export function buildYasUrl(targetUrl: string, params: YasQueryParams = {}): string {
   const [path, existingQuery = ""] = targetUrl.split("?", 2);
   const searchParams = new URLSearchParams(existingQuery);
 

@@ -43,6 +43,7 @@ import {
   ListingPartnerAgencyStrip,
 } from "@/components/monetization/ListingDetailPlacements";
 import { useListingDetailPageData } from "@/pages/listing-detail/useListingDetailPageData";
+import { useYasHomeUrl } from "@/features/yas-app/hooks/useYasHomeUrl";
 import { useListingDetailContact } from "@/pages/listing-detail/useListingDetailContact";
 import { buildListingDetailViewModel } from "@/pages/listing-detail/buildListingDetailViewModel";
 import {
@@ -69,6 +70,7 @@ const ListingDetail = () => {
   const [selectedImg, setSelectedImg] = useState(0);
   const [showAllSpecsMobile, setShowAllSpecsMobile] = useState(false);
   const [showAllFeaturesMobile, setShowAllFeaturesMobile] = useState(false);
+  const homeUrl = useYasHomeUrl();
 
   const { listing, isLoading, fetchError, refetch, filteredSimilar } = useListingDetailPageData(id);
 
@@ -212,7 +214,7 @@ const ListingDetail = () => {
       <Header />
       <div className="container mx-auto py-4 md:py-6 pb-32 lg:pb-6">
         <nav className="flex items-center gap-2 text-xs md:text-sm font-sans text-muted-foreground mb-4 md:mb-6 overflow-x-auto whitespace-nowrap">
-          <Link to="/" className="hover:text-primary">
+          <Link to={homeUrl} className="hover:text-primary">
             {t("nav.home", "Accueil")}
           </Link>
           <ChevronRight className="h-3 w-3" />

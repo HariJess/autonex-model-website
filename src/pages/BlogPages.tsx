@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, AlertTriangle, Info, Lightbulb } from "lucide-react";
 import { seedBlogPosts, type SeedBlogCallout } from "@/data/seed-blog";
+import { useYasHomeUrl } from "@/features/yas-app/hooks/useYasHomeUrl";
 
 const slugify = (text: string) =>
   text
@@ -163,6 +164,7 @@ const BlogList = () => {
 const BlogArticle = () => {
   const { slug } = useParams();
   const { t } = useTranslation();
+  const homeUrl = useYasHomeUrl();
   const post = seedBlogPosts.find((p) => p.slug === slug);
   const fallbackCover = "/placeholder.svg";
   const canonical = typeof window !== "undefined"
@@ -236,7 +238,7 @@ const BlogArticle = () => {
       <Header />
       <article className="container mx-auto py-6 md:py-8 max-w-3xl">
         <nav className="flex items-center gap-2 text-sm font-sans text-muted-foreground mb-6">
-          <Link to="/" className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
+          <Link to={homeUrl} className="hover:text-primary">{t("nav.home", "Accueil")}</Link>
           <span>›</span>
           <Link to="/conseils" className="hover:text-primary">{t("nav.advice")}</Link>
           <span>›</span>

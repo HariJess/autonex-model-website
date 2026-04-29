@@ -38,6 +38,7 @@ import { SearchLoadingState } from "@/pages/search/components/SearchLoadingState
 import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
 import { listingTypesForTransaction } from "@/lib/listingRules";
+import { useYasHomeUrl } from "@/features/yas-app/hooks/useYasHomeUrl";
 import { formatEngineDisplacementLiters, getExteriorColorLabel } from "@/lib/vehicleAttributes";
 import { buildSearchResultsModel } from "@/pages/search/searchResultsModel";
 import { SEARCH_RELAXED_DB_ROW_CAP } from "@/config/searchListings";
@@ -335,8 +336,9 @@ const SearchPage = () => {
     return qs ? `/recherche?${qs}` : "/recherche";
   }, [filters.transaction]);
 
+  const homeUrl = useYasHomeUrl();
   const breadcrumbs = useMemo(() => {
-    const crumbs: { label: string; to?: string }[] = [{ label: t("nav.home", "Accueil"), to: "/" }];
+    const crumbs: { label: string; to?: string }[] = [{ label: t("nav.home", "Accueil"), to: homeUrl }];
     if (filters.transaction) {
       crumbs.push({
         label: TRANSACTION_LABELS[filters.transaction as keyof typeof TRANSACTION_LABELS] || filters.transaction,
@@ -345,7 +347,7 @@ const SearchPage = () => {
     }
     if (filters.ville) crumbs.push({ label: filters.ville });
     return crumbs;
-  }, [filters.transaction, filters.ville, t, transactionOnlyHref]);
+  }, [filters.transaction, filters.ville, t, transactionOnlyHref, homeUrl]);
 
   const pageTitle = useMemo(() => {
     const parts: string[] = [];

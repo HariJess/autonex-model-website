@@ -38,6 +38,7 @@ import {
   getCurrentEstimationStepIndex,
   getVehicleStepErrors,
 } from "@/pages/estimation/estimationPageModel";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 
 const EstimationResultReport = lazy(() => import("@/components/estimation/EstimationResultReport"));
 
@@ -317,6 +318,7 @@ const VehicleEstimationPage = () => {
       </Helmet>
       <Header />
       <main className="container mx-auto max-w-6xl py-7 md:py-14">
+        <YasBackButton />
         <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-64 max-w-5xl bg-gradient-to-r from-primary/15 via-transparent to-primary/15 blur-3xl" />
         {screen === "landing" && (
           <section className="space-y-8 md:space-y-10">

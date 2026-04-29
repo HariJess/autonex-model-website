@@ -18,6 +18,7 @@ import {
 } from "@/lib/seoP1Registry";
 import { AlertTriangle, Home, ChevronRight, Link2 } from "lucide-react";
 import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
+import { useYasHomeUrl } from "@/features/yas-app/hooks/useYasHomeUrl";
 
 type LandingKind = "transaction" | "category" | "city" | "category-city";
 
@@ -26,6 +27,7 @@ const MAX_LISTINGS = 24;
 const SeoLandingPage = () => {
   const params = useParams();
   const location = useLocation();
+  const homeUrl = useYasHomeUrl();
   const transactionSlugFromPath = useMemo(() => {
     const slug = location.pathname.replace(/^\/+/, "").replace(/\/+$/, "");
     if (!slug) return null;
@@ -199,7 +201,7 @@ const SeoLandingPage = () => {
 
       <div className="container mx-auto pt-4 pb-8">
         <nav className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-          <Link to="/" className="hover:text-primary inline-flex items-center gap-1">
+          <Link to={homeUrl} className="hover:text-primary inline-flex items-center gap-1">
             <Home className="h-3 w-3" />
             Accueil
           </Link>
