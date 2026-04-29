@@ -1,245 +1,182 @@
 import { Link } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { LegalLayout } from "./LegalLayout";
 import { LEGAL_LAST_UPDATED } from "./legalConstants";
 
 export default function PolitiqueConfidentialitePage() {
+  const { t } = useTranslation();
   return (
     <LegalLayout
-      title="Politique de confidentialité — AutoNex"
-      description="Politique de confidentialité AutoNex : données collectées, finalités, base légale, destinataires, durées de conservation, droits des utilisateurs (RGPD + loi malgache 2014-038)."
+      title={t("legal.privacy.pageTitle")}
+      description={t("legal.privacy.pageDescription")}
       canonicalPath="/legal/confidentialite"
       lastUpdated={LEGAL_LAST_UPDATED}
     >
-      <h1>Politique de confidentialité</h1>
+      <h1>{t("legal.privacy.heading")}</h1>
 
-      <h2>Cadre légal applicable</h2>
+      <h2>{t("legal.privacy.framework.title")}</h2>
       <ul>
-        <li>Règlement Général sur la Protection des Données (RGPD) — applicable aux utilisateurs situés dans l'Union Européenne</li>
-        <li>Loi malgache n°2014-038 du 9 janvier 2015 sur la protection des données à caractère personnel</li>
-        <li>Loi malgache n°2014-025 sur la cybercriminalité</li>
+        <li>{t("legal.privacy.framework.item1")}</li>
+        <li>{t("legal.privacy.framework.item2")}</li>
+        <li>{t("legal.privacy.framework.item3")}</li>
       </ul>
 
-      <h2>1. Responsable du traitement</h2>
+      <h2>{t("legal.privacy.controller.title")}</h2>
       <ul>
-        <li>APLi SARLU (identifiants complets en <Link to="/legal/mentions" className="text-primary hover:underline">Mentions légales</Link>)</li>
         <li>
-          Délégué à la Protection des Données (DPO) : PIRBAY Ali As —{" "}
-          <a href="mailto:info@autonex.mg" className="text-primary hover:underline">info@autonex.mg</a>
+          <Trans i18nKey="legal.privacy.controller.item1">
+            APLi SARLU (identifiants complets en <Link to="/legal/mentions" className="text-primary hover:underline">Mentions légales</Link>)
+          </Trans>
+        </li>
+        <li>
+          <Trans i18nKey="legal.privacy.controller.item2">
+            Délégué à la Protection des Données (DPO) : PIRBAY Ali As —{" "}
+            <a href="mailto:info@autonex.mg" className="text-primary hover:underline">info@autonex.mg</a>
+          </Trans>
         </li>
       </ul>
 
-      <h2>2. Données collectées et finalités</h2>
+      <h2>{t("legal.privacy.data.title")}</h2>
       <div className="overflow-x-auto">
         <table>
           <thead>
             <tr>
-              <th>Catégorie</th>
-              <th>Données</th>
-              <th>Finalité</th>
-              <th>Base légale</th>
+              <th>{t("legal.privacy.data.colCategory")}</th>
+              <th>{t("legal.privacy.data.colData")}</th>
+              <th>{t("legal.privacy.data.colPurpose")}</th>
+              <th>{t("legal.privacy.data.colBasis")}</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Compte utilisateur</td>
-              <td>Nom, prénom, email, téléphone WhatsApp, mot de passe (haché avec bcrypt)</td>
-              <td>Fourniture du service marketplace, authentification</td>
-              <td>Exécution du contrat</td>
-            </tr>
-            <tr>
-              <td>Annonces</td>
-              <td>Photos véhicule, description, prix, localisation GPS approximative, caractéristiques techniques</td>
-              <td>Publication et diffusion des annonces</td>
-              <td>Exécution du contrat</td>
-            </tr>
-            <tr>
-              <td>Transactions</td>
-              <td>IDs de transactions anonymisés, historique crédits AutoNex, statut publications boostées</td>
-              <td>Facturation, historique utilisateur</td>
-              <td>Exécution du contrat + Obligation légale (conservation comptable)</td>
-            </tr>
-            <tr>
-              <td>Données de connexion</td>
-              <td>Adresse IP, user-agent, logs de session</td>
-              <td>Sécurité, prévention de la fraude, détection de bot</td>
-              <td>Intérêt légitime</td>
-            </tr>
-            <tr>
-              <td>Cookies et analytics</td>
-              <td>Voir section "Cookies"</td>
-              <td>Amélioration du service, statistiques anonymisées</td>
-              <td>Consentement (analytics) / Intérêt légitime (techniques)</td>
-            </tr>
-            <tr>
-              <td>Monitoring technique</td>
-              <td>Logs d'erreurs, stack traces, user-agent, session ID (via Sentry)</td>
-              <td>Détection et correction des bugs</td>
-              <td>Intérêt légitime</td>
-            </tr>
-            <tr>
-              <td>Modération et signalements</td>
-              <td>Raisons de signalement, identifiant du signalant, décisions admin</td>
-              <td>Prévention des fraudes, qualité de la plateforme</td>
-              <td>Intérêt légitime + Obligation légale (conservation audit logs)</td>
-            </tr>
+            <tr><td>{t("legal.privacy.data.row1Cat")}</td><td>{t("legal.privacy.data.row1Data")}</td><td>{t("legal.privacy.data.row1Purpose")}</td><td>{t("legal.privacy.data.row1Basis")}</td></tr>
+            <tr><td>{t("legal.privacy.data.row2Cat")}</td><td>{t("legal.privacy.data.row2Data")}</td><td>{t("legal.privacy.data.row2Purpose")}</td><td>{t("legal.privacy.data.row2Basis")}</td></tr>
+            <tr><td>{t("legal.privacy.data.row3Cat")}</td><td>{t("legal.privacy.data.row3Data")}</td><td>{t("legal.privacy.data.row3Purpose")}</td><td>{t("legal.privacy.data.row3Basis")}</td></tr>
+            <tr><td>{t("legal.privacy.data.row4Cat")}</td><td>{t("legal.privacy.data.row4Data")}</td><td>{t("legal.privacy.data.row4Purpose")}</td><td>{t("legal.privacy.data.row4Basis")}</td></tr>
+            <tr><td>{t("legal.privacy.data.row5Cat")}</td><td>{t("legal.privacy.data.row5Data")}</td><td>{t("legal.privacy.data.row5Purpose")}</td><td>{t("legal.privacy.data.row5Basis")}</td></tr>
+            <tr><td>{t("legal.privacy.data.row6Cat")}</td><td>{t("legal.privacy.data.row6Data")}</td><td>{t("legal.privacy.data.row6Purpose")}</td><td>{t("legal.privacy.data.row6Basis")}</td></tr>
+            <tr><td>{t("legal.privacy.data.row7Cat")}</td><td>{t("legal.privacy.data.row7Data")}</td><td>{t("legal.privacy.data.row7Purpose")}</td><td>{t("legal.privacy.data.row7Basis")}</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h2>3. Données NON collectées</h2>
-      <p>AutoNex ne stocke AUCUNE donnée bancaire sensible :</p>
+      <h2>{t("legal.privacy.notCollected.title")}</h2>
+      <p>{t("legal.privacy.notCollected.intro")}</p>
       <ul>
-        <li>Numéros de cartes bancaires</li>
-        <li>Cryptogrammes visuels (CVV)</li>
-        <li>Identifiants complets de comptes mobile money</li>
-        <li>Codes secrets, mots de passe tiers</li>
+        <li>{t("legal.privacy.notCollected.item1")}</li>
+        <li>{t("legal.privacy.notCollected.item2")}</li>
+        <li>{t("legal.privacy.notCollected.item3")}</li>
+        <li>{t("legal.privacy.notCollected.item4")}</li>
       </ul>
-      <p>
-        Toutes les données de paiement sont traitées exclusivement par les prestataires de paiement tiers agréés (voir section
-        "Destinataires"). Seuls les identifiants de transaction anonymisés et le statut (succès/échec) sont conservés.
-      </p>
+      <p>{t("legal.privacy.notCollected.note")}</p>
 
-      <h2>4. Destinataires des données</h2>
-      <h3>Personnel interne AutoNex</h3>
+      <h2>{t("legal.privacy.recipients.title")}</h2>
+      <h3>{t("legal.privacy.recipients.staff.title")}</h3>
       <ul>
-        <li>Gérant unique : PIRBAY Ali As (accès complet en qualité de DPO)</li>
-        <li>Administrateurs désignés : accès aux données strictement nécessaires à leurs missions (modération, support)</li>
+        <li>{t("legal.privacy.recipients.staff.item1")}</li>
+        <li>{t("legal.privacy.recipients.staff.item2")}</li>
       </ul>
-      <h3>Sous-traitants (responsables de traitement indépendants)</h3>
+      <h3>{t("legal.privacy.recipients.processors.title")}</h3>
       <div className="overflow-x-auto">
         <table>
           <thead>
             <tr>
-              <th>Sous-traitant</th>
-              <th>Finalité</th>
-              <th>Données traitées</th>
-              <th>Pays d'hébergement</th>
+              <th>{t("legal.privacy.recipients.colProcessor")}</th>
+              <th>{t("legal.privacy.recipients.colPurpose")}</th>
+              <th>{t("legal.privacy.recipients.colData")}</th>
+              <th>{t("legal.privacy.recipients.colCountry")}</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Supabase Inc.</td>
-              <td>Hébergement base de données, authentification</td>
-              <td>Ensemble des données utilisateurs, annonces, transactions</td>
-              <td>Singapour</td>
-            </tr>
-            <tr>
-              <td>Vercel Inc.</td>
-              <td>Hébergement application web</td>
-              <td>Logs techniques, cookies de session anonymes</td>
-              <td>États-Unis</td>
-            </tr>
-            <tr>
-              <td>Sentry</td>
-              <td>Monitoring d'erreurs</td>
-              <td>Logs d'erreurs, stack traces, user-agent, session ID anonymisé</td>
-              <td>États-Unis</td>
-            </tr>
-            <tr>
-              <td>Google LLC (Google Analytics 4)</td>
-              <td>Statistiques d'usage</td>
-              <td>IP tronquée (anonymisation activée), session analytics agrégées</td>
-              <td>États-Unis</td>
-            </tr>
-            <tr>
-              <td>Resend</td>
-              <td>Envoi emails transactionnels (formulaire contact)</td>
-              <td>Nom, email, message de contact</td>
-              <td>États-Unis</td>
-            </tr>
-            <tr>
-              <td>Prestataire de paiement</td>
-              <td>Traitement des paiements en ligne</td>
-              <td>Données de paiement (hors AutoNex)</td>
-              <td>Variable selon le prestataire</td>
-            </tr>
+            <tr><td>Supabase Inc.</td><td>{t("legal.privacy.recipients.row1Purpose")}</td><td>{t("legal.privacy.recipients.row1Data")}</td><td>Singapour</td></tr>
+            <tr><td>Vercel Inc.</td><td>{t("legal.privacy.recipients.row2Purpose")}</td><td>{t("legal.privacy.recipients.row2Data")}</td><td>États-Unis</td></tr>
+            <tr><td>Sentry</td><td>{t("legal.privacy.recipients.row3Purpose")}</td><td>{t("legal.privacy.recipients.row3Data")}</td><td>États-Unis</td></tr>
+            <tr><td>Google LLC (Google Analytics 4)</td><td>{t("legal.privacy.recipients.row4Purpose")}</td><td>{t("legal.privacy.recipients.row4Data")}</td><td>États-Unis</td></tr>
+            <tr><td>Resend</td><td>{t("legal.privacy.recipients.row5Purpose")}</td><td>{t("legal.privacy.recipients.row5Data")}</td><td>États-Unis</td></tr>
+            <tr><td>{t("legal.privacy.recipients.row6Processor")}</td><td>{t("legal.privacy.recipients.row6Purpose")}</td><td>{t("legal.privacy.recipients.row6Data")}</td><td>{t("legal.privacy.recipients.row6Country")}</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h2>5. Transferts hors de Madagascar</h2>
-      <p>
-        Certains sous-traitants étant situés hors de Madagascar (États-Unis, Singapour), des transferts de données personnelles
-        vers ces pays peuvent avoir lieu. Ces transferts sont encadrés par :
-      </p>
+      <h2>{t("legal.privacy.transfers.title")}</h2>
+      <p>{t("legal.privacy.transfers.intro")}</p>
       <ul>
-        <li>Les Clauses Contractuelles Types (CCT) publiées par la Commission européenne (pour les utilisateurs UE)</li>
+        <li>{t("legal.privacy.transfers.item1")}</li>
+        <li>{t("legal.privacy.transfers.item2")}</li>
+      </ul>
+
+      <h2>{t("legal.privacy.retention.title")}</h2>
+      <div className="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>{t("legal.privacy.retention.colCategory")}</th>
+              <th>{t("legal.privacy.retention.colDuration")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>{t("legal.privacy.retention.row1Cat")}</td><td>{t("legal.privacy.retention.row1Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row2Cat")}</td><td>{t("legal.privacy.retention.row2Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row3Cat")}</td><td>{t("legal.privacy.retention.row3Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row4Cat")}</td><td>{t("legal.privacy.retention.row4Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row5Cat")}</td><td>{t("legal.privacy.retention.row5Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row6Cat")}</td><td>{t("legal.privacy.retention.row6Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row7Cat")}</td><td>{t("legal.privacy.retention.row7Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row8Cat")}</td><td>{t("legal.privacy.retention.row8Duration")}</td></tr>
+            <tr><td>{t("legal.privacy.retention.row9Cat")}</td><td>{t("legal.privacy.retention.row9Duration")}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>{t("legal.privacy.rights.title")}</h2>
+      <p>{t("legal.privacy.rights.intro")}</p>
+      <ul>
+        <li><strong>{t("legal.privacy.rights.access.label")}</strong> {t("legal.privacy.rights.access.desc")}</li>
+        <li><strong>{t("legal.privacy.rights.rectify.label")}</strong> {t("legal.privacy.rights.rectify.desc")}</li>
+        <li><strong>{t("legal.privacy.rights.erasure.label")}</strong> {t("legal.privacy.rights.erasure.desc")}</li>
+        <li><strong>{t("legal.privacy.rights.portability.label")}</strong> {t("legal.privacy.rights.portability.desc")}</li>
+        <li><strong>{t("legal.privacy.rights.object.label")}</strong> {t("legal.privacy.rights.object.desc")}</li>
+        <li><strong>{t("legal.privacy.rights.limitation.label")}</strong> {t("legal.privacy.rights.limitation.desc")}</li>
+        <li><strong>{t("legal.privacy.rights.withdraw.label")}</strong> {t("legal.privacy.rights.withdraw.desc")}</li>
+        <li><strong>{t("legal.privacy.rights.automated.label")}</strong> {t("legal.privacy.rights.automated.desc")}</li>
+      </ul>
+      <h3>{t("legal.privacy.rights.procedure.title")}</h3>
+      <ul>
         <li>
-          Les conditions contractuelles des sous-traitants, conformes aux standards internationaux de protection des données
+          <Trans i18nKey="legal.privacy.rights.procedure.item1">
+            Email : <a href="mailto:info@autonex.mg" className="text-primary hover:underline">info@autonex.mg</a> avec copie d'une pièce d'identité en cours de validité
+          </Trans>
         </li>
+        <li>{t("legal.privacy.rights.procedure.item2")}</li>
+        <li>{t("legal.privacy.rights.procedure.item3")}</li>
+      </ul>
+      <h3>{t("legal.privacy.rights.recourse.title")}</h3>
+      <ul>
+        <li>{t("legal.privacy.rights.recourse.item1")}</li>
+        <li>{t("legal.privacy.rights.recourse.item2")}</li>
       </ul>
 
-      <h2>6. Durées de conservation</h2>
-      <div className="overflow-x-auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Catégorie</th>
-              <th>Durée</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Compte utilisateur actif</td><td>Durée de vie du compte</td></tr>
-            <tr><td>Compte utilisateur inactif</td><td>3 ans après dernière connexion, puis suppression automatique ou anonymisation</td></tr>
-            <tr><td>Annonces actives</td><td>Durée de publication + 30 jours (pour les annonces expirées)</td></tr>
-            <tr><td>Annonces archivées</td><td>12 mois puis suppression</td></tr>
-            <tr><td>Logs techniques (IP, user-agent)</td><td>12 mois glissants</td></tr>
-            <tr><td>Logs d'audit admin</td><td>5 ans (obligation comptable et traçabilité)</td></tr>
-            <tr><td>Données de transactions</td><td>10 ans (obligation légale comptable et fiscale)</td></tr>
-            <tr><td>Cookies analytics</td><td>13 mois maximum</td></tr>
-            <tr><td>Messages de contact (contact_messages)</td><td>3 ans après dernière interaction</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2>7. Droits des utilisateurs</h2>
-      <p>Conformément au RGPD et à la loi malgache 2014-038, tout utilisateur dispose des droits suivants :</p>
+      <h2>{t("legal.privacy.security.title")}</h2>
+      <p>{t("legal.privacy.security.intro")}</p>
       <ul>
-        <li><strong>Droit d'accès</strong> : obtenir une copie des données le concernant</li>
-        <li><strong>Droit de rectification</strong> : corriger des données inexactes ou incomplètes</li>
-        <li><strong>Droit à l'effacement</strong> ("droit à l'oubli") : demander la suppression de ses données</li>
-        <li><strong>Droit à la portabilité</strong> : recevoir ses données dans un format structuré, couramment utilisé et lisible par machine</li>
-        <li><strong>Droit d'opposition</strong> : s'opposer au traitement pour motif légitime</li>
-        <li><strong>Droit à la limitation</strong> : demander la limitation temporaire du traitement</li>
-        <li><strong>Droit de retrait du consentement</strong> : à tout moment pour les traitements basés sur le consentement</li>
-        <li><strong>Droit de ne pas faire l'objet d'une décision automatisée</strong> : AutoNex n'utilise actuellement aucun traitement automatisé avec effet juridique sur les utilisateurs</li>
-      </ul>
-      <h3>Procédure pour exercer ces droits</h3>
-      <ul>
-        <li>Email : <a href="mailto:info@autonex.mg" className="text-primary hover:underline">info@autonex.mg</a> avec copie d'une pièce d'identité en cours de validité</li>
-        <li>Délai de réponse : 30 jours maximum à compter de la réception de la demande complète</li>
-        <li>Gratuité : sauf demandes manifestement infondées ou excessives</li>
-      </ul>
-      <h3>Recours</h3>
-      <ul>
-        <li>Utilisateurs malgaches : CMIL (Commission Malagasy Informatique et Libertés) — cmil.mg (si créée à date de consultation)</li>
-        <li>Utilisateurs UE : CNIL (France) — cnil.fr — ou autorité de contrôle du pays de résidence</li>
+        <li>{t("legal.privacy.security.item1")}</li>
+        <li>{t("legal.privacy.security.item2")}</li>
+        <li>{t("legal.privacy.security.item3")}</li>
+        <li>{t("legal.privacy.security.item4")}</li>
+        <li>{t("legal.privacy.security.item5")}</li>
+        <li>{t("legal.privacy.security.item6")}</li>
+        <li>{t("legal.privacy.security.item7")}</li>
+        <li>{t("legal.privacy.security.item8")}</li>
       </ul>
 
-      <h2>8. Sécurité des données</h2>
-      <p>AutoNex met en œuvre les mesures techniques et organisationnelles suivantes :</p>
-      <ul>
-        <li>Chiffrement TLS 1.3 pour toutes les communications (HTTPS obligatoire)</li>
-        <li>Hachage des mots de passe (algorithme bcrypt)</li>
-        <li>Row Level Security (RLS) activée sur toutes les tables Supabase contenant des données personnelles</li>
-        <li>Audit logs pour toutes les actions administrateur</li>
-        <li>Rate limiting anti-bot (20 publications maximum par utilisateur sur 24h)</li>
-        <li>Système de modération a priori (particuliers) et signalement communautaire avec auto-masquage</li>
-        <li>Monitoring des erreurs en temps réel via Sentry</li>
-        <li>Sauvegardes automatiques quotidiennes de la base de données (via Supabase)</li>
-      </ul>
-
-      <h2>9. Cookies</h2>
+      <h2>{t("legal.privacy.cookies.title")}</h2>
       <p>
-        Voir la page dédiée <Link to="/legal/cookies" className="text-primary hover:underline">/legal/cookies</Link>.
+        <Trans i18nKey="legal.privacy.cookies.body">
+          Voir la page dédiée <Link to="/legal/cookies" className="text-primary hover:underline">/legal/cookies</Link>.
+        </Trans>
       </p>
 
-      <h2>10. Modifications</h2>
-      <p>
-        La présente politique peut être mise à jour pour refléter les évolutions de la plateforme ou des obligations légales. La
-        date de dernière mise à jour est indiquée en pied de page. Les utilisateurs sont informés par email de toute modification
-        substantielle.
-      </p>
+      <h2>{t("legal.privacy.changes.title")}</h2>
+      <p>{t("legal.privacy.changes.body")}</p>
     </LegalLayout>
   );
 }

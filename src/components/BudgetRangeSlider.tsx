@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,7 @@ const BudgetRangeSlider = ({
   onClose,
   onCurrencyChange,
 }: BudgetRangeSliderProps) => {
+  const { t } = useTranslation();
   const [displayCurrency, setDisplayCurrency] = useState<"MGA" | "EUR">("MGA");
 
   const handleCurrencyChange = (c: "MGA" | "EUR") => {
@@ -178,7 +180,7 @@ const BudgetRangeSlider = ({
               const v = parseInput(e.target.value);
               onMaxChange(v > 0 ? fromDisplay(v) : 0);
             }}
-            placeholder="Sans limite"
+            placeholder={t("search.noLimit", "Sans limite")}
             className="font-sans text-sm"
           />
         </div>

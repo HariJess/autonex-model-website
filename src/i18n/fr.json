@@ -42,7 +42,16 @@
       "reasonNotSpecified": "non précisée"
     },
     "noDirectoryAgencies": "Aucun concessionnaire ne correspond aux critères.",
-    "runtimeUnavailable": "Le profil concessionnaire est momentanément indisponible. Veuillez réessayer dans quelques instants."
+    "runtimeUnavailable": "Le profil concessionnaire est momentanément indisponible. Veuillez réessayer dans quelques instants.",
+    "profile": {
+      "bannerTitle": "Visibilité concessionnaire sur AutoNex",
+      "bannerSubtitle": "Packages marque, spotlight et diffusion multi-villes — contact commercial pour un plan sur mesure.",
+      "bannerCta": "Booster ma visibilité",
+      "aboutTitle": "À propos",
+      "openingHours": "Horaires d'ouverture",
+      "followUs": "Suivez-nous",
+      "closed": "Fermé"
+    }
   },
   "auth": {
     "agency": "Agence",
@@ -1053,7 +1062,8 @@
     "browseByAreaTitle": "Ville complète & arrondissements",
     "locationHierarchyHint": "Toute la ville si rien n’est coché en dessous. Cochez un arrondissement entier ou des quartiers précis — cumul possible.",
     "wholeArrondissementShort": "Tout",
-    "relaxedFetchCapHint": "Les résultats affichés sont prioritaires sur les annonces récentes dans une fenêtre limitée ; le total peut inclure des annonces hors de cette fenêtre."
+    "relaxedFetchCapHint": "Les résultats affichés sont prioritaires sur les annonces récentes dans une fenêtre limitée ; le total peut inclure des annonces hors de cette fenêtre.",
+    "noLimit": "Sans limite"
   },
   "sections": {
     "agencies": "Concessionnaires partenaires",
@@ -1359,6 +1369,666 @@
       "messageMin": "Minimum 20 caractères.",
       "messageMax": "Maximum 2000 caractères.",
       "consentRequired": "Vous devez accepter la politique de confidentialité."
+    }
+  },
+  "legal": {
+    "layout": {
+      "linkMentions": "Mentions légales",
+      "linkPrivacy": "Politique de confidentialité",
+      "linkTerms": "CGU",
+      "linkCookies": "Cookies",
+      "linkDataDeletion": "Suppression des données",
+      "lastUpdated": "Dernière mise à jour : {{date}}"
+    },
+    "mentions": {
+      "pageTitle": "Mentions légales — AutoNex",
+      "pageDescription": "Mentions légales de la plateforme AutoNex, exploitée par APLi SARLU — éditeur, hébergeurs, propriété intellectuelle, responsabilité.",
+      "heading": "Mentions légales",
+      "editor": {
+        "title": "1. Éditeur du site",
+        "item1": "APLi SARLU (Société à Responsabilité Limitée Unipersonnelle)",
+        "item2": "Capital social : 1 000 000 MGA",
+        "address": "Siège social : LOGT 51 CITE AMPEFILOHA CUA ANTANANARIVO I, 10101 Antananarivo Renivohitra, Analamanga, Madagascar",
+        "brand": "Site exploité sous la marque commerciale \"AutoNex\""
+      },
+      "publisher": {
+        "title": "2. Directeur de la publication",
+        "body": "PIRBAY Ali As, gérant unique d'APLi SARLU."
+      },
+      "hosting": {
+        "title": "3. Hébergeurs",
+        "frontend": "<0>Application front-end</0> : Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA — <1>vercel.com</1>",
+        "database": "<0>Base de données et authentification</0> : Supabase Inc., 970 Toa Payoh North #07-04, Singapore 318992 — <1>supabase.com</1>"
+      },
+      "ip": {
+        "title": "4. Propriété intellectuelle",
+        "item1": "La marque \"AutoNex\" ainsi que le logo, l'identité visuelle et l'ensemble des contenus éditoriaux originaux publiés sur le site sont la propriété exclusive d'APLi SARLU.",
+        "item2": "Les annonces publiées sur la plateforme restent la propriété de leurs auteurs respectifs qui concèdent à AutoNex une licence non-exclusive pour leur affichage public dans le cadre du service (voir article 9 des CGU).",
+        "item3": "Toute reproduction, diffusion ou exploitation non autorisée des contenus protégés est strictement interdite et susceptible de poursuites."
+      },
+      "responsibility": {
+        "title": "5. Responsabilité du contenu des annonces",
+        "item1": "AutoNex agit en qualité d'intermédiaire technique.",
+        "item2": "Les annonces publiées le sont sous la responsabilité exclusive de leurs auteurs (particuliers ou concessionnaires).",
+        "item3": "AutoNex ne peut être tenu responsable de l'exactitude, de la complétude ou de la légalité des informations publiées par les utilisateurs.",
+        "item4": "Un système de modération a priori (pour les particuliers) et de signalement communautaire est en place pour préserver la qualité de la plateforme."
+      },
+      "links": {
+        "title": "6. Liens hypertextes",
+        "item1": "Les liens sortants vers des sites tiers sont proposés à titre informatif.",
+        "item2": "AutoNex n'exerce aucun contrôle sur le contenu de ces sites et décline toute responsabilité quant à leur contenu.",
+        "item3": "Les liens entrants vers le site autonex.mg sont autorisés à condition de ne pas créer de confusion sur l'origine ou la nature du contenu."
+      },
+      "credits": {
+        "title": "7. Crédits",
+        "item1": "Photos et visuels d'annonces : fournis par les utilisateurs ayant attesté détenir les droits nécessaires.",
+        "item2": "Icônes et composants UI : shadcn/ui, lucide-react (licences open source)."
+      },
+      "law": {
+        "title": "8. Loi applicable et juridiction compétente",
+        "item1": "Les présentes Mentions légales sont régies par le droit malgache.",
+        "item2": "Tout litige relatif à l'interprétation ou l'exécution des présentes relève de la compétence exclusive du Tribunal de Première Instance d'Antananarivo, sous réserve des règles impératives de procédure."
+      }
+    },
+    "cookies": {
+      "pageTitle": "Cookies — AutoNex",
+      "pageDescription": "Cookies utilisés par AutoNex : techniques, analytics Google Analytics 4, fonctionnels, monitoring Sentry. Gestion du consentement.",
+      "heading": "Cookies",
+      "what": {
+        "title": "Qu'est-ce qu'un cookie ?",
+        "body": "Un cookie est un petit fichier texte déposé sur le terminal de l'utilisateur (ordinateur, smartphone, tablette) par le navigateur lors de la consultation d'un site web. Les cookies permettent de reconnaître le terminal, conserver des préférences, analyser l'usage, ou fournir des services personnalisés."
+      },
+      "used": {
+        "title": "Cookies utilisés sur AutoNex"
+      },
+      "colCookie": "Cookie",
+      "colPurpose": "Finalité",
+      "colDuration": "Durée",
+      "technical": {
+        "title": "1. Cookies techniques (obligatoires, pas de consent requis)",
+        "row1Name": "Session Supabase Auth",
+        "row1Purpose": "Maintien de la connexion utilisateur",
+        "row1Duration": "Session + 7 jours",
+        "row2Name": "Beta Lock gate",
+        "row2Purpose": "Accès à la version beta de la plateforme",
+        "row2Duration": "30 jours",
+        "row3Name": "Vercel load balancer",
+        "row3Purpose": "Performance et haute disponibilité",
+        "row3Duration": "Session",
+        "note": "Ces cookies sont strictement nécessaires au fonctionnement du service et ne peuvent être désactivés sans empêcher l'utilisation d'AutoNex."
+      },
+      "analytics": {
+        "title": "2. Cookies analytics (consent requis)",
+        "row1Purpose": "Statistiques d'usage anonymisées (IP tronquée activée)",
+        "row1Duration": "13 mois maximum",
+        "note": "Ces cookies ne sont déposés qu'avec le consentement explicite de l'utilisateur (via la bannière cookies)."
+      },
+      "functional": {
+        "title": "3. Cookies fonctionnels (consent requis)",
+        "row1Name": "Préférence langue",
+        "row1Purpose": "Mémorisation de la langue choisie",
+        "row1Duration": "1 an"
+      },
+      "monitoring": {
+        "title": "4. Cookies de monitoring (intérêt légitime, révocable)",
+        "row1Purpose": "Reproduction de bugs techniques, aucune donnée personnelle identifiante",
+        "row1Duration": "Session"
+      },
+      "management": {
+        "title": "Gestion des cookies",
+        "item1": "Bannière de consentement : lors de votre première visite, une bannière vous permet de choisir les catégories de cookies à accepter",
+        "item2": "Bouton \"Gérer mes cookies\" : présent en pied de page, il vous permet de modifier vos choix à tout moment",
+        "item3": "Paramètres navigateur : vous pouvez également configurer votre navigateur pour bloquer ou supprimer les cookies. Attention : le blocage des cookies techniques peut empêcher le fonctionnement d'AutoNex",
+        "item4": "Effet différé : si vous révoquez votre consentement après qu'un cookie a été déposé, celui-ci ne sera plus redéposé lors de vos prochaines visites, mais son contenu déjà stocké peut persister jusqu'à expiration naturelle"
+      },
+      "managePreferencesButton": "Gérer mes préférences cookies",
+      "thirdParty": {
+        "title": "Politiques de confidentialité des prestataires tiers"
+      }
+    },
+    "dataDeletion": {
+      "pageTitle": "Suppression des données — AutoNex",
+      "pageDescription": "Procédure de suppression du compte et des données personnelles sur AutoNex Madagascar : depuis le tableau de bord ou par email, conservation légale, révocation des connexions Google et Facebook.",
+      "heading": "Suppression de vos données",
+      "intro": "AutoNex respecte votre droit à la suppression de vos données personnelles, conformément au Règlement général sur la protection des données (RGPD), à la loi malgache n°2014-038 sur la protection des données à caractère personnel, et aux pratiques internationales.",
+      "what": {
+        "title": "1. Ce que la suppression implique",
+        "intro": "Quand vous demandez la suppression de votre compte, nous procédons aux actions suivantes :",
+        "item1": "Suppression de votre profil utilisateur (nom, prénom, téléphone, email).",
+        "item2": "Suppression de vos annonces publiées et de leurs photos.",
+        "item3": "Suppression de votre solde de crédits restant, qui est non remboursable conformément aux <0>CGU</0>.",
+        "item4": "Suppression de votre historique de transactions et de messages côté front.",
+        "item5": "Suppression des liaisons OAuth Google et Facebook.",
+        "item6": "Anonymisation de vos avis et signalements éventuels (le contenu reste mais aucun identifiant ne pointe plus vers vous)."
+      },
+      "kept": {
+        "title": "2. Ce qui peut être conservé",
+        "intro": "Pour des raisons légales, fiscales et comptables, certaines informations peuvent être conservées de manière anonymisée pendant la durée prévue par la loi malgache et européenne :",
+        "item1": "Factures et reçus de paiement liés à l'achat de crédits AutoNex : conservation 10 ans (obligation comptable).",
+        "item2": "Logs techniques anonymisés (adresses IP partielles, métadonnées de session) : 12 mois, pour la sécurité du service et la lutte contre la fraude.",
+        "item3": "Identifiants techniques de transactions auprès de notre prestataire de paiement, conservés conformément à la réglementation bancaire applicable."
+      },
+      "how": {
+        "title": "3. Comment demander la suppression",
+        "dashboard": {
+          "title": "3.1. Depuis votre tableau de bord (recommandé)",
+          "body": "Connectez-vous à votre compte → menu Paramètres → section \"Zone de danger\" → Supprimer mon compte. Vous recevez un email de confirmation à l'adresse associée à votre compte. La suppression devient effective sous 7 jours après confirmation."
+        },
+        "email": {
+          "title": "3.2. Par email",
+          "body": "Envoyez un email à <0>info@autonex.mg</0> depuis l'adresse associée à votre compte AutoNex, avec pour objet <1>« Demande de suppression de compte »</1>. Indiquez votre email de connexion et, si possible, l'identifiant de votre compte (visible dans Paramètres > Mon profil).",
+          "followup": "Nous traitons les demandes par email sous 30 jours maximum (généralement sous 7 jours). Vous recevez une confirmation écrite une fois la suppression effective."
+        }
+      },
+      "oauth": {
+        "title": "4. Suppression des connexions Google ou Facebook",
+        "intro": "Si vous vous êtes connecté(e) à AutoNex via Google ou Facebook, la suppression de votre compte AutoNex révoque automatiquement le lien entre votre compte tiers et notre service. Vous pouvez aussi révoquer ce lien à tout moment, indépendamment de la suppression de votre compte AutoNex :",
+        "google": "Google : <0>myaccount.google.com/permissions</0> → rechercher AutoNex → <1>Supprimer l'accès</1>.",
+        "facebook": "Facebook : Paramètres & confidentialité → Paramètres → Apps et sites web → AutoNex → <0>Supprimer</0>. Lien direct : <1>facebook.com/settings?tab=applications</1>.",
+        "note": "Cette révocation côté Google ou Facebook empêche AutoNex d'accéder à nouveau à ces données, mais ne supprime pas votre compte AutoNex existant — pour cela, suivez la section 3 ci-dessus."
+      },
+      "delay": {
+        "title": "5. Délai et confirmation",
+        "body": "Le délai légal maximum de traitement est de 30 jours à compter de la réception de votre demande. En pratique, AutoNex traite les demandes sous 7 jours. Vous recevez une confirmation écrite par email une fois la suppression terminée."
+      },
+      "recourse": {
+        "title": "6. Recours",
+        "intro": "Si vous estimez que vos droits ne sont pas respectés, vous pouvez :",
+        "item1": "Nous contacter à <0>info@autonex.mg</0> pour ouvrir une réclamation interne.",
+        "item2": "Saisir la Commission Malgache de l'Informatique et des Libertés (CMIL) ou, pour les utilisateurs européens, la CNIL ou l'autorité de protection des données de votre pays de résidence."
+      },
+      "contact": {
+        "title": "7. Contact",
+        "body": "Pour toute question relative à la suppression de vos données, contactez notre Délégué à la Protection des Données (DPO) : PIRBAY Ali As — <0>info@autonex.mg</0>. Voir aussi notre <1>Politique de confidentialité</1> pour la liste complète des données collectées et leurs finalités."
+      }
+    },
+    "privacy": {
+      "pageTitle": "Politique de confidentialité — AutoNex",
+      "pageDescription": "Politique de confidentialité AutoNex : données collectées, finalités, base légale, destinataires, durées de conservation, droits des utilisateurs (RGPD + loi malgache 2014-038).",
+      "heading": "Politique de confidentialité",
+      "framework": {
+        "title": "Cadre légal applicable",
+        "item1": "Règlement Général sur la Protection des Données (RGPD) — applicable aux utilisateurs situés dans l'Union Européenne",
+        "item2": "Loi malgache n°2014-038 du 9 janvier 2015 sur la protection des données à caractère personnel",
+        "item3": "Loi malgache n°2014-025 sur la cybercriminalité"
+      },
+      "controller": {
+        "title": "1. Responsable du traitement",
+        "item1": "APLi SARLU (identifiants complets en <0>Mentions légales</0>)",
+        "item2": "Délégué à la Protection des Données (DPO) : PIRBAY Ali As — <0>info@autonex.mg</0>"
+      },
+      "data": {
+        "title": "2. Données collectées et finalités",
+        "colCategory": "Catégorie",
+        "colData": "Données",
+        "colPurpose": "Finalité",
+        "colBasis": "Base légale",
+        "row1Cat": "Compte utilisateur",
+        "row1Data": "Nom, prénom, email, téléphone WhatsApp, mot de passe (haché avec bcrypt)",
+        "row1Purpose": "Fourniture du service marketplace, authentification",
+        "row1Basis": "Exécution du contrat",
+        "row2Cat": "Annonces",
+        "row2Data": "Photos véhicule, description, prix, localisation GPS approximative, caractéristiques techniques",
+        "row2Purpose": "Publication et diffusion des annonces",
+        "row2Basis": "Exécution du contrat",
+        "row3Cat": "Transactions",
+        "row3Data": "IDs de transactions anonymisés, historique crédits AutoNex, statut publications boostées",
+        "row3Purpose": "Facturation, historique utilisateur",
+        "row3Basis": "Exécution du contrat + Obligation légale (conservation comptable)",
+        "row4Cat": "Données de connexion",
+        "row4Data": "Adresse IP, user-agent, logs de session",
+        "row4Purpose": "Sécurité, prévention de la fraude, détection de bot",
+        "row4Basis": "Intérêt légitime",
+        "row5Cat": "Cookies et analytics",
+        "row5Data": "Voir section \"Cookies\"",
+        "row5Purpose": "Amélioration du service, statistiques anonymisées",
+        "row5Basis": "Consentement (analytics) / Intérêt légitime (techniques)",
+        "row6Cat": "Monitoring technique",
+        "row6Data": "Logs d'erreurs, stack traces, user-agent, session ID (via Sentry)",
+        "row6Purpose": "Détection et correction des bugs",
+        "row6Basis": "Intérêt légitime",
+        "row7Cat": "Modération et signalements",
+        "row7Data": "Raisons de signalement, identifiant du signalant, décisions admin",
+        "row7Purpose": "Prévention des fraudes, qualité de la plateforme",
+        "row7Basis": "Intérêt légitime + Obligation légale (conservation audit logs)"
+      },
+      "notCollected": {
+        "title": "3. Données NON collectées",
+        "intro": "AutoNex ne stocke AUCUNE donnée bancaire sensible :",
+        "item1": "Numéros de cartes bancaires",
+        "item2": "Cryptogrammes visuels (CVV)",
+        "item3": "Identifiants complets de comptes mobile money",
+        "item4": "Codes secrets, mots de passe tiers",
+        "note": "Toutes les données de paiement sont traitées exclusivement par les prestataires de paiement tiers agréés (voir section \"Destinataires\"). Seuls les identifiants de transaction anonymisés et le statut (succès/échec) sont conservés."
+      },
+      "recipients": {
+        "title": "4. Destinataires des données",
+        "staff": {
+          "title": "Personnel interne AutoNex",
+          "item1": "Gérant unique : PIRBAY Ali As (accès complet en qualité de DPO)",
+          "item2": "Administrateurs désignés : accès aux données strictement nécessaires à leurs missions (modération, support)"
+        },
+        "processors": {
+          "title": "Sous-traitants (responsables de traitement indépendants)"
+        },
+        "colProcessor": "Sous-traitant",
+        "colPurpose": "Finalité",
+        "colData": "Données traitées",
+        "colCountry": "Pays d'hébergement",
+        "row1Purpose": "Hébergement base de données, authentification",
+        "row1Data": "Ensemble des données utilisateurs, annonces, transactions",
+        "row2Purpose": "Hébergement application web",
+        "row2Data": "Logs techniques, cookies de session anonymes",
+        "row3Purpose": "Monitoring d'erreurs",
+        "row3Data": "Logs d'erreurs, stack traces, user-agent, session ID anonymisé",
+        "row4Purpose": "Statistiques d'usage",
+        "row4Data": "IP tronquée (anonymisation activée), session analytics agrégées",
+        "row5Purpose": "Envoi emails transactionnels (formulaire contact)",
+        "row5Data": "Nom, email, message de contact",
+        "row6Processor": "Prestataire de paiement",
+        "row6Purpose": "Traitement des paiements en ligne",
+        "row6Data": "Données de paiement (hors AutoNex)",
+        "row6Country": "Variable selon le prestataire"
+      },
+      "transfers": {
+        "title": "5. Transferts hors de Madagascar",
+        "intro": "Certains sous-traitants étant situés hors de Madagascar (États-Unis, Singapour), des transferts de données personnelles vers ces pays peuvent avoir lieu. Ces transferts sont encadrés par :",
+        "item1": "Les Clauses Contractuelles Types (CCT) publiées par la Commission européenne (pour les utilisateurs UE)",
+        "item2": "Les conditions contractuelles des sous-traitants, conformes aux standards internationaux de protection des données"
+      },
+      "retention": {
+        "title": "6. Durées de conservation",
+        "colCategory": "Catégorie",
+        "colDuration": "Durée",
+        "row1Cat": "Compte utilisateur actif",
+        "row1Duration": "Durée de vie du compte",
+        "row2Cat": "Compte utilisateur inactif",
+        "row2Duration": "3 ans après dernière connexion, puis suppression automatique ou anonymisation",
+        "row3Cat": "Annonces actives",
+        "row3Duration": "Durée de publication + 30 jours (pour les annonces expirées)",
+        "row4Cat": "Annonces archivées",
+        "row4Duration": "12 mois puis suppression",
+        "row5Cat": "Logs techniques (IP, user-agent)",
+        "row5Duration": "12 mois glissants",
+        "row6Cat": "Logs d'audit admin",
+        "row6Duration": "5 ans (obligation comptable et traçabilité)",
+        "row7Cat": "Données de transactions",
+        "row7Duration": "10 ans (obligation légale comptable et fiscale)",
+        "row8Cat": "Cookies analytics",
+        "row8Duration": "13 mois maximum",
+        "row9Cat": "Messages de contact (contact_messages)",
+        "row9Duration": "3 ans après dernière interaction"
+      },
+      "rights": {
+        "title": "7. Droits des utilisateurs",
+        "intro": "Conformément au RGPD et à la loi malgache 2014-038, tout utilisateur dispose des droits suivants :",
+        "access": {
+          "label": "Droit d'accès :",
+          "desc": "obtenir une copie des données le concernant"
+        },
+        "rectify": {
+          "label": "Droit de rectification :",
+          "desc": "corriger des données inexactes ou incomplètes"
+        },
+        "erasure": {
+          "label": "Droit à l'effacement (\"droit à l'oubli\") :",
+          "desc": "demander la suppression de ses données"
+        },
+        "portability": {
+          "label": "Droit à la portabilité :",
+          "desc": "recevoir ses données dans un format structuré, couramment utilisé et lisible par machine"
+        },
+        "object": {
+          "label": "Droit d'opposition :",
+          "desc": "s'opposer au traitement pour motif légitime"
+        },
+        "limitation": {
+          "label": "Droit à la limitation :",
+          "desc": "demander la limitation temporaire du traitement"
+        },
+        "withdraw": {
+          "label": "Droit de retrait du consentement :",
+          "desc": "à tout moment pour les traitements basés sur le consentement"
+        },
+        "automated": {
+          "label": "Droit de ne pas faire l'objet d'une décision automatisée :",
+          "desc": "AutoNex n'utilise actuellement aucun traitement automatisé avec effet juridique sur les utilisateurs"
+        },
+        "procedure": {
+          "title": "Procédure pour exercer ces droits",
+          "item1": "Email : <0>info@autonex.mg</0> avec copie d'une pièce d'identité en cours de validité",
+          "item2": "Délai de réponse : 30 jours maximum à compter de la réception de la demande complète",
+          "item3": "Gratuité : sauf demandes manifestement infondées ou excessives"
+        },
+        "recourse": {
+          "title": "Recours",
+          "item1": "Utilisateurs malgaches : CMIL (Commission Malagasy Informatique et Libertés) — cmil.mg (si créée à date de consultation)",
+          "item2": "Utilisateurs UE : CNIL (France) — cnil.fr — ou autorité de contrôle du pays de résidence"
+        }
+      },
+      "security": {
+        "title": "8. Sécurité des données",
+        "intro": "AutoNex met en œuvre les mesures techniques et organisationnelles suivantes :",
+        "item1": "Chiffrement TLS 1.3 pour toutes les communications (HTTPS obligatoire)",
+        "item2": "Hachage des mots de passe (algorithme bcrypt)",
+        "item3": "Row Level Security (RLS) activée sur toutes les tables Supabase contenant des données personnelles",
+        "item4": "Audit logs pour toutes les actions administrateur",
+        "item5": "Rate limiting anti-bot (20 publications maximum par utilisateur sur 24h)",
+        "item6": "Système de modération a priori (particuliers) et signalement communautaire avec auto-masquage",
+        "item7": "Monitoring des erreurs en temps réel via Sentry",
+        "item8": "Sauvegardes automatiques quotidiennes de la base de données (via Supabase)"
+      },
+      "cookies": {
+        "title": "9. Cookies",
+        "body": "Voir la page dédiée <0>/legal/cookies</0>."
+      },
+      "changes": {
+        "title": "10. Modifications",
+        "body": "La présente politique peut être mise à jour pour refléter les évolutions de la plateforme ou des obligations légales. La date de dernière mise à jour est indiquée en pied de page. Les utilisateurs sont informés par email de toute modification substantielle."
+      }
+    },
+    "terms": {
+      "pageTitle": "Conditions Générales d'Utilisation — AutoNex",
+      "pageDescription": "CGU AutoNex : accès, inscription, publication d'annonces, crédits, signalements, responsabilités, résiliation, médiation. Marketplace véhicules Madagascar.",
+      "heading": "Conditions Générales d'Utilisation",
+      "preamble": {
+        "title": "Préambule",
+        "body1": "Les présentes Conditions Générales d'Utilisation (ci-après \"CGU\") régissent l'accès et l'utilisation de la plateforme AutoNex, exploitée par APLi SARLU, marketplace de véhicules à Madagascar.",
+        "body2": "AutoNex est un <0>intermédiaire technique</0> qui met en relation des acheteurs et des vendeurs de véhicules (particuliers et concessionnaires). AutoNex n'est jamais partie aux transactions conclues entre utilisateurs."
+      },
+      "art1": {
+        "title": "Article 1 — Définitions",
+        "user": {
+          "label": "Utilisateur :",
+          "desc": "toute personne physique majeure utilisant la plateforme AutoNex, qu'elle soit inscrite ou non"
+        },
+        "listing": {
+          "label": "Annonce / Listing :",
+          "desc": "publication par un utilisateur décrivant un véhicule proposé à la vente ou à la location"
+        },
+        "individual": {
+          "label": "Particulier :",
+          "desc": "utilisateur publiant des annonces à titre non-professionnel"
+        },
+        "dealer": {
+          "label": "Concessionnaire vérifié :",
+          "desc": "utilisateur professionnel ayant fourni les justificatifs nécessaires à la validation de son statut (voir article 4)"
+        },
+        "credits": {
+          "label": "Crédits AutoNex :",
+          "desc": "unité de valeur permettant d'accéder aux services payants (publication avancée, boosts)"
+        },
+        "boost": {
+          "label": "Boost / Mise en avant :",
+          "desc": "service payant permettant d'augmenter la visibilité d'une annonce"
+        },
+        "report": {
+          "label": "Signalement :",
+          "desc": "action par laquelle un utilisateur signale une annonce qu'il estime problématique"
+        }
+      },
+      "art2": {
+        "title": "Article 2 — Acceptation et modifications des CGU",
+        "item1": "L'utilisation de la plateforme implique l'acceptation pleine et entière des présentes CGU",
+        "item2": "AutoNex se réserve le droit de modifier les CGU à tout moment",
+        "item3": "Les modifications substantielles seront notifiées par email aux utilisateurs inscrits, avec un préavis de 15 jours",
+        "item4": "En cas de désaccord avec les nouvelles CGU, l'utilisateur peut fermer son compte avant l'entrée en vigueur des modifications",
+        "item5": "L'utilisation continue de la plateforme après l'entrée en vigueur vaut acceptation des nouvelles CGU"
+      },
+      "art3": {
+        "title": "Article 3 — Inscription et compte utilisateur",
+        "signup": {
+          "title": "3.1 Conditions d'inscription",
+          "item1": "Être âgé d'au moins 18 ans",
+          "item2": "Disposer de la capacité juridique",
+          "item3": "Fournir des informations exactes, complètes et à jour",
+          "item4": "Disposer d'une adresse email valide"
+        },
+        "unique": {
+          "title": "3.2 Unicité du compte",
+          "body": "Un utilisateur ne peut créer qu'un seul compte par personne physique."
+        },
+        "confidentiality": {
+          "title": "3.3 Confidentialité des identifiants",
+          "item1": "L'utilisateur est seul responsable de la confidentialité de son mot de passe et des activités réalisées depuis son compte",
+          "item2": "Toute utilisation suspecte doit être signalée immédiatement à <0>info@autonex.mg</0>"
+        },
+        "refusal": {
+          "title": "3.4 Refus, suspension, suppression",
+          "body": "AutoNex se réserve le droit de refuser une inscription, suspendre ou supprimer tout compte en cas de violation des CGU, sans préavis pour les infractions graves (fraude, contenu illégal)."
+        }
+      },
+      "art4": {
+        "title": "Article 4 — Statut particulier vs concessionnaire",
+        "individual": {
+          "title": "4.1 Particulier",
+          "item1": "Publie à titre non-professionnel",
+          "item2": "Soumis à modération a priori pour chaque nouvelle annonce",
+          "item3": "Soumis à modération des modifications sur les champs sensibles (titre, description, prix, photos)"
+        },
+        "dealer": {
+          "title": "4.2 Concessionnaire vérifié",
+          "intro": "Statut accordé après validation par AutoNex des justificatifs suivants :",
+          "item1": "NIF (Numéro d'Identification Fiscale) professionnel",
+          "item2": "Numéro RCS ou document équivalent",
+          "item3": "Pièce d'identité du représentant légal",
+          "item4": "Justificatif de local professionnel (bail, titre de propriété, facture d'utilité)",
+          "item5": "Bénéficie d'une modération allégée (publications et modifications en temps réel)",
+          "item6": "Tenu aux mêmes règles de contenu que les particuliers"
+        },
+        "revoke": {
+          "title": "4.3 Révocation du statut dealer",
+          "body": "En cas de violation répétée des CGU ou de pratiques frauduleuses, AutoNex peut révoquer le statut de concessionnaire vérifié et réappliquer la modération a priori."
+        }
+      },
+      "art5": {
+        "title": "Article 5 — Publication d'annonces",
+        "allowed": {
+          "title": "5.1 Contenus autorisés",
+          "item1": "Véhicules légalement commercialisables à Madagascar",
+          "item2": "Véhicules possédés par l'utilisateur ou pour lesquels l'utilisateur dispose d'un mandat de vente valide",
+          "item3": "Véhicules disposant des papiers réguliers (carte grise, contrôle technique si applicable)"
+        },
+        "forbidden": {
+          "title": "5.2 Contenus strictement interdits",
+          "item1": "Véhicules volés, sans papiers, ou dont l'origine ne peut être justifiée",
+          "item2": "Fraudes, arnaques ou tentatives d'escroquerie",
+          "item3": "Contenus discriminatoires, injurieux, diffamatoires ou illégaux",
+          "item4": "Mentions incitant à des paiements par Western Union, MoneyGram, crypto-monnaies, virements internationaux non sécurisés",
+          "item5": "Usurpation d'identité ou publication au nom d'un tiers sans autorisation",
+          "item6": "Contenu protégé par le droit d'auteur sans autorisation",
+          "item7": "Données personnelles de tiers sans leur consentement"
+        },
+        "veracity": {
+          "title": "5.3 Véracité des informations",
+          "item1": "L'utilisateur garantit l'exactitude des informations publiées",
+          "item2": "Les sanctions en cas de fausses informations vont du retrait de l'annonce à la suppression du compte"
+        },
+        "photoRights": {
+          "title": "5.4 Droits sur les photos",
+          "item1": "L'utilisateur garantit qu'il possède tous les droits (propriété, reproduction, diffusion) sur les photos publiées",
+          "item2": "AutoNex décline toute responsabilité en cas de réclamation de tiers sur les photos publiées par les utilisateurs"
+        },
+        "limits": {
+          "title": "5.5 Limites de publication",
+          "item1": "Maximum 20 nouvelles publications par utilisateur sur 24 heures glissantes",
+          "item2": "Cette limite vise à prévenir le spam et les abus automatisés"
+        },
+        "moderation": {
+          "title": "5.6 Modération",
+          "item1": "AutoNex se réserve le droit, à sa seule discrétion, de refuser, modifier ou supprimer toute annonce contraire aux présentes CGU ou aux lois en vigueur",
+          "item2": "Aucun préavis n'est requis pour les contenus manifestement illégaux ou dangereux",
+          "item3": "Un message de rejet motivé est envoyé à l'utilisateur par email"
+        }
+      },
+      "art6": {
+        "title": "Article 6 — Crédits AutoNex et services payants",
+        "mechanic": {
+          "title": "6.1 Mécanique des crédits",
+          "item1": "Les Crédits AutoNex sont une unité interne utilisable pour accéder aux services payants",
+          "item2": "Les tarifs sont affichés dans l'espace \"Monétisation\" du site et peuvent évoluer"
+        },
+        "providers": {
+          "title": "6.2 Prestataires de paiement",
+          "item1": "Les paiements sont traités par des prestataires tiers agréés à Madagascar",
+          "item2": "AutoNex ne stocke AUCUNE donnée bancaire sensible : seuls les identifiants de transactions anonymisés sont conservés pour traçabilité",
+          "item3": "Les transactions sont conformes aux normes de sécurité en vigueur (PCI-DSS pour les cartes bancaires)",
+          "item4": "La liste des prestataires de paiement actuellement utilisés est disponible sur demande à <0>info@autonex.mg</0>"
+        },
+        "payments": {
+          "title": "6.3 Moyens de paiement acceptés",
+          "item1": "Mobile Money : MVola, Orange Money, Airtel Money",
+          "item2": "Cartes bancaires : Visa, Mastercard",
+          "item3": "D'autres moyens pourront être ajoutés à l'avenir"
+        },
+        "boosts": {
+          "title": "6.4 Boosts et mises en avant",
+          "item1": "Nature : augmentation de la visibilité d'une annonce (placement prioritaire, badge, épinglage homepage)",
+          "item2": "Durée : variable selon le type de boost (affichée au moment de l'achat)",
+          "item3": "Prix : affiché en Crédits AutoNex au moment de l'achat"
+        },
+        "refunds": {
+          "title": "6.5 Remboursements",
+          "item1": "Crédits AutoNex non consommés : remboursables sur demande dans un délai de 14 jours à compter de leur achat, à l'exception des crédits acquis via des codes promotionnels",
+          "item2": "Crédits AutoNex déjà consommés : non remboursables sauf défaut de service imputable à AutoNex (exemples : panne prolongée de la plateforme, erreur technique d'activation)",
+          "item3": "Procédure : email à info@autonex.mg avec justification et coordonnées de paiement"
+        },
+        "promo": {
+          "title": "6.6 Codes promotionnels",
+          "item1": "Chaque code promo précise ses conditions d'usage (unicité, expiration, montant, catégorie applicable)",
+          "item2": "Les codes promo ne sont pas remboursables en numéraire",
+          "item3": "Un code promo est non-cumulable avec un autre code promo sauf mention contraire"
+        },
+        "invoices": {
+          "title": "6.7 Factures",
+          "item1": "Les factures sont émises sur demande à <0>info@autonex.mg</0>, dans un délai de 15 jours ouvrés",
+          "item2": "Factures conformes aux exigences fiscales malgaches"
+        }
+      },
+      "art7": {
+        "title": "Article 7 — Signalement d'annonces",
+        "right": {
+          "title": "7.1 Droit de signaler",
+          "item1": "Tout utilisateur authentifié peut signaler une annonce publiée par un autre utilisateur",
+          "item2": "Les utilisateurs ne peuvent pas signaler leurs propres annonces",
+          "item3": "Un utilisateur ne peut signaler qu'une seule fois une même annonce"
+        },
+        "reasons": {
+          "title": "7.2 Motifs de signalement",
+          "item1": "Arnaque / Fraude",
+          "item2": "Contenu inapproprié",
+          "item3": "Doublon d'annonce",
+          "item4": "Prix aberrant",
+          "item5": "Autre (avec justification obligatoire)"
+        },
+        "process": {
+          "title": "7.3 Traitement des signalements",
+          "item1": "Auto-masquage : lorsqu'une annonce atteint 3 signalements en attente, elle est automatiquement masquée en attente de révision administrateur",
+          "item2": "Révision : l'équipe de modération traite les signalements dans les meilleurs délais",
+          "item3": "Décision finale : valider (annonce rejetée) ou rejeter (annonce réactivée)"
+        },
+        "abuse": {
+          "title": "7.4 Abus de signalement",
+          "body": "Les signalements abusifs (répétés, infondés, concurrence déloyale) peuvent entraîner des sanctions : avertissement, suspension temporaire, voire suppression du compte."
+        }
+      },
+      "art8": {
+        "title": "Article 8 — Responsabilités",
+        "role": {
+          "title": "8.1 Rôle d'AutoNex",
+          "item1": "AutoNex est un intermédiaire technique, pas vendeur",
+          "item2": "AutoNex ne conclut aucune transaction avec les utilisateurs",
+          "item3": "AutoNex ne garantit pas :",
+          "sub1": "L'exactitude des informations des annonces",
+          "sub2": "La solvabilité des utilisateurs",
+          "sub3": "Le bon déroulement des transactions",
+          "sub4": "La conformité légale des véhicules vendus"
+        },
+        "users": {
+          "title": "8.2 Responsabilité des utilisateurs",
+          "intro": "Les utilisateurs sont seuls responsables :",
+          "item1": "De la véracité de leurs annonces",
+          "item2": "De la légalité des transactions qu'ils concluent",
+          "item3": "De la fiscalité éventuellement due (TVA, droits d'importation, revente professionnelle)",
+          "item4": "Du respect de la réglementation applicable aux véhicules concernés"
+        },
+        "safety": {
+          "title": "8.3 Recommandations de sécurité",
+          "intro": "AutoNex recommande vivement aux utilisateurs :",
+          "item1": "D'organiser les rencontres en lieu public et de préférence de jour",
+          "item2": "D'exiger et de vérifier les documents officiels (carte grise, pièce d'identité) avant tout paiement",
+          "item3": "De ne jamais payer avant d'avoir inspecté physiquement le véhicule",
+          "item4": "De faire essayer le véhicule avant achat",
+          "item5": "De faire réaliser un contrôle technique indépendant si nécessaire",
+          "item6": "De se méfier des demandes de virements internationaux, mobile money vers l'étranger, ou cryptomonnaies",
+          "item7": "De signaler toute annonce suspecte via le bouton \"Signaler\""
+        },
+        "limit": {
+          "title": "8.4 Limitation de responsabilité",
+          "item1": "Dans les limites autorisées par le droit malgache, la responsabilité d'AutoNex est limitée au montant des sommes effectivement perçues par AutoNex au titre des services fournis à l'utilisateur sur les 12 mois précédant le dommage",
+          "item2": "Exclusions : préjudices indirects, pertes de profits, perte de chance, préjudices immatériels"
+        }
+      },
+      "art9": {
+        "title": "Article 9 — Propriété intellectuelle",
+        "autonex": {
+          "title": "9.1 Propriété d'AutoNex",
+          "item1": "Marque AutoNex, logo, design, contenus éditoriaux, code source sont la propriété exclusive d'APLi SARLU",
+          "item2": "Toute reproduction non autorisée est interdite"
+        },
+        "user": {
+          "title": "9.2 Contenus utilisateurs",
+          "item1": "Les utilisateurs conservent la propriété de leurs contenus (photos, descriptions, etc.)",
+          "item2": "En publiant un contenu sur AutoNex, l'utilisateur concède à APLi SARLU une licence non-exclusive, mondiale, gratuite et pour la durée légale des droits, d'utiliser, reproduire, représenter, adapter et diffuser ledit contenu dans le cadre du service AutoNex et de sa promotion",
+          "item3": "Cette licence cesse à la suppression du contenu par l'utilisateur, sous réserve des sauvegardes légales obligatoires"
+        }
+      },
+      "art10": {
+        "title": "Article 10 — Données personnelles",
+        "body": "La collecte et le traitement des données personnelles sont régis par la <0>Politique de Confidentialité</0>."
+      },
+      "art11": {
+        "title": "Article 11 — Durée et résiliation",
+        "duration": {
+          "title": "11.1 Durée",
+          "body": "Les CGU sont applicables tant que l'utilisateur dispose d'un compte actif sur la plateforme."
+        },
+        "userExit": {
+          "title": "11.2 Résiliation par l'utilisateur",
+          "item1": "L'utilisateur peut supprimer son compte à tout moment depuis son espace personnel (fonctionnalité en cours de déploiement — entretemps, demande par email à <0>info@autonex.mg</0>)",
+          "item2": "La suppression entraîne l'effacement des annonces actives et l'anonymisation des données conservées pour raisons légales"
+        },
+        "platformExit": {
+          "title": "11.3 Résiliation par AutoNex",
+          "item1": "En cas de violation des CGU : suspension temporaire puis suppression du compte, avec préavis proportionné à la gravité",
+          "item2": "En cas d'infraction grave (fraude, contenu illégal, atteinte à la sécurité) : suppression immédiate sans préavis",
+          "item3": "Le solde de Crédits AutoNex au moment de la suspension/suppression fait l'objet d'un traitement individuel selon la cause de la résiliation"
+        }
+      },
+      "art12": {
+        "title": "Article 12 — Force majeure",
+        "body": "Aucune des parties ne pourra être tenue responsable de l'inexécution de ses obligations en cas de force majeure (catastrophe naturelle, guerre, pandémie, panne d'infrastructure tiers majeure, décision administrative contraignante, etc.). La partie affectée notifiera l'autre dans les meilleurs délais."
+      },
+      "art13": {
+        "title": "Article 13 — Médiation et litiges",
+        "mediation": {
+          "title": "13.1 Médiation préalable",
+          "item1": "En cas de litige, les parties s'engagent à rechercher une solution amiable avant toute action judiciaire",
+          "item2": "Contact initial : <0>info@autonex.mg</0>"
+        },
+        "law": {
+          "title": "13.2 Droit applicable",
+          "body": "Les présentes CGU sont régies par le droit malgache."
+        },
+        "jurisdiction": {
+          "title": "13.3 Juridiction compétente",
+          "body": "Tout litige relatif à l'interprétation ou à l'exécution des présentes CGU relève de la compétence exclusive du Tribunal de Première Instance d'Antananarivo, sous réserve des règles impératives de procédure applicables."
+        }
+      },
+      "art14": {
+        "title": "Article 14 — Contact",
+        "body": "Pour toute question relative aux présentes CGU : <0>info@autonex.mg</0>"
+      }
     }
   }
 }

@@ -42,7 +42,16 @@
       "reasonNotSpecified": "not specified"
     },
     "noDirectoryAgencies": "No dealer matches the filters.",
-    "runtimeUnavailable": "The dealer profile is temporarily unavailable. Please try again in a moment."
+    "runtimeUnavailable": "The dealer profile is temporarily unavailable. Please try again in a moment.",
+    "profile": {
+      "bannerTitle": "Dealer visibility on AutoNex",
+      "bannerSubtitle": "Brand packages, spotlight and multi-city distribution — contact sales for a tailor-made plan.",
+      "bannerCta": "Boost my visibility",
+      "aboutTitle": "About",
+      "openingHours": "Opening hours",
+      "followUs": "Follow us",
+      "closed": "Closed"
+    }
   },
   "auth": {
     "agency": "Agency",
@@ -1053,7 +1062,8 @@
     "browseByAreaTitle": "Whole city & districts",
     "locationHierarchyHint": "Whole city if nothing is checked below. Tick a full district or specific neighbourhoods — combinations are allowed.",
     "wholeArrondissementShort": "All",
-    "relaxedFetchCapHint": "Displayed results prioritise recent listings within a limited window; the total may include listings outside that window."
+    "relaxedFetchCapHint": "Displayed results prioritise recent listings within a limited window; the total may include listings outside that window.",
+    "noLimit": "No limit"
   },
   "sections": {
     "agencies": "Partner dealers",
@@ -1359,6 +1369,666 @@
       "messageMin": "Minimum 20 characters.",
       "messageMax": "Maximum 2000 characters.",
       "consentRequired": "You must accept the privacy policy."
+    }
+  },
+  "legal": {
+    "layout": {
+      "linkMentions": "Legal notice",
+      "linkPrivacy": "Privacy policy",
+      "linkTerms": "Terms",
+      "linkCookies": "Cookies",
+      "linkDataDeletion": "Data deletion",
+      "lastUpdated": "Last updated: {{date}}"
+    },
+    "mentions": {
+      "pageTitle": "Legal notice — AutoNex",
+      "pageDescription": "Legal notice for the AutoNex platform, operated by APLi SARLU — publisher, hosts, intellectual property, liability.",
+      "heading": "Legal notice",
+      "editor": {
+        "title": "1. Site publisher",
+        "item1": "APLi SARLU (Single-member limited liability company)",
+        "item2": "Share capital: 1,000,000 MGA",
+        "address": "Registered office: LOGT 51 CITE AMPEFILOHA CUA ANTANANARIVO I, 10101 Antananarivo Renivohitra, Analamanga, Madagascar",
+        "brand": "Site operated under the trade name \"AutoNex\""
+      },
+      "publisher": {
+        "title": "2. Publication director",
+        "body": "PIRBAY Ali As, sole manager of APLi SARLU."
+      },
+      "hosting": {
+        "title": "3. Hosts",
+        "frontend": "<0>Front-end application</0>: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA — <1>vercel.com</1>",
+        "database": "<0>Database and authentication</0>: Supabase Inc., 970 Toa Payoh North #07-04, Singapore 318992 — <1>supabase.com</1>"
+      },
+      "ip": {
+        "title": "4. Intellectual property",
+        "item1": "The \"AutoNex\" trademark, logo, visual identity and all original editorial content published on the site are the exclusive property of APLi SARLU.",
+        "item2": "Listings published on the platform remain the property of their respective authors, who grant AutoNex a non-exclusive licence to display them publicly as part of the service (see article 9 of the Terms).",
+        "item3": "Any unauthorised reproduction, distribution or exploitation of protected content is strictly prohibited and may result in legal action."
+      },
+      "responsibility": {
+        "title": "5. Liability for listing content",
+        "item1": "AutoNex acts as a technical intermediary.",
+        "item2": "Listings are published under the sole responsibility of their authors (individuals or dealers).",
+        "item3": "AutoNex cannot be held liable for the accuracy, completeness or legality of information posted by users.",
+        "item4": "An a-priori moderation system (for individuals) and community reporting are in place to maintain the platform's quality."
+      },
+      "links": {
+        "title": "6. Hyperlinks",
+        "item1": "Outbound links to third-party sites are provided for information purposes only.",
+        "item2": "AutoNex has no control over the content of those sites and disclaims all liability for it.",
+        "item3": "Inbound links to autonex.mg are allowed provided they do not create confusion about the origin or nature of the content."
+      },
+      "credits": {
+        "title": "7. Credits",
+        "item1": "Listing photos and visuals: provided by users who have certified that they hold the required rights.",
+        "item2": "Icons and UI components: shadcn/ui, lucide-react (open-source licences)."
+      },
+      "law": {
+        "title": "8. Applicable law and jurisdiction",
+        "item1": "This legal notice is governed by Malagasy law.",
+        "item2": "Any dispute regarding the interpretation or performance of this notice falls under the exclusive jurisdiction of the Tribunal de Première Instance of Antananarivo, subject to mandatory procedural rules."
+      }
+    },
+    "cookies": {
+      "pageTitle": "Cookies — AutoNex",
+      "pageDescription": "Cookies used by AutoNex: technical, Google Analytics 4 analytics, functional, Sentry monitoring. Consent management.",
+      "heading": "Cookies",
+      "what": {
+        "title": "What is a cookie?",
+        "body": "A cookie is a small text file placed on the user's device (computer, smartphone, tablet) by the browser when visiting a website. Cookies make it possible to recognise the device, store preferences, analyse usage, or provide personalised services."
+      },
+      "used": {
+        "title": "Cookies used on AutoNex"
+      },
+      "colCookie": "Cookie",
+      "colPurpose": "Purpose",
+      "colDuration": "Duration",
+      "technical": {
+        "title": "1. Technical cookies (mandatory, no consent required)",
+        "row1Name": "Supabase Auth session",
+        "row1Purpose": "Keep the user signed in",
+        "row1Duration": "Session + 7 days",
+        "row2Name": "Beta lock gate",
+        "row2Purpose": "Access to the beta version of the platform",
+        "row2Duration": "30 days",
+        "row3Name": "Vercel load balancer",
+        "row3Purpose": "Performance and high availability",
+        "row3Duration": "Session",
+        "note": "These cookies are strictly required for the service to function and cannot be disabled without preventing the use of AutoNex."
+      },
+      "analytics": {
+        "title": "2. Analytics cookies (consent required)",
+        "row1Purpose": "Anonymised usage statistics (truncated IP enabled)",
+        "row1Duration": "13 months maximum",
+        "note": "These cookies are only set with the user's explicit consent (via the cookie banner)."
+      },
+      "functional": {
+        "title": "3. Functional cookies (consent required)",
+        "row1Name": "Language preference",
+        "row1Purpose": "Remember the chosen language",
+        "row1Duration": "1 year"
+      },
+      "monitoring": {
+        "title": "4. Monitoring cookies (legitimate interest, revocable)",
+        "row1Purpose": "Reproduction of technical bugs, no personal identifying data",
+        "row1Duration": "Session"
+      },
+      "management": {
+        "title": "Cookie management",
+        "item1": "Consent banner: on your first visit, a banner lets you choose which cookie categories to accept",
+        "item2": "\"Manage my cookies\" button: in the footer, lets you change your choices at any time",
+        "item3": "Browser settings: you can also configure your browser to block or delete cookies. Warning: blocking technical cookies may prevent AutoNex from working",
+        "item4": "Deferred effect: if you withdraw your consent after a cookie has been set, it will not be set again on subsequent visits, but its already-stored content may persist until natural expiration"
+      },
+      "managePreferencesButton": "Manage my cookie preferences",
+      "thirdParty": {
+        "title": "Privacy policies of third-party providers"
+      }
+    },
+    "dataDeletion": {
+      "pageTitle": "Data deletion — AutoNex",
+      "pageDescription": "Procedure to delete your account and personal data on AutoNex Madagascar: from the dashboard or by email, legal retention, revoking Google and Facebook sign-ins.",
+      "heading": "Deletion of your data",
+      "intro": "AutoNex respects your right to have your personal data deleted, in line with the GDPR, Malagasy law No. 2014-038 on personal data protection, and international practice.",
+      "what": {
+        "title": "1. What deletion involves",
+        "intro": "When you request account deletion we carry out the following actions:",
+        "item1": "Deletion of your user profile (last name, first name, phone, email).",
+        "item2": "Deletion of your published listings and their photos.",
+        "item3": "Deletion of your remaining credit balance, which is non-refundable under the <0>Terms</0>.",
+        "item4": "Deletion of your transaction and message history on the front-end.",
+        "item5": "Deletion of Google and Facebook OAuth links.",
+        "item6": "Anonymisation of any reviews and reports you submitted (the content stays, but no identifier points back to you)."
+      },
+      "kept": {
+        "title": "2. What may be retained",
+        "intro": "For legal, tax and accounting reasons, some information may be kept in anonymised form for the period required by Malagasy and European law:",
+        "item1": "Invoices and payment receipts linked to AutoNex credit purchases: kept for 10 years (accounting obligation).",
+        "item2": "Anonymised technical logs (partial IP addresses, session metadata): 12 months, for service security and fraud prevention.",
+        "item3": "Technical transaction identifiers held by our payment provider, retained in line with applicable banking regulations."
+      },
+      "how": {
+        "title": "3. How to request deletion",
+        "dashboard": {
+          "title": "3.1. From your dashboard (recommended)",
+          "body": "Sign in to your account → Settings menu → \"Danger zone\" section → Delete my account. You will receive a confirmation email at the address linked to your account. Deletion becomes effective within 7 days of confirmation."
+        },
+        "email": {
+          "title": "3.2. By email",
+          "body": "Send an email to <0>info@autonex.mg</0> from the address linked to your AutoNex account, with the subject <1>\"Account deletion request\"</1>. Include your sign-in email and, if possible, your account identifier (visible in Settings > My profile).",
+          "followup": "We handle email requests within 30 days at most (typically within 7 days). You will receive a written confirmation once deletion is effective."
+        }
+      },
+      "oauth": {
+        "title": "4. Removing Google or Facebook sign-ins",
+        "intro": "If you signed in to AutoNex via Google or Facebook, deleting your AutoNex account automatically revokes the link between your third-party account and our service. You can also revoke that link at any time, independently of deleting your AutoNex account:",
+        "google": "Google: <0>myaccount.google.com/permissions</0> → search for AutoNex → <1>Remove access</1>.",
+        "facebook": "Facebook: Settings & privacy → Settings → Apps and websites → AutoNex → <0>Remove</0>. Direct link: <1>facebook.com/settings?tab=applications</1>.",
+        "note": "This revocation on the Google or Facebook side prevents AutoNex from accessing those data again, but does not delete your existing AutoNex account — for that, follow section 3 above."
+      },
+      "delay": {
+        "title": "5. Timing and confirmation",
+        "body": "The maximum legal processing time is 30 days from receipt of your request. In practice, AutoNex processes requests within 7 days. You will receive a written confirmation email once deletion is complete."
+      },
+      "recourse": {
+        "title": "6. Recourse",
+        "intro": "If you believe your rights are not being respected, you can:",
+        "item1": "Contact us at <0>info@autonex.mg</0> to open an internal complaint.",
+        "item2": "Refer the matter to the Malagasy Data Protection Authority (CMIL) or, for European users, the CNIL or the data-protection authority of your country of residence."
+      },
+      "contact": {
+        "title": "7. Contact",
+        "body": "For any question about data deletion, contact our Data Protection Officer (DPO): PIRBAY Ali As — <0>info@autonex.mg</0>. See also our <1>Privacy policy</1> for the complete list of data collected and their purposes."
+      }
+    },
+    "privacy": {
+      "pageTitle": "Privacy policy — AutoNex",
+      "pageDescription": "AutoNex privacy policy: data collected, purposes, legal basis, recipients, retention periods, user rights (GDPR + Malagasy law 2014-038).",
+      "heading": "Privacy policy",
+      "framework": {
+        "title": "Applicable legal framework",
+        "item1": "General Data Protection Regulation (GDPR) — applicable to users in the European Union",
+        "item2": "Loi malgache n°2014-038 of 9 January 2015 on personal data protection",
+        "item3": "Loi malgache n°2014-025 on cybercrime"
+      },
+      "controller": {
+        "title": "1. Data controller",
+        "item1": "APLi SARLU (full identifiers in the <0>Legal notice</0>)",
+        "item2": "Data Protection Officer (DPO): PIRBAY Ali As — <0>info@autonex.mg</0>"
+      },
+      "data": {
+        "title": "2. Data collected and purposes",
+        "colCategory": "Category",
+        "colData": "Data",
+        "colPurpose": "Purpose",
+        "colBasis": "Legal basis",
+        "row1Cat": "User account",
+        "row1Data": "Last name, first name, email, WhatsApp phone, password (hashed with bcrypt)",
+        "row1Purpose": "Provision of the marketplace service, authentication",
+        "row1Basis": "Performance of contract",
+        "row2Cat": "Listings",
+        "row2Data": "Vehicle photos, description, price, approximate GPS location, technical specifications",
+        "row2Purpose": "Publication and distribution of listings",
+        "row2Basis": "Performance of contract",
+        "row3Cat": "Transactions",
+        "row3Data": "Anonymised transaction IDs, AutoNex credit history, boosted listings status",
+        "row3Purpose": "Billing, user history",
+        "row3Basis": "Performance of contract + Legal obligation (accounting retention)",
+        "row4Cat": "Connection data",
+        "row4Data": "IP address, user-agent, session logs",
+        "row4Purpose": "Security, fraud prevention, bot detection",
+        "row4Basis": "Legitimate interest",
+        "row5Cat": "Cookies and analytics",
+        "row5Data": "See \"Cookies\" section",
+        "row5Purpose": "Service improvement, anonymised statistics",
+        "row5Basis": "Consent (analytics) / Legitimate interest (technical)",
+        "row6Cat": "Technical monitoring",
+        "row6Data": "Error logs, stack traces, user-agent, session ID (via Sentry)",
+        "row6Purpose": "Bug detection and fixing",
+        "row6Basis": "Legitimate interest",
+        "row7Cat": "Moderation and reports",
+        "row7Data": "Reporting reasons, reporter ID, admin decisions",
+        "row7Purpose": "Fraud prevention, platform quality",
+        "row7Basis": "Legitimate interest + Legal obligation (audit log retention)"
+      },
+      "notCollected": {
+        "title": "3. Data NOT collected",
+        "intro": "AutoNex stores NO sensitive banking data:",
+        "item1": "Bank card numbers",
+        "item2": "Card verification values (CVV)",
+        "item3": "Full mobile money account identifiers",
+        "item4": "Secret codes, third-party passwords",
+        "note": "All payment data is processed exclusively by approved third-party payment providers (see \"Recipients\" section). Only anonymised transaction identifiers and the status (success/failure) are kept."
+      },
+      "recipients": {
+        "title": "4. Data recipients",
+        "staff": {
+          "title": "Internal AutoNex staff",
+          "item1": "Sole manager: PIRBAY Ali As (full access as DPO)",
+          "item2": "Designated administrators: access to the data strictly required for their duties (moderation, support)"
+        },
+        "processors": {
+          "title": "Sub-processors (independent data controllers)"
+        },
+        "colProcessor": "Sub-processor",
+        "colPurpose": "Purpose",
+        "colData": "Data processed",
+        "colCountry": "Hosting country",
+        "row1Purpose": "Database hosting, authentication",
+        "row1Data": "All user, listing and transaction data",
+        "row2Purpose": "Web application hosting",
+        "row2Data": "Technical logs, anonymous session cookies",
+        "row3Purpose": "Error monitoring",
+        "row3Data": "Error logs, stack traces, user-agent, anonymised session ID",
+        "row4Purpose": "Usage statistics",
+        "row4Data": "Truncated IP (anonymisation enabled), aggregated analytics sessions",
+        "row5Purpose": "Sending transactional emails (contact form)",
+        "row5Data": "Name, email, contact message",
+        "row6Processor": "Payment provider",
+        "row6Purpose": "Online payment processing",
+        "row6Data": "Payment data (outside AutoNex)",
+        "row6Country": "Varies by provider"
+      },
+      "transfers": {
+        "title": "5. Transfers outside Madagascar",
+        "intro": "Some sub-processors are located outside Madagascar (United States, Singapore), so personal data transfers to those countries may occur. These transfers are governed by:",
+        "item1": "Standard Contractual Clauses (SCCs) published by the European Commission (for EU users)",
+        "item2": "The contractual terms of the sub-processors, in line with international data-protection standards"
+      },
+      "retention": {
+        "title": "6. Retention periods",
+        "colCategory": "Category",
+        "colDuration": "Duration",
+        "row1Cat": "Active user account",
+        "row1Duration": "Lifetime of the account",
+        "row2Cat": "Inactive user account",
+        "row2Duration": "3 years after last login, then automatic deletion or anonymisation",
+        "row3Cat": "Active listings",
+        "row3Duration": "Publication duration + 30 days (for expired listings)",
+        "row4Cat": "Archived listings",
+        "row4Duration": "12 months then deletion",
+        "row5Cat": "Technical logs (IP, user-agent)",
+        "row5Duration": "12 rolling months",
+        "row6Cat": "Admin audit logs",
+        "row6Duration": "5 years (accounting and traceability obligation)",
+        "row7Cat": "Transaction data",
+        "row7Duration": "10 years (accounting and tax legal obligation)",
+        "row8Cat": "Analytics cookies",
+        "row8Duration": "13 months maximum",
+        "row9Cat": "Contact messages (contact_messages)",
+        "row9Duration": "3 years after last interaction"
+      },
+      "rights": {
+        "title": "7. User rights",
+        "intro": "In accordance with the GDPR and Malagasy law 2014-038, every user has the following rights:",
+        "access": {
+          "label": "Right of access:",
+          "desc": "obtain a copy of the data concerning them"
+        },
+        "rectify": {
+          "label": "Right to rectification:",
+          "desc": "correct inaccurate or incomplete data"
+        },
+        "erasure": {
+          "label": "Right to erasure (\"right to be forgotten\"):",
+          "desc": "request the deletion of their data"
+        },
+        "portability": {
+          "label": "Right to portability:",
+          "desc": "receive their data in a structured, commonly used, machine-readable format"
+        },
+        "object": {
+          "label": "Right to object:",
+          "desc": "object to processing on legitimate grounds"
+        },
+        "limitation": {
+          "label": "Right to restriction:",
+          "desc": "request temporary restriction of processing"
+        },
+        "withdraw": {
+          "label": "Right to withdraw consent:",
+          "desc": "at any time for processing based on consent"
+        },
+        "automated": {
+          "label": "Right not to be subject to automated decisions:",
+          "desc": "AutoNex does not currently use any automated processing with legal effect on users"
+        },
+        "procedure": {
+          "title": "Procedure to exercise these rights",
+          "item1": "Email: <0>info@autonex.mg</0> with a copy of a valid ID document",
+          "item2": "Response time: 30 days maximum from receipt of the complete request",
+          "item3": "Free of charge: except for manifestly unfounded or excessive requests"
+        },
+        "recourse": {
+          "title": "Recourse",
+          "item1": "Malagasy users: CMIL (Commission Malagasy Informatique et Libertés) — cmil.mg (if established at the date of consultation)",
+          "item2": "EU users: CNIL (France) — cnil.fr — or the supervisory authority of your country of residence"
+        }
+      },
+      "security": {
+        "title": "8. Data security",
+        "intro": "AutoNex implements the following technical and organisational measures:",
+        "item1": "TLS 1.3 encryption for all communications (HTTPS mandatory)",
+        "item2": "Password hashing (bcrypt algorithm)",
+        "item3": "Row Level Security (RLS) enabled on every Supabase table holding personal data",
+        "item4": "Audit logs for every administrator action",
+        "item5": "Anti-bot rate limiting (max 20 listings per user per 24h)",
+        "item6": "A-priori moderation (individuals) and community reporting with auto-hide",
+        "item7": "Real-time error monitoring via Sentry",
+        "item8": "Automatic daily database backups (via Supabase)"
+      },
+      "cookies": {
+        "title": "9. Cookies",
+        "body": "See the dedicated page <0>/legal/cookies</0>."
+      },
+      "changes": {
+        "title": "10. Updates",
+        "body": "This policy may be updated to reflect changes in the platform or legal obligations. The last-updated date is shown in the footer. Users are notified by email of any substantial change."
+      }
+    },
+    "terms": {
+      "pageTitle": "Terms and Conditions — AutoNex",
+      "pageDescription": "AutoNex Terms: access, signup, listing publication, credits, reporting, liabilities, termination, mediation. Vehicle marketplace in Madagascar.",
+      "heading": "Terms and Conditions",
+      "preamble": {
+        "title": "Preamble",
+        "body1": "These Terms and Conditions (hereafter \"Terms\") govern access to and use of the AutoNex platform, operated by APLi SARLU, a vehicle marketplace in Madagascar.",
+        "body2": "AutoNex is a <0>technical intermediary</0> connecting buyers and sellers of vehicles (individuals and dealers). AutoNex is never a party to transactions concluded between users."
+      },
+      "art1": {
+        "title": "Article 1 — Definitions",
+        "user": {
+          "label": "User:",
+          "desc": "any adult natural person using the AutoNex platform, whether registered or not"
+        },
+        "listing": {
+          "label": "Listing / Ad:",
+          "desc": "a publication by a user describing a vehicle offered for sale or rental"
+        },
+        "individual": {
+          "label": "Individual:",
+          "desc": "user posting listings on a non-professional basis"
+        },
+        "dealer": {
+          "label": "Verified dealer:",
+          "desc": "professional user who has provided the necessary documents to validate their status (see article 4)"
+        },
+        "credits": {
+          "label": "AutoNex credits:",
+          "desc": "unit of value providing access to paid services (premium publishing, boosts)"
+        },
+        "boost": {
+          "label": "Boost / Featuring:",
+          "desc": "paid service that increases a listing's visibility"
+        },
+        "report": {
+          "label": "Report:",
+          "desc": "action by which a user reports a listing they consider problematic"
+        }
+      },
+      "art2": {
+        "title": "Article 2 — Acceptance and updates to the Terms",
+        "item1": "Using the platform implies full and complete acceptance of these Terms",
+        "item2": "AutoNex reserves the right to modify the Terms at any time",
+        "item3": "Substantial changes will be notified by email to registered users, with 15 days' notice",
+        "item4": "If the user disagrees with the new Terms, they can close their account before the changes take effect",
+        "item5": "Continued use of the platform after the changes take effect constitutes acceptance of the new Terms"
+      },
+      "art3": {
+        "title": "Article 3 — Signup and user account",
+        "signup": {
+          "title": "3.1 Signup conditions",
+          "item1": "Be at least 18 years old",
+          "item2": "Have legal capacity",
+          "item3": "Provide accurate, complete and up-to-date information",
+          "item4": "Have a valid email address"
+        },
+        "unique": {
+          "title": "3.2 Single account",
+          "body": "A user may create only one account per natural person."
+        },
+        "confidentiality": {
+          "title": "3.3 Credential confidentiality",
+          "item1": "The user is solely responsible for the confidentiality of their password and for any activity carried out from their account",
+          "item2": "Any suspicious activity must be reported immediately to <0>info@autonex.mg</0>"
+        },
+        "refusal": {
+          "title": "3.4 Refusal, suspension, deletion",
+          "body": "AutoNex reserves the right to refuse a signup, suspend or delete any account in the event of a Terms violation, without notice for serious infringements (fraud, illegal content)."
+        }
+      },
+      "art4": {
+        "title": "Article 4 — Individual vs dealer status",
+        "individual": {
+          "title": "4.1 Individual",
+          "item1": "Publishes on a non-professional basis",
+          "item2": "Subject to a-priori moderation for each new listing",
+          "item3": "Subject to moderation of changes on sensitive fields (title, description, price, photos)"
+        },
+        "dealer": {
+          "title": "4.2 Verified dealer",
+          "intro": "Status granted after AutoNex validates the following documents:",
+          "item1": "Professional Tax Identification Number (NIF)",
+          "item2": "RCS number or equivalent document",
+          "item3": "Legal representative's ID document",
+          "item4": "Proof of business premises (lease, title deed, utility bill)",
+          "item5": "Benefits from lighter moderation (real-time publishing and edits)",
+          "item6": "Bound by the same content rules as individuals"
+        },
+        "revoke": {
+          "title": "4.3 Revocation of dealer status",
+          "body": "In case of repeated Terms violations or fraudulent practices, AutoNex may revoke verified dealer status and re-apply a-priori moderation."
+        }
+      },
+      "art5": {
+        "title": "Article 5 — Listing publication",
+        "allowed": {
+          "title": "5.1 Allowed content",
+          "item1": "Vehicles that may legally be sold in Madagascar",
+          "item2": "Vehicles owned by the user or for which the user holds a valid sales mandate",
+          "item3": "Vehicles with proper papers (registration card, technical inspection where applicable)"
+        },
+        "forbidden": {
+          "title": "5.2 Strictly forbidden content",
+          "item1": "Stolen, undocumented vehicles or those whose origin cannot be justified",
+          "item2": "Fraud, scams or attempts to defraud",
+          "item3": "Discriminatory, offensive, defamatory or illegal content",
+          "item4": "Mentions inviting payments via Western Union, MoneyGram, cryptocurrencies, unsecured international transfers",
+          "item5": "Identity theft or publishing on behalf of a third party without authorisation",
+          "item6": "Copyright-protected content without authorisation",
+          "item7": "Personal data of third parties without their consent"
+        },
+        "veracity": {
+          "title": "5.3 Truthfulness of information",
+          "item1": "The user warrants that the information published is accurate",
+          "item2": "Sanctions for false information range from listing removal to account deletion"
+        },
+        "photoRights": {
+          "title": "5.4 Photo rights",
+          "item1": "The user warrants that they hold all rights (ownership, reproduction, distribution) over the photos published",
+          "item2": "AutoNex disclaims all liability for third-party claims on photos published by users"
+        },
+        "limits": {
+          "title": "5.5 Publication limits",
+          "item1": "Maximum 20 new listings per user over 24 rolling hours",
+          "item2": "This limit aims to prevent spam and automated abuse"
+        },
+        "moderation": {
+          "title": "5.6 Moderation",
+          "item1": "AutoNex reserves the right, at its sole discretion, to refuse, modify or remove any listing that violates these Terms or applicable laws",
+          "item2": "No notice is required for content that is manifestly illegal or dangerous",
+          "item3": "A motivated rejection message is sent to the user by email"
+        }
+      },
+      "art6": {
+        "title": "Article 6 — AutoNex credits and paid services",
+        "mechanic": {
+          "title": "6.1 How credits work",
+          "item1": "AutoNex credits are an internal unit used to access paid services",
+          "item2": "Prices are shown in the site's \"Monetization\" section and may change"
+        },
+        "providers": {
+          "title": "6.2 Payment providers",
+          "item1": "Payments are handled by third-party providers approved in Madagascar",
+          "item2": "AutoNex stores NO sensitive banking data: only anonymised transaction identifiers are kept for traceability",
+          "item3": "Transactions comply with the relevant security standards (PCI-DSS for bank cards)",
+          "item4": "The list of payment providers currently used is available on request at <0>info@autonex.mg</0>"
+        },
+        "payments": {
+          "title": "6.3 Accepted payment methods",
+          "item1": "Mobile Money: MVola, Orange Money, Airtel Money",
+          "item2": "Bank cards: Visa, Mastercard",
+          "item3": "Additional methods may be added in the future"
+        },
+        "boosts": {
+          "title": "6.4 Boosts and featuring",
+          "item1": "Nature: increased listing visibility (priority placement, badge, homepage pinning)",
+          "item2": "Duration: varies by boost type (shown at purchase time)",
+          "item3": "Price: shown in AutoNex credits at the time of purchase"
+        },
+        "refunds": {
+          "title": "6.5 Refunds",
+          "item1": "Unused AutoNex credits: refundable on request within 14 days of purchase, except for credits obtained via promo codes",
+          "item2": "Already-spent AutoNex credits: non-refundable except for service failures attributable to AutoNex (e.g. prolonged platform outage, technical activation error)",
+          "item3": "Procedure: email info@autonex.mg with justification and payment details"
+        },
+        "promo": {
+          "title": "6.6 Promo codes",
+          "item1": "Each promo code specifies its terms (uniqueness, expiry, amount, applicable category)",
+          "item2": "Promo codes are not refundable in cash",
+          "item3": "Promo codes cannot be combined with another promo code unless stated otherwise"
+        },
+        "invoices": {
+          "title": "6.7 Invoices",
+          "item1": "Invoices are issued on request at <0>info@autonex.mg</0>, within 15 working days",
+          "item2": "Invoices comply with Malagasy tax requirements"
+        }
+      },
+      "art7": {
+        "title": "Article 7 — Reporting listings",
+        "right": {
+          "title": "7.1 Right to report",
+          "item1": "Any signed-in user can report a listing published by another user",
+          "item2": "Users cannot report their own listings",
+          "item3": "A user can only report the same listing once"
+        },
+        "reasons": {
+          "title": "7.2 Reporting reasons",
+          "item1": "Scam / Fraud",
+          "item2": "Inappropriate content",
+          "item3": "Duplicate listing",
+          "item4": "Suspicious price",
+          "item5": "Other (justification required)"
+        },
+        "process": {
+          "title": "7.3 How reports are handled",
+          "item1": "Auto-hide: when a listing reaches 3 pending reports, it is automatically hidden pending admin review",
+          "item2": "Review: the moderation team handles reports as quickly as possible",
+          "item3": "Final decision: confirm (listing rejected) or dismiss (listing reactivated)"
+        },
+        "abuse": {
+          "title": "7.4 Reporting abuse",
+          "body": "Abusive reports (repeated, unfounded, unfair competition) may lead to sanctions: warning, temporary suspension or even account deletion."
+        }
+      },
+      "art8": {
+        "title": "Article 8 — Liabilities",
+        "role": {
+          "title": "8.1 AutoNex's role",
+          "item1": "AutoNex is a technical intermediary, not a seller",
+          "item2": "AutoNex does not enter into any transactions with users",
+          "item3": "AutoNex does not warrant:",
+          "sub1": "The accuracy of listing information",
+          "sub2": "User solvency",
+          "sub3": "The smooth running of transactions",
+          "sub4": "The legal compliance of vehicles sold"
+        },
+        "users": {
+          "title": "8.2 User responsibility",
+          "intro": "Users are solely responsible for:",
+          "item1": "The truthfulness of their listings",
+          "item2": "The legality of the transactions they enter into",
+          "item3": "Any taxes that may be owed (VAT, import duties, professional resale)",
+          "item4": "Compliance with regulations applicable to the relevant vehicles"
+        },
+        "safety": {
+          "title": "8.3 Safety recommendations",
+          "intro": "AutoNex strongly recommends that users:",
+          "item1": "Arrange meetings in a public place, preferably during the day",
+          "item2": "Request and verify official documents (registration card, ID) before any payment",
+          "item3": "Never pay before physically inspecting the vehicle",
+          "item4": "Test-drive the vehicle before buying",
+          "item5": "Have an independent technical inspection done if needed",
+          "item6": "Be wary of requests for international transfers, foreign mobile money, or cryptocurrencies",
+          "item7": "Report any suspicious listing via the \"Report\" button"
+        },
+        "limit": {
+          "title": "8.4 Limitation of liability",
+          "item1": "Within the limits allowed by Malagasy law, AutoNex's liability is capped at the amounts actually received by AutoNex for services provided to the user in the 12 months preceding the damage",
+          "item2": "Exclusions: indirect damages, lost profits, loss of chance, intangible damages"
+        }
+      },
+      "art9": {
+        "title": "Article 9 — Intellectual property",
+        "autonex": {
+          "title": "9.1 AutoNex property",
+          "item1": "AutoNex trademark, logo, design, editorial content and source code are the exclusive property of APLi SARLU",
+          "item2": "Any unauthorised reproduction is prohibited"
+        },
+        "user": {
+          "title": "9.2 User content",
+          "item1": "Users retain ownership of their content (photos, descriptions, etc.)",
+          "item2": "By publishing content on AutoNex, the user grants APLi SARLU a non-exclusive, worldwide, royalty-free licence for the legal duration of the rights, to use, reproduce, represent, adapt and distribute that content in connection with the AutoNex service and its promotion",
+          "item3": "This licence ends when the user deletes the content, subject to mandatory legal backups"
+        }
+      },
+      "art10": {
+        "title": "Article 10 — Personal data",
+        "body": "The collection and processing of personal data are governed by the <0>Privacy Policy</0>."
+      },
+      "art11": {
+        "title": "Article 11 — Duration and termination",
+        "duration": {
+          "title": "11.1 Duration",
+          "body": "The Terms apply as long as the user has an active account on the platform."
+        },
+        "userExit": {
+          "title": "11.2 Termination by the user",
+          "item1": "The user may delete their account at any time from their personal area (feature being rolled out — meanwhile, request by email at <0>info@autonex.mg</0>)",
+          "item2": "Deletion erases active listings and anonymises data retained for legal reasons"
+        },
+        "platformExit": {
+          "title": "11.3 Termination by AutoNex",
+          "item1": "For Terms violations: temporary suspension then account deletion, with notice proportional to severity",
+          "item2": "For serious infringements (fraud, illegal content, security breach): immediate deletion without notice",
+          "item3": "The AutoNex credit balance at the time of suspension/deletion is handled on a case-by-case basis depending on the reason for termination"
+        }
+      },
+      "art12": {
+        "title": "Article 12 — Force majeure",
+        "body": "Neither party can be held liable for failure to perform its obligations in the event of force majeure (natural disaster, war, pandemic, major third-party infrastructure outage, binding administrative decision, etc.). The affected party will notify the other as soon as possible."
+      },
+      "art13": {
+        "title": "Article 13 — Mediation and disputes",
+        "mediation": {
+          "title": "13.1 Prior mediation",
+          "item1": "In case of dispute, the parties agree to seek an amicable solution before any legal action",
+          "item2": "Initial contact: <0>info@autonex.mg</0>"
+        },
+        "law": {
+          "title": "13.2 Applicable law",
+          "body": "These Terms are governed by Malagasy law."
+        },
+        "jurisdiction": {
+          "title": "13.3 Competent jurisdiction",
+          "body": "Any dispute regarding the interpretation or performance of these Terms falls under the exclusive jurisdiction of the Tribunal de Première Instance of Antananarivo, subject to mandatory applicable procedural rules."
+        }
+      },
+      "art14": {
+        "title": "Article 14 — Contact",
+        "body": "For any question about these Terms: <0>info@autonex.mg</0>"
+      }
     }
   }
 }

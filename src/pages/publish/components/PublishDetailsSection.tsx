@@ -634,7 +634,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                 <SelectValue placeholder={t("publish.selectCondition", "Sélectionner un état")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
                 {CONDITION_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
@@ -661,7 +661,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                 <SelectValue placeholder={t("publish.selectFuel", "Sélectionner un carburant")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
                 {FUEL_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
@@ -677,7 +677,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                 <SelectValue placeholder={t("publish.selectTransmission", "Sélectionner une boîte")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
                 {TRANSMISSION_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
@@ -693,7 +693,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                 <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
                 {DRIVETRAIN_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
@@ -857,7 +857,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                 <SelectValue placeholder={t("publish.selectAvailability", "Sélectionner une disponibilité")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
                 {AVAILABILITY_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
@@ -874,7 +874,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                   <SelectValue placeholder={t("publish.selectRentalMode", "Sélectionner un mode")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                  <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
                   {RENTAL_MODE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
@@ -892,7 +892,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                   <SelectValue placeholder={t("publish.selectSellerType", "Sélectionner un vendeur")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={EMPTY_OPTION}>Non précisé</SelectItem>
+                  <SelectItem value={EMPTY_OPTION}>{t("publish.notSpecified", "Non précisé")}</SelectItem>
                   {SELLER_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}

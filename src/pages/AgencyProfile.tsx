@@ -161,10 +161,10 @@ const AgencyProfile = () => {
         {MONETIZATION_PLACEMENTS.agencyStrip && (
           <div className="mb-8">
             <BannerSlot
-              title="Visibilité concessionnaire sur AutoNex"
-              subtitle="Packages marque, spotlight et diffusion multi-villes — contact commercial pour un plan sur mesure."
+              title={t("agencies.profile.bannerTitle", "Visibilité concessionnaire sur AutoNex")}
+              subtitle={t("agencies.profile.bannerSubtitle", "Packages marque, spotlight et diffusion multi-villes — contact commercial pour un plan sur mesure.")}
               href="/publier"
-              ctaLabel="Booster ma visibilité"
+              ctaLabel={t("agencies.profile.bannerCta", "Booster ma visibilité")}
             />
           </div>
         )}
@@ -187,7 +187,7 @@ const AgencyProfile = () => {
             <div className="flex items-center gap-2 justify-center md:justify-start">
               <h1 className="font-sans text-2xl font-bold">{displayName}</h1>
               {displayVerified && <Badge className="bg-success font-sans text-xs" style={{ color: "#FAFAFA" }}>{t("listing.verified")}</Badge>}
-              {partnerDealer && <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>}
+              {partnerDealer && <Badge variant="secondary" className="font-sans text-xs">{t("agencies.autonexPartnerBadge", "Partenaire AutoNex")}</Badge>}
             </div>
             {displayLocation && <p className="text-sm font-sans text-muted-foreground mt-2">📍 {displayLocation}</p>}
             <p className="text-muted-foreground font-sans mt-2 break-words">{displayBio || t("agencies.noDescription")}</p>
@@ -219,7 +219,7 @@ const AgencyProfile = () => {
 
         {agency?.description_long ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
-            <h2 className="font-sans text-lg font-bold mb-2">À propos</h2>
+            <h2 className="font-sans text-lg font-bold mb-2">{t("agencies.profile.aboutTitle", "À propos")}</h2>
             <p className="font-sans text-sm text-muted-foreground whitespace-pre-wrap break-words">
               {agency.description_long}
             </p>
@@ -228,7 +228,7 @@ const AgencyProfile = () => {
 
         {agency?.opening_hours && Object.keys(agency.opening_hours as OpeningHours).length > 0 ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
-            <h2 className="font-sans text-lg font-bold mb-3">Horaires d'ouverture</h2>
+            <h2 className="font-sans text-lg font-bold mb-3">{t("agencies.profile.openingHours", "Horaires d'ouverture")}</h2>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1.5 font-sans text-sm">
               {WEEKDAYS.map((day) => {
                 const hours = (agency.opening_hours as OpeningHours)[day];
@@ -236,7 +236,7 @@ const AgencyProfile = () => {
                 return (
                   <div key={day} className="flex justify-between">
                     <dt className="text-muted-foreground">{WEEKDAY_LABELS_FR[day]}</dt>
-                    <dd>{hours === "closed" ? "Fermé" : hours}</dd>
+                    <dd>{hours === "closed" ? t("agencies.profile.closed", "Fermé") : hours}</dd>
                   </div>
                 );
               })}
@@ -246,7 +246,7 @@ const AgencyProfile = () => {
 
         {agency?.social_links && Object.values(agency.social_links as SocialLinks).some(Boolean) ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
-            <h2 className="font-sans text-lg font-bold mb-3">Suivez-nous</h2>
+            <h2 className="font-sans text-lg font-bold mb-3">{t("agencies.profile.followUs", "Suivez-nous")}</h2>
             <div className="flex flex-wrap gap-3 font-sans text-sm">
               {(Object.entries(agency.social_links as SocialLinks) as Array<[keyof SocialLinks, string | null | undefined]>).map(([k, v]) =>
                 v ? (

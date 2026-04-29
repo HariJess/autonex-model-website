@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { buildCanonicalUrl } from "@/lib/seo";
@@ -14,12 +15,12 @@ type LegalLayoutProps = {
   children: ReactNode;
 };
 
-const LEGAL_LINKS: { to: string; label: string }[] = [
-  { to: "/legal/mentions", label: "Mentions légales" },
-  { to: "/legal/confidentialite", label: "Politique de confidentialité" },
-  { to: "/legal/cgu", label: "CGU" },
-  { to: "/legal/cookies", label: "Cookies" },
-  { to: "/legal/suppression-donnees", label: "Suppression des données" },
+const LEGAL_LINKS: { to: string; labelKey: string }[] = [
+  { to: "/legal/mentions", labelKey: "legal.layout.linkMentions" },
+  { to: "/legal/confidentialite", labelKey: "legal.layout.linkPrivacy" },
+  { to: "/legal/cgu", labelKey: "legal.layout.linkTerms" },
+  { to: "/legal/cookies", labelKey: "legal.layout.linkCookies" },
+  { to: "/legal/suppression-donnees", labelKey: "legal.layout.linkDataDeletion" },
 ];
 
 export function LegalLayout({
@@ -30,6 +31,7 @@ export function LegalLayout({
   jsonLd,
   children,
 }: LegalLayoutProps) {
+  const { t } = useTranslation();
   const canonical = buildCanonicalUrl(canonicalPath);
   return (
     <>
@@ -53,14 +55,14 @@ export function LegalLayout({
               to={link.to}
               className="rounded-full border border-border px-3 py-1 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
             >
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           ))}
         </nav>
         <article className="mx-auto max-w-3xl space-y-6 font-sans leading-relaxed text-foreground [&_h1]:font-sans [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:font-sans [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_h3]:font-sans [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-1 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-1 [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_th]:border [&_th]:border-border [&_th]:bg-muted/40 [&_th]:p-2 [&_th]:text-left [&_td]:border [&_td]:border-border [&_td]:p-2 [&_td]:align-top">
           {children}
           <footer className="mt-10 border-t border-border pt-4 text-xs text-muted-foreground">
-            Dernière mise à jour : {lastUpdated}
+            {t("legal.layout.lastUpdated", { date: lastUpdated })}
           </footer>
         </article>
       </main>
