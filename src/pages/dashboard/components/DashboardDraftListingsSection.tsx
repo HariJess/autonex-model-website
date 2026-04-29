@@ -51,7 +51,7 @@ export function DashboardDraftListingsSection({
       <CardContent className="p-6 space-y-4">
         <div className="flex items-center gap-2">
           <FileEdit className="h-5 w-5 text-primary" />
-          <h2 className="font-serif text-lg font-bold">{title}</h2>
+          <h2 className="font-sans text-lg font-bold">{title}</h2>
         </div>
         <p className="text-sm text-muted-foreground font-sans">{hint}</p>
         <ul className="space-y-3">

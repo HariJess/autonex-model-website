@@ -160,7 +160,7 @@ export default function ContactPage() {
       <Header />
       <main className="container mx-auto py-8 md:py-12">
         <header className="mb-6 md:mb-8 space-y-2">
-          <h1 className="font-serif text-3xl md:text-4xl font-bold">Nous contacter</h1>
+          <h1 className="font-sans text-3xl md:text-4xl font-bold">Nous contacter</h1>
           <p className="font-sans text-muted-foreground max-w-2xl">
             Une question, une suggestion, un partenariat ? Notre équipe vous répond sous 48h ouvrés.
           </p>
@@ -282,7 +282,7 @@ export default function ContactPage() {
           </form>
 
           <aside className="space-y-4 rounded-2xl border border-border bg-card p-5 h-fit lg:sticky lg:top-24">
-            <h2 className="font-serif text-lg font-bold">Autres canaux</h2>
+            <h2 className="font-sans text-lg font-bold">Autres canaux</h2>
             <p className="text-sm font-sans text-muted-foreground flex items-start gap-2">
               <Mail className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
               <a href="mailto:info@autonex.mg" className="text-primary hover:underline">

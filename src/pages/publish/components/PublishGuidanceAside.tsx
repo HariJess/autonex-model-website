@@ -27,7 +27,7 @@ export function PublishGuidanceAside({
         <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
           {overline}
         </p>
-        <p className="mt-1 font-serif text-lg text-foreground">{title}</p>
+        <p className="mt-1 font-sans text-lg text-foreground">{title}</p>
         <div className="mt-3 space-y-2.5">
           <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">
             <p className="inline-flex items-center gap-2 font-sans text-sm font-medium text-foreground">

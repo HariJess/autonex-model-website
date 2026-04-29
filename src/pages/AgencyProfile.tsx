@@ -88,7 +88,7 @@ const AgencyProfile = () => {
         <Header />
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-          <h1 className="font-serif text-2xl font-bold mb-2">{t("common.error")}</h1>
+          <h1 className="font-sans text-2xl font-bold mb-2">{t("common.error")}</h1>
           <p className="text-muted-foreground font-sans mb-6">
             {t(
               "agencies.runtimeUnavailable",
@@ -107,7 +107,7 @@ const AgencyProfile = () => {
         <Header />
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-          <h1 className="font-serif text-2xl font-bold mb-2">{t("agencies.notFound")}</h1>
+          <h1 className="font-sans text-2xl font-bold mb-2">{t("agencies.notFound")}</h1>
           <p className="text-muted-foreground font-sans mb-6">{t("agencies.notFoundDesc")}</p>
           <Link to="/agences">
             <Button variant="hero" className="font-sans">{t("agencies.viewAll")}</Button>
@@ -180,12 +180,12 @@ const AgencyProfile = () => {
                 onError={(e) => applyImageFallback(e.currentTarget)}
               />
             ) : (
-              <span className="font-serif text-2xl font-bold text-muted-foreground">{displayName.charAt(0)}</span>
+              <span className="font-sans text-2xl font-bold text-muted-foreground">{displayName.charAt(0)}</span>
             )}
           </div>
           <div className="flex-1 text-center md:text-left">
             <div className="flex items-center gap-2 justify-center md:justify-start">
-              <h1 className="font-serif text-2xl font-bold">{displayName}</h1>
+              <h1 className="font-sans text-2xl font-bold">{displayName}</h1>
               {displayVerified && <Badge className="bg-success font-sans text-xs" style={{ color: "#FAFAFA" }}>{t("listing.verified")}</Badge>}
               {partnerDealer && <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>}
             </div>
@@ -219,7 +219,7 @@ const AgencyProfile = () => {
 
         {agency?.description_long ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
-            <h2 className="font-serif text-lg font-bold mb-2">À propos</h2>
+            <h2 className="font-sans text-lg font-bold mb-2">À propos</h2>
             <p className="font-sans text-sm text-muted-foreground whitespace-pre-wrap break-words">
               {agency.description_long}
             </p>
@@ -228,7 +228,7 @@ const AgencyProfile = () => {
 
         {agency?.opening_hours && Object.keys(agency.opening_hours as OpeningHours).length > 0 ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
-            <h2 className="font-serif text-lg font-bold mb-3">Horaires d'ouverture</h2>
+            <h2 className="font-sans text-lg font-bold mb-3">Horaires d'ouverture</h2>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1.5 font-sans text-sm">
               {WEEKDAYS.map((day) => {
                 const hours = (agency.opening_hours as OpeningHours)[day];
@@ -246,7 +246,7 @@ const AgencyProfile = () => {
 
         {agency?.social_links && Object.values(agency.social_links as SocialLinks).some(Boolean) ? (
           <section className="mb-8 rounded-2xl border border-border bg-card p-5 md:p-6">
-            <h2 className="font-serif text-lg font-bold mb-3">Suivez-nous</h2>
+            <h2 className="font-sans text-lg font-bold mb-3">Suivez-nous</h2>
             <div className="flex flex-wrap gap-3 font-sans text-sm">
               {(Object.entries(agency.social_links as SocialLinks) as Array<[keyof SocialLinks, string | null | undefined]>).map(([k, v]) =>
                 v ? (
@@ -265,14 +265,14 @@ const AgencyProfile = () => {
           </section>
         ) : null}
 
-        <h2 className="font-serif text-xl font-bold mb-4">{t("agencies.listingsOf", { name: displayName })}</h2>
+        <h2 className="font-sans text-xl font-bold mb-4">{t("agencies.listingsOf", { name: displayName })}</h2>
         {listingsLoading ? (
           <div className="flex justify-center py-8">
             <WheelSpinner size="md" />
           </div>
         ) : listings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-secondary/15 px-6 py-10 text-center">
-            <p className="font-serif text-lg text-foreground">
+            <p className="font-sans text-lg text-foreground">
               {partnerDealer ? "Aucun véhicule actif pour le moment." : t("agencies.noListings")}
             </p>
             {partnerDealer && (

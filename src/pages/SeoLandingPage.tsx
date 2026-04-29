@@ -217,7 +217,7 @@ const SeoLandingPage = () => {
 
         <section className="rounded-2xl border border-border/70 bg-card/70 p-5 md:p-6">
           <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground mb-2">Landing P1 AutoNex</p>
-          <h1 className="font-serif text-2xl md:text-3xl font-bold mb-2">{landing.title}</h1>
+          <h1 className="font-sans text-2xl md:text-3xl font-bold mb-2">{landing.title}</h1>
           <p className="font-sans text-muted-foreground leading-relaxed">{landing.intro}</p>
           {!shouldIndex && landing.inventoryFloor > 0 ? (
             <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-sm font-sans text-amber-700 dark:text-amber-300">
@@ -229,7 +229,7 @@ const SeoLandingPage = () => {
 
         <section className="mt-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-serif text-xl font-semibold">
+            <h2 className="font-sans text-xl font-semibold">
               {isLoading ? "Annonces en chargement..." : `${listings.length} annonce${listings.length > 1 ? "s" : ""}`}
             </h2>
             <Link

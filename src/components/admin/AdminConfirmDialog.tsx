@@ -60,7 +60,7 @@ export function AdminConfirmDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="font-serif">{title}</AlertDialogTitle>
+          <AlertDialogTitle className="font-sans">{title}</AlertDialogTitle>
           {description ? (
             <AlertDialogDescription className="font-sans">
               {description}

@@ -23,7 +23,7 @@ function AdminCreditPacksEditor() {
   return (
     <Card className="rounded-2xl">
       <CardHeader>
-        <CardTitle className="font-serif">Packs de crédits</CardTitle>
+        <CardTitle className="font-sans">Packs de crédits</CardTitle>
         <CardDescription className="font-sans">
           Offres de crédits vendues aux utilisateurs. La création et la
           suppression passent par migration SQL (intégrité historique des

@@ -23,7 +23,7 @@ export function UserDetailTransactions({ ledger }: UserDetailTransactionsProps) 
   return (
     <Card className="rounded-2xl overflow-hidden">
       <CardHeader>
-        <CardTitle className="font-serif text-lg">
+        <CardTitle className="font-sans text-lg">
           Transactions crédits ({ledger.length})
         </CardTitle>
       </CardHeader>

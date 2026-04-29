@@ -61,7 +61,7 @@ function AdminLoginPage() {
             <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <ShieldCheck className="h-5 w-5" />
             </div>
-            <CardTitle className="font-serif text-2xl">Back-office admin</CardTitle>
+            <CardTitle className="font-sans text-2xl">Back-office admin</CardTitle>
             <CardDescription className="font-sans">
               Accès réservé aux administrateurs AutoNex.
             </CardDescription>

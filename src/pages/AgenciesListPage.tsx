@@ -71,7 +71,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
       ) : null}
       <Header />
       <div className="container mx-auto py-6 md:py-8">
-        <h1 className="font-serif text-3xl font-bold mb-2">{title}</h1>
+        <h1 className="font-sans text-3xl font-bold mb-2">{title}</h1>
         <p className="text-sm md:text-base text-muted-foreground font-sans mb-6">
           Retrouvez nos partenaires officiels et les concessionnaires présents sur la plateforme.
         </p>
@@ -130,7 +130,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
             {PARTNER_DEALERS.length > 0 && !search && !verifiedOnly && city === "all" ? (
               <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <h2 className="font-serif text-xl font-bold">Partenaires officiels AutoNex</h2>
+                  <h2 className="font-sans text-xl font-bold">Partenaires officiels AutoNex</h2>
                   <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground font-sans mb-4">
@@ -149,7 +149,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-serif text-lg font-bold group-hover:text-primary transition-colors">{dealer.name}</h3>
+                            <h3 className="font-sans text-lg font-bold group-hover:text-primary transition-colors">{dealer.name}</h3>
                             <Badge className="bg-success text-xs font-sans" style={{ color: "#FAFAFA" }}>Partenaire</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground font-sans">{dealer.city}, {dealer.area}</p>
@@ -164,7 +164,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
             ) : null}
 
             <section>
-              <h2 className="font-serif text-xl font-bold mb-1">Annuaire des concessionnaires</h2>
+              <h2 className="font-sans text-xl font-bold mb-1">Annuaire des concessionnaires</h2>
               <p className="text-sm text-muted-foreground font-sans mb-4">
                 {agencies.length} concessionnaire{agencies.length > 1 ? "s" : ""} trouvé{agencies.length > 1 ? "s" : ""}.
               </p>
@@ -190,12 +190,12 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
                             decoding="async"
                           />
                         ) : (
-                          <span className="font-serif text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
+                          <span className="font-sans text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
                         )}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-serif font-bold group-hover:text-primary transition-colors">{agency.name}</h3>
+                          <h3 className="font-sans font-bold group-hover:text-primary transition-colors">{agency.name}</h3>
                           {agency.verified && (
                             <span className="inline-flex items-center gap-0.5 rounded-md border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs font-sans font-medium text-amber-800">
                               <ShieldCheck className="h-3 w-3" /> Partenaire

@@ -37,7 +37,7 @@ export function AgencyActionsPanel({ detail }: AgencyActionsPanelProps) {
     <>
       <Card className="rounded-2xl">
         <CardHeader>
-          <CardTitle className="font-serif text-lg">Actions</CardTitle>
+          <CardTitle className="font-sans text-lg">Actions</CardTitle>
           <div className="pt-2">
             <AgencyStatusBadge status={agency.status} verified={agency.verified} />
           </div>

@@ -23,7 +23,7 @@ const FavoritesPage = () => {
 
       <main className="flex-1 container mx-auto py-8 md:py-10">
         <section className="mb-6 md:mb-8">
-          <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
+          <h1 className="font-sans text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
             <Heart className="h-6 w-6 md:h-7 md:w-7 text-destructive fill-destructive" aria-hidden />
             {t("favorites.title")}
           </h1>
@@ -55,7 +55,7 @@ const FavoritesPage = () => {
             <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-muted">
               <Heart className="h-7 w-7 text-muted-foreground" aria-hidden />
             </div>
-            <h2 className="font-serif text-lg md:text-xl font-semibold text-foreground">
+            <h2 className="font-sans text-lg md:text-xl font-semibold text-foreground">
               {t("favorites.empty.title")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground font-sans max-w-md mx-auto">

@@ -57,7 +57,7 @@ export function LegalLayout({
             </Link>
           ))}
         </nav>
-        <article className="mx-auto max-w-3xl space-y-6 font-sans leading-relaxed text-foreground [&_h1]:font-serif [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:font-serif [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_h3]:font-serif [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-1 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-1 [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_th]:border [&_th]:border-border [&_th]:bg-muted/40 [&_th]:p-2 [&_th]:text-left [&_td]:border [&_td]:border-border [&_td]:p-2 [&_td]:align-top">
+        <article className="mx-auto max-w-3xl space-y-6 font-sans leading-relaxed text-foreground [&_h1]:font-sans [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:font-sans [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_h3]:font-sans [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-1 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-1 [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_th]:border [&_th]:border-border [&_th]:bg-muted/40 [&_th]:p-2 [&_th]:text-left [&_td]:border [&_td]:border-border [&_td]:p-2 [&_td]:align-top">
           {children}
           <footer className="mt-10 border-t border-border pt-4 text-xs text-muted-foreground">
             Dernière mise à jour : {lastUpdated}

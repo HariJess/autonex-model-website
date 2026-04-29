@@ -94,12 +94,12 @@ const ESTIMATION_PALETTE = {
 
 // Typography lock: fixed scale/weight/leading for this feature.
 const ESTIMATION_TYPO = {
-  display: "font-serif tracking-tight leading-[1.05]",
-  h1: "font-serif text-4xl md:text-6xl tracking-tight leading-[1.05]",
-  h2: "font-serif text-3xl md:text-4xl tracking-tight",
-  h3: "font-serif text-xl md:text-2xl",
-  valueHero: "font-serif text-5xl md:text-7xl tracking-tight leading-[0.98]",
-  valueMetric: "font-serif text-2xl",
+  display: "font-sans tracking-tight leading-[1.05]",
+  h1: "font-sans text-4xl md:text-6xl tracking-tight leading-[1.05]",
+  h2: "font-sans text-3xl md:text-4xl tracking-tight",
+  h3: "font-sans text-xl md:text-2xl",
+  valueHero: "font-sans text-5xl md:text-7xl tracking-tight leading-[0.98]",
+  valueMetric: "font-sans text-2xl",
   body: "font-sans text-sm leading-relaxed text-muted-foreground",
   label: "font-sans text-xs uppercase tracking-wide text-muted-foreground",
   caption: "font-sans text-xs text-muted-foreground",
@@ -400,7 +400,7 @@ const VehicleEstimationPage = () => {
             <div className="grid gap-4 md:grid-cols-3">
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-lg">{t("estimation.howItWorksTitle", "Comment ça fonctionne")}</CardTitle>
+                  <CardTitle className="font-sans text-lg">{t("estimation.howItWorksTitle", "Comment ça fonctionne")}</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm text-muted-foreground">
                   {t("estimation.howItWorksDesc", "Décrivez votre véhicule, précisez son état, puis recevez un rapport d'estimation structuré en quelques secondes.")}
@@ -408,7 +408,7 @@ const VehicleEstimationPage = () => {
               </Card>
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-lg">{t("estimation.reliableTransparentTitle", "Fiable et transparent")}</CardTitle>
+                  <CardTitle className="font-sans text-lg">{t("estimation.reliableTransparentTitle", "Fiable et transparent")}</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm text-muted-foreground">
                   {t("estimation.reliableTransparentDesc", "L'outil combine profils de référence et signaux de marché. Chaque estimation inclut sa fourchette et son niveau de confiance.")}
@@ -416,7 +416,7 @@ const VehicleEstimationPage = () => {
               </Card>
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="font-serif text-lg">{t("estimation.convertReadyTitle", "Pensé pour convertir")}</CardTitle>
+                  <CardTitle className="font-sans text-lg">{t("estimation.convertReadyTitle", "Pensé pour convertir")}</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm text-muted-foreground">
                   {t("estimation.convertReadyDesc", "Une fois la valeur obtenue, vous pouvez publier votre véhicule immédiatement avec un prix conseillé.")}

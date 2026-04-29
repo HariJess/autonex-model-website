@@ -38,7 +38,7 @@ const NotificationsPage = () => {
       <div className="container mx-auto max-w-3xl py-6 md:py-8 px-4">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
           <div>
-            <h1 className="font-serif text-2xl md:text-3xl font-bold">Notifications</h1>
+            <h1 className="font-sans text-2xl md:text-3xl font-bold">Notifications</h1>
             <p className="text-sm text-muted-foreground font-sans mt-1">
               {unreadCount > 0
                 ? `${unreadCount} non lue${unreadCount > 1 ? "s" : ""}`

@@ -528,7 +528,7 @@ const SearchPage = () => {
           ))}
         </nav>
 
-        <h1 className="font-serif text-xl md:text-3xl font-bold mb-2 leading-snug">
+        <h1 className="font-sans text-xl md:text-3xl font-bold mb-2 leading-snug">
           {queryError ? t("search.title", "Recherche") : pageTitle}{" "}
           {!queryError && (
             <span className="text-muted-foreground font-normal text-base md:text-lg">
@@ -666,7 +666,7 @@ const SearchPage = () => {
                     <p className="hidden sm:block font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                       {t("search.mainSelectionOverline", "Sélection principale")}
                     </p>
-                    <p className="font-serif text-xl text-foreground">
+                    <p className="font-sans text-xl text-foreground">
                       {t("search.mainSelectionMapTitle", "Exploration carte + annonces")}
                     </p>
                   </div>
@@ -704,7 +704,7 @@ const SearchPage = () => {
                     <p className="hidden sm:block font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                       {t("search.mainSelectionOverline", "Sélection principale")}
                     </p>
-                    <p className="font-serif text-xl text-foreground">
+                    <p className="font-sans text-xl text-foreground">
                       {t("search.mainSelectionListTitle", "Annonces correspondant à votre recherche")}
                     </p>
                   </div>
@@ -726,7 +726,7 @@ const SearchPage = () => {
                     <p className="hidden sm:block font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                       {t("search.mainSelectionOverline", "Sélection principale")}
                     </p>
-                    <p className="font-serif text-xl text-foreground">
+                    <p className="font-sans text-xl text-foreground">
                       {t("search.mainSelectionListTitle", "Annonces correspondant à votre recherche")}
                     </p>
                   </div>
@@ -741,7 +741,7 @@ const SearchPage = () => {
 
             {showAlsoLikeBlock && (
               <div className="mt-8 pt-6 border-t border-border/70 max-lg:mt-8">
-                <h2 className="font-serif text-xl max-lg:font-bold font-semibold mb-2 max-lg:mb-3">
+                <h2 className="font-sans text-xl max-lg:font-bold font-semibold mb-2 max-lg:mb-3">
                   {t("search.youMayAlsoLike", "Vous pouvez aussi aimer")}
                 </h2>
                 <p className="font-sans text-sm text-muted-foreground mb-4 max-lg:leading-relaxed">

@@ -75,7 +75,7 @@ const BetaLoginPage = () => {
                 (e.currentTarget as HTMLImageElement).src = "/favicon.ico";
               }}
             />
-            <h1 className="font-serif text-3xl font-bold tracking-tight">
+            <h1 className="font-sans text-3xl font-bold tracking-tight">
               Accès réservé
             </h1>
             <p className="font-sans text-sm text-muted-foreground max-w-sm">

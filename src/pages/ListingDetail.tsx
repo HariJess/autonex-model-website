@@ -280,7 +280,7 @@ const ListingDetail = () => {
                 )}
               </div>
               <div className="flex items-center justify-between gap-3">
-                <h1 className="font-serif text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground break-words">{displayTitle}</h1>
+                <h1 className="font-sans text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground break-words">{displayTitle}</h1>
                 <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0" />
               </div>
               {vehicleSummary && (
@@ -401,7 +401,7 @@ const ListingDetail = () => {
 
             {listingTrustProofs.length > 0 && (
               <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
-                <h2 className="font-serif text-xl font-bold">{t("listing.trustLayerTitle", "Pourquoi cette annonce inspire confiance")}</h2>
+                <h2 className="font-sans text-xl font-bold">{t("listing.trustLayerTitle", "Pourquoi cette annonce inspire confiance")}</h2>
                 <p className="mt-1.5 text-sm font-sans text-muted-foreground">
                   {t("listing.trustLayerSubtitle", "Indicateurs utiles pour décider plus sereinement avant contact.")}
                 </p>
@@ -451,7 +451,7 @@ const ListingDetail = () => {
               <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CarFront className="h-5 w-5 text-primary" />
-                  <h2 className="font-serif text-xl font-bold">{t("listing.vehicleSpecs", "Fiche véhicule")}</h2>
+                  <h2 className="font-sans text-xl font-bold">{t("listing.vehicleSpecs", "Fiche véhicule")}</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 md:gap-y-3">
                   {visibleSpecRowsMobile.map((spec) => (
@@ -475,14 +475,14 @@ const ListingDetail = () => {
 
             {listing.description && (
               <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
-                <h2 className="font-serif text-xl font-bold mb-3">{t("listing.description")}</h2>
+                <h2 className="font-sans text-xl font-bold mb-3">{t("listing.description")}</h2>
                 <p className="font-sans text-muted-foreground leading-relaxed whitespace-pre-line break-words">{listing.description}</p>
               </section>
             )}
 
             {allFeatureBadges.length > 0 && (
               <section className="rounded-2xl border border-border/75 bg-card p-5 md:p-6">
-                <h2 className="font-serif text-xl font-bold mb-3">{t("listing.features")}</h2>
+                <h2 className="font-sans text-xl font-bold mb-3">{t("listing.features")}</h2>
                 <div className="grid grid-cols-2 gap-2">
                   {visibleFeatureBadgesMobile.map((f) => (
                     <div key={f} className="flex items-center gap-2 text-sm font-sans">
@@ -504,7 +504,7 @@ const ListingDetail = () => {
 
             {(listing.video_url?.trim() || listing.virtual_tour_url?.trim()) && (
               <div>
-                <h2 className="font-serif text-xl font-bold mb-3">{t("listing.mediaLinks", "Médias")}</h2>
+                <h2 className="font-sans text-xl font-bold mb-3">{t("listing.mediaLinks", "Médias")}</h2>
                 <div className="flex flex-wrap gap-3">
                   {listing.video_url?.trim() && (
                     <a
@@ -543,7 +543,7 @@ const ListingDetail = () => {
 
             <section className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
               <div className="p-5 md:p-6 border-b border-border/80 bg-secondary/20">
-                <h2 className="font-serif text-xl font-bold">{t("listing.locationMap", "Localisation")}</h2>
+                <h2 className="font-sans text-xl font-bold">{t("listing.locationMap", "Localisation")}</h2>
                 <p className="text-[14px] text-muted-foreground font-sans mt-1.5 leading-relaxed">
                   {hasApproxMap
                     ? t(
@@ -608,14 +608,14 @@ const ListingDetail = () => {
                   </div>
                 ) : (
                   <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center border border-border">
-                    <span className="font-serif text-lg font-bold text-muted-foreground">
+                    <span className="font-sans text-lg font-bold text-muted-foreground">
                       {(listing.agency_name ?? listing.owner_name ?? "?").charAt(0)}
                     </span>
                   </div>
                 )}
                 <div>
                   <p className="font-sans text-xs text-muted-foreground">{t("listing.seller", "Vendeur")}</p>
-                  <h3 className="font-serif font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Vendeur")}</h3>
+                  <h3 className="font-sans font-bold">{listing.agency_name ?? listing.owner_name ?? t("listing.owner", "Vendeur")}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {sellerLabel && <Badge variant="outline" className="text-xs font-sans">{sellerLabel}</Badge>}
                     {listing.agency_verified && (
@@ -669,7 +669,7 @@ const ListingDetail = () => {
               </p>
 
               <form onSubmit={handleContact} className="space-y-2.5 md:space-y-3">
-                <h4 className="font-serif font-semibold">{t("listing.contact", "Écrire au vendeur")}</h4>
+                <h4 className="font-sans font-semibold">{t("listing.contact", "Écrire au vendeur")}</h4>
                 <p className="hidden sm:block text-[13px] font-sans text-muted-foreground leading-relaxed">
                   {t("listing.contactHint", "Présentez votre besoin clairement pour obtenir une réponse plus rapide et utile.")}
                 </p>
@@ -706,7 +706,7 @@ const ListingDetail = () => {
 
         {filteredSimilar.length > 0 && (
           <section className="mt-16 border-t border-border/70 pt-10">
-            <h2 className="font-serif text-2xl font-bold mb-1.5">{t("listing.similar")}</h2>
+            <h2 className="font-sans text-2xl font-bold mb-1.5">{t("listing.similar")}</h2>
             <p className="mb-6 text-sm font-sans text-muted-foreground">
               {t("listing.similarHint", "Suggestions complémentaires pour élargir votre comparaison après avoir évalué cette annonce.")}
             </p>

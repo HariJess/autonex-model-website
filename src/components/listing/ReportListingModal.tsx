@@ -126,7 +126,7 @@ export function ReportListingModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-serif">
+          <DialogTitle className="font-sans">
             {t("listing.report.title", "Signaler cette annonce")}
           </DialogTitle>
           <DialogDescription className="font-sans">

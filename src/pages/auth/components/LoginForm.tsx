@@ -54,7 +54,7 @@ export function LoginForm({
   return (
     <>
       <div className="text-center">
-        <h1 className="font-serif text-2xl font-bold">{labels.login}</h1>
+        <h1 className="font-sans text-2xl font-bold">{labels.login}</h1>
       </div>
       <div className="grid grid-cols-2 gap-2">
         <button

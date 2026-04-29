@@ -62,7 +62,7 @@ const ResetPasswordPage = () => {
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md bg-card rounded-2xl border border-border p-8 shadow-sm space-y-6">
           <div className="text-center">
-            <h1 className="font-serif text-2xl font-bold">{t("auth.newPassword")}</h1>
+            <h1 className="font-sans text-2xl font-bold">{t("auth.newPassword")}</h1>
           </div>
 
           {!ready ? (

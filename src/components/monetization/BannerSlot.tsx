@@ -42,7 +42,7 @@ export function BannerSlot({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="space-y-1">
           <SponsoredPill />
-          <p className="font-serif text-base md:text-lg font-semibold text-foreground">{title}</p>
+          <p className="font-sans text-base md:text-lg font-semibold text-foreground">{title}</p>
           <p className="text-xs md:text-sm text-muted-foreground font-sans max-w-xl leading-relaxed">{subtitle}</p>
         </div>
         <div className="flex items-center gap-3">

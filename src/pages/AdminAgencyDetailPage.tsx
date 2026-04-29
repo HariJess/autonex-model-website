@@ -62,7 +62,7 @@ function AdminAgencyDetailPage() {
                 <ArrowLeft className="h-4 w-4" /> Retour aux agences
               </Link>
             </Button>
-            <h1 className="font-serif text-2xl font-bold">{data.agency.name}</h1>
+            <h1 className="font-sans text-2xl font-bold">{data.agency.name}</h1>
             <p className="font-sans text-sm text-muted-foreground">{data.agency.slug}</p>
           </div>
 
@@ -70,7 +70,7 @@ function AdminAgencyDetailPage() {
             <div className="lg:col-span-2 space-y-6 min-w-0">
               <Card className="rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Identité</CardTitle>
+                  <CardTitle className="font-sans text-lg">Identité</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <dl>
@@ -86,7 +86,7 @@ function AdminAgencyDetailPage() {
 
               <Card className="rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Contact</CardTitle>
+                  <CardTitle className="font-sans text-lg">Contact</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <dl>
@@ -100,7 +100,7 @@ function AdminAgencyDetailPage() {
 
               <Card className="rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Adresse</CardTitle>
+                  <CardTitle className="font-sans text-lg">Adresse</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <dl>
@@ -113,7 +113,7 @@ function AdminAgencyDetailPage() {
 
               <Card className="rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Présentation</CardTitle>
+                  <CardTitle className="font-sans text-lg">Présentation</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 font-sans text-sm">
                   {data.agency.bio ? <p className="italic">{data.agency.bio}</p> : <p className="text-muted-foreground">Pas de bio.</p>}
@@ -125,7 +125,7 @@ function AdminAgencyDetailPage() {
 
               <Card className="rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Horaires</CardTitle>
+                  <CardTitle className="font-sans text-lg">Horaires</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <dl>
@@ -143,7 +143,7 @@ function AdminAgencyDetailPage() {
               {data.agency.status !== "approved" && data.agency.rejection_reason ? (
                 <Card className="rounded-2xl border-destructive/40">
                   <CardHeader>
-                    <CardTitle className="font-serif text-lg text-destructive">
+                    <CardTitle className="font-sans text-lg text-destructive">
                       Raison du statut actuel
                     </CardTitle>
                   </CardHeader>
@@ -161,7 +161,7 @@ function AdminAgencyDetailPage() {
               <AgencyActionsPanel detail={data} />
               <Card className="rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Traces</CardTitle>
+                  <CardTitle className="font-sans text-lg">Traces</CardTitle>
                 </CardHeader>
                 <CardContent className="font-sans text-sm space-y-1">
                   <p className="text-muted-foreground">

@@ -140,7 +140,7 @@ export function PublishMediaSection({
           aria-expanded={showAdvancedMedia}
         >
           <div>
-            <p className="font-serif text-sm text-foreground">{labels.advancedMediaTitle}</p>
+            <p className="font-sans text-sm text-foreground">{labels.advancedMediaTitle}</p>
             <p className="mt-0.5 font-sans text-[13px] text-muted-foreground leading-relaxed">{labels.advancedMediaHint}</p>
           </div>
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showAdvancedMedia ? "rotate-180" : ""}`} />

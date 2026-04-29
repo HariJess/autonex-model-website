@@ -18,7 +18,7 @@ export function PublishStepGuideCard({
       <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
         {stepCounterLabel}
       </p>
-      <p className="mt-1 font-serif text-2xl text-foreground">{stepGuide?.title}</p>
+      <p className="mt-1 font-sans text-2xl text-foreground">{stepGuide?.title}</p>
       <p className="mt-1 font-sans text-[14px] md:text-sm font-medium text-foreground/85 leading-relaxed">
         {stepGuide?.subtitle}
       </p>

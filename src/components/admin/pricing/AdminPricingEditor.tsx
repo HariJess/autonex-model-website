@@ -41,7 +41,7 @@ function AdminPricingEditor() {
   return (
     <Card className="rounded-2xl">
       <CardHeader>
-        <CardTitle className="font-serif">Tarifs des actions</CardTitle>
+        <CardTitle className="font-sans">Tarifs des actions</CardTitle>
         <CardDescription className="font-sans">
           Coût en crédits des actions facturables. Modifications prises en compte
           immédiatement par le front (invalidation du cache get_pricing).

@@ -12,7 +12,7 @@ const NotFound = () => {
       <Header />
       <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
         <AlertCircle className="h-16 w-16 text-muted-foreground mb-6" />
-        <h1 className="font-serif text-4xl font-bold mb-3">404</h1>
+        <h1 className="font-sans text-4xl font-bold mb-3">404</h1>
         <p className="text-lg text-muted-foreground font-sans mb-2">Page introuvable</p>
         <p className="text-sm text-muted-foreground font-sans mb-8">
           La page <code className="text-foreground">{location.pathname}</code> n'existe pas.

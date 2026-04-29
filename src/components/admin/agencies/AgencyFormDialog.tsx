@@ -154,7 +154,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-serif">
+          <DialogTitle className="font-sans">
             {isEdit ? `Modifier ${target?.name}` : "Nouvelle agence"}
           </DialogTitle>
           <DialogDescription className="font-sans">
@@ -166,7 +166,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
 
         <div className="space-y-5 font-sans">
           <section className="space-y-3">
-            <h3 className="font-serif text-sm font-semibold">Identité</h3>
+            <h3 className="font-sans text-sm font-semibold">Identité</h3>
             <div>
               <Label htmlFor="ag-name">Nom *</Label>
               <Input id="ag-name" value={f.name} onChange={(e) => set("name", e.target.value)} />
@@ -184,7 +184,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-sm font-semibold">Légal (Madagascar)</h3>
+            <h3 className="font-sans text-sm font-semibold">Légal (Madagascar)</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div>
                 <Label htmlFor="ag-nif">NIF</Label>
@@ -202,7 +202,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-sm font-semibold">Contact</h3>
+            <h3 className="font-sans text-sm font-semibold">Contact</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <Label htmlFor="ag-email">Email</Label>
@@ -224,7 +224,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-sm font-semibold">Adresse</h3>
+            <h3 className="font-sans text-sm font-semibold">Adresse</h3>
             <div>
               <Label htmlFor="ag-addr">Adresse</Label>
               <Input id="ag-addr" value={f.address} onChange={(e) => set("address", e.target.value)} />
@@ -242,7 +242,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-sm font-semibold">Identité visuelle</h3>
+            <h3 className="font-sans text-sm font-semibold">Identité visuelle</h3>
             <div>
               <Label htmlFor="ag-logo">Logo URL</Label>
               <Input id="ag-logo" type="url" value={f.logo_url} onChange={(e) => set("logo_url", e.target.value)} />
@@ -256,7 +256,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-sm font-semibold">Présentation</h3>
+            <h3 className="font-sans text-sm font-semibold">Présentation</h3>
             <div>
               <Label htmlFor="ag-bio">Bio (court)</Label>
               <Textarea id="ag-bio" rows={2} value={f.bio} onChange={(e) => set("bio", e.target.value)} />
@@ -272,7 +272,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
           {isEdit ? (
             <>
               <section className="space-y-3">
-                <h3 className="font-serif text-sm font-semibold">Horaires d'ouverture</h3>
+                <h3 className="font-sans text-sm font-semibold">Horaires d'ouverture</h3>
                 <p className="text-xs text-muted-foreground">
                   Format : "08:00-18:00" ou "closed" (vide = non renseigné)
                 </p>
@@ -292,7 +292,7 @@ function AgencyFormDialog({ open, mode, target, onOpenChange }: AgencyFormDialog
               </section>
 
               <section className="space-y-3">
-                <h3 className="font-serif text-sm font-semibold">Réseaux sociaux</h3>
+                <h3 className="font-sans text-sm font-semibold">Réseaux sociaux</h3>
                 {(["facebook", "instagram", "linkedin", "youtube", "tiktok"] as const).map((k) => (
                   <div key={k}>
                     <Label htmlFor={`ag-social-${k}`} className="capitalize">{k}</Label>

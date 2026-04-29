@@ -111,7 +111,7 @@ export function DashboardBoostPurchaseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-serif flex items-center gap-2">
+          <DialogTitle className="font-sans flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-amber-600" />
             Booster l’annonce
           </DialogTitle>

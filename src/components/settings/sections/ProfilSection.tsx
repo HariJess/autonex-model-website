@@ -152,7 +152,7 @@ export function ProfilSection() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="font-serif text-2xl font-bold" id="section-profil-heading">Profil</h2>
+        <h2 className="font-sans text-2xl font-bold" id="section-profil-heading">Profil</h2>
         <p className="mt-1 font-sans text-sm text-muted-foreground">
           Modifiez votre identité et vos coordonnées publiques.
         </p>
@@ -160,7 +160,7 @@ export function ProfilSection() {
 
       {/* Read-only info card */}
       <div className="rounded-2xl border border-border bg-muted/20 p-4 md:p-5">
-        <p className="font-serif text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+        <p className="font-sans text-sm font-semibold text-muted-foreground uppercase tracking-wide">
           Informations compte
         </p>
         <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">

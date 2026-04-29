@@ -59,7 +59,7 @@ export function FeaturedAgenciesSection({
     <>
       <div className={`flex items-center gap-3 mb-6 ${variant === "page" ? "justify-center" : "justify-start flex-wrap"}`}>
         <h2
-          className={`font-serif font-bold text-foreground ${variant === "embedded" ? "text-lg md:text-xl" : "text-2xl md:text-3xl text-center"}`}
+          className={`font-sans font-bold text-foreground ${variant === "embedded" ? "text-lg md:text-xl" : "text-2xl md:text-3xl text-center"}`}
         >
           {title}
         </h2>
@@ -85,7 +85,7 @@ export function FeaturedAgenciesSection({
                     decoding="async"
                   />
                 ) : (
-                  <span className="font-serif text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
+                  <span className="font-sans text-xl font-bold text-muted-foreground">{agency.name.charAt(0)}</span>
                 )}
               </div>
               <span className="text-xs font-sans font-medium text-foreground text-center leading-tight">{agency.name}</span>

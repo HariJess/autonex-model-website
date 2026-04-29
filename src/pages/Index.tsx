@@ -241,7 +241,7 @@ const Index = () => {
     <section className="container mx-auto py-5 md:py-6">
       <div className="flex items-start justify-between gap-3 mb-4 md:mb-5">
         <div className="min-w-0">
-          <h3 className="font-serif text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
+          <h3 className="font-sans text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
           <p className="text-sm text-muted-foreground font-sans mt-1 leading-relaxed">{subtitle}</p>
         </div>
         <Link to={linksTo} className="text-primary font-sans text-sm font-medium hover:underline shrink-0 min-h-10 inline-flex items-center rounded-md motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
@@ -314,7 +314,7 @@ const Index = () => {
           <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
             <div>
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1">{t("home.quickExplore", "Explorer rapidement")}</p>
-              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.mainCategories", "Catégories principales")}</h2>
+              <h2 className="font-sans text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.mainCategories", "Catégories principales")}</h2>
             </div>
             <Link
               to="/recherche"
@@ -355,7 +355,7 @@ const Index = () => {
                     }}
                   />
                 </span>
-                <span className="font-serif text-sm text-foreground leading-tight">{shortcut.label}</span>
+                <span className="font-sans text-sm text-foreground leading-tight">{shortcut.label}</span>
               </Link>
             ))}
             </div>
@@ -390,7 +390,7 @@ const Index = () => {
                     }}
                   />
                 </span>
-                <span className="font-serif text-sm md:text-base text-foreground font-medium leading-tight">
+                <span className="font-sans text-sm md:text-base text-foreground font-medium leading-tight">
                   {shortcut.label}
                 </span>
               </Link>
@@ -404,7 +404,7 @@ const Index = () => {
           <div className="flex items-end justify-between gap-3 mb-6 md:mb-8">
             <div>
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1">{t("home.popularBrandsOverline", "Découvrir")}</p>
-              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.popularBrands", "Marques populaires")}</h2>
+              <h2 className="font-sans text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">{t("home.popularBrands", "Marques populaires")}</h2>
             </div>
             <Link
               to="/recherche"
@@ -468,7 +468,7 @@ const Index = () => {
         <section className="container mx-auto pt-6 md:pt-8">
           <div className="flex items-end justify-between gap-3 mb-4 md:mb-5">
             <div className="min-w-0">
-              <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">
+              <h2 className="font-sans text-xl md:text-3xl font-bold text-foreground leading-tight">
                 {t("home.goodDealsTitle", "Bonnes affaires")}
               </h2>
               <p className="text-sm text-muted-foreground font-sans mt-1 leading-relaxed">
@@ -495,7 +495,7 @@ const Index = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">{t("home.estimationOverline", "Différenciateur AutoNex")}</p>
-              <h2 className="mt-1 font-serif text-2xl text-foreground md:text-[2rem]">{t("home.estimationTitle", "Estimation: votre repère avant négociation")}</h2>
+              <h2 className="mt-1 font-sans text-2xl text-foreground md:text-[2rem]">{t("home.estimationTitle", "Estimation: votre repère avant négociation")}</h2>
               <p className="mt-2 font-sans text-[14px] md:text-sm leading-relaxed text-muted-foreground">
                 {t("home.estimationSupport", "Obtenez une fourchette argumentée, un niveau de confiance explicite et un rapport utile pour cadrer votre décision d'achat ou de vente.")}
               </p>
@@ -515,7 +515,7 @@ const Index = () => {
       {/* Recent feed — complementary to “À la une” */}
       <section className="container mx-auto py-8 md:py-12">
         <div className="flex items-start justify-between gap-3 mb-5 md:mb-8">
-          <h2 className="font-serif text-xl md:text-3xl font-bold text-foreground leading-tight">{t("sections.latest", "Nouvelles annonces auto")}</h2>
+          <h2 className="font-sans text-xl md:text-3xl font-bold text-foreground leading-tight">{t("sections.latest", "Nouvelles annonces auto")}</h2>
           <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline shrink-0 min-h-10 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2">
             {t("sections.viewAll")} <ChevronRight className="h-4 w-4" />
           </Link>
@@ -563,7 +563,7 @@ const Index = () => {
       {isLowInventory && themedSectionsToRender.length === 0 && (
         <section className="container mx-auto py-5 md:py-6">
           <div className="rounded-2xl border border-border/80 bg-card p-5 md:p-6">
-            <h3 className="font-serif text-lg md:text-xl font-bold text-foreground">{t("home.marketStarting", "Le marché se lance")}</h3>
+            <h3 className="font-sans text-lg md:text-xl font-bold text-foreground">{t("home.marketStarting", "Le marché se lance")}</h3>
             <p className="text-sm text-muted-foreground font-sans mt-1.5 leading-relaxed">
               {t("home.lowInventoryDesc", "L’inventaire est encore limité. Publiez votre véhicule ou explorez les recherches pour suivre les nouvelles annonces.")}
             </p>

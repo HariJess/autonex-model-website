@@ -60,7 +60,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
         {step === "description" ? (
           <>
             <DialogHeader>
-              <DialogTitle className="font-serif">Supprimer mon compte ?</DialogTitle>
+              <DialogTitle className="font-sans">Supprimer mon compte ?</DialogTitle>
               <DialogDescription className="font-sans">
                 Avant de confirmer, voici ce qui se passe :
               </DialogDescription>
@@ -95,7 +95,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="font-serif">Confirmer la suppression</DialogTitle>
+              <DialogTitle className="font-sans">Confirmer la suppression</DialogTitle>
               <DialogDescription className="font-sans">
                 Cette action est irréversible au bout de 30 jours. Pour confirmer, tapez{" "}
                 <strong className="font-mono">{CONFIRM_WORD}</strong> ci-dessous.

@@ -64,7 +64,7 @@ const PaiementRetourPage = () => {
       return (
         <CardContent className="flex flex-col items-center gap-4 pt-4">
           <CheckCircle2 className="h-10 w-10 text-primary" aria-hidden />
-          <h2 className="font-serif text-lg text-foreground">
+          <h2 className="font-sans text-lg text-foreground">
             {t("payment.vanilla.successHeading", "Paiement confirmé")}
           </h2>
           <p className="text-center font-sans text-sm text-muted-foreground leading-relaxed">
@@ -92,7 +92,7 @@ const PaiementRetourPage = () => {
       return (
         <CardContent className="flex flex-col items-center gap-4 pt-4">
           <XCircle className="h-10 w-10 text-destructive" aria-hidden />
-          <h2 className="font-serif text-lg text-foreground">
+          <h2 className="font-sans text-lg text-foreground">
             {t("payment.vanilla.failureHeading", "Paiement non abouti")}
           </h2>
           <p className="text-center font-sans text-sm text-muted-foreground leading-relaxed">
@@ -112,7 +112,7 @@ const PaiementRetourPage = () => {
       return (
         <CardContent className="flex flex-col items-center gap-4 pt-4">
           <Clock className="h-10 w-10 text-muted-foreground" aria-hidden />
-          <h2 className="font-serif text-lg text-foreground">
+          <h2 className="font-sans text-lg text-foreground">
             {t("payment.vanilla.pendingHeading", "Paiement en cours")}
           </h2>
           <p className="text-center font-sans text-sm text-muted-foreground leading-relaxed">
@@ -157,7 +157,7 @@ const PaiementRetourPage = () => {
     return (
       <CardContent className="flex flex-col items-center gap-4 pt-4">
         <WheelSpinner size="xl" aria-hidden />
-        <h2 className="font-serif text-lg text-foreground">
+        <h2 className="font-sans text-lg text-foreground">
           {isInitial
             ? t("payment.vanilla.checkingStatus", "Vérification en cours...")
             : t("payment.vanilla.pendingHeading", "Paiement en cours")}
@@ -187,7 +187,7 @@ const PaiementRetourPage = () => {
         <BetaPaymentBanner />
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="font-serif text-xl text-foreground">
+            <CardTitle className="font-sans text-xl text-foreground">
               {t("payment.vanilla.returnPageTitle", "Retour de paiement")}
             </CardTitle>
             <p className="mt-1 font-sans text-sm text-muted-foreground">

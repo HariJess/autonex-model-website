@@ -46,7 +46,7 @@ export function FeaturedListingsSection({
     <section className="container mx-auto py-14">
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-3">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">{title}</h2>
+          <h2 className="font-sans text-2xl md:text-3xl font-bold text-foreground">{title}</h2>
           <FeaturedPill />
         </div>
         <Link to="/recherche" className="text-primary font-sans text-sm font-medium flex items-center gap-1 hover:underline">

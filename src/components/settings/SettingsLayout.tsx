@@ -55,7 +55,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
     <div className="container mx-auto py-6 md:py-10">
       {/* Mobile: top bar with drawer trigger */}
       <div className="mb-4 flex items-center justify-between md:hidden">
-        <h1 className="font-serif text-2xl font-bold">Paramètres</h1>
+        <h1 className="font-sans text-2xl font-bold">Paramètres</h1>
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="sm" className="font-sans">
@@ -64,7 +64,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-4">
-            <p className="mb-3 font-serif text-lg font-bold">Paramètres</p>
+            <p className="mb-3 font-sans text-lg font-bold">Paramètres</p>
             {nav}
           </SheetContent>
         </Sheet>
@@ -74,7 +74,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
         {/* Desktop sidebar */}
         <aside className="hidden md:block">
           <div className="sticky top-24 rounded-2xl border border-border bg-card p-4">
-            <p className="px-3 pt-1 pb-3 font-serif text-lg font-bold">Paramètres</p>
+            <p className="px-3 pt-1 pb-3 font-sans text-lg font-bold">Paramètres</p>
             {nav}
           </div>
         </aside>

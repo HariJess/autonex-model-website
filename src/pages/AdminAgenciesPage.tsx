@@ -25,7 +25,7 @@ function AdminAgenciesPage() {
       <div className="space-y-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <h1 className="font-serif text-2xl font-bold">Agences</h1>
+            <h1 className="font-sans text-2xl font-bold">Agences</h1>
             <p className="text-sm text-muted-foreground font-sans">
               Gestion du back-office des concessionnaires : modération, édition, rattachement utilisateurs.
             </p>
@@ -38,19 +38,19 @@ function AdminAgenciesPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-sans text-sm">
           <div className="rounded-xl border border-border p-3">
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Total</p>
-            <p className="font-serif text-2xl font-bold">{stats.total}</p>
+            <p className="font-sans text-2xl font-bold">{stats.total}</p>
           </div>
           <div className="rounded-xl border border-border p-3">
             <p className="text-xs text-muted-foreground uppercase tracking-wide">En attente</p>
-            <p className="font-serif text-2xl font-bold">{stats.pending}</p>
+            <p className="font-sans text-2xl font-bold">{stats.pending}</p>
           </div>
           <div className="rounded-xl border border-border p-3">
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Approuvées</p>
-            <p className="font-serif text-2xl font-bold">{stats.approved}</p>
+            <p className="font-sans text-2xl font-bold">{stats.approved}</p>
           </div>
           <div className="rounded-xl border border-border p-3">
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Partenaires</p>
-            <p className="font-serif text-2xl font-bold">{stats.verified}</p>
+            <p className="font-sans text-2xl font-bold">{stats.verified}</p>
           </div>
         </div>
 

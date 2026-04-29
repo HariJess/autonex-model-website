@@ -34,7 +34,7 @@ export function ListingRelatedPromoted({ listingId, ville, transaction, type }: 
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
-        <h3 className="font-serif text-lg font-bold">À voir aussi</h3>
+        <h3 className="font-sans text-lg font-bold">À voir aussi</h3>
         <SponsoredPill label="Pour vous" />
       </div>
       {isLoading ? (

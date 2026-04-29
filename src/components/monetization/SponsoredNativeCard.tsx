@@ -23,7 +23,7 @@ export function SponsoredNativeCard({ className, enabled = true }: SponsoredNati
           <SponsoredPill />
           <Sparkles className="h-4 w-4 text-primary shrink-0" aria-hidden />
         </div>
-        <p className="font-serif font-semibold text-lg text-foreground leading-snug">
+        <p className="font-sans font-semibold text-lg text-foreground leading-snug">
           Campagne partenaire
         </p>
         <p className="mt-2 text-sm text-muted-foreground font-sans leading-relaxed">

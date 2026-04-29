@@ -45,7 +45,7 @@ function PromoRedemptionsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-serif">
+          <DialogTitle className="font-sans">
             Historique des utilisations
             {promoCode ? (
               <code className="ml-2 rounded bg-muted px-2 py-0.5 text-sm">

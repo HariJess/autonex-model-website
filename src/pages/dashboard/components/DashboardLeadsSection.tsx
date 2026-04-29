@@ -23,7 +23,7 @@ export function DashboardLeadsSection({
 }: DashboardLeadsSectionProps) {
   return (
     <div>
-      <h2 className="font-serif text-xl font-bold mb-4">{title}</h2>
+      <h2 className="font-sans text-xl font-bold mb-4">{title}</h2>
       {leadsLoading ? (
         <div className="flex justify-center py-8">
           <WheelSpinner size="md" />

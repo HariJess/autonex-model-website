@@ -21,8 +21,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        serif: ["Playfair Display", "serif"],
-        sans: ["Inter", "sans-serif"],
+        sans: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
         geist: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {

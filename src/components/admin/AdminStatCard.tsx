@@ -15,7 +15,7 @@ export function AdminStatCard({ title, value, subtitle, className }: AdminStatCa
         <p className="text-xs font-sans uppercase tracking-wide text-muted-foreground">
           {title}
         </p>
-        <p className="font-serif text-2xl font-bold leading-tight">{value}</p>
+        <p className="font-sans text-2xl font-bold leading-tight">{value}</p>
         {subtitle ? (
           <p className="text-xs font-sans text-muted-foreground">{subtitle}</p>
         ) : null}

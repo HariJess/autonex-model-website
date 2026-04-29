@@ -308,7 +308,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
         {!hideHeader ? (
           <>
             <h1
-              className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight px-1"
+              className="font-sans text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight px-1"
               style={{ color: "#FAFAFA" }}
             >
               {t("hero.title")}

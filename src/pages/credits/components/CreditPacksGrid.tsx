@@ -41,7 +41,7 @@ export function CreditPacksGrid({ creditPacks, selectedPackId, onSelectPack }: C
             <p className="mt-1 text-sm text-muted-foreground">
               {p.credits_amount} {t("credits.unit", "crédits")}
             </p>
-            <p className="mt-2 font-serif text-lg text-primary">
+            <p className="mt-2 font-sans text-lg text-primary">
               {formatAriary(p.price_mga)}
             </p>
             {ratio != null && (

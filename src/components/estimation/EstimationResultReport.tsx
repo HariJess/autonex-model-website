@@ -64,7 +64,7 @@ export default function EstimationResultReport({
               <div className="space-y-2">
                 <p className="font-sans text-[11px] uppercase tracking-[0.16em] text-background/65">Valeur de marché estimée</p>
                 <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
-                  <h2 className="font-serif text-5xl leading-[0.94] text-white md:text-7xl">
+                  <h2 className="font-sans text-5xl leading-[0.94] text-white md:text-7xl">
                     <span className="inline-flex flex-wrap items-end gap-x-3">
                       {estimatedGroups.map((group, index) => (
                         <span key={`estimated-group-${index}`} className="tabular-nums tracking-tight">
@@ -96,11 +96,11 @@ export default function EstimationResultReport({
               <div className="mt-3 flex items-end gap-2">
                 {presentation.showExactConfidence ? (
                   <>
-                    <p className="font-serif text-5xl leading-none tabular-nums">{presentation.confidenceDisplayValue}</p>
+                    <p className="font-sans text-5xl leading-none tabular-nums">{presentation.confidenceDisplayValue}</p>
                     <p className="pb-1 font-sans text-sm text-background/68">/100</p>
                   </>
                 ) : (
-                  <p className="font-serif text-2xl leading-none text-background/90">Affichage prudent</p>
+                  <p className="font-sans text-2xl leading-none text-background/90">Affichage prudent</p>
                 )}
               </div>
               <p className="mt-2 font-sans text-xs leading-relaxed text-background/68">
@@ -119,7 +119,7 @@ export default function EstimationResultReport({
       <section className="space-y-3">
         <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] via-primary/[0.04] to-transparent px-4 py-3.5 md:px-5">
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-primary/80">Lecture du rapport</p>
-          <p className="mt-1 font-serif text-xl text-foreground md:text-2xl">{presentation.evidenceHeadline}</p>
+          <p className="mt-1 font-sans text-xl text-foreground md:text-2xl">{presentation.evidenceHeadline}</p>
           <p className="mt-1 font-sans text-sm text-muted-foreground">{presentation.evidenceSummaryLine}</p>
         </div>
 
@@ -127,22 +127,22 @@ export default function EstimationResultReport({
           <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.3fr_1.1fr_1.1fr_0.9fr] md:gap-0 md:divide-x md:divide-border/55">
             <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix conseillé d'annonce</p>
-              <p className="mt-1 font-serif text-2xl">{formatAriary(values.recommendedListingPrice)}</p>
+              <p className="mt-1 font-sans text-2xl">{formatAriary(values.recommendedListingPrice)}</p>
               <p className="mt-1 font-sans text-xs text-muted-foreground">Positionnement conseillé pour publier sur AutoNex.</p>
             </div>
             <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Prix de vente rapide</p>
-              <p className="mt-1 font-serif text-2xl">{formatAriary(values.quickSalePrice)}</p>
+              <p className="mt-1 font-sans text-2xl">{formatAriary(values.quickSalePrice)}</p>
               <p className="mt-1 font-sans text-xs text-muted-foreground">Repère pour accélérer la conversion.</p>
             </div>
             <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Base marché</p>
-              <p className="mt-1 font-serif text-2xl">{formatAriary(v2.anchors.finalBaseAnchor)}</p>
+              <p className="mt-1 font-sans text-2xl">{formatAriary(v2.anchors.finalBaseAnchor)}</p>
               <p className="mt-1 font-sans text-xs text-muted-foreground">Ancrage principal avant ajustements véhicule.</p>
             </div>
             <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
               <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">Niveau global</p>
-              <p className="mt-1 font-serif text-2xl">{presentation.summaryLevel}</p>
+              <p className="mt-1 font-sans text-2xl">{presentation.summaryLevel}</p>
             </div>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function EstimationResultReport({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.05fr_0.95fr]">
         <Card className="rounded-2xl border border-emerald-300/20 bg-gradient-to-br from-emerald-500/[0.06] to-background shadow-sm transition-all duration-300 ease-out hover:shadow-md">
           <CardHeader className="pb-3">
-            <CardTitle className="font-serif text-xl flex items-center gap-2">
+            <CardTitle className="font-sans text-xl flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-success" />
               Facteurs qui renforcent la valeur
             </CardTitle>
@@ -210,7 +210,7 @@ export default function EstimationResultReport({
 
         <Card className="rounded-2xl border border-destructive/20 bg-gradient-to-br from-destructive/[0.04] to-background shadow-sm transition-all duration-300 ease-out hover:shadow-md">
           <CardHeader className="pb-3">
-            <CardTitle className="font-serif text-xl flex items-center gap-2">
+            <CardTitle className="font-sans text-xl flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-destructive" />
               Points de vigilance prix
             </CardTitle>
@@ -236,7 +236,7 @@ export default function EstimationResultReport({
 
       <Card className="rounded-2xl border border-border/60 shadow-sm bg-background/80">
         <CardHeader className="pb-3">
-          <CardTitle className="font-serif text-xl flex items-center gap-2">
+          <CardTitle className="font-sans text-xl flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary" />
             Lecture d'évidence
           </CardTitle>
@@ -262,7 +262,7 @@ export default function EstimationResultReport({
           <div className="grid gap-3 md:grid-cols-[1.35fr_0.65fr] md:items-center">
             <div>
               <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Support marché</p>
-              <p className="mt-1 font-serif text-2xl text-foreground">{presentation.marketSupportHeadline}</p>
+              <p className="mt-1 font-sans text-2xl text-foreground">{presentation.marketSupportHeadline}</p>
               <p className="mt-1 font-sans text-sm text-muted-foreground">
                 {comparables.length > 0 ? presentation.comparablesIntro : presentation.comparablesEmptyMessage}
               </p>
@@ -287,7 +287,7 @@ export default function EstimationResultReport({
 
         <Card className="rounded-2xl border border-border/60 bg-card/95 shadow-sm transition-all duration-300 ease-out hover:shadow-md">
           <CardHeader className="pb-2">
-            <CardTitle className="font-serif text-xl flex items-center gap-2">
+            <CardTitle className="font-sans text-xl flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
               Annonces comparables retenues
             </CardTitle>
@@ -299,7 +299,7 @@ export default function EstimationResultReport({
                   <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-border/70 bg-background/80">
                     <Sparkles className="h-4.5 w-4.5 text-primary" />
                   </div>
-                  <p className="font-serif text-xl">{presentation.comparablesEmptyTitle}</p>
+                  <p className="font-sans text-xl">{presentation.comparablesEmptyTitle}</p>
                   <p className="mt-2 font-sans text-sm text-muted-foreground">{presentation.comparablesEmptyMessage}</p>
                 </div>
               </div>
@@ -321,7 +321,7 @@ export default function EstimationResultReport({
                       )}
                     </div>
                     <p className="font-sans text-sm font-semibold line-clamp-2">{item.title}</p>
-                    <p className="mt-1 font-serif text-base">{formatAriary(item.price)}</p>
+                    <p className="mt-1 font-sans text-base">{formatAriary(item.price)}</p>
                     <p className="mt-1.5 font-sans text-xs text-muted-foreground">{item.year} • {item.mileage.toLocaleString("fr-FR")} km • {item.city || "Madagascar"}</p>
                     <div className="mt-2.5 rounded-lg border border-border/50 bg-secondary/20 px-2.5 py-2">
                       <div className="flex items-center justify-between">
@@ -354,7 +354,7 @@ export default function EstimationResultReport({
                 <Target className="h-3.5 w-3.5" />
                 Prochaine meilleure action
               </p>
-              <p className="mt-2 font-serif text-2xl leading-tight md:text-3xl">{presentation.actionHeadline}</p>
+              <p className="mt-2 font-sans text-2xl leading-tight md:text-3xl">{presentation.actionHeadline}</p>
               <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-muted-foreground">{presentation.actionDescription}</p>
             </div>
             <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-3 md:px-3.5">

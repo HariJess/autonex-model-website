@@ -34,7 +34,7 @@ const CreditsPage = () => {
           <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
             {t("credits.pageOverline", "Espace crédits")}
           </p>
-          <h1 className="font-serif text-2xl md:text-3xl text-foreground">
+          <h1 className="font-sans text-2xl md:text-3xl text-foreground">
             {t("credits.pageHeading", "Vos crédits AutoNex")}
           </h1>
           <p className="font-sans text-sm text-muted-foreground leading-relaxed">
@@ -50,7 +50,7 @@ const CreditsPage = () => {
         <CreditsBalanceHero />
 
         <section className="space-y-3">
-          <h2 className="font-serif text-lg text-foreground">
+          <h2 className="font-sans text-lg text-foreground">
             {t("credits.purchaseSectionTitle", "Choisissez votre pack")}
           </h2>
           <CreditsPurchaseFlow variant="standalone" />

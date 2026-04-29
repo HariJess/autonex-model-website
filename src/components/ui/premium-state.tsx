@@ -42,7 +42,7 @@ export function PremiumStatePanel({
         {overline ? (
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{overline}</p>
         ) : null}
-        <p className="mt-1.5 font-serif text-xl text-foreground md:text-2xl">{title}</p>
+        <p className="mt-1.5 font-sans text-xl text-foreground md:text-2xl">{title}</p>
         <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground md:text-[15px]">{description}</p>
         {action ? <div className="mt-5">{action}</div> : null}
       </div>

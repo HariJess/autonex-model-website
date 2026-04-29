@@ -214,12 +214,12 @@ const AdminPartnerAdsPage = () => {
               <ArrowLeft className="h-4 w-4 mr-1" /> Admin monétisation
             </Link>
           </Button>
-          <h1 className="font-serif text-2xl font-bold">Campagnes publicitaires partenaires (admin)</h1>
+          <h1 className="font-sans text-2xl font-bold">Campagnes publicitaires partenaires (admin)</h1>
         </div>
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Créer / modifier une campagne</CardTitle>
+            <CardTitle className="font-sans">Créer / modifier une campagne</CardTitle>
             <CardDescription className="font-sans">
               Gestion interne uniquement. Aucune auto-gestion publique par les partenaires.
             </CardDescription>
@@ -425,7 +425,7 @@ const AdminPartnerAdsPage = () => {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Campagnes existantes</CardTitle>
+            <CardTitle className="font-sans">Campagnes existantes</CardTitle>
             <CardDescription className="font-sans">Filtrage rapide et activation/désactivation.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

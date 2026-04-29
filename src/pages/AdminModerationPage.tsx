@@ -43,7 +43,7 @@ function AdminModerationPage() {
       </Helmet>
       <div className="space-y-5">
         <div>
-          <h1 className="font-serif text-2xl font-bold">Modération</h1>
+          <h1 className="font-sans text-2xl font-bold">Modération</h1>
           <p className="text-sm text-muted-foreground font-sans">
             File d'attente des annonces à examiner : nouvelles publications, signalements utilisateurs, historique.
           </p>
@@ -161,7 +161,7 @@ function ListingCard({ row, filter }: { row: ModerationQueueRow; filter: Moderat
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1 space-y-1">
-            <CardTitle className="font-serif text-base">
+            <CardTitle className="font-sans text-base">
               <Link
                 to={`/annonce/${row.listing_id}`}
                 target="_blank"

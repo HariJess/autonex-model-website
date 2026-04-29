@@ -105,7 +105,7 @@ export function UserDetailListings({ listings }: UserDetailListingsProps) {
   return (
     <Card className="rounded-2xl overflow-hidden">
       <CardHeader>
-        <CardTitle className="font-serif text-lg">
+        <CardTitle className="font-sans text-lg">
           Annonces ({listings.length})
         </CardTitle>
       </CardHeader>

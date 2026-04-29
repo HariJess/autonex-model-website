@@ -31,7 +31,7 @@ export function UserDetailIdentity({ profile }: UserDetailIdentityProps) {
   return (
     <Card className="rounded-2xl">
       <CardHeader>
-        <CardTitle className="font-serif text-lg">Identité</CardTitle>
+        <CardTitle className="font-sans text-lg">Identité</CardTitle>
       </CardHeader>
       <CardContent>
         <dl>

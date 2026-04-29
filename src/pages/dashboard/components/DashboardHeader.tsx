@@ -16,7 +16,7 @@ export function DashboardHeader({
   return (
     <div className="flex items-center justify-between flex-wrap gap-3">
       <div>
-        <h1 className="font-serif text-3xl font-bold">{title}</h1>
+        <h1 className="font-sans text-3xl font-bold">{title}</h1>
         {accountRoleLabel && <p className="text-sm text-muted-foreground font-sans mt-1">{accountRoleLabel}</p>}
       </div>
       <div className="flex items-center gap-2">

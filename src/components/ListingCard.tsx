@@ -257,7 +257,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             />
           ) : displayBrandAsset?.label ? (
             <span
-              className={`shrink-0 rounded-md border border-border/80 bg-muted/60 mt-0.5 inline-flex items-center justify-center text-[11px] font-serif font-bold text-muted-foreground ${
+              className={`shrink-0 rounded-md border border-border/80 bg-muted/60 mt-0.5 inline-flex items-center justify-center text-[11px] font-sans font-bold text-muted-foreground ${
                 isCompactLayout ? "hidden md:inline-flex h-6 w-9" : "h-6 w-9"
               }`}
               title={displayBrandAsset.label}
@@ -266,7 +266,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               {displayBrandAsset.label.charAt(0).toUpperCase()}
             </span>
           ) : null}
-          <h3 className={`flex-1 font-serif text-foreground leading-snug break-words font-semibold ${
+          <h3 className={`flex-1 font-sans text-foreground leading-snug break-words font-semibold ${
             isSearchVariant
               ? "text-[1.03rem] line-clamp-2"
               : isCompactLayout

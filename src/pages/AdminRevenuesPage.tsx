@@ -98,7 +98,7 @@ export default function AdminRevenuesPage() {
       </Helmet>
       <div className="max-w-6xl space-y-6">
         <div>
-          <h1 className="font-serif text-2xl font-bold">Revenus & analytics</h1>
+          <h1 className="font-sans text-2xl font-bold">Revenus & analytics</h1>
           <p className="text-sm text-muted-foreground font-sans mt-1">
             Revenus nets après remises promotionnelles. Source : transactions approuvées d'achats de packs de crédits.
           </p>
@@ -106,7 +106,7 @@ export default function AdminRevenuesPage() {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Vue d'ensemble</CardTitle>
+            <CardTitle className="font-sans">Vue d'ensemble</CardTitle>
             <CardDescription className="font-sans">All-time + comparaison mois en cours vs mois dernier.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -160,7 +160,7 @@ export default function AdminRevenuesPage() {
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <CardTitle className="font-serif">Évolution des revenus</CardTitle>
+                <CardTitle className="font-sans">Évolution des revenus</CardTitle>
                 <CardDescription className="font-sans">Revenu net journalier sur la période sélectionnée.</CardDescription>
               </div>
               <div className="flex flex-wrap gap-1">
@@ -240,7 +240,7 @@ export default function AdminRevenuesPage() {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Stats opérationnelles</CardTitle>
+            <CardTitle className="font-sans">Stats opérationnelles</CardTitle>
             <CardDescription className="font-sans">
               Taux d'approbation et statuts all-time. Refusées = rejected + failed + cancelled. En attente = pending + under_review.
             </CardDescription>
@@ -263,7 +263,7 @@ export default function AdminRevenuesPage() {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Top 10 acheteurs</CardTitle>
+            <CardTitle className="font-sans">Top 10 acheteurs</CardTitle>
             <CardDescription className="font-sans">Classement par revenu net cumulé all-time.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -306,7 +306,7 @@ export default function AdminRevenuesPage() {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Crédits en circulation</CardTitle>
+            <CardTitle className="font-sans">Crédits en circulation</CardTitle>
             <CardDescription className="font-sans">
               Vue financière du ledger : achetés vs dépensés. Les crédits non consommés représentent une dette d'usage.
             </CardDescription>
@@ -324,7 +324,7 @@ export default function AdminRevenuesPage() {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Performance des packs</CardTitle>
+            <CardTitle className="font-sans">Performance des packs</CardTitle>
             <CardDescription className="font-sans">Quel pack rapporte le plus sur la période sélectionnée.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -361,7 +361,7 @@ export default function AdminRevenuesPage() {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Méthodes de paiement</CardTitle>
+            <CardTitle className="font-sans">Méthodes de paiement</CardTitle>
             <CardDescription className="font-sans">Répartition des achats par méthode sur la période.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -394,7 +394,7 @@ export default function AdminRevenuesPage() {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Impact des codes promo</CardTitle>
+            <CardTitle className="font-sans">Impact des codes promo</CardTitle>
             <CardDescription className="font-sans">
               Coût total des promotions accordées (à comparer aux ventes générées).
             </CardDescription>

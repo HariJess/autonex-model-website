@@ -44,7 +44,7 @@ export function NotificationBell() {
         className="w-96 p-0 max-w-[calc(100vw-2rem)]"
       >
         <div className="flex items-center justify-between border-b px-4 py-3">
-          <h3 className="font-serif font-semibold text-sm text-foreground">Notifications</h3>
+          <h3 className="font-sans font-semibold text-sm text-foreground">Notifications</h3>
           {unreadCount > 0 && (
             <button
               type="button"

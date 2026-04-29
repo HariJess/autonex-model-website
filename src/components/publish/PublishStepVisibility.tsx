@@ -122,7 +122,7 @@ const PublishStepVisibility = ({
         <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
           {t("publish.finalStep", "Étape finale")}
         </p>
-        <p className="mt-1 font-serif text-lg text-foreground">
+        <p className="mt-1 font-sans text-lg text-foreground">
           {t("publish.finalizeThreeChoices", "Finalisez en 3 choix simples")}
         </p>
         <p className="mt-1 font-sans text-[14px] md:text-sm text-muted-foreground leading-relaxed">
@@ -136,7 +136,7 @@ const PublishStepVisibility = ({
       {/* Lot 9.2 — Contact et coordonnées (WhatsApp déplacé depuis l'Étape 1) */}
       <Card className="rounded-2xl border-border">
         <CardHeader>
-          <CardTitle className="font-serif flex items-center gap-2">
+          <CardTitle className="font-sans flex items-center gap-2">
             <MessageCircle className="h-5 w-5" /> {t("publish.contactTitle", "Contact et coordonnées")}
           </CardTitle>
           <CardDescription className="font-sans">
@@ -174,7 +174,7 @@ const PublishStepVisibility = ({
 
       <Card className="rounded-2xl border-border">
         <CardHeader>
-          <CardTitle className="font-serif flex items-center gap-2">
+          <CardTitle className="font-sans flex items-center gap-2">
             <Coins className="h-5 w-5" /> {t("publish.creditsTitle", "Crédits & coût")}
           </CardTitle>
           <CardDescription className="font-sans">
@@ -254,7 +254,7 @@ const PublishStepVisibility = ({
         aria-expanded={showMobileOptions}
       >
         <div>
-          <p className="font-serif font-semibold text-sm">{t("publish.visibilityOptions", "Options de visibilité")}</p>
+          <p className="font-sans font-semibold text-sm">{t("publish.visibilityOptions", "Options de visibilité")}</p>
           <p className="text-xs text-muted-foreground font-sans">
             {t("publish.visibilityOptionsHint", "Boosts et options avancées (facultatif)")}
           </p>
@@ -265,7 +265,7 @@ const PublishStepVisibility = ({
       <div className={`${showMobileOptions ? "block" : "hidden"} md:block space-y-5`}>
       <Card className="rounded-2xl border-border">
         <CardHeader>
-          <CardTitle className="font-serif flex items-center gap-2">
+          <CardTitle className="font-sans flex items-center gap-2">
             <Sparkles className="h-5 w-5" /> {t("publish.boostTitleInstant", "Boosts (application immédiate)")}
           </CardTitle>
           <CardDescription className="font-sans">
@@ -310,7 +310,7 @@ const PublishStepVisibility = ({
       {hasAgency && (
         <Card className="rounded-2xl border-border border-dashed border-primary/30">
           <CardHeader className="pb-2">
-            <CardTitle className="font-serif text-base">
+            <CardTitle className="font-sans text-base">
               {t("publish.agencySpotlightTitle", "Visibilité agence")}
             </CardTitle>
             <CardDescription className="font-sans text-[13px] leading-relaxed">
@@ -343,7 +343,7 @@ const PublishStepVisibility = ({
 
       <Card className="rounded-2xl border-border">
         <CardHeader>
-          <CardTitle className="font-serif text-lg">
+          <CardTitle className="font-sans text-lg">
             {t("publish.summary", "Récapitulatif")}
           </CardTitle>
         </CardHeader>
@@ -393,7 +393,7 @@ const PublishStepVisibility = ({
           aria-expanded={showCreditPurchase}
         >
           <div>
-            <h3 className="font-serif font-semibold">{t("publish.buyCredits", "Acheter des crédits")}</h3>
+            <h3 className="font-sans font-semibold">{t("publish.buyCredits", "Acheter des crédits")}</h3>
             <p className="text-[13px] text-muted-foreground font-sans leading-relaxed">
               {t("publish.buyCreditsAccordionHint", "Ouvrez ce bloc uniquement si votre solde est insuffisant.")}
             </p>

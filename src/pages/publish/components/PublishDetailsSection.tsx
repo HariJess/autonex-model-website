@@ -355,7 +355,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
     <div className="space-y-5 form-surface">
       <section className="space-y-3 rounded-xl border border-border/75 bg-gradient-to-br from-card to-secondary/15 p-4">
         <div>
-          <p className="font-serif text-base text-foreground">{t("publish.essentialInfoTitle", "Informations essentielles")}</p>
+          <p className="font-sans text-base text-foreground">{t("publish.essentialInfoTitle", "Informations essentielles")}</p>
           <p className="mt-1 hidden sm:block font-sans text-[13px] text-muted-foreground leading-relaxed">
             {t("publish.essentialInfoDesc", "Commencez par les champs qui influencent le plus la compréhension et la conversion.")}
           </p>
@@ -463,7 +463,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
       {/* Bloc 2 — Identité véhicule (visible par défaut) */}
       <section className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
         <div>
-          <p className="font-serif font-semibold text-sm">{t("publish.vehicleIdentityTitle", "Identité du véhicule")}</p>
+          <p className="font-sans font-semibold text-sm">{t("publish.vehicleIdentityTitle", "Identité du véhicule")}</p>
           <p className="hidden sm:block text-[13px] text-muted-foreground font-sans mt-1 leading-relaxed">
             {t("publish.vehicleIdentityDesc", "Marque, modèle, année et version de votre véhicule.")}
           </p>
@@ -575,7 +575,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
                               {asset?.logoPath ? (
                                 <img src={asset.logoPath} alt="" className="mr-2 h-4 w-6 object-contain shrink-0" loading="lazy" />
                               ) : (
-                                <span className="mr-2 h-4 w-6 shrink-0 inline-flex items-center justify-center rounded border border-border/70 bg-muted/50 text-[10px] font-serif font-bold text-muted-foreground">
+                                <span className="mr-2 h-4 w-6 shrink-0 inline-flex items-center justify-center rounded border border-border/70 bg-muted/50 text-[10px] font-sans font-bold text-muted-foreground">
                                   {brand.charAt(0).toUpperCase()}
                                 </span>
                               )}
@@ -648,7 +648,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
       {/* Bloc 3 — Motorisation (visible par défaut) */}
       <section className="space-y-3 rounded-xl border border-border/75 bg-background/70 p-4">
         <div>
-          <p className="font-serif font-semibold text-sm">{t("publish.motorizationTitle", "Motorisation")}</p>
+          <p className="font-sans font-semibold text-sm">{t("publish.motorizationTitle", "Motorisation")}</p>
           <p className="hidden sm:block text-[13px] text-muted-foreground font-sans mt-1 leading-relaxed">
             {t("publish.motorizationDesc", "Carburant, boîte, motricité et cylindrée.")}
           </p>
@@ -741,7 +741,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
       {/* Bloc 4 — Carrosserie et configuration (visible par défaut) */}
       <section className="space-y-3 rounded-xl border border-border/75 bg-background/70 p-4">
         <div>
-          <p className="font-serif font-semibold text-sm">{t("publish.configTitle", "Carrosserie et configuration")}</p>
+          <p className="font-sans font-semibold text-sm">{t("publish.configTitle", "Carrosserie et configuration")}</p>
           <p className="hidden sm:block text-[13px] text-muted-foreground font-sans mt-1 leading-relaxed">
             {t("publish.configDesc", "Portes, places et couleurs.")}
           </p>
@@ -847,7 +847,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
       {/* Bloc 5 — État et disponibilité (visible par défaut) */}
       <section className="space-y-3 rounded-xl border border-border/75 bg-background/70 p-4">
         <div>
-          <p className="font-serif font-semibold text-sm">{t("publish.availabilityTitle", "État et disponibilité")}</p>
+          <p className="font-sans font-semibold text-sm">{t("publish.availabilityTitle", "État et disponibilité")}</p>
         </div>
         <div className={cn("grid grid-cols-1 gap-3.5 md:gap-4", isRentalTransaction ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
           <div className="space-y-2">
@@ -926,7 +926,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
           aria-expanded={showEquipmentSection}
         >
           <div>
-            <p className="font-serif text-sm text-foreground">{t("publish.equipmentTitle", "Équipements (optionnel)")}</p>
+            <p className="font-sans text-sm text-foreground">{t("publish.equipmentTitle", "Équipements (optionnel)")}</p>
             <p className="mt-0.5 hidden sm:block font-sans text-[13px] text-muted-foreground leading-relaxed">
               {t("publish.equipmentDesc", "Ajouter des équipements augmente la visibilité de votre annonce.")}
             </p>
@@ -1028,7 +1028,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
           aria-expanded={showComplementaryInfo}
         >
           <div>
-            <p className="font-serif text-sm text-foreground">{t("publish.complementaryTitle", "Informations complémentaires (optionnel)")}</p>
+            <p className="font-sans text-sm text-foreground">{t("publish.complementaryTitle", "Informations complémentaires (optionnel)")}</p>
             <p className="mt-0.5 hidden sm:block font-sans text-[13px] text-muted-foreground leading-relaxed">
               {t("publish.complementaryDesc", "Notes libres et caractéristiques additionnelles.")}
             </p>

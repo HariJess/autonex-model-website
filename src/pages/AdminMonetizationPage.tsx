@@ -190,7 +190,7 @@ const AdminMonetizationPage = () => {
       </Helmet>
       <div className="max-w-4xl space-y-10">
         <div>
-          <h1 className="font-serif text-2xl font-bold">Monétisation (admin)</h1>
+          <h1 className="font-sans text-2xl font-bold">Monétisation (admin)</h1>
           <p className="text-sm text-muted-foreground font-sans mt-1">
             Validation des achats de crédits et modération des annonces en attente. Les actions sont idempotentes côté serveur.
           </p>
@@ -203,7 +203,7 @@ const AdminMonetizationPage = () => {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Achats de crédits en attente</CardTitle>
+            <CardTitle className="font-sans">Achats de crédits en attente</CardTitle>
             <CardDescription className="font-sans">
               Source de vérité : table `transactions` (demandes de packs avec `credit_pack_id` non nul).
               États à traiter ici : {PENDING_PAYMENT_ACTIONABLE.join(", ")}.
@@ -290,7 +290,7 @@ const AdminMonetizationPage = () => {
 
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="font-serif">Annonces en modération</CardTitle>
+            <CardTitle className="font-sans">Annonces en modération</CardTitle>
             <CardDescription className="font-sans">
               Les crédits ont déjà été débités à la soumission. L’approbation active l’annonce et crée les lignes de boost.
             </CardDescription>

@@ -140,7 +140,7 @@ export function DashboardListingsSection({
 
   return (
     <div>
-      <h2 className="font-serif text-xl font-bold mb-4">{title}</h2>
+      <h2 className="font-sans text-xl font-bold mb-4">{title}</h2>
 
       {listingsErrorMessage && (
         <div className="flex items-center gap-2 text-destructive mb-4">
@@ -232,7 +232,7 @@ export function DashboardListingsSection({
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="font-serif">{labels.deleteConfirm}</AlertDialogTitle>
+                            <AlertDialogTitle className="font-sans">{labels.deleteConfirm}</AlertDialogTitle>
                             <AlertDialogDescription className="font-sans">{labels.deleteDesc}</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -330,7 +330,7 @@ export function DashboardListingsSection({
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle className="font-serif">{labels.deleteConfirm}</AlertDialogTitle>
+                                  <AlertDialogTitle className="font-sans">{labels.deleteConfirm}</AlertDialogTitle>
                                   <AlertDialogDescription className="font-sans">{labels.deleteDesc}</AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>

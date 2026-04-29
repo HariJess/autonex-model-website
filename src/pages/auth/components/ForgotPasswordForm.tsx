@@ -31,7 +31,7 @@ export function ForgotPasswordForm({
   return (
     <>
       <div className="text-center">
-        <h1 className="font-serif text-2xl font-bold">{labels.forgotPassword}</h1>
+        <h1 className="font-sans text-2xl font-bold">{labels.forgotPassword}</h1>
       </div>
       {sent ? (
         <p className="text-center font-sans text-muted-foreground">

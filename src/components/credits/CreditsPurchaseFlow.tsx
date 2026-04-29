@@ -120,7 +120,7 @@ export function CreditsPurchaseFlow({
 
       <section className="space-y-3">
         <div className="space-y-1">
-          <h3 className="font-serif text-base text-foreground">
+          <h3 className="font-sans text-base text-foreground">
             {t("payment.vanilla.sectionTitle", "Paiement rapide")}
           </h3>
           <p className="font-sans text-xs text-muted-foreground leading-relaxed">

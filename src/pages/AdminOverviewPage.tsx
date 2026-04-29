@@ -92,7 +92,7 @@ function AdminOverviewPage() {
       </Helmet>
       <div className="space-y-5">
         <div>
-          <h1 className="font-serif text-2xl font-bold">Vue d’ensemble admin</h1>
+          <h1 className="font-sans text-2xl font-bold">Vue d’ensemble admin</h1>
           <p className="text-sm text-muted-foreground font-sans mt-1">
             Espace interne séparé du compte utilisateur standard.
           </p>
@@ -111,37 +111,37 @@ function AdminOverviewPage() {
               <Card className="rounded-2xl">
                 <CardContent className="pt-5">
                   <p className="text-xs text-muted-foreground font-sans">Utilisateurs (total)</p>
-                  <p className="font-serif text-2xl font-bold">{data?.totalUsers ?? 0}</p>
+                  <p className="font-sans text-2xl font-bold">{data?.totalUsers ?? 0}</p>
                 </CardContent>
               </Card>
               <Card className="rounded-2xl">
                 <CardContent className="pt-5">
                   <p className="text-xs text-muted-foreground font-sans">Nouveaux utilisateurs (7j)</p>
-                  <p className="font-serif text-2xl font-bold">{data?.recentUsers7d ?? 0}</p>
+                  <p className="font-sans text-2xl font-bold">{data?.recentUsers7d ?? 0}</p>
                 </CardContent>
               </Card>
               <Card className="rounded-2xl">
                 <CardContent className="pt-5">
                   <p className="text-xs text-muted-foreground font-sans">Annonces en modération</p>
-                  <p className="font-serif text-2xl font-bold">{data?.pendingListings ?? 0}</p>
+                  <p className="font-sans text-2xl font-bold">{data?.pendingListings ?? 0}</p>
                 </CardContent>
               </Card>
               <Card className="rounded-2xl">
                 <CardContent className="pt-5">
                   <p className="text-xs text-muted-foreground font-sans">Achats crédits en attente</p>
-                  <p className="font-serif text-2xl font-bold">{data?.pendingCreditTx ?? 0}</p>
+                  <p className="font-sans text-2xl font-bold">{data?.pendingCreditTx ?? 0}</p>
                 </CardContent>
               </Card>
               <Card className="rounded-2xl">
                 <CardContent className="pt-5">
                   <p className="text-xs text-muted-foreground font-sans">Campagnes partenaires actives</p>
-                  <p className="font-serif text-2xl font-bold">{data?.activePartnerCampaigns ?? 0}</p>
+                  <p className="font-sans text-2xl font-bold">{data?.activePartnerCampaigns ?? 0}</p>
                 </CardContent>
               </Card>
               <Card className="rounded-2xl">
                 <CardContent className="pt-5">
                   <p className="text-xs text-muted-foreground font-sans">Annonces actives</p>
-                  <p className="font-serif text-2xl font-bold">{data?.activeListings ?? 0}</p>
+                  <p className="font-sans text-2xl font-bold">{data?.activeListings ?? 0}</p>
                 </CardContent>
               </Card>
             </>
@@ -152,7 +152,7 @@ function AdminOverviewPage() {
             <Link key={item.to} to={item.to}>
               <Card className="rounded-2xl hover:shadow-sm transition-shadow">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">{item.title}</CardTitle>
+                  <CardTitle className="font-sans text-lg">{item.title}</CardTitle>
                   <CardDescription className="font-sans">{item.desc}</CardDescription>
                 </CardHeader>
                 <CardContent className="text-sm text-primary font-sans">Ouvrir</CardContent>

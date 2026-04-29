@@ -112,7 +112,7 @@ export function AdminAgenciesListTable() {
                           {a.logo_url ? (
                             <img src={a.logo_url} alt={a.name} className="w-full h-full object-cover" loading="lazy" />
                           ) : (
-                            <span className="font-serif font-bold text-muted-foreground">
+                            <span className="font-sans font-bold text-muted-foreground">
                               {a.name.charAt(0)}
                             </span>
                           )}

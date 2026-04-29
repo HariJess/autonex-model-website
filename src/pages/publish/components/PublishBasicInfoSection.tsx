@@ -139,7 +139,7 @@ export function PublishBasicInfoSection({ labels }: PublishBasicInfoSectionProps
       </div>
       <div className="space-y-3 rounded-xl border border-border/80 bg-muted/20 px-4 py-4">
         <div>
-          <p className="font-serif font-semibold text-sm text-foreground">{labels.listingLocationTitle} *</p>
+          <p className="font-sans font-semibold text-sm text-foreground">{labels.listingLocationTitle} *</p>
           <p className="text-xs text-muted-foreground font-sans mt-1">
             {labels.listingLocationHint}
           </p>
@@ -157,7 +157,7 @@ export function PublishBasicInfoSection({ labels }: PublishBasicInfoSectionProps
       </div>
       <div className="border-t-2 border-border/80 pt-6 mt-1">
         <div className="form-surface-muted space-y-3">
-          <h3 className="font-serif font-semibold text-base text-foreground">{labels.mapTitle} *</h3>
+          <h3 className="font-sans font-semibold text-base text-foreground">{labels.mapTitle} *</h3>
           <p className="text-xs text-muted-foreground font-sans">{labels.mapPublicHint}</p>
           {!ville ? (
             <p className="text-sm text-muted-foreground font-sans">{labels.mapNeedVille}</p>

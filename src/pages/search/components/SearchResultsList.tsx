@@ -71,7 +71,7 @@ export function SearchResultsList({
                 onFocus={() => void prefetchListing(queryClient, listing.id)}
                 onTouchStart={() => void prefetchListing(queryClient, listing.id)}
               >
-                <h2 className="font-serif font-semibold text-[1.02rem] sm:text-lg leading-snug group-hover:text-primary transition-colors line-clamp-2">{displayTitle}</h2>
+                <h2 className="font-sans font-semibold text-[1.02rem] sm:text-lg leading-snug group-hover:text-primary transition-colors line-clamp-2">{displayTitle}</h2>
                 {vehicleHeadline && <p className="text-[13px] text-muted-foreground font-sans mt-1 leading-relaxed">{vehicleHeadline}</p>}
               </Link>
               {showCloseMatchBadges && (
@@ -90,7 +90,7 @@ export function SearchResultsList({
               </div>
             </div>
             <div className="flex items-center justify-between mt-3 gap-2 border-t border-border/50 pt-3">
-              <span className="font-serif font-bold text-lg text-primary">{formatPrice(listing.price_mga)}</span>
+              <span className="font-sans font-bold text-lg text-primary">{formatPrice(listing.price_mga)}</span>
               <Button variant="outline" size="sm" className="font-sans rounded-xl border-border/70 shrink-0 min-h-10 touch-manipulation" asChild>
                 <Link to={`/annonce/${listing.id}`}>{seeListingLabel}</Link>
               </Button>

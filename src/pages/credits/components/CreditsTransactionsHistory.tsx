@@ -63,7 +63,7 @@ export function CreditsTransactionsHistory() {
     <div className="space-y-4">
       <Card className="rounded-2xl border-border">
         <CardHeader>
-          <CardTitle className="font-serif text-base">
+          <CardTitle className="font-sans text-base">
             {t("credits.pendingTitle", "En attente de validation")}
           </CardTitle>
         </CardHeader>
@@ -99,7 +99,7 @@ export function CreditsTransactionsHistory() {
 
       <Card className="rounded-2xl border-border">
         <CardHeader>
-          <CardTitle className="font-serif text-base">
+          <CardTitle className="font-sans text-base">
             {t("credits.historyTitle", "Historique récent")}
           </CardTitle>
         </CardHeader>

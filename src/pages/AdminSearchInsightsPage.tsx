@@ -36,7 +36,7 @@ const AdminSearchInsightsPage = () => {
               <ArrowLeft className="h-4 w-4 mr-1" /> Vue d’ensemble
             </Link>
           </Button>
-          <h1 className="font-serif text-2xl font-bold">Signaux de recherche (aperçu)</h1>
+          <h1 className="font-sans text-2xl font-bold">Signaux de recherche (aperçu)</h1>
         </div>
         <p className="text-sm text-muted-foreground font-sans mb-6 max-w-2xl">
           Données anonymisées : filtres utilisés, nombre de résultats exacts, recours aux suggestions. Base pour

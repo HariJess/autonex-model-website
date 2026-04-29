@@ -58,7 +58,7 @@ function AdminPromoCodesEditor() {
     <Card className="rounded-2xl">
       <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
         <div className="space-y-1">
-          <CardTitle className="font-serif">Codes promo</CardTitle>
+          <CardTitle className="font-sans">Codes promo</CardTitle>
           <CardDescription className="font-sans">
             Réductions appliquées à l'achat de packs de crédits : pourcentage
             sur le prix ou crédits bonus. Désactivation soft (historique préservé).

@@ -74,7 +74,7 @@ export function SecuriteSection() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="font-serif text-2xl font-bold" id="section-securite-heading">Sécurité</h2>
+        <h2 className="font-sans text-2xl font-bold" id="section-securite-heading">Sécurité</h2>
         <p className="mt-1 font-sans text-sm text-muted-foreground">
           Changez votre mot de passe et consultez vos informations de session.
         </p>
@@ -84,7 +84,7 @@ export function SecuriteSection() {
       <section className="space-y-4 rounded-2xl border border-border bg-card p-4 md:p-5">
         <div className="flex items-center gap-2">
           <Lock className="h-4 w-4 text-muted-foreground" aria-hidden />
-          <h3 className="font-serif text-base font-semibold">Changer le mot de passe</h3>
+          <h3 className="font-sans text-base font-semibold">Changer le mot de passe</h3>
         </div>
 
         <form onSubmit={onSubmit} noValidate className="space-y-4" aria-label="Formulaire changement de mot de passe">
@@ -139,7 +139,7 @@ export function SecuriteSection() {
       <section className="space-y-3 rounded-2xl border border-border bg-muted/20 p-4 md:p-5">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-muted-foreground" aria-hidden />
-          <h3 className="font-serif text-base font-semibold">Informations de sécurité</h3>
+          <h3 className="font-sans text-base font-semibold">Informations de sécurité</h3>
         </div>
         <dl className="grid grid-cols-1 gap-2">
           <div>

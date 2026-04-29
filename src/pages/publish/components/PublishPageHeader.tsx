@@ -42,7 +42,7 @@ export function PublishPageHeader({
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-        <h1 className="font-serif text-3xl font-bold">{title}</h1>
+        <h1 className="font-sans text-3xl font-bold">{title}</h1>
         {showNewButton && (
           <Button type="button" variant="outline" size="sm" className="font-sans shrink-0" onClick={onNewListing}>
             <FilePlus2 className="h-4 w-4 mr-2" />

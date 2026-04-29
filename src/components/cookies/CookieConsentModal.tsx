@@ -77,7 +77,7 @@ export function CookieConsentModal({ open, onOpenChange, initial, onSave }: Cook
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-serif">Préférences cookies</DialogTitle>
+          <DialogTitle className="font-sans">Préférences cookies</DialogTitle>
           <DialogDescription className="font-sans">
             Choisissez quelles catégories de cookies vous souhaitez autoriser. Vos choix sont modifiables à tout moment via
             le bouton "Gérer mes cookies" en pied de page.

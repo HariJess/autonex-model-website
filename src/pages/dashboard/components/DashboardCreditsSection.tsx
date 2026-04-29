@@ -64,7 +64,7 @@ export function DashboardCreditsSection({
                     {labels.creditsSectionBadge}
                   </Badge>
                   <div>
-                    <h2 className="font-serif text-xl font-bold tracking-tight text-foreground md:text-2xl">{labels.creditsMonetization}</h2>
+                    <h2 className="font-sans text-xl font-bold tracking-tight text-foreground md:text-2xl">{labels.creditsMonetization}</h2>
                     <p className="mt-1.5 font-sans text-sm text-muted-foreground">{labels.creditsSectionTagline}</p>
                   </div>
                 </div>
@@ -116,7 +116,7 @@ export function DashboardCreditsSection({
           <CardContent className="p-6 space-y-3">
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-muted-foreground" />
-              <h2 className="font-serif text-lg font-bold">{labels.pendingPurchases}</h2>
+              <h2 className="font-sans text-lg font-bold">{labels.pendingPurchases}</h2>
             </div>
             {pendingPurchases.length === 0 ? (
               <p className="text-sm text-muted-foreground font-sans">{labels.noPendingPurchases}</p>
@@ -140,7 +140,7 @@ export function DashboardCreditsSection({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="rounded-2xl">
           <CardContent className="p-6 space-y-3">
-            <h2 className="font-serif text-lg font-bold">{labels.creditDecisions}</h2>
+            <h2 className="font-sans text-lg font-bold">{labels.creditDecisions}</h2>
             {creditTxHistory.length === 0 ? (
               <p className="text-sm text-muted-foreground font-sans">{labels.noCreditHistory}</p>
             ) : (
@@ -161,7 +161,7 @@ export function DashboardCreditsSection({
         </Card>
         <Card className="rounded-2xl">
           <CardContent className="p-6 space-y-3">
-            <h2 className="font-serif text-lg font-bold">{labels.creditsLedger}</h2>
+            <h2 className="font-sans text-lg font-bold">{labels.creditsLedger}</h2>
             {ledgerRows.length === 0 ? (
               <p className="text-sm text-muted-foreground font-sans">{labels.noLedger}</p>
             ) : (

@@ -89,7 +89,7 @@ const SettingsNotificationsPage = () => {
       <Header />
       <div className="container mx-auto max-w-3xl py-6 md:py-8 px-4">
         <div className="mb-6">
-          <h1 className="font-serif text-2xl md:text-3xl font-bold">Préférences de notifications</h1>
+          <h1 className="font-sans text-2xl md:text-3xl font-bold">Préférences de notifications</h1>
           <p className="text-sm text-muted-foreground font-sans mt-1">
             Choisissez les canaux (in-app, email immédiat, email digest) pour chaque catégorie.
           </p>
@@ -154,7 +154,7 @@ const SettingsNotificationsPage = () => {
 
             <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
               <div>
-                <p className="font-serif font-semibold text-sm">Digest email</p>
+                <p className="font-sans font-semibold text-sm">Digest email</p>
                 <p className="text-xs text-muted-foreground font-sans mt-0.5">
                   Regroupement des notifications non critiques en un email récapitulatif.
                 </p>

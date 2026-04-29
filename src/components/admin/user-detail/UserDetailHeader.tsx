@@ -20,7 +20,7 @@ export function UserDetailHeader({ profile }: UserDetailHeaderProps) {
       </Button>
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-serif text-2xl font-bold">{displayName}</h1>
+        <h1 className="font-sans text-2xl font-bold">{displayName}</h1>
         <Badge variant="secondary" className="font-sans uppercase tracking-wide">
           {profile.role}
         </Badge>

@@ -85,7 +85,7 @@ export function SignupForm({
   return (
     <>
       <div className="text-center space-y-1">
-        <h1 className="font-serif text-2xl font-bold">{labels.signupChooseTitle}</h1>
+        <h1 className="font-sans text-2xl font-bold">{labels.signupChooseTitle}</h1>
         <p className="text-sm text-muted-foreground font-sans">{labels.signupSubtitle}</p>
       </div>
       <form onSubmit={onSubmit} className="space-y-4">

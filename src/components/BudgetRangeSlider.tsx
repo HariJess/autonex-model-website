@@ -123,7 +123,7 @@ const BudgetRangeSlider = ({
   return (
     <div className="space-y-4 w-full">
       <div className="flex items-center justify-between">
-        <span className="font-serif font-semibold text-sm">Budget</span>
+        <span className="font-sans font-semibold text-sm">Budget</span>
         <div className="flex items-center border border-border rounded-lg overflow-hidden">
           <button
             className={`px-3 py-1 text-xs font-sans font-medium transition-colors ${

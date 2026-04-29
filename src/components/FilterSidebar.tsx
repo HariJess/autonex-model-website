@@ -183,7 +183,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
       <div className={cn("bg-gradient-to-br from-card via-card to-secondary/15 rounded-2xl border border-border/75 overflow-hidden", isMobile && "shadow-sm")}>
         <Accordion type="multiple" defaultValue={defaultOpenSections} className="w-full">
           <AccordionItem value="transaction" className="border-b border-border px-4">
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.transaction", "Transaction")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.transaction", "Transaction")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <RadioGroup value={filters.transaction || "all"} onValueChange={setTransaction}>
                 <div className={cn("flex items-center gap-3", isMobile ? "min-h-11 py-1" : "py-0.5")}>
@@ -205,7 +205,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           </AccordionItem>
 
           <AccordionItem value="type" className="border-b border-border px-4">
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.propertyType", "Type de véhicule")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.propertyType", "Type de véhicule")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-2">
               <div className="space-y-1">
                 <label className={cn("flex items-center gap-3 cursor-pointer touch-manipulation", isMobile ? "min-h-11 py-1" : "py-0.5")}>
@@ -256,7 +256,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="brand" className="border-b border-border px-4">
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("search.brand", "Marque")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 space-y-2">
@@ -302,7 +302,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           </AccordionItem>
 
           <AccordionItem value="location" className="border-b border-border px-4">
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.location", "Localisation")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.location", "Localisation")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <LocationSelector
                 mode="apply"
@@ -328,7 +328,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           </AccordionItem>
 
           <AccordionItem value="budget" className="border-b border-border px-4">
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.budget", "Budget")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.budget", "Budget")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <BudgetRangeSlider
                 transaction={filters.transaction}
@@ -356,7 +356,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           )}
 
           <AccordionItem value="mileageKm" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.mileageKm", "Kilométrage")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("search.mileageKm", "Kilométrage")}</AccordionTrigger>
             <AccordionContent className="pb-3">
               <div className="space-y-3">
                 <p className="text-xs text-muted-foreground font-sans">
@@ -401,7 +401,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
 
           {hasResidentialType && (
             <AccordionItem value="bathrooms" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-              <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.doors", "Portes")}</AccordionTrigger>
+              <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.doors", "Portes")}</AccordionTrigger>
               <AccordionContent className="pb-3">
                 <p className="text-xs text-muted-foreground font-sans mb-2">{t("search.bathroomsHint", "« 4+ » inclut les véhicules avec au moins 4 portes.")}</p>
                 <div className="flex flex-wrap gap-2">
@@ -427,7 +427,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           )}
 
           <AccordionItem value="equipment" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.features", "Équipements")}</AccordionTrigger>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>{t("listing.features", "Équipements")}</AccordionTrigger>
             <AccordionContent className="pb-3 space-y-1">
               <p className="text-xs text-muted-foreground font-sans mb-2">{t("search.equipmentHint", "Correspondance sur les équipements renseignés dans l’annonce (recherche souple).")}</p>
               {EQUIPMENTS.map((eq) => (
@@ -443,7 +443,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="fuel" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("search.fuel", "Carburant")}
             </AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -464,7 +464,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="exterior-color" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("listing.exteriorColor", "Couleur extérieure")}
             </AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -487,7 +487,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="engine-displacement" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("listing.engineDisplacement", "Cylindrée")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 space-y-2">
@@ -519,7 +519,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="gear" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("search.transmission", "Boîte")}
             </AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -540,7 +540,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="drive" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("listing.drivetrain", "Motricité")}
             </AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -561,7 +561,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="condition" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("listing.condition", "État")}
             </AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -582,7 +582,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="seller" className={cn("border-b border-border px-4", isMobile && !showMobileAdvanced && "hidden")}>
-            <AccordionTrigger className={cn("font-serif text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
+            <AccordionTrigger className={cn("font-sans text-sm font-semibold py-3", isMobile && "py-4 min-h-[3rem] touch-manipulation")}>
               {t("listing.seller", "Vendeur")}
             </AccordionTrigger>
             <AccordionContent className="pb-3">
@@ -613,7 +613,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
         <div className="shrink-0 px-4 pt-3 pb-3 border-b border-border/80 bg-background">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="font-serif font-bold text-lg leading-tight">{t("search.filters")}</h3>
+              <h3 className="font-sans font-bold text-lg leading-tight">{t("search.filters")}</h3>
               <p className="text-xs text-muted-foreground font-sans mt-1.5 leading-relaxed">
                 {t(
                   "search.mobileFiltersDraftHint",
@@ -664,7 +664,7 @@ const FilterSidebar = ({ filters, onFiltersChange, onClose, isMobile, onMobileAp
           <p className="font-sans text-[11px] uppercase tracking-wide text-muted-foreground">
             {t("search.sidebarOverline", "Recherche AutoNex")}
           </p>
-          <h3 className="font-serif font-bold text-lg">{t("search.filters")}</h3>
+          <h3 className="font-sans font-bold text-lg">{t("search.filters")}</h3>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" className="text-xs font-sans text-muted-foreground h-8 rounded-lg" onClick={resetFilters}>

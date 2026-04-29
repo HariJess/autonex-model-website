@@ -32,7 +32,7 @@ export function SearchTrustPanel({
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">Confiance de navigation</p>
-          <p className="mt-1 font-serif text-lg leading-snug text-foreground">{headline}</p>
+          <p className="mt-1 font-sans text-lg leading-snug text-foreground">{headline}</p>
           <p className="mt-1.5 max-w-3xl font-sans text-sm leading-relaxed text-muted-foreground">{summary}</p>
         </div>
         <div className="rounded-xl border border-border/60 bg-background/75 px-3 py-2.5">

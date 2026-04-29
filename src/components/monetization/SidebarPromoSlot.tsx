@@ -11,7 +11,7 @@ export function SidebarPromoSlot() {
       <SponsoredPill />
       <div className="flex items-center gap-2">
         <Coins className="h-5 w-5 text-amber-600 shrink-0" />
-        <p className="font-serif font-semibold text-sm">Crédits & visibilité</p>
+        <p className="font-sans font-semibold text-sm">Crédits & visibilité</p>
       </div>
       <p className="text-xs text-muted-foreground font-sans leading-relaxed">
         Publiez et boostez vos annonces avec des packs en Ariary. Paiement manuel vérifié par l’équipe.

@@ -40,7 +40,7 @@ export function UserDetailActions({ profile, currentAdminId }: UserDetailActions
   return (
     <Card className="rounded-2xl">
       <CardHeader>
-        <CardTitle className="font-serif text-lg">Actions admin</CardTitle>
+        <CardTitle className="font-sans text-lg">Actions admin</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         <Button

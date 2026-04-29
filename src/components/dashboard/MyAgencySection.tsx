@@ -142,12 +142,12 @@ export function MyAgencySection() {
                 className="w-14 h-14 rounded-xl object-cover border border-border"
               />
             ) : (
-              <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center font-serif text-2xl font-bold text-muted-foreground">
+              <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center font-sans text-2xl font-bold text-muted-foreground">
                 {agency.name.charAt(0)}
               </div>
             )}
             <div className="space-y-1">
-              <CardTitle className="font-serif">{agency.name}</CardTitle>
+              <CardTitle className="font-sans">{agency.name}</CardTitle>
               <AgencyStatusBadge status={agency.status} verified={agency.verified} />
             </div>
           </div>
@@ -173,7 +173,7 @@ export function MyAgencySection() {
         ) : null}
 
         <section className="space-y-3">
-          <h3 className="font-serif text-sm font-semibold">Identité visuelle</h3>
+          <h3 className="font-sans text-sm font-semibold">Identité visuelle</h3>
           <div>
             <Label htmlFor="my-logo">Logo URL</Label>
             <Input id="my-logo" type="url" value={f.logo_url} onChange={(e) => set("logo_url", e.target.value)} />
@@ -185,7 +185,7 @@ export function MyAgencySection() {
         </section>
 
         <section className="space-y-3">
-          <h3 className="font-serif text-sm font-semibold">Présentation</h3>
+          <h3 className="font-sans text-sm font-semibold">Présentation</h3>
           <div>
             <Label htmlFor="my-bio">Bio (courte)</Label>
             <Textarea id="my-bio" rows={2} value={f.bio} onChange={(e) => set("bio", e.target.value)} />
@@ -197,7 +197,7 @@ export function MyAgencySection() {
         </section>
 
         <section className="space-y-3">
-          <h3 className="font-serif text-sm font-semibold">Contact</h3>
+          <h3 className="font-sans text-sm font-semibold">Contact</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <Label htmlFor="my-email">Email</Label>
@@ -219,7 +219,7 @@ export function MyAgencySection() {
         </section>
 
         <section className="space-y-3">
-          <h3 className="font-serif text-sm font-semibold">Horaires</h3>
+          <h3 className="font-sans text-sm font-semibold">Horaires</h3>
           <div className="space-y-1.5">
             {WEEKDAYS.map((day) => (
               <div key={day} className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export function MyAgencySection() {
         </section>
 
         <section className="space-y-3">
-          <h3 className="font-serif text-sm font-semibold">Réseaux sociaux</h3>
+          <h3 className="font-sans text-sm font-semibold">Réseaux sociaux</h3>
           {(["facebook", "instagram", "linkedin", "youtube", "tiktok"] as const).map((k) => (
             <div key={k}>
               <Label htmlFor={`my-social-${k}`} className="capitalize">{k}</Label>
