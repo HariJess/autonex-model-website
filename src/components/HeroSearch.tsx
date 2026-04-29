@@ -285,6 +285,9 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
   const desktopAdvancedShellBaseClass = hideBackground
     ? "hidden lg:grid gap-3 mt-2 rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm p-3"
     : "hidden lg:grid gap-3 mt-2 rounded-xl border border-border/70 bg-background/70 p-3";
+  const trustMentionsClass = hideBackground
+    ? "mt-6 md:mt-8 flex flex-wrap items-center justify-center font-geist text-xs md:text-sm text-white/60 font-medium tracking-wide"
+    : "hidden";
 
   return (
     <section
@@ -832,6 +835,25 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
               </Button>
             </div>
           </div>
+
+          {hideBackground && (
+            <div className={trustMentionsClass}>
+              <span className="whitespace-nowrap">
+                <span className="md:hidden">{t("hero.trustModeratedShort", "Modérées")}</span>
+                <span className="hidden md:inline">{t("hero.trustModerated", "Annonces modérées")}</span>
+              </span>
+              <span className="text-white/30 mx-3 md:mx-4 select-none" aria-hidden="true">•</span>
+              <span className="whitespace-nowrap">
+                <span className="md:hidden">{t("hero.trustMadeInMgShort", "Malgache")}</span>
+                <span className="hidden md:inline">{t("hero.trustMadeInMg", "100% Malgache")}</span>
+              </span>
+              <span className="text-white/30 mx-3 md:mx-4 select-none" aria-hidden="true">•</span>
+              <span className="whitespace-nowrap">
+                <span className="md:hidden">{t("hero.trustEstimationFreeShort", "Estimation")}</span>
+                <span className="hidden md:inline">{t("hero.trustEstimationFree", "Estimation gratuite")}</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </section>
