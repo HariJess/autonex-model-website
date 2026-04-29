@@ -28,7 +28,7 @@ import type { YasContext } from "@/features/yas-app/hooks/useYasContext";
  *     listing_id  uuid,
  *     user_id     uuid,
  *     session_id  text NOT NULL,
- *     payload     jsonb DEFAULT '{}'::jsonb,
+ *     payload     jsonb NOT NULL DEFAULT '{}'::jsonb,
  *     created_at  timestamptz NOT NULL DEFAULT now()
  *   );
  *
@@ -42,13 +42,9 @@ import type { YasContext } from "@/features/yas-app/hooks/useYasContext";
  *     TO anon, authenticated
  *     WITH CHECK (true);
  *
- *   -- SELECT réservé aux admins (utilise public.immonex_is_admin() existante).
- *   DROP POLICY IF EXISTS "yas_tracking_events_select_admin" ON public.yas_tracking_events;
- *   CREATE POLICY "yas_tracking_events_select_admin"
- *     ON public.yas_tracking_events
- *     FOR SELECT
- *     TO authenticated
- *     USING (public.immonex_is_admin());
+ *   -- Aucune policy SELECT : lecture réservée au service_role (bypasse RLS
+ *   -- par défaut). Toute analyse admin se fait côté serveur ou via SQL Editor
+ *   -- avec service role key. Pas d'accès public ni authenticated en lecture.
  *
  *   CREATE INDEX IF NOT EXISTS yas_tracking_events_event_name_idx
  *     ON public.yas_tracking_events (event_name);
@@ -88,7 +84,6 @@ export function trackYasEvent(
   };
 
   if (isDev) {
-    // eslint-disable-next-line no-console
     console.debug("[yas-tracking]", eventName, row);
   }
 
