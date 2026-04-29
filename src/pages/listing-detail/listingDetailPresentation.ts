@@ -8,6 +8,23 @@ function cleanSpec(value: string | number | null | undefined): string | null {
   return asString.length > 0 ? asString : null;
 }
 
+const AVAILABILITY_FALLBACK_LABELS: Record<string, string> = {
+  disponible: "Disponible",
+  reserve: "Réservé",
+  vendu: "Vendu",
+  en_arrivage: "En arrivage",
+};
+
+function localizeAvailabilityStatus(
+  raw: string | null | undefined,
+  t: TFunction<"translation", undefined>,
+): string | null {
+  const cleaned = cleanSpec(raw);
+  if (!cleaned) return null;
+  const fallback = AVAILABILITY_FALLBACK_LABELS[cleaned] ?? cleaned;
+  return t(`listing.availabilityValue.${cleaned}`, fallback);
+}
+
 export function getSellerLabel(
   sellerType: CanonicalVehicleAttributes["sellerType"],
   t: TFunction<"translation", undefined>,
@@ -64,7 +81,7 @@ export function buildVehicleSpecRows(
     },
     {
       label: t("listing.availability", "Disponibilité"),
-      value: cleanSpec(canonicalVehicle.availabilityStatus),
+      value: localizeAvailabilityStatus(canonicalVehicle.availabilityStatus, t),
     },
     { label: t("listing.rentalMode", "Mode location"), value: cleanSpec(canonicalVehicle.rentalMode) },
   ].filter((item) => item.value);
@@ -81,7 +98,7 @@ export function buildContactTrustHints(
   return [
     params.sellerLabel ? `${t("listing.seller", "Vendeur")} : ${params.sellerLabel}` : null,
     params.availabilityStatus
-      ? `${t("listing.availability", "Disponibilité")} : ${params.availabilityStatus}`
+      ? `${t("listing.availability", "Disponibilité")} : ${localizeAvailabilityStatus(params.availabilityStatus, t) ?? params.availabilityStatus}`
       : null,
     params.hasWhatsappContact
       ? t("listing.whatsappReady", "Réponse WhatsApp disponible")

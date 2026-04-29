@@ -42,37 +42,37 @@ const Footer = () => {
             <h4 className="font-semibold text-base md:text-lg">{t("footer.information")}</h4>
             <div className="flex flex-col gap-1.5 text-[0.95rem] leading-relaxed font-sans opacity-75">
               <Link to="/conseils" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.advice")}</Link>
-              <Link to="/contact" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Contact</Link>
+              <Link to="/contact" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("footer.contact")}</Link>
             </div>
           </div>
 
           {/* Legal */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-base md:text-lg">Informations légales</h4>
+            <h4 className="font-semibold text-base md:text-lg">{t("footer.legalSection")}</h4>
             <div className="flex flex-col gap-1.5 text-[0.95rem] leading-relaxed font-sans opacity-75">
-              <Link to="/legal/mentions" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Mentions légales</Link>
-              <Link to="/legal/confidentialite" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Politique de confidentialité</Link>
-              <Link to="/legal/cgu" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Conditions générales d'utilisation</Link>
-              <Link to="/legal/cookies" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Gestion des cookies</Link>
-              <Link to="/legal/suppression-donnees" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">Suppression des données</Link>
+              <Link to="/legal/mentions" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("footer.legal")}</Link>
+              <Link to="/legal/confidentialite" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("footer.privacy")}</Link>
+              <Link to="/legal/cgu" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("footer.terms")}</Link>
+              <Link to="/legal/cookies" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("footer.cookiesManagement")}</Link>
+              <Link to="/legal/suppression-donnees" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("footer.dataDeletion")}</Link>
               <button
                 type="button"
                 onClick={openPreferences}
                 className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity text-left"
               >
-                Gérer mes cookies
+                {t("footer.manageCookies")}
               </button>
             </div>
           </div>
         </div>
 
         <div className="mt-10 md:mt-12 pt-6 border-t border-muted-foreground/20 text-center text-sm font-sans opacity-60 space-y-1">
-          <p>© 2026 APLi SARLU — Marque AutoNex. Tous droits réservés.</p>
+          <p>{t("footer.copyright", { year: new Date().getFullYear() })}</p>
           <p className="text-xs opacity-80">RCS Antananarivo 2025 B 00769 — NIF 4019287505</p>
         </div>
 
         <div className="mt-4 pt-4 border-t border-muted-foreground/10 text-center text-xs font-sans text-muted-foreground/70">
-          <span>Conçu et développé par </span>
+          <span>{t("footer.designedBy")} </span>
           <a
             href="https://www.linkedin.com/company/aplisarlu/"
             target="_blank"

@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { SponsoredPill } from "./MonetizationLabels";
 
@@ -9,6 +10,7 @@ interface SponsoredNativeCardProps {
 
 /** Carte type « native » dans les grilles d’annonces, sobre et assortie à la marque. */
 export function SponsoredNativeCard({ className, enabled = true }: SponsoredNativeCardProps) {
+  const { t } = useTranslation();
   if (!enabled) return null;
 
   return (
@@ -24,10 +26,10 @@ export function SponsoredNativeCard({ className, enabled = true }: SponsoredNati
           <Sparkles className="h-4 w-4 text-primary shrink-0" aria-hidden />
         </div>
         <p className="font-sans font-semibold text-lg text-foreground leading-snug">
-          Campagne partenaire
+          {t("ads.partnerCampaign.title")}
         </p>
         <p className="mt-2 text-sm text-muted-foreground font-sans leading-relaxed">
-          Format natif réservé aux marques et services partenaires sélectionnés par AutoNex.
+          {t("ads.partnerCampaign.description")}
         </p>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,7 @@ export function FeaturedAgenciesSection({
   limit = 12,
   variant = "page",
 }: FeaturedAgenciesSectionProps) {
+  const { t } = useTranslation();
   const { data: agencies = [], isLoading } = useQuery({
     queryKey: ["agencies-monetization", limit, variant],
     queryFn: async () => {
@@ -63,7 +65,7 @@ export function FeaturedAgenciesSection({
         >
           {title}
         </h2>
-        <FeaturedPill label="Réseau" />
+        <FeaturedPill label={t("agencies.networkBadge")} />
       </div>
       {isLoading ? (
         <div className="flex justify-center py-8">

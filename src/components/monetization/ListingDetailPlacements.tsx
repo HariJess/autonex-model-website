@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useDbListings } from "@/hooks/useListings";
 import ListingCard from "@/components/ListingCard";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
@@ -138,6 +139,7 @@ export function ListingSponsorBlockView({ campaign, className, onClick }: Listin
 }
 
 export function ListingPartnerAgencyStrip() {
+  const { t } = useTranslation();
   if (!MONETIZATION_PLACEMENTS.listingPartner) return null;
-  return <FeaturedAgenciesSection title="Agences en vedette" enabled limit={6} variant="embedded" />;
+  return <FeaturedAgenciesSection title={t("agencies.featuredTitle")} enabled limit={6} variant="embedded" />;
 }
