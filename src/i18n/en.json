@@ -40,7 +40,9 @@
       "rejectedBanner": "Your profile was rejected. Reason: {{reason}}. Fix the information below — our team will re-review after you save.",
       "suspendedBanner": "Your dealer profile is currently suspended. Reason: {{reason}}. Contact support for more information.",
       "reasonNotSpecified": "not specified"
-    }
+    },
+    "noDirectoryAgencies": "No dealer matches the filters.",
+    "runtimeUnavailable": "The dealer profile is temporarily unavailable. Please try again in a moment."
   },
   "auth": {
     "agency": "Agency",
@@ -101,7 +103,13 @@
     "passwordRuleMin8": "Password must be at least 8 characters",
     "passwordRuleLowercase": "Password must contain at least one lowercase letter",
     "passwordRuleUppercase": "Password must contain at least one uppercase letter",
-    "passwordRuleDigit": "Password must contain at least one digit"
+    "passwordRuleDigit": "Password must contain at least one digit",
+    "signupSubtitle": "Individual or dealer: one account, adapted journeys.",
+    "agencyName": "Dealer name",
+    "commercialContact": "Sales contact",
+    "agencyAddress": "Head office address",
+    "agencyLogoUrl": "Logo (URL, optional)",
+    "phoneAgencyHint": "Number reachable for customers."
   },
   "common": {
     "back": "Back",
@@ -156,7 +164,48 @@
     "title": "Dashboard",
     "totalViews": "Total views",
     "views": "Views",
-    "visitor": "Visitor"
+    "visitor": "Visitor",
+    "creditsBalance": "Available credits",
+    "txStatusPending": "Awaiting verification",
+    "txStatusReview": "Under review",
+    "txStatusApproved": "Approved — credits added",
+    "txStatusRejected": "Rejected",
+    "txStatusCancelled": "Cancelled",
+    "txStatusSuccess": "Successful",
+    "txStatusFailed": "Failed",
+    "draftListings": "Listing drafts",
+    "draftListingsHint": "Resume a listing in progress — everything is saved automatically.",
+    "draftStep": "Step {{n}}/4",
+    "draftUpdated": "Upd.",
+    "resumeDraft": "Resume",
+    "deleteDraft": "Delete",
+    "deleteDraftTitle": "Delete this draft?",
+    "deleteDraftDesc": "This action is permanent.",
+    "creditsSectionBadge": "Credits space",
+    "creditsMonetization": "Credits & packs",
+    "creditsSectionTagline": "Post and boost your listings with your credits.",
+    "creditsUsableInline": "Usable balance",
+    "creditsBalanceInlineHint": "Excluding payments pending validation.",
+    "creditsChipPublish": "Publishing",
+    "creditsChipBoost": "Boosts & visibility",
+    "creditsBullet1": "Pack purchases in Ariary — manual payment with proof (bank transfer, mobile money, etc.).",
+    "creditsBullet2": "Credits are added to your balance only after our team validates them.",
+    "creditsBullet3": "The balance shown at the top of the dashboard and in this block does not include payments still pending.",
+    "buyCreditsCta": "Buy credits",
+    "pendingPurchases": "Pending purchases",
+    "noPendingPurchases": "No payments pending verification.",
+    "txRef": "Ref.",
+    "txPendingHonest": "Verification in progress — credits are not available yet.",
+    "creditDecisions": "Credit purchase history",
+    "noCreditHistory": "No purchases processed yet.",
+    "creditsLedger": "Credit movements",
+    "noLedger": "No movement recorded.",
+    "pendingBoosts": "Visibility after validation",
+    "activeBoosts": "Active boosts",
+    "expiredBoosts": "Expired boosts",
+    "boostListing": "Boost",
+    "boostPendingReviewNote": "“After publication” boosts will become available once the listing is validated. Options paid at submission stay pending above.",
+    "editListing": "Edit"
   },
   "estimation": {
     "accidentDeclaredDesc": "Declared major incidents can impact suggested range.",
@@ -348,7 +397,9 @@
     "trustModerated": "Moderated listings",
     "trustModeratedShort": "Moderated",
     "type": "Vehicle type",
-    "year": "Year"
+    "year": "Year",
+    "hideAdvancedMobile": "Hide advanced filters",
+    "showAdvancedMobile": "Show more filters"
   },
   "home": {
     "brandNavigation": "Browse by make",
@@ -398,7 +449,8 @@
     "thematicElectricSubtitle": "More efficient powertrains for your trips.",
     "thematicElectricTitle": "Electric & Hybrid",
     "thematicUtilitySubtitle": "Business transport, logistics, and passenger activity.",
-    "thematicUtilityTitle": "Utility Vehicles, Vans & Minibuses"
+    "thematicUtilityTitle": "Utility Vehicles, Vans & Minibuses",
+    "popularBrandsRibbon": "Popular brands"
   },
   "listing": {
     "addressUnknown": "Address not specified",
@@ -542,7 +594,8 @@
       "coupDeCoeur": "Top pick",
       "nouveau": "New",
       "urgent": "Urgent"
-    }
+    },
+    "mapApproximate": "Position shown on the map."
   },
   "listings": {
     "negotiable": {
@@ -827,7 +880,51 @@
     "videoUrl": "Video URL",
     "villeRequired": "City is required",
     "yearInvalid": "Invalid year.",
-    "yourBalance": "Your balance"
+    "yourBalance": "Your balance",
+    "contactTitle": "Contact details",
+    "contactDesc": "This number is the main buyer contact point on your listing.",
+    "whatsappLabel": "WhatsApp number (optional)",
+    "whatsappHint": "International format without spaces (+261341234567). A WhatsApp button will appear on your listing as the main CTA.",
+    "visibilityOptions": "Visibility options",
+    "visibilityOptionsHint": "Boosts and advanced options (optional)",
+    "mapHint": "Click on the map or drag the pin to mark the exact vehicle location. Buyers will see it on the listing page.",
+    "sellerTypeConcessionnaire": "Dealer",
+    "sellerTypeParticulier": "Individual",
+    "regenerateAutoTitle": "Regenerate automatically",
+    "titleAutoHint": "Automatically generated from make, model, trim and year.",
+    "brandCustomPlaceholder": "Type the brand",
+    "brandBackToList": "Choose from the list",
+    "brandSearchPlaceholder": "Search a brand…",
+    "brandNoMatch": "No brand found.",
+    "brandOtherOption": "Other brand…",
+    "motorizationTitle": "Powertrain",
+    "motorizationDesc": "Fuel, transmission, drivetrain and engine size.",
+    "engineDisplacementPlaceholderCc": "E.g. 1500",
+    "engineDisplacementPlaceholderL": "E.g. 1.5",
+    "engineDisplacementEquivalence": "Equivalent: {{value}}",
+    "configTitle": "Body and configuration",
+    "configDesc": "Doors, seats and colours.",
+    "interiorColorCustomPlaceholder": "Type a colour",
+    "selectInteriorColor": "Select a colour",
+    "interiorColorOther": "Other…",
+    "availabilityTitle": "Condition and availability",
+    "sellerTypeLabel": "Seller type",
+    "sellerTypeAutoHint": "Automatically set from your profile.",
+    "equipmentLegacyTitle": "Others (kept)",
+    "equipmentLegacyDesc": "Values inherited from an older catalogue version. Untick them to remove them from the listing.",
+    "complementaryTitle": "Additional information (optional)",
+    "complementaryDesc": "Free-form notes and extra specifications.",
+    "titleTooLong": "Title cannot exceed 120 characters.",
+    "priceTooLow": "Price must be at least 100,000 Ar.",
+    "priceTooHigh": "Price cannot exceed 10 billion Ariary.",
+    "mileageKmInvalid": "Invalid mileage",
+    "successPublishedActive": "Listing successfully posted!",
+    "successPublishedActiveDesc": "Your listing is now publicly visible on AutoNex.",
+    "successPublishedReview": "Listing sent for review",
+    "successPublishedReviewDesc": "Our team will review your listing within 24 hours. You'll be notified as soon as it goes live.",
+    "doors": "Doors",
+    "seats": "Seats / capacity (optional)",
+    "uploading": "Uploading…"
   },
   "search": {
     "activeSelection": "Active selection: {{value}}",
@@ -946,7 +1043,17 @@
     "yearMax": "Max year",
     "yearMin": "Min year",
     "youMayAlsoLike": "You may also like",
-    "zeroListingsHeadline": "0 listing"
+    "zeroListingsHeadline": "0 listing",
+    "hideAdvancedFilters": "Hide advanced filters",
+    "showAdvancedFilters": "Show advanced filters",
+    "locationAppliedTitle": "Location applied",
+    "locationAppliedBody": "Location filters have been updated. Results are reloading.",
+    "quartierZonesFirst": "Neighbourhoods & zones",
+    "quartierZonesHint": "Pick specific neighbourhoods — the most common way in Madagascar to narrow your search.",
+    "browseByAreaTitle": "Whole city & districts",
+    "locationHierarchyHint": "Whole city if nothing is checked below. Tick a full district or specific neighbourhoods — combinations are allowed.",
+    "wholeArrondissementShort": "All",
+    "relaxedFetchCapHint": "Displayed results prioritise recent listings within a limited window; the total may include listings outside that window."
   },
   "sections": {
     "agencies": "Partner dealers",
@@ -972,7 +1079,11 @@
     "active": "Active",
     "draft": "Draft",
     "expired": "Expired",
-    "paused": "Paused"
+    "paused": "Paused",
+    "pendingReview": "Under review",
+    "pendingPayment": "Payment to confirm",
+    "pendingPaymentVerification": "Payment under verification",
+    "rejected": "Rejected"
   },
   "transaction": {
     "rent": "Long-term rental",
@@ -1161,7 +1272,30 @@
     "promoValid": "Valid code",
     "promoRemove": "Remove promo code",
     "promoInvalid": "Invalid code.",
-    "purchaseSendError": "Error sending the request."
+    "purchaseSendError": "Error sending the request.",
+    "promoInvalidSyntax": "Invalid code (A-Z, 0-9, dashes)",
+    "promoLabel": "Do you have a promo code?",
+    "unit": "credits",
+    "ratioLabel": "{{ratio}} MGA / credit",
+    "termsAcknowledgement": "By purchasing, you accept the ",
+    "termsLinkLabel": "Credits terms of use",
+    "termsHintSuffix": " — credits are non-refundable and expire after 12 months.",
+    "balance": {
+      "insufficient": "Not enough yet to post a listing ({{count}} credits required).",
+      "scenariosWith": "With this balance: {{scenarios}}"
+    },
+    "balanceLabel": "Your balance",
+    "pendingTitle": "Pending validation",
+    "noPending": "No pending requests.",
+    "statusPending": "Pending",
+    "historyTitle": "Recent history",
+    "noHistory": "No past transactions.",
+    "pageTitle": "AutoNex credits",
+    "pageDescription": "Manage your AutoNex credit balance, buy a pack, and track your transactions.",
+    "pageOverline": "Credits space",
+    "pageHeading": "Your AutoNex credits",
+    "pageIntro": "Buy a credit pack to post your listings and activate boosts. Credits are non-refundable and expire 12 months after purchase.",
+    "purchaseSectionTitle": "Choose your pack"
   },
   "boost": {
     "dialogTitle": "Boost the listing",
@@ -1176,5 +1310,55 @@
     "confirming": "Confirming…",
     "confirmWithCredits": "Confirm ({{count}} credits)",
     "purchaseSuccess": "Boosts activated. Your listing now benefits from the chosen visibility."
+  },
+  "brands": {
+    "scrollPrev": "Previous brands",
+    "scrollNext": "Next brands"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content"
+  },
+  "blog": {
+    "noPosts": "No articles yet.",
+    "notFound": "Article not found",
+    "notFoundDesc": "This article does not exist or has been removed.",
+    "viewAll": "View all articles",
+    "toc": "Table of contents"
+  },
+  "contact": {
+    "pageTitle": "Contact",
+    "metaDescription": "Contact the AutoNex team: general questions, technical support, dealers, partnerships. Reply within 48 business hours.",
+    "heading": "Contact us",
+    "subheading": "A question, a suggestion, a partnership? Our team replies within 48 business hours.",
+    "fullNameLabel": "Full name *",
+    "emailLabel": "Email *",
+    "whatsappLabel": "WhatsApp phone (optional)",
+    "subjectLabel": "Subject *",
+    "subjectPlaceholder": "Choose a subject",
+    "subjectGeneral": "General question",
+    "subjectTechnical": "Technical support",
+    "subjectDealers": "Dealers",
+    "subjectPartnerships": "Partnerships",
+    "subjectOther": "Other",
+    "messageLabel": "Message *",
+    "charsRemaining": "{{count}} characters remaining (min 20).",
+    "consentPrefix": "I agree that my data may be used to respond to my request, in accordance with the",
+    "privacyPolicyLink": "Privacy Policy",
+    "sending": "Sending…",
+    "submit": "Send message",
+    "successToast": "Thanks, your message has been sent. We will reply within 48 business hours.",
+    "otherChannelsTitle": "Other channels",
+    "responseTime": "Response within 48 business hours",
+    "legalQuestionPrefix": "For any legal question, see our",
+    "legalNoticeLink": "Legal notice",
+    "errors": {
+      "fullNameMin": "Full name required (min 2 characters).",
+      "fullNameMax": "Max 100 characters.",
+      "emailInvalid": "Invalid email.",
+      "phoneInvalid": "Invalid number (international format expected: +261…).",
+      "messageMin": "Minimum 20 characters.",
+      "messageMax": "Maximum 2000 characters.",
+      "consentRequired": "You must accept the privacy policy."
+    }
   }
 }

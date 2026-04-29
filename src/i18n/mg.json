@@ -40,7 +40,9 @@
       "rejectedBanner": "Nolavina ny pejinao. Antony : {{reason}}. Ahitsio ireo vaovao etsy ambany — havaozin'ny ekipanay ny famenana aorian'ny fitehirizana.",
       "suspendedBanner": "Voaajanona aloha ny concessionnaire-nao. Antony : {{reason}}. Mifandraisa amin'ny support raha mila vaovao fanampiny.",
       "reasonNotSpecified": "tsy voalaza"
-    }
+    },
+    "noDirectoryAgencies": "Tsy misy concessionnaire mifanaraka amin'ny sivana.",
+    "runtimeUnavailable": "Tsy hita vonjimaika ny pejin'ny concessionnaire. Andramo indray afaka fotoana fohy."
   },
   "auth": {
     "agency": "Concessionnaires",
@@ -101,7 +103,13 @@
     "passwordRuleMin8": "Tsy maintsy 8 litera farafahakeliny ny teny miafina",
     "passwordRuleLowercase": "Tsy maintsy misy litera kely iray ny teny miafina",
     "passwordRuleUppercase": "Tsy maintsy misy litera lehibe iray ny teny miafina",
-    "passwordRuleDigit": "Tsy maintsy misy isa iray ny teny miafina"
+    "passwordRuleDigit": "Tsy maintsy misy isa iray ny teny miafina",
+    "signupSubtitle": "Tsotra na concessionnaire : kaonty iray, dingana mifanaraka.",
+    "agencyName": "Anaran'ny concessionnaire",
+    "commercialContact": "Fifandraisana ara-barotra",
+    "agencyAddress": "Adiresin'ny foibe",
+    "agencyLogoUrl": "Logo (URL, tsy voatery)",
+    "phoneAgencyHint": "Laharana azon'ny mpanjifa idirana."
   },
   "common": {
     "back": "Hiverina",
@@ -156,7 +164,48 @@
     "title": "Pejin'ny fitantanana",
     "totalViews": "Fijerena totaly",
     "views": "Fijerena",
-    "visitor": "Mpitsidika"
+    "visitor": "Mpitsidika",
+    "creditsBalance": "Crédits azo ampiasaina",
+    "txStatusPending": "Miandry fanamarinana",
+    "txStatusReview": "Eo am-panaraha-maso",
+    "txStatusApproved": "Ekena — voapetraka ny crédits",
+    "txStatusRejected": "Nolavina",
+    "txStatusCancelled": "Nofoanana",
+    "txStatusSuccess": "Vita soa aman-tsara",
+    "txStatusFailed": "Tsy nahomby",
+    "draftListings": "Drafts filazana",
+    "draftListingsHint": "Tohizo ny filazana eo am-panaovana — voatahiry hoazy ny zava-drehetra.",
+    "draftStep": "Dingana {{n}}/4",
+    "draftUpdated": "Hav.",
+    "resumeDraft": "Tohizo",
+    "deleteDraft": "Esory",
+    "deleteDraftTitle": "Esorina ity draft ity ?",
+    "deleteDraftDesc": "Tsy azo averina intsony ity hetsika ity.",
+    "creditsSectionBadge": "Sehatry ny crédits",
+    "creditsMonetization": "Crédits sy packs",
+    "creditsSectionTagline": "Avoahy sy ampoizo ny filazanao amin'ny crédits.",
+    "creditsUsableInline": "Solde azo ampiasaina",
+    "creditsBalanceInlineHint": "Ankoatra ny fandoavam-bola miandry fanamarinana.",
+    "creditsChipPublish": "Famoahana",
+    "creditsChipBoost": "Boost sy fahitana",
+    "creditsBullet1": "Fividianana pack amin'ny Ariary — fandoavam-bola manuel miaraka amin'ny porofo (virement, mobile money, sns.).",
+    "creditsBullet2": "Ampiana amin'ny solde-nao ny crédits aorian'ny fanamarinan'ny ekipanay.",
+    "creditsBullet3": "Ny solde aseho ambonin'ny dashboard sy eto amin'ity bloc ity dia tsy ahitana ny fandoavam-bola mbola miandry.",
+    "buyCreditsCta": "Hividy crédits",
+    "pendingPurchases": "Vidianana miandry",
+    "noPendingPurchases": "Tsy misy fandoavam-bola miandry fanamarinana.",
+    "txRef": "Réf.",
+    "txPendingHonest": "Eo am-panamarinana — mbola tsy azo ampiasaina ny crédits.",
+    "creditDecisions": "Tantaran'ny fividianana crédits",
+    "noCreditHistory": "Tsy mbola misy fividianana voakarakara.",
+    "creditsLedger": "Hetsiky ny crédits",
+    "noLedger": "Tsy misy hetsika voarakitra.",
+    "pendingBoosts": "Fahitana aorian'ny fanamarinana",
+    "activeBoosts": "Boost mavitrika",
+    "expiredBoosts": "Boost lany andro",
+    "boostListing": "Hampoizina",
+    "boostPendingReviewNote": "Ho azo atao ny boost « aorian'ny famoahana » rehefa avy nohamarinin'ny ekipa ny filazana. Ny safidy aloha amin'ny fandefasana dia mijanona miandry etsy ambony.",
+    "editListing": "Hovaina"
   },
   "estimation": {
     "accidentDeclaredDesc": "Misy fiantraikany amin'ny vidiny tombanana.",
@@ -348,7 +397,9 @@
     "trustModerated": "Filazana voasivana",
     "trustModeratedShort": "Voajery",
     "type": "Karazana fiara",
-    "year": "Taona"
+    "year": "Taona",
+    "hideAdvancedMobile": "Hanafina ny sivana mandroso",
+    "showAdvancedMobile": "Asehoy ny sivana fanampiny"
   },
   "home": {
     "brandNavigation": "Mitady araka ny marika",
@@ -398,7 +449,8 @@
     "thematicElectricSubtitle": "Moteur mahomby kokoa ho an'ny diany isan'andro.",
     "thematicElectricTitle": "Elektrika sy Hybride",
     "thematicUtilitySubtitle": "Fitaterana matihanina, logistika ary asam-pitaterana mpandeha.",
-    "thematicUtilityTitle": "Utilitaire, Van sy Minibus"
+    "thematicUtilityTitle": "Utilitaire, Van sy Minibus",
+    "popularBrandsRibbon": "Marika malaza"
   },
   "listing": {
     "addressUnknown": "Adiresy tsy voafaritra",
@@ -542,7 +594,8 @@
       "coupDeCoeur": "Tena tia",
       "nouveau": "Vaovao",
       "urgent": "Maika"
-    }
+    },
+    "mapApproximate": "Toerana hita amin'ny sarintany."
   },
   "listings": {
     "negotiable": {
@@ -827,7 +880,51 @@
     "videoUrl": "Rohy vidéo",
     "villeRequired": "Tanàna ilaina",
     "yearInvalid": "Taona tsy manankery",
-    "yourBalance": "Solde-nao"
+    "yourBalance": "Solde-nao",
+    "contactTitle": "Fifandraisana sy mombamomba",
+    "contactDesc": "Io laharana io no fifandraisana voalohany ho an'ny mpividy amin'ny filazanao.",
+    "whatsappLabel": "Laharana WhatsApp (tsy voatery)",
+    "whatsappHint": "Format international tsy misy elanelany (+261341234567). Bokotra WhatsApp no haseho amin'ny pejinao ho CTA fototra.",
+    "visibilityOptions": "Safidy fahitana",
+    "visibilityOptionsHint": "Boost sy safidy mandroso (tsy voatery)",
+    "mapHint": "Tsindrio ny sarintany na akisaho ny mariky toerana mba hampisehoana ny toerana marina. Hahita izany amin'ny pejin'ny filazana ny mpividy.",
+    "sellerTypeConcessionnaire": "Concessionnaire",
+    "sellerTypeParticulier": "Tsotra",
+    "regenerateAutoTitle": "Avereno hoazy",
+    "titleAutoHint": "Noforonina hoazy avy amin'ny marika, ny modely, ny version ary ny taona.",
+    "brandCustomPlaceholder": "Soraty ny marika",
+    "brandBackToList": "Misafidiana ao anaty lisitra",
+    "brandSearchPlaceholder": "Mitady marika…",
+    "brandNoMatch": "Tsy nahitana marika.",
+    "brandOtherOption": "Marika hafa…",
+    "motorizationTitle": "Motorisation",
+    "motorizationDesc": "Carburant, boîte, motricité ary cylindrée.",
+    "engineDisplacementPlaceholderCc": "Oh : 1500",
+    "engineDisplacementPlaceholderL": "Oh : 1.5",
+    "engineDisplacementEquivalence": "Mitovy amin'ny : {{value}}",
+    "configTitle": "Carrosserie sy fandrindrana",
+    "configDesc": "Varavarana, seza ary loko.",
+    "interiorColorCustomPlaceholder": "Soraty ny loko",
+    "selectInteriorColor": "Mifidiana loko",
+    "interiorColorOther": "Hafa…",
+    "availabilityTitle": "Toetra sy fahafahana",
+    "sellerTypeLabel": "Karazana mpivarotra",
+    "sellerTypeAutoHint": "Voafaritra hoazy araka ny mombamomba anao.",
+    "equipmentLegacyTitle": "Hafa (voatahiry)",
+    "equipmentLegacyDesc": "Sanda avy amin'ny version taloha ny katalaogy. Soraty hiala mba hanesorana azy ireo amin'ny filazana.",
+    "complementaryTitle": "Vaovao fanampiny (tsy voatery)",
+    "complementaryDesc": "Naoty malalaka sy toetra fanampiny.",
+    "titleTooLong": "Tsy mahazo mihoatra ny 120 litera ny lohateny.",
+    "priceTooLow": "Tsy maintsy farafahakeliny 100 000 Ar ny vidiny.",
+    "priceTooHigh": "Tsy mahazo mihoatra ny 10 lavitrisa Ariary ny vidiny.",
+    "mileageKmInvalid": "Kilométrage tsy mety",
+    "successPublishedActive": "Voapetraka soa aman-tsara ny filazana !",
+    "successPublishedActiveDesc": "Hita amin'ny besinimaro ao amin'ny AutoNex izao ny filazanao.",
+    "successPublishedReview": "Nalefa ho voasivana ny filazana",
+    "successPublishedReviewDesc": "Hojeren'ny ekipanay ao anatin'ny 24 ora ny filazanao. Hampahafantarina ianao raha vao hita.",
+    "doors": "Varavarana",
+    "seats": "Seza / habetsahana (tsy voatery)",
+    "uploading": "Mampakatra…"
   },
   "search": {
     "activeSelection": "Safidy mavitrika: {{value}}",
@@ -946,7 +1043,17 @@
     "yearMax": "Taona farany ambony",
     "yearMin": "Taona farany ambany",
     "youMayAlsoLike": "Mety ho tianao koa",
-    "zeroListingsHeadline": "0 filazana"
+    "zeroListingsHeadline": "0 filazana",
+    "hideAdvancedFilters": "Hanafina ny sivana mandroso",
+    "showAdvancedFilters": "Asehoy ny sivana mandroso",
+    "locationAppliedTitle": "Toerana voafidy",
+    "locationAppliedBody": "Voaova ny sivana toerana. Mihantona indray ny valiny.",
+    "quartierZonesFirst": "Faripiadidiana sy faritra",
+    "quartierZonesHint": "Mifidiana faripiadidiana voafaritra — izay no fomba mahazatra eto Madagasikara hanasokajiana ny fikarohana.",
+    "browseByAreaTitle": "Tanàna manontolo sy distrika",
+    "locationHierarchyHint": "Ny tanàna manontolo raha tsy misy voamariny eto ambany. Marihy distrika manontolo na faripiadidiana voafaritra — azo akambana.",
+    "wholeArrondissementShort": "Rehetra",
+    "relaxedFetchCapHint": "Asongadina ireo filazana vao haingana ao anatin'ny fe-potoana voafetra ny valiny aseho ; mety ahitana filazana ivelan'io fe-potoana io ny totaly."
   },
   "sections": {
     "agencies": "Concessionnaires mpiara-miombon'antoka",
@@ -972,7 +1079,11 @@
     "active": "Mavitrika",
     "draft": "Boribory",
     "expired": "Lany andro",
-    "paused": "Mihantona"
+    "paused": "Mihantona",
+    "pendingReview": "Eo am-panaraha-maso",
+    "pendingPayment": "Fandoavam-bola hamarinina",
+    "pendingPaymentVerification": "Fandoavam-bola eo am-panamarinana",
+    "rejected": "Nolavina"
   },
   "transaction": {
     "rent": "Hofa maharitra",
@@ -1161,7 +1272,30 @@
     "promoValid": "Mety ny code",
     "promoRemove": "Esory ny code promo",
     "promoInvalid": "Tsy mety ny code.",
-    "purchaseSendError": "Hadisoana nandritra ny fandefasana ny fangatahana."
+    "purchaseSendError": "Hadisoana nandritra ny fandefasana ny fangatahana.",
+    "promoInvalidSyntax": "Code tsy mety (A-Z, 0-9, tiret)",
+    "promoLabel": "Manana code promo ve ianao ?",
+    "unit": "crédits",
+    "ratioLabel": "{{ratio}} MGA / crédit",
+    "termsAcknowledgement": "Amin'ny fividianana, ekenao ny ",
+    "termsLinkLabel": "Fepetra fampiasana ny crédits",
+    "termsHintSuffix": " — tsy averina ny crédits, lany aorian'ny 12 volana.",
+    "balance": {
+      "insufficient": "Tsy ampy mba hamoahana filazana ({{count}} crédits ilaina).",
+      "scenariosWith": "Amin'ity solde ity : {{scenarios}}"
+    },
+    "balanceLabel": "Ny solde-nao",
+    "pendingTitle": "Miandry fanamarinana",
+    "noPending": "Tsy misy fangatahana miandry.",
+    "statusPending": "Miandry",
+    "historyTitle": "Tantara vao haingana",
+    "noHistory": "Tsy misy transaction lasa.",
+    "pageTitle": "Crédits AutoNex",
+    "pageDescription": "Tantano ny solde crédits AutoNex, mividy pack ary araho ny transaction-nao.",
+    "pageOverline": "Sehatry ny crédits",
+    "pageHeading": "Ny crédits AutoNex-nao",
+    "pageIntro": "Mividiana pack crédits mba hamoahana ny filazanao ary hampandeha ny boost. Tsy averina ny crédits ary lany 12 volana aorian'ny fividianana.",
+    "purchaseSectionTitle": "Misafidiana pakety"
   },
   "boost": {
     "dialogTitle": "Hampoizina ny filazana",
@@ -1176,5 +1310,55 @@
     "confirming": "Fanamarinana…",
     "confirmWithCredits": "Hamarino ({{count}} crédits)",
     "purchaseSuccess": "Voasokatra ny boost. Misitraka avy hatrany ny fahitana voafidy ny filazanao."
+  },
+  "brands": {
+    "scrollPrev": "Marika teo aloha",
+    "scrollNext": "Marika manaraka"
+  },
+  "a11y": {
+    "skipToContent": "Mankany amin'ny votoaty fototra"
+  },
+  "blog": {
+    "noPosts": "Tsy mbola misy lahatsoratra.",
+    "notFound": "Tsy hita ny lahatsoratra",
+    "notFoundDesc": "Tsy misy na efa nesorina ity lahatsoratra ity.",
+    "viewAll": "Hijery ny lahatsoratra rehetra",
+    "toc": "Lisitry ny ao anatiny"
+  },
+  "contact": {
+    "pageTitle": "Fifandraisana",
+    "metaDescription": "Mifandraisa amin'ny ekipan'ny AutoNex : fanontaniana ankapobeny, support ara-teknika, concessionnaires, fiaraha-miasa. Valiny ao anatin'ny 48 ora fiasana.",
+    "heading": "Mifandraisa aminay",
+    "subheading": "Manana fanontaniana, soso-kevitra, na fiaraha-miasa ? Mamaly anao ao anatin'ny 48 ora fiasana ny ekipanay.",
+    "fullNameLabel": "Anarana feno *",
+    "emailLabel": "Email *",
+    "whatsappLabel": "Finday WhatsApp (tsy voatery)",
+    "subjectLabel": "Lohahevitra *",
+    "subjectPlaceholder": "Misafidiana lohahevitra",
+    "subjectGeneral": "Fanontaniana ankapobeny",
+    "subjectTechnical": "Support ara-teknika",
+    "subjectDealers": "Concessionnaires",
+    "subjectPartnerships": "Fiaraha-miasa",
+    "subjectOther": "Hafa",
+    "messageLabel": "Hafatra *",
+    "charsRemaining": "{{count}} litera sisa (farafahakeliny 20).",
+    "consentPrefix": "Manaiky aho fa azo ampiasaina ny angonako mba hamaliana ny fangatahana, mifanaraka amin'ny",
+    "privacyPolicyLink": "Politikan'ny tsiambaratelo",
+    "sending": "Mandefa…",
+    "submit": "Alefaso ny hafatra",
+    "successToast": "Misaotra, voalefa ny hafatrao. Hamaly anao ao anatin'ny 48 ora fiasana izahay.",
+    "otherChannelsTitle": "Lalana hafa",
+    "responseTime": "Valiny ao anatin'ny 48 ora fiasana",
+    "legalQuestionPrefix": "Ho an'ny fanontaniana ara-dalàna, jereo ny",
+    "legalNoticeLink": "Fanambarana ara-dalàna",
+    "errors": {
+      "fullNameMin": "Ilaina ny anarana feno (farafahakeliny 2 litera).",
+      "fullNameMax": "Farany 100 litera.",
+      "emailInvalid": "Tsy mety ny email.",
+      "phoneInvalid": "Laharana tsy mety (format international ilaina : +261…).",
+      "messageMin": "Farafahakeliny 20 litera.",
+      "messageMax": "Farany 2000 litera.",
+      "consentRequired": "Tsy maintsy ekenao ny politikan'ny tsiambaratelo."
+    }
   }
 }

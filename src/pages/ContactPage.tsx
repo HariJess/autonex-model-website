@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
@@ -27,32 +28,32 @@ import {
   type ContactSubject,
 } from "@/hooks/useSubmitContactMessage";
 
-const SUBJECT_OPTIONS: { value: ContactSubject; label: string }[] = [
-  { value: "general", label: "Question générale" },
-  { value: "technical", label: "Support technique" },
-  { value: "dealers", label: "Concessionnaires" },
-  { value: "partnerships", label: "Partenariats" },
-  { value: "other", label: "Autre" },
+const SUBJECT_OPTION_KEYS: { value: ContactSubject; labelKey: string }[] = [
+  { value: "general", labelKey: "contact.subjectGeneral" },
+  { value: "technical", labelKey: "contact.subjectTechnical" },
+  { value: "dealers", labelKey: "contact.subjectDealers" },
+  { value: "partnerships", labelKey: "contact.subjectPartnerships" },
+  { value: "other", labelKey: "contact.subjectOther" },
 ];
 
 const contactFormSchema = z.object({
-  fullName: z.string().trim().min(2, "Nom complet requis (min 2 caractères).").max(100, "Max 100 caractères."),
-  email: z.string().trim().email("Email invalide."),
+  fullName: z.string().trim().min(2, "contact.errors.fullNameMin").max(100, "contact.errors.fullNameMax"),
+  email: z.string().trim().email("contact.errors.emailInvalid"),
   whatsappPhone: z
     .string()
     .trim()
     .optional()
     .refine((v) => !v || isValidPhoneNumber(v), {
-      message: "Numéro invalide (format international attendu : +261…).",
+      message: "contact.errors.phoneInvalid",
     }),
   subject: z.enum(["general", "technical", "dealers", "partnerships", "other"]),
   message: z
     .string()
     .trim()
-    .min(20, "Minimum 20 caractères.")
-    .max(2000, "Maximum 2000 caractères."),
+    .min(20, "contact.errors.messageMin")
+    .max(2000, "contact.errors.messageMax"),
   consentGiven: z.literal(true, {
-    errorMap: () => ({ message: "Vous devez accepter la politique de confidentialité." }),
+    errorMap: () => ({ message: "contact.errors.consentRequired" }),
   }),
   // Honeypot field — must stay empty. Not shown to real users.
   website: z.literal("").default(""),
@@ -74,6 +75,7 @@ const CONTACT_JSON_LD = {
 };
 
 export default function ContactPage() {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsappPhone, setWhatsappPhone] = useState("");
@@ -93,7 +95,7 @@ export default function ContactPage() {
 
     // Honeypot: silently drop if filled. Bot-only.
     if (website.trim().length > 0) {
-      toast.success("Merci, votre message a été envoyé. Nous vous répondrons sous 48h ouvrés.");
+      toast.success(t("contact.successToast"));
       return;
     }
 
@@ -128,7 +130,7 @@ export default function ContactPage() {
       },
       {
         onSuccess: () => {
-          toast.success("Merci, votre message a été envoyé. Nous vous répondrons sous 48h ouvrés.");
+          toast.success(t("contact.successToast"));
           setFullName("");
           setEmail("");
           setWhatsappPhone("");
@@ -148,10 +150,10 @@ export default function ContactPage() {
   return (
     <>
       <Helmet>
-        <title>Contact — AutoNex</title>
+        <title>{t("contact.pageTitle", "Contact")} — AutoNex</title>
         <meta
           name="description"
-          content="Contactez l'équipe AutoNex : questions générales, support technique, concessionnaires, partenariats. Réponse sous 48h ouvrés."
+          content={t("contact.metaDescription", "Contactez l'équipe AutoNex : questions générales, support technique, concessionnaires, partenariats. Réponse sous 48h ouvrés.")}
         />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={canonical} />
@@ -160,9 +162,9 @@ export default function ContactPage() {
       <Header />
       <main className="container mx-auto py-8 md:py-12">
         <header className="mb-6 md:mb-8 space-y-2">
-          <h1 className="font-sans text-3xl md:text-4xl font-bold">Nous contacter</h1>
+          <h1 className="font-sans text-3xl md:text-4xl font-bold">{t("contact.heading", "Nous contacter")}</h1>
           <p className="font-sans text-muted-foreground max-w-2xl">
-            Une question, une suggestion, un partenariat ? Notre équipe vous répond sous 48h ouvrés.
+            {t("contact.subheading", "Une question, une suggestion, un partenariat ? Notre équipe vous répond sous 48h ouvrés.")}
           </p>
         </header>
 
@@ -184,7 +186,7 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="contact-fullName" className="font-sans">Nom complet *</Label>
+              <Label htmlFor="contact-fullName" className="font-sans">{t("contact.fullNameLabel", "Nom complet *")}</Label>
               <Input
                 id="contact-fullName"
                 value={fullName}
@@ -193,11 +195,11 @@ export default function ContactPage() {
                 maxLength={100}
                 required
               />
-              {errors.fullName ? <p className="text-xs text-destructive font-sans">{errors.fullName}</p> : null}
+              {errors.fullName ? <p className="text-xs text-destructive font-sans">{t(errors.fullName)}</p> : null}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="contact-email" className="font-sans">Email *</Label>
+              <Label htmlFor="contact-email" className="font-sans">{t("contact.emailLabel", "Email *")}</Label>
               <Input
                 id="contact-email"
                 type="email"
@@ -207,11 +209,11 @@ export default function ContactPage() {
                 maxLength={255}
                 required
               />
-              {errors.email ? <p className="text-xs text-destructive font-sans">{errors.email}</p> : null}
+              {errors.email ? <p className="text-xs text-destructive font-sans">{t(errors.email)}</p> : null}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="contact-whatsapp" className="font-sans">Téléphone WhatsApp (optionnel)</Label>
+              <Label htmlFor="contact-whatsapp" className="font-sans">{t("contact.whatsappLabel", "Téléphone WhatsApp (optionnel)")}</Label>
               <Input
                 id="contact-whatsapp"
                 value={whatsappPhone}
@@ -221,29 +223,29 @@ export default function ContactPage() {
                 maxLength={30}
               />
               {errors.whatsappPhone ? (
-                <p className="text-xs text-destructive font-sans">{errors.whatsappPhone}</p>
+                <p className="text-xs text-destructive font-sans">{t(errors.whatsappPhone)}</p>
               ) : null}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="contact-subject" className="font-sans">Sujet *</Label>
+              <Label htmlFor="contact-subject" className="font-sans">{t("contact.subjectLabel", "Sujet *")}</Label>
               <Select value={subject} onValueChange={(v) => setSubject(v as ContactSubject)}>
                 <SelectTrigger id="contact-subject" className="font-sans">
-                  <SelectValue placeholder="Choisir un sujet" />
+                  <SelectValue placeholder={t("contact.subjectPlaceholder", "Choisir un sujet")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {SUBJECT_OPTIONS.map((opt) => (
+                  {SUBJECT_OPTION_KEYS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.subject ? <p className="text-xs text-destructive font-sans">{errors.subject}</p> : null}
+              {errors.subject ? <p className="text-xs text-destructive font-sans">{t(errors.subject)}</p> : null}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="contact-message" className="font-sans">Message *</Label>
+              <Label htmlFor="contact-message" className="font-sans">{t("contact.messageLabel", "Message *")}</Label>
               <Textarea
                 id="contact-message"
                 value={message}
@@ -254,9 +256,9 @@ export default function ContactPage() {
                 required
               />
               <p className="text-xs text-muted-foreground font-sans">
-                {charsRemaining} caractères restants (min 20).
+                {t("contact.charsRemaining", { count: charsRemaining })}
               </p>
-              {errors.message ? <p className="text-xs text-destructive font-sans">{errors.message}</p> : null}
+              {errors.message ? <p className="text-xs text-destructive font-sans">{t(errors.message)}</p> : null}
             </div>
 
             <label className="flex items-start gap-2">
@@ -267,22 +269,22 @@ export default function ContactPage() {
                 className="mt-0.5"
               />
               <span className="text-sm font-sans text-foreground">
-                J'accepte que mes données soient utilisées pour répondre à ma demande, conformément à la{" "}
+                {t("contact.consentPrefix", "J'accepte que mes données soient utilisées pour répondre à ma demande, conformément à la")}{" "}
                 <Link to="/legal/confidentialite" className="text-primary hover:underline">
-                  Politique de Confidentialité
+                  {t("contact.privacyPolicyLink", "Politique de Confidentialité")}
                 </Link>
                 .
               </span>
             </label>
-            {errors.consentGiven ? <p className="text-xs text-destructive font-sans">{errors.consentGiven}</p> : null}
+            {errors.consentGiven ? <p className="text-xs text-destructive font-sans">{t(errors.consentGiven)}</p> : null}
 
             <Button type="submit" disabled={mutation.isPending} className="font-sans">
-              {mutation.isPending ? "Envoi…" : "Envoyer le message"}
+              {mutation.isPending ? t("contact.sending", "Envoi…") : t("contact.submit", "Envoyer le message")}
             </Button>
           </form>
 
           <aside className="space-y-4 rounded-2xl border border-border bg-card p-5 h-fit lg:sticky lg:top-24">
-            <h2 className="font-sans text-lg font-bold">Autres canaux</h2>
+            <h2 className="font-sans text-lg font-bold">{t("contact.otherChannelsTitle", "Autres canaux")}</h2>
             <p className="text-sm font-sans text-muted-foreground flex items-start gap-2">
               <Mail className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
               <a href="mailto:info@autonex.mg" className="text-primary hover:underline">
@@ -291,7 +293,7 @@ export default function ContactPage() {
             </p>
             <p className="text-sm font-sans text-muted-foreground flex items-start gap-2">
               <Clock className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
-              Réponse sous 48h ouvrés
+              {t("contact.responseTime", "Réponse sous 48h ouvrés")}
             </p>
             <p className="text-sm font-sans text-muted-foreground flex items-start gap-2">
               <MapPin className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
@@ -301,9 +303,9 @@ export default function ContactPage() {
               </span>
             </p>
             <p className="text-xs font-sans text-muted-foreground border-t border-border pt-3">
-              Pour toute question légale, consultez nos{" "}
+              {t("contact.legalQuestionPrefix", "Pour toute question légale, consultez nos")}{" "}
               <Link to="/legal/mentions" className="text-primary hover:underline">
-                Mentions légales
+                {t("contact.legalNoticeLink", "Mentions légales")}
               </Link>
               .
             </p>
