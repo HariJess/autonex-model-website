@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -95,6 +96,7 @@ export function useDeletionStatus() {
 export function useRequestDeletion() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return useMutation<
     { scheduled_for: Date; emailWarning: string | null },
@@ -162,11 +164,9 @@ export function useRequestDeletion() {
     onSuccess: ({ scheduled_for, emailWarning }) => {
       const formatted = formatFrenchDate(scheduled_for);
       if (emailWarning) {
-        toast.warning(
-          `Compte programmé pour suppression le ${formatted}. L'email de confirmation n'a pas pu être envoyé.`,
-        );
+        toast.warning(t("account.deletion.scheduledWithEmailWarning", { date: formatted }));
       } else {
-        toast.success(`Compte programmé pour suppression le ${formatted}.`);
+        toast.success(t("account.deletion.scheduled", { date: formatted }));
       }
       if (user?.id) {
         void queryClient.invalidateQueries({ queryKey: DELETION_STATUS_KEY(user.id) });
@@ -175,7 +175,7 @@ export function useRequestDeletion() {
       }
     },
     onError: (err) => {
-      toast.error(err.message || "La demande de suppression a échoué.");
+      toast.error(err.message || t("account.deletion.requestFailed", "La demande de suppression a échoué."));
     },
   });
 }
@@ -183,6 +183,7 @@ export function useRequestDeletion() {
 export function useCancelDeletion() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return useMutation<void, Error, void>({
     mutationFn: async () => {
@@ -196,7 +197,7 @@ export function useCancelDeletion() {
         .eq("id", user.id);
     },
     onSuccess: () => {
-      toast.success("Suppression annulée. Votre compte reste actif.");
+      toast.success(t("account.deletion.cancelled", "Suppression annulée. Votre compte reste actif."));
       if (user?.id) {
         void queryClient.invalidateQueries({ queryKey: DELETION_STATUS_KEY(user.id) });
         void queryClient.invalidateQueries({ queryKey: ["settings-profile", user.id] });
@@ -204,13 +205,14 @@ export function useCancelDeletion() {
       }
     },
     onError: (err) => {
-      toast.error(err.message || "L'annulation a échoué.");
+      toast.error(err.message || t("account.deletion.cancelFailed", "L'annulation a échoué."));
     },
   });
 }
 
 /** RGPD Art. 20 portabilité — triggers a browser download of the JSONB export. */
 export function useExportData() {
+  const { t } = useTranslation();
   return useMutation<void, Error, void>({
     mutationFn: async () => {
       const { data, error } = await supabase.rpc("export_user_data");
@@ -230,7 +232,7 @@ export function useExportData() {
         URL.revokeObjectURL(url);
       }
     },
-    onSuccess: () => toast.success("Export téléchargé."),
-    onError: (err) => toast.error(err.message || "L'export a échoué."),
+    onSuccess: () => toast.success(t("account.deletion.exportSuccess", "Export téléchargé.")),
+    onError: (err) => toast.error(err.message || t("account.deletion.exportFailed", "L'export a échoué.")),
   });
 }

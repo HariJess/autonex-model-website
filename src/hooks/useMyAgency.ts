@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,6 +66,7 @@ export function useMyAgency() {
 export function useUpdateMyAgency() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation<void, Error, UpdateMyAgencyInput>({
     mutationFn: async (input) => {
@@ -83,11 +85,11 @@ export function useUpdateMyAgency() {
       if (error) throw new Error(error.message);
     },
     onSuccess: () => {
-      toast.success("Fiche agence mise à jour.");
+      toast.success(t("agencies.toastUpdated", "Fiche agence mise à jour."));
       queryClient.invalidateQueries({ queryKey: myAgencyKey(user?.id) });
       queryClient.invalidateQueries({ queryKey: ["agency-profile"] });
       queryClient.invalidateQueries({ queryKey: ["agencies-list"] });
     },
-    onError: (err) => toast.error(mapDbError(err, "Erreur lors de la mise à jour.")),
+    onError: (err) => toast.error(mapDbError(err, t("agencies.toastUpdateError", "Erreur lors de la mise à jour."))),
   });
 }

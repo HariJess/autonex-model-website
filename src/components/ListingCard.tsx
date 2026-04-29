@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Gauge, ChevronLeft, ChevronRight, Camera } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useMemo, useState } from "react";
@@ -35,6 +36,7 @@ interface ListingCardProps {
 const LOCAL_PLACEHOLDER = "/placeholder.svg";
 
 const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default", dealMeta = null, layout = "default" }: ListingCardProps) => {
+  const { t } = useTranslation();
   const images = useMemo(
     () => (listing.images.length > 0 ? listing.images : [LOCAL_PLACEHOLDER]),
     [listing.images],
@@ -48,11 +50,11 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
     return Array.from({ length: 5 }, (_, i) => start + i);
   }, [images, imgIndex]);
 
-  const badgeLabels: Record<string, { label: string; className: string }> = {
-    boost: { label: "Boost", className: "gradient-primary" },
-    coup_de_coeur: { label: "Coup de cœur", className: "bg-accent" },
-    nouveau: { label: "Nouveau", className: "bg-success" },
-    urgent: { label: "Urgent", className: "bg-destructive" },
+  const badgeLabels: Record<string, { labelKey: string; className: string }> = {
+    boost: { labelKey: "listing.badge.boost", className: "gradient-primary" },
+    coup_de_coeur: { labelKey: "listing.badge.coupDeCoeur", className: "bg-accent" },
+    nouveau: { labelKey: "listing.badge.nouveau", className: "bg-success" },
+    urgent: { labelKey: "listing.badge.urgent", className: "bg-destructive" },
   };
 
   const displayAgencyName = agencyName ?? listing.agency_name;
@@ -66,11 +68,11 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
   const displayBrandAsset = resolveBrandAsset(displayBrand);
   const transactionBadgeLabel =
     listing.transaction === "vente"
-      ? "Vente"
+      ? t("transaction.sale", "Acheter")
       : listing.transaction === "location"
-        ? "Location"
+        ? t("transaction.rent", "Location longue durée")
         : listing.transaction === "location_vacances"
-          ? "Location courte durée"
+          ? t("transaction.vacation", "Location courte durée")
           : listing.transaction;
   const isSearchVariant = variant === "search";
   const isCompactLayout = layout === "compact";
@@ -130,7 +132,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               className={`${badgeLabels[listing.badge].className} rounded-full text-[11px] font-semibold px-3 py-1 shadow-sm whitespace-nowrap border-transparent`}
               style={{ color: "#FAFAFA" }}
             >
-              {badgeLabels[listing.badge].label}
+              {t(badgeLabels[listing.badge].labelKey)}
             </Badge>
           )}
           <Badge className={`rounded-full bg-white/90 backdrop-blur-sm border border-white/40 font-medium text-slate-900 shadow-sm whitespace-nowrap hover:bg-white/90 ${
@@ -161,7 +163,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
             className={`lg:hidden absolute bottom-2 z-[2] inline-flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm ${
               displayAgencyLogo ? "left-2" : "right-2"
             }`}
-            aria-label={`${images.length} photos`}
+            aria-label={t("listing.card.photoCount", { count: images.length })}
           >
             <Camera className="h-3.5 w-3.5" aria-hidden />
             {images.length}
@@ -174,7 +176,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i > 0 ? i - 1 : images.length - 1)); }}
               className="hidden lg:inline-flex absolute left-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 active:scale-95"
-              aria-label="Photo précédente"
+              aria-label={t("listing.card.photoPrevious", "Photo précédente")}
               tabIndex={-1}
             >
               <ChevronLeft className="h-5 w-5" />
@@ -183,7 +185,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               type="button"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImgIndex((i) => (i < images.length - 1 ? i + 1 : 0)); }}
               className="hidden lg:inline-flex absolute right-2 top-1/2 -translate-y-1/2 min-h-11 min-w-11 items-center justify-center rounded-full bg-card/85 backdrop-blur-sm shadow-sm border border-border/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 active:scale-95"
-              aria-label="Photo suivante"
+              aria-label={t("listing.card.photoNext", "Photo suivante")}
               tabIndex={-1}
             >
               <ChevronRight className="h-5 w-5" />

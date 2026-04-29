@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -18,13 +19,17 @@ import { Label } from "@/components/ui/label";
  * change is a conscious action, so we take the opportunity to raise the bar
  * on at least one uppercase + one lowercase + one digit. Signup-time rules
  * stay unchanged to avoid breaking the onboarding funnel.
+ *
+ * Validation messages are passed through i18n keys; t() is invoked at the
+ * call site (form), which is fine since Zod re-evaluates message functions
+ * on each parse.
  */
 const passwordRules = z
   .string()
-  .min(8, "Le mot de passe doit contenir au moins 8 caractères")
-  .regex(/[a-z]/, "Le mot de passe doit contenir au moins une minuscule")
-  .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une majuscule")
-  .regex(/\d/, "Le mot de passe doit contenir au moins un chiffre");
+  .min(8, "auth.passwordRuleMin8")
+  .regex(/[a-z]/, "auth.passwordRuleLowercase")
+  .regex(/[A-Z]/, "auth.passwordRuleUppercase")
+  .regex(/\d/, "auth.passwordRuleDigit");
 
 const passwordFormSchema = z
   .object({
@@ -33,7 +38,7 @@ const passwordFormSchema = z
   })
   .refine((v) => v.new_password === v.confirm_password, {
     path: ["confirm_password"],
-    message: "Les mots de passe ne correspondent pas",
+    message: "auth.passwordMismatch",
   });
 
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
@@ -47,6 +52,7 @@ function formatFrenchDateTime(iso: string | null | undefined): string {
 
 export function SecuriteSection() {
   const { user, session } = useAuth();
+  const { t } = useTranslation();
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema),
@@ -59,11 +65,11 @@ export function SecuriteSection() {
       if (error) throw new Error(error.message);
     },
     onSuccess: () => {
-      toast.success("Mot de passe modifié");
+      toast.success(t("account.security.toastSuccess", "Mot de passe modifié"));
       form.reset({ new_password: "", confirm_password: "" });
     },
     onError: (err) => {
-      toast.error(err.message || "Erreur lors du changement de mot de passe");
+      toast.error(err.message || t("account.security.toastErrorFallback", "Erreur lors du changement de mot de passe"));
     },
   });
 
@@ -71,12 +77,15 @@ export function SecuriteSection() {
 
   const lastSignInIso = session?.user?.last_sign_in_at ?? user?.last_sign_in_at ?? null;
 
+  const newPasswordError = form.formState.errors.new_password?.message;
+  const confirmPasswordError = form.formState.errors.confirm_password?.message;
+
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="font-sans text-2xl font-bold" id="section-securite-heading">Sécurité</h2>
+        <h2 className="font-sans text-2xl font-bold" id="section-securite-heading">{t("account.security.title", "Sécurité")}</h2>
         <p className="mt-1 font-sans text-sm text-muted-foreground">
-          Changez votre mot de passe et consultez vos informations de session.
+          {t("account.security.subtitle", "Changez votre mot de passe et consultez vos informations de session.")}
         </p>
       </header>
 
@@ -84,12 +93,12 @@ export function SecuriteSection() {
       <section className="space-y-4 rounded-2xl border border-border bg-card p-4 md:p-5">
         <div className="flex items-center gap-2">
           <Lock className="h-4 w-4 text-muted-foreground" aria-hidden />
-          <h3 className="font-sans text-base font-semibold">Changer le mot de passe</h3>
+          <h3 className="font-sans text-base font-semibold">{t("account.security.changePassword", "Changer le mot de passe")}</h3>
         </div>
 
-        <form onSubmit={onSubmit} noValidate className="space-y-4" aria-label="Formulaire changement de mot de passe">
+        <form onSubmit={onSubmit} noValidate className="space-y-4" aria-label={t("account.security.formAriaLabel", "Formulaire changement de mot de passe")}>
           <div className="space-y-1.5">
-            <Label htmlFor="securite-new-password" className="font-sans">Nouveau mot de passe</Label>
+            <Label htmlFor="securite-new-password" className="font-sans">{t("account.security.newPasswordLabel", "Nouveau mot de passe")}</Label>
             <Input
               id="securite-new-password"
               type="password"
@@ -98,17 +107,17 @@ export function SecuriteSection() {
               disabled={mutation.isPending}
               {...form.register("new_password")}
             />
-            {form.formState.errors.new_password ? (
-              <p className="text-xs text-destructive font-sans">{form.formState.errors.new_password.message}</p>
+            {newPasswordError ? (
+              <p className="text-xs text-destructive font-sans">{t(newPasswordError)}</p>
             ) : (
               <p className="text-xs text-muted-foreground font-sans">
-                Au moins 8 caractères, une majuscule, une minuscule et un chiffre.
+                {t("account.security.passwordRulesHint", "Au moins 8 caractères, une majuscule, une minuscule et un chiffre.")}
               </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="securite-confirm-password" className="font-sans">Confirmer le mot de passe</Label>
+            <Label htmlFor="securite-confirm-password" className="font-sans">{t("account.security.confirmPasswordLabel", "Confirmer le mot de passe")}</Label>
             <Input
               id="securite-confirm-password"
               type="password"
@@ -117,8 +126,8 @@ export function SecuriteSection() {
               disabled={mutation.isPending}
               {...form.register("confirm_password")}
             />
-            {form.formState.errors.confirm_password ? (
-              <p className="text-xs text-destructive font-sans">{form.formState.errors.confirm_password.message}</p>
+            {confirmPasswordError ? (
+              <p className="text-xs text-destructive font-sans">{t(confirmPasswordError)}</p>
             ) : null}
           </div>
 
@@ -126,10 +135,10 @@ export function SecuriteSection() {
             {mutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden />
-                Mise à jour…
+                {t("account.security.updating", "Mise à jour…")}
               </>
             ) : (
-              "Modifier le mot de passe"
+              t("account.security.submitButton", "Modifier le mot de passe")
             )}
           </Button>
         </form>
@@ -139,11 +148,11 @@ export function SecuriteSection() {
       <section className="space-y-3 rounded-2xl border border-border bg-muted/20 p-4 md:p-5">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-muted-foreground" aria-hidden />
-          <h3 className="font-sans text-base font-semibold">Informations de sécurité</h3>
+          <h3 className="font-sans text-base font-semibold">{t("account.security.infoTitle", "Informations de sécurité")}</h3>
         </div>
         <dl className="grid grid-cols-1 gap-2">
           <div>
-            <dt className="text-xs font-sans text-muted-foreground">Dernière connexion</dt>
+            <dt className="text-xs font-sans text-muted-foreground">{t("account.security.lastSignIn", "Dernière connexion")}</dt>
             <dd className="text-sm font-sans font-medium" data-testid="last-sign-in">
               {formatFrenchDateTime(lastSignInIso)}
             </dd>

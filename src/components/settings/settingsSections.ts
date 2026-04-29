@@ -9,17 +9,18 @@ export type SettingsSectionId = "profil" | "securite" | "notifications" | "zone-
 
 export type SettingsSectionDef = {
   id: SettingsSectionId;
-  label: string;
+  /** i18n key — resolved at the call site via `t(labelKey)`. */
+  labelKey: string;
   hash: `#${SettingsSectionId}`;
   icon: LucideIcon;
   danger?: boolean;
 };
 
 export const SETTINGS_SECTIONS: readonly SettingsSectionDef[] = [
-  { id: "profil", label: "Profil", hash: "#profil", icon: User },
-  { id: "securite", label: "Sécurité", hash: "#securite", icon: Lock },
-  { id: "notifications", label: "Notifications", hash: "#notifications", icon: Bell },
-  { id: "zone-danger", label: "Zone de danger", hash: "#zone-danger", icon: AlertTriangle, danger: true },
+  { id: "profil", labelKey: "account.settings.sectionProfile", hash: "#profil", icon: User },
+  { id: "securite", labelKey: "account.settings.sectionSecurity", hash: "#securite", icon: Lock },
+  { id: "notifications", labelKey: "account.settings.sectionNotifications", hash: "#notifications", icon: Bell },
+  { id: "zone-danger", labelKey: "account.settings.sectionDangerZone", hash: "#zone-danger", icon: AlertTriangle, danger: true },
 ] as const;
 
 export const DEFAULT_SETTINGS_SECTION: SettingsSectionId = "profil";

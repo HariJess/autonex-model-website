@@ -89,11 +89,11 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: Omit<NotificationPreferences, "us
   maxEmailsPerDay: 5,
 };
 
-export const NOTIFICATION_CATEGORY_LABELS: Record<NotificationCategory, string> = {
-  listings: "Annonces",
-  payments: "Paiements",
-  activity: "Activité",
-  searches: "Recherches sauvegardées",
-  admin: "Administration",
-  system: "Système",
+export const NOTIFICATION_CATEGORY_LABEL_KEYS: Record<NotificationCategory, string> = {
+  listings: "notifications.categoryListings",
+  payments: "notifications.categoryPayments",
+  activity: "notifications.categoryActivity",
+  searches: "notifications.categorySearches",
+  admin: "notifications.categoryAdmin",
+  system: "notifications.categorySystem",
 };

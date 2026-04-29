@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -21,8 +22,8 @@ type CookieConsentModalProps = {
 
 type CategoryRow = {
   id: "technical" | "analytics" | "functional" | "monitoring";
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   /** When true, the switch is shown as ON and the user cannot change it. */
   locked: boolean;
   /** When true, the switch is shown as OFF and the user cannot change it (category currently not toggleable from UI). */
@@ -30,35 +31,14 @@ type CategoryRow = {
 };
 
 const CATEGORIES: CategoryRow[] = [
-  {
-    id: "technical",
-    label: "Cookies techniques",
-    description: "Nécessaires au fonctionnement du site, ne peuvent être désactivés.",
-    locked: true,
-  },
-  {
-    id: "analytics",
-    label: "Cookies analytics",
-    description: "Nous aident à comprendre l'usage du site pour l'améliorer (Google Analytics, anonymisé).",
-    locked: false,
-  },
-  {
-    id: "functional",
-    label: "Cookies fonctionnels",
-    description: "Mémorisation de vos préférences (langue, thème).",
-    locked: false,
-  },
-  {
-    id: "monitoring",
-    label: "Cookies de monitoring",
-    description:
-      "Aident à détecter les bugs techniques, anonymisés. Désactivables dans les paramètres utilisateur plus tard.",
-    locked: true,
-    lockedOff: false,
-  },
+  { id: "technical", labelKey: "cookies.technicalLabel", descriptionKey: "cookies.technicalDescription", locked: true },
+  { id: "analytics", labelKey: "cookies.analyticsLabel", descriptionKey: "cookies.analyticsDescription", locked: false },
+  { id: "functional", labelKey: "cookies.functionalLabel", descriptionKey: "cookies.functionalDescription", locked: false },
+  { id: "monitoring", labelKey: "cookies.monitoringLabel", descriptionKey: "cookies.monitoringDescription", locked: true, lockedOff: false },
 ];
 
 export function CookieConsentModal({ open, onOpenChange, initial, onSave }: CookieConsentModalProps) {
+  const { t } = useTranslation();
   const [analytics, setAnalytics] = useState(initial.analytics);
   const [functional, setFunctional] = useState(initial.functional);
 
@@ -77,10 +57,9 @@ export function CookieConsentModal({ open, onOpenChange, initial, onSave }: Cook
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-sans">Préférences cookies</DialogTitle>
+          <DialogTitle className="font-sans">{t("cookies.preferencesTitle", "Préférences cookies")}</DialogTitle>
           <DialogDescription className="font-sans">
-            Choisissez quelles catégories de cookies vous souhaitez autoriser. Vos choix sont modifiables à tout moment via
-            le bouton "Gérer mes cookies" en pied de page.
+            {t("cookies.preferencesDescription", "Choisissez quelles catégories de cookies vous souhaitez autoriser. Vos choix sont modifiables à tout moment via le bouton \"Gérer mes cookies\" en pied de page.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -94,20 +73,21 @@ export function CookieConsentModal({ open, onOpenChange, initial, onSave }: Cook
               if (isAnalytics) setAnalytics(next);
               if (isFunctional) setFunctional(next);
             };
+            const label = t(cat.labelKey);
             return (
               <div
                 key={cat.id}
                 className="flex items-start justify-between gap-4 rounded-xl border border-border p-4"
               >
                 <div className="min-w-0 flex-1 space-y-1">
-                  <Label className="font-sans text-sm font-semibold">{cat.label}</Label>
-                  <p className="text-xs font-sans text-muted-foreground leading-relaxed">{cat.description}</p>
+                  <Label className="font-sans text-sm font-semibold">{label}</Label>
+                  <p className="text-xs font-sans text-muted-foreground leading-relaxed">{t(cat.descriptionKey)}</p>
                 </div>
                 <Switch
                   checked={checked}
                   onCheckedChange={onCheckedChange}
                   disabled={cat.locked}
-                  aria-label={cat.label}
+                  aria-label={label}
                 />
               </div>
             );
@@ -115,19 +95,19 @@ export function CookieConsentModal({ open, onOpenChange, initial, onSave }: Cook
         </div>
 
         <p className="text-xs font-sans text-muted-foreground">
-          Plus de détails sur la page{" "}
+          {t("cookies.moreDetailsPrefix", "Plus de détails sur la page")}{" "}
           <Link to="/legal/cookies" className="text-primary hover:underline">
-            Cookies
+            {t("cookies.moreDetailsLink", "Cookies")}
           </Link>
           .
         </p>
 
         <DialogFooter className="gap-2 sm:gap-2">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="font-sans">
-            Annuler
+            {t("common.cancel", "Annuler")}
           </Button>
           <Button type="button" onClick={handleSave} className="font-sans">
-            Enregistrer mes choix
+            {t("cookies.saveChoices", "Enregistrer mes choix")}
           </Button>
         </DialogFooter>
       </DialogContent>

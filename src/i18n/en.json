@@ -32,7 +32,15 @@
     "title": "Car dealers",
     "verifiedOnly": "Verified partners only",
     "viewAll": "View all dealers",
-    "viewStock": "View inventory"
+    "viewStock": "View inventory",
+    "toastUpdated": "Dealer profile updated.",
+    "toastUpdateError": "Error while updating.",
+    "myAgency": {
+      "pendingReviewBanner": "Your dealer profile is awaiting review by our team. This usually takes 24-48 hours. You can already fill in your details.",
+      "rejectedBanner": "Your profile was rejected. Reason: {{reason}}. Fix the information below — our team will re-review after you save.",
+      "suspendedBanner": "Your dealer profile is currently suspended. Reason: {{reason}}. Contact support for more information.",
+      "reasonNotSpecified": "not specified"
+    }
   },
   "auth": {
     "agency": "Agency",
@@ -89,7 +97,11 @@
     "signupSuccess": "Sign up successful! Check your email to confirm your account.",
     "updatePassword": "Update password",
     "updating": "Updating...",
-    "whatsapp": "WhatsApp (optional)"
+    "whatsapp": "WhatsApp (optional)",
+    "passwordRuleMin8": "Password must be at least 8 characters",
+    "passwordRuleLowercase": "Password must contain at least one lowercase letter",
+    "passwordRuleUppercase": "Password must contain at least one uppercase letter",
+    "passwordRuleDigit": "Password must contain at least one digit"
   },
   "common": {
     "back": "Back",
@@ -116,7 +128,8 @@
     "select": "Select",
     "send": "Send",
     "view": "View",
-    "yes": "Yes"
+    "yes": "Yes",
+    "continue": "Continue"
   },
   "dashboard": {
     "accountAdmin": "Administrator account",
@@ -518,7 +531,18 @@
     "whatsappAria": "Contact seller via WhatsApp",
     "whatsappReady": "WhatsApp response available",
     "whatsappUnavailable": "WhatsApp number unavailable for this listing.",
-    "yourMessage": "Your message..."
+    "yourMessage": "Your message...",
+    "card": {
+      "photoCount": "{{count}} photos",
+      "photoPrevious": "Previous photo",
+      "photoNext": "Next photo"
+    },
+    "badge": {
+      "boost": "Boost",
+      "coupDeCoeur": "Top pick",
+      "nouveau": "New",
+      "urgent": "Urgent"
+    }
   },
   "listings": {
     "negotiable": {
@@ -967,5 +991,190 @@
     "silver": "Silver",
     "white": "White",
     "yellow": "Yellow"
+  },
+  "account": {
+    "security": {
+      "title": "Security",
+      "subtitle": "Change your password and review your session info.",
+      "changePassword": "Change password",
+      "passwordRulesHint": "At least 8 characters, one uppercase, one lowercase, and one digit.",
+      "newPasswordLabel": "New password",
+      "confirmPasswordLabel": "Confirm password",
+      "formAriaLabel": "Password change form",
+      "updating": "Updating…",
+      "submitButton": "Update password",
+      "infoTitle": "Security information",
+      "lastSignIn": "Last sign-in",
+      "toastSuccess": "Password updated",
+      "toastErrorFallback": "Error while updating password"
+    },
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Edit your identity and public contact details.",
+      "accountInfo": "Account information",
+      "accountType": "Account type",
+      "memberSince": "Member since",
+      "deletionPendingTitle": "Deletion in progress",
+      "deletionPendingDescription": "Edits unavailable — your account is being deleted. Go to the “Danger zone” section to cancel.",
+      "formAriaLabel": "Profile form",
+      "saving": "Saving…",
+      "saveButton": "Save changes",
+      "toastSuccess": "Profile updated",
+      "toastErrorFallback": "Error while updating",
+      "signInRequired": "Sign-in required.",
+      "loadErrorTitle": "Loading error",
+      "loadErrorFallback": "Profile unavailable.",
+      "roleIndividual": "Individual",
+      "roleAgency": "Dealer",
+      "roleAdmin": "Administrator",
+      "errors": {
+        "nameMin2": "Name must be at least 2 characters",
+        "nameMax100": "Name cannot exceed 100 characters"
+      }
+    },
+    "dangerZone": {
+      "title": "Danger zone",
+      "subtitle": "GDPR data export and permanent account deletion.",
+      "pendingTitle": "Deletion request pending",
+      "pendingDescription": "Use the “Cancel deletion” button in the banner above to undo before the scheduled deletion date.",
+      "exportTitle": "Download my data",
+      "exportDescription": "Download a complete copy of all data we hold on you, in JSON format. Compliant with GDPR Article 20 (right to portability).",
+      "exportPreparing": "Preparing…",
+      "exportButton": "Download my data",
+      "deleteTitle": "Delete my account",
+      "deleteDescription": "This action will request the permanent deletion of your AutoNex account. A 30-day grace period lets you change your mind. After that, your personal data will be irreversibly anonymised under GDPR. Your active listings will be removed immediately."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "comingSoon": "Coming soon",
+      "comingSoonDesc": "Email and WhatsApp preferences (new features, listing replies, moderation alerts)."
+    },
+    "deleteDialog": {
+      "titleStep1": "Delete my account?",
+      "titleStep2": "Confirm deletion",
+      "intro": "Before you confirm, here's what happens:",
+      "bullet1": "Your account will be deactivated immediately.",
+      "bullet2": "Your active listings will be removed from the site.",
+      "bullet3": "Your data is kept for 30 days; the request can still be cancelled during that period.",
+      "bullet4": "After 30 days: irreversible GDPR anonymisation.",
+      "legalNote": "In line with our legal obligations, certain accounting data (transactions, invoices) will be retained in anonymised form.",
+      "confirmHelpPrefix": "This action becomes irreversible after 30 days. To confirm, type",
+      "confirmHelpSuffix": " below.",
+      "typeWordLabel": "Type {{word}}",
+      "typeWordError": "Please type exactly {{word}} to continue.",
+      "requestFailed": "The deletion request failed. Please try again.",
+      "sending": "Sending…",
+      "confirmButton": "Confirm deletion"
+    },
+    "deletionBanner": {
+      "anonymizedTitle": "Account anonymised",
+      "anonymizedDescription": "This account has been anonymised. No action is possible.",
+      "pendingTitleWithDate": "Your account will be deleted on {{date}}",
+      "pendingTitleWithoutDate": "Your account is scheduled for deletion",
+      "pendingDescription": "You can cancel this request at any time before that date. Your active listings have been removed from the platform.",
+      "cancelling": "Cancelling…",
+      "cancelButton": "Cancel deletion"
+    },
+    "deletion": {
+      "scheduled": "Account scheduled for deletion on {{date}}.",
+      "scheduledWithEmailWarning": "Account scheduled for deletion on {{date}}. The confirmation email could not be sent.",
+      "requestFailed": "The deletion request failed.",
+      "cancelled": "Deletion cancelled. Your account remains active.",
+      "cancelFailed": "Cancellation failed.",
+      "exportSuccess": "Export downloaded.",
+      "exportFailed": "Export failed."
+    },
+    "settings": {
+      "title": "Settings",
+      "sectionsButton": "Sections",
+      "sectionProfile": "Profile",
+      "sectionSecurity": "Security",
+      "sectionNotifications": "Notifications",
+      "sectionDangerZone": "Danger zone"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bellAriaLabel": "Notifications ({{count}} unread)",
+    "markAllAsRead": "Mark all as read",
+    "empty": "No notifications yet",
+    "viewAll": "View all notifications",
+    "preferences": {
+      "pageTitle": "Notification preferences",
+      "heading": "Notification preferences",
+      "subtitle": "Choose channels (in-app, immediate email, email digest) for each category.",
+      "loading": "Loading preferences…",
+      "colCategory": "Category",
+      "colInApp": "In-app",
+      "colEmailImmediate": "Immediate email",
+      "colEmailDigest": "Email digest",
+      "digestTitle": "Email digest",
+      "digestDescription": "Bundles non-critical notifications into a single recap email.",
+      "digestFrequency": "Frequency",
+      "digestDaily": "Daily",
+      "digestWeekly": "Weekly",
+      "digestNever": "Never",
+      "digestTime": "Sending time (EAT)",
+      "maxEmailsPerDay": "Max emails / day",
+      "resetButton": "Reset to defaults",
+      "resetSuccess": "Preferences reset to defaults.",
+      "backLink": "Back to notifications"
+    },
+    "unreadDot": "Unread",
+    "archive": "Archive",
+    "unreadCount": "{{count}} unread",
+    "allCaughtUp": "All caught up",
+    "filterAll": "All",
+    "filterUnread": "Unread",
+    "filterAllCategories": "All categories",
+    "emptyUnread": "No unread notifications",
+    "emptyCategory": "No notifications in this category",
+    "categoryListings": "Listings",
+    "categoryPayments": "Payments",
+    "categoryActivity": "Activity",
+    "categorySearches": "Saved searches",
+    "categoryAdmin": "Administration",
+    "categorySystem": "System"
+  },
+  "cookies": {
+    "preferencesTitle": "Cookie preferences",
+    "preferencesDescription": "Choose which cookie categories you want to allow. You can change your choices at any time via the \"Manage my cookies\" button in the footer.",
+    "technicalLabel": "Technical cookies",
+    "technicalDescription": "Required for the site to work, cannot be disabled.",
+    "analyticsLabel": "Analytics cookies",
+    "analyticsDescription": "Help us understand site usage to improve it (Google Analytics, anonymised).",
+    "functionalLabel": "Functional cookies",
+    "functionalDescription": "Remember your preferences (language, theme).",
+    "monitoringLabel": "Monitoring cookies",
+    "monitoringDescription": "Help us detect technical bugs, anonymised. Will become opt-out in user settings later.",
+    "moreDetailsPrefix": "More details on the",
+    "moreDetailsLink": "Cookies",
+    "saveChoices": "Save my choices",
+    "bannerAriaLabel": "Cookie consent banner",
+    "bannerBodyPrefix": "AutoNex uses technical cookies required by the service, plus optional cookies (analytics, functional) subject to your consent. You can accept all, reject all, or customise your choices. Details on the",
+    "acceptAll": "Accept all",
+    "rejectAll": "Reject all",
+    "customize": "Customise"
+  },
+  "credits": {
+    "promoValidationError": "Promo code validation error.",
+    "promoValid": "Valid code",
+    "promoRemove": "Remove promo code",
+    "promoInvalid": "Invalid code.",
+    "purchaseSendError": "Error sending the request."
+  },
+  "boost": {
+    "dialogTitle": "Boost the listing",
+    "dialogDescription": "Visibility purchase only: no republication fee, no new content moderation for a listing already online.",
+    "allActive": "All available boosts are already active for this listing. Come back after a boost expires to repurchase the same type.",
+    "checkOneOrMore": "Check one or more options. The total in credits is shown before confirmation.",
+    "creditsAmount": "{{count}} credits",
+    "daysAmount": "{{count}} days",
+    "total": "Total",
+    "availableBalance": "Available balance",
+    "insufficientBalance": "Insufficient balance for this cart.",
+    "confirming": "Confirming…",
+    "confirmWithCredits": "Confirm ({{count}} credits)",
+    "purchaseSuccess": "Boosts activated. Your listing now benefits from the chosen visibility."
   }
 }

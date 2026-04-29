@@ -77,7 +77,7 @@ describe("SecuriteSection", () => {
     fill("Nouveau mot de passe", "Ab1");
     fill("Confirmer le mot de passe", "Ab1");
     submitForm();
-    await waitFor(() => expect(screen.getByText(/8 caractères/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("auth.passwordRuleMin8")).toBeInTheDocument());
     expect(mockState.updateCalls.length).toBe(0);
   });
 
@@ -86,7 +86,7 @@ describe("SecuriteSection", () => {
     fill("Nouveau mot de passe", "abcdefg1");
     fill("Confirmer le mot de passe", "abcdefg1");
     submitForm();
-    await waitFor(() => expect(screen.getByText(/majuscule/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("auth.passwordRuleUppercase")).toBeInTheDocument());
     expect(mockState.updateCalls.length).toBe(0);
   });
 
@@ -95,7 +95,7 @@ describe("SecuriteSection", () => {
     fill("Nouveau mot de passe", "Abcdefgh");
     fill("Confirmer le mot de passe", "Abcdefgh");
     submitForm();
-    await waitFor(() => expect(screen.getByText(/chiffre/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("auth.passwordRuleDigit")).toBeInTheDocument());
     expect(mockState.updateCalls.length).toBe(0);
   });
 
@@ -105,7 +105,7 @@ describe("SecuriteSection", () => {
     fill("Confirmer le mot de passe", "Abcdef13");
     submitForm();
     await waitFor(() =>
-      expect(screen.getByText(/ne correspondent pas/i)).toBeInTheDocument(),
+      expect(screen.getByText("auth.passwordMismatch")).toBeInTheDocument(),
     );
     expect(mockState.updateCalls.length).toBe(0);
   });

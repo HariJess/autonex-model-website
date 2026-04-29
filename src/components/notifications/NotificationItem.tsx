@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   AlertCircle,
   AlertTriangle,
@@ -46,6 +47,7 @@ export function NotificationItem({
   showArchiveButton,
   onArchive,
 }: NotificationItemProps) {
+  const { t } = useTranslation();
   const unread = isNotificationUnread(notification);
   const Icon = ICON_MAP[notification.icon] ?? Bell;
   const content = (
@@ -59,7 +61,7 @@ export function NotificationItem({
             {notification.title}
           </p>
           {unread && (
-            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" aria-label="Non lue" />
+            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" aria-label={t("notifications.unreadDot", "Non lue")} />
           )}
         </div>
         {notification.body && (
@@ -81,7 +83,7 @@ export function NotificationItem({
           }}
           className="self-center text-xs font-sans text-muted-foreground hover:text-foreground underline"
         >
-          Archiver
+          {t("notifications.archive", "Archiver")}
         </button>
       )}
     </>

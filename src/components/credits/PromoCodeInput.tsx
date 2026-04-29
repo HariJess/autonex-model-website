@@ -65,12 +65,12 @@ export function PromoCodeInput({
             if (result.valid) {
               setErrorMessage(null);
             } else {
-              setErrorMessage(mapDbError(result.error_code ?? "", "Code invalide."));
+              setErrorMessage(mapDbError(result.error_code ?? "", t("credits.promoInvalid", "Code invalide.")));
             }
           },
           onError: (err) => {
             onValidationChange(null);
-            setErrorMessage(mapDbError(err, "Erreur de validation du code."));
+            setErrorMessage(mapDbError(err, t("credits.promoValidationError", "Erreur de validation du code.")));
           },
         },
       );
@@ -113,7 +113,7 @@ export function PromoCodeInput({
             {validate.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             ) : showSummary ? (
-              <Check className="h-4 w-4 text-green-600" aria-label="Code valide" />
+              <Check className="h-4 w-4 text-green-600" aria-label={t("credits.promoValid", "Code valide")} />
             ) : null}
           </div>
         </div>
@@ -124,7 +124,7 @@ export function PromoCodeInput({
             variant="ghost"
             className="font-sans"
             onClick={clearCode}
-            aria-label="Retirer le code promo"
+            aria-label={t("credits.promoRemove", "Retirer le code promo")}
           >
             <X className="h-4 w-4" />
           </Button>

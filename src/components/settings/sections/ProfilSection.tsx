@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { AlertCircle, Mail, ShieldCheck, User, CalendarClock, Loader2 } from "lucide-react";
 
@@ -19,8 +20,8 @@ const profilFormSchema = z.object({
   full_name: z
     .string()
     .trim()
-    .min(2, "Le nom doit contenir au moins 2 caractères")
-    .max(100, "Le nom ne peut pas dépasser 100 caractères"),
+    .min(2, "account.profile.errors.nameMin2")
+    .max(100, "account.profile.errors.nameMax100"),
   phone: optionalMgPhoneSchema,
   whatsapp_phone: optionalMgPhoneSchema,
 });
@@ -40,10 +41,10 @@ type ProfileRow = {
   is_anonymized: boolean;
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  particulier: "Particulier",
-  agence: "Agence",
-  admin: "Administrateur",
+const ROLE_LABEL_KEYS: Record<string, string> = {
+  particulier: "account.profile.roleIndividual",
+  agence: "account.profile.roleAgency",
+  admin: "account.profile.roleAdmin",
 };
 
 function formatFrenchDate(iso: string | null): string {
@@ -57,6 +58,7 @@ const profileQueryKey = (userId: string) => ["settings-profile", userId] as cons
 
 export function ProfilSection() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -114,16 +116,16 @@ export function ProfilSection() {
       if (err) throw new Error(err.message);
     },
     onSuccess: () => {
-      toast.success("Profil mis à jour");
+      toast.success(t("account.profile.toastSuccess", "Profil mis à jour"));
       if (user?.id) void queryClient.invalidateQueries({ queryKey: profileQueryKey(user.id) });
     },
     onError: (err) => {
-      toast.error(err.message || "Erreur lors de la mise à jour");
+      toast.error(err.message || t("account.profile.toastErrorFallback", "Erreur lors de la mise à jour"));
     },
   });
 
   if (!user) {
-    return <p className="font-sans text-sm text-muted-foreground">Connexion requise.</p>;
+    return <p className="font-sans text-sm text-muted-foreground">{t("account.profile.signInRequired", "Connexion requise.")}</p>;
   }
 
   if (isLoading) {
@@ -140,48 +142,53 @@ export function ProfilSection() {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Erreur de chargement</AlertTitle>
-        <AlertDescription>{error instanceof Error ? error.message : "Profil indisponible."}</AlertDescription>
+        <AlertTitle>{t("account.profile.loadErrorTitle", "Erreur de chargement")}</AlertTitle>
+        <AlertDescription>{error instanceof Error ? error.message : t("account.profile.loadErrorFallback", "Profil indisponible.")}</AlertDescription>
       </Alert>
     );
   }
 
   const onSubmit = form.handleSubmit((values) => mutation.mutate(values));
   const formDisabled = isDeletionPending || mutation.isPending;
+  const fullNameError = form.formState.errors.full_name?.message;
+  const phoneError = form.formState.errors.phone?.message;
+  const whatsappError = form.formState.errors.whatsapp_phone?.message;
+  const roleKey = ROLE_LABEL_KEYS[profile.role];
+  const roleLabel = roleKey ? t(roleKey) : profile.role;
 
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="font-sans text-2xl font-bold" id="section-profil-heading">Profil</h2>
+        <h2 className="font-sans text-2xl font-bold" id="section-profil-heading">{t("account.profile.title", "Profil")}</h2>
         <p className="mt-1 font-sans text-sm text-muted-foreground">
-          Modifiez votre identité et vos coordonnées publiques.
+          {t("account.profile.subtitle", "Modifiez votre identité et vos coordonnées publiques.")}
         </p>
       </header>
 
       {/* Read-only info card */}
       <div className="rounded-2xl border border-border bg-muted/20 p-4 md:p-5">
         <p className="font-sans text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          Informations compte
+          {t("account.profile.accountInfo", "Informations compte")}
         </p>
         <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="flex items-start gap-2">
             <Mail className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" aria-hidden />
             <div className="min-w-0">
-              <dt className="text-xs font-sans text-muted-foreground">Email</dt>
+              <dt className="text-xs font-sans text-muted-foreground">{t("auth.email", "Email")}</dt>
               <dd className="text-sm font-sans font-medium truncate">{user.email ?? "—"}</dd>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <ShieldCheck className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" aria-hidden />
             <div>
-              <dt className="text-xs font-sans text-muted-foreground">Type de compte</dt>
-              <dd className="text-sm font-sans font-medium">{ROLE_LABELS[profile.role] ?? profile.role}</dd>
+              <dt className="text-xs font-sans text-muted-foreground">{t("account.profile.accountType", "Type de compte")}</dt>
+              <dd className="text-sm font-sans font-medium">{roleLabel}</dd>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <CalendarClock className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" aria-hidden />
             <div>
-              <dt className="text-xs font-sans text-muted-foreground">Membre depuis</dt>
+              <dt className="text-xs font-sans text-muted-foreground">{t("account.profile.memberSince", "Membre depuis")}</dt>
               <dd className="text-sm font-sans font-medium">{formatFrenchDate(profile.created_at)}</dd>
             </div>
           </div>
@@ -191,20 +198,19 @@ export function ProfilSection() {
       {isDeletionPending ? (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Suppression en cours</AlertTitle>
+          <AlertTitle>{t("account.profile.deletionPendingTitle", "Suppression en cours")}</AlertTitle>
           <AlertDescription>
-            Modifications indisponibles, votre compte est en cours de suppression. Rendez-vous dans la section
-            « Zone de danger » pour annuler.
+            {t("account.profile.deletionPendingDescription", "Modifications indisponibles, votre compte est en cours de suppression. Rendez-vous dans la section « Zone de danger » pour annuler.")}
           </AlertDescription>
         </Alert>
       ) : null}
 
       {/* Editable form */}
-      <form onSubmit={onSubmit} noValidate className="space-y-4" aria-label="Formulaire de profil">
+      <form onSubmit={onSubmit} noValidate className="space-y-4" aria-label={t("account.profile.formAriaLabel", "Formulaire de profil")}>
         <div className="space-y-1.5">
           <Label htmlFor="profil-full-name" className="font-sans">
             <span className="inline-flex items-center gap-1.5">
-              <User className="h-4 w-4" aria-hidden /> Nom complet
+              <User className="h-4 w-4" aria-hidden /> {t("auth.name", "Nom complet")}
             </span>
           </Label>
           <Input
@@ -214,14 +220,14 @@ export function ProfilSection() {
             disabled={formDisabled}
             {...form.register("full_name")}
           />
-          {form.formState.errors.full_name ? (
-            <p className="text-xs text-destructive font-sans">{form.formState.errors.full_name.message}</p>
+          {fullNameError ? (
+            <p className="text-xs text-destructive font-sans">{t(fullNameError)}</p>
           ) : null}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="profil-phone" className="font-sans">Téléphone</Label>
+            <Label htmlFor="profil-phone" className="font-sans">{t("auth.phone", "Téléphone")}</Label>
             <Input
               id="profil-phone"
               className="font-sans"
@@ -230,12 +236,12 @@ export function ProfilSection() {
               disabled={formDisabled}
               {...form.register("phone")}
             />
-            {form.formState.errors.phone ? (
-              <p className="text-xs text-destructive font-sans">{form.formState.errors.phone.message}</p>
+            {phoneError ? (
+              <p className="text-xs text-destructive font-sans">{t(phoneError)}</p>
             ) : null}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="profil-whatsapp" className="font-sans">WhatsApp (optionnel)</Label>
+            <Label htmlFor="profil-whatsapp" className="font-sans">{t("auth.whatsapp", "WhatsApp (optionnel)")}</Label>
             <Input
               id="profil-whatsapp"
               className="font-sans"
@@ -244,8 +250,8 @@ export function ProfilSection() {
               disabled={formDisabled}
               {...form.register("whatsapp_phone")}
             />
-            {form.formState.errors.whatsapp_phone ? (
-              <p className="text-xs text-destructive font-sans">{form.formState.errors.whatsapp_phone.message}</p>
+            {whatsappError ? (
+              <p className="text-xs text-destructive font-sans">{t(whatsappError)}</p>
             ) : null}
           </div>
         </div>
@@ -255,10 +261,10 @@ export function ProfilSection() {
             {mutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden />
-                Enregistrement…
+                {t("account.profile.saving", "Enregistrement…")}
               </>
             ) : (
-              "Enregistrer les modifications"
+              t("account.profile.saveButton", "Enregistrer les modifications")
             )}
           </Button>
         </div>

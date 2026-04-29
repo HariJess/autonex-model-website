@@ -69,7 +69,8 @@ describe("DeleteAccountDialog", () => {
 
     fireEvent.change(input, { target: { value: "abc" } });
     expect(confirmBtn).toBeDisabled();
-    expect(screen.getByText(/Veuillez taper exactement SUPPRIMER/i)).toBeInTheDocument();
+    // Interpolated key — the test mock returns the key when called with object args.
+    expect(screen.getByText("account.deleteDialog.typeWordError")).toBeInTheDocument();
 
     fireEvent.change(input, { target: { value: "supprimer" } });
     expect(confirmBtn).toBeDisabled();

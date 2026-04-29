@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import {
-  NOTIFICATION_CATEGORY_LABELS,
+  NOTIFICATION_CATEGORY_LABEL_KEYS,
   type NotificationCategory,
   type NotificationPreferences,
 } from "@/types/notification";
@@ -70,6 +71,7 @@ const USER_FACING_CATEGORIES: NotificationCategory[] = [
 ];
 
 const SettingsNotificationsPage = () => {
+  const { t } = useTranslation();
   const { preferences, loading, saving, error, update, resetDefaults } = useNotificationPreferences();
 
   const handleToggle = (key: keyof NotificationPreferences, value: boolean) => {
@@ -78,26 +80,26 @@ const SettingsNotificationsPage = () => {
 
   const handleReset = async () => {
     await resetDefaults();
-    toast.success("Préférences remises par défaut.");
+    toast.success(t("notifications.preferences.resetSuccess", "Préférences remises par défaut."));
   };
 
   return (
     <>
       <Helmet>
-        <title>Préférences de notifications — AutoNex</title>
+        <title>{t("notifications.preferences.pageTitle", "Préférences de notifications")} — AutoNex</title>
       </Helmet>
       <Header />
       <div className="container mx-auto max-w-3xl py-6 md:py-8 px-4">
         <div className="mb-6">
-          <h1 className="font-sans text-2xl md:text-3xl font-bold">Préférences de notifications</h1>
+          <h1 className="font-sans text-2xl md:text-3xl font-bold">{t("notifications.preferences.heading", "Préférences de notifications")}</h1>
           <p className="text-sm text-muted-foreground font-sans mt-1">
-            Choisissez les canaux (in-app, email immédiat, email digest) pour chaque catégorie.
+            {t("notifications.preferences.subtitle", "Choisissez les canaux (in-app, email immédiat, email digest) pour chaque catégorie.")}
           </p>
         </div>
 
         {loading && (
           <div className="rounded-2xl border border-border bg-card px-4 py-6 text-sm text-muted-foreground">
-            Chargement des préférences…
+            {t("notifications.preferences.loading", "Chargement des préférences…")}
           </div>
         )}
 
@@ -111,10 +113,10 @@ const SettingsNotificationsPage = () => {
           <div className="space-y-4">
             <div className="rounded-2xl border border-border bg-card overflow-hidden">
               <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center px-4 py-3 bg-muted/30 text-xs font-sans text-muted-foreground">
-                <span>Catégorie</span>
-                <span className="text-center w-20">In-app</span>
-                <span className="text-center w-20">Email immédiat</span>
-                <span className="text-center w-20">Email digest</span>
+                <span>{t("notifications.preferences.colCategory", "Catégorie")}</span>
+                <span className="text-center w-20">{t("notifications.preferences.colInApp", "In-app")}</span>
+                <span className="text-center w-20">{t("notifications.preferences.colEmailImmediate", "Email immédiat")}</span>
+                <span className="text-center w-20">{t("notifications.preferences.colEmailDigest", "Email digest")}</span>
               </div>
               {USER_FACING_CATEGORIES.map((cat) => {
                 const keys = CATEGORY_PREF_KEYS[cat];
@@ -124,7 +126,7 @@ const SettingsNotificationsPage = () => {
                     className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center px-4 py-3 border-t border-border first:border-t-0"
                   >
                     <span className="font-sans text-sm text-foreground">
-                      {NOTIFICATION_CATEGORY_LABELS[cat]}
+                      {t(NOTIFICATION_CATEGORY_LABEL_KEYS[cat])}
                     </span>
                     <div className="flex justify-center w-20">
                       <Switch
@@ -154,14 +156,14 @@ const SettingsNotificationsPage = () => {
 
             <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
               <div>
-                <p className="font-sans font-semibold text-sm">Digest email</p>
+                <p className="font-sans font-semibold text-sm">{t("notifications.preferences.digestTitle", "Digest email")}</p>
                 <p className="text-xs text-muted-foreground font-sans mt-0.5">
-                  Regroupement des notifications non critiques en un email récapitulatif.
+                  {t("notifications.preferences.digestDescription", "Regroupement des notifications non critiques en un email récapitulatif.")}
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="font-sans text-xs">Fréquence</Label>
+                  <Label className="font-sans text-xs">{t("notifications.preferences.digestFrequency", "Fréquence")}</Label>
                   <Select
                     value={preferences.digestFrequency}
                     onValueChange={(v) =>
@@ -173,14 +175,14 @@ const SettingsNotificationsPage = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="daily">Quotidien</SelectItem>
-                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                      <SelectItem value="never">Jamais</SelectItem>
+                      <SelectItem value="daily">{t("notifications.preferences.digestDaily", "Quotidien")}</SelectItem>
+                      <SelectItem value="weekly">{t("notifications.preferences.digestWeekly", "Hebdomadaire")}</SelectItem>
+                      <SelectItem value="never">{t("notifications.preferences.digestNever", "Jamais")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="font-sans text-xs">Heure d'envoi (EAT)</Label>
+                  <Label className="font-sans text-xs">{t("notifications.preferences.digestTime", "Heure d'envoi (EAT)")}</Label>
                   <Input
                     type="time"
                     value={preferences.digestTime.slice(0, 5)}
@@ -190,7 +192,7 @@ const SettingsNotificationsPage = () => {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="font-sans text-xs">Max emails / jour</Label>
+                  <Label className="font-sans text-xs">{t("notifications.preferences.maxEmailsPerDay", "Max emails / jour")}</Label>
                   <Input
                     type="number"
                     min={0}
@@ -211,10 +213,10 @@ const SettingsNotificationsPage = () => {
 
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <Button variant="outline" onClick={() => void handleReset()} disabled={saving}>
-                Remettre par défaut
+                {t("notifications.preferences.resetButton", "Remettre par défaut")}
               </Button>
               <Link to="/notifications" className="text-sm font-sans text-primary hover:underline">
-                Retour aux notifications
+                {t("notifications.preferences.backLink", "Retour aux notifications")}
               </Link>
             </div>
           </div>

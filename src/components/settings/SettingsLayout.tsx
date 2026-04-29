@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Menu } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -16,6 +17,7 @@ type SettingsLayoutProps = {
 };
 
 export function SettingsLayout({ activeSection, onSelectSection, children }: SettingsLayoutProps) {
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const nav = (
@@ -44,7 +46,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
             aria-current={isActive ? "page" : undefined}
           >
             <Icon className="h-4 w-4 shrink-0" aria-hidden />
-            <span>{section.label}</span>
+            <span>{t(section.labelKey)}</span>
           </button>
         );
       })}
@@ -55,16 +57,16 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
     <div className="container mx-auto py-6 md:py-10">
       {/* Mobile: top bar with drawer trigger */}
       <div className="mb-4 flex items-center justify-between md:hidden">
-        <h1 className="font-sans text-2xl font-bold">Paramètres</h1>
+        <h1 className="font-sans text-2xl font-bold">{t("account.settings.title", "Paramètres")}</h1>
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="sm" className="font-sans">
               <Menu className="h-4 w-4 mr-2" aria-hidden />
-              Sections
+              {t("account.settings.sectionsButton", "Sections")}
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-4">
-            <p className="mb-3 font-sans text-lg font-bold">Paramètres</p>
+            <p className="mb-3 font-sans text-lg font-bold">{t("account.settings.title", "Paramètres")}</p>
             {nav}
           </SheetContent>
         </Sheet>
@@ -74,7 +76,7 @@ export function SettingsLayout({ activeSection, onSelectSection, children }: Set
         {/* Desktop sidebar */}
         <aside className="hidden md:block">
           <div className="sticky top-24 rounded-2xl border border-border bg-card p-4">
-            <p className="px-3 pt-1 pb-3 font-sans text-lg font-bold">Paramètres</p>
+            <p className="px-3 pt-1 pb-3 font-sans text-lg font-bold">{t("account.settings.title", "Paramètres")}</p>
             {nav}
           </div>
         </aside>

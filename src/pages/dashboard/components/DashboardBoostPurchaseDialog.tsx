@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
@@ -52,6 +53,7 @@ export function DashboardBoostPurchaseDialog({
   creditsBalancePending,
   userId,
 }: DashboardBoostPurchaseDialogProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<PurchasableBoostType>>(new Set());
 
@@ -80,7 +82,7 @@ export function DashboardBoostPurchaseDialog({
       return data;
     },
     onSuccess: async () => {
-      toast.success("Boosts activés. Votre annonce bénéficie tout de suite de la visibilité choisie.");
+      toast.success(t("boost.purchaseSuccess", "Boosts activés. Votre annonce bénéficie tout de suite de la visibilité choisie."));
       onOpenChange(false);
       if (userId) {
         await queryClient.invalidateQueries({ queryKey: ["my-listings", userId] });
@@ -113,12 +115,11 @@ export function DashboardBoostPurchaseDialog({
         <DialogHeader>
           <DialogTitle className="font-sans flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-amber-600" />
-            Booster l’annonce
+            {t("boost.dialogTitle", "Booster l’annonce")}
           </DialogTitle>
           <DialogDescription className="font-sans text-left space-y-2">
             <span className="block">
-              Achat de visibilité uniquement : aucun frais de republication, pas de nouvelle modération du contenu
-              pour une annonce déjà en ligne.
+              {t("boost.dialogDescription", "Achat de visibilité uniquement : aucun frais de republication, pas de nouvelle modération du contenu pour une annonce déjà en ligne.")}
             </span>
             {listing?.title ? (
               <span className="block font-medium text-foreground">« {listing.title} »</span>
@@ -128,13 +129,12 @@ export function DashboardBoostPurchaseDialog({
 
         {available.length === 0 ? (
           <p className="text-sm text-muted-foreground font-sans">
-            Tous les boosts disponibles sont déjà actifs pour cette annonce. Revenez après expiration d’un boost pour en
-            racheter un du même type.
+            {t("boost.allActive", "Tous les boosts disponibles sont déjà actifs pour cette annonce. Revenez après expiration d’un boost pour en racheter un du même type.")}
           </p>
         ) : (
           <div className="space-y-4">
             <p className="text-xs text-muted-foreground font-sans">
-              Cochez une ou plusieurs options. Le total en crédits est indiqué avant confirmation.
+              {t("boost.checkOneOrMore", "Cochez une ou plusieurs options. Le total en crédits est indiqué avant confirmation.")}
             </p>
             <ul className="space-y-3">
               {available.map((k) => (
@@ -152,8 +152,8 @@ export function DashboardBoostPurchaseDialog({
                       </Label>
                       <p className="text-xs text-muted-foreground font-sans leading-snug">{BOOST_VISIBILITY_FR[k]}</p>
                       <p className="text-xs font-sans">
-                        <span className="font-medium text-foreground">{boostPrice(k)} crédits</span>
-                        <span className="text-muted-foreground"> · {BOOST_DURATION_DAYS[k]} jours</span>
+                        <span className="font-medium text-foreground">{t("boost.creditsAmount", { count: boostPrice(k) })}</span>
+                        <span className="text-muted-foreground"> · {t("boost.daysAmount", { count: BOOST_DURATION_DAYS[k] })}</span>
                       </p>
                     </div>
                   </div>
@@ -163,15 +163,15 @@ export function DashboardBoostPurchaseDialog({
 
             <div className="rounded-lg bg-muted/50 p-3 font-sans text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total</span>
-                <span className="font-semibold">{total} crédits</span>
+                <span className="text-muted-foreground">{t("boost.total", "Total")}</span>
+                <span className="font-semibold">{t("boost.creditsAmount", { count: total })}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Solde disponible</span>
-                <span>{creditsBalancePending ? "…" : `${creditsBalance} crédits`}</span>
+                <span className="text-muted-foreground">{t("boost.availableBalance", "Solde disponible")}</span>
+                <span>{creditsBalancePending ? "…" : t("boost.creditsAmount", { count: creditsBalance })}</span>
               </div>
               {!creditsBalancePending && !canAfford && !nothingSelected ? (
-                <p className="text-xs text-destructive pt-1">Solde insuffisant pour ce panier.</p>
+                <p className="text-xs text-destructive pt-1">{t("boost.insufficientBalance", "Solde insuffisant pour ce panier.")}</p>
               ) : null}
             </div>
           </div>
@@ -179,7 +179,7 @@ export function DashboardBoostPurchaseDialog({
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button type="button" variant="outline" className="font-sans" onClick={() => onOpenChange(false)}>
-            Annuler
+            {t("common.cancel", "Annuler")}
           </Button>
           <Button
             type="button"
@@ -197,10 +197,10 @@ export function DashboardBoostPurchaseDialog({
             {purchase.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Confirmation…
+                {t("boost.confirming", "Confirmation…")}
               </>
             ) : (
-              `Confirmer (${total} crédits)`
+              t("boost.confirmWithCredits", { count: total })
             )}
           </Button>
         </DialogFooter>

@@ -104,7 +104,9 @@ describe("ProfilSection", () => {
     renderSection();
     await waitFor(() => expect(screen.getByDisplayValue("Alice Dupont")).toBeInTheDocument());
     expect(screen.getByText("alice@example.com")).toBeInTheDocument();
-    expect(screen.getByText("Particulier")).toBeInTheDocument();
+    // ROLE_LABEL_KEYS in ProfilSection maps "particulier" → "account.profile.roleIndividual";
+    // the test mock returns the key when no fallback is provided.
+    expect(screen.getByText("account.profile.roleIndividual")).toBeInTheDocument();
     expect(screen.getByDisplayValue("+261340000000")).toBeInTheDocument();
     expect(screen.getByDisplayValue("+261340000001")).toBeInTheDocument();
   });
@@ -144,7 +146,7 @@ describe("ProfilSection", () => {
     changeInput(nameInput, "A");
     fireEvent.submit(nameInput.closest("form")!);
     await waitFor(() =>
-      expect(screen.getByText(/au moins 2 caractères/i)).toBeInTheDocument(),
+      expect(screen.getByText("account.profile.errors.nameMin2")).toBeInTheDocument(),
     );
     expect(mockState.updatePayload.full_name).toBeUndefined();
   });

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ExternalLink, Loader2, Save } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -46,6 +47,7 @@ const nullIfEmpty = (v: string): string | null => {
 };
 
 export function MyAgencySection() {
+  const { t } = useTranslation();
   const { data: agency, isLoading, error } = useMyAgency();
   const update = useUpdateMyAgency();
   const [f, setF] = useState<UserFormState>(EMPTY);
@@ -112,19 +114,23 @@ export function MyAgencySection() {
     if (agency.status === "pending_review") {
       return {
         color: "bg-amber-50 border-amber-200 text-amber-900",
-        text: "Votre agence est en attente de validation par notre équipe. Cela prend généralement 24-48h. Vous pouvez déjà renseigner votre fiche.",
+        text: t("agencies.myAgency.pendingReviewBanner", "Votre agence est en attente de validation par notre équipe. Cela prend généralement 24-48h. Vous pouvez déjà renseigner votre fiche."),
       };
     }
     if (agency.status === "rejected") {
       return {
         color: "bg-red-50 border-red-200 text-red-900",
-        text: `Votre fiche a été rejetée. Raison : ${agency.rejection_reason ?? "non précisée"}. Corrigez les informations ci-dessous — notre équipe réexaminera votre fiche après sauvegarde.`,
+        text: t("agencies.myAgency.rejectedBanner", {
+          reason: agency.rejection_reason ?? t("agencies.myAgency.reasonNotSpecified", "non précisée"),
+        }),
       };
     }
     if (agency.status === "suspended") {
       return {
         color: "bg-red-100 border-red-300 text-red-950",
-        text: `Votre agence est actuellement suspendue. Raison : ${agency.rejection_reason ?? "non précisée"}. Contactez le support pour plus d'informations.`,
+        text: t("agencies.myAgency.suspendedBanner", {
+          reason: agency.rejection_reason ?? t("agencies.myAgency.reasonNotSpecified", "non précisée"),
+        }),
       };
     }
     return null;

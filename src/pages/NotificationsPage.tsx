@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { NotificationList } from "@/components/notifications/NotificationList";
@@ -8,7 +9,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { Button } from "@/components/ui/button";
 import {
   NOTIFICATION_CATEGORIES,
-  NOTIFICATION_CATEGORY_LABELS,
+  NOTIFICATION_CATEGORY_LABEL_KEYS,
   type NotificationCategory,
 } from "@/types/notification";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ type CategoryFilter = "all" | NotificationCategory;
 type StatusFilter = "all" | "unread";
 
 const NotificationsPage = () => {
+  const { t } = useTranslation();
   const { notifications, loading, markAsRead, markAllAsRead, archive, unreadCount } = useNotifications(100);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -32,27 +34,27 @@ const NotificationsPage = () => {
   return (
     <>
       <Helmet>
-        <title>Notifications — AutoNex</title>
+        <title>{t("notifications.title", "Notifications")} — AutoNex</title>
       </Helmet>
       <Header />
       <div className="container mx-auto max-w-3xl py-6 md:py-8 px-4">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
           <div>
-            <h1 className="font-sans text-2xl md:text-3xl font-bold">Notifications</h1>
+            <h1 className="font-sans text-2xl md:text-3xl font-bold">{t("notifications.title", "Notifications")}</h1>
             <p className="text-sm text-muted-foreground font-sans mt-1">
               {unreadCount > 0
-                ? `${unreadCount} non lue${unreadCount > 1 ? "s" : ""}`
-                : "Tout est à jour"}
+                ? t("notifications.unreadCount", { count: unreadCount })
+                : t("notifications.allCaughtUp", "Tout est à jour")}
             </p>
           </div>
           <div className="flex items-center gap-2">
             {unreadCount > 0 && (
               <Button variant="outline" size="sm" onClick={() => void markAllAsRead()}>
-                Tout marquer comme lu
+                {t("notifications.markAllAsRead", "Tout marquer comme lu")}
               </Button>
             )}
             <Button asChild variant="ghost" size="sm">
-              <Link to="/settings/notifications">Préférences</Link>
+              <Link to="/settings/notifications">{t("notifications.preferences")}</Link>
             </Button>
           </div>
         </div>
@@ -68,7 +70,7 @@ const NotificationsPage = () => {
             )}
             onClick={() => setStatusFilter("all")}
           >
-            Toutes
+            {t("notifications.filterAll", "Toutes")}
           </button>
           <button
             type="button"
@@ -80,7 +82,7 @@ const NotificationsPage = () => {
             )}
             onClick={() => setStatusFilter("unread")}
           >
-            Non lues
+            {t("notifications.filterUnread", "Non lues")}
           </button>
           <span className="w-px bg-border mx-1" aria-hidden />
           <button
@@ -93,7 +95,7 @@ const NotificationsPage = () => {
             )}
             onClick={() => setCategoryFilter("all")}
           >
-            Toutes catégories
+            {t("notifications.filterAllCategories", "Toutes catégories")}
           </button>
           {NOTIFICATION_CATEGORIES.map((cat) => (
             <button
@@ -107,7 +109,7 @@ const NotificationsPage = () => {
               )}
               onClick={() => setCategoryFilter(cat)}
             >
-              {NOTIFICATION_CATEGORY_LABELS[cat]}
+              {t(NOTIFICATION_CATEGORY_LABEL_KEYS[cat])}
             </button>
           ))}
         </div>
@@ -115,7 +117,7 @@ const NotificationsPage = () => {
         <div className="rounded-2xl border border-border bg-card">
           {loading ? (
             <div className="px-4 py-10 text-center text-sm text-muted-foreground font-sans">
-              Chargement…
+              {t("common.loading", "Chargement...")}
             </div>
           ) : (
             <NotificationList
@@ -125,8 +127,8 @@ const NotificationsPage = () => {
               showArchiveButton
               emptyMessage={
                 statusFilter === "unread"
-                  ? "Aucune notification non lue"
-                  : "Aucune notification pour cette catégorie"
+                  ? t("notifications.emptyUnread", "Aucune notification non lue")
+                  : t("notifications.emptyCategory", "Aucune notification pour cette catégorie")
               }
               maxHeightClass="max-h-none"
             />

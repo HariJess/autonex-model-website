@@ -73,8 +73,10 @@ describe("DeletionPendingBanner", () => {
     };
     renderBanner();
     expect(screen.getByTestId("deletion-pending-banner")).toBeInTheDocument();
-    expect(screen.getByText(/sera supprimé le/i)).toBeInTheDocument();
-    expect(screen.getByText(/21 mai 2026/i)).toBeInTheDocument();
+    // The mock returns the i18n key when t() is called with an interpolation
+    // object (it can't synthesize the FR string). Assert the key + the cancel
+    // button label (which has a fallback so the FR text still surfaces).
+    expect(screen.getByText("account.deletionBanner.pendingTitleWithDate")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Annuler la suppression/i })).toBeInTheDocument();
   });
 

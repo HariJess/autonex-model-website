@@ -32,7 +32,15 @@
     "title": "Concessionnaires automobiles",
     "verifiedOnly": "Partenaires vérifiés uniquement",
     "viewAll": "Voir tous les concessionnaires",
-    "viewStock": "Voir le stock"
+    "viewStock": "Voir le stock",
+    "toastUpdated": "Fiche agence mise à jour.",
+    "toastUpdateError": "Erreur lors de la mise à jour.",
+    "myAgency": {
+      "pendingReviewBanner": "Votre agence est en attente de validation par notre équipe. Cela prend généralement 24-48h. Vous pouvez déjà renseigner votre fiche.",
+      "rejectedBanner": "Votre fiche a été rejetée. Raison : {{reason}}. Corrigez les informations ci-dessous — notre équipe réexaminera votre fiche après sauvegarde.",
+      "suspendedBanner": "Votre agence est actuellement suspendue. Raison : {{reason}}. Contactez le support pour plus d'informations.",
+      "reasonNotSpecified": "non précisée"
+    }
   },
   "auth": {
     "agency": "Agence",
@@ -89,7 +97,11 @@
     "signupSuccess": "Inscription réussie ! Vérifiez votre email pour confirmer votre compte.",
     "updatePassword": "Mettre à jour le mot de passe",
     "updating": "Mise à jour...",
-    "whatsapp": "WhatsApp (optionnel)"
+    "whatsapp": "WhatsApp (optionnel)",
+    "passwordRuleMin8": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordRuleLowercase": "Le mot de passe doit contenir au moins une minuscule",
+    "passwordRuleUppercase": "Le mot de passe doit contenir au moins une majuscule",
+    "passwordRuleDigit": "Le mot de passe doit contenir au moins un chiffre"
   },
   "common": {
     "back": "Retour",
@@ -116,7 +128,8 @@
     "select": "Sélectionner",
     "send": "Envoyer",
     "view": "Voir",
-    "yes": "Oui"
+    "yes": "Oui",
+    "continue": "Continuer"
   },
   "dashboard": {
     "accountAdmin": "Compte administrateur",
@@ -518,7 +531,18 @@
     "whatsappAria": "Contacter l’annonceur via WhatsApp",
     "whatsappReady": "Réponse WhatsApp disponible",
     "whatsappUnavailable": "Numéro WhatsApp indisponible pour cette annonce.",
-    "yourMessage": "Votre message..."
+    "yourMessage": "Votre message...",
+    "card": {
+      "photoCount": "{{count}} photos",
+      "photoPrevious": "Photo précédente",
+      "photoNext": "Photo suivante"
+    },
+    "badge": {
+      "boost": "Boost",
+      "coupDeCoeur": "Coup de cœur",
+      "nouveau": "Nouveau",
+      "urgent": "Urgent"
+    }
   },
   "listings": {
     "negotiable": {
@@ -967,5 +991,190 @@
     "silver": "Argent",
     "white": "Blanc",
     "yellow": "Jaune"
+  },
+  "account": {
+    "security": {
+      "title": "Sécurité",
+      "subtitle": "Changez votre mot de passe et consultez vos informations de session.",
+      "changePassword": "Changer le mot de passe",
+      "passwordRulesHint": "Au moins 8 caractères, une majuscule, une minuscule et un chiffre.",
+      "newPasswordLabel": "Nouveau mot de passe",
+      "confirmPasswordLabel": "Confirmer le mot de passe",
+      "formAriaLabel": "Formulaire changement de mot de passe",
+      "updating": "Mise à jour…",
+      "submitButton": "Modifier le mot de passe",
+      "infoTitle": "Informations de sécurité",
+      "lastSignIn": "Dernière connexion",
+      "toastSuccess": "Mot de passe modifié",
+      "toastErrorFallback": "Erreur lors du changement de mot de passe"
+    },
+    "profile": {
+      "title": "Profil",
+      "subtitle": "Modifiez votre identité et vos coordonnées publiques.",
+      "accountInfo": "Informations compte",
+      "accountType": "Type de compte",
+      "memberSince": "Membre depuis",
+      "deletionPendingTitle": "Suppression en cours",
+      "deletionPendingDescription": "Modifications indisponibles, votre compte est en cours de suppression. Rendez-vous dans la section « Zone de danger » pour annuler.",
+      "formAriaLabel": "Formulaire de profil",
+      "saving": "Enregistrement…",
+      "saveButton": "Enregistrer les modifications",
+      "toastSuccess": "Profil mis à jour",
+      "toastErrorFallback": "Erreur lors de la mise à jour",
+      "signInRequired": "Connexion requise.",
+      "loadErrorTitle": "Erreur de chargement",
+      "loadErrorFallback": "Profil indisponible.",
+      "roleIndividual": "Particulier",
+      "roleAgency": "Agence",
+      "roleAdmin": "Administrateur",
+      "errors": {
+        "nameMin2": "Le nom doit contenir au moins 2 caractères",
+        "nameMax100": "Le nom ne peut pas dépasser 100 caractères"
+      }
+    },
+    "dangerZone": {
+      "title": "Zone de danger",
+      "subtitle": "Export RGPD de vos données et suppression définitive du compte.",
+      "pendingTitle": "Demande de suppression en cours",
+      "pendingDescription": "Utilisez le bouton « Annuler la suppression » dans la bannière ci-dessus pour revenir en arrière avant la date de suppression programmée.",
+      "exportTitle": "Télécharger mes données",
+      "exportDescription": "Téléchargez une copie complète de toutes les données que nous conservons sur vous, au format JSON. Conforme à l'article 20 du RGPD (droit à la portabilité).",
+      "exportPreparing": "Préparation…",
+      "exportButton": "Télécharger mes données",
+      "deleteTitle": "Supprimer mon compte",
+      "deleteDescription": "Cette action demandera la suppression définitive de votre compte AutoNex. Un délai de 30 jours vous permettra de revenir sur votre décision. Passé ce délai, vos données personnelles seront anonymisées définitivement, conformément au RGPD. Vos annonces actives seront retirées immédiatement."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "comingSoon": "Bientôt disponible",
+      "comingSoonDesc": "Préférences email et WhatsApp (nouveautés, réponses aux annonces, alertes modération)."
+    },
+    "deleteDialog": {
+      "titleStep1": "Supprimer mon compte ?",
+      "titleStep2": "Confirmer la suppression",
+      "intro": "Avant de confirmer, voici ce qui se passe :",
+      "bullet1": "Votre compte sera désactivé immédiatement.",
+      "bullet2": "Vos annonces actives seront retirées du site.",
+      "bullet3": "Vos données seront conservées 30 jours ; la demande reste annulable pendant cette période.",
+      "bullet4": "Après 30 jours : anonymisation RGPD définitive.",
+      "legalNote": "Conformément à nos obligations légales, certaines données comptables (transactions, factures) seront conservées de façon anonymisée.",
+      "confirmHelpPrefix": "Cette action est irréversible au bout de 30 jours. Pour confirmer, tapez",
+      "confirmHelpSuffix": " ci-dessous.",
+      "typeWordLabel": "Tapez {{word}}",
+      "typeWordError": "Veuillez taper exactement {{word}} pour continuer.",
+      "requestFailed": "La demande de suppression a échoué. Veuillez réessayer.",
+      "sending": "Envoi…",
+      "confirmButton": "Confirmer la suppression"
+    },
+    "deletionBanner": {
+      "anonymizedTitle": "Compte anonymisé",
+      "anonymizedDescription": "Ce compte a été anonymisé. Aucune action n'est possible.",
+      "pendingTitleWithDate": "Votre compte sera supprimé le {{date}}",
+      "pendingTitleWithoutDate": "Votre compte est programmé pour suppression",
+      "pendingDescription": "Vous pouvez annuler cette demande à tout moment avant cette date. Vos annonces actives ont été retirées de la plateforme.",
+      "cancelling": "Annulation…",
+      "cancelButton": "Annuler la suppression"
+    },
+    "deletion": {
+      "scheduled": "Compte programmé pour suppression le {{date}}.",
+      "scheduledWithEmailWarning": "Compte programmé pour suppression le {{date}}. L'email de confirmation n'a pas pu être envoyé.",
+      "requestFailed": "La demande de suppression a échoué.",
+      "cancelled": "Suppression annulée. Votre compte reste actif.",
+      "cancelFailed": "L'annulation a échoué.",
+      "exportSuccess": "Export téléchargé.",
+      "exportFailed": "L'export a échoué."
+    },
+    "settings": {
+      "title": "Paramètres",
+      "sectionsButton": "Sections",
+      "sectionProfile": "Profil",
+      "sectionSecurity": "Sécurité",
+      "sectionNotifications": "Notifications",
+      "sectionDangerZone": "Zone de danger"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bellAriaLabel": "Notifications ({{count}} non lues)",
+    "markAllAsRead": "Tout marquer comme lu",
+    "empty": "Aucune notification pour le moment",
+    "viewAll": "Voir toutes les notifications",
+    "preferences": {
+      "pageTitle": "Préférences de notifications",
+      "heading": "Préférences de notifications",
+      "subtitle": "Choisissez les canaux (in-app, email immédiat, email digest) pour chaque catégorie.",
+      "loading": "Chargement des préférences…",
+      "colCategory": "Catégorie",
+      "colInApp": "In-app",
+      "colEmailImmediate": "Email immédiat",
+      "colEmailDigest": "Email digest",
+      "digestTitle": "Digest email",
+      "digestDescription": "Regroupement des notifications non critiques en un email récapitulatif.",
+      "digestFrequency": "Fréquence",
+      "digestDaily": "Quotidien",
+      "digestWeekly": "Hebdomadaire",
+      "digestNever": "Jamais",
+      "digestTime": "Heure d'envoi (EAT)",
+      "maxEmailsPerDay": "Max emails / jour",
+      "resetButton": "Remettre par défaut",
+      "resetSuccess": "Préférences remises par défaut.",
+      "backLink": "Retour aux notifications"
+    },
+    "unreadDot": "Non lue",
+    "archive": "Archiver",
+    "unreadCount": "{{count}} non lue(s)",
+    "allCaughtUp": "Tout est à jour",
+    "filterAll": "Toutes",
+    "filterUnread": "Non lues",
+    "filterAllCategories": "Toutes catégories",
+    "emptyUnread": "Aucune notification non lue",
+    "emptyCategory": "Aucune notification pour cette catégorie",
+    "categoryListings": "Annonces",
+    "categoryPayments": "Paiements",
+    "categoryActivity": "Activité",
+    "categorySearches": "Recherches sauvegardées",
+    "categoryAdmin": "Administration",
+    "categorySystem": "Système"
+  },
+  "cookies": {
+    "preferencesTitle": "Préférences cookies",
+    "preferencesDescription": "Choisissez quelles catégories de cookies vous souhaitez autoriser. Vos choix sont modifiables à tout moment via le bouton \"Gérer mes cookies\" en pied de page.",
+    "technicalLabel": "Cookies techniques",
+    "technicalDescription": "Nécessaires au fonctionnement du site, ne peuvent être désactivés.",
+    "analyticsLabel": "Cookies analytics",
+    "analyticsDescription": "Nous aident à comprendre l'usage du site pour l'améliorer (Google Analytics, anonymisé).",
+    "functionalLabel": "Cookies fonctionnels",
+    "functionalDescription": "Mémorisation de vos préférences (langue, thème).",
+    "monitoringLabel": "Cookies de monitoring",
+    "monitoringDescription": "Aident à détecter les bugs techniques, anonymisés. Désactivables dans les paramètres utilisateur plus tard.",
+    "moreDetailsPrefix": "Plus de détails sur la page",
+    "moreDetailsLink": "Cookies",
+    "saveChoices": "Enregistrer mes choix",
+    "bannerAriaLabel": "Bandeau de consentement cookies",
+    "bannerBodyPrefix": "AutoNex utilise des cookies techniques nécessaires au service, ainsi que des cookies optionnels (analytics, fonctionnels) soumis à votre consentement. Vous pouvez tout accepter, tout refuser ou personnaliser vos choix. Détails sur la page",
+    "acceptAll": "Tout accepter",
+    "rejectAll": "Tout refuser",
+    "customize": "Personnaliser"
+  },
+  "credits": {
+    "promoValidationError": "Erreur de validation du code.",
+    "promoValid": "Code valide",
+    "promoRemove": "Retirer le code promo",
+    "promoInvalid": "Code invalide.",
+    "purchaseSendError": "Erreur lors de l'envoi de la demande."
+  },
+  "boost": {
+    "dialogTitle": "Booster l’annonce",
+    "dialogDescription": "Achat de visibilité uniquement : aucun frais de republication, pas de nouvelle modération du contenu pour une annonce déjà en ligne.",
+    "allActive": "Tous les boosts disponibles sont déjà actifs pour cette annonce. Revenez après expiration d’un boost pour en racheter un du même type.",
+    "checkOneOrMore": "Cochez une ou plusieurs options. Le total en crédits est indiqué avant confirmation.",
+    "creditsAmount": "{{count}} crédits",
+    "daysAmount": "{{count}} jours",
+    "total": "Total",
+    "availableBalance": "Solde disponible",
+    "insufficientBalance": "Solde insuffisant pour ce panier.",
+    "confirming": "Confirmation…",
+    "confirmWithCredits": "Confirmer ({{count}} crédits)",
+    "purchaseSuccess": "Boosts activés. Votre annonce bénéficie tout de suite de la visibilité choisie."
   }
 }

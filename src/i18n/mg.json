@@ -32,7 +32,15 @@
     "title": "Concessionnaires fiara",
     "verifiedOnly": "Mpiara-miombon'antoka voamarina ihany",
     "viewAll": "Hijery ny concessionnaires rehetra",
-    "viewStock": "Hijery ny tahirin'entana"
+    "viewStock": "Hijery ny tahirin'entana",
+    "toastUpdated": "Voaova ny pejin'ny concessionnaire.",
+    "toastUpdateError": "Hadisoana nandritra ny fanavaozana.",
+    "myAgency": {
+      "pendingReviewBanner": "Eo am-piandrasana fanamarinana avy amin'ny ekipanay ny pejinao. Maharitra 24-48 ora matetika izany. Azonao fenoina sahady ny pejinao.",
+      "rejectedBanner": "Nolavina ny pejinao. Antony : {{reason}}. Ahitsio ireo vaovao etsy ambany — havaozin'ny ekipanay ny famenana aorian'ny fitehirizana.",
+      "suspendedBanner": "Voaajanona aloha ny concessionnaire-nao. Antony : {{reason}}. Mifandraisa amin'ny support raha mila vaovao fanampiny.",
+      "reasonNotSpecified": "tsy voalaza"
+    }
   },
   "auth": {
     "agency": "Concessionnaires",
@@ -89,7 +97,11 @@
     "signupSuccess": "Voasoratra soa aman-tsara ! Hamarino ny email-nao mba hanamafisana ny kaontinao.",
     "updatePassword": "Hanavao ny teny miafina",
     "updating": "Manavao...",
-    "whatsapp": "WhatsApp (tsy voatery)"
+    "whatsapp": "WhatsApp (tsy voatery)",
+    "passwordRuleMin8": "Tsy maintsy 8 litera farafahakeliny ny teny miafina",
+    "passwordRuleLowercase": "Tsy maintsy misy litera kely iray ny teny miafina",
+    "passwordRuleUppercase": "Tsy maintsy misy litera lehibe iray ny teny miafina",
+    "passwordRuleDigit": "Tsy maintsy misy isa iray ny teny miafina"
   },
   "common": {
     "back": "Hiverina",
@@ -116,7 +128,8 @@
     "select": "Hisafidy",
     "send": "Handefa hafatra",
     "view": "Hijery",
-    "yes": "Eny"
+    "yes": "Eny",
+    "continue": "Tohizo"
   },
   "dashboard": {
     "accountAdmin": "Kaonty mpitantana",
@@ -518,7 +531,18 @@
     "whatsappAria": "Hifandray amin'ny annonceur amin'ny WhatsApp",
     "whatsappReady": "Mamaly amin'ny WhatsApp",
     "whatsappUnavailable": "Tsy misy laharana WhatsApp ho an'ity filazana ity.",
-    "yourMessage": "Hafatrao..."
+    "yourMessage": "Hafatrao...",
+    "card": {
+      "photoCount": "{{count}} sary",
+      "photoPrevious": "Sary teo aloha",
+      "photoNext": "Sary manaraka"
+    },
+    "badge": {
+      "boost": "Boost",
+      "coupDeCoeur": "Tena tia",
+      "nouveau": "Vaovao",
+      "urgent": "Maika"
+    }
   },
   "listings": {
     "negotiable": {
@@ -967,5 +991,190 @@
     "silver": "Volafotsy",
     "white": "Fotsy",
     "yellow": "Mavo"
+  },
+  "account": {
+    "security": {
+      "title": "Filaminana",
+      "subtitle": "Hovaina ny teny miafinanao ary jereo ny vaovao momba ny fidirana.",
+      "changePassword": "Hanova ny teny miafina",
+      "passwordRulesHint": "8 litera farafahakeliny, litera lehibe iray, litera kely iray ary isa iray.",
+      "newPasswordLabel": "Teny miafina vaovao",
+      "confirmPasswordLabel": "Hamarino ny teny miafina",
+      "formAriaLabel": "Saha fanovana ny teny miafina",
+      "updating": "Manavao…",
+      "submitButton": "Hanova ny teny miafina",
+      "infoTitle": "Vaovao momba ny filaminana",
+      "lastSignIn": "Fidirana farany",
+      "toastSuccess": "Voaova ny teny miafina",
+      "toastErrorFallback": "Hadisoana nandritra ny fanovana ny teny miafina"
+    },
+    "profile": {
+      "title": "Mombamomba",
+      "subtitle": "Hovaina ny mombamomba anao sy ny fifandraisana ho an'ny besinimaro.",
+      "accountInfo": "Vaovao momba ny kaonty",
+      "accountType": "Karazana kaonty",
+      "memberSince": "Mpikambana hatramin'ny",
+      "deletionPendingTitle": "Eo am-pofoanana",
+      "deletionPendingDescription": "Tsy azo ovaina mandritra ny fofoanana ny kaontinao. Mandehana any amin'ny « Faritra mampidi-doza » mba hanafoanana izany.",
+      "formAriaLabel": "Saha mombamomba",
+      "saving": "Mitahiry…",
+      "saveButton": "Tehirizo ny fanovana",
+      "toastSuccess": "Voaova ny mombamomba",
+      "toastErrorFallback": "Hadisoana nandritra ny fanavaozana",
+      "signInRequired": "Mila fidirana.",
+      "loadErrorTitle": "Hadisoana nandritra ny famakiana",
+      "loadErrorFallback": "Tsy hita ny mombamomba.",
+      "roleIndividual": "Tsotra",
+      "roleAgency": "Concessionnaire",
+      "roleAdmin": "Mpitantana",
+      "errors": {
+        "nameMin2": "Tsy maintsy 2 litera farafahakeliny ny anarana",
+        "nameMax100": "Tsy mahazo mihoatra ny 100 litera ny anarana"
+      }
+    },
+    "dangerZone": {
+      "title": "Faritra mampidi-doza",
+      "subtitle": "Famoahana RGPD ny angonao sy fofoanana mandrakizay ny kaonty.",
+      "pendingTitle": "Fangatahana fofoanana eo am-piandrasana",
+      "pendingDescription": "Ampiasao ny bokotra « Hanafoana ny fofoanana » ao amin'ny banner etsy ambony mba hiverenana alohan'ny daty voafetra.",
+      "exportTitle": "Halaina ny angonako",
+      "exportDescription": "Halaina dikany feno ny angona rehetra tehirizinay momba anao, amin'ny endrika JSON. Mifanaraka amin'ny andinin'ny RGPD faha-20 (zo amin'ny famindrana angona).",
+      "exportPreparing": "Manomana…",
+      "exportButton": "Halaina ny angonako",
+      "deleteTitle": "Hofoanana ny kaontiko",
+      "deleteDescription": "Hangataka ny fofoanana mandrakizay ny kaontinao AutoNex ity hetsika ity. Misy 30 andro hahafahanao manova hevitra. Aorian'izany, ho fafana mandrakizay ny angona manokana, mifanaraka amin'ny RGPD. Ho esorina avy hatrany ny filazanao mavitrika."
+    },
+    "notifications": {
+      "title": "Fampahafantarana",
+      "comingSoon": "Ho avy tsy ho ela",
+      "comingSoonDesc": "Safidy email sy WhatsApp (vaovao, valiny amin'ny filazana, fampilazana fanaraha-maso)."
+    },
+    "deleteDialog": {
+      "titleStep1": "Hofoanana ny kaontiko ?",
+      "titleStep2": "Hamarino ny fofoanana",
+      "intro": "Alohan'ny hanamarinanao, ireto izay ho mitranga :",
+      "bullet1": "Ho atsahatra avy hatrany ny kaontinao.",
+      "bullet2": "Ho esorina amin'ny tranonkala ny filazanao mavitrika.",
+      "bullet3": "Hotehirizina mandritra ny 30 andro ny angonao ; azo ajanonina ny fangatahana mandritra izany fotoana izany.",
+      "bullet4": "Aorian'ny 30 andro : ho fafana mandrakizay ara-RGPD.",
+      "legalNote": "Mifanaraka amin'ny adidy ara-dalàna, ny angona kaonty sasany (transactions, factures) dia hotehirizina amin'ny endrika tsy fantatra anarana.",
+      "confirmHelpPrefix": "Tsy azo averina intsony ity hetsika ity aorian'ny 30 andro. Mba hanamarinana, soraty",
+      "confirmHelpSuffix": " etsy ambany.",
+      "typeWordLabel": "Soraty {{word}}",
+      "typeWordError": "Soraty marina ny {{word}} mba hanohizana.",
+      "requestFailed": "Tsy nahomby ny fangatahana fofoanana. Andramo indray azafady.",
+      "sending": "Mandefa…",
+      "confirmButton": "Hamarino ny fofoanana"
+    },
+    "deletionBanner": {
+      "anonymizedTitle": "Kaonty tsy fantatra anarana",
+      "anonymizedDescription": "Efa nataona tsy fantatra anarana ity kaonty ity. Tsy misy hetsika azo atao.",
+      "pendingTitleWithDate": "Hofoanana ny kaontinao amin'ny {{date}}",
+      "pendingTitleWithoutDate": "Voafanjeohy hofoanana ny kaontinao",
+      "pendingDescription": "Azonao ajanonina amin'ny fotoana rehetra alohan'io daty io ny fangatahana. Efa nesorina amin'ny tranonkala ny filazanao mavitrika.",
+      "cancelling": "Manafoana…",
+      "cancelButton": "Hanafoana ny fofoanana"
+    },
+    "deletion": {
+      "scheduled": "Voafanjeohy hofoanana amin'ny {{date}} ny kaonty.",
+      "scheduledWithEmailWarning": "Voafanjeohy hofoanana amin'ny {{date}} ny kaonty. Tsy voalefa ny email fanamafisana.",
+      "requestFailed": "Tsy nahomby ny fangatahana fofoanana.",
+      "cancelled": "Voafoana ny fofoanana. Mavitrika foana ny kaontinao.",
+      "cancelFailed": "Tsy nahomby ny fanafoanana.",
+      "exportSuccess": "Voakopia ny export.",
+      "exportFailed": "Tsy nahomby ny export."
+    },
+    "settings": {
+      "title": "Paramètres",
+      "sectionsButton": "Fizarana",
+      "sectionProfile": "Mombamomba",
+      "sectionSecurity": "Filaminana",
+      "sectionNotifications": "Fampahafantarana",
+      "sectionDangerZone": "Faritra mampidi-doza"
+    }
+  },
+  "notifications": {
+    "title": "Fampahafantarana",
+    "bellAriaLabel": "Fampahafantarana ({{count}} tsy mbola novakiana)",
+    "markAllAsRead": "Marihy ho voavaky avokoa",
+    "empty": "Tsy mbola misy fampahafantarana",
+    "viewAll": "Hijery ny fampahafantarana rehetra",
+    "preferences": {
+      "pageTitle": "Safidin'ny fampahafantarana",
+      "heading": "Safidin'ny fampahafantarana",
+      "subtitle": "Mifidiana ny lalana (in-app, email avy hatrany, email digest) ho an'ny sokajy tsirairay.",
+      "loading": "Mihantona ny safidy…",
+      "colCategory": "Sokajy",
+      "colInApp": "In-app",
+      "colEmailImmediate": "Email avy hatrany",
+      "colEmailDigest": "Email digest",
+      "digestTitle": "Email digest",
+      "digestDescription": "Fanambarana ireo fampahafantarana tsy maika amin'ny email iray fanesoana.",
+      "digestFrequency": "Hafetsana",
+      "digestDaily": "Isan'andro",
+      "digestWeekly": "Isan-kerinandro",
+      "digestNever": "Tsy mihitsy",
+      "digestTime": "Ora fandefasana (EAT)",
+      "maxEmailsPerDay": "Email betsaka indrindra / andro",
+      "resetButton": "Hamerina amin'ny voalohany",
+      "resetSuccess": "Naverina ho voalohany ny safidy.",
+      "backLink": "Hiverina amin'ny fampahafantarana"
+    },
+    "unreadDot": "Tsy mbola novakiana",
+    "archive": "Hatahiry",
+    "unreadCount": "{{count}} tsy mbola novakiana",
+    "allCaughtUp": "Voavaky avokoa",
+    "filterAll": "Rehetra",
+    "filterUnread": "Tsy mbola novakiana",
+    "filterAllCategories": "Sokajy rehetra",
+    "emptyUnread": "Tsy misy fampahafantarana tsy mbola novakiana",
+    "emptyCategory": "Tsy misy fampahafantarana ho an'ity sokajy ity",
+    "categoryListings": "Filazana",
+    "categoryPayments": "Fandoavam-bola",
+    "categoryActivity": "Hetsika",
+    "categorySearches": "Fikarohana voatahiry",
+    "categoryAdmin": "Fitantanana",
+    "categorySystem": "Rafitra"
+  },
+  "cookies": {
+    "preferencesTitle": "Safidin'ny cookies",
+    "preferencesDescription": "Mifidiana izay sokajy cookies tianao alefa. Azonao ovaina amin'ny fotoana rehetra ireo safidy ireo amin'ny alalan'ny bokotra \"Hitantana ny cookies-ko\" ao amin'ny pied de page.",
+    "technicalLabel": "Cookies technical",
+    "technicalDescription": "Ilaina hampandeha ny tranonkala, tsy azo atsahatra.",
+    "analyticsLabel": "Cookies analytics",
+    "analyticsDescription": "Manampy anay hahatakatra ny fampiasana ny tranonkala mba hanatsarana azy (Google Analytics, tsy fantatra anarana).",
+    "functionalLabel": "Cookies fonctionnels",
+    "functionalDescription": "Fitehirizana ny safidinao (fiteny, lokony).",
+    "monitoringLabel": "Cookies monitoring",
+    "monitoringDescription": "Manampy hizaha ny olana ara-teknika, anonymisé. Azo atsahatra any amin'ny safidin'ny mpampiasa amin'ny manaraka.",
+    "moreDetailsPrefix": "Antsipiriany fanampiny ao amin'ny pejy",
+    "moreDetailsLink": "Cookies",
+    "saveChoices": "Tehirizo ny safidiko",
+    "bannerAriaLabel": "Banner fanekena ny cookies",
+    "bannerBodyPrefix": "Mampiasa cookies technical ilaina amin'ny serivisy ny AutoNex, sy cookies tsy voatery (analytics, fonctionnels) izay miankina amin'ny fankatoavanao. Azonao ekena rehetra, lavinao rehetra, na safidinao manokana. Antsipiriany ao amin'ny pejy",
+    "acceptAll": "Eken'ny rehetra",
+    "rejectAll": "Lavin'ny rehetra",
+    "customize": "Manokanao"
+  },
+  "credits": {
+    "promoValidationError": "Hadisoana nandritra ny fanamarinana ny code.",
+    "promoValid": "Mety ny code",
+    "promoRemove": "Esory ny code promo",
+    "promoInvalid": "Tsy mety ny code.",
+    "purchaseSendError": "Hadisoana nandritra ny fandefasana ny fangatahana."
+  },
+  "boost": {
+    "dialogTitle": "Hampoizina ny filazana",
+    "dialogDescription": "Fividianana fahitana ihany : tsy misy saram-pamoahana indray, tsy misy fanaraha-maso vaovao ho an'ny filazana efa an-tserasera.",
+    "allActive": "Efa mavitrika ho an'ity filazana ity ny boost rehetra azo atao. Miverena rehefa lany ny boost iray mba hividy hafa amin'ny karazana mitovy.",
+    "checkOneOrMore": "Marihy safidy iray na maromaro. Aseho alohan'ny fanamarinana ny totalin'ny crédits.",
+    "creditsAmount": "{{count}} crédits",
+    "daysAmount": "{{count}} andro",
+    "total": "Totaly",
+    "availableBalance": "Solde misy",
+    "insufficientBalance": "Tsy ampy ny solde ho an'ity panier ity.",
+    "confirming": "Fanamarinana…",
+    "confirmWithCredits": "Hamarino ({{count}} crédits)",
+    "purchaseSuccess": "Voasokatra ny boost. Misitraka avy hatrany ny fahitana voafidy ny filazanao."
   }
 }

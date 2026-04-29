@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 import { CookieConsentModal } from "./CookieConsentModal";
@@ -9,6 +10,7 @@ import { CookieConsentModal } from "./CookieConsentModal";
  * pattern: the three buttons share equivalent visual weight and layout.
  */
 export function CookieConsentBanner() {
+  const { t } = useTranslation();
   const {
     consent,
     hasDecided,
@@ -26,30 +28,28 @@ export function CookieConsentBanner() {
         <div
           role="dialog"
           aria-live="polite"
-          aria-label="Bandeau de consentement cookies"
+          aria-label={t("cookies.bannerAriaLabel", "Bandeau de consentement cookies")}
           className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/98 backdrop-blur-sm shadow-[0_-8px_24px_rgba(0,0,0,0.15)]"
         >
           <div className="container mx-auto py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="max-w-3xl text-sm font-sans text-foreground">
               <p>
-                AutoNex utilise des cookies techniques nécessaires au service, ainsi que des cookies optionnels
-                (analytics, fonctionnels) soumis à votre consentement. Vous pouvez tout accepter, tout refuser ou
-                personnaliser vos choix. Détails sur la page{" "}
+                {t("cookies.bannerBodyPrefix", "AutoNex utilise des cookies techniques nécessaires au service, ainsi que des cookies optionnels (analytics, fonctionnels) soumis à votre consentement. Vous pouvez tout accepter, tout refuser ou personnaliser vos choix. Détails sur la page")}{" "}
                 <Link to="/legal/cookies" className="text-primary hover:underline">
-                  Cookies
+                  {t("cookies.moreDetailsLink", "Cookies")}
                 </Link>
                 .
               </p>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
               <Button type="button" variant="outline" onClick={rejectAll} className="font-sans">
-                Tout refuser
+                {t("cookies.rejectAll", "Tout refuser")}
               </Button>
               <Button type="button" variant="outline" onClick={openPreferences} className="font-sans">
-                Personnaliser
+                {t("cookies.customize", "Personnaliser")}
               </Button>
               <Button type="button" onClick={acceptAll} className="font-sans">
-                Tout accepter
+                {t("cookies.acceptAll", "Tout accepter")}
               </Button>
             </div>
           </div>

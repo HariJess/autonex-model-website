@@ -169,7 +169,7 @@ export function usePurchaseCredits(opts?: UsePurchaseCreditsOptions): UsePurchas
       setPromoValidation(null);
       opts?.onSuccess?.();
     } catch (e: unknown) {
-      toast.error(mapDbError(e, "Erreur lors de l'envoi de la demande."));
+      toast.error(mapDbError(e, t("credits.purchaseSendError", "Erreur lors de l'envoi de la demande.")));
       opts?.onError?.(e);
     } finally {
       setSubmitting(false);

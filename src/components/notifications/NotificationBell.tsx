@@ -1,6 +1,7 @@
 import { Bell } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -8,6 +9,7 @@ import { NotificationList } from "./NotificationList";
 import { cn } from "@/lib/utils";
 
 export function NotificationBell() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(10);
   const location = useLocation();
@@ -23,7 +25,7 @@ export function NotificationBell() {
           variant="ghost"
           size="icon"
           className="relative text-navbar-foreground"
-          aria-label={`Notifications (${unreadCount} non lues)`}
+          aria-label={t("notifications.bellAriaLabel", { count: unreadCount })}
         >
           <Bell
             className={cn(
@@ -44,14 +46,14 @@ export function NotificationBell() {
         className="w-96 p-0 max-w-[calc(100vw-2rem)]"
       >
         <div className="flex items-center justify-between border-b px-4 py-3">
-          <h3 className="font-sans font-semibold text-sm text-foreground">Notifications</h3>
+          <h3 className="font-sans font-semibold text-sm text-foreground">{t("notifications.title", "Notifications")}</h3>
           {unreadCount > 0 && (
             <button
               type="button"
               className="text-xs font-sans text-primary hover:underline"
               onClick={() => void markAllAsRead()}
             >
-              Tout marquer comme lu
+              {t("notifications.markAllAsRead", "Tout marquer comme lu")}
             </button>
           )}
         </div>
@@ -61,7 +63,7 @@ export function NotificationBell() {
             void markAsRead(n.id);
             setOpen(false);
           }}
-          emptyMessage="Aucune notification pour le moment"
+          emptyMessage={t("notifications.empty", "Aucune notification pour le moment")}
         />
         <div className="border-t px-4 py-2 flex items-center justify-between">
           <Link
@@ -69,14 +71,14 @@ export function NotificationBell() {
             className="text-sm font-sans text-primary hover:underline"
             onClick={() => setOpen(false)}
           >
-            Voir toutes les notifications
+            {t("notifications.viewAll", "Voir toutes les notifications")}
           </Link>
           <Link
             to="/settings/notifications"
             className="text-xs font-sans text-muted-foreground hover:text-foreground hover:underline"
             onClick={() => setOpen(false)}
           >
-            Préférences
+            {t("notifications.preferences")}
           </Link>
         </div>
       </PopoverContent>

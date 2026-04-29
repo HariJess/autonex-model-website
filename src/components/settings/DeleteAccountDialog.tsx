@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 import {
@@ -24,6 +25,7 @@ type DeleteAccountDialogProps = {
 };
 
 export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogProps) {
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>("description");
   const [typed, setTyped] = useState("");
   const mutation = useRequestDeletion();
@@ -60,27 +62,26 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
         {step === "description" ? (
           <>
             <DialogHeader>
-              <DialogTitle className="font-sans">Supprimer mon compte ?</DialogTitle>
+              <DialogTitle className="font-sans">{t("account.deleteDialog.titleStep1", "Supprimer mon compte ?")}</DialogTitle>
               <DialogDescription className="font-sans">
-                Avant de confirmer, voici ce qui se passe :
+                {t("account.deleteDialog.intro", "Avant de confirmer, voici ce qui se passe :")}
               </DialogDescription>
             </DialogHeader>
 
             <ul className="list-disc pl-5 space-y-2 text-sm font-sans text-foreground">
-              <li>Votre compte sera désactivé immédiatement.</li>
-              <li>Vos annonces actives seront retirées du site.</li>
-              <li>Vos données seront conservées 30 jours ; la demande reste annulable pendant cette période.</li>
-              <li>Après 30 jours : anonymisation RGPD définitive.</li>
+              <li>{t("account.deleteDialog.bullet1", "Votre compte sera désactivé immédiatement.")}</li>
+              <li>{t("account.deleteDialog.bullet2", "Vos annonces actives seront retirées du site.")}</li>
+              <li>{t("account.deleteDialog.bullet3", "Vos données seront conservées 30 jours ; la demande reste annulable pendant cette période.")}</li>
+              <li>{t("account.deleteDialog.bullet4", "Après 30 jours : anonymisation RGPD définitive.")}</li>
             </ul>
 
             <p className="text-xs font-sans text-muted-foreground">
-              Conformément à nos obligations légales, certaines données comptables (transactions,
-              factures) seront conservées de façon anonymisée.
+              {t("account.deleteDialog.legalNote", "Conformément à nos obligations légales, certaines données comptables (transactions, factures) seront conservées de façon anonymisée.")}
             </p>
 
             <DialogFooter className="gap-2 sm:gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="font-sans">
-                Annuler
+                {t("common.cancel", "Annuler")}
               </Button>
               <Button
                 type="button"
@@ -88,23 +89,23 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
                 onClick={() => setStep("confirmation")}
                 className="font-sans"
               >
-                Continuer
+                {t("common.continue", "Continuer")}
               </Button>
             </DialogFooter>
           </>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="font-sans">Confirmer la suppression</DialogTitle>
+              <DialogTitle className="font-sans">{t("account.deleteDialog.titleStep2", "Confirmer la suppression")}</DialogTitle>
               <DialogDescription className="font-sans">
-                Cette action est irréversible au bout de 30 jours. Pour confirmer, tapez{" "}
-                <strong className="font-mono">{CONFIRM_WORD}</strong> ci-dessous.
+                {t("account.deleteDialog.confirmHelpPrefix", "Cette action est irréversible au bout de 30 jours. Pour confirmer, tapez")}{" "}
+                <strong className="font-mono">{CONFIRM_WORD}</strong>{t("account.deleteDialog.confirmHelpSuffix", " ci-dessous.")}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-1.5">
               <Label htmlFor="delete-confirm-input" className="font-sans text-sm">
-                Tapez {CONFIRM_WORD}
+                {t("account.deleteDialog.typeWordLabel", { word: CONFIRM_WORD })}
               </Label>
               <Input
                 id="delete-confirm-input"
@@ -120,7 +121,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
               />
               {typedLooksPartial ? (
                 <p className="text-xs text-destructive font-sans">
-                  Veuillez taper exactement {CONFIRM_WORD} pour continuer.
+                  {t("account.deleteDialog.typeWordError", { word: CONFIRM_WORD })}
                 </p>
               ) : null}
             </div>
@@ -129,7 +130,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
               <Alert variant="destructive" role="alert">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  {mutation.error?.message || "La demande de suppression a échoué. Veuillez réessayer."}
+                  {mutation.error?.message || t("account.deleteDialog.requestFailed", "La demande de suppression a échoué. Veuillez réessayer.")}
                 </AlertDescription>
               </Alert>
             ) : null}
@@ -146,7 +147,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
                 disabled={mutation.isPending}
                 className="font-sans"
               >
-                Retour
+                {t("common.back", "Retour")}
               </Button>
               <Button
                 type="button"
@@ -159,10 +160,10 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
                 {mutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden />
-                    Envoi…
+                    {t("account.deleteDialog.sending", "Envoi…")}
                   </>
                 ) : (
-                  "Confirmer la suppression"
+                  t("account.deleteDialog.confirmButton", "Confirmer la suppression")
                 )}
               </Button>
             </DialogFooter>

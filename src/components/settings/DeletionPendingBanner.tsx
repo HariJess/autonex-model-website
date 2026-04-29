@@ -1,6 +1,7 @@
 import { AlertCircle, Clock, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ function formatFrenchDate(d: Date | null): string {
  * for nothing.
  */
 export function DeletionPendingBanner() {
+  const { t } = useTranslation();
   const { data, isLoading } = useDeletionStatus();
   const cancelMutation = useCancelDeletion();
 
@@ -27,9 +29,9 @@ export function DeletionPendingBanner() {
     return (
       <Alert variant="destructive" className="mb-6" role="alert">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Compte anonymisé</AlertTitle>
+        <AlertTitle>{t("account.deletionBanner.anonymizedTitle", "Compte anonymisé")}</AlertTitle>
         <AlertDescription>
-          Ce compte a été anonymisé. Aucune action n'est possible.
+          {t("account.deletionBanner.anonymizedDescription", "Ce compte a été anonymisé. Aucune action n'est possible.")}
         </AlertDescription>
       </Alert>
     );
@@ -49,13 +51,12 @@ export function DeletionPendingBanner() {
       <Clock className="h-4 w-4" aria-hidden />
       <AlertTitle>
         {formatted
-          ? `Votre compte sera supprimé le ${formatted}`
-          : "Votre compte est programmé pour suppression"}
+          ? t("account.deletionBanner.pendingTitleWithDate", { date: formatted })
+          : t("account.deletionBanner.pendingTitleWithoutDate", "Votre compte est programmé pour suppression")}
       </AlertTitle>
       <AlertDescription className="space-y-3">
         <p>
-          Vous pouvez annuler cette demande à tout moment avant cette date. Vos annonces actives ont
-          été retirées de la plateforme.
+          {t("account.deletionBanner.pendingDescription", "Vous pouvez annuler cette demande à tout moment avant cette date. Vos annonces actives ont été retirées de la plateforme.")}
         </p>
         <Button
           type="button"
@@ -68,10 +69,10 @@ export function DeletionPendingBanner() {
           {cancelMutation.isPending ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden />
-              Annulation…
+              {t("account.deletionBanner.cancelling", "Annulation…")}
             </>
           ) : (
-            "Annuler la suppression"
+            t("account.deletionBanner.cancelButton", "Annuler la suppression")
           )}
         </Button>
       </AlertDescription>

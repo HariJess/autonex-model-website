@@ -99,7 +99,9 @@ describe("SettingsPage", () => {
     for (const section of SETTINGS_SECTIONS) {
       // the label appears in the sidebar button (and active section main heading
       // when it matches). getAllByText covers both occurrences safely.
-      expect(screen.getAllByText(section.label).length).toBeGreaterThan(0);
+      // Tests run with the i18next test config (returns the key as fallback),
+      // so we match against the labelKey directly.
+      expect(screen.getAllByText(section.labelKey).length).toBeGreaterThan(0);
     }
   });
 
