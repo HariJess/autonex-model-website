@@ -36,7 +36,7 @@ export default function YasAppPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const publishUrl = buildYasUrl("/publier", {
+  const estimationUrl = buildYasUrl("/estimation", {
     source: yas.source ?? "yas",
     embedded: yas.isEmbedded ? "true" : null,
     platform: yas.platform,
@@ -60,27 +60,34 @@ export default function YasAppPage() {
           <YasWhySection />
           <YasFeaturedDeals />
 
+          {/*
+           * Card de réassurance — angle psychologique différent de l'action
+           * "Estimer" du haut. Vise les utilisateurs hésitants qui n'ont pas
+           * encore cliqué : "tu hésites à vendre ? Découvre la valeur d'abord,
+           * sans engagement". Cross-sell vers l'outil estimation = différencia-
+           * teur AutoNex (Marketplace n'a pas ça).
+           */}
           <section
-            aria-label={t("yas.cta.sectionAria", "Publier une annonce")}
+            aria-label={t("yas.cta.sectionAria", "Découvrir la valeur de mon véhicule")}
             className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.08] via-card to-primary/[0.02] p-5 shadow-sm"
           >
             <p className="font-sans text-base font-semibold text-foreground sm:text-lg">
-              {t("yas.cta.title", "Vendez votre voiture sur AutoNex")}
+              {t("yas.cta.title", "Hésitant à vendre ?")}
             </p>
             <p className="mt-1 font-sans text-[13px] leading-relaxed text-muted-foreground">
               {t(
                 "yas.cta.body",
-                "Publication guidée, modération avant mise en ligne, paiement sécurisé en MGA.",
+                "Découvrez la vraie valeur de votre voiture en 2 minutes — sans engagement.",
               )}
             </p>
             <Button
               asChild
               size="lg"
               className="mt-4 w-full font-sans"
-              onClick={() => trackYasEvent("yas_publish_cta_click", yas)}
+              onClick={() => trackYasEvent("yas_publish_cta_click", yas, { variant: "estimate_reassurance" })}
             >
-              <Link to={publishUrl}>
-                {t("yas.cta.button", "Publier mon véhicule")}
+              <Link to={estimationUrl}>
+                {t("yas.cta.button", "Estimer ma voiture")}
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
               </Link>
             </Button>

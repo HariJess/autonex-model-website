@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import Footer from "@/components/Footer";
 import { NotificationList } from "@/components/notifications/NotificationList";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -38,6 +39,7 @@ const NotificationsPage = () => {
       </Helmet>
       <Header />
       <div className="container mx-auto max-w-3xl py-6 md:py-8 px-4">
+        <YasBackButton />
         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
           <div>
             <h1 className="font-sans text-2xl md:text-3xl font-bold">{t("notifications.title", "Notifications")}</h1>

@@ -8,6 +8,7 @@ import { isValidPhoneNumber } from "libphonenumber-js/min";
 import { Mail, MapPin, Clock } from "lucide-react";
 
 import Header from "@/components/Header";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -161,6 +162,7 @@ export default function ContactPage() {
       </Helmet>
       <Header />
       <main className="container mx-auto py-8 md:py-12">
+        <YasBackButton />
         <header className="mb-6 md:mb-8 space-y-2">
           <h1 className="font-sans text-3xl md:text-4xl font-bold">{t("contact.heading", "Nous contacter")}</h1>
           <p className="font-sans text-muted-foreground max-w-2xl">

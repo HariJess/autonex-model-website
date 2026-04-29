@@ -6,6 +6,7 @@ import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BetaPaymentBanner } from "@/components/payments/BetaPaymentBanner";
@@ -184,6 +185,7 @@ const PaiementRetourPage = () => {
       </Helmet>
       <Header />
       <main className="container mx-auto max-w-xl py-12 space-y-4">
+        <YasBackButton />
         <BetaPaymentBanner />
         <Card>
           <CardHeader className="text-center">

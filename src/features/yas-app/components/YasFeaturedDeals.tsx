@@ -48,8 +48,9 @@ export function YasFeaturedDeals() {
 
   return (
     <section
+      id="deals"
       aria-label={t("yas.deals.sectionAria", "Aperçu bonnes affaires")}
-      className="space-y-3"
+      className="scroll-mt-4 space-y-3"
     >
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">

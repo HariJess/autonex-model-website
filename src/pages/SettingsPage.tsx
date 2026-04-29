@@ -13,6 +13,7 @@ import { ProfilSection } from "@/components/settings/sections/ProfilSection";
 import { SecuriteSection } from "@/components/settings/sections/SecuriteSection";
 import { NotificationsSection } from "@/components/settings/sections/NotificationsSection";
 import { ZoneDangerSection } from "@/components/settings/sections/ZoneDangerSection";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 
 /**
  * Hash-driven single-page settings container. The URL hash is the source of
@@ -50,6 +51,9 @@ export default function SettingsPage() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <Header />
+      <div className="container mx-auto px-4 pt-3">
+        <YasBackButton />
+      </div>
       <SettingsLayout activeSection={activeSection} onSelectSection={handleSelectSection}>
         <section role="region" aria-labelledby={`section-${activeSection}-heading`}>
           {activeSection === "profil" && <ProfilSection />}

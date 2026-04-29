@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { CreditsBalanceHero } from "@/pages/credits/components/CreditsBalanceHero";
 import { CreditsPurchaseFlow } from "@/components/credits/CreditsPurchaseFlow";
 import { BetaPaymentBanner } from "@/components/payments/BetaPaymentBanner";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 
 /**
  * Dedicated /credits route — auth-gated.
@@ -30,6 +31,7 @@ const CreditsPage = () => {
       </Helmet>
       <Header />
       <main className="container mx-auto max-w-4xl py-8 space-y-6">
+        <YasBackButton />
         <header className="space-y-2">
           <p className="font-sans text-xs uppercase tracking-[0.14em] text-muted-foreground">
             {t("credits.pageOverline", "Espace crédits")}

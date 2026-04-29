@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import { Badge } from "@/components/ui/badge";
@@ -74,6 +75,7 @@ const AgencyProfile = () => {
     return (
       <>
         <Header />
+        <div className="container mx-auto px-4 pt-3"><YasBackButton /></div>
         <div className="min-h-[60vh] flex items-center justify-center">
           <WheelSpinner size="lg" />
         </div>
@@ -86,6 +88,7 @@ const AgencyProfile = () => {
     return (
       <>
         <Header />
+        <div className="container mx-auto px-4 pt-3"><YasBackButton /></div>
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-destructive mb-4" />
           <h1 className="font-sans text-2xl font-bold mb-2">{t("common.error")}</h1>
@@ -105,6 +108,7 @@ const AgencyProfile = () => {
     return (
       <>
         <Header />
+        <div className="container mx-auto px-4 pt-3"><YasBackButton /></div>
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
           <h1 className="font-sans text-2xl font-bold mb-2">{t("agencies.notFound")}</h1>
@@ -158,6 +162,7 @@ const AgencyProfile = () => {
       </Helmet>
       <Header />
       <div className="container mx-auto py-6 md:py-8">
+        <YasBackButton />
         {MONETIZATION_PLACEMENTS.agencyStrip && (
           <div className="mb-8">
             <BannerSlot

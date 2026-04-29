@@ -6,17 +6,26 @@ import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 import { trackYasEvent, type YasEventName } from "@/features/yas-app/lib/yasTracking";
 
 type YasAction = {
-  id: "buy" | "sell" | "estimate" | "deals";
+  id: "buy" | "estimate" | "deals" | "sell";
   labelKey: string;
   fallbackLabel: string;
   helperKey: string;
   fallbackHelper: string;
   Icon: LucideIcon;
-  /** Chemin interne avant injection des params YAS. */
-  href: string;
+  /** Chemin interne avant injection des params YAS, ou null pour un scroll vers une ancre interne. */
+  href: string | null;
+  /** Ancre cible pour scroll local (utilisé pour le CTA "Bonnes affaires" qui scroll vers la section preview en bas). */
+  scrollTo?: string;
   eventName: YasEventName;
 };
 
+/**
+ * Ordre Acheter / Estimer / Bonnes affaires / Vendre — choix Ali :
+ *   1. Acheter (intent majoritaire, exploration)
+ *   2. Estimer (différenciateur AutoNex, signal fort, CTA softer)
+ *   3. Bonnes affaires (chasse opportuniste — scroll vers la section preview)
+ *   4. Vendre (engagement plus fort, dernier dans le tunnel cognitif)
+ */
 const ACTIONS: YasAction[] = [
   {
     id: "buy",
@@ -27,16 +36,6 @@ const ACTIONS: YasAction[] = [
     Icon: Car,
     href: "/recherche?transaction=vente",
     eventName: "yas_action_buy_click",
-  },
-  {
-    id: "sell",
-    labelKey: "yas.actions.sell.label",
-    fallbackLabel: "Vendre ma voiture",
-    helperKey: "yas.actions.sell.helper",
-    fallbackHelper: "Publier votre véhicule en quelques étapes.",
-    Icon: Upload,
-    href: "/publier",
-    eventName: "yas_action_sell_click",
   },
   {
     id: "estimate",
@@ -55,16 +54,40 @@ const ACTIONS: YasAction[] = [
     helperKey: "yas.actions.deals.helper",
     fallbackHelper: "Annonces avec prix réellement réduits.",
     Icon: Flame,
-    href: "/recherche?sort=recent",
+    href: null,
+    scrollTo: "deals",
     eventName: "yas_action_deals_click",
   },
+  {
+    id: "sell",
+    labelKey: "yas.actions.sell.label",
+    fallbackLabel: "Vendre ma voiture",
+    helperKey: "yas.actions.sell.helper",
+    fallbackHelper: "Publier votre véhicule en quelques étapes.",
+    Icon: Upload,
+    href: "/publier",
+    eventName: "yas_action_sell_click",
+  },
 ];
+
+const cardClass =
+  "group flex min-h-[72px] items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 active:translate-y-0 active:bg-muted/40";
 
 export function YasActionGrid() {
   const { t } = useTranslation();
   const yas = useYasContext();
 
-  const handleClick = (action: YasAction) => {
+  const handleAnchorClick = (action: YasAction) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+    trackYasEvent(action.eventName, yas, { action_id: action.id });
+    if (!action.scrollTo) return;
+    const target = document.getElementById(action.scrollTo);
+    if (target) {
+      event.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleNavClick = (action: YasAction) => () => {
     trackYasEvent(action.eventName, yas, { action_id: action.id });
   };
 
@@ -74,31 +97,52 @@ export function YasActionGrid() {
       className="grid grid-cols-1 gap-3 sm:grid-cols-2"
     >
       {ACTIONS.map((action) => {
-        const targetUrl = buildYasUrl(action.href, {
+        const Icon = action.Icon;
+        const labelNode = (
+          <span className="min-w-0">
+            <span className="block font-sans text-sm font-semibold text-foreground sm:text-base">
+              {t(action.labelKey, action.fallbackLabel)}
+            </span>
+            <span className="mt-0.5 block font-sans text-[12px] leading-snug text-muted-foreground sm:text-[13px]">
+              {t(action.helperKey, action.fallbackHelper)}
+            </span>
+          </span>
+        );
+        const iconNode = (
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+            <Icon className="h-5 w-5" aria-hidden />
+          </span>
+        );
+
+        if (action.scrollTo) {
+          return (
+            <a
+              key={action.id}
+              href={`#${action.scrollTo}`}
+              onClick={handleAnchorClick(action)}
+              className={cardClass}
+            >
+              {iconNode}
+              {labelNode}
+            </a>
+          );
+        }
+
+        const targetUrl = buildYasUrl(action.href ?? "/", {
           source: yas.source ?? "yas",
           embedded: yas.isEmbedded ? "true" : null,
           platform: yas.platform,
           entry_point: yas.entryPoint,
         });
-        const Icon = action.Icon;
         return (
           <Link
             key={action.id}
             to={targetUrl}
-            onClick={() => handleClick(action)}
-            className="group flex min-h-[64px] items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 active:translate-y-0"
+            onClick={handleNavClick(action)}
+            className={cardClass}
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
-              <Icon className="h-5 w-5" aria-hidden />
-            </span>
-            <span className="min-w-0">
-              <span className="block font-sans text-sm font-semibold text-foreground sm:text-base">
-                {t(action.labelKey, action.fallbackLabel)}
-              </span>
-              <span className="mt-0.5 block font-sans text-[12px] leading-snug text-muted-foreground sm:text-[13px]">
-                {t(action.helperKey, action.fallbackHelper)}
-              </span>
-            </span>
+            {iconNode}
+            {labelNode}
           </Link>
         );
       })}

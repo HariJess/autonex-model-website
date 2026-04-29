@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { useMyFavoritesList } from "@/hooks/useFavorites";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 
 const FavoritesPage = () => {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ const FavoritesPage = () => {
       <Header />
 
       <main className="flex-1 container mx-auto py-8 md:py-10">
+        <YasBackButton />
         <section className="mb-6 md:mb-8">
           <h1 className="font-sans text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
             <Heart className="h-6 w-6 md:h-7 md:w-7 text-destructive fill-destructive" aria-hidden />

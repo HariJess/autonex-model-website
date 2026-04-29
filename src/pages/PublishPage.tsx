@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import PublishStepVisibility from "@/components/publish/PublishStepVisibility";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPES_WITH_DOORS_FIELDS, type ListingType } from "@/types/listing";
@@ -957,6 +958,7 @@ const PublishPage = () => {
       </Helmet>
       <Header />
       <div className="container mx-auto max-w-6xl py-6 md:py-8 pb-36 sm:pb-8">
+        <YasBackButton />
         <PublishPageHeader
           moderationText={t(
             "publish.publishBannerInstant",

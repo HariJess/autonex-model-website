@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, AlertTriangle, Info, Lightbulb } from "lucide-react";
 import { seedBlogPosts, type SeedBlogCallout } from "@/data/seed-blog";
 import { useYasHomeUrl } from "@/features/yas-app/hooks/useYasHomeUrl";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 
 const slugify = (text: string) =>
   text
@@ -101,6 +102,7 @@ const BlogList = () => {
       </Helmet>
       <Header />
       <div className="container mx-auto py-6 md:py-8">
+        <YasBackButton />
         <h1 className="font-sans text-3xl font-bold mb-6">{t("nav.advice")}</h1>
 
         {posts.length === 0 ? (

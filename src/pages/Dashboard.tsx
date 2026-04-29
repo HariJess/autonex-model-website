@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import Footer from "@/components/Footer";
 import { Eye, Phone, MessageSquare, Home, Coins } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -316,6 +317,7 @@ const Dashboard = () => {
       </Helmet>
       <Header />
       <div className="container mx-auto py-8 space-y-8">
+        <YasBackButton />
         <DashboardHeader
           title={t("dashboard.title")}
           accountRoleLabel={accountRoleLabel}

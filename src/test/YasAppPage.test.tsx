@@ -43,20 +43,22 @@ function renderYasAppPage(initialPath = "/yas-app?source=yas&embedded=true") {
 }
 
 describe("YasAppPage", () => {
-  it("rend le hero, les 4 actions principales et le CTA final", () => {
+  it("rend le hero, les 4 actions principales et le CTA final cross-sell estimation", () => {
     renderYasAppPage();
 
     // Hero
     expect(screen.getByText(/Acheter, vendre ou estimer une voiture/i)).toBeInTheDocument();
 
-    // 4 actions
+    // 4 actions (ordre : Acheter / Estimer / Bonnes affaires / Vendre)
     expect(screen.getByText("Acheter une voiture")).toBeInTheDocument();
     expect(screen.getByText("Vendre ma voiture")).toBeInTheDocument();
-    expect(screen.getByText("Estimer ma voiture")).toBeInTheDocument();
     expect(screen.getByText("Voir les bonnes affaires")).toBeInTheDocument();
+    // « Estimer ma voiture » apparaît 2 fois : action card + bouton du CTA
+    // final cross-sell estimation.
+    expect(screen.getAllByText("Estimer ma voiture").length).toBeGreaterThanOrEqual(2);
 
-    // CTA final
-    expect(screen.getByText("Publier mon véhicule")).toBeInTheDocument();
+    // CTA final — angle réassurance "Hésitant à vendre ?" pointe vers /estimation
+    expect(screen.getByText(/Hésitant à vendre/i)).toBeInTheDocument();
   });
 
   it("émet l'événement yas_autonex_open au mount", () => {

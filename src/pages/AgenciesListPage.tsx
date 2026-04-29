@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -71,6 +72,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
       ) : null}
       <Header />
       <div className="container mx-auto py-6 md:py-8">
+        <YasBackButton />
         <h1 className="font-sans text-3xl font-bold mb-2">{title}</h1>
         <p className="text-sm md:text-base text-muted-foreground font-sans mb-6">
           {t("agencies.pageSubtitle")}

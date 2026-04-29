@@ -12,6 +12,7 @@ import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import Index from "./pages/Index.tsx";
 import SentrySmokeTest from "./components/dev/SentrySmokeTest";
 import { CookieConsentBanner } from "@/components/cookies/CookieConsentBanner";
+import { YasScrollToTop } from "@/features/yas-app/components/YasScrollToTop";
 import { initGA4IfConsented } from "@/lib/analytics/ga4";
 import { COOKIE_CONSENT_EVENT } from "@/lib/analytics/cookieConsentStorage";
 
@@ -94,6 +95,7 @@ const App = () => {
       <Sonner />
       <SentrySmokeTest />
       <BrowserRouter>
+        <YasScrollToTop />
         <Suspense fallback={<PageLoader />}>
           <BetaLockGate>
           <Routes>
