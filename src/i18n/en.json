@@ -7,7 +7,14 @@
   },
   "agencies": {
     "activeListings": "{{count}} active listing(s)",
+    "allCities": "All cities",
+    "autonexPartnerBadge": "AutoNex partner",
+    "cityLabel": "City",
+    "dealersFoundCount": "{{count}} dealer(s) found.",
+    "directoryTitle": "Dealer directory",
     "featuredTitle": "Featured agencies",
+    "heading": "AutoNex Dealers",
+    "headingConcessionnairesRoute": "Car dealers in Madagascar",
     "listingsOf": "Listings from {{name}}",
     "networkBadge": "Network",
     "noAgencies": "No partner dealers at the moment.",
@@ -15,9 +22,17 @@
     "noListings": "No active listings at the moment.",
     "notFound": "Dealer not found",
     "notFoundDesc": "This dealer does not exist or has been removed.",
+    "officialPartnersSubtitle": "Dealers selected and featured by AutoNex.",
+    "officialPartnersTitle": "Official AutoNex partners",
+    "pageSubtitle": "Browse our official partners and dealers on the platform.",
     "pageTitle": "Partner dealers",
+    "partnerBadge": "Partner",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Dealer name...",
     "title": "Car dealers",
-    "viewAll": "View all dealers"
+    "verifiedOnly": "Verified partners only",
+    "viewAll": "View all dealers",
+    "viewStock": "View inventory"
   },
   "auth": {
     "agency": "Agency",
@@ -313,8 +328,8 @@
       "line2Suffix": " that fits you in Madagascar"
     },
     "aria": "Vehicle search on AutoNex",
-    "trustEstimationFree": "Free estimation",
-    "trustEstimationFreeShort": "Estimation",
+    "trustEstimationFree": "Free valuation",
+    "trustEstimationFreeShort": "Valuation",
     "trustMadeInMg": "100% Malagasy",
     "trustMadeInMgShort": "Malagasy",
     "trustModerated": "Moderated listings",
@@ -877,7 +892,7 @@
     "emptyOverline": "AutoNex search",
     "runtimeDataUnavailable": "The vehicle catalog is temporarily unavailable. Please try again in a few seconds.",
     "runtimeGenericError": "We could not load listings. Check your connection, then try again.",
-    "sale": "Buy",
+    "sale": "For sale",
     "school": "School",
     "seeListing": "View listing",
     "selectedTypesCount": "{{count}} types selected",
@@ -937,7 +952,7 @@
   },
   "transaction": {
     "rent": "Long-term rental",
-    "sale": "Buy",
+    "sale": "For sale",
     "vacation": "Short-term rental"
   },
   "vehicleColor": {

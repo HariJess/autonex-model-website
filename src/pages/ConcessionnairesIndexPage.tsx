@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import AgenciesListPage from "./AgenciesListPage";
 
 /**
@@ -9,6 +10,7 @@ import AgenciesListPage from "./AgenciesListPage";
  * malgache). Même contenu, canonical distinct par page.
  */
 const ConcessionnairesIndexPage = () => {
+  const { t } = useTranslation();
   const canonical =
     typeof window !== "undefined"
       ? `${window.location.origin}/concessionnaires`
@@ -24,7 +26,7 @@ const ConcessionnairesIndexPage = () => {
         />
         <link rel="canonical" href={canonical} />
       </Helmet>
-      <AgenciesListPage heading="Concessionnaires automobiles à Madagascar" />
+      <AgenciesListPage heading={t("agencies.headingConcessionnairesRoute")} />
     </>
   );
 };

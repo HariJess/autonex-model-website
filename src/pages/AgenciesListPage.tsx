@@ -55,7 +55,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
       ? `${window.location.origin}/agences`
       : "https://autonex.mg/agences";
 
-  const title = heading ?? "Concessionnaires AutoNex";
+  const title = heading ?? t("agencies.heading");
 
   return (
     <>
@@ -73,29 +73,29 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
       <div className="container mx-auto py-6 md:py-8">
         <h1 className="font-sans text-3xl font-bold mb-2">{title}</h1>
         <p className="text-sm md:text-base text-muted-foreground font-sans mb-6">
-          Retrouvez nos partenaires officiels et les concessionnaires présents sur la plateforme.
+          {t("agencies.pageSubtitle")}
         </p>
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3 items-end mb-8">
           <div className="flex-1 min-w-[200px] max-w-md">
-            <Label htmlFor="ag-search" className="font-sans text-xs">Rechercher</Label>
+            <Label htmlFor="ag-search" className="font-sans text-xs">{t("agencies.searchLabel")}</Label>
             <Input
               id="ag-search"
-              placeholder="Nom de l'agence..."
+              placeholder={t("agencies.searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="font-sans"
             />
           </div>
           <div className="w-48">
-            <Label className="font-sans text-xs">Ville</Label>
+            <Label className="font-sans text-xs">{t("agencies.cityLabel")}</Label>
             <Select value={city} onValueChange={setCity}>
               <SelectTrigger className="font-sans">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Toutes les villes</SelectItem>
+                <SelectItem value="all">{t("agencies.allCities")}</SelectItem>
                 {CITIES.map((c) => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
@@ -109,7 +109,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
               onCheckedChange={(v) => setVerifiedOnly(v === true)}
             />
             <Label htmlFor="ag-verified" className="font-sans text-sm font-normal">
-              Partenaires vérifiés uniquement
+              {t("agencies.verifiedOnly")}
             </Label>
           </div>
         </div>
@@ -130,11 +130,11 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
             {PARTNER_DEALERS.length > 0 && !search && !verifiedOnly && city === "all" ? (
               <section className="rounded-2xl border border-border bg-card p-5 md:p-6">
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <h2 className="font-sans text-xl font-bold">Partenaires officiels AutoNex</h2>
-                  <Badge variant="secondary" className="font-sans text-xs">Partenaire AutoNex</Badge>
+                  <h2 className="font-sans text-xl font-bold">{t("agencies.officialPartnersTitle")}</h2>
+                  <Badge variant="secondary" className="font-sans text-xs">{t("agencies.autonexPartnerBadge")}</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground font-sans mb-4">
-                  Des concessionnaires sélectionnés et mis en avant par AutoNex.
+                  {t("agencies.officialPartnersSubtitle")}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {PARTNER_DEALERS.map((dealer) => (
@@ -150,13 +150,13 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <h3 className="font-sans text-lg font-bold group-hover:text-primary transition-colors">{dealer.name}</h3>
-                            <Badge className="bg-success text-xs font-sans" style={{ color: "#FAFAFA" }}>Partenaire</Badge>
+                            <Badge className="bg-success text-xs font-sans" style={{ color: "#FAFAFA" }}>{t("agencies.partnerBadge")}</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground font-sans">{dealer.city}, {dealer.area}</p>
                           <p className="text-xs text-muted-foreground font-sans mt-1">{dealer.brands.slice(0, 3).join(" • ")}</p>
                         </div>
                       </div>
-                      <p className="mt-4 text-sm font-sans text-primary">Voir le stock</p>
+                      <p className="mt-4 text-sm font-sans text-primary">{t("agencies.viewStock")}</p>
                     </Link>
                   ))}
                 </div>
@@ -164,9 +164,9 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
             ) : null}
 
             <section>
-              <h2 className="font-sans text-xl font-bold mb-1">Annuaire des concessionnaires</h2>
+              <h2 className="font-sans text-xl font-bold mb-1">{t("agencies.directoryTitle")}</h2>
               <p className="text-sm text-muted-foreground font-sans mb-4">
-                {agencies.length} concessionnaire{agencies.length > 1 ? "s" : ""} trouvé{agencies.length > 1 ? "s" : ""}.
+                {t("agencies.dealersFoundCount", { count: agencies.length })}
               </p>
               {agencies.length === 0 ? (
                 <p className="text-center text-muted-foreground font-sans py-8">
@@ -198,7 +198,7 @@ const AgenciesListPage = ({ heading }: AgenciesListPageProps = {}) => {
                           <h3 className="font-sans font-bold group-hover:text-primary transition-colors">{agency.name}</h3>
                           {agency.verified && (
                             <span className="inline-flex items-center gap-0.5 rounded-md border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs font-sans font-medium text-amber-800">
-                              <ShieldCheck className="h-3 w-3" /> Partenaire
+                              <ShieldCheck className="h-3 w-3" /> {t("agencies.partnerBadge")}
                             </span>
                           )}
                         </div>

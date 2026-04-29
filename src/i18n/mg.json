@@ -7,7 +7,14 @@
   },
   "agencies": {
     "activeListings": "{{count}} filazana mavitrika",
+    "allCities": "Tanàna rehetra",
+    "autonexPartnerBadge": "Mpiara-miombon'antoka AutoNex",
+    "cityLabel": "Tanàna",
+    "dealersFoundCount": "{{count}} concessionnaire(s) hita.",
+    "directoryTitle": "Tahirin-kevitry ny concessionnaires",
     "featuredTitle": "Concessionnaires malaza",
+    "heading": "Concessionnaires AutoNex",
+    "headingConcessionnairesRoute": "Concessionnaires fiara eto Madagasikara",
     "listingsOf": "Filazana avy amin'i {{name}}",
     "networkBadge": "Tambazotra",
     "noAgencies": "Mbola tsy misy concessionnaire mpiara-miombon'antoka.",
@@ -15,9 +22,17 @@
     "noListings": "Mbola tsy misy filazana mavitrika.",
     "notFound": "Concessionnaire tsy hita",
     "notFoundDesc": "Tsy misy io concessionnaire io na efa nesorina.",
+    "officialPartnersSubtitle": "Concessionnaires voafidy sy nasongadin'ny AutoNex.",
+    "officialPartnersTitle": "Mpiara-miombon'antoka ofisialy AutoNex",
+    "pageSubtitle": "Tadiavo ireo mpiara-miombon'antoka ofisialy sy ireo concessionnaires hita amin'ny tranonkala.",
     "pageTitle": "Concessionnaires mpiara-miombon'antoka",
+    "partnerBadge": "Mpiara-miombon'antoka",
+    "searchLabel": "Hitady",
+    "searchPlaceholder": "Anaran'ny concessionnaire...",
     "title": "Concessionnaires fiara",
-    "viewAll": "Hijery ny concessionnaires rehetra"
+    "verifiedOnly": "Mpiara-miombon'antoka voamarina ihany",
+    "viewAll": "Hijery ny concessionnaires rehetra",
+    "viewStock": "Hijery ny tahirin'entana"
   },
   "auth": {
     "agency": "Concessionnaires",

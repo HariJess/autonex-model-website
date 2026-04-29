@@ -7,7 +7,14 @@
   },
   "agencies": {
     "activeListings": "{{count}} annonce(s) active(s)",
+    "allCities": "Toutes les villes",
+    "autonexPartnerBadge": "Partenaire AutoNex",
+    "cityLabel": "Ville",
+    "dealersFoundCount": "{{count}} concessionnaire(s) trouvé(s).",
+    "directoryTitle": "Annuaire des concessionnaires",
     "featuredTitle": "Agences en vedette",
+    "heading": "Concessionnaires AutoNex",
+    "headingConcessionnairesRoute": "Concessionnaires automobiles à Madagascar",
     "listingsOf": "Annonces de {{name}}",
     "networkBadge": "Réseau",
     "noAgencies": "Aucun concessionnaire partenaire pour le moment.",
@@ -15,9 +22,17 @@
     "noListings": "Aucune annonce active pour le moment.",
     "notFound": "Concessionnaire introuvable",
     "notFoundDesc": "Ce concessionnaire n'existe pas ou a été supprimé.",
+    "officialPartnersSubtitle": "Des concessionnaires sélectionnés et mis en avant par AutoNex.",
+    "officialPartnersTitle": "Partenaires officiels AutoNex",
+    "pageSubtitle": "Retrouvez nos partenaires officiels et les concessionnaires présents sur la plateforme.",
     "pageTitle": "Concessionnaires partenaires",
+    "partnerBadge": "Partenaire",
+    "searchLabel": "Rechercher",
+    "searchPlaceholder": "Nom de l'agence...",
     "title": "Concessionnaires automobiles",
-    "viewAll": "Voir tous les concessionnaires"
+    "verifiedOnly": "Partenaires vérifiés uniquement",
+    "viewAll": "Voir tous les concessionnaires",
+    "viewStock": "Voir le stock"
   },
   "auth": {
     "agency": "Agence",
