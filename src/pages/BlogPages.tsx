@@ -30,13 +30,14 @@ function deriveCoverWebpSrcSet(jpgPath: string): { mobile: string; desktop: stri
 
 const calloutStyles: Record<
   SeedBlogCallout["type"],
-  { border: string; bg: string; iconColor: string; Icon: typeof Info; defaultTitle: string }
+  { border: string; bg: string; iconColor: string; Icon: typeof Info; defaultTitleKey: string; defaultTitle: string }
 > = {
   tip: {
     border: "border-l-emerald-500",
     bg: "bg-emerald-500/10",
     iconColor: "text-emerald-600",
     Icon: Lightbulb,
+    defaultTitleKey: "blog.calloutTip",
     defaultTitle: "Astuce",
   },
   warning: {
@@ -44,6 +45,7 @@ const calloutStyles: Record<
     bg: "bg-amber-500/10",
     iconColor: "text-amber-600",
     Icon: AlertTriangle,
+    defaultTitleKey: "blog.calloutWarning",
     defaultTitle: "Attention",
   },
   info: {
@@ -51,11 +53,13 @@ const calloutStyles: Record<
     bg: "bg-sky-500/10",
     iconColor: "text-sky-600",
     Icon: Info,
+    defaultTitleKey: "blog.calloutInfo",
     defaultTitle: "À savoir",
   },
 };
 
 const Callout = ({ callout }: { callout: SeedBlogCallout }) => {
+  const { t } = useTranslation();
   const style = calloutStyles[callout.type];
   const Icon = style.Icon;
   return (
@@ -63,7 +67,7 @@ const Callout = ({ callout }: { callout: SeedBlogCallout }) => {
       <div className="flex gap-3">
         <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${style.iconColor}`} aria-hidden="true" />
         <div className="space-y-1">
-          <p className="font-sans font-semibold text-foreground">{callout.title ?? style.defaultTitle}</p>
+          <p className="font-sans font-semibold text-foreground">{callout.title ?? t(style.defaultTitleKey, style.defaultTitle)}</p>
           <p className="text-sm sm:text-base text-muted-foreground leading-7">{callout.text}</p>
         </div>
       </div>
@@ -245,7 +249,7 @@ const BlogArticle = () => {
           <span>•</span>
           <span>{post.readingTime}</span>
           <span>•</span>
-          <span>Mis à jour le {post.updated_at ? new Date(post.updated_at).toLocaleDateString("fr-FR") : ""}</span>
+          <span>{t("blog.updatedOn", "Mis à jour le {{date}}", { date: post.updated_at ? new Date(post.updated_at).toLocaleDateString("fr-FR") : "" })}</span>
         </div>
         {post.cover && (() => {
           const webp = deriveCoverWebpSrcSet(post.cover);

@@ -459,7 +459,9 @@
     "thematicElectricTitle": "Elektrika sy Hybride",
     "thematicUtilitySubtitle": "Fitaterana matihanina, logistika ary asam-pitaterana mpandeha.",
     "thematicUtilityTitle": "Utilitaire, Van sy Minibus",
-    "popularBrandsRibbon": "Marika malaza"
+    "popularBrandsRibbon": "Marika malaza",
+    "seoTitle": "AutoNex — Fiara eto Madagasikara",
+    "seoDescription": "AutoNex : filazana fiara eto Madagasikara — fividianana, fivarotana, fiara, 4x4, môtô sy fitateram-bolana."
   },
   "listing": {
     "addressUnknown": "Adiresy tsy voafaritra",
@@ -933,7 +935,27 @@
     "successPublishedReviewDesc": "Hojeren'ny ekipanay ao anatin'ny 24 ora ny filazanao. Hampahafantarina ianao raha vao hita.",
     "doors": "Varavarana",
     "seats": "Seza / habetsahana (tsy voatery)",
-    "uploading": "Mampakatra…"
+    "uploading": "Mampakatra…",
+    "validation": {
+      "invalid": "Diso ny angon-drakitra",
+      "title": {
+        "minLength": "Tsy maintsy 5 sora-baventy farafahakeliny ny lohateny.",
+        "maxLength": "Tsy mahazo mihoatra ny 120 sora-baventy ny lohateny."
+      },
+      "description": {
+        "minLength": "Tsy maintsy 40 sora-baventy farafahakeliny ny famaritana."
+      },
+      "price": {
+        "min": "Tsy maintsy 100 000 Ar farafahakeliny ny vidiny.",
+        "max": "Tsy mahazo mihoatra ny 10 lavitrisa Ariary ny vidiny."
+      },
+      "year": {
+        "range": "Tsy maintsy eo anelanelan'ny 1950 sy ny taona ankehitriny ny taona."
+      },
+      "whatsapp": {
+        "format": "Tsy maintsy amin'ny endrika iraisam-pirenena (+261…) ny laharana WhatsApp."
+      }
+    }
   },
   "search": {
     "activeSelection": "Safidy mavitrika: {{value}}",
@@ -1211,7 +1233,8 @@
       "sectionProfile": "Mombamomba",
       "sectionSecurity": "Filaminana",
       "sectionNotifications": "Fampahafantarana",
-      "sectionDangerZone": "Faritra mampidi-doza"
+      "sectionDangerZone": "Faritra mampidi-doza",
+      "metaTitle": "Paramètres — AutoNex"
     }
   },
   "notifications": {
@@ -1333,7 +1356,11 @@
     "notFound": "Tsy hita ny lahatsoratra",
     "notFoundDesc": "Tsy misy na efa nesorina ity lahatsoratra ity.",
     "viewAll": "Hijery ny lahatsoratra rehetra",
-    "toc": "Lisitry ny ao anatiny"
+    "toc": "Lisitry ny ao anatiny",
+    "calloutTip": "Torohevitra",
+    "calloutWarning": "Tandremo",
+    "calloutInfo": "Tokony ho fantatra",
+    "updatedOn": "Nohavaozina ny {{date}}"
   },
   "contact": {
     "pageTitle": "Fifandraisana",
@@ -2030,5 +2057,50 @@
         "body": "Pour toute question relative aux présentes CGU : <0>info@autonex.mg</0>"
       }
     }
+  },
+  "errorBoundary": {
+    "title": "Indrisy, nisy fahadisoana",
+    "description": "Miala tsiny izahay amin'ny fanelingelenana. Azonao atao ny manandrana indray na hiverina any am-pidirana.",
+    "retry": "Andramo indray",
+    "backToHome": "Hiverina any am-pidirana"
+  },
+  "budgetSlider": {
+    "budget": "Budget",
+    "min": "Min",
+    "max": "Max",
+    "reset": "Averina",
+    "apply": "Ampiharo"
+  },
+  "beta": {
+    "metaTitle": "Fidirana voafetra — AutoNex",
+    "heading": "Fidirana voafetra",
+    "subtitle": "Mbola amin'ny dingana beta manokana ny AutoNex. Ampidiro ny code fidirana mba hanohizana.",
+    "codeLabel": "Code fidirana",
+    "placeholder": "Code beta",
+    "showCode": "Asehoy ny code",
+    "hideCode": "Afenoy ny code",
+    "submitting": "Manamarina...",
+    "submit": "Hiditra",
+    "success": "Nahazo alalana. Tongasoa eto amin'ny beta AutoNex.",
+    "errorIncorrect": "Diso ny code, andramo indray."
+  },
+  "notFound": {
+    "title": "Tsy hita ny pejy",
+    "bodyPrefix": "Ny pejy",
+    "bodySuffix": "tsy misy.",
+    "backToHome": "Hiverina any am-pidirana",
+    "viewListings": "Hijery ny filazana"
+  },
+  "vehicleCombobox": {
+    "modelPlaceholder": "Mifidiana na soraty ny modely",
+    "typePlaceholder": "Mifidiana na soraty ny karazana",
+    "selectBrandFirst": "Mifidiana marika aloha",
+    "searchOrType": "Mikaroha na manorata…",
+    "noSuggestion": "Tsy nahitana soso-kevitra",
+    "useFreeText": "Ampiasao « {{value}} »",
+    "popularModels": "Modely malaza",
+    "otherModels": "Modely hafa",
+    "popularSuggestions": "Soso-kevitra malaza",
+    "otherTypes": "Karazana hafa"
   }
 }

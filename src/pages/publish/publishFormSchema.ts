@@ -89,15 +89,15 @@ export const vehicleDescriptionSubSchema = z.object({
   title: z
     .string()
     .refine((v) => v.length === 0 || v.trim().length >= 5, {
-      message: "Le titre doit faire au moins 5 caractères.",
+      message: "publish.validation.title.minLength",
     })
     .refine((v) => v.length === 0 || v.length <= 120, {
-      message: "Le titre ne peut pas dépasser 120 caractères.",
+      message: "publish.validation.title.maxLength",
     }),
   description: z
     .string()
     .refine((v) => v.length === 0 || v.trim().length >= 40, {
-      message: "La description doit faire au moins 40 caractères.",
+      message: "publish.validation.description.minLength",
     }),
   priceMga: z
     .string()
@@ -107,7 +107,7 @@ export const vehicleDescriptionSubSchema = z.object({
         const n = Number(v);
         return Number.isFinite(n) && n >= PRICE_MIN_MGA;
       },
-      { message: "Le prix doit être au moins 100 000 Ar." },
+      { message: "publish.validation.price.min" },
     )
     .refine(
       (v) => {
@@ -115,7 +115,7 @@ export const vehicleDescriptionSubSchema = z.object({
         const n = Number(v);
         return !Number.isFinite(n) || n <= PRICE_MAX_MGA;
       },
-      { message: "Le prix ne peut pas dépasser 10 milliards d'Ariary." },
+      { message: "publish.validation.price.max" },
     ),
   negotiable: z.boolean(),
 });
@@ -164,7 +164,7 @@ export const vehicleAttrsSubSchema = z.object({
    */
   vehicleWhatsappPhone: z.string().refine(
     (v) => v === "" || /^\+[1-9]\d{6,14}$/.test(v),
-    { message: "Le numéro WhatsApp doit être au format international (+261…)." },
+    { message: "publish.validation.whatsapp.format" },
   ),
   vehicleIsElectric: z.boolean(),
   vehicleIsHybrid: z.boolean(),

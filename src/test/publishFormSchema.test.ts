@@ -62,7 +62,7 @@ describe("publishFormSchema — title", () => {
     const result = parseDescription({ title: "abcd" });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/5 caractères/);
+      expect(result.error.issues[0].message).toBe("publish.validation.title.minLength");
     }
   });
 
@@ -78,7 +78,7 @@ describe("publishFormSchema — title", () => {
     const result = parseDescription({ title: "a".repeat(121) });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/120 caractères/);
+      expect(result.error.issues[0].message).toBe("publish.validation.title.maxLength");
     }
   });
 
@@ -86,7 +86,7 @@ describe("publishFormSchema — title", () => {
     const result = parseDescription({ title: "   ab   " });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/5 caractères/);
+      expect(result.error.issues[0].message).toBe("publish.validation.title.minLength");
     }
   });
 });
@@ -100,7 +100,7 @@ describe("publishFormSchema — description", () => {
     const result = parseDescription({ description: "a".repeat(39) });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/40 caractères/);
+      expect(result.error.issues[0].message).toBe("publish.validation.description.minLength");
     }
   });
 
@@ -123,7 +123,7 @@ describe("publishFormSchema — priceMga", () => {
     const result = parseDescription({ priceMga: "99999" });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/100 000/);
+      expect(result.error.issues[0].message).toBe("publish.validation.price.min");
     }
   });
 
@@ -139,7 +139,7 @@ describe("publishFormSchema — priceMga", () => {
     const result = parseDescription({ priceMga: String(PRICE_MAX_MGA + 1) });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/10 milliards/);
+      expect(result.error.issues[0].message).toBe("publish.validation.price.max");
     }
   });
 });
@@ -157,7 +157,7 @@ describe("publishFormSchema — vehicleWhatsappPhone (E.164)", () => {
     const result = parseAttrs({ vehicleWhatsappPhone: "+261 34 12 34 567" });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/international/);
+      expect(result.error.issues[0].message).toBe("publish.validation.whatsapp.format");
     }
   });
 

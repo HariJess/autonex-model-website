@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { useBetaAccess } from "@/hooks/useBetaAccess";
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 const BetaLoginPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { unlock, isUnlocked, isLockEnabled } = useBetaAccess();
   const [code, setCode] = useState("");
@@ -42,7 +44,7 @@ const BetaLoginPage = () => {
     await sleep(500); // soft anti-spam delay (cosmetic)
     const success = unlock(code);
     if (success) {
-      toast.success("Accès accordé. Bienvenue sur la beta AutoNex.");
+      toast.success(t("beta.success", "Accès accordé. Bienvenue sur la beta AutoNex."));
       // Full reload (not navigate) to avoid an infinite render loop
       // between BetaLockGate and this page: the cookie is set
       // synchronously, but the React state of useBetaAccess does not
@@ -51,7 +53,7 @@ const BetaLoginPage = () => {
       // replace() also keeps /beta-login out of the back button.
       window.location.replace("/");
     } else {
-      setError("Code incorrect, réessayez.");
+      setError(t("beta.errorIncorrect", "Code incorrect, réessayez."));
       setCode("");
     }
     setSubmitting(false);
@@ -60,7 +62,7 @@ const BetaLoginPage = () => {
   return (
     <>
       <Helmet>
-        <title>Accès réservé — AutoNex</title>
+        <title>{t("beta.metaTitle", "Accès réservé — AutoNex")}</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
@@ -76,18 +78,17 @@ const BetaLoginPage = () => {
               }}
             />
             <h1 className="font-sans text-3xl font-bold tracking-tight">
-              Accès réservé
+              {t("beta.heading", "Accès réservé")}
             </h1>
             <p className="font-sans text-sm text-muted-foreground max-w-sm">
-              AutoNex est actuellement en phase beta privée. Entrez le code
-              d'accès pour continuer.
+              {t("beta.subtitle", "AutoNex est actuellement en phase beta privée. Entrez le code d'accès pour continuer.")}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="beta-code" className="font-sans">
-                Code d'accès
+                {t("beta.codeLabel", "Code d'accès")}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
@@ -96,7 +97,7 @@ const BetaLoginPage = () => {
                   type={showCode ? "text" : "password"}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="Code beta"
+                  placeholder={t("beta.placeholder", "Code beta")}
                   autoFocus
                   autoComplete="off"
                   spellCheck={false}
@@ -108,7 +109,7 @@ const BetaLoginPage = () => {
                   type="button"
                   onClick={() => setShowCode((v) => !v)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showCode ? "Masquer le code" : "Afficher le code"}
+                  aria-label={showCode ? t("beta.hideCode", "Masquer le code") : t("beta.showCode", "Afficher le code")}
                   tabIndex={-1}
                 >
                   {showCode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -129,7 +130,7 @@ const BetaLoginPage = () => {
               disabled={submitting || code.trim().length === 0}
               className="w-full font-sans h-11"
             >
-              {submitting ? "Vérification..." : "Accéder"}
+              {submitting ? t("beta.submitting", "Vérification...") : t("beta.submit", "Accéder")}
             </Button>
           </form>
 

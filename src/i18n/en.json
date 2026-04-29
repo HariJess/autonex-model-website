@@ -459,7 +459,9 @@
     "thematicElectricTitle": "Electric & Hybrid",
     "thematicUtilitySubtitle": "Business transport, logistics, and passenger activity.",
     "thematicUtilityTitle": "Utility Vehicles, Vans & Minibuses",
-    "popularBrandsRibbon": "Popular brands"
+    "popularBrandsRibbon": "Popular brands",
+    "seoTitle": "AutoNex — Cars in Madagascar",
+    "seoDescription": "AutoNex: car listings in Madagascar — buy, sell, cars, 4x4s, motorbikes and utility vehicles."
   },
   "listing": {
     "addressUnknown": "Address not specified",
@@ -933,7 +935,27 @@
     "successPublishedReviewDesc": "Our team will review your listing within 24 hours. You'll be notified as soon as it goes live.",
     "doors": "Doors",
     "seats": "Seats / capacity (optional)",
-    "uploading": "Uploading…"
+    "uploading": "Uploading…",
+    "validation": {
+      "invalid": "Invalid data",
+      "title": {
+        "minLength": "The title must be at least 5 characters.",
+        "maxLength": "The title cannot exceed 120 characters."
+      },
+      "description": {
+        "minLength": "The description must be at least 40 characters."
+      },
+      "price": {
+        "min": "The price must be at least 100,000 Ar.",
+        "max": "The price cannot exceed 10 billion Ariary."
+      },
+      "year": {
+        "range": "The year must be between 1950 and the current year."
+      },
+      "whatsapp": {
+        "format": "The WhatsApp number must be in international format (+261…)."
+      }
+    }
   },
   "search": {
     "activeSelection": "Active selection: {{value}}",
@@ -1211,7 +1233,8 @@
       "sectionProfile": "Profile",
       "sectionSecurity": "Security",
       "sectionNotifications": "Notifications",
-      "sectionDangerZone": "Danger zone"
+      "sectionDangerZone": "Danger zone",
+      "metaTitle": "Settings — AutoNex"
     }
   },
   "notifications": {
@@ -1333,7 +1356,11 @@
     "notFound": "Article not found",
     "notFoundDesc": "This article does not exist or has been removed.",
     "viewAll": "View all articles",
-    "toc": "Table of contents"
+    "toc": "Table of contents",
+    "calloutTip": "Tip",
+    "calloutWarning": "Warning",
+    "calloutInfo": "Good to know",
+    "updatedOn": "Updated on {{date}}"
   },
   "contact": {
     "pageTitle": "Contact",
@@ -2030,5 +2057,50 @@
         "body": "For any question about these Terms: <0>info@autonex.mg</0>"
       }
     }
+  },
+  "errorBoundary": {
+    "title": "Oops, something went wrong",
+    "description": "We're sorry for the inconvenience. You can retry or return to the home page.",
+    "retry": "Retry",
+    "backToHome": "Back to home"
+  },
+  "budgetSlider": {
+    "budget": "Budget",
+    "min": "Min",
+    "max": "Max",
+    "reset": "Reset",
+    "apply": "Apply"
+  },
+  "beta": {
+    "metaTitle": "Restricted access — AutoNex",
+    "heading": "Restricted access",
+    "subtitle": "AutoNex is currently in private beta. Enter the access code to continue.",
+    "codeLabel": "Access code",
+    "placeholder": "Beta code",
+    "showCode": "Show code",
+    "hideCode": "Hide code",
+    "submitting": "Verifying...",
+    "submit": "Sign in",
+    "success": "Access granted. Welcome to the AutoNex beta.",
+    "errorIncorrect": "Incorrect code, please try again."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "bodyPrefix": "The page",
+    "bodySuffix": "does not exist.",
+    "backToHome": "Back to home",
+    "viewListings": "View listings"
+  },
+  "vehicleCombobox": {
+    "modelPlaceholder": "Choose or type a model",
+    "typePlaceholder": "Choose or type a type",
+    "selectBrandFirst": "Pick a brand first",
+    "searchOrType": "Search or type…",
+    "noSuggestion": "No suggestions found",
+    "useFreeText": "Use \"{{value}}\"",
+    "popularModels": "Popular models",
+    "otherModels": "Other models",
+    "popularSuggestions": "Popular suggestions",
+    "otherTypes": "Other types"
   }
 }

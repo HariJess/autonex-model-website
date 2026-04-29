@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Frown } from "lucide-react";
 import { captureReactError } from "@/lib/monitoring";
+import i18n from "@/i18n";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -43,9 +44,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         <main className="min-h-screen flex items-center justify-center bg-background px-4" role="alert" aria-live="assertive">
           <section className="max-w-md w-full text-center space-y-4">
             <Frown className="mx-auto h-16 w-16 text-muted-foreground" aria-hidden="true" />
-            <h1 className="text-2xl font-semibold">Oups, une erreur est survenue</h1>
+            <h1 className="text-2xl font-semibold">{i18n.t("errorBoundary.title", "Oups, une erreur est survenue")}</h1>
             <p className="text-muted-foreground text-sm">
-              Nous sommes désolés pour la gêne occasionnée. Vous pouvez réessayer ou revenir à l'accueil.
+              {i18n.t("errorBoundary.description", "Nous sommes désolés pour la gêne occasionnée. Vous pouvez réessayer ou revenir à l'accueil.")}
             </p>
             {import.meta.env.DEV && this.state.error && (
               <pre className="text-left text-xs bg-muted p-3 rounded-md overflow-auto max-h-40">
@@ -60,14 +61,14 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition"
                 type="button"
               >
-                Réessayer
+                {i18n.t("errorBoundary.retry", "Réessayer")}
               </button>
               <button
                 onClick={() => (window.location.href = "/")}
                 className="px-4 py-2 rounded-md border border-border hover:bg-muted transition"
                 type="button"
               >
-                Retour à l'accueil
+                {i18n.t("errorBoundary.backToHome", "Retour à l'accueil")}
               </button>
             </div>
           </section>

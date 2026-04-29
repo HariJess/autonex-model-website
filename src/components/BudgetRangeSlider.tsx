@@ -125,7 +125,7 @@ const BudgetRangeSlider = ({
   return (
     <div className="space-y-4 w-full">
       <div className="flex items-center justify-between">
-        <span className="font-sans font-semibold text-sm">Budget</span>
+        <span className="font-sans font-semibold text-sm">{t("budgetSlider.budget", "Budget")}</span>
         <div className="flex items-center border border-border rounded-lg overflow-hidden">
           <button
             className={`px-3 py-1 text-xs font-sans font-medium transition-colors ${
@@ -159,7 +159,7 @@ const BudgetRangeSlider = ({
       <div className="flex gap-2">
         <div className="flex-1">
           <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans mb-1 block">
-            Min
+            {t("budgetSlider.min", "Min")}
           </label>
           <Input
             type="text"
@@ -171,7 +171,7 @@ const BudgetRangeSlider = ({
         </div>
         <div className="flex-1">
           <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans mb-1 block">
-            Max
+            {t("budgetSlider.max", "Max")}
           </label>
           <Input
             type="text"
@@ -214,14 +214,14 @@ const BudgetRangeSlider = ({
           className="flex-1 font-sans text-xs text-muted-foreground"
           onClick={handleReset}
         >
-          Réinitialiser
+          {t("budgetSlider.reset", "Réinitialiser")}
         </Button>
         <Button
           size="sm"
           className="flex-1 gradient-primary border-0 font-sans text-xs text-white"
           onClick={onClose}
         >
-          Appliquer
+          {t("budgetSlider.apply", "Appliquer")}
         </Button>
       </div>
     </div>

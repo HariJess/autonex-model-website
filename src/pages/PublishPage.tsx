@@ -709,9 +709,15 @@ const PublishPage = () => {
     if (!allValid) {
       const fieldErrors = form.formState.errors as Record<string, { message?: string }>;
       const firstInvalidField = allZodFields.find((f) => fieldErrors[f]);
-      const firstMessage = firstInvalidField
-        ? fieldErrors[firstInvalidField]?.message ?? "Données invalides"
-        : "Données invalides";
+      const fallback = t("publish.validation.invalid", "Données invalides");
+      const rawMessage = firstInvalidField
+        ? fieldErrors[firstInvalidField]?.message ?? fallback
+        : fallback;
+      // Zod messages are i18n keys (e.g. "publish.validation.title.minLength")
+      // resolved here via t() so users see localized errors.
+      const firstMessage = rawMessage.startsWith("publish.validation.")
+        ? t(rawMessage, { defaultValue: fallback })
+        : rawMessage;
       toast.error(firstMessage);
       // Si l'erreur est sur whatsapp (étape 3), on reste ; sinon on renvoie en étape 1.
       if (firstInvalidField && firstInvalidField !== "vehicleWhatsappPhone") {

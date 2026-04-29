@@ -1,5 +1,6 @@
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,13 +44,15 @@ export function VehicleModelCombobox({
   brand,
   value,
   onChange,
-  placeholder = "Choisissez ou tapez un modèle",
+  placeholder,
   className,
   disabled = false,
   id,
 }: VehicleModelComboboxProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const resolvedPlaceholder = placeholder ?? t("vehicleCombobox.modelPlaceholder", "Choisissez ou tapez un modèle");
 
   const sortedModels = getSortedModelsForBrand(brand);
   const popular = sortedModels.filter((m) => m.popular);
@@ -88,14 +91,14 @@ export function VehicleModelCombobox({
             className,
           )}
         >
-          {displayValue || (isBrandSelected ? placeholder : "Sélectionnez d'abord une marque")}
+          {displayValue || (isBrandSelected ? resolvedPlaceholder : t("vehicleCombobox.selectBrandFirst", "Sélectionnez d'abord une marque"))}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command shouldFilter={true}>
           <CommandInput
-            placeholder="Rechercher ou taper…"
+            placeholder={t("vehicleCombobox.searchOrType", "Rechercher ou taper…")}
             value={inputValue}
             onValueChange={setInputValue}
             onKeyDown={(e) => {
@@ -108,7 +111,7 @@ export function VehicleModelCombobox({
           <CommandList>
             <CommandEmpty>
               <div className="py-2 px-3 text-sm text-center">
-                <p className="text-muted-foreground mb-2">Aucune suggestion trouvée</p>
+                <p className="text-muted-foreground mb-2">{t("vehicleCombobox.noSuggestion", "Aucune suggestion trouvée")}</p>
                 {inputValue.trim() && (
                   <Button
                     type="button"
@@ -116,13 +119,13 @@ export function VehicleModelCombobox({
                     variant="secondary"
                     onClick={handleCustomSubmit}
                   >
-                    Utiliser « {inputValue.trim()} »
+                    {t("vehicleCombobox.useFreeText", "Utiliser « {{value}} »", { value: inputValue.trim() })}
                   </Button>
                 )}
               </div>
             </CommandEmpty>
             {popular.length > 0 && (
-              <CommandGroup heading="Modèles populaires">
+              <CommandGroup heading={t("vehicleCombobox.popularModels", "Modèles populaires")}>
                 {popular.map((model) => (
                   <CommandItem
                     key={model.value}
@@ -143,7 +146,7 @@ export function VehicleModelCombobox({
             {rest.length > 0 && (
               <>
                 <CommandSeparator />
-                <CommandGroup heading="Autres modèles">
+                <CommandGroup heading={t("vehicleCombobox.otherModels", "Autres modèles")}>
                   {rest.map((model) => (
                     <CommandItem
                       key={model.value}

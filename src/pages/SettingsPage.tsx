@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SettingsLayout } from "@/components/settings/SettingsLayout";
@@ -19,6 +20,7 @@ import { ZoneDangerSection } from "@/components/settings/sections/ZoneDangerSect
  * deep-links (e.g. /settings#zone-danger) just work without a router change.
  */
 export default function SettingsPage() {
+  const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState<SettingsSectionId>(() =>
     typeof window === "undefined"
       ? DEFAULT_SETTINGS_SECTION
@@ -44,7 +46,7 @@ export default function SettingsPage() {
   return (
     <>
       <Helmet>
-        <title>Paramètres — AutoNex</title>
+        <title>{t("account.settings.metaTitle", "Paramètres — AutoNex")}</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <Header />

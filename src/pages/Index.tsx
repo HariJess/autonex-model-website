@@ -27,9 +27,9 @@ const Index = () => {
   const categoriesScrollRef = useRef<HTMLDivElement>(null);
   const brandsMobileScrollRef = useRef<HTMLDivElement>(null);
   const canonical = buildCanonicalUrl("/");
-  const seoTitle = "AutoNex — Automobile à Madagascar";
+  const seoTitle = t("home.seoTitle", "AutoNex — Automobile à Madagascar");
   const seoDescription = truncateMetaDescription(
-    "AutoNex : annonces automobiles à Madagascar — achat, vente, voitures, 4x4, motos et utilitaires.",
+    t("home.seoDescription", "AutoNex : annonces automobiles à Madagascar — achat, vente, voitures, 4x4, motos et utilitaires."),
   );
   const seoImage = toAbsoluteUrl("/blog-covers/location-antananarivo.jpg");
   const { data: allListings = [], isLoading } = useDbListings({ limit: 48 });

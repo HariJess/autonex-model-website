@@ -459,7 +459,9 @@
     "thematicElectricTitle": "Électriques & hybrides",
     "thematicUtilitySubtitle": "Transport pro, logistique et activité passagers.",
     "thematicUtilityTitle": "Utilitaires, Vans & Minibus",
-    "popularBrandsRibbon": "Marques populaires"
+    "popularBrandsRibbon": "Marques populaires",
+    "seoTitle": "AutoNex — Automobile à Madagascar",
+    "seoDescription": "AutoNex : annonces automobiles à Madagascar — achat, vente, voitures, 4x4, motos et utilitaires."
   },
   "listing": {
     "addressUnknown": "Adresse non précisée",
@@ -933,7 +935,27 @@
     "successPublishedReviewDesc": "Notre équipe va vérifier votre annonce sous 24h. Vous serez notifié dès qu'elle sera visible.",
     "doors": "Portes",
     "seats": "Places / capacité (optionnel)",
-    "uploading": "Téléversement en cours…"
+    "uploading": "Téléversement en cours…",
+    "validation": {
+      "invalid": "Données invalides",
+      "title": {
+        "minLength": "Le titre doit faire au moins 5 caractères.",
+        "maxLength": "Le titre ne peut pas dépasser 120 caractères."
+      },
+      "description": {
+        "minLength": "La description doit faire au moins 40 caractères."
+      },
+      "price": {
+        "min": "Le prix doit être au moins 100 000 Ar.",
+        "max": "Le prix ne peut pas dépasser 10 milliards d'Ariary."
+      },
+      "year": {
+        "range": "L'année doit être comprise entre 1950 et l'année en cours."
+      },
+      "whatsapp": {
+        "format": "Le numéro WhatsApp doit être au format international (+261…)."
+      }
+    }
   },
   "search": {
     "activeSelection": "Active selection: {{value}}",
@@ -1211,7 +1233,8 @@
       "sectionProfile": "Profil",
       "sectionSecurity": "Sécurité",
       "sectionNotifications": "Notifications",
-      "sectionDangerZone": "Zone de danger"
+      "sectionDangerZone": "Zone de danger",
+      "metaTitle": "Paramètres — AutoNex"
     }
   },
   "notifications": {
@@ -1333,7 +1356,11 @@
     "notFound": "Article introuvable",
     "notFoundDesc": "Cet article n'existe pas ou a été supprimé.",
     "viewAll": "Voir tous les articles",
-    "toc": "Sommaire"
+    "toc": "Sommaire",
+    "calloutTip": "Astuce",
+    "calloutWarning": "Attention",
+    "calloutInfo": "À savoir",
+    "updatedOn": "Mis à jour le {{date}}"
   },
   "contact": {
     "pageTitle": "Contact",
@@ -2030,5 +2057,50 @@
         "body": "Pour toute question relative aux présentes CGU : <0>info@autonex.mg</0>"
       }
     }
+  },
+  "errorBoundary": {
+    "title": "Oups, une erreur est survenue",
+    "description": "Nous sommes désolés pour la gêne occasionnée. Vous pouvez réessayer ou revenir à l'accueil.",
+    "retry": "Réessayer",
+    "backToHome": "Retour à l'accueil"
+  },
+  "budgetSlider": {
+    "budget": "Budget",
+    "min": "Min",
+    "max": "Max",
+    "reset": "Réinitialiser",
+    "apply": "Appliquer"
+  },
+  "beta": {
+    "metaTitle": "Accès réservé — AutoNex",
+    "heading": "Accès réservé",
+    "subtitle": "AutoNex est actuellement en phase beta privée. Entrez le code d'accès pour continuer.",
+    "codeLabel": "Code d'accès",
+    "placeholder": "Code beta",
+    "showCode": "Afficher le code",
+    "hideCode": "Masquer le code",
+    "submitting": "Vérification...",
+    "submit": "Accéder",
+    "success": "Accès accordé. Bienvenue sur la beta AutoNex.",
+    "errorIncorrect": "Code incorrect, réessayez."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "bodyPrefix": "La page",
+    "bodySuffix": "n'existe pas.",
+    "backToHome": "Retour à l'accueil",
+    "viewListings": "Voir les annonces"
+  },
+  "vehicleCombobox": {
+    "modelPlaceholder": "Choisissez ou tapez un modèle",
+    "typePlaceholder": "Choisissez ou tapez un type",
+    "selectBrandFirst": "Sélectionnez d'abord une marque",
+    "searchOrType": "Rechercher ou taper…",
+    "noSuggestion": "Aucune suggestion trouvée",
+    "useFreeText": "Utiliser « {{value}} »",
+    "popularModels": "Modèles populaires",
+    "otherModels": "Autres modèles",
+    "popularSuggestions": "Suggestions populaires",
+    "otherTypes": "Autres types"
   }
 }
