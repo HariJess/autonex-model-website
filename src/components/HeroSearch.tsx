@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Euro, Banknote, ChevronDown } from "lucide-react";
+import { Search, MapPin, Euro, Banknote, ChevronDown, Car } from "lucide-react";
 import { useState, useMemo, useCallback, type CSSProperties } from "react";
 import LocationSelector from "@/components/LocationSelector";
 import BudgetRangeSlider, { formatBudgetLabel } from "@/components/BudgetRangeSlider";
@@ -422,11 +422,14 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
                     <button
                       type="button"
                       className={cn(
-                        "w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left truncate",
+                        "w-full border-0 shadow-none p-0 h-7 font-sans text-sm text-left",
                         hideBackground && "text-white",
                       )}
                     >
-                      {typeLabel}
+                      <div className="flex items-center gap-1.5">
+                        <Car className={cn("h-3.5 w-3.5 shrink-0", pillIconClass)} />
+                        <span className="truncate">{typeLabel}</span>
+                      </div>
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-72 p-3" align="start">
@@ -653,7 +656,8 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
             <div className="lg:hidden space-y-2.5">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className={cn("w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation truncate", mobileOutlineClass)}>
+                  <Button type="button" variant="outline" className={cn("w-full justify-start font-sans text-sm gap-2 min-h-11 touch-manipulation", mobileOutlineClass)}>
+                    <Car className={cn("h-4 w-4 shrink-0", hideBackground ? "text-white/70" : "text-accent")} />
                     {typeLabel}
                   </Button>
                 </PopoverTrigger>
