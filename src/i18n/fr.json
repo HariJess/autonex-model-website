@@ -39,7 +39,23 @@
       "pendingReviewBanner": "Votre agence est en attente de validation par notre équipe. Cela prend généralement 24-48h. Vous pouvez déjà renseigner votre fiche.",
       "rejectedBanner": "Votre fiche a été rejetée. Raison : {{reason}}. Corrigez les informations ci-dessous — notre équipe réexaminera votre fiche après sauvegarde.",
       "suspendedBanner": "Votre agence est actuellement suspendue. Raison : {{reason}}. Contactez le support pour plus d'informations.",
-      "reasonNotSpecified": "non précisée"
+      "reasonNotSpecified": "non précisée",
+      "loading": "Chargement de votre agence...",
+      "error": "Erreur",
+      "viewPublicProfile": "Voir ma fiche publique",
+      "editPublicInfoIntro": "Modifiez les informations visibles publiquement.",
+      "legalFieldsHint": "Les champs légaux (nom, NIF, STAT, RC, adresse) restent gérés par l'admin.",
+      "visualIdentityTitle": "Identité visuelle",
+      "logoUrl": "Logo URL",
+      "coverImageUrl": "Image de couverture URL",
+      "aboutTitle": "Présentation",
+      "shortBio": "Bio (courte)",
+      "detailedDescription": "Description détaillée",
+      "contactTitle": "Contact",
+      "whatsapp": "WhatsApp",
+      "website": "Site web",
+      "openingHoursTitle": "Horaires",
+      "socialMediaTitle": "Réseaux sociaux"
     },
     "noDirectoryAgencies": "Aucun concessionnaire ne correspond aux critères.",
     "runtimeUnavailable": "Le profil concessionnaire est momentanément indisponible. Veuillez réessayer dans quelques instants.",
@@ -321,7 +337,127 @@
     "vehicleIdentityLead": "Renseignez les informations clés du véhicule pour établir une base d’estimation fiable et exploitable.",
     "viewMyEstimate": "Voir mon estimation",
     "whyTheseInfo": "Pourquoi ces informations ?",
-    "whyUseful": "Pourquoi c'est utile"
+    "whyUseful": "Pourquoi c'est utile",
+    "report": {
+      "claimModeStrong": "Analyse marché robuste",
+      "claimModeLimited": "Analyse marché qualifiée",
+      "claimModeReference": "Estimation indicative assistée",
+      "claimModeExploratory": "Estimation indicative exploratoire",
+      "claimMessageStrong": "Estimation principalement appuyée sur des comparables solides du marché AutoNex.",
+      "claimMessageLimited": "Estimation guidée par le marché, avec un niveau de prudence supplémentaire.",
+      "claimMessageReference": "Estimation indicative appuyée par des références et un signal marché partiel.",
+      "claimMessageExploratory": "Estimation indicative en contexte de données marché encore insuffisantes.",
+      "confidenceHigh": "élevée",
+      "confidenceMedium": "moyenne",
+      "confidenceLow": "prudente",
+      "confidenceBadge": "Confiance {{level}}",
+      "confidenceIndex": "Indice de confiance",
+      "rangeTight": "resserrée",
+      "rangeStandard": "équilibrée",
+      "rangeWide": "prudente",
+      "summaryRobust": "Robuste",
+      "summaryQualified": "Qualifié",
+      "summaryIndicative": "Indicatif",
+      "summaryCautious": "Prudent",
+      "supportStrong": "Fort",
+      "supportModerate": "Modéré",
+      "supportLimited": "Limité",
+      "supportWeak": "Faible",
+      "supportHeadlineStrong": "Appui marché solide",
+      "supportHeadlineModerate": "Appui marché exploitable",
+      "supportHeadlineLimited": "Appui marché partiel",
+      "supportHeadlineWeak": "Appui marché faible",
+      "supportSummary": "{{used}} comparables retenus ({{strong}} solides), similarité médiane {{similarity}} / 100, {{locality}}.",
+      "supportCautionModerate": "Le signal marché soutient l'estimation, mais une marge de prudence reste recommandée.",
+      "supportCautionWeak": "Le signal marché reste partiel : utilisez ce rapport comme repère de décision, pas comme preuve forte.",
+      "supportPrefix": "Support {{label}}",
+      "localitySameCity": "majoritairement dans la même ville",
+      "localitySameRegion": "principalement dans la même région",
+      "localityMixed": "avec une couverture géographique mixte",
+      "localityWeak": "avec une couverture géographique limitée",
+      "comparableSelectionHint": "Comparables sélectionnés sur proximité modèle/année/kilométrage, qualité d'annonce et cohérence prix.",
+      "evidenceSummaryLine": "Niveau {{level}} : {{evidence}}.",
+      "sectionAria": "Rapport d'estimation AutoNex",
+      "estimatedMarketValue": "Valeur de marché estimée",
+      "valuationRange": "Fourchette de valorisation ({{tone}})",
+      "cautiousDisplay": "Affichage prudent",
+      "exactScoreDeemphasized": "Le score exact est volontairement dé-emphasé pour rester cohérent avec le niveau d'évidence disponible.",
+      "reportReading": "Lecture du rapport",
+      "recommendedListingPrice": "Prix conseillé d'annonce",
+      "positioningHint": "Positionnement conseillé pour publier sur AutoNex.",
+      "quickSalePrice": "Prix de vente rapide",
+      "fastConversionMarker": "Repère pour accélérer la conversion.",
+      "marketBaseline": "Base marché",
+      "anchorBeforeAdjustments": "Ancrage principal avant ajustements véhicule.",
+      "globalLevel": "Niveau global",
+      "indicativeWarningAria": "Avertissement de lecture indicative",
+      "indicativeTitle": "Estimation indicative",
+      "indicativeDataLimited": "Les données disponibles sont plus limitées ; la fourchette est volontairement plus large.",
+      "evidenceSummaryAria": "Résumé de la qualité d'évidence",
+      "evidenceQuality": "Qualité d'évidence",
+      "comparablesSummary": "{{used}} comparables retenus, dont {{strong}} solides, avec une similarité médiane de {{similarity}} / 100.",
+      "factorsAnalysis": "Analyse des facteurs",
+      "factorsInfluence": "Ce qui influence la valeur",
+      "positiveFactorsTitle": "Facteurs qui renforcent la valeur",
+      "noOvercoteFactors": "Aucun levier majeur de surcote n'est détecté pour l'instant.",
+      "negativeFactorsTitle": "Points de vigilance prix",
+      "noDecoteFactors": "Aucun facteur de décote marqué n'est relevé à ce stade.",
+      "evidenceInterpretation": "Lecture d'évidence",
+      "noEvidenceNote": "Pas de note d'évidence complémentaire pour ce cas.",
+      "comparablesSupport": "Support de comparables marché",
+      "marketSupport": "Support marché",
+      "comparablesRetained": "Annonces comparables retenues",
+      "viewComparableAria": "Voir l'annonce comparable {{title}}",
+      "marketRelevance": "Pertinence marché",
+      "viewListing": "Voir l'annonce",
+      "nextBestAction": "Prochaine meilleure action",
+      "finalReading": "Lecture finale",
+      "publishThisCar": "Publier cette voiture",
+      "refineEstimation": "Affiner l'estimation",
+      "compareAria": "Voir plus d'annonces similaires sur AutoNex",
+      "compareListings": "Comparer les annonces",
+      "restartEstimation": "Refaire une estimation",
+      "toneRobust": {
+        "confidenceInterpretation": "La base de comparaison est solide ; vous pouvez piloter votre prix avec une marge de négociation maîtrisée.",
+        "evidenceHeadline": "Évidence marché bien établie",
+        "actionHeadline": "Publiez maintenant avec un positionnement assumé",
+        "actionDescription": "Le rapport soutient une décision de publication rapide avec un cap prix crédible.",
+        "comparablesIntro": "Comparables cohérents et proches du profil de votre véhicule pour soutenir un prix de mise en marché convaincant.",
+        "comparablesEmptyTitle": "Comparaison marché en consolidation",
+        "comparablesEmptyMessage": "Le socle d'évidence reste robuste, même si la vitrine de comparables affichée ici est partielle.",
+        "ctaFootnote": "Conseil AutoNex : un prix aligné sur cette fourchette robuste favorise des prises de contact qualifiées."
+      },
+      "toneQualified": {
+        "confidenceInterpretation": "Le signal marché est exploitable, avec une prudence raisonnable sur le positionnement final.",
+        "evidenceHeadline": "Évidence marché partielle mais exploitable",
+        "actionHeadline": "Publiez avec un positionnement calibré",
+        "actionDescription": "Le rapport donne une base sérieuse, à ajuster selon vos priorités de délai et de marge.",
+        "comparablesIntro": "Comparables utiles pour cadrer le prix, avec un niveau de preuve qualifié et une marge d'interprétation.",
+        "comparablesEmptyTitle": "Comparaison marché en consolidation",
+        "comparablesEmptyMessage": "Les comparables exacts sont encore peu nombreux. Le rapport reste utile pour cadrer votre décision avec prudence.",
+        "ctaFootnote": "Conseil AutoNex : en mode qualifié, restez proche de la fourchette et ajustez selon le rythme des retours marché."
+      },
+      "toneIndicative": {
+        "confidenceInterpretation": "Le résultat reste utile comme repère initial, mais nécessite une lecture prudente avant décision.",
+        "evidenceHeadline": "Évidence limitée, appui de référence",
+        "actionHeadline": "Publiez prudemment ou affinez d'abord les données",
+        "actionDescription": "Le rapport est indicatif : privilégiez une approche prudente et vérifiez vos hypothèses avant publication.",
+        "comparablesIntro": "Comparables partiels : utilisez-les comme repères de cadrage, sans surinterpréter le signal marché.",
+        "comparablesEmptyTitle": "Comparaison marché en consolidation",
+        "comparablesEmptyMessage": "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente.",
+        "ctaFootnote": "Conseil AutoNex : en mode indicatif, privilégiez un positionnement prudent et réévaluez après premiers retours."
+      },
+      "toneCautious": {
+        "confidenceInterpretation": "Le résultat reste utile comme repère initial, mais nécessite une lecture prudente avant décision.",
+        "evidenceHeadline": "Évidence marché insuffisante",
+        "actionHeadline": "Publiez prudemment ou affinez d'abord les données",
+        "actionDescription": "Le rapport est indicatif : privilégiez une approche prudente et vérifiez vos hypothèses avant publication.",
+        "comparablesIntro": "Comparables encore limités : utilisez-les comme repères, pas comme preuve forte.",
+        "comparablesEmptyTitle": "Comparables encore insuffisants",
+        "comparablesEmptyMessage": "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente.",
+        "ctaFootnote": "Conseil AutoNex : en contexte d'évidence faible, privilégiez une stratégie prudente avant de figer le prix."
+      }
+    }
   },
   "favorites": {
     "title": "Mes favoris",
@@ -408,7 +544,11 @@
     "type": "Type de véhicule",
     "year": "Année",
     "hideAdvancedMobile": "Masquer les filtres avancés",
-    "showAdvancedMobile": "Afficher plus de filtres"
+    "showAdvancedMobile": "Afficher plus de filtres",
+    "itemsSelected": "{{count}} {{noun}} sélectionnés",
+    "pluralNounTypes": "types",
+    "pluralNounBrands": "marques",
+    "pluralNounFuels": "carburants"
   },
   "home": {
     "brandNavigation": "Parcourir par marque",
@@ -936,6 +1076,9 @@
     "doors": "Portes",
     "seats": "Places / capacité (optionnel)",
     "uploading": "Téléversement en cours…",
+    "modelLabel": "Modèle *",
+    "fuelLabel": "Carburant",
+    "rentalModeLabel": "Mode location",
     "validation": {
       "invalid": "Données invalides",
       "title": {
@@ -1085,7 +1228,20 @@
     "locationHierarchyHint": "Toute la ville si rien n’est coché en dessous. Cochez un arrondissement entier ou des quartiers précis — cumul possible.",
     "wholeArrondissementShort": "Tout",
     "relaxedFetchCapHint": "Les résultats affichés sont prioritaires sur les annonces récentes dans une fenêtre limitée ; le total peut inclure des annonces hors de cette fenêtre.",
-    "noLimit": "Sans limite"
+    "noLimit": "Sans limite",
+    "trust": {
+      "headlineExact": "Résultats prioritaires: {{count}} annonce(s) strictement alignée(s)",
+      "headlineSimilar": "Aucun match strict: {{count}} alternatives proches proposées",
+      "headlineEmpty": "Aucun résultat pour les critères actuels",
+      "summaryExact": "Les annonces affichées correspondent à vos filtres principaux. Les résultats restent triés pour maximiser la pertinence de navigation.",
+      "summarySimilar": "Nous avons élargi certains critères secondaires pour vous proposer des options crédibles sans masquer l'absence de match exact.",
+      "summaryEmpty": "Élargissez légèrement vos filtres pour relancer une sélection plus représentative du marché AutoNex.",
+      "overline": "Confiance de navigation",
+      "activeFilters": "Filtres actifs",
+      "verifiedByStatus": "Annonces vérifiées par statut de publication",
+      "guidedByCriteria": "Lecture guidée par vos critères",
+      "similarModeActive": "Mode alternatives proches activé"
+    }
   },
   "sections": {
     "agencies": "Concessionnaires partenaires",
@@ -1328,7 +1484,14 @@
     "pageOverline": "Espace crédits",
     "pageHeading": "Vos crédits AutoNex",
     "pageIntro": "Achetez un pack de crédits pour publier vos annonces et activer des boosts. Les crédits ne sont pas remboursables et expirent 12 mois après l'achat.",
-    "purchaseSectionTitle": "Choisissez votre pack"
+    "purchaseSectionTitle": "Choisissez votre pack",
+    "price": "Prix",
+    "creditsReceived": "Crédits reçus",
+    "initialPrice": "Prix initial",
+    "discountApplied": "Réduction ({{code}})",
+    "totalToPay": "Total à payer",
+    "bonusApplied": "Bonus ({{code}})",
+    "bonusCreditsLine": "+{{count}} crédits"
   },
   "boost": {
     "dialogTitle": "Booster l’annonce",
@@ -1395,7 +1558,10 @@
       "phoneInvalid": "Numéro invalide (format international attendu : +261…).",
       "messageMin": "Minimum 20 caractères.",
       "messageMax": "Maximum 2000 caractères.",
-      "consentRequired": "Vous devez accepter la politique de confidentialité."
+      "consentRequired": "Vous devez accepter la politique de confidentialité.",
+      "invalidSubject": "Sujet invalide.",
+      "rateLimitExceeded": "Vous avez soumis trop de messages récemment. Merci de patienter une heure avant de réessayer.",
+      "unknown": "Une erreur est survenue. Veuillez réessayer."
     }
   },
   "legal": {
@@ -2102,5 +2268,35 @@
     "otherModels": "Autres modèles",
     "popularSuggestions": "Suggestions populaires",
     "otherTypes": "Autres types"
+  },
+  "monetization": {
+    "sponsoredLabel": "Sponsorisé",
+    "featuredLabel": "Mis en avant",
+    "topListingLabel": "Top annonce",
+    "adAriaLabel": "Publicité {{advertiser}}",
+    "creditsVisibilityTitle": "Crédits & visibilité",
+    "creditsVisibilityDesc": "Publiez et boostez vos annonces avec des packs en Ariary. Paiement manuel vérifié par l’équipe.",
+    "alsoSee": "À voir aussi",
+    "forYou": "Pour vous",
+    "suggestionsHint": "Suggestions basées sur la ville et le type de bien.",
+    "advancedSearchLink": "Recherche avancée",
+    "featuredAgencies": {
+      "empty": "Les concessionnaires inscrits apparaîtront ici.",
+      "verified": "Vérifiée"
+    },
+    "banner": {
+      "defaultTitle": "Espace partenaire premium",
+      "defaultSubtitle": "Visibilité nationale, ciblage par ville, leads qualifiés — contactez-nous pour les médias."
+    }
+  },
+  "budget": {
+    "fromValue": "À partir de {{value}}",
+    "upToValue": "Jusqu'à {{value}}"
+  },
+  "time": {
+    "justNow": "à l'instant",
+    "minutesAgo": "il y a {{count}} min",
+    "hoursAgo": "il y a {{count}} h",
+    "daysAgo": "il y a {{count}} j"
   }
 }

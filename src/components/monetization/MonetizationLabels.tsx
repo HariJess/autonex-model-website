@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 type PillVariant = "sponsored" | "featured" | "top";
@@ -10,11 +11,13 @@ const styles: Record<PillVariant, string> = {
 
 export function SponsoredPill({
   className,
-  label = "Sponsorisé",
+  label,
 }: {
   className?: string;
   label?: string;
 }) {
+  const { t } = useTranslation();
+  const resolvedLabel = label ?? t("monetization.sponsoredLabel", "Sponsorisé");
   return (
     <span
       className={cn(
@@ -23,12 +26,14 @@ export function SponsoredPill({
         className,
       )}
     >
-      {label}
+      {resolvedLabel}
     </span>
   );
 }
 
-export function FeaturedPill({ className, label = "Mis en avant" }: { className?: string; label?: string }) {
+export function FeaturedPill({ className, label }: { className?: string; label?: string }) {
+  const { t } = useTranslation();
+  const resolvedLabel = label ?? t("monetization.featuredLabel", "Mis en avant");
   return (
     <span
       className={cn(
@@ -37,12 +42,14 @@ export function FeaturedPill({ className, label = "Mis en avant" }: { className?
         className,
       )}
     >
-      {label}
+      {resolvedLabel}
     </span>
   );
 }
 
-export function TopAnnoncePill({ className, label = "Top annonce" }: { className?: string; label?: string }) {
+export function TopAnnoncePill({ className, label }: { className?: string; label?: string }) {
+  const { t } = useTranslation();
+  const resolvedLabel = label ?? t("monetization.topListingLabel", "Top annonce");
   return (
     <span
       className={cn(
@@ -52,7 +59,7 @@ export function TopAnnoncePill({ className, label = "Top annonce" }: { className
       )}
       style={{ color: "#FAFAFA" }}
     >
-      {label}
+      {resolvedLabel}
     </span>
   );
 }

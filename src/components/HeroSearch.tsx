@@ -43,16 +43,21 @@ const HERO_YEAR_PRESETS = [
   { value: "before-1980", label: "Avant 1980", min: 0, max: 1979 },
 ] as const;
 
+type SummaryTFn = (key: string, defaultValue: string, options?: Record<string, unknown>) => string;
+
 function summarizeSelection(
   labels: string[],
   pluralNoun: string,
+  t: SummaryTFn,
   joiner = ", ",
 ): string {
   if (labels.length === 0) return "";
   if (labels.length === 1) return labels[0];
   if (labels.length === 2) {
     const joined = `${labels[0]}${joiner}${labels[1]}`;
-    return joined.length > 28 ? `2 ${pluralNoun} sélectionnés` : joined;
+    return joined.length > 28
+      ? t("hero.itemsSelected", "{{count}} {{noun}} sélectionnés", { count: 2, noun: pluralNoun })
+      : joined;
   }
   return `${labels[0]}${joiner}${labels[1]} +${labels.length - 2}`;
 }
@@ -111,13 +116,13 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
   const selectedTypeLabels = heroTypeOptions.filter((opt) => vehicleTypes.includes(opt.id)).map((opt) => opt.label);
   const typeLabel = vehicleTypes.length === 0
     ? t("hero.allTypes")
-    : summarizeSelection(selectedTypeLabels, "types");
+    : summarizeSelection(selectedTypeLabels, t("hero.pluralNounTypes", "types"), t);
   const brandLabel = brands.length === 0
     ? t("hero.allBrands", "Toutes les marques")
-    : summarizeSelection(brands, "marques");
+    : summarizeSelection(brands, t("hero.pluralNounBrands", "marques"), t);
   const fuelLabel = fuels.length === 0
     ? t("hero.allFuels", "Tous carburants")
-    : summarizeSelection(fuels, "carburants", " + ");
+    : summarizeSelection(fuels, t("hero.pluralNounFuels", "carburants"), t, " + ");
   const visibleTopBrands = useMemo(() => {
     const q = brandSearch.trim().toLowerCase();
     if (!q) return TOP_AUTO_BRANDS;
@@ -253,7 +258,7 @@ const HeroSearch = ({ hideHeader = false, hideBackground = false }: HeroSearchPr
     setQuartierLibre(v.quartierLibre);
   }, []);
 
-  const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency);
+  const budgetLabel = formatBudgetLabel(priceMin, priceMax, budgetCurrency, t);
   const BudgetIcon = budgetCurrency === "EUR" ? Euro : Banknote;
 
   // Class forks for the glass / on-dark variant used inside HeroCinematic.

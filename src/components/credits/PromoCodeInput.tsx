@@ -172,17 +172,18 @@ function PurchaseSummary({
   bonusCredits,
   appliedCode,
 }: PurchaseSummaryProps) {
+  const { t } = useTranslation();
   const fmt = (n: number) => new Intl.NumberFormat("fr-MG").format(n);
 
   if (!applied) {
     return (
       <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm font-sans space-y-0.5">
         <div className="flex justify-between">
-          <span className="text-muted-foreground">Prix</span>
+          <span className="text-muted-foreground">{t("credits.price", "Prix")}</span>
           <span className="font-medium">{fmt(packPriceMga)} Ar</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-muted-foreground">Crédits reçus</span>
+          <span className="text-muted-foreground">{t("credits.creditsReceived", "Crédits reçus")}</span>
           <span className="font-medium">{packCredits}</span>
         </div>
       </div>
@@ -194,36 +195,36 @@ function PurchaseSummary({
       {discountMga > 0 ? (
         <>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Prix initial</span>
+            <span className="text-muted-foreground">{t("credits.initialPrice", "Prix initial")}</span>
             <span className="text-muted-foreground line-through">
               {fmt(packPriceMga)} Ar
             </span>
           </div>
           <div className="flex justify-between text-green-700">
-            <span>Réduction ({appliedCode})</span>
+            <span>{t("credits.discountApplied", "Réduction ({{code}})", { code: appliedCode })}</span>
             <span>−{fmt(discountMga)} Ar</span>
           </div>
           <div className="flex justify-between font-semibold pt-1 border-t border-green-200">
-            <span>Total à payer</span>
+            <span>{t("credits.totalToPay", "Total à payer")}</span>
             <span>{fmt(finalPrice)} Ar</span>
           </div>
           <div className="flex justify-between text-muted-foreground">
-            <span>Crédits reçus</span>
+            <span>{t("credits.creditsReceived", "Crédits reçus")}</span>
             <span>{finalCredits}</span>
           </div>
         </>
       ) : (
         <>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Prix</span>
+            <span className="text-muted-foreground">{t("credits.price", "Prix")}</span>
             <span className="font-medium">{fmt(packPriceMga)} Ar</span>
           </div>
           <div className="flex justify-between text-green-700">
-            <span>Bonus ({appliedCode})</span>
-            <span>+{bonusCredits} crédits</span>
+            <span>{t("credits.bonusApplied", "Bonus ({{code}})", { code: appliedCode })}</span>
+            <span>{t("credits.bonusCreditsLine", "+{{count}} crédits", { count: bonusCredits })}</span>
           </div>
           <div className="flex justify-between font-semibold pt-1 border-t border-green-200">
-            <span>Crédits reçus</span>
+            <span>{t("credits.creditsReceived", "Crédits reçus")}</span>
             <span>
               {packCredits} + {bonusCredits} = {finalCredits}
             </span>

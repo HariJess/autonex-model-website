@@ -38,16 +38,22 @@ export function normalizeSubmitContactError(raw: unknown): SubmitContactError {
   return new SubmitContactError(hit ?? "unknown", message);
 }
 
-export function submitContactErrorMessage(code: SubmitContactErrorCode): string {
+type ContactErrorTFn = (key: string, defaultValue: string) => string;
+const passthroughContactT: ContactErrorTFn = (_k, defaultValue) => defaultValue;
+
+export function submitContactErrorMessage(
+  code: SubmitContactErrorCode,
+  t: ContactErrorTFn = passthroughContactT,
+): string {
   switch (code) {
     case "consent_required":
-      return "Vous devez accepter la politique de confidentialité.";
+      return t("contact.errors.consentRequired", "Vous devez accepter la politique de confidentialité.");
     case "invalid_subject":
-      return "Sujet invalide.";
+      return t("contact.errors.invalidSubject", "Sujet invalide.");
     case "rate_limit_exceeded":
-      return "Vous avez soumis trop de messages récemment. Merci de patienter une heure avant de réessayer.";
+      return t("contact.errors.rateLimitExceeded", "Vous avez soumis trop de messages récemment. Merci de patienter une heure avant de réessayer.");
     default:
-      return "Une erreur est survenue. Veuillez réessayer.";
+      return t("contact.errors.unknown", "Une erreur est survenue. Veuillez réessayer.");
   }
 }
 

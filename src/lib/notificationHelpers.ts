@@ -88,26 +88,34 @@ export function notificationPreferencesToDbPatch(
   return patch;
 }
 
+type RelativeTimeTFn = (key: string, defaultValue: string, options?: Record<string, unknown>) => string;
+const passthroughRelativeT: RelativeTimeTFn = (_k, defaultValue, options) => {
+  if (!options) return defaultValue;
+  return defaultValue.replace(/\{\{(\w+)\}\}/g, (_m, name) => String(options[name] ?? ""));
+};
+
 /**
- * Format relatif FR : « il y a 2 min », « il y a 3 h », « il y a 2 j »,
- * sinon date courte « 24 avril ».
+ * Format relatif (par défaut FR) : « il y a 2 min », « il y a 3 h », « il y a 2 j »,
+ * sinon date courte « 24 avril ». Le `t` injecté permet la traduction EN/MG.
  */
 export function formatNotificationTimestamp(
   isoDate: string | null | undefined,
   now: Date = new Date(),
+  t: RelativeTimeTFn = passthroughRelativeT,
+  locale: string = "fr-FR",
 ): string {
   if (!isoDate) return "";
   const then = new Date(isoDate).getTime();
   if (!Number.isFinite(then)) return "";
   const diffSeconds = Math.max(0, Math.floor((now.getTime() - then) / 1000));
-  if (diffSeconds < 60) return "à l'instant";
+  if (diffSeconds < 60) return t("time.justNow", "à l'instant");
   const diffMinutes = Math.floor(diffSeconds / 60);
-  if (diffMinutes < 60) return `il y a ${diffMinutes} min`;
+  if (diffMinutes < 60) return t("time.minutesAgo", "il y a {{count}} min", { count: diffMinutes });
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `il y a ${diffHours} h`;
+  if (diffHours < 24) return t("time.hoursAgo", "il y a {{count}} h", { count: diffHours });
   const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 7) return `il y a ${diffDays} j`;
-  return new Date(isoDate).toLocaleDateString("fr-FR", {
+  if (diffDays < 7) return t("time.daysAgo", "il y a {{count}} j", { count: diffDays });
+  return new Date(isoDate).toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
   });

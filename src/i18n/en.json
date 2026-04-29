@@ -39,7 +39,23 @@
       "pendingReviewBanner": "Your dealer profile is awaiting review by our team. This usually takes 24-48 hours. You can already fill in your details.",
       "rejectedBanner": "Your profile was rejected. Reason: {{reason}}. Fix the information below — our team will re-review after you save.",
       "suspendedBanner": "Your dealer profile is currently suspended. Reason: {{reason}}. Contact support for more information.",
-      "reasonNotSpecified": "not specified"
+      "reasonNotSpecified": "not specified",
+      "loading": "Loading your dealer profile...",
+      "error": "Error",
+      "viewPublicProfile": "View my public profile",
+      "editPublicInfoIntro": "Edit publicly visible information.",
+      "legalFieldsHint": "Legal fields (name, NIF, STAT, RC, address) remain managed by admin.",
+      "visualIdentityTitle": "Visual identity",
+      "logoUrl": "Logo URL",
+      "coverImageUrl": "Cover image URL",
+      "aboutTitle": "About",
+      "shortBio": "Short bio",
+      "detailedDescription": "Detailed description",
+      "contactTitle": "Contact",
+      "whatsapp": "WhatsApp",
+      "website": "Website",
+      "openingHoursTitle": "Opening hours",
+      "socialMediaTitle": "Social media"
     },
     "noDirectoryAgencies": "No dealer matches the filters.",
     "runtimeUnavailable": "The dealer profile is temporarily unavailable. Please try again in a moment.",
@@ -321,7 +337,127 @@
     "vehicleIdentityLead": "Provide key vehicle information to build a reliable and actionable estimate base.",
     "viewMyEstimate": "View my estimate",
     "whyTheseInfo": "Why this information matters",
-    "whyUseful": "Why this is useful"
+    "whyUseful": "Why this is useful",
+    "report": {
+      "claimModeStrong": "Robust market analysis",
+      "claimModeLimited": "Qualified market analysis",
+      "claimModeReference": "Reference-assisted indicative valuation",
+      "claimModeExploratory": "Exploratory indicative valuation",
+      "claimMessageStrong": "Valuation primarily backed by solid AutoNex market comparables.",
+      "claimMessageLimited": "Market-guided valuation with an additional layer of caution.",
+      "claimMessageReference": "Indicative valuation backed by references and a partial market signal.",
+      "claimMessageExploratory": "Indicative valuation in a context of still-insufficient market data.",
+      "confidenceHigh": "high",
+      "confidenceMedium": "medium",
+      "confidenceLow": "cautious",
+      "confidenceBadge": "Confidence: {{level}}",
+      "confidenceIndex": "Confidence score",
+      "rangeTight": "tight",
+      "rangeStandard": "balanced",
+      "rangeWide": "cautious",
+      "summaryRobust": "Robust",
+      "summaryQualified": "Qualified",
+      "summaryIndicative": "Indicative",
+      "summaryCautious": "Cautious",
+      "supportStrong": "Strong",
+      "supportModerate": "Moderate",
+      "supportLimited": "Limited",
+      "supportWeak": "Weak",
+      "supportHeadlineStrong": "Solid market backing",
+      "supportHeadlineModerate": "Workable market backing",
+      "supportHeadlineLimited": "Partial market backing",
+      "supportHeadlineWeak": "Weak market backing",
+      "supportSummary": "{{used}} comparables retained ({{strong}} solid), median similarity {{similarity}} / 100, {{locality}}.",
+      "supportCautionModerate": "The market signal supports the valuation, but a margin of caution remains advisable.",
+      "supportCautionWeak": "The market signal stays partial: use this report as a decision marker, not as strong proof.",
+      "supportPrefix": "Support {{label}}",
+      "localitySameCity": "mostly in the same city",
+      "localitySameRegion": "mainly in the same region",
+      "localityMixed": "with mixed geographic coverage",
+      "localityWeak": "with limited geographic coverage",
+      "comparableSelectionHint": "Comparables selected by model/year/mileage proximity, listing quality and price coherence.",
+      "evidenceSummaryLine": "Level {{level}}: {{evidence}}.",
+      "sectionAria": "AutoNex valuation report",
+      "estimatedMarketValue": "Estimated market value",
+      "valuationRange": "Valuation range ({{tone}})",
+      "cautiousDisplay": "Cautious display",
+      "exactScoreDeemphasized": "The exact score is intentionally de-emphasized to stay consistent with the available evidence level.",
+      "reportReading": "Report reading",
+      "recommendedListingPrice": "Recommended listing price",
+      "positioningHint": "Recommended positioning to publish on AutoNex.",
+      "quickSalePrice": "Quick sale price",
+      "fastConversionMarker": "Marker to speed up conversion.",
+      "marketBaseline": "Market baseline",
+      "anchorBeforeAdjustments": "Main anchor before vehicle adjustments.",
+      "globalLevel": "Overall level",
+      "indicativeWarningAria": "Indicative reading warning",
+      "indicativeTitle": "Indicative valuation",
+      "indicativeDataLimited": "Available data is more limited; the range is intentionally wider.",
+      "evidenceSummaryAria": "Evidence quality summary",
+      "evidenceQuality": "Evidence quality",
+      "comparablesSummary": "{{used}} comparables retained, including {{strong}} solid ones, with a median similarity of {{similarity}} / 100.",
+      "factorsAnalysis": "Factor analysis",
+      "factorsInfluence": "What influences value",
+      "positiveFactorsTitle": "Factors that strengthen value",
+      "noOvercoteFactors": "No major upside factors detected yet.",
+      "negativeFactorsTitle": "Price watch points",
+      "noDecoteFactors": "No significant downside factors noted at this stage.",
+      "evidenceInterpretation": "Evidence interpretation",
+      "noEvidenceNote": "No additional evidence notes for this case.",
+      "comparablesSupport": "Market comparables support",
+      "marketSupport": "Market support",
+      "comparablesRetained": "Comparable listings retained",
+      "viewComparableAria": "View comparable listing {{title}}",
+      "marketRelevance": "Market relevance",
+      "viewListing": "View listing",
+      "nextBestAction": "Next best action",
+      "finalReading": "Final reading",
+      "publishThisCar": "Publish this car",
+      "refineEstimation": "Refine valuation",
+      "compareAria": "View more similar listings on AutoNex",
+      "compareListings": "Compare listings",
+      "restartEstimation": "Run a new valuation",
+      "toneRobust": {
+        "confidenceInterpretation": "The comparison base is solid; you can steer your price with a controlled negotiation margin.",
+        "evidenceHeadline": "Well-established market evidence",
+        "actionHeadline": "Publish now with a confident positioning",
+        "actionDescription": "The report supports a fast publication decision with a credible price ceiling.",
+        "comparablesIntro": "Coherent comparables close to your vehicle profile to support a convincing market entry price.",
+        "comparablesEmptyTitle": "Market comparison consolidating",
+        "comparablesEmptyMessage": "The evidence base remains robust, even if the comparables on display here are partial.",
+        "ctaFootnote": "AutoNex tip: a price aligned with this robust range encourages qualified contacts."
+      },
+      "toneQualified": {
+        "confidenceInterpretation": "The market signal is workable, with reasonable caution on final positioning.",
+        "evidenceHeadline": "Partial yet workable market evidence",
+        "actionHeadline": "Publish with a calibrated positioning",
+        "actionDescription": "The report gives a serious base, to adjust according to your time and margin priorities.",
+        "comparablesIntro": "Useful comparables to frame the price, with a qualified evidence level and a margin of interpretation.",
+        "comparablesEmptyTitle": "Market comparison consolidating",
+        "comparablesEmptyMessage": "Exact comparables are still few. The report still helps frame your decision with caution.",
+        "ctaFootnote": "AutoNex tip: in qualified mode, stay close to the range and adjust to market feedback pace."
+      },
+      "toneIndicative": {
+        "confidenceInterpretation": "The result remains useful as an initial marker, but requires careful reading before deciding.",
+        "evidenceHeadline": "Limited evidence, reference support",
+        "actionHeadline": "Publish carefully or refine the data first",
+        "actionDescription": "The report is indicative: prefer a cautious approach and verify your assumptions before publishing.",
+        "comparablesIntro": "Partial comparables: use them as framing markers, without over-reading the market signal.",
+        "comparablesEmptyTitle": "Market comparison consolidating",
+        "comparablesEmptyMessage": "The report mainly relies on reference signals. Keep a cautious pricing strategy.",
+        "ctaFootnote": "AutoNex tip: in indicative mode, prefer a cautious positioning and re-evaluate after first feedback."
+      },
+      "toneCautious": {
+        "confidenceInterpretation": "The result remains useful as an initial marker, but requires careful reading before deciding.",
+        "evidenceHeadline": "Insufficient market evidence",
+        "actionHeadline": "Publish carefully or refine the data first",
+        "actionDescription": "The report is indicative: prefer a cautious approach and verify your assumptions before publishing.",
+        "comparablesIntro": "Comparables still limited: use them as markers, not as strong proof.",
+        "comparablesEmptyTitle": "Comparables still insufficient",
+        "comparablesEmptyMessage": "The report mainly relies on reference signals. Keep a cautious pricing strategy.",
+        "ctaFootnote": "AutoNex tip: in a low-evidence context, prefer a cautious strategy before locking the price."
+      }
+    }
   },
   "favorites": {
     "title": "My favorites",
@@ -408,7 +544,11 @@
     "type": "Vehicle type",
     "year": "Year",
     "hideAdvancedMobile": "Hide advanced filters",
-    "showAdvancedMobile": "Show more filters"
+    "showAdvancedMobile": "Show more filters",
+    "itemsSelected": "{{count}} {{noun}} selected",
+    "pluralNounTypes": "types",
+    "pluralNounBrands": "brands",
+    "pluralNounFuels": "fuels"
   },
   "home": {
     "brandNavigation": "Browse by make",
@@ -936,6 +1076,9 @@
     "doors": "Doors",
     "seats": "Seats / capacity (optional)",
     "uploading": "Uploading…",
+    "modelLabel": "Model *",
+    "fuelLabel": "Fuel",
+    "rentalModeLabel": "Rental mode",
     "validation": {
       "invalid": "Invalid data",
       "title": {
@@ -1085,7 +1228,20 @@
     "locationHierarchyHint": "Whole city if nothing is checked below. Tick a full district or specific neighbourhoods — combinations are allowed.",
     "wholeArrondissementShort": "All",
     "relaxedFetchCapHint": "Displayed results prioritise recent listings within a limited window; the total may include listings outside that window.",
-    "noLimit": "No limit"
+    "noLimit": "No limit",
+    "trust": {
+      "headlineExact": "Priority results: {{count}} listing(s) strictly aligned",
+      "headlineSimilar": "No strict match: {{count}} close alternatives offered",
+      "headlineEmpty": "No results for the current criteria",
+      "summaryExact": "The listings shown match your main filters. Results stay sorted to maximise navigation relevance.",
+      "summarySimilar": "We broadened some secondary criteria to offer credible options without hiding the absence of an exact match.",
+      "summaryEmpty": "Slightly broaden your filters to retrieve a more representative AutoNex selection.",
+      "overline": "Navigation confidence",
+      "activeFilters": "Active filters",
+      "verifiedByStatus": "Listings verified by publication status",
+      "guidedByCriteria": "Reading guided by your criteria",
+      "similarModeActive": "Close-alternative mode active"
+    }
   },
   "sections": {
     "agencies": "Partner dealers",
@@ -1328,7 +1484,14 @@
     "pageOverline": "Credits space",
     "pageHeading": "Your AutoNex credits",
     "pageIntro": "Buy a credit pack to post your listings and activate boosts. Credits are non-refundable and expire 12 months after purchase.",
-    "purchaseSectionTitle": "Choose your pack"
+    "purchaseSectionTitle": "Choose your pack",
+    "price": "Price",
+    "creditsReceived": "Credits received",
+    "initialPrice": "Initial price",
+    "discountApplied": "Discount ({{code}})",
+    "totalToPay": "Total to pay",
+    "bonusApplied": "Bonus ({{code}})",
+    "bonusCreditsLine": "+{{count}} credits"
   },
   "boost": {
     "dialogTitle": "Boost the listing",
@@ -1395,7 +1558,10 @@
       "phoneInvalid": "Invalid number (international format expected: +261…).",
       "messageMin": "Minimum 20 characters.",
       "messageMax": "Maximum 2000 characters.",
-      "consentRequired": "You must accept the privacy policy."
+      "consentRequired": "You must accept the privacy policy.",
+      "invalidSubject": "Invalid subject.",
+      "rateLimitExceeded": "You have submitted too many messages recently. Please wait an hour before retrying.",
+      "unknown": "An error occurred. Please try again."
     }
   },
   "legal": {
@@ -2102,5 +2268,35 @@
     "otherModels": "Other models",
     "popularSuggestions": "Popular suggestions",
     "otherTypes": "Other types"
+  },
+  "monetization": {
+    "sponsoredLabel": "Sponsored",
+    "featuredLabel": "Featured",
+    "topListingLabel": "Top listing",
+    "adAriaLabel": "Ad by {{advertiser}}",
+    "creditsVisibilityTitle": "Credits & visibility",
+    "creditsVisibilityDesc": "Publish and boost your listings with Ariary packs. Manual payment verified by the team.",
+    "alsoSee": "See also",
+    "forYou": "For you",
+    "suggestionsHint": "Suggestions based on city and listing type.",
+    "advancedSearchLink": "Advanced search",
+    "featuredAgencies": {
+      "empty": "Registered dealers will appear here.",
+      "verified": "Verified"
+    },
+    "banner": {
+      "defaultTitle": "Premium partner space",
+      "defaultSubtitle": "National visibility, city-level targeting, qualified leads — contact us for media."
+    }
+  },
+  "budget": {
+    "fromValue": "From {{value}}",
+    "upToValue": "Up to {{value}}"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}} min ago",
+    "hoursAgo": "{{count}} h ago",
+    "daysAgo": "{{count}} d ago"
   }
 }

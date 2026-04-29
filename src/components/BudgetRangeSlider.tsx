@@ -230,7 +230,18 @@ const BudgetRangeSlider = ({
 
 export default BudgetRangeSlider;
 
-export const formatBudgetLabel = (minValue: number, maxValue: number, currency: "MGA" | "EUR" = "MGA"): string => {
+type BudgetLabelTFn = (key: string, defaultValue: string, options?: Record<string, unknown>) => string;
+const passthroughBudgetT: BudgetLabelTFn = (_k, defaultValue, options) => {
+  if (!options) return defaultValue;
+  return defaultValue.replace(/\{\{(\w+)\}\}/g, (_m, name) => String(options[name] ?? ""));
+};
+
+export const formatBudgetLabel = (
+  minValue: number,
+  maxValue: number,
+  currency: "MGA" | "EUR" = "MGA",
+  t: BudgetLabelTFn = passthroughBudgetT,
+): string => {
   if (!minValue && !maxValue) return "";
   const rate = currency === "EUR" ? EXCHANGE_RATE : 1;
   const suffix = currency === "MGA" ? " Ar" : " €";
@@ -248,7 +259,7 @@ export const formatBudgetLabel = (minValue: number, maxValue: number, currency: 
     return `${v}`;
   };
 
-  if (minValue && !maxValue) return `À partir de ${compact(minValue)}${suffix}`;
-  if (!minValue && maxValue) return `Jusqu'à ${compact(maxValue)}${suffix}`;
+  if (minValue && !maxValue) return t("budget.fromValue", "À partir de {{value}}", { value: `${compact(minValue)}${suffix}` });
+  if (!minValue && maxValue) return t("budget.upToValue", "Jusqu'à {{value}}", { value: `${compact(maxValue)}${suffix}` });
   return `${compact(minValue)} - ${compact(maxValue)}${suffix}`;
 };

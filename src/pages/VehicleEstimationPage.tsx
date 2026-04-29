@@ -227,7 +227,7 @@ const VehicleEstimationPage = () => {
   );
 
   const canSubmit = vehicleStepErrors.length === 0;
-  const presentation = result ? buildEstimationPresentation(result) : null;
+  const presentation = result ? buildEstimationPresentation(result, t) : null;
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/estimation`
     : "https://autonex.mg/estimation";

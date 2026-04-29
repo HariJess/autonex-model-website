@@ -47,8 +47,10 @@ export function NotificationItem({
   showArchiveButton,
   onArchive,
 }: NotificationItemProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const unread = isNotificationUnread(notification);
+  const localeMap: Record<string, string> = { fr: "fr-FR", en: "en-GB", mg: "mg-MG" };
+  const dateLocale = localeMap[i18n.language] ?? "fr-FR";
   const Icon = ICON_MAP[notification.icon] ?? Bell;
   const content = (
     <>
@@ -70,7 +72,7 @@ export function NotificationItem({
           </p>
         )}
         <p className="text-[11px] font-sans text-muted-foreground mt-1">
-          {formatNotificationTimestamp(notification.createdAt)}
+          {formatNotificationTimestamp(notification.createdAt, undefined, t, dateLocale)}
         </p>
       </div>
       {showArchiveButton && onArchive && (

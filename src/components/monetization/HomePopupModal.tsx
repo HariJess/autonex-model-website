@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
@@ -14,6 +15,7 @@ const SESSION_KEY_PREFIX = "autonex.popup.dismissed.";
  * persiste son dismissal en sessionStorage (1 affichage par session).
  */
 export function HomePopupModal() {
+  const { t } = useTranslation();
   const enabled = MONETIZATION_PLACEMENTS.homeModal;
   const { data: campaign } = usePartnerCampaign("homeModal", enabled);
   const [isOpen, setIsOpen] = useState(false);
@@ -60,14 +62,14 @@ export function HomePopupModal() {
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <DialogPrimitive.Content
           className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-xl bg-transparent shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
-          aria-label={`Publicité ${campaign.advertiser_name}`}
+          aria-label={t("monetization.adAriaLabel", "Publicité {{advertiser}}", { advertiser: campaign.advertiser_name })}
         >
           <DialogPrimitive.Title className="sr-only">
-            {`Publicité ${campaign.advertiser_name}`}
+            {t("monetization.adAriaLabel", "Publicité {{advertiser}}", { advertiser: campaign.advertiser_name })}
           </DialogPrimitive.Title>
           <DialogPrimitive.Close
             className="absolute right-3 top-3 z-20 rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-white/50"
-            aria-label="Fermer"
+            aria-label={t("common.close", "Fermer")}
           >
             <X className="h-4 w-4" />
           </DialogPrimitive.Close>
@@ -85,6 +87,7 @@ interface HomePopupModalViewProps {
 
 /** Rendu visuel pur. Utilisable en preview admin (sans Dialog ni timer). */
 export function HomePopupModalView({ campaign, onClick }: HomePopupModalViewProps) {
+  const { t } = useTranslation();
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
@@ -100,7 +103,7 @@ export function HomePopupModalView({ campaign, onClick }: HomePopupModalViewProp
       <Wrapper
         {...wrapperProps}
         className="relative block w-full overflow-hidden rounded-xl bg-muted/40"
-        aria-label={`Publicité ${campaign.advertiser_name}`}
+        aria-label={t("monetization.adAriaLabel", "Publicité {{advertiser}}", { advertiser: campaign.advertiser_name })}
       >
         <picture>
           {campaign.image_url_mobile ? (
@@ -114,7 +117,7 @@ export function HomePopupModalView({ campaign, onClick }: HomePopupModalViewProp
           />
         </picture>
         <span className="absolute right-3 bottom-3 z-10 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">
-          Sponsorisé
+          {t("monetization.sponsoredLabel", "Sponsorisé")}
         </span>
       </Wrapper>
     </div>

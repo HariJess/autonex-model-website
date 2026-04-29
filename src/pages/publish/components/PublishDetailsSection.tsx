@@ -608,7 +608,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label className="font-sans">Modèle *</Label>
+            <Label className="font-sans">{t("publish.modelLabel", "Modèle *")}</Label>
             <VehicleModelCombobox
               brand={make}
               value={model}
@@ -617,7 +617,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label className="font-sans">Année</Label>
+            <Label className="font-sans">{t("search.year", "Année")}</Label>
             <Input
               type="number"
               min={1950}
@@ -628,7 +628,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label className="font-sans">État</Label>
+            <Label className="font-sans">{t("listing.condition", "État")}</Label>
             <Select value={condition || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleCondition", v === EMPTY_OPTION ? "" : v)}>
               <SelectTrigger className="font-sans">
                 <SelectValue placeholder={t("publish.selectCondition", "Sélectionner un état")} />
@@ -655,7 +655,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-4">
           <div className="space-y-2">
-            <Label className="font-sans">Carburant</Label>
+            <Label className="font-sans">{t("publish.fuelLabel", "Carburant")}</Label>
             <Select value={fuel || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleFuel", v === EMPTY_OPTION ? "" : v)}>
               <SelectTrigger className="font-sans">
                 <SelectValue placeholder={t("publish.selectFuel", "Sélectionner un carburant")} />
@@ -671,7 +671,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="font-sans">Boîte</Label>
+            <Label className="font-sans">{t("search.transmission", "Boîte")}</Label>
             <Select value={transmission || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleTransmission", v === EMPTY_OPTION ? "" : v)}>
               <SelectTrigger className="font-sans">
                 <SelectValue placeholder={t("publish.selectTransmission", "Sélectionner une boîte")} />
@@ -687,7 +687,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="font-sans">Motricité</Label>
+            <Label className="font-sans">{t("listing.drivetrain", "Motricité")}</Label>
             <Select value={drivetrain || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleDrivetrain", v === EMPTY_OPTION ? "" : v)}>
               <SelectTrigger className="font-sans">
                 <SelectValue placeholder={t("publish.selectDrivetrain", "Sélectionner une motricité")} />
@@ -851,7 +851,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
         </div>
         <div className={cn("grid grid-cols-1 gap-3.5 md:gap-4", isRentalTransaction ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
           <div className="space-y-2">
-            <Label className="font-sans">Disponibilité</Label>
+            <Label className="font-sans">{t("listing.availability", "Disponibilité")}</Label>
             <Select value={availabilityStatus || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleAvailabilityStatus", v === EMPTY_OPTION ? "" : v)}>
               <SelectTrigger className="font-sans">
                 <SelectValue placeholder={t("publish.selectAvailability", "Sélectionner une disponibilité")} />
@@ -868,7 +868,7 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
           </div>
           {isRentalTransaction && (
             <div className="space-y-2">
-              <Label className="font-sans">Mode location</Label>
+              <Label className="font-sans">{t("publish.rentalModeLabel", "Mode location")}</Label>
               <Select value={rentalMode || EMPTY_OPTION} onValueChange={(v) => form.setValue("vehicleRentalMode", v === EMPTY_OPTION ? "" : v)}>
                 <SelectTrigger className="font-sans">
                   <SelectValue placeholder={t("publish.selectRentalMode", "Sélectionner un mode")} />

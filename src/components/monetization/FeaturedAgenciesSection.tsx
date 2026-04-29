@@ -72,7 +72,7 @@ export function FeaturedAgenciesSection({
           <WheelSpinner size="md" />
         </div>
       ) : agencies.length === 0 ? (
-        <p className="text-center text-muted-foreground font-sans">Les concessionnaires inscrits apparaîtront ici.</p>
+        <p className="text-center text-muted-foreground font-sans">{t("monetization.featuredAgencies.empty", "Les concessionnaires inscrits apparaîtront ici.")}</p>
       ) : (
         <div className="flex flex-wrap justify-center gap-8 md:gap-10">
           {agencies.map((agency) => (
@@ -91,7 +91,7 @@ export function FeaturedAgenciesSection({
                 )}
               </div>
               <span className="text-xs font-sans font-medium text-foreground text-center leading-tight">{agency.name}</span>
-              {agency.verified && <span className="text-[10px] text-success font-sans">Vérifiée</span>}
+              {agency.verified && <span className="text-[10px] text-success font-sans">{t("monetization.featuredAgencies.verified", "Vérifiée")}</span>}
             </Link>
           ))}
         </div>

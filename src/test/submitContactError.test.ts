@@ -35,7 +35,7 @@ describe("normalizeSubmitContactError", () => {
 describe("submitContactErrorMessage", () => {
   it("returns a user-facing FR message for every code", () => {
     const messages = (["consent_required", "invalid_subject", "rate_limit_exceeded", "unknown"] as const).map(
-      submitContactErrorMessage,
+      (code) => submitContactErrorMessage(code),
     );
     for (const m of messages) {
       expect(m.length).toBeGreaterThan(5);

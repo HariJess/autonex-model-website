@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { cn } from "@/lib/utils";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
@@ -47,6 +48,7 @@ interface PremiumBillboardViewProps {
 
 /** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
 export function PremiumBillboardView({ campaign, className, onClick }: PremiumBillboardViewProps) {
+  const { t } = useTranslation();
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
@@ -62,7 +64,7 @@ export function PremiumBillboardView({ campaign, className, onClick }: PremiumBi
       <Wrapper
         {...wrapperProps}
         className="relative block w-full overflow-hidden rounded-xl bg-muted/40 group"
-        aria-label={`Publicité ${campaign.advertiser_name}`}
+        aria-label={t("monetization.adAriaLabel", "Publicité {{advertiser}}", { advertiser: campaign.advertiser_name })}
       >
         <div className="relative w-full aspect-[2/1] md:aspect-[6/1]">
           <picture>
@@ -79,7 +81,7 @@ export function PremiumBillboardView({ campaign, className, onClick }: PremiumBi
         </div>
 
         <span className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">
-          Sponsorisé
+          {t("monetization.sponsoredLabel", "Sponsorisé")}
         </span>
       </Wrapper>
     </section>

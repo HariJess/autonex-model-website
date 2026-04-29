@@ -139,7 +139,7 @@ export default function ContactPage() {
           setConsentGiven(false);
         },
         onError: (err) => {
-          toast.error(submitContactErrorMessage(err.code));
+          toast.error(submitContactErrorMessage(err.code, t));
         },
       },
     );

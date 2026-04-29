@@ -22,6 +22,7 @@ interface RelatedPromotedProps {
 
 /** Subtle related strip — excludes current listing; “promoted” is honest native card when inventory thin. */
 export function ListingRelatedPromoted({ listingId, ville, transaction, type }: RelatedPromotedProps) {
+  const { t } = useTranslation();
   const { data: related = [], isLoading } = useDbListings({
     ville: ville || undefined,
     transaction,
@@ -35,8 +36,8 @@ export function ListingRelatedPromoted({ listingId, ville, transaction, type }: 
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
-        <h3 className="font-sans text-lg font-bold">À voir aussi</h3>
-        <SponsoredPill label="Pour vous" />
+        <h3 className="font-sans text-lg font-bold">{t("monetization.alsoSee", "À voir aussi")}</h3>
+        <SponsoredPill label={t("monetization.forYou", "Pour vous")} />
       </div>
       {isLoading ? (
         <WheelSpinner size="md" />
@@ -48,9 +49,9 @@ export function ListingRelatedPromoted({ listingId, ville, transaction, type }: 
         </div>
       )}
       <p className="text-xs text-muted-foreground font-sans">
-        Suggestions basées sur la ville et le type de bien.{" "}
+        {t("monetization.suggestionsHint", "Suggestions basées sur la ville et le type de bien.")}{" "}
         <Link to="/recherche" className="text-primary hover:underline">
-          Recherche avancée
+          {t("monetization.advancedSearchLink", "Recherche avancée")}
         </Link>
       </p>
     </section>
@@ -99,6 +100,7 @@ interface ListingSponsorBlockViewProps {
 
 /** Rendu visuel pur. Utilisable en preview admin sans toucher au hook. */
 export function ListingSponsorBlockView({ campaign, className, onClick }: ListingSponsorBlockViewProps) {
+  const { t } = useTranslation();
   const Wrapper = campaign.destination_url ? "a" : "div";
   const wrapperProps = campaign.destination_url
     ? {
@@ -114,7 +116,7 @@ export function ListingSponsorBlockView({ campaign, className, onClick }: Listin
       <Wrapper
         {...wrapperProps}
         className="relative block w-full overflow-hidden rounded-xl bg-muted/40 group"
-        aria-label={`Publicité ${campaign.advertiser_name}`}
+        aria-label={t("monetization.adAriaLabel", "Publicité {{advertiser}}", { advertiser: campaign.advertiser_name })}
       >
         <div className="relative w-full aspect-[2/1] md:aspect-[3/1]">
           <picture>
@@ -131,7 +133,7 @@ export function ListingSponsorBlockView({ campaign, className, onClick }: Listin
         </div>
 
         <span className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">
-          Sponsorisé
+          {t("monetization.sponsoredLabel", "Sponsorisé")}
         </span>
       </Wrapper>
     </div>

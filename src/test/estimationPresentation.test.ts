@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { buildEstimationPresentation } from "@/lib/estimation/presentation";
+import { buildEstimationPresentation, type EstimationTFn } from "@/lib/estimation/presentation";
 import type { EstimationRunResult } from "@/types/estimation";
+
+// Mock t that returns the FR fallback after interpolating {{var}} placeholders.
+// Lets the FR-text-based assertions below stay aligned with what users see.
+const tMock: EstimationTFn = (_key, defaultValue, options) => {
+  if (!options) return defaultValue;
+  return defaultValue.replace(/\{\{(\w+)\}\}/g, (_, name) => String(options[name] ?? ""));
+};
 
 function makeResult(overrides?: Partial<EstimationRunResult["outputV2"]>): EstimationRunResult {
   return {
@@ -122,7 +129,7 @@ describe("estimation presentation governance", () => {
         rangeWidthMode: "tight",
       },
     });
-    const presentation = buildEstimationPresentation(result);
+    const presentation = buildEstimationPresentation(result, tMock);
     expect(presentation.claimLabel).toContain("robuste");
     expect(presentation.summaryLevel).toBe("Robuste");
     expect(presentation.rangeToneLabel).toBe("resserrée");
@@ -162,7 +169,7 @@ describe("estimation presentation governance", () => {
         explanationMode: "summary_only",
       },
     });
-    const presentation = buildEstimationPresentation(result);
+    const presentation = buildEstimationPresentation(result, tMock);
     expect(presentation.indicativeRequired).toBe(true);
     expect(presentation.showExactConfidence).toBe(false);
     expect(presentation.confidenceDisplayValue).toBeNull();
@@ -182,6 +189,7 @@ describe("estimation presentation governance", () => {
           rangeWidthMode: "wide",
         },
       }),
+      tMock,
     );
     const moderateMarket = buildEstimationPresentation(
       makeResult({
@@ -192,6 +200,7 @@ describe("estimation presentation governance", () => {
           rangeWidthMode: "standard",
         },
       }),
+      tMock,
     );
     expect(referenceAssisted.claimLabel).not.toEqual(moderateMarket.claimLabel);
     expect(referenceAssisted.claimMessage).toContain("indicative");
@@ -229,6 +238,7 @@ describe("estimation presentation governance", () => {
           fallbackType: null,
         },
       }),
+      tMock,
     );
     expect(presentation.summaryLevel).toBe("Qualifié");
     expect(presentation.evidenceHeadline).toContain("partielle");
