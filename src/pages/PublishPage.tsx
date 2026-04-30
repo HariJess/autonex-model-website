@@ -976,6 +976,7 @@ const PublishPage = () => {
           saveStatus={saveStatus}
           lastSavedAt={lastSavedAt}
           saveError={saveError}
+          showModerationBanner={!isEmbedded}
           labels={{
             saving: t("publish.saving", "Sauvegarde…"),
             draftSaved: t("publish.draftSaved", "Brouillon enregistré"),

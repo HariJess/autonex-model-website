@@ -12,6 +12,11 @@ type PublishPageHeaderProps = {
   saveStatus: "idle" | "saving" | "saved" | "error";
   lastSavedAt: string | null;
   saveError: string | null;
+  /** Si false, le bandeau de règles "Publication directe / Description en français"
+   * n'est pas rendu — utilisé en mode embedded YAS où le contexte rend le bandeau
+   * redondant et où la règle "français" est désormais affichée comme helper text
+   * contextuel sous le champ Description. */
+  showModerationBanner?: boolean;
   labels: {
     saving: string;
     draftSaved: string;
@@ -32,14 +37,17 @@ export function PublishPageHeader({
   saveStatus,
   lastSavedAt,
   saveError,
+  showModerationBanner = true,
   labels,
 }: PublishPageHeaderProps) {
   return (
     <>
-      <div className="flex items-start gap-3 mb-5 rounded-2xl border-2 border-border/90 bg-secondary/40 p-4 shadow-sm">
-        <Shield className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-        <p className="text-[14px] md:text-sm text-muted-foreground font-sans leading-relaxed">{moderationText.replace("{cost}", String(publishCreditCost))}</p>
-      </div>
+      {showModerationBanner && (
+        <div className="flex items-start gap-3 mb-5 rounded-2xl border-2 border-border/90 bg-secondary/40 p-4 shadow-sm">
+          <Shield className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+          <p className="text-[14px] md:text-sm text-muted-foreground font-sans leading-relaxed">{moderationText.replace("{cost}", String(publishCreditCost))}</p>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
         <h1 className="font-sans text-3xl font-bold">{title}</h1>

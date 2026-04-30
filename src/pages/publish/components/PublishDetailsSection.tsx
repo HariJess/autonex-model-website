@@ -403,6 +403,12 @@ export function PublishDetailsSection({ labels }: PublishDetailsSectionProps) {
             maxLength={5000}
             placeholder={t("publish.descriptionPlaceholderLong", "Rédigez une description complète en français…")}
           />
+          <p className="mt-1.5 text-xs text-muted-foreground font-sans">
+            {t(
+              "publish.descriptionHelperFr",
+              "Description en français uniquement — les annonces dans une autre langue peuvent être rejetées par la modération.",
+            )}
+          </p>
           <p className="text-[13px] text-muted-foreground font-sans">{t("publish.descriptionCounter", "{{count}}/5000 caractères", { count: description.trim().length })}</p>
           {form.formState.errors.description ? (
             <p className="text-xs font-sans text-destructive" role="alert">

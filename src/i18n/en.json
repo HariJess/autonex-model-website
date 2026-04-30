@@ -854,6 +854,7 @@
     "descPlaceholder": "Describe your vehicle...",
     "descriptionCounter": "{{count}}/5000 characters",
     "descriptionFr": "Description (French)",
+    "descriptionHelperFr": "French-only description — listings in other languages may be rejected by moderation.",
     "descriptionHint": "Focus on fuel type, gearbox, overall condition and maintenance history.",
     "descriptionPlaceholderLong": "Write a complete description in French…",
     "doorsInvalid": "Invalid door count.",

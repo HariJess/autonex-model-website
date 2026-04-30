@@ -854,6 +854,7 @@
     "descPlaceholder": "Décrivez votre véhicule...",
     "descriptionCounter": "{{count}}/5000 caractères",
     "descriptionFr": "Description (français)",
+    "descriptionHelperFr": "Description en français uniquement — les annonces dans une autre langue peuvent être rejetées par la modération.",
     "descriptionHint": "Détaillez surtout : carburant, boîte, état général et historique d’entretien.",
     "descriptionPlaceholderLong": "Rédigez une description complète en français…",
     "doorsInvalid": "Nombre de portes invalide",
