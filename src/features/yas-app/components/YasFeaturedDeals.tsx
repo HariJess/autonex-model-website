@@ -44,7 +44,13 @@ export function YasFeaturedDeals() {
     entry_point: yas.entryPoint,
   });
 
-  if (!isLoading && deals.length === 0) return null;
+  // On garde TOUJOURS la section avec id="deals" même quand il n'y a pas de
+  // deals à montrer : la card "Voir les bonnes affaires" pointe vers `#deals`
+  // via un saut hash natif, et si l'ancre n'existe pas dans le DOM, le
+  // navigateur ne scrolle pas (root cause du bug #deals identifié à l'audit).
+  // Quand aucun deal n'est dispo, on affiche un fallback minimal + lien vers
+  // toutes les annonces — meilleur UX que de masquer la section silencieusement.
+  const hasDeals = deals.length > 0;
 
   return (
     <section
@@ -75,7 +81,7 @@ export function YasFeaturedDeals() {
         <div className="flex justify-center py-6">
           <WheelSpinner size="md" />
         </div>
-      ) : (
+      ) : hasDeals ? (
         <div className="grid grid-cols-2 gap-2.5">
           {deals.map((entry) => (
             <div
@@ -85,6 +91,12 @@ export function YasFeaturedDeals() {
               <ListingCard listing={entry.listing} dealMeta={entry.deal} layout="compact" />
             </div>
           ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-border/60 bg-card/50 px-4 py-5 text-center">
+          <p className="font-sans text-[13px] text-muted-foreground">
+            {t("yas.deals.empty", "Pas de bonne affaire pour l'instant. Reviens plus tard !")}
+          </p>
         </div>
       )}
     </section>

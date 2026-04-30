@@ -7,22 +7,28 @@ import { isCatalogOptionMatch } from "@/lib/estimation/catalogSearch";
 import { cn } from "@/lib/utils";
 
 type VehicleCatalogComboboxProps = {
+  /** id appliqué au bouton trigger (matche `htmlFor` du Label & permet focus programmatique). */
+  id?: string;
   value: string;
   options: string[];
   placeholder: string;
   searchPlaceholder: string;
   emptyLabel: string;
   disabled?: boolean;
+  /** Si vrai, le trigger affiche une bordure rouge — utilisé pour la validation inline. */
+  hasError?: boolean;
   onSelect: (value: string) => void;
 };
 
 export default function VehicleCatalogCombobox({
+  id,
   value,
   options,
   placeholder,
   searchPlaceholder,
   emptyLabel,
   disabled,
+  hasError,
   onSelect,
 }: VehicleCatalogComboboxProps) {
   const [open, setOpen] = useState(false);
@@ -40,11 +46,18 @@ export default function VehicleCatalogCombobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           type="button"
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="h-11 w-full justify-between rounded-xl border border-border/70 bg-background px-3 font-normal shadow-sm transition hover:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/30"
+          aria-invalid={hasError || undefined}
+          className={cn(
+            "h-11 w-full justify-between rounded-xl border bg-background px-3 font-normal shadow-sm transition focus-visible:ring-2 focus-visible:ring-offset-1",
+            hasError
+              ? "border-destructive hover:border-destructive focus-visible:ring-destructive/40"
+              : "border-border/70 hover:border-primary/30 focus-visible:ring-primary/30",
+          )}
           disabled={disabled}
         >
           <span className="truncate text-left">{selected || placeholder}</span>

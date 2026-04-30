@@ -9,39 +9,51 @@ export function getCurrentEstimationStepIndex(
   return 3;
 }
 
+export type VehicleFieldErrorKey = "make" | "model" | "year" | "city" | "mileage";
+export type VehicleFieldErrors = Partial<Record<VehicleFieldErrorKey, string>>;
+
+export function getVehicleFieldErrors(params: {
+  form: EstimationInput;
+  currentYear: number;
+  t: (key: string, defaultValue: string) => string;
+}): VehicleFieldErrors {
+  const { form, currentYear, t } = params;
+  const errors: VehicleFieldErrors = {};
+
+  if (!form.makeName.trim()) {
+    errors.make = t("estimation.fieldRequired", "Champ obligatoire");
+  }
+  if (!form.modelName.trim()) {
+    errors.model = t("estimation.fieldRequired", "Champ obligatoire");
+  }
+  if (!Number.isFinite(form.year) || form.year < 1950 || form.year > currentYear) {
+    errors.year = t(
+      "estimation.errorYearRangeShort",
+      "Année invalide (1950 — {{year}}).",
+    ).replace("{{year}}", String(currentYear));
+  }
+  if (!form.city.trim()) {
+    errors.city = t("estimation.fieldRequired", "Champ obligatoire");
+  }
+  if (!Number.isFinite(form.mileage) || form.mileage < 0 || form.mileage > 1_500_000) {
+    errors.mileage = t(
+      "estimation.errorMileageRangeShort",
+      "Kilométrage invalide (0 — 1 500 000 km).",
+    );
+  }
+
+  return errors;
+}
+
+/**
+ * Conserve l'API string[] pour les rares appelants qui ne s'intéressent qu'à
+ * `length === 0` (canSubmit). Réutilise `getVehicleFieldErrors` pour éviter
+ * la duplication de règles métier.
+ */
 export function getVehicleStepErrors(params: {
   form: EstimationInput;
   currentYear: number;
   t: (key: string, defaultValue: string) => string;
 }): string[] {
-  const { form, currentYear, t } = params;
-  const errors: string[] = [];
-
-  if (!form.makeName.trim()) {
-    errors.push(t("estimation.errorMakeRequired", "La marque est obligatoire."));
-  }
-  if (!form.modelName.trim()) {
-    errors.push(t("estimation.errorModelRequired", "Le modèle est obligatoire."));
-  }
-  if (!Number.isFinite(form.year) || form.year < 1950 || form.year > currentYear) {
-    errors.push(
-      t(
-        "estimation.errorYearRange",
-        "L'année doit être comprise entre 1950 et l'année en cours.",
-      ),
-    );
-  }
-  if (!form.city.trim()) {
-    errors.push(t("estimation.errorCityRequired", "La ville / région est obligatoire."));
-  }
-  if (!Number.isFinite(form.mileage) || form.mileage < 0 || form.mileage > 1_500_000) {
-    errors.push(
-      t(
-        "estimation.errorMileageRange",
-        "Le kilométrage doit être entre 0 et 1 500 000 km.",
-      ),
-    );
-  }
-
-  return errors;
+  return Object.values(getVehicleFieldErrors(params));
 }

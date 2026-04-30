@@ -41,16 +41,16 @@ const ITEMS: WhyItem[] = [
   },
 ];
 
-// En mode embedded (WebView YAS), on réduit la section aux 2 signaux les plus
-// différenciants (modération + estimation transparente) — l'utilisateur a déjà
-// cliqué via l'app YAS, pas besoin de le convaincre avec "100% Madagascar" /
-// "Rapide à utiliser" qui font doublon avec le hero co-brandé.
-const EMBEDDED_ITEMS = ITEMS.slice(0, 2);
-
 export function YasWhySection() {
   const { t } = useTranslation();
   const { isEmbedded } = useYasContext();
-  const items = isEmbedded ? EMBEDDED_ITEMS : ITEMS;
+
+  // En mode embedded (WebView YAS) la section est totalement masquée :
+  // l'utilisateur partenaire est déjà qualifié, et la densité visuelle de la
+  // mini-app doit rester minimale (cf. retour utilisateur "trop dense, pas
+  // premium"). En mode normal, on garde les 4 raisons inchangées.
+  if (isEmbedded) return null;
+
   return (
     <section
       aria-label={t("yas.why.sectionAria", "Pourquoi AutoNex")}
@@ -60,7 +60,7 @@ export function YasWhySection() {
         {t("yas.why.heading", "Pourquoi AutoNex ?")}
       </h2>
       <ul className="space-y-2.5">
-        {items.map((item) => {
+        {ITEMS.map((item) => {
           const Icon = item.Icon;
           return (
             <li key={item.titleKey} className="flex items-start gap-3">

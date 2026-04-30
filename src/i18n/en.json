@@ -262,8 +262,11 @@
     "errorCityRequired": "City / region is required.",
     "errorMakeRequired": "Make is required.",
     "errorMileageRange": "Mileage must be between 0 and 1,500,000 km.",
+    "errorMileageRangeShort": "Invalid mileage (0 — 1,500,000 km).",
     "errorModelRequired": "Model is required.",
     "errorYearRange": "Year must be between 1950 and current year.",
+    "errorYearRangeShort": "Invalid year (1950 — {{year}}).",
+    "fieldRequired": "Required field",
     "estimateMyVehicle": "Estimate my vehicle",
     "estimateVehicle": "Estimate your vehicle value",
     "estimatedRange": "Estimated range",
@@ -2304,7 +2307,7 @@
     "partnerLogoAlt": "YAS & Moi",
     "backToYasApp": "Back to AutoNex",
     "heroTitle": "Buy, sell or value a car in Madagascar",
-    "heroSubtitle": "Madagascar's #1 car portal — accessible directly from YAS & Moi.",
+    "heroSubtitle": "Madagascar's #1 car portal.",
     "actions": {
       "sectionAria": "Main actions",
       "buy": {
@@ -2348,7 +2351,8 @@
       "sectionAria": "Top deals preview",
       "heading": "Top deals",
       "subtitle": "Listings with genuinely reduced prices, verified on AutoNex.",
-      "seeAll": "See all"
+      "seeAll": "See all",
+      "empty": "No deals right now. Check back later!"
     },
     "cta": {
       "sectionAria": "Estimate your car",
@@ -2359,6 +2363,13 @@
     "footer": {
       "tagline": "AutoNex — Madagascar's reference car marketplace.",
       "copyright": "© 2026 APLi SARLU — AutoNex"
+    },
+    "publish": {
+      "trust": {
+        "moderation": "Moderation",
+        "autosave": "Auto-save",
+        "guided": "Guided flow"
+      }
     }
   }
 }

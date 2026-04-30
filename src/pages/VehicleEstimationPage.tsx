@@ -36,8 +36,9 @@ import type { EstimationInput, EstimationRunResult } from "@/types/estimation";
 import EstimationProgressHeader from "@/pages/estimation/components/EstimationProgressHeader";
 import {
   getCurrentEstimationStepIndex,
-  getVehicleStepErrors,
+  getVehicleFieldErrors,
 } from "@/pages/estimation/estimationPageModel";
+import { cn } from "@/lib/utils";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 
@@ -123,7 +124,12 @@ const VehicleEstimationPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isEmbedded } = useYasContext();
-  const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">("landing");
+  // En mode embedded YAS, on skippe la landing marketing : l'utilisateur a
+  // cliqué « Estimer ma voiture » dans la mini-app, il connaît déjà l'intent
+  // et la friction d'une page d'accueil intermédiaire est inutile.
+  const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">(
+    isEmbedded ? "vehicle" : "landing",
+  );
   const [form, setForm] = useState<EstimationInput>(EMPTY_FORM);
   const [result, setResult] = useState<EstimationRunResult | null>(null);
   /** Avoid duplicate "result viewed" telemetry without an extra render (StrictMode-safe single fire per request id). */
@@ -219,9 +225,9 @@ const VehicleEstimationPage = () => {
     },
   });
 
-  const vehicleStepErrors = useMemo(
+  const vehicleFieldErrors = useMemo(
     () =>
-      getVehicleStepErrors({
+      getVehicleFieldErrors({
         form,
         currentYear,
         t: (key, defaultValue) => t(key, defaultValue),
@@ -229,7 +235,45 @@ const VehicleEstimationPage = () => {
     [form, t],
   );
 
-  const canSubmit = vehicleStepErrors.length === 0;
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const canSubmit = Object.keys(vehicleFieldErrors).length === 0;
+  const visibleFieldError = (key: keyof typeof vehicleFieldErrors): string | undefined =>
+    submitAttempted ? vehicleFieldErrors[key] : undefined;
+
+  const handleVehicleNext = () => {
+    if (!canSubmit) {
+      setSubmitAttempted(true);
+      // Auto-focus le premier champ invalide pour aider l'utilisateur.
+      // Ordre de priorité = ordre logique du formulaire.
+      const order: (keyof typeof vehicleFieldErrors)[] = [
+        "make",
+        "model",
+        "year",
+        "city",
+        "mileage",
+      ];
+      const first = order.find((k) => vehicleFieldErrors[k]);
+      if (first) {
+        // Les comboboxes (make/model/city) ont un trigger button avec id, les
+        // inputs natifs (year/mileage) ont un id direct. On cible par id générique.
+        const targetId =
+          first === "make"
+            ? "make"
+            : first === "model"
+              ? "model"
+              : first === "year"
+                ? "year"
+                : first === "city"
+                  ? "city"
+                  : "mileage";
+        const el = document.getElementById(targetId) as HTMLElement | null;
+        el?.focus?.();
+      }
+      return;
+    }
+    setSubmitAttempted(false);
+    setScreen("condition");
+  };
   const presentation = result ? buildEstimationPresentation(result, t) : null;
   const canonical = typeof window !== "undefined"
     ? `${window.location.origin}/estimation`
@@ -464,13 +508,6 @@ const VehicleEstimationPage = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-7 pt-6">
-              {vehicleStepErrors.length > 0 && (
-                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
-                  {vehicleStepErrors.map((error) => (
-                    <p key={error} className="font-sans text-sm text-destructive">{error}</p>
-                  ))}
-                </div>
-              )}
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.55fr_0.65fr]">
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -520,28 +557,42 @@ const VehicleEstimationPage = () => {
                       </div>
                     )}
                 <div className="space-y-2">
-                  <Label htmlFor="make">{t("search.brand", "Marque")}</Label>
+                  <Label htmlFor="make">
+                    {t("search.brand", "Marque")} <span className="text-destructive">*</span>
+                  </Label>
                   <VehicleCatalogCombobox
+                    id="make"
                     value={form.makeName}
                     options={makeOptions}
                     placeholder={t("estimation.selectBrand", "Sélectionner une marque")}
                     searchPlaceholder={t("estimation.searchBrand", "Rechercher une marque...")}
                     emptyLabel={t("estimation.noBrandFound", "Aucune marque trouvée")}
                     disabled={catalogLoading || makeOptions.length === 0}
+                    hasError={Boolean(visibleFieldError("make"))}
                     onSelect={(value) => setForm((prev) => ({ ...prev, makeName: value, modelName: "" }))}
                   />
+                  {visibleFieldError("make") && (
+                    <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("make")}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="model">{t("search.model", "Modèle")}</Label>
+                  <Label htmlFor="model">
+                    {t("search.model", "Modèle")} <span className="text-destructive">*</span>
+                  </Label>
                   <VehicleCatalogCombobox
+                    id="model"
                     value={form.modelName}
                     options={modelOptions}
                     placeholder={form.makeName ? t("estimation.selectModel", "Sélectionner un modèle") : t("estimation.chooseBrandFirst", "Choisissez d'abord une marque")}
                     searchPlaceholder={t("estimation.searchModel", "Rechercher un modèle...")}
                     emptyLabel={form.makeName ? t("estimation.noModelFound", "Aucun modèle trouvé pour cette marque") : t("estimation.selectBrand", "Sélectionner une marque")}
                     disabled={!form.makeName.trim()}
+                    hasError={Boolean(visibleFieldError("model"))}
                     onSelect={(value) => setForm((prev) => ({ ...prev, modelName: value }))}
                   />
+                  {visibleFieldError("model") && (
+                    <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("model")}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="year">{t("search.year", "Année")}</Label>
@@ -551,20 +602,34 @@ const VehicleEstimationPage = () => {
                     min={1950}
                     max={currentYear}
                     value={form.year}
-                    className={ESTIMATION_UI.inputLike}
+                    aria-invalid={Boolean(visibleFieldError("year")) || undefined}
+                    className={cn(
+                      ESTIMATION_UI.inputLike,
+                      visibleFieldError("year") && "border-destructive focus-visible:ring-destructive/40",
+                    )}
                     onChange={(e) => setForm((prev) => ({ ...prev, year: Number(e.target.value) }))}
                   />
+                  {visibleFieldError("year") && (
+                    <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("year")}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">{t("estimation.cityRegion", "Ville / Région")}</Label>
+                  <Label htmlFor="city">
+                    {t("estimation.cityRegion", "Ville / Région")} <span className="text-destructive">*</span>
+                  </Label>
                   <VehicleCatalogCombobox
+                    id="city"
                     value={form.city}
                     options={[...MADAGASCAR_LOCATION_OPTIONS]}
                     placeholder={t("estimation.selectCity", "Sélectionner une ville / région")}
                     searchPlaceholder={t("estimation.searchCity", "Rechercher une ville / région...")}
                     emptyLabel={t("estimation.noCityFound", "Aucune ville trouvée")}
+                    hasError={Boolean(visibleFieldError("city"))}
                     onSelect={(value) => setForm((prev) => ({ ...prev, city: value }))}
                   />
+                  {visibleFieldError("city") && (
+                    <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("city")}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="mileage">{t("search.mileageKm", "Kilométrage")} (km)</Label>
@@ -574,9 +639,16 @@ const VehicleEstimationPage = () => {
                     min={0}
                     max={1500000}
                     value={form.mileage}
-                    className={ESTIMATION_UI.inputLike}
+                    aria-invalid={Boolean(visibleFieldError("mileage")) || undefined}
+                    className={cn(
+                      ESTIMATION_UI.inputLike,
+                      visibleFieldError("mileage") && "border-destructive focus-visible:ring-destructive/40",
+                    )}
                     onChange={(e) => setForm((prev) => ({ ...prev, mileage: Number(e.target.value) }))}
                   />
+                  {visibleFieldError("mileage") && (
+                    <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("mileage")}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>{t("search.fuel", "Carburant")}</Label>
@@ -646,11 +718,12 @@ const VehicleEstimationPage = () => {
                 </aside>
               </div>
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>{t("publish.previousStep", "Étape précédente")}</Button>
+                {!isEmbedded && (
+                  <Button variant="outline" onClick={() => setScreen("landing")} className={`${ESTIMATION_UI.secondaryCta} w-full px-5 sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2`}>{t("publish.previousStep", "Étape précédente")}</Button>
+                )}
                 <Button
-                  disabled={!canSubmit}
-                  onClick={() => setScreen("condition")}
-                  className={`${ESTIMATION_UI.primaryCta} w-full min-w-[150px] sm:w-auto focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2`}
+                  onClick={handleVehicleNext}
+                  className={`${ESTIMATION_UI.primaryCta} w-full min-w-[150px] sm:w-auto sm:ml-auto focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2`}
                 >
                   {t("publish.continue", "Continuer")}
                   <ChevronRight className="ml-1 h-4 w-4" />

@@ -15,7 +15,7 @@ import yasMoiLogo from "@/assets/yas-moi-logo.svg";
 export function YasHero() {
   const { t } = useTranslation();
   return (
-    <header className="relative overflow-hidden rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/[0.06] via-card to-primary/[0.02] px-4 py-6 sm:px-6 sm:py-8">
+    <header className="relative overflow-hidden rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/[0.06] via-card to-primary/[0.02] px-4 py-5 sm:px-6 sm:py-6">
       <div className="flex items-center gap-2 sm:gap-3">
         <img src={autonexLogoDark} alt="AutoNex" className="h-10 w-auto sm:h-12" />
         <span aria-hidden className="text-2xl font-light text-muted-foreground sm:text-3xl">
@@ -31,7 +31,7 @@ export function YasHero() {
         {t("yas.heroTitle", "Acheter, vendre ou estimer une voiture à Madagascar")}
       </h1>
       <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground sm:text-base">
-        {t("yas.heroSubtitle", "Le portail auto N°1 de Madagascar — accessible directement depuis YAS & Moi.")}
+        {t("yas.heroSubtitle", "Le portail auto N°1 de Madagascar.")}
       </p>
     </header>
   );

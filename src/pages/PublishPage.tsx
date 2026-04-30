@@ -43,6 +43,8 @@ import { PublishMediaSection } from "@/pages/publish/components/PublishMediaSect
 import { PublishStepNav } from "@/pages/publish/components/PublishStepNav";
 import { PublishStepGuideCard } from "@/pages/publish/components/PublishStepGuideCard";
 import { PublishGuidanceAside } from "@/pages/publish/components/PublishGuidanceAside";
+import { PublishTrustStrip } from "@/pages/publish/components/PublishTrustStrip";
+import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PremiumStatePanel } from "@/components/ui/premium-state";
 import { buildVehicleMetaTags } from "@/lib/vehicleMetaTags";
@@ -75,6 +77,7 @@ const PublishPage = () => {
   const spEdit = searchParams.get("edit");
   const { user, profile, refreshProfile } = useAuth();
   const queryClient = useQueryClient();
+  const { isEmbedded } = useYasContext();
 
   /**
    * Phase 6.3.a: form instance co-exists with the legacy useState block below.
@@ -1002,7 +1005,9 @@ const PublishPage = () => {
         <>
         <PublishProgressSteps steps={steps} step={step} progress={progress} />
 
-        <div className={`grid grid-cols-1 gap-5 ${step === 0 ? "lg:grid-cols-[1.45fr_0.55fr] lg:gap-6" : ""}`}>
+        {isEmbedded && step === 0 && <PublishTrustStrip />}
+
+        <div className={`grid grid-cols-1 gap-5 ${step === 0 && !isEmbedded ? "lg:grid-cols-[1.45fr_0.55fr] lg:gap-6" : ""}`}>
           <div className="space-y-4">
             <PublishStepGuideCard
               stepGuide={stepGuides[step]}
@@ -1117,7 +1122,7 @@ const PublishPage = () => {
         />
           </div>
 
-          {step === 0 && (
+          {step === 0 && !isEmbedded && (
             <PublishGuidanceAside
               overline={t("publish.guidanceOverline", "Guidage AutoNex")}
               title={t("publish.publishWithConfidence", "Publiez avec confiance")}

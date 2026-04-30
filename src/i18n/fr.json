@@ -262,8 +262,11 @@
     "errorCityRequired": "La ville / région est obligatoire.",
     "errorMakeRequired": "La marque est obligatoire.",
     "errorMileageRange": "Le kilométrage doit être compris entre 0 et 1 500 000 km.",
+    "errorMileageRangeShort": "Kilométrage invalide (0 — 1 500 000 km).",
     "errorModelRequired": "Le modèle est obligatoire.",
     "errorYearRange": "L’année doit être comprise entre 1950 et l’année en cours.",
+    "errorYearRangeShort": "Année invalide (1950 — {{year}}).",
+    "fieldRequired": "Champ obligatoire",
     "estimateMyVehicle": "Estimer mon véhicule",
     "estimateVehicle": "Estimez la valeur de votre véhicule",
     "estimatedRange": "Fourchette estimée",
@@ -2304,7 +2307,7 @@
     "partnerLogoAlt": "YAS & Moi",
     "backToYasApp": "Retour à AutoNex",
     "heroTitle": "Acheter, vendre ou estimer une voiture à Madagascar",
-    "heroSubtitle": "Le portail auto N°1 de Madagascar — accessible directement depuis YAS & Moi.",
+    "heroSubtitle": "Le portail auto N°1 de Madagascar.",
     "actions": {
       "sectionAria": "Actions principales",
       "buy": {
@@ -2348,7 +2351,8 @@
       "sectionAria": "Aperçu bonnes affaires",
       "heading": "Bonnes affaires",
       "subtitle": "Annonces avec prix réellement réduits, vérifiés sur AutoNex.",
-      "seeAll": "Voir tout"
+      "seeAll": "Voir tout",
+      "empty": "Pas de bonne affaire pour l'instant. Reviens plus tard !"
     },
     "cta": {
       "sectionAria": "Estimer votre voiture",
@@ -2359,6 +2363,13 @@
     "footer": {
       "tagline": "AutoNex — la marketplace automobile de référence à Madagascar.",
       "copyright": "© 2026 APLi SARLU — AutoNex"
+    },
+    "publish": {
+      "trust": {
+        "moderation": "Modération",
+        "autosave": "Auto-save",
+        "guided": "Parcours guidé"
+      }
     }
   }
 }

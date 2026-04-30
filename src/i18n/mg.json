@@ -262,8 +262,11 @@
     "errorCityRequired": "Tsy maintsy fenoina ny tanàna / faritra.",
     "errorMakeRequired": "Tsy maintsy fenoina ny marika.",
     "errorMileageRange": "Ny kilometatra dia tokony ho eo anelanelan'ny 0 sy 1 500 000 km.",
+    "errorMileageRangeShort": "Kilometatra tsy mety (0 — 1 500 000 km).",
     "errorModelRequired": "Tsy maintsy fenoina ny modely.",
     "errorYearRange": "Ny taona dia tokony ho eo anelanelan'ny 1950 sy ny taona ankehitriny.",
+    "errorYearRangeShort": "Taona tsy mety (1950 — {{year}}).",
+    "fieldRequired": "Tsy maintsy fenoina",
     "estimateMyVehicle": "Hanombana ny fiarako",
     "estimateVehicle": "Hanombana fiara",
     "estimatedRange": "Elanelam-bidy tombanana",
@@ -2304,7 +2307,7 @@
     "partnerLogoAlt": "YAS & Moi",
     "backToYasApp": "Hiverina any AutoNex",
     "heroTitle": "Hividy, hivarotra na hanombatombana fiara eto Madagasikara",
-    "heroSubtitle": "Ny portail auto laharana voalohany eto Madagasikara — azo idirana mivantana avy ao YAS & Moi.",
+    "heroSubtitle": "Ny portail auto laharana voalohany eto Madagasikara.",
     "actions": {
       "sectionAria": "Hetsika fototra",
       "buy": {
@@ -2348,7 +2351,8 @@
       "sectionAria": "Famintinana ny varotra tsara",
       "heading": "Varotra tsara",
       "subtitle": "Filazana misy fihenam-bidy marina, voamarina ao AutoNex.",
-      "seeAll": "Hijery rehetra"
+      "seeAll": "Hijery rehetra",
+      "empty": "Tsy misy tolotra manokana izao. Miverena indray any aoriana!"
     },
     "cta": {
       "sectionAria": "Tombanana ny fiarany",
@@ -2359,6 +2363,13 @@
     "footer": {
       "tagline": "AutoNex — ny tsena fiara fototra eto Madagasikara.",
       "copyright": "© 2026 APLi SARLU — AutoNex"
+    },
+    "publish": {
+      "trust": {
+        "moderation": "Fanaraha-maso",
+        "autosave": "Tehirizina ho azy",
+        "guided": "Vohitra mitarika"
+      }
     }
   }
 }
