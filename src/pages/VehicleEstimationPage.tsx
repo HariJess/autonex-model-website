@@ -549,13 +549,6 @@ const VehicleEstimationPage = () => {
                         />
                       </div>
                     )}
-                    {!catalogLoading && catalogPayload?.source === "ui-curated" && (
-                      <div className="md:col-span-2 rounded-xl border border-border/70 bg-secondary/20 p-3">
-                        <p className="font-sans text-xs text-muted-foreground">
-                          {t("estimation.referenceReadyUi", "Référentiel estimation prêt (source UI curatée).")}
-                        </p>
-                      </div>
-                    )}
                 <div className="space-y-2">
                   <Label htmlFor="make">
                     {t("search.brand", "Marque")} <span className="text-destructive">*</span>
