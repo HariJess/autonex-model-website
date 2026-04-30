@@ -39,6 +39,7 @@ import {
   getVehicleStepErrors,
 } from "@/pages/estimation/estimationPageModel";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
+import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 
 const EstimationResultReport = lazy(() => import("@/components/estimation/EstimationResultReport"));
 
@@ -121,6 +122,7 @@ const VehicleEstimationPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isEmbedded } = useYasContext();
   const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">("landing");
   const [form, setForm] = useState<EstimationInput>(EMPTY_FORM);
   const [result, setResult] = useState<EstimationRunResult | null>(null);
@@ -334,16 +336,20 @@ const VehicleEstimationPage = () => {
                     <h1 className={ESTIMATION_TYPO.h1}>
                       {t("estimation.estimateVehicle", "Estimez la valeur de votre véhicule")}
                     </h1>
-                    <p className={`${ESTIMATION_TYPO.body} max-w-2xl md:text-base`}>
-                      {t("estimation.landingLead", "En quelques étapes, obtenez une estimation claire, crédible et directement utile avant publication.")}
-                    </p>
+                    {!isEmbedded && (
+                      <p className={`${ESTIMATION_TYPO.body} max-w-2xl md:text-base`}>
+                        {t("estimation.landingLead", "En quelques étapes, obtenez une estimation claire, crédible et directement utile avant publication.")}
+                      </p>
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeFast", "Rapide")}</Badge>
-                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeTransparent", "Transparent")}</Badge>
-                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeUseful", "Utile avant publication")}</Badge>
-                    <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeMadagascar", "Pensé pour Madagascar")}</Badge>
-                  </div>
+                  {!isEmbedded && (
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeFast", "Rapide")}</Badge>
+                      <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeTransparent", "Transparent")}</Badge>
+                      <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeUseful", "Utile avant publication")}</Badge>
+                      <Badge variant="secondary" className="font-sans normal-case">{t("estimation.badgeMadagascar", "Pensé pour Madagascar")}</Badge>
+                    </div>
+                  )}
                   <div className="flex flex-wrap gap-3 pt-1">
                     <Button
                       onClick={() => setScreen("vehicle")}
@@ -353,16 +359,19 @@ const VehicleEstimationPage = () => {
                       {t("estimation.start", "Commencer l'estimation")}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="rounded-xl px-5 font-sans transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
-                      onClick={() => navigate("/recherche")}
-                    >
-                      {t("estimation.exploreListings", "Explorer les annonces")}
-                    </Button>
+                    {!isEmbedded && (
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="rounded-xl px-5 font-sans transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+                        onClick={() => navigate("/recherche")}
+                      >
+                        {t("estimation.exploreListings", "Explorer les annonces")}
+                      </Button>
+                    )}
                   </div>
                 </div>
+                {!isEmbedded && (
                 <div className={`rounded-2xl border bg-background/85 p-5 md:p-6 ${ESTIMATION_PALETTE.surface}`}>
                   <p className={ESTIMATION_TYPO.label}>{t("estimation.whyUseful", "Pourquoi c'est utile")}</p>
                   <div className="mt-4 space-y-3">
@@ -396,9 +405,11 @@ const VehicleEstimationPage = () => {
                     </div>
                   </div>
                 </div>
+                )}
               </CardContent>
             </Card>
 
+            {!isEmbedded && (
             <div className="grid gap-4 md:grid-cols-3">
               <Card className={`rounded-2xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md ${ESTIMATION_PALETTE.surface}`}>
                 <CardHeader className="pb-2">
@@ -425,6 +436,7 @@ const VehicleEstimationPage = () => {
                 </CardContent>
               </Card>
             </div>
+            )}
           </section>
         )}
 

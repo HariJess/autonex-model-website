@@ -34,6 +34,7 @@ import { SearchActiveChips } from "@/pages/search/components/SearchActiveChips";
 import { SearchResultsGrid } from "@/pages/search/components/SearchResultsGrid";
 import { SearchResultsList } from "@/pages/search/components/SearchResultsList";
 import { SearchEmptyState } from "@/pages/search/components/SearchEmptyState";
+import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import { SearchLoadingState } from "@/pages/search/components/SearchLoadingState";
 import { SearchErrorState } from "@/pages/search/components/SearchErrorState";
 import { AUTO_SEARCH_VEHICLE_TYPE_OPTIONS } from "@/data/automotiveCatalog";
@@ -758,12 +759,15 @@ const SearchPage = () => {
             )}
 
             {showEmpty && (
-              <SearchEmptyState
-                title={t("search.noResults", "Aucune annonce ne correspond")}
-                description={t("search.tryDifferentWiden", "Aucun résultat exact trouvé. Élargissez la zone, le budget ou les quartiers, puis relancez la recherche.")}
-                resetLabel={t("search.resetFilters", "Réinitialiser pour relancer")}
-                onReset={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
-              />
+              <div className="space-y-3">
+                <YasBackButton />
+                <SearchEmptyState
+                  title={t("search.noResults", "Aucune annonce ne correspond")}
+                  description={t("search.tryDifferentWiden", "Aucun résultat exact trouvé. Élargissez la zone, le budget ou les quartiers, puis relancez la recherche.")}
+                  resetLabel={t("search.resetFilters", "Réinitialiser pour relancer")}
+                  onReset={() => updateFilters({ ...EMPTY_SEARCH_FILTERS })}
+                />
+              </div>
             )}
           </main>
         </div>

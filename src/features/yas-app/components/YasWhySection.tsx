@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ShieldCheck, BadgeCheck, Sparkles, MapPin, type LucideIcon } from "lucide-react";
+import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 
 type WhyItem = {
   Icon: LucideIcon;
@@ -40,8 +41,16 @@ const ITEMS: WhyItem[] = [
   },
 ];
 
+// En mode embedded (WebView YAS), on réduit la section aux 2 signaux les plus
+// différenciants (modération + estimation transparente) — l'utilisateur a déjà
+// cliqué via l'app YAS, pas besoin de le convaincre avec "100% Madagascar" /
+// "Rapide à utiliser" qui font doublon avec le hero co-brandé.
+const EMBEDDED_ITEMS = ITEMS.slice(0, 2);
+
 export function YasWhySection() {
   const { t } = useTranslation();
+  const { isEmbedded } = useYasContext();
+  const items = isEmbedded ? EMBEDDED_ITEMS : ITEMS;
   return (
     <section
       aria-label={t("yas.why.sectionAria", "Pourquoi AutoNex")}
@@ -51,7 +60,7 @@ export function YasWhySection() {
         {t("yas.why.heading", "Pourquoi AutoNex ?")}
       </h2>
       <ul className="space-y-2.5">
-        {ITEMS.map((item) => {
+        {items.map((item) => {
           const Icon = item.Icon;
           return (
             <li key={item.titleKey} className="flex items-start gap-3">

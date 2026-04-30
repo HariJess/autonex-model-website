@@ -2351,10 +2351,10 @@
       "seeAll": "See all"
     },
     "cta": {
-      "sectionAria": "Publish a listing",
-      "title": "Sell your car on AutoNex",
-      "body": "Guided publishing, moderation before going live, secure MGA payment.",
-      "button": "Publish my vehicle"
+      "sectionAria": "Estimate your car",
+      "title": "Not sure yet?",
+      "body": "Find out what your car is really worth in 2 minutes — no strings attached.",
+      "button": "Estimate my car"
     },
     "footer": {
       "tagline": "AutoNex — Madagascar's reference car marketplace.",

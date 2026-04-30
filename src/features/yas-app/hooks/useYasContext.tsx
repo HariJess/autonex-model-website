@@ -67,6 +67,15 @@ function writeStored(value: StoredYasContext): void {
   }
 }
 
+function clearStored(): void {
+  if (typeof window === "undefined" || !window.sessionStorage) return;
+  try {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* silent — same private-mode caveat */
+  }
+}
+
 function parseFromQuery(search: string): StoredYasContext | null {
   if (!search) return null;
   const params = new URLSearchParams(search);
@@ -95,18 +104,32 @@ export function useYasContext(): YasContext {
 
   useEffect(() => {
     const fromQuery = parseFromQuery(location.search);
-    if (!fromQuery) return;
-    // Merge : ne pas perdre platform/entryPoint si l'URL courante ne les
-    // contient plus mais la session les a déjà capturés.
-    const merged: StoredYasContext = {
-      isEmbedded: true,
-      source: fromQuery.source ?? stored.source,
-      platform: fromQuery.platform ?? stored.platform,
-      entryPoint: fromQuery.entryPoint ?? stored.entryPoint,
-    };
-    writeStored(merged);
-    setStored(merged);
-  }, [location.search, stored.entryPoint, stored.platform, stored.source]);
+    if (fromQuery) {
+      // Merge : ne pas perdre platform/entryPoint si l'URL courante ne les
+      // contient plus mais la session les a déjà capturés.
+      const merged: StoredYasContext = {
+        isEmbedded: true,
+        source: fromQuery.source ?? stored.source,
+        platform: fromQuery.platform ?? stored.platform,
+        entryPoint: fromQuery.entryPoint ?? stored.entryPoint,
+      };
+      writeStored(merged);
+      setStored(merged);
+      return;
+    }
+    // Atterrissage sur la home `/` SANS aucun signal YAS dans l'URL → on
+    // considère que l'utilisateur sort du parcours partenaire (lien partagé,
+    // bookmark, retour direct sur l'accueil normal). On purge le sessionStorage
+    // pour éviter le leak (le site se comportait en mode embedded sur toutes
+    // les pages tant que la session navigateur était ouverte).
+    // Les pages internes YAS (`/recherche`, `/estimation`, `/login`...) gardent
+    // l'embedded actif tant qu'elles sont ouvertes via un lien interne, même
+    // après refresh : on ne purge QUE sur `/` sans params.
+    if (location.pathname === "/" && stored.isEmbedded) {
+      clearStored();
+      setStored(EMPTY);
+    }
+  }, [location.pathname, location.search, stored.entryPoint, stored.isEmbedded, stored.platform, stored.source]);
 
   const sessionId = useMemo(() => getOrCreateSessionId(), []);
 

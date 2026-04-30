@@ -68,7 +68,7 @@ export default function YasAppPage() {
            * teur AutoNex (Marketplace n'a pas ça).
            */}
           <section
-            aria-label={t("yas.cta.sectionAria", "Découvrir la valeur de mon véhicule")}
+            aria-label={t("yas.cta.sectionAria", "Estimer votre voiture")}
             className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.08] via-card to-primary/[0.02] p-5 shadow-sm"
           >
             <p className="font-sans text-base font-semibold text-foreground sm:text-lg">

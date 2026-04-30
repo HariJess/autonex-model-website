@@ -52,6 +52,11 @@ export function BetaLockGate({ children }: BetaLockGateProps) {
 
   if (!isLockEnabled) return <>{children}</>;
   if (location.pathname === "/beta-login") return <>{children}</>;
+  // /yas-app est exposée à un partenaire externe (YAS & Moi) via WebView :
+  // le rendu ne doit JAMAIS être bloqué par le beta lock, sinon le partenaire
+  // voit une page blanche (le redirect vers /beta-login est déjà bypassé en
+  // amont, mais le rendu était quand même null sans cookie d'unlock).
+  if (location.pathname === "/yas-app") return <>{children}</>;
   if (!isUnlocked) return null;
   return <>{children}</>;
 }

@@ -77,14 +77,13 @@ export function YasActionGrid() {
   const { t } = useTranslation();
   const yas = useYasContext();
 
-  const handleAnchorClick = (action: YasAction) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+  // Solution A : tracking d'analytics seul, et on laisse le navigateur faire
+  // le saut natif via `<a href="#deals">`. `preventDefault + scrollIntoView`
+  // était cassé en pratique (un effet React reset scrollY juste après) — le
+  // saut hash natif est plus fiable et l'offset est géré par `scroll-mt-4`
+  // sur la cible (cf. YasFeaturedDeals.tsx).
+  const handleAnchorClick = (action: YasAction) => () => {
     trackYasEvent(action.eventName, yas, { action_id: action.id });
-    if (!action.scrollTo) return;
-    const target = document.getElementById(action.scrollTo);
-    if (target) {
-      event.preventDefault();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
   };
 
   const handleNavClick = (action: YasAction) => () => {

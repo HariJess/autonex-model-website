@@ -23,6 +23,8 @@ dist-ssr
 /playwright/.cache/
 /test-results/
 /blob-report/
+# Visual audit screenshots (regenerable artifacts, not source)
+/e2e/screenshots/
 
 # Environment (secrets — never commit)
 .env
