@@ -1,0 +1,9 @@
+{
+  "alias_to_canonical": {
+    "Essence": "petrol", "ESSENCE": "petrol", "Petrol": "petrol", "essence": "petrol", "petrol": "petrol",
+    "Diesel": "diesel", "DIESEL": "diesel", "Diésel": "diesel", "diesel": "diesel", "Gasoil": "diesel", "Gazole": "diesel",
+    "Hybride": "hybrid", "HYBRIDE": "hybrid", "Hybrid": "hybrid", "HEV": "hybrid", "PHEV": "hybrid", "hybrid": "hybrid",
+    "Électrique": "electric", "Electrique": "electric", "ELECTRIQUE": "electric", "Electric": "electric", "EV": "electric"
+  },
+  "canonical_values": ["petrol", "diesel", "hybrid", "electric"]
+}

@@ -1,0 +1,13 @@
+{
+  "comment": "Modèles individuels à exclure du seed même s'ils passent la calibration. Format: { 'Marque': ['Model1', 'Model2'] }. À utiliser pour les cas exceptionnels non couverts par les filtres automatiques (ex: data trop pauvre, fusion générationnelle problématique, prix manifestement faux).",
+  "blacklist": {
+    "Renault": ["Trafic"],
+    "Kia": ["Pride"],
+    "Land Rover": ["Range Rover Evoque"]
+  },
+  "rationale": {
+    "Renault Trafic": "2 obs FB sur Trafic 2004 fatigué (3.87M Ar). Profil donnerait des estimations sous-évaluées (~50% de la valeur réelle) pour les Trafic récents 2015+. Réintégrer en vague 2 quand on aura ≥4 obs sur années récentes.",
+    "Kia Pride": "Fusion Pride / Pride SLX a créé baseline_year=2021 à 7.7M Ar — incohérent (modèle Pride arrêté avant 2015). Bug d'extrapolation. Réintégrer en vague 2 avec normalisation modèle plus fine (Pride 1, Pride 5 séparés).",
+    "Land Rover Range Rover Evoque": "2 obs cohérentes entre elles (CV 0.01) mais valeur 17.2M Ar pour un Evoque 2015 manifestement aberrante (vrai prix 70-110M). Probable typo ou post FB accidentel non détecté. Réintégrer en vague 2 avec ≥3 obs."
+  }
+}

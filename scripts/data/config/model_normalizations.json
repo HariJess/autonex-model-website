@@ -1,0 +1,480 @@
+{
+  "alias_to_canonical": {
+    "Toyota": {
+      "rav-4": "RAV4",
+      "rav 4": "RAV4",
+      "rav4": "RAV4",
+      "land cruiser": "Land Cruiser",
+      "landcruiser": "Land Cruiser",
+      "land-cruiser": "Land Cruiser",
+      "land cruiser 70": "Land Cruiser 70",
+      "land cruiser 200": "Land Cruiser 200",
+      "land cruiser 300": "Land Cruiser 300",
+      "hilux": "Hilux",
+      "hilux revo": "Hilux",
+      "revo": "Hilux",
+      "vigo": "Hilux",
+      "lc": "Land Cruiser",
+      "lc70": "Land Cruiser",
+      "lc100": "Land Cruiser",
+      "lc200": "Land Cruiser",
+      "lc300": "Land Cruiser",
+      "lc 70": "Land Cruiser",
+      "lc 200": "Land Cruiser",
+      "lc 300": "Land Cruiser",
+      "land cruiser 70": "Land Cruiser",
+      "land cruiser 200": "Land Cruiser",
+      "land cruiser 300": "Land Cruiser",
+      "land-cruiser": "Land Cruiser",
+      "hilux 5l": "Hilux",
+      "hilux 5 l": "Hilux",
+      "rav": "RAV4",
+      "highlander": "Highlander",
+      "harrier": "Harrier",
+      "corolla": "Corolla",
+      "corolla cross": "Corolla Cross",
+      "fortuner": "Fortuner",
+      "yaris": "Yaris",
+      "vios": "Vios",
+      "camry": "Camry",
+      "prado": "Prado",
+      "rush": "Rush",
+      "veloz": "Veloz",
+      "avanza": "Avanza",
+      "agya": "Agya",
+      "aqua": "Aqua",
+      "prius": "Prius",
+      "hiace": "Hiace",
+      "c-hr": "C-HR",
+      "chr": "C-HR",
+      "4runner": "4Runner",
+      "auris": "Auris",
+      "passo": "Passo",
+      "vitz": "Vitz",
+      "platz": "Platz",
+      "ist": "Ist",
+      "raum": "Raum",
+      "spacio": "Spacio",
+      "verso": "Verso",
+      "bb": "bB",
+      "wish": "Wish"
+    },
+    "Nissan": {
+      "quashqai": "Qashqai",
+      "qashqai": "Qashqai",
+      "x-trail": "X-Trail",
+      "xtrail": "X-Trail",
+      "x trail": "X-Trail",
+      "np300": "NP300",
+      "np 300": "NP300",
+      "np300 ann": "NP300",
+      "np300 double": "NP300",
+      "np300 annonce": "NP300",
+      "navara": "Navara",
+      "patrol": "Patrol",
+      "juke": "Juke",
+      "kicks": "Kicks",
+      "almera": "Almera",
+      "sunny": "Sunny",
+      "tiida": "Tiida",
+      "note": "Note",
+      "micra": "Micra",
+      "murano": "Murano",
+      "pathfinder": "Pathfinder",
+      "terra": "Terra",
+      "urvan": "Urvan",
+      "armada": "Armada",
+      "march": "March",
+      "leaf": "Leaf",
+      "primera": "Primera",
+      "bluebird": "Bluebird"
+    },
+    "Kia": {
+      "pride": "Pride",
+      "pride slx": "Pride",
+      "pride bonn": "DROP",
+      "pride bonnet": "DROP",
+      "picanto": "Picanto",
+      "morning": "Picanto",
+      "morning 3": "Picanto",
+      "rio": "Rio",
+      "cerato": "Cerato",
+      "sorrento": "Sorento",
+      "sorento": "Sorento",
+      "sportage": "Sportage",
+      "carnival": "Carnival",
+      "seltos": "Seltos",
+      "sonet": "Sonet",
+      "soul": "Soul",
+      "venga": "Venga",
+      "k2700": "K2700",
+      "k3": "K3"
+    },
+    "Hyundai": {
+      "i10": "i10",
+      "grand i10": "Grand i10",
+      "i20": "i20",
+      "i30": "i30",
+      "i30 phase2": "i30",
+      "accent": "Accent",
+      "elantra": "Elantra",
+      "sonata": "Sonata",
+      "tucson": "Tucson",
+      "santafe": "Santa Fe",
+      "santa fe": "Santa Fe",
+      "creta": "Creta",
+      "alcazar": "Alcazar",
+      "kona": "Kona",
+      "venue": "Venue",
+      "palisade": "Palisade",
+      "stargazer": "Stargazer",
+      "staria": "Staria",
+      "h1": "H1",
+      "porter": "Porter",
+      "galoper": "Galloper",
+      "galloper": "Galloper",
+      "atos": "Atos",
+      "matrix": "Matrix",
+      "getz": "Getz",
+      "click": "Click",
+      "starex": "Starex",
+      "ix35": "iX35",
+      "i40": "i40",
+      "terracan": "Terracan",
+      "veloster": "Veloster",
+      "tiburon": "Tiburon"
+    },
+    "Mazda": {
+      "bt-50": "BT-50",
+      "bt50": "BT-50",
+      "cx-3": "CX-3",
+      "cx3": "CX-3",
+      "cx-30": "CX-30",
+      "cx30": "CX-30",
+      "cx-5": "CX-5",
+      "cx5": "CX-5",
+      "cx-9": "CX-9",
+      "cx9": "CX-9",
+      "cx-50": "CX-50",
+      "cx-60": "CX-60",
+      "cx60": "CX-60",
+      "cx-70": "CX-70",
+      "cx-80": "CX-80",
+      "cx-90": "CX-90",
+      "cx90": "CX-90",
+      "mazda 2": "Mazda 2",
+      "mazda 3": "Mazda 3",
+      "mazda 6": "Mazda 6",
+      "mx-5": "MX-5",
+      "rx-7": "RX-7",
+      "premacy": "Premacy",
+      "demio": "Demio",
+      "tribute": "Tribute"
+    },
+    "Suzuki": {
+      "swift": "Swift",
+      "alto": "Alto",
+      "celerio": "Celerio",
+      "baleno": "Baleno",
+      "ignis": "Ignis",
+      "dzire": "Dzire",
+      "ertiga": "Ertiga",
+      "vitara": "Vitara",
+      "grand vitara": "Grand Vitara",
+      "s-cross": "S-Cross",
+      "scross": "S-Cross",
+      "fronx": "Fronx",
+      "xl7": "XL7",
+      "jimny": "Jimny",
+      "jimmy": "Jimny",
+      "carry": "Carry",
+      "wagon r": "Wagon R",
+      "wagonr": "Wagon R",
+      "splash": "Splash"
+    },
+    "Volkswagen": {
+      "golf": "Golf",
+      "golf5": "Golf",
+      "polo": "Polo",
+      "passat": "Passat",
+      "jetta": "Jetta",
+      "tiguan": "Tiguan",
+      "touareg": "Touareg",
+      "amarok": "Amarok",
+      "transporter": "Transporter",
+      "t-cross": "T-Cross",
+      "tcross": "T-Cross",
+      "taigo": "Taigo",
+      "virtus": "Virtus",
+      "caddy": "Caddy",
+      "scirocco": "Scirocco",
+      "tiguan tdi": "Tiguan",
+      "mk7 gti": "Golf",
+      "mk7": "Golf",
+      "gti": "Golf",
+      "up": "Up",
+      "bora": "Bora"
+    },
+    "Renault": {
+      "duster": "Duster",
+      "captur": "Captur",
+      "clio": "Clio",
+      "kadjar": "Kadjar",
+      "koleos": "Koleos",
+      "logan": "Logan",
+      "megane": "Megane",
+      "sandero": "Sandero",
+      "kwid": "Kwid",
+      "twingo": "Twingo",
+      "kangoo": "Kangoo",
+      "scenic": "Scenic",
+      "talisman": "Talisman",
+      "trafic": "Trafic"
+    },
+    "Peugeot": {
+      "208": "208",
+      "308": "308",
+      "508": "508",
+      "2008": "2008",
+      "3008": "3008",
+      "5008": "5008",
+      "206": "206",
+      "207": "207",
+      "307": "307",
+      "301": "301",
+      "408": "408",
+      "partner": "Partner",
+      "expert": "Expert",
+      "boxer": "Boxer",
+      "rifter": "Rifter"
+    },
+    "Mitsubishi": {
+      "pajero": "Pajero",
+      "pajero sport": "Pajero Sport",
+      "outlander": "Outlander",
+      "asx": "ASX",
+      "l200": "L200",
+      "triton": "Triton",
+      "mirage": "Mirage",
+      "lancer": "Lancer",
+      "colt": "Colt",
+      "eclipse cross": "Eclipse Cross",
+      "delica": "Delica"
+    },
+    "Honda": {
+      "civic": "Civic",
+      "accord": "Accord",
+      "city": "City",
+      "fit": "Fit",
+      "jazz": "Jazz",
+      "cr-v": "CR-V",
+      "crv": "CR-V",
+      "hr-v": "HR-V",
+      "hrv": "HR-V",
+      "br-v": "BR-V",
+      "wr-v": "WR-V",
+      "pilot": "Pilot",
+      "stepwgn": "Stepwgn",
+      "freed": "Freed",
+      "vezel": "Vezel"
+    },
+    "Ford": {
+      "ranger": "Ranger",
+      "f-150": "F-150",
+      "f150": "F-150",
+      "fiesta": "Fiesta",
+      "focus": "Focus",
+      "ecosport": "EcoSport",
+      "edge": "Edge",
+      "escape": "Escape",
+      "everest": "Everest",
+      "expedition": "Expedition",
+      "explorer": "Explorer",
+      "kuga": "Kuga",
+      "puma": "Puma",
+      "bronco": "Bronco",
+      "mustang": "Mustang",
+      "tourneo": "Tourneo",
+      "transit": "Transit",
+      "fusion": "Fusion"
+    },
+    "BMW": {
+      "x1": "X1","x2": "X2","x3": "X3","x4": "X4","x5": "X5","x6": "X6","x7": "X7",
+      "320i": "320i","330i": "330i","520i": "520i","530i": "530i",
+      "118i": "118i","120i": "120i","116i": "116i","218i": "218i",
+      "m3": "M3","m5": "M5","z4": "Z4",
+      "serie 3": "Serie 3","serie 5": "Serie 5","serie 7": "Serie 7",
+      "320d": "320d","318i": "318i","318d": "318d","325i": "325i","330d": "330d",
+      "mk7 gti": "Golf",
+      "mk7": "Golf",
+      "e30": "Serie 3","e36": "Serie 3","e46": "Serie 3","e90": "Serie 3","e91": "Serie 3","e92": "Serie 3","f30": "Serie 3","f80": "Serie 3"
+    },
+    "Mercedes-Benz": {
+      "a-class": "A-Class","aclass": "A-Class","classe a": "A-Class",
+      "c-class": "C-Class","cclass": "C-Class","classe c": "C-Class",
+      "cla": "CLA",
+      "e-class": "E-Class","eclass": "E-Class","classe e": "E-Class",
+      "gla": "GLA","glb": "GLB","glc": "GLC","gle": "GLE","gls": "GLS",
+      "s-class": "S-Class","classe s": "S-Class",
+      "vito": "Vito","sprinter": "Sprinter","viano": "Viano","g-class": "G-Class","ml": "ML",
+      "glk": "GLK"
+    },
+    "Audi": {
+      "a1": "A1","a3": "A3","a4": "A4","a5": "A5","a6": "A6","a7": "A7","a8": "A8",
+      "q2": "Q2","q3": "Q3","q5": "Q5","q5 quattro": "Q5","q5 quatro": "Q5",
+      "q7": "Q7","q8": "Q8",
+      "rs3": "RS3","rs6": "RS6","tt": "TT"
+    },
+    "Land Rover": {
+      "defender": "Defender",
+      "discovery": "Discovery",
+      "discovery sport": "Discovery Sport",
+      "range rover": "Range Rover",
+      "range rover sport": "Range Rover Sport",
+      "range rover evoque": "Range Rover Evoque",
+      "evoque": "Range Rover Evoque",
+      "range rover velar": "Range Rover Velar",
+      "velar": "Range Rover Velar",
+      "freelander": "Freelander"
+    },
+    "Isuzu": {
+      "d-max": "D-Max","dmax": "D-Max",
+      "f-series": "F-Series",
+      "mu-7": "MU-7","mu-x": "MU-X","mu7": "MU-7","mux": "MU-X",
+      "n-series": "N-Series","trooper": "Trooper"
+    },
+    "Chevrolet": {
+      "aveo": "Aveo","captiva": "Captiva","camaro": "Camaro","cruze": "Cruze",
+      "malibu": "Malibu","spark": "Spark","tahoe": "Tahoe","trailblazer": "Trailblazer",
+      "equinox": "Equinox","colorado": "Colorado","optra": "Optra","matiz": "Matiz",
+      "epica": "Epica","kalos": "Kalos","lacetti": "Lacetti"
+    },
+    "Citroen": {
+      "c1": "C1","c2": "C2","c3": "C3","c4": "C4","c5": "C5",
+      "c-elysee": "C-Elysee","celysee": "C-Elysee",
+      "c3 aircross": "C3 Aircross","c4 cactus": "C4 Cactus","c5 aircross": "C5 Aircross",
+      "berlingo": "Berlingo","ds3": "DS3","ds4": "DS4","ds5": "DS5",
+      "xsara": "Xsara","picasso": "Picasso","saxo": "Saxo"
+    },
+    "Lexus": {
+      "es": "ES","gx": "GX","is": "IS","lx": "LX","nx": "NX","rx": "RX","ux": "UX",
+      "ct": "CT","ls": "LS"
+    },
+    "Jeep": {
+      "wrangler": "Wrangler","cherokee": "Cherokee","grand cherokee": "Grand Cherokee",
+      "compass": "Compass","renegade": "Renegade","gladiator": "Gladiator","patriot": "Patriot"
+    },
+    "Subaru": {
+      "forester": "Forester","outback": "Outback","impreza": "Impreza","legacy": "Legacy",
+      "xv": "XV","crosstrek": "Crosstrek","wrx": "WRX"
+    },
+    "Volvo": {
+      "xc40": "XC40","xc60": "XC60","xc90": "XC90","s60": "S60","s90": "S90","v60": "V60","c40": "C40",
+      "v40": "V40","v50": "V50","s40": "S40","s80": "S80"
+    },
+    "Mini": {
+      "cooper": "Cooper","clubman": "Clubman","countryman": "Countryman","paceman": "Paceman","one": "One"
+    },
+    "Daihatsu": {
+      "sirion": "Sirion","materia": "Materia","charade": "Charade","terios": "Terios","mira": "Mira","copen": "Copen"
+    },
+    "Datsun": {
+      "go": "Go","go+": "Go Plus","go plus": "Go Plus","redigo": "Redi-Go","redi-go": "Redi-Go"
+    },
+    "Skoda": {
+      "fabia": "Fabia","octavia": "Octavia","superb": "Superb","kodiaq": "Kodiaq","karoq": "Karoq","kamiq": "Kamiq","yeti": "Yeti","rapid": "Rapid"
+    },
+    "SEAT": {
+      "ibiza": "Ibiza","leon": "Leon","arona": "Arona","ateca": "Ateca","tarraco": "Tarraco","altea": "Altea"
+    },
+    "Dacia": {
+      "duster": "Duster","logan": "Logan","sandero": "Sandero","spring": "Spring","jogger": "Jogger","lodgy": "Lodgy"
+    },
+    "Opel": {
+      "astra": "Astra","corsa": "Corsa","insignia": "Insignia","mokka": "Mokka","crossland": "Crossland","grandland": "Grandland","zafira": "Zafira","vectra": "Vectra"
+    },
+    "Fiat": {
+      "500": "500","500x": "500X","panda": "Panda","punto": "Punto","tipo": "Tipo","doblo": "Doblo","palio": "Palio","stilo": "Stilo"
+    },
+    "BYD": {
+      "atto 3": "Atto 3","dolphin": "Dolphin","han": "Han","seal": "Seal","seagull": "Seagull","song plus": "Song Plus","tang": "Tang","yuan plus": "Yuan Plus","f3": "F3"
+    },
+    "Chery": {
+      "tiggo 2": "Tiggo 2","tiggo 4": "Tiggo 4","tiggo 7": "Tiggo 7","tiggo 8": "Tiggo 8","arrizo 5": "Arrizo 5","arrizo 8": "Arrizo 8","omoda 5": "Omoda 5","qq": "QQ"
+    },
+    "Geely": {
+      "azkarra": "Azkarra","coolray": "Coolray","emgrand": "Emgrand","gx3 pro": "GX3 Pro","monjaro": "Monjaro","okavango": "Okavango"
+    },
+    "Haval": {
+      "h1": "H1","h2": "H2","h6": "H6","h6 gt": "H6 GT","h9": "H9","jolion": "Jolion","dargo": "Dargo","ora good cat": "Ora Good Cat"
+    },
+    "Great Wall": {
+      "cannon": "Cannon","h6": "H6","poer": "Poer","poer kingkong": "Poer Kingkong","steed": "Steed",
+      "wingle": "Wingle 5","wingles": "Wingle 5","wingle 5": "Wingle 5","wingle 7": "Wingle 7",
+      "tank 300": "Tank 300","tank 400": "Tank 400","tank 500": "Tank 500","tank 700": "Tank 700","wey 80": "Wey 80"
+    },
+    "MG": {
+      "hs": "HS","mg3": "MG3","mg4": "MG4","mg5": "MG5","mg6": "MG6","marvel r": "Marvel R","zs": "ZS"
+    },
+    "Mahindra": {
+      "bolero": "Bolero","kuv100": "KUV100","scorpio": "Scorpio","s11 scorpio": "Scorpio","thar": "Thar","xuv300": "XUV300","xuv 300": "XUV300","xuv500": "XUV500","xuv700": "XUV700"
+    },
+    "Tata": {
+      "altroz": "Altroz","harrier": "Harrier","nexon": "Nexon","punch": "Punch","safari": "Safari","tiago": "Tiago","tigor": "Tigor","indica": "Indica","xenon": "Xenon"
+    },
+    "Acura": {
+      "ilx": "ILX","integra": "Integra","mdx": "MDX","nsx": "NSX","rdx": "RDX","rlx": "RLX","tlx": "TLX","zdx": "ZDX"
+    },
+    "Alfa Romeo": {
+      "4c": "4C","giulia": "Giulia","giulietta": "Giulietta","stelvio": "Stelvio","tonale": "Tonale","159": "159"
+    },
+    "Infiniti": {
+      "q30": "Q30","q50": "Q50","q60": "Q60","qx50": "QX50","qx60": "QX60","qx80": "QX80"
+    },
+    "Jaguar": {
+      "e-pace": "E-Pace","f-pace": "F-Pace","f-type": "F-Type","i-pace": "I-Pace","xe": "XE","xf": "XF","xj": "XJ"
+    },
+    "Porsche": {
+      "718": "718","911": "911","cayenne": "Cayenne","macan": "Macan","panamera": "Panamera","taycan": "Taycan"
+    },
+    "SsangYong": {
+      "actyon": "Actyon","korando": "Korando","rexton": "Rexton","tivoli": "Tivoli","kyron": "Kyron","stavic": "Stavic"
+    },
+    "Brilliance": {
+      "v3": "V3","v4": "V4","v5": "V5","h3": "H3","h530": "H530"
+    },
+    "Enranger": {
+      "g3": "G3","g5": "G5"
+    },
+    "Kaiyi": {
+      "x3 pro": "X3 Pro","x7": "X7","e-qute 02": "E-qute 02","kunlun": "Kunlun"
+    },
+    "Jetta": {
+      "vs5": "VS5","vs7": "VS7","va3": "VA3"
+    },
+    "JAC": {
+      "j5": "J5","j7": "J7","s2": "S2","s3": "S3","s5": "S5","t6": "T6","t8": "T8"
+    },
+    "JMC": {
+      "vigus": "Vigus","baodian": "Baodian","yuhu": "Yuhu"
+    },
+    "DFSK": {
+      "glory": "Glory","ix5": "iX5","580": "580"
+    },
+    "Foton": {
+      "tunland": "Tunland","sauvana": "Sauvana"
+    },
+    "Lifan": {
+      "x60": "X60","x70": "X70","620": "620"
+    },
+    "Lada": {
+      "niva": "Niva","granta": "Granta","vesta": "Vesta"
+    },
+    "Smart": {
+      "fortwo": "ForTwo","forfour": "ForFour"
+    },
+    "Oceantrade": {
+      "ot": "OT"
+    }
+  }
+}

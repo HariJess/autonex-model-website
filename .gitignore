@@ -66,3 +66,13 @@ supabase/.temp/
 # (npm run typecheck:edge). Not part of the build pipeline; pinned versions
 # already live in the import URLs of supabase/functions/**/index.ts.
 deno.lock
+
+# Reference profiles ingestion pipeline — inputs et outputs ne sont pas committés.
+# Inputs: déposés manuellement par Ali avant chaque run.
+# Outputs: regénérés à chaque run via `npx tsx scripts/data/build-reference-profiles.ts`.
+# On garde uniquement INGESTION_REPORT.md (lecture humaine) + les .gitkeep.
+/scripts/data/inputs/*
+!/scripts/data/inputs/.gitkeep
+/scripts/data/output/*
+!/scripts/data/output/.gitkeep
+!/scripts/data/output/INGESTION_REPORT.md
