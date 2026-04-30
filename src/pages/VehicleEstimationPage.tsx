@@ -497,7 +497,6 @@ const VehicleEstimationPage = () => {
           <Card className={`${ESTIMATION_UI.sectionCard} overflow-hidden`}>
             <CardHeader className="border-b border-border/50 pb-5">
               <div className="space-y-3">
-                  <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 px-2.5 py-0.5 font-sans normal-case text-primary">{t("estimation.stepOne", "Étape 1")}</Badge>
                 <CardTitle className={ESTIMATION_TYPO.h2}>{t("estimation.vehicleIdentity", "Identité du véhicule")}</CardTitle>
                 <p className={ESTIMATION_TYPO.body}>
                   {t(
@@ -508,7 +507,7 @@ const VehicleEstimationPage = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-7 pt-6">
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.55fr_0.65fr]">
+              <div className={cn("grid grid-cols-1 gap-6", !isEmbedded && "lg:grid-cols-[1.55fr_0.65fr]")}>
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     {catalogLoading && (
@@ -688,27 +687,29 @@ const VehicleEstimationPage = () => {
                     </p>
                   </div>
                 </div>
-                <aside className={`rounded-2xl border bg-gradient-to-b p-4 shadow-sm sm:p-5 lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
-                  <p className={ESTIMATION_TYPO.label}>{t("estimation.whyTheseInfo", "Pourquoi ces informations ?")}</p>
-                  <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>{t("estimation.fairerEstimate", "Une estimation plus juste")}</h3>
-                  <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
-                    {t("estimation.fairerEstimateDesc", "Marque, modèle, année et kilométrage constituent le socle de valorisation le plus pertinent pour votre véhicule.")}
-                  </p>
-                  <div className="mt-4 space-y-2.5">
-                    <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">{t("estimation.quickJourneyTitle", "Parcours rapide")}</p>
-                      <p className="font-sans text-xs text-muted-foreground">{t("estimation.quickJourneyDesc", "Environ 2 minutes pour compléter les informations essentielles.")}</p>
+                {!isEmbedded && (
+                  <aside className={`rounded-2xl border bg-gradient-to-b p-4 shadow-sm sm:p-5 lg:sticky lg:top-24 ${ESTIMATION_PALETTE.accent}`}>
+                    <p className={ESTIMATION_TYPO.label}>{t("estimation.whyTheseInfo", "Pourquoi ces informations ?")}</p>
+                    <h3 className={`mt-2 ${ESTIMATION_TYPO.h3}`}>{t("estimation.fairerEstimate", "Une estimation plus juste")}</h3>
+                    <p className={`mt-2 ${ESTIMATION_TYPO.body}`}>
+                      {t("estimation.fairerEstimateDesc", "Marque, modèle, année et kilométrage constituent le socle de valorisation le plus pertinent pour votre véhicule.")}
+                    </p>
+                    <div className="mt-4 space-y-2.5">
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-3">
+                        <p className="font-sans text-xs font-medium">{t("estimation.quickJourneyTitle", "Parcours rapide")}</p>
+                        <p className="font-sans text-xs text-muted-foreground">{t("estimation.quickJourneyDesc", "Environ 2 minutes pour compléter les informations essentielles.")}</p>
+                      </div>
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-3">
+                        <p className="font-sans text-xs font-medium">{t("estimation.actionableResultTitle", "Résultat actionnable")}</p>
+                        <p className="font-sans text-xs text-muted-foreground">{t("estimation.actionableResultDesc", "Prix conseillé, fourchette et niveau de confiance immédiats.")}</p>
+                      </div>
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-3">
+                        <p className="font-sans text-xs font-medium">{t("estimation.readyAfterTitle", "Prêt pour la suite")}</p>
+                        <p className="font-sans text-xs text-muted-foreground">{t("estimation.readyAfterDesc", "Vous pourrez publier ensuite sur AutoNex avec un cap prix clair.")}</p>
+                      </div>
                     </div>
-                    <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">{t("estimation.actionableResultTitle", "Résultat actionnable")}</p>
-                      <p className="font-sans text-xs text-muted-foreground">{t("estimation.actionableResultDesc", "Prix conseillé, fourchette et niveau de confiance immédiats.")}</p>
-                    </div>
-                    <div className="rounded-lg border border-border/60 bg-background/80 p-3">
-                      <p className="font-sans text-xs font-medium">{t("estimation.readyAfterTitle", "Prêt pour la suite")}</p>
-                      <p className="font-sans text-xs text-muted-foreground">{t("estimation.readyAfterDesc", "Vous pourrez publier ensuite sur AutoNex avec un cap prix clair.")}</p>
-                    </div>
-                  </div>
-                </aside>
+                  </aside>
+                )}
               </div>
               <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 {!isEmbedded && (
@@ -730,7 +731,6 @@ const VehicleEstimationPage = () => {
           <Card className={ESTIMATION_UI.sectionCard}>
             <CardHeader>
               <div className="space-y-2">
-                <Badge variant="outline" className="w-fit border-primary/30 bg-primary/5 font-sans normal-case text-primary">{t("estimation.stepTwo", "Étape 2")}</Badge>
                 <CardTitle className={ESTIMATION_TYPO.h2}>{t("estimation.conditionHistoryTitle", "État et historique")}</CardTitle>
                 <p className={ESTIMATION_TYPO.body}>
                   {t("estimation.conditionHistoryDesc", "Affinez la valorisation avec le contexte d'usage pour obtenir un rapport plus juste.")}
