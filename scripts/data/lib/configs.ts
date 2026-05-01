@@ -65,9 +65,28 @@ export type PipelineConfig = {
   year_pivot_cap: number;
   decay_clip_range: [number, number];
   deduplication: { fb_price_tolerance_ratio: number; comment: string };
+  new_used_split?: NewUsedSplitConfig;
+  decay_calibration?: DecayCalibrationConfig;
   outlier_filter?: OutlierFilterConfig;
   conflict_strategy: "DO_UPDATE" | "DO_NOTHING";
   expected_km_per_year_default: number;
+};
+
+export type NewUsedSplitConfig = {
+  enabled: boolean;
+  min_obs_dealer_for_split: number;
+  min_obs_fb_for_split: number;
+  comment?: string;
+};
+
+export type DecayCalibrationConfig = {
+  enabled: boolean;
+  min_obs_for_calibration: number;
+  min_year_span_for_calibration: number;
+  min_r_squared: number;
+  default_decay_rate: number;
+  decay_clip_range: [number, number];
+  comment?: string;
 };
 
 export type OutlierFilterConfig = {

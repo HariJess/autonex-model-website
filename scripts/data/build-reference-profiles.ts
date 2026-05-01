@@ -74,6 +74,10 @@ import {
   applyMadOutlierFilter,
   type OutlierFilterOptions,
 } from "./lib/outlier-filter";
+import {
+  applyNewUsedSplit,
+  type SplitAppliedEntry,
+} from "./lib/new-used-split";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
@@ -117,6 +121,9 @@ type NormalizedRow = RawObservation & {
   // les rapports et le lookup `min_obs` par bucket lors de la calibration.
   _original_model?: string;
   _generation_bucket_label?: string;
+  // Passe 6 — nom du modèle avant l'application du suffixe Neuf/Occasion
+  // (uniquement pour les modèles éligibles au split).
+  _original_model_pre_split?: string;
 };
 
 type RejectedRow = NormalizedRow & {
@@ -136,6 +143,9 @@ type CalibratedProfile = ProfileRow & {
   tier: QualityTier;
   cv: number;
   year_span: number;
+  // Passe 7 — flags du decay calibré par régression log-linéaire.
+  decay_calibrated: boolean;
+  decay_r_squared: number;
 };
 
 const VEHICLE_BUYER_PATTERNS = /\b(mitady|recherche|wanted|cherche|i'm looking|looking for)\b/i;
@@ -603,7 +613,7 @@ function buildProfiles(
   };
   const logOutliers = pipelineConfig.outlier_filter?.log_rejected ?? false;
 
-  const calibOpts = {
+  const calibOpts: Parameters<typeof calibrateGroup>[1] = {
     default_annual_depreciation_rate: pipelineConfig.calibration.default_annual_depreciation_rate,
     decay_clip_min: pipelineConfig.decay_clip_range[0],
     decay_clip_max: pipelineConfig.decay_clip_range[1],
@@ -614,6 +624,15 @@ function buildProfiles(
     // tier_c_policy.allow_fb_only : ancrage tier C sans dealer Neuf (médiane FB).
     allow_fb_only_anchor: pipelineConfig.tier_c_policy?.allow_fb_only ?? false,
     min_observations_fb_only: pipelineConfig.tier_c_policy?.min_observations_fb_only ?? 2,
+    // Passe 7 — calibrage du decay par régression log-linéaire.
+    decay_calibration: pipelineConfig.decay_calibration?.enabled
+      ? {
+          enabled: true,
+          minObs: pipelineConfig.decay_calibration.min_obs_for_calibration,
+          minYearSpan: pipelineConfig.decay_calibration.min_year_span_for_calibration,
+          minRSquared: pipelineConfig.decay_calibration.min_r_squared,
+        }
+      : undefined,
   };
 
   const tierThresholds = {
@@ -768,6 +787,8 @@ function buildProfiles(
       tier,
       cv: calib.cv,
       year_span: calib.year_span,
+      decay_calibrated: calib.decay_calibrated,
+      decay_r_squared: calib.decay_r_squared,
     });
   }
 
@@ -862,6 +883,9 @@ function writeCalibratedProfiles(profiles: CalibratedProfile[]): void {
     "sample_size",
     "year_span",
     "cv",
+    // Passe 7 — flags decay calibré (true/false) + R² de la régression.
+    "decay_calibrated",
+    "decay_r_squared",
   ];
   const data = profiles.map((p) => [
     p.make_name,
@@ -876,6 +900,8 @@ function writeCalibratedProfiles(profiles: CalibratedProfile[]): void {
     p.sample_size,
     p.year_span,
     p.cv,
+    p.decay_calibrated ? "true" : "false",
+    p.decay_r_squared,
   ]);
   writeCsv(resolve(OUTPUT_DIR, "calibrated_profiles.csv"), headers, data);
 }
@@ -1001,6 +1027,8 @@ function writeReport(args: {
   bucketRejectedTotal: number;
   /** Passe 5 — observations rejetées par le filtre outlier MAD. */
   outlierRejections: OutlierRejection[];
+  /** Passe 6 — modèles splittés en (Neuf) / (Occasion). */
+  splitsApplied: SplitAppliedEntry[];
 }): void {
   const { profiles } = args;
   const tierA = profiles.filter((p) => p.tier === "A_strong");
@@ -1253,6 +1281,62 @@ function writeReport(args: {
     lines.push("*(aucun outlier détecté — soit filtre désactivé, soit data déjà propre)*");
   }
   lines.push("");
+  // Section 10e — passe 6 : modèles splittés en Neuf / Occasion.
+  lines.push("## 10e. Profils splittés Neuf/Occasion (passe 6)");
+  lines.push("");
+  lines.push(`Total : ${args.splitsApplied.length} modèle(s) splitté(s).`);
+  lines.push("");
+  if (args.splitsApplied.length > 0) {
+    const findProfile = (brand: string, modelName: string): CalibratedProfile | undefined =>
+      args.profiles.find((p) => p.make_name === brand && p.model_name === modelName);
+    lines.push("| Marque | Modèle original | n_dealer | n_fb | → Neuf baseline | → Occasion baseline | Decay neuf | Decay occasion |");
+    lines.push("|---|---|---:|---:|---:|---:|---:|---:|");
+    for (const s of args.splitsApplied) {
+      const neuf = findProfile(s.brand, `${s.original_model} (Neuf)`);
+      const occ = findProfile(s.brand, `${s.original_model} (Occasion)`);
+      const fmtBaseline = (p: CalibratedProfile | undefined) =>
+        p ? `${(p.baseline_price_mga / 1_000_000).toFixed(1)} MAr (${p.baseline_year})` : "—";
+      const fmtDecay = (p: CalibratedProfile | undefined) =>
+        p
+          ? `${(p.annual_depreciation_rate * 100).toFixed(1)} %${p.decay_calibrated ? " *" : ""}`
+          : "—";
+      lines.push(
+        `| ${s.brand} | ${s.original_model} | ${s.n_dealer} | ${s.n_fb} | ${fmtBaseline(neuf)} | ${fmtBaseline(occ)} | ${fmtDecay(neuf)} | ${fmtDecay(occ)} |`,
+      );
+    }
+    lines.push("");
+    lines.push("*`*` = decay calibré par régression log-linéaire (passe 7), sinon default 10 %.*");
+  } else {
+    lines.push("*(aucun modèle éligible : config désactivée ou pas assez d'obs des deux types)*");
+  }
+  lines.push("");
+  // Section 10f — passe 7 : decays calibrés vs default.
+  lines.push("## 10f. Decays calibrés vs default (passe 7)");
+  lines.push("");
+  const calibratedProfiles = args.profiles.filter((p) => p.decay_calibrated);
+  const defaultProfiles = args.profiles.filter((p) => !p.decay_calibrated);
+  lines.push(
+    `Total : ${calibratedProfiles.length} profil(s) avec decay calibré, ${defaultProfiles.length} profil(s) avec decay default.`,
+  );
+  lines.push("");
+  if (calibratedProfiles.length > 0) {
+    const sortedByDistance = [...calibratedProfiles].sort(
+      (a, b) =>
+        Math.abs(b.annual_depreciation_rate - 0.1) - Math.abs(a.annual_depreciation_rate - 0.1),
+    );
+    lines.push("Top decays calibrés (les plus éloignés du 10% générique) :");
+    lines.push("");
+    lines.push("| Marque | Modèle | Decay calibré | R² | Sample | Tier |");
+    lines.push("|---|---|---:|---:|---:|---|");
+    for (const p of sortedByDistance.slice(0, 15)) {
+      lines.push(
+        `| ${p.make_name} | ${p.model_name} | ${(p.annual_depreciation_rate * 100).toFixed(1)} % | ${p.decay_r_squared.toFixed(2)} | ${p.sample_size} | ${p.tier} |`,
+      );
+    }
+  } else {
+    lines.push("*(aucun decay calibré — calibration désactivée ou aucun profil avec assez de signal)*");
+  }
+  lines.push("");
   lines.push("## 11. Migrations SQL");
   lines.push("");
   const toRel = (p: string) =>
@@ -1340,12 +1424,26 @@ async function main(): Promise<void> {
     console.log(`[buckets] ${bucketRejected.length} ligne(s) rejetée(s) (année hors bucket générationnel)`);
   }
 
+  // Passe 6 — split neuf/occasion : pour les modèles ayant à la fois ≥1 obs
+  // dealer Neuf et ≥3 obs FB occasion, on suffixe model_canonical en "(Neuf)"
+  // et "(Occasion)" pour produire 2 profils distincts en aval.
+  const newUsedConfig = pipelineConfig.new_used_split ?? {
+    enabled: false,
+    min_obs_dealer_for_split: 1,
+    min_obs_fb_for_split: 3,
+  };
+  const splitOutput = applyNewUsedSplit(keptAfterBuckets, newUsedConfig);
+  console.log(
+    `[new-used-split] ${splitOutput.splitsApplied.length} modèle(s) splitté(s) en neuf/occasion`,
+  );
+  const splitsApplied: SplitAppliedEntry[] = splitOutput.splitsApplied;
+
   const {
     profiles: rawProfiles,
     unfinishable,
     qualityRejected,
     outlierRejections,
-  } = buildProfiles(keptAfterBuckets);
+  } = buildProfiles(splitOutput.rows);
   console.log(
     `[calib] profiles=${rawProfiles.length} unfinishable=${unfinishable.length} qualityRejected=${qualityRejected.length} outliersMad=${outlierRejections.length}`,
   );
@@ -1492,6 +1590,7 @@ async function main(): Promise<void> {
     insufficientBuckets,
     bucketRejectedTotal: bucketRejected.length,
     outlierRejections,
+    splitsApplied,
   });
 
   console.log("=== Pipeline terminé ===");

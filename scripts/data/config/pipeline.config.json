@@ -85,6 +85,21 @@
     "fb_price_tolerance_ratio": 0.05,
     "comment": "Doublon FB = même seller+brand+model+year ET prix corrigés à ±5%."
   },
+  "new_used_split": {
+    "enabled": true,
+    "comment": "Si un modèle a >=1 obs dealer (vehicle_status='neuf') ET >=3 obs FB occasion, on crée 2 profils distincts: 'Modèle (Neuf)' calibré sur dealer year=current, et 'Modèle (Occasion)' calibré sur FB. Évite la pollution baseline + permet decay calibré occasion réaliste.",
+    "min_obs_dealer_for_split": 1,
+    "min_obs_fb_for_split": 3
+  },
+  "decay_calibration": {
+    "enabled": true,
+    "comment": "Calibrage du decay annuel (taux de dépréciation) par régression log-linéaire sur les obs du profil. Remplace le decay générique 10%/an quand on a assez de signal. Garde le clip [0.04, 0.20] pour rejeter les decays aberrants. R² minimum 0.30 pour considérer la régression fiable.",
+    "min_obs_for_calibration": 4,
+    "min_year_span_for_calibration": 4,
+    "min_r_squared": 0.30,
+    "default_decay_rate": 0.10,
+    "decay_clip_range": [0.04, 0.20]
+  },
   "outlier_filter": {
     "enabled": true,
     "method": "mad_modified_zscore",

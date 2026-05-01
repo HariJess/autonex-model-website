@@ -1,14 +1,14 @@
 # Ingestion reference profiles vague v1
 
-Date génération: 2026-05-01T08:25:24.543Z
+Date génération: 2026-05-01T08:53:42.307Z
 Pipeline: `scripts/data/build-reference-profiles.ts`
 
 ## 1. Résumé exécutif
 
-- **Profils générés**: 109
-  - Tier A (strong): 12
-  - Tier B (moderate): 44
-  - Tier C (anchor): 53
+- **Profils générés**: 113
+  - Tier A (strong): 11
+  - Tier B (moderate): 45
+  - Tier C (anchor): 57
 - **Marques couvertes**: 25
 - **Lignes lues**: 5509
 - **Lignes rejetées**: 4681
@@ -53,17 +53,16 @@ Pipeline: `scripts/data/build-reference-profiles.ts`
 | Marque | Modèle | Body | Baseline year | Baseline prix | Decay/an | Sample | CV |
 |---|---|---|---:|---:|---:|---:|---:|
 | Audi | Q5 | suv | 2013 | 50.2 MAr | 10.00 % | 9 | 18.3 % |
-| Chevrolet | Captiva | suv | 2015 | 37.2 MAr | 10.00 % | 21 | 11.2 % |
 | Chevrolet | Cruze | sedan | 2015 | 26.8 MAr | 10.00 % | 16 | 10.2 % |
-| Hyundai | Starex | van | 2013 | 48.4 MAr | 10.00 % | 10 | 26.4 % |
-| Hyundai | Terracan | suv | 2007 | 25.4 MAr | 6.03 % | 6 | 15.6 % |
-| Hyundai | Tucson (2004-2015) | suv | 2012 | 39.5 MAr | 10.00 % | 12 | 26.1 % |
-| Kia | Picanto | hatchback | 2014 | 25.7 MAr | 10.00 % | 14 | 24.1 % |
-| Kia | Sportage | suv | 2019 | 56.0 MAr | 10.00 % | 22 | 24.6 % |
-| Peugeot | 307 | sedan | 2007 | 15.5 MAr | 10.00 % | 5 | 22.4 % |
-| SsangYong | Rexton | suv | 2014 | 36.1 MAr | 10.00 % | 9 | 23.0 % |
+| Hyundai | Starex | van | 2013 | 48.4 MAr | 6.65 % | 10 | 26.4 % |
+| Hyundai | Terracan | suv | 2007 | 25.4 MAr | 10.00 % | 6 | 15.6 % |
+| Hyundai | Tucson (2004-2015) | suv | 2012 | 39.5 MAr | 10.28 % | 12 | 26.1 % |
+| Kia | Picanto | hatchback | 2014 | 25.7 MAr | 5.05 % | 14 | 24.1 % |
+| Kia | Sportage | suv | 2019 | 56.0 MAr | 5.40 % | 22 | 24.6 % |
+| Peugeot | 307 | sedan | 2007 | 15.5 MAr | 7.40 % | 5 | 22.4 % |
+| SsangYong | Rexton | suv | 2014 | 36.1 MAr | 5.05 % | 9 | 23.0 % |
 | Suzuki | Jimny (2019-2026) | suv | 2025 | 113.0 MAr | 10.00 % | 9 | 7.9 % |
-| Volkswagen | Tiguan | suv | 2014 | 54.1 MAr | 10.00 % | 12 | 16.9 % |
+| Volkswagen | Tiguan | suv | 2014 | 54.1 MAr | 6.58 % | 12 | 16.9 % |
 
 ## 4. Profils Tier C (faible confiance)
 
@@ -83,6 +82,7 @@ Pipeline: `scripts/data/build-reference-profiles.ts`
 | Great Wall | Tank 500 | suv | 2025 | 344.9 MAr | 10.00 % | 2 | 18.4 % |
 | Great Wall | Tank 700 | suv | 2025 | 449.9 MAr | 10.00 % | 2 | 15.7 % |
 | Great Wall | Wey 80 | suv | 2025 | 339.9 MAr | 10.00 % | 1 | 0.0 % |
+| Great Wall | Wingle 5 (Neuf) | pickup | 2025 | 99.9 MAr | 10.00 % | 2 | 7.1 % |
 | Great Wall | Wingle 7 | pickup | 2025 | 119.9 MAr | 10.00 % | 1 | 0.0 % |
 | Haval | Dargo | suv | 2025 | 187.4 MAr | 10.00 % | 2 | 5.7 % |
 | Haval | H6 GT | suv | 2025 | 199.9 MAr | 10.00 % | 1 | 0.0 % |
@@ -91,6 +91,7 @@ Pipeline: `scripts/data/build-reference-profiles.ts`
 | Hyundai | i40 | sedan | 2016 | 38.9 MAr | 10.00 % | 2 | 18.4 % |
 | Hyundai | Maxcruz | suv | 2014 | 63.4 MAr | 10.00 % | 2 | 0.0 % |
 | Hyundai | Veloster | coupe | 2014 | 33.9 MAr | 10.00 % | 2 | 9.2 % |
+| Isuzu | D-Max (Neuf) | pickup | 2025 | 174.5 MAr | 10.00 % | 2 | 10.5 % |
 | Isuzu | MU-X | suv | 2025 | 258.2 MAr | 10.00 % | 1 | 0.0 % |
 | Jeep | Cherokee | suv | 2002 | 31.7 MAr | 10.00 % | 4 | 67.0 % |
 | Jeep | Grand Cherokee | suv | 2018 | 160.6 MAr | 10.00 % | 2 | 25.2 % |
@@ -98,6 +99,7 @@ Pipeline: `scripts/data/build-reference-profiles.ts`
 | Kia | Rio | other | 2010 | 28.5 MAr | 10.00 % | 2 | 12.4 % |
 | Mahindra | Scorpio | pickup | 2024 | 125.0 MAr | 10.00 % | 1 | 0.0 % |
 | Mahindra | XUV300 | other | 2024 | 125.0 MAr | 10.00 % | 1 | 0.0 % |
+| Mazda | BT-50 (Neuf) | pickup | 2025 | 191.5 MAr | 10.00 % | 1 | 0.0 % |
 | Mazda | CX-30 | suv | 2025 | 144.8 MAr | 10.00 % | 2 | 4.9 % |
 | Mazda | CX-60 | suv | 2025 | 249.8 MAr | 10.00 % | 1 | 0.0 % |
 | Mazda | CX-90 | suv | 2025 | 289.8 MAr | 10.00 % | 2 | 19.5 % |
@@ -112,6 +114,7 @@ Pipeline: `scripts/data/build-reference-profiles.ts`
 | Peugeot | 308 | sedan | 2010 | 11.9 MAr | 10.00 % | 2 | 72.6 % |
 | Peugeot | 309 | hatchback | 1992 | 7.9 MAr | 10.00 % | 2 | 0.0 % |
 | Renault | Avantime | van | 2002 | 8.4 MAr | 10.00 % | 2 | 7.4 % |
+| Renault | Duster (Neuf) | suv | 2025 | 97.5 MAr | 10.00 % | 1 | 0.0 % |
 | Renault | Koleos | suv | 2015 | 37.4 MAr | 10.00 % | 2 | 8.3 % |
 | Renault | Scenic | van | 2004 | 11.7 MAr | 10.00 % | 2 | 2.7 % |
 | Suzuki | Intruder 750 | other | 1997 | 10.6 MAr | 10.00 % | 2 | 0.0 % |
@@ -231,16 +234,15 @@ Détail: `scripts/data/output/unfinishable_profiles.csv`
 Total: 15
 
 Répartition par cause :
-- CV_TOO_HIGH : 8
+- CV_TOO_HIGH : 7
 - MODEL_BLACKLISTED : 3
-- PRICE_BELOW_FLOOR : 2
+- PRICE_BELOW_FLOOR : 3
 - YEAR_SPAN_TOO_WIDE : 2
 
 | Marque | Modèle | Baseline | Sample | CV | Span | Raison |
 |---|---|---:|---:|---:|---:|---|
 | BMW | X3 | 16.9 MAr | 4 | 107.3 % | 1 | CV_TOO_HIGH |
 | Chevrolet | Malibu | 33.2 MAr | 4 | 108.2 % | 1 | CV_TOO_HIGH |
-| Great Wall | Wingle 5 | 55.3 MAr | 6 | 109.7 % | 4 | CV_TOO_HIGH |
 | Hyundai | Tucson (2016-2026) | 127.6 MAr | 3 | 147.2 % | 3 | CV_TOO_HIGH |
 | Mercedes-Benz | GLK | 28.0 MAr | 2 | 94.3 % | 0 | CV_TOO_HIGH |
 | Nissan | X-Trail | 22.4 MAr | 4 | 103.0 % | 16 | CV_TOO_HIGH |
@@ -249,6 +251,7 @@ Répartition par cause :
 | Kia | Pride | 21.1 MAr | 21 | 77.4 % | 20 | MODEL_BLACKLISTED |
 | Land Rover | Range Rover Evoque | 84.5 MAr | 6 | 57.2 % | 1 | MODEL_BLACKLISTED |
 | Renault | Trafic | 11.6 MAr | 4 | 77.0 % | 0 | MODEL_BLACKLISTED |
+| Great Wall | Wingle 5 (Occasion) | 12.7 MAr | 4 | 77.0 % | 0 | PRICE_BELOW_FLOOR |
 | Mitsubishi | L200 | 37.1 MAr | 18 | 59.8 % | 20 | PRICE_BELOW_FLOOR |
 | Renault | Oroch | 44.0 MAr | 2 | 0.0 % | 0 | PRICE_BELOW_FLOOR |
 | BMW | Serie 3 | 56.4 MAr | 11 | 55.5 % | 28 | YEAR_SPAN_TOO_WIDE |
@@ -308,6 +311,43 @@ Méthode : mad_modified_zscore, threshold = 3.5, min_obs = 5, max_outlier_pct = 
 | Volkswagen | Tiguan | Giovanni Rakotoson | 2010 | 7.9 MAr | 43.6 MAr | 3.64 |
 | Volkswagen | Tiguan | Car for sell | 2012 | 8.6 MAr | 43.6 MAr | 3.57 |
 | Audi | Q5 | ? | 2015 | 95.0 MAr | 51.0 MAr | 3.55 |
+
+## 10e. Profils splittés Neuf/Occasion (passe 6)
+
+Total : 4 modèle(s) splitté(s).
+
+| Marque | Modèle original | n_dealer | n_fb | → Neuf baseline | → Occasion baseline | Decay neuf | Decay occasion |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Great Wall | Wingle 5 | 2 | 4 | 99.9 MAr (2025) | — | 10.0 % | — |
+| Isuzu | D-Max | 2 | 4 | 174.5 MAr (2025) | 68.2 MAr (2021) | 10.0 % | 10.0 % |
+| Mazda | BT-50 | 1 | 6 | 191.5 MAr (2025) | 127.4 MAr (2024) | 10.0 % | 10.7 % * |
+| Renault | Duster | 1 | 8 | 97.5 MAr (2025) | 58.7 MAr (2022) | 10.0 % | 4.7 % * |
+
+*`*` = decay calibré par régression log-linéaire (passe 7), sinon default 10 %.*
+
+## 10f. Decays calibrés vs default (passe 7)
+
+Total : 28 profil(s) avec decay calibré, 85 profil(s) avec decay default.
+
+Top decays calibrés (les plus éloignés du 10% générique) :
+
+| Marque | Modèle | Decay calibré | R² | Sample | Tier |
+|---|---|---:|---:|---:|---|
+| Haval | H6 | 16.7 % | 0.99 | 5 | B_moderate |
+| Chevrolet | Captiva | 4.2 % | 0.64 | 21 | B_moderate |
+| Renault | Duster (Occasion) | 4.7 % | 0.13 | 8 | B_moderate |
+| Kia | Picanto | 5.1 % | 0.33 | 14 | A_strong |
+| SsangYong | Rexton | 5.1 % | 0.50 | 9 | A_strong |
+| BMW | 320d | 14.9 % | 0.83 | 4 | B_moderate |
+| Toyota | RAV4 | 5.1 % | 0.42 | 9 | B_moderate |
+| Hyundai | Galloper | 14.8 % | 0.55 | 4 | B_moderate |
+| Kia | Sportage | 5.4 % | 0.76 | 22 | A_strong |
+| Hyundai | Accent | 6.1 % | 0.39 | 7 | B_moderate |
+| Citroen | C4 | 13.8 % | 0.84 | 6 | B_moderate |
+| Volkswagen | Tiguan | 6.6 % | 0.71 | 12 | A_strong |
+| Hyundai | Grand Starex | 6.6 % | 0.47 | 4 | B_moderate |
+| Hyundai | Starex | 6.7 % | 0.77 | 10 | A_strong |
+| Haval | Jolion | 12.7 % | 0.98 | 4 | B_moderate |
 
 ## 11. Migrations SQL
 
