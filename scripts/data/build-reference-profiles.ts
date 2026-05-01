@@ -58,7 +58,22 @@ import {
   type ProfileRow,
 } from "./lib/generate-sql";
 
-import { pipelineConfig, brandConfig, modelBlacklistConfig, type PlausibilityFloorRule } from "./lib/configs";
+import {
+  pipelineConfig,
+  brandConfig,
+  modelBlacklistConfig,
+  modelGenerationsConfig,
+  type PlausibilityFloorRule,
+} from "./lib/configs";
+import {
+  applyGenerationBuckets,
+  getBucketsForModel,
+  parseBucketedModelName,
+} from "./lib/generation-buckets";
+import {
+  applyMadOutlierFilter,
+  type OutlierFilterOptions,
+} from "./lib/outlier-filter";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
@@ -97,6 +112,11 @@ type NormalizedRow = RawObservation & {
   fuel_canonical: string | null;
   transmission_canonical: string | null;
   price_ar_corrected: number | null;
+  // Renseignés uniquement après bucketing générationnel (passe 4) pour les
+  // modèles listés dans `model_generations.json`. Permet la traçabilité dans
+  // les rapports et le lookup `min_obs` par bucket lors de la calibration.
+  _original_model?: string;
+  _generation_bucket_label?: string;
 };
 
 type RejectedRow = NormalizedRow & {
@@ -125,6 +145,9 @@ function readInputs(): RawObservation[] {
   out.push(...readFb(resolve(INPUTS_DIR, "fb_extractions_v1.csv")));
   out.push(...readOccasions(resolve(INPUTS_DIR, "occasions_structured_v1.csv")));
   out.push(...readDealers(resolve(INPUTS_DIR, "dealers_v1.csv")));
+  // Sprint 2 — extractions LLM (sortie de `npm run data:llm-extract`).
+  // Source optionnelle : ne casse pas le pipeline si le fichier est absent.
+  out.push(...readLlmExtractions(resolve(OUTPUT_DIR, "llm_extractions.csv")));
   return out;
 }
 
@@ -223,6 +246,55 @@ function readDealers(path: string): RawObservation[] {
       seller_name: r.seller_name || null,
       source_url: null,
       observed_at: null,
+      raw_text: null,
+    };
+  });
+}
+
+/**
+ * Sprint 2 — lit `scripts/data/output/llm_extractions.csv` (sortie de
+ * `run-llm-extraction.ts`). Les colonnes sont déjà structurées par le LLM :
+ * brand/model/year/mileage_km/price_ar/etc. Le prix est garanti en Ariary
+ * (le system prompt force la conversion Fmg→Ar côté LLM), donc currency
+ * detected = "AR".
+ *
+ * Mapping vers la source canonique "fb_scrap" pour bénéficier du même
+ * traitement (coefficient -12 % FB, dédoublonnage par seller, cap vendeur).
+ * source_detail = "fb_scrap_llm" pour traçabilité dans les rapports.
+ */
+function readLlmExtractions(path: string): RawObservation[] {
+  if (!existsSync(path)) {
+    console.warn(`[llm] fichier absent (skip): ${path}`);
+    return [];
+  }
+  const rows = parseCsv(readFileSync(path, "utf8"));
+  console.log(`[llm] lignes lues: ${rows.length}`);
+  return rows.map((r) => {
+    // price_ar est déjà numérique (sortie LLM normalisée Ariary). On passe
+    // par parsePriceToAriary pour profiter du parsing tolérant aux séparateurs
+    // et du fallback null. La devise déclarée est "AR" : pas de conversion.
+    const { price_ar } = parsePriceToAriary(r.price_ar, "AR");
+    return {
+      source: "fb_scrap" as const,
+      source_detail: "fb_scrap_llm",
+      vehicle_status: "occasion" as const,
+      brand_raw: (r.brand || "").trim(),
+      model_raw: (r.model || "").trim() || null,
+      version: null,
+      year: parseYear(r.year),
+      km: parseKm(r.mileage_km),
+      price_ar_raw: price_ar,
+      currency_detected: "AR" as const,
+      fuel_raw: r.fuel_type || null,
+      transmission_raw: r.transmission || null,
+      body_style_raw: r.body_style || null,
+      city: r.city || null,
+      condition: r.condition || null,
+      seller_name: (r.sellerName || "").trim() || null,
+      source_url: r.facebookUrl || null,
+      observed_at: parseObservedAt(r.time),
+      // raw_text vide : le LLM a déjà filtré les acheteurs upstream (R6 ne
+      // déclenchera pas, c'est intentionnel).
       raw_text: null,
     };
   });
@@ -487,12 +559,24 @@ type QualityRejection = {
   reason_detail: string;
 };
 
+/** Passe 5 — outlier rejeté par le filtre MAD pour un profil donné. */
+type OutlierRejection = {
+  brand: string;
+  model: string;
+  seller_name: string | null;
+  year: number | null;
+  price_ar: number;
+  modified_z: number;
+  median: number;
+};
+
 function buildProfiles(
   rows: NormalizedRow[],
 ): {
   profiles: CalibratedProfile[];
   unfinishable: { brand: string; model: string; reason: string; sample: number }[];
   qualityRejected: QualityRejection[];
+  outlierRejections: OutlierRejection[];
 } {
   // Groupement par (brand, model)
   const groups = new Map<string, NormalizedRow[]>();
@@ -506,6 +590,18 @@ function buildProfiles(
   const profiles: CalibratedProfile[] = [];
   const unfinishable: { brand: string; model: string; reason: string; sample: number }[] = [];
   const qualityRejected: QualityRejection[] = [];
+  const outlierRejections: OutlierRejection[] = [];
+
+  // Passe 5 — options du filtre outlier MAD. Lues dans pipeline.config.json
+  // avec valeurs par défaut sûres si la section n'existe pas (rétrocompat).
+  const outlierFilterOptions: OutlierFilterOptions = {
+    enabled: pipelineConfig.outlier_filter?.enabled ?? false,
+    threshold: pipelineConfig.outlier_filter?.threshold ?? 3.5,
+    minObservationsForFilter:
+      pipelineConfig.outlier_filter?.min_observations_for_filter ?? 5,
+    maxOutlierPct: pipelineConfig.outlier_filter?.max_outlier_pct ?? 0.2,
+  };
+  const logOutliers = pipelineConfig.outlier_filter?.log_rejected ?? false;
 
   const calibOpts = {
     default_annual_depreciation_rate: pipelineConfig.calibration.default_annual_depreciation_rate,
@@ -527,14 +623,60 @@ function buildProfiles(
 
   for (const [key, list] of groups.entries()) {
     const [brand, model] = key.split("|");
-    const obs: Observation[] = list
-      .filter((r) => r.year !== null && r.price_ar_corrected !== null)
-      .map((r) => ({
-        year: r.year as number,
-        price_ar: r.price_ar_corrected as number,
-        source: r.source,
-        vehicle_status: r.vehicle_status,
-      }));
+    // Lignes valides pour la calibration (année + prix corrigé non nuls).
+    const validRows = list.filter(
+      (r) => r.year !== null && r.price_ar_corrected !== null,
+    );
+    // Passe 4 — bucketing : si le modèle est bucketé, le bucket impose son
+    // propre `min_obs`. Si le bucket n'a pas assez d'observations, on rejette
+    // immédiatement (ne sert à rien d'appeler la calibration).
+    const parsed = parseBucketedModelName(model);
+    if (parsed) {
+      const buckets = getBucketsForModel(brand, parsed.originalModel, modelGenerationsConfig);
+      const bucket = buckets?.find((b) => b.label === parsed.label);
+      if (bucket && validRows.length < bucket.min_obs) {
+        unfinishable.push({
+          brand,
+          model,
+          reason: `INSUFFICIENT_BUCKET_OBS (sample=${validRows.length} < min_obs=${bucket.min_obs} pour bucket ${bucket.label})`,
+          sample: validRows.length,
+        });
+        continue;
+      }
+    }
+    // Passe 5 — filtre outlier MAD : on ré-écrit l'ensemble des observations
+    // utilisées pour la calibration en éjectant les valeurs aberrantes (modified
+    // z-score > threshold). Le filtre s'auto-désactive si trop d'outliers
+    // (signal de bimodalité ou de bucket à splitter, voir module).
+    const filterResult = applyMadOutlierFilter(
+      validRows,
+      (r) => r.price_ar_corrected ?? 0,
+      outlierFilterOptions,
+    );
+    if (filterResult.applied && filterResult.rejected.length > 0) {
+      if (logOutliers) {
+        console.log(
+          `[outlier-mad] ${brand} ${model}: ${filterResult.rejected.length}/${validRows.length} obs rejetées (median=${(filterResult.median / 1e6).toFixed(1)}M, mad=${(filterResult.mad / 1e6).toFixed(1)}M)`,
+        );
+      }
+      for (const r of filterResult.rejected) {
+        outlierRejections.push({
+          brand,
+          model,
+          seller_name: r.row.seller_name,
+          year: r.row.year,
+          price_ar: r.row.price_ar_corrected ?? 0,
+          modified_z: r.modifiedZ,
+          median: filterResult.median,
+        });
+      }
+    }
+    const obs: Observation[] = filterResult.kept.map((r) => ({
+      year: r.year as number,
+      price_ar: r.price_ar_corrected as number,
+      source: r.source,
+      vehicle_status: r.vehicle_status,
+    }));
     const calib = calibrateGroup(obs, calibOpts);
     if (!calib) {
       unfinishable.push({
@@ -603,10 +745,12 @@ function buildProfiles(
       }
     }
 
-    // Body / fuel / transmission par majorité
-    const bodyMode = modeOf(list.map((r) => r.body_canonical));
-    const fuelMode = modeOf(list.map((r) => r.fuel_canonical));
-    const transMode = modeOf(list.map((r) => r.transmission_canonical));
+    // Body / fuel / transmission par majorité — calculés sur les rows
+    // effectivement utilisées pour la calibration (post-filtre outlier MAD)
+    // afin que le profil reflète la même cohérence que la baseline.
+    const bodyMode = modeOf(filterResult.kept.map((r) => r.body_canonical));
+    const fuelMode = modeOf(filterResult.kept.map((r) => r.fuel_canonical));
+    const transMode = modeOf(filterResult.kept.map((r) => r.transmission_canonical));
 
     profiles.push({
       make_name: brand,
@@ -629,7 +773,7 @@ function buildProfiles(
 
   // Tri stable
   profiles.sort((a, b) => a.make_name.localeCompare(b.make_name) || a.model_name.localeCompare(b.model_name));
-  return { profiles, unfinishable, qualityRejected };
+  return { profiles, unfinishable, qualityRejected, outlierRejections };
 }
 
 /**
@@ -833,6 +977,8 @@ function writeMigrations(
 
 function writeReport(args: {
   totalLinesPerSource: Record<Source, number>;
+  /** Sprint 2 : breakdown détaillé par source_detail (fb_scrap vs fb_scrap_llm). */
+  linesPerSourceDetail: Record<string, number>;
   rejectedPerCode: Record<string, number>;
   cappedSellers: { seller: string; dropped: number }[];
   cappedTotal: number;
@@ -847,6 +993,14 @@ function writeReport(args: {
   blacklistedBrands: string[];
   blacklistedProfilesCount: number;
   qualityRejected: QualityRejection[];
+  /** Passe 4 — profils issus du bucketing générationnel (model_name suffixé). */
+  generationProfiles: CalibratedProfile[];
+  /** Passe 4 — buckets dont sample < min_obs (rejetés). */
+  insufficientBuckets: { brand: string; model: string; reason: string; sample: number }[];
+  /** Passe 4 — total lignes rejetées car année hors bucket (code R-GEN). */
+  bucketRejectedTotal: number;
+  /** Passe 5 — observations rejetées par le filtre outlier MAD. */
+  outlierRejections: OutlierRejection[];
 }): void {
   const { profiles } = args;
   const tierA = profiles.filter((p) => p.tier === "A_strong");
@@ -886,6 +1040,21 @@ function writeReport(args: {
     lines.push(`| ${src} | ${args.totalLinesPerSource[src]} |`);
   }
   lines.push("");
+  // Sprint 2 — breakdown source_detail : permet de voir la part LLM vs regex
+  // dans la source `fb_scrap`.
+  const detailEntries = Object.entries(args.linesPerSourceDetail).sort(
+    (a, b) => b[1] - a[1],
+  );
+  if (detailEntries.length > 0) {
+    lines.push("### Détail par `source_detail`");
+    lines.push("");
+    lines.push("| source_detail | Lignes lues |");
+    lines.push("|---|---:|");
+    for (const [detail, count] of detailEntries) {
+      lines.push(`| ${detail} | ${count} |`);
+    }
+    lines.push("");
+  }
   lines.push("### Rejets par code");
   lines.push("");
   lines.push("| Code | Description | Count |");
@@ -899,6 +1068,7 @@ function writeReport(args: {
     R6: "FB acheteur (mitady/recherche)",
     R7: "année manquante (dealer Neuf si REJECT)",
     R8: "doublon FB",
+    "R-GEN": "année hors bucket générationnel (passe 4)",
     CAP: "cap vendeur dépassé",
   };
   for (const [code, count] of Object.entries(args.rejectedPerCode).sort()) {
@@ -1011,6 +1181,78 @@ function writeReport(args: {
     }
   }
   lines.push("");
+  // Section 10c — passe 4 : profils générationnels (modèles bucketés via
+  // `model_generations.json`) et buckets rejetés faute d'observations.
+  lines.push("## 10c. Profils générationnels (passe 4)");
+  lines.push("");
+  lines.push(
+    `Total : ${args.generationProfiles.length} profil(s) issus de bucketing générationnel.`,
+  );
+  lines.push(
+    `Lignes rejetées car année hors bucket (code R-GEN) : ${args.bucketRejectedTotal}.`,
+  );
+  lines.push("");
+  if (args.generationProfiles.length > 0) {
+    lines.push("| Marque | Modèle (gen) | Sample | Baseline | Tier |");
+    lines.push("|---|---|---:|---:|---|");
+    const sortedGen = [...args.generationProfiles].sort(
+      (a, b) => a.make_name.localeCompare(b.make_name) || a.model_name.localeCompare(b.model_name),
+    );
+    for (const p of sortedGen) {
+      const baseline = `${(p.baseline_price_mga / 1_000_000).toFixed(1)} MAr`;
+      lines.push(`| ${p.make_name} | ${p.model_name} | ${p.sample_size} | ${baseline} | ${p.tier} |`);
+    }
+  } else {
+    lines.push("*(aucun profil bucketé calibré — vérifier la config `model_generations.json`)*");
+  }
+  lines.push("");
+  if (args.insufficientBuckets.length > 0) {
+    lines.push("Buckets sans assez d'observations (rejetés en `INSUFFICIENT_BUCKET_OBS`) :");
+    lines.push("");
+    const sortedBuckets = [...args.insufficientBuckets].sort(
+      (a, b) => a.brand.localeCompare(b.brand) || a.model.localeCompare(b.model),
+    );
+    for (const b of sortedBuckets) {
+      lines.push(`- ${b.brand} ${b.model} — sample=${b.sample}, ${b.reason}`);
+    }
+    lines.push("");
+  }
+  // Section 10d — passe 5 : outliers individuellement rejetés par le filtre
+  // MAD (modified z-score) au sein de chaque profil, avant calibration.
+  lines.push("## 10d. Outliers rejetés par filtre MAD (passe 5)");
+  lines.push("");
+  const filterCfg = pipelineConfig.outlier_filter;
+  const profilesWithOutliers = new Set(
+    args.outlierRejections.map((r) => `${r.brand}|${r.model}`),
+  );
+  lines.push(
+    `Total : ${args.outlierRejections.length} observation(s) rejetée(s) sur ${profilesWithOutliers.size} profil(s) calibré(s).`,
+  );
+  if (filterCfg) {
+    lines.push(
+      `Méthode : ${filterCfg.method}, threshold = ${filterCfg.threshold}, min_obs = ${filterCfg.min_observations_for_filter}, max_outlier_pct = ${filterCfg.max_outlier_pct}.`,
+    );
+  }
+  lines.push("");
+  if (args.outlierRejections.length > 0) {
+    lines.push("| Marque | Modèle | Vendeur | Année | Prix observé | Médiane profil | Modified Z |");
+    lines.push("|---|---|---|---:|---:|---:|---:|");
+    const sortedOutliers = [...args.outlierRejections].sort(
+      (a, b) => b.modified_z - a.modified_z,
+    );
+    for (const o of sortedOutliers) {
+      const seller = o.seller_name?.trim() || "?";
+      const yearStr = o.year !== null ? `${o.year}` : "?";
+      const priceStr = `${(o.price_ar / 1_000_000).toFixed(1)} MAr`;
+      const medianStr = `${(o.median / 1_000_000).toFixed(1)} MAr`;
+      lines.push(
+        `| ${o.brand} | ${o.model} | ${seller} | ${yearStr} | ${priceStr} | ${medianStr} | ${o.modified_z.toFixed(2)} |`,
+      );
+    }
+  } else {
+    lines.push("*(aucun outlier détecté — soit filtre désactivé, soit data déjà propre)*");
+  }
+  lines.push("");
   lines.push("## 11. Migrations SQL");
   lines.push("");
   const toRel = (p: string) =>
@@ -1061,6 +1303,11 @@ async function main(): Promise<void> {
     manual_structured: rawAll.filter((r) => r.source === "manual_structured").length,
     dealer: rawAll.filter((r) => r.source === "dealer").length,
   };
+  // Sprint 2 — breakdown source_detail (fb_scrap regex vs fb_scrap_llm).
+  const linesPerSourceDetail: Record<string, number> = {};
+  for (const r of rawAll) {
+    linesPerSourceDetail[r.source_detail] = (linesPerSourceDetail[r.source_detail] ?? 0) + 1;
+  }
 
   const rawWithDefault = applyDealerNeufYearDefault(rawAll);
   const unknownTerms = new Map<string, UnknownTerm>();
@@ -1075,8 +1322,33 @@ async function main(): Promise<void> {
   const { kept: keptAfterDedup, dups } = dedupFb(keptAfterCap);
   console.log(`[dedup] kept=${keptAfterDedup.length} dups=${dups.length}`);
 
-  const { profiles: rawProfiles, unfinishable, qualityRejected } = buildProfiles(keptAfterDedup);
-  console.log(`[calib] profiles=${rawProfiles.length} unfinishable=${unfinishable.length} qualityRejected=${qualityRejected.length}`);
+  // Passe 4 — bucketing générationnel : pour les modèles listés dans
+  // `model_generations.json`, on ré-écrit `model_canonical` avec un suffixe
+  // `(YYYY-YYYY)` afin que la calibration produise un profil distinct par
+  // génération. Les lignes dont l'année tombe hors de tous les buckets sont
+  // rejetées (code R-GEN).
+  const { kept: keptAfterBuckets, rejected: bucketRejectedRaw } = applyGenerationBuckets(
+    keptAfterDedup,
+    modelGenerationsConfig,
+  );
+  const bucketRejected: RejectedRow[] = bucketRejectedRaw.map((entry) => ({
+    ...entry.row,
+    rejection_code: "R-GEN",
+    rejection_reason: entry.reason,
+  }));
+  if (bucketRejected.length > 0) {
+    console.log(`[buckets] ${bucketRejected.length} ligne(s) rejetée(s) (année hors bucket générationnel)`);
+  }
+
+  const {
+    profiles: rawProfiles,
+    unfinishable,
+    qualityRejected,
+    outlierRejections,
+  } = buildProfiles(keptAfterBuckets);
+  console.log(
+    `[calib] profiles=${rawProfiles.length} unfinishable=${unfinishable.length} qualityRejected=${qualityRejected.length} outliersMad=${outlierRejections.length}`,
+  );
 
   // Filtres qualité passe 3 — appliqués après calibration et tier assignment :
   //   1. plausibility_floors  → rejet si baseline_price < floor segment
@@ -1136,10 +1408,12 @@ async function main(): Promise<void> {
     console.log(`[blacklist] ${blacklistedProfiles.length} profil(s) retiré(s) du seed: ${[...new Set(blacklistedProfiles.map((p) => p.make_name))].join(", ")}`);
   }
 
-  // Outputs
-  writeNormalizedDataset(keptAfterDedup);
+  // Outputs — on écrit le dataset après bucketing (model_canonical déjà
+  // suffixé pour les modèles bucketés) afin que `normalized_dataset.csv`
+  // reflète exactement les groupes utilisés en calibration.
+  writeNormalizedDataset(keptAfterBuckets);
   writeCalibratedProfiles(profiles);
-  writeRejectedRows([...rejectedFilters, ...capped, ...dups]);
+  writeRejectedRows([...rejectedFilters, ...capped, ...dups, ...bucketRejected]);
   writeUnknownTerms(unknownTerms);
   writeUnfinishable(unfinishable, qualityRejected);
 
@@ -1183,7 +1457,7 @@ async function main(): Promise<void> {
 
   // Report
   const rejectedPerCode: Record<string, number> = {};
-  for (const r of [...rejectedFilters, ...capped, ...dups]) {
+  for (const r of [...rejectedFilters, ...capped, ...dups, ...bucketRejected]) {
     rejectedPerCode[r.rejection_code] = (rejectedPerCode[r.rejection_code] ?? 0) + 1;
   }
 
@@ -1191,8 +1465,15 @@ async function main(): Promise<void> {
   const unknownBrands = [...unknownTerms.values()].filter((t) => t.kind === "brand").length;
   const unknownModels = [...unknownTerms.values()].filter((t) => t.kind === "model").length;
 
+  // Passe 4 — buckets : on isole les profils issus du bucketing (suffixe
+  // `(YYYY-YYYY)`) et les buckets sous-peuplés (rejetés via
+  // INSUFFICIENT_BUCKET_OBS) pour la section 10c du rapport.
+  const generationProfiles = profiles.filter((p) => parseBucketedModelName(p.model_name) !== null);
+  const insufficientBuckets = unfinishable.filter((u) => u.reason.startsWith("INSUFFICIENT_BUCKET_OBS"));
+
   writeReport({
     totalLinesPerSource,
+    linesPerSourceDetail,
     rejectedPerCode,
     cappedSellers: topCappedSellers,
     cappedTotal: capped.length,
@@ -1207,6 +1488,10 @@ async function main(): Promise<void> {
     blacklistedBrands: pipelineConfig.brand_blacklist_for_seed?.brands ?? [],
     blacklistedProfilesCount: blacklistedProfiles.length,
     qualityRejected,
+    generationProfiles,
+    insufficientBuckets,
+    bucketRejectedTotal: bucketRejected.length,
+    outlierRejections,
   });
 
   console.log("=== Pipeline terminé ===");

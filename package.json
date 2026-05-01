@@ -42,6 +42,8 @@
     "catalog:overrides:apply": "node ./scripts/catalog/apply-manual-overrides.mjs",
     "optimize:hero": "node ./scripts/optimize-hero.mjs",
     "build:reference-profiles": "tsx scripts/data/build-reference-profiles.ts",
+    "data:llm-extract": "tsx scripts/data/run-llm-extraction.ts",
+    "data:build-profiles": "tsx scripts/data/build-reference-profiles.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -50,6 +52,7 @@
     ]
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",

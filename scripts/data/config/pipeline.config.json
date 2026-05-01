@@ -85,6 +85,15 @@
     "fb_price_tolerance_ratio": 0.05,
     "comment": "Doublon FB = même seller+brand+model+year ET prix corrigés à ±5%."
   },
+  "outlier_filter": {
+    "enabled": true,
+    "method": "mad_modified_zscore",
+    "threshold": 3.5,
+    "min_observations_for_filter": 5,
+    "max_outlier_pct": 0.20,
+    "comment": "Filtre outlier MAD (Median Absolute Deviation). Pour chaque profil avec >= min_observations_for_filter obs, on calcule la médiane et le MAD des prix. Toute obs avec un modified z-score > threshold est considérée comme outlier et exclue de la calibration. Si le pourcentage d'outliers dépasse max_outlier_pct, on n'applique pas le filtre (suspect : peut-être que la médiane elle-même est fausse). Threshold 3.5 = standard Iglewicz & Hoaglin 1993.",
+    "log_rejected": true
+  },
   "conflict_strategy": "DO_UPDATE",
   "expected_km_per_year_default": 15000
 }

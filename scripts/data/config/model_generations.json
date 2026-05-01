@@ -1,0 +1,47 @@
+{
+  "comment": "Bucketing générationnel : pour les modèles multi-génération, on calibre des profils distincts par bucket d'années. Chaque bucket devient un (make, model+suffix) séparé dans la table reference_profiles. Le suffix est appliqué automatiquement (ex: 'Tucson' devient 'Tucson (2004-2015)' et 'Tucson (2016-2026)').",
+  "rationale": "Un Tucson phase 1 (2008-2015) et un Tucson phase 4 (2020-2025) ont des baselines très différentes (40M vs 145M). Les calibrer ensemble produit CV>1.0 et fait planter les filtres qualité. Les séparer produit 2 profils précis avec CV<30%.",
+  "generations": {
+    "Hyundai": {
+      "Tucson": [
+        { "from": 2004, "to": 2015, "label": "2004-2015", "min_obs": 5 },
+        { "from": 2016, "to": 2026, "label": "2016-2026", "min_obs": 3 }
+      ],
+      "Santa Fe": [
+        { "from": 2001, "to": 2018, "label": "2001-2018", "min_obs": 5 },
+        { "from": 2019, "to": 2026, "label": "2019-2026", "min_obs": 2 }
+      ]
+    },
+    "Suzuki": {
+      "Jimny": [
+        { "from": 1998, "to": 2018, "label": "1998-2018", "min_obs": 5 },
+        { "from": 2019, "to": 2026, "label": "2019-2026", "min_obs": 5 }
+      ]
+    },
+    "Nissan": {
+      "Navara": [
+        { "from": 2005, "to": 2015, "label": "2005-2015", "min_obs": 3 },
+        { "from": 2016, "to": 2026, "label": "2016-2026", "min_obs": 3 }
+      ],
+      "Patrol": [
+        { "from": 1995, "to": 2010, "label": "1995-2010", "min_obs": 4 },
+        { "from": 2011, "to": 2026, "label": "2011-2026", "min_obs": 3 }
+      ],
+      "NP300": [
+        { "from": 2005, "to": 2015, "label": "2005-2015", "min_obs": 5 }
+      ]
+    },
+    "Renault": {
+      "Clio": [
+        { "from": 2005, "to": 2014, "label": "2005-2014", "min_obs": 3 },
+        { "from": 2015, "to": 2026, "label": "2015-2026", "min_obs": 3 }
+      ]
+    },
+    "Volkswagen": {
+      "Touareg": [
+        { "from": 2002, "to": 2014, "label": "2002-2014", "min_obs": 4 },
+        { "from": 2015, "to": 2026, "label": "2015-2026", "min_obs": 3 }
+      ]
+    }
+  }
+}

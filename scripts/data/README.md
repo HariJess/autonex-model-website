@@ -83,6 +83,66 @@ scripts/data/
 
 Tests sous `src/test/dataPipeline*.test.ts` (≥ 30 cas, run via `npm run test`).
 
+## Extraction LLM (Sprint 2)
+
+Pour passer de ~5 % de rendement (regex) à 30-50 % sur les annonces FB, on
+ajoute un étage d'extraction LLM avec **Claude Haiku 4.5** + `tool_use` (output
+JSON garanti).
+
+### Pré-requis
+
+```bash
+# Copier le fichier d'exemple et y coller la vraie clé Anthropic.
+cp .env.local.example .env.local
+# Puis éditer ANTHROPIC_API_KEY dans .env.local
+
+# Déposer les CSV scrap FB dans inputs/
+#   - fb_scrap_v1_varotra_apr2026.csv      (~6473 lignes)
+#   - fb_scrap_v2_coinautomoto_jul2025_apr2026.csv (~5000 lignes)
+```
+
+### Lancer le batch
+
+```bash
+npm run data:llm-extract
+```
+
+Le batch :
+1. Charge les 2 CSV FB scrap depuis `scripts/data/inputs/`
+2. Dédoublonne par texte trimé (filtre les posts < 30 chars)
+3. Pour chaque post unique : check cache disque → sinon appel Claude Haiku
+4. Stop dès que le coût cumulé atteint `LLM_BUDGET_USD_MAX` ($5 par défaut)
+5. Écrit `scripts/data/output/llm_extractions.csv` (les vrais véhicules
+   uniquement — `is_vehicle_listing && !is_buyer_post`)
+6. Écrit `scripts/data/output/llm_budget_log.json` (tokens / $$ / erreurs)
+
+### Coût attendu
+
+- ~$0.001 par post (Haiku 4.5, ~330 input + ~80 output tokens / appel)
+- ~$5-7 pour les 6064 posts uniques estimés
+- Re-run sur le même corpus = $0 grâce au cache disque (`llm_cache.json`)
+
+### Composer avec le pipeline calibration
+
+```bash
+# Étape 1 : extraction LLM (1 fois, batch)
+npm run data:llm-extract
+
+# Étape 2 : calibration (consomme llm_extractions.csv en plus des autres sources)
+npm run data:build-profiles
+```
+
+`build-reference-profiles.ts` détecte automatiquement la présence de
+`scripts/data/output/llm_extractions.csv` et l'ajoute en source `fb_scrap`
+(`source_detail = "fb_scrap_llm"`). Le coefficient FB -12 % et le cap vendeur
+s'appliquent donc à ces lignes comme aux autres extractions FB.
+
+### Documentation détaillée
+
+Voir [`docs/llm-pipeline.md`](../../docs/llm-pipeline.md) pour le schéma
+tool_use, l'architecture du cache, les coûts par 1000 posts et la procédure
+d'ajout de nouveaux groupes FB.
+
 ## Vague 2 (à venir)
 
 Pour ingérer plus de data sans toucher au code :
