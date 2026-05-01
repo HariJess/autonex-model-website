@@ -1,0 +1,55 @@
+facebookUrl,time,sellerName,seller_type,brand,model,year,mileage_km,price_ar,currency_original,fuel_type,transmission,body_style,condition,city,confidence,notes
+manual_batch1_001,2026-03-31,John Rambeloson,private,BMW,320d EfficientDynamics,2012,,57000000,Ar,diesel,automatic,sedan,excellent,Antananarivo,0.95,F30 toit ouvrant immat etrangere
+manual_batch1_002,2026-03-30,John Rambeloson,private,Porsche,Macan S,2020,,1150000000,USD,diesel,automatic,suv,excellent,Antananarivo,0.92,Turbo V6 Diesel 230k USD env 1.15Md Ar
+manual_batch1_003,2026-03-26,Nirina Rz,reseller,Mazda,BT-50,2019,150280,70000000,Ar,diesel,manual,pickup,excellent,Antananarivo,0.95,2.2L diesel mutation offerte
+manual_batch1_004,2026-03-29,Stevy Marcus,private,Toyota,Fortuner,2018,60000,180000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,3.0L D4D 7 places cuir
+manual_batch1_005,2026-03-13,Niriana Razafindramisa,private,Renault,Duster,2012,,31000000,Ar,petrol,automatic,suv,good,Antananarivo,0.95,BVA sequentielle papier complet
+manual_batch1_006,2026-02-09,Hassan Aly,reseller,Honda,CR-V,2014,80000,65000000,Ar,petrol,automatic,suv,excellent,Antananarivo,0.95,IV 4x4 cuir clim glace camera
+manual_batch1_007,2026-01-31,Hassan Aly,reseller,Chery,Tiggo,2010,120000,25900000,Ar,petrol,manual,suv,good,Antananarivo,0.92,2L essence prix sacrifie
+manual_batch1_008,2026-01-29,Hassan Aly,reseller,Volkswagen,Amarok,2025,4000,255000000,Ar,diesel,automatic,pickup,excellent,Antananarivo,0.98,Bi turbo BVA10 sortie Sodiama
+manual_batch1_009,2026-03-26,Nirina Rz,reseller,Renault,Duster,2017,152423,35700000,Ar,petrol,manual,suv,excellent,Antananarivo,0.95,Ambiance 2wd entretenu concessionnaire
+manual_batch1_010,2026-02-14,Nirina Rz,reseller,Hyundai,Tucson,2010,83330,42000000,Ar,diesel,manual,suv,excellent,Antananarivo,0.95,X20 2wd ix35 generation
+manual_batch1_011,2026-01-20,Faneva Ranjalahy,private,Ford,Ranger,2018,88000,170000000,Ar,diesel,automatic,pickup,excellent,Antananarivo,0.95,T8 Wildtrack Kit Raptor 3.2L
+manual_batch1_012,2026-01-12,Mameno Aina Finiavana,private,Kia,Sportage,2014,,36600000,Ar,petrol,automatic,suv,excellent,Antananarivo,0.92,Sportage 3 full options 183m fmg
+manual_batch1_013,2025-12-05,Nirina Rz,reseller,Hyundai,iX35,2010,103390,33000000,Ar,diesel,manual,suv,good,Antananarivo,0.95,4wd boite manuelle bon etat
+manual_batch1_014,2026-04-25,Dream Car,reseller,Kia,Sorento,2017,,88000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Phase 5 Noblesse Edition full options
+manual_batch1_015,2026-03-08,Dream Car,reseller,Kia,Sorento,2017,81000,85000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Phase 5 4WD eco dynamics
+manual_batch1_016,2025-12-05,Dream Car,reseller,Mitsubishi,L200,2022,,91000000,Ar,diesel,manual,pickup,excellent,Antananarivo,0.97,Double cabine entretien CFAO
+manual_batch1_017,2025-08-27,Dream Car,reseller,Land Rover,Range Rover Evoque,2015,73350,105000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Prestige edition cuir
+manual_batch1_018,2025-05-24,Dream Car,reseller,Suzuki,Grand Vitara,2024,19000,112000000,Ar,petrol,automatic,suv,excellent,Antananarivo,0.97,GLX Hybrid full options
+manual_batch1_019,2025-03-18,Dream Car,reseller,Volkswagen,Touareg,2014,,102000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,3.0 V6 TDI 245ch CARAT
+manual_batch1_020,2025-02-09,Dream Car,reseller,Audi,Q3,2017,,98000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,S Line Quattro 184ch
+manual_batch1_021,2024-11-14,Dream Car,reseller,Land Rover,Range Rover Evoque,2015,,115000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Prestige Edition options max
+manual_batch1_022,2024-08-09,Dream Car,reseller,Mazda,BT-50,2025,470,149000000,Ar,diesel,manual,pickup,excellent,Antananarivo,0.97,New BT50 Platinum NEUVE
+manual_batch1_023,2024-07-20,Dream Car,reseller,Mitsubishi,L200,2023,25000,93000000,Ar,diesel,manual,pickup,excellent,Antananarivo,0.97,All New 154ch sortie sicam CFAO
+manual_batch1_024,2024-06-24,Dream Car,reseller,Audi,Q5,2012,,81000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Ambition luxe Quattro
+manual_batch1_025,2024-06-09,Dream Car,reseller,Kia,Sorento,2014,95000,53000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,New Sorento R phase 4 Limited
+manual_batch1_026,2024-05-24,Dream Car,reseller,Kia,Sorento,2014,,62000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,New Sorento R phase 4 Limited Edition
+manual_batch1_027,2024-05-24,Dream Car,reseller,Chevrolet,Cruze,2012,,27000000,Ar,diesel,automatic,sedan,excellent,Antananarivo,0.97,LTZ coupe 163ch BVA
+manual_batch1_028,2024-05-18,Dream Car,reseller,Mini,Cooper Countryman,2016,,57000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,ALL4 4 roues motrices full options
+manual_batch1_029,2024-03-30,Dream Car,reseller,Ford,Fiesta,2009,53000,25000000,Ar,petrol,manual,hatchback,excellent,Antananarivo,0.95,5 places sortie materauto
+manual_batch1_030,2024-03-05,Dream Car,reseller,Kia,Sorento,2014,,62000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Phase 4 Full Options
+manual_batch1_031,2024-02-25,Dream Car,reseller,Kia,Sorento,2012,178000,52000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,R Limited 4WD full beige
+manual_batch1_032,2024-02-14,Dream Car,reseller,Kia,Sorento,2012,,52000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,R Limited 4WD doublon avec batch1_031
+manual_batch1_033,2026-04-28,Madagas'Car Business,reseller,BMW,X6,2013,,88000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,xDrive30d 245ch Full options
+manual_batch1_034,2026-04-29,Madagas'Car Business,reseller,Land Rover,Range Rover Evoque,2015,,97000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,SD4 190ch options max Meridian
+manual_batch1_035,2026-04-25,Madagas'Car Business,reseller,Kia,Sorento,2014,,53000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,4x2 phase 4 Limited
+manual_batch1_036,2026-04-25,Madagas'Car Business,reseller,Kia,Sportage,2011,,48000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,03 Limited 4x4 full options
+manual_batch1_037,2026-04-16,Madagas'Car Business,reseller,SsangYong,Tivoli,2017,,51000000,Ar,petrol,automatic,suv,excellent,Antananarivo,0.95,Luxury Pack Red 1.6 essence
+manual_batch1_038,2026-04-29,Hari Zo,private,Volkswagen,Touareg,2014,128000,75000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,3.0 V6 TDI 245ch sortie Sodiama
+manual_batch1_039,2026-04-28,Nax Silver,private,Kia,Sorento,2014,,49000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,4R 4x4 Limited active eco-drive
+manual_batch1_040,2026-04-28,Harry Van,reseller,Hyundai,i30,2014,82000,36000000,Ar,diesel,manual,hatchback,excellent,Antananarivo,0.95,2e generation BVM 6 1.6 CRDi 110ch
+manual_batch1_041,2026-04-28,Sarah Sarah,private,Volkswagen,Amarok,2025,4000,237000000,Ar,diesel,automatic,pickup,excellent,Antananarivo,0.97,Bi Turbo BVA10 sortie Sodiama
+manual_batch1_042,2026-04-29,Akbaraly Akbaraly,reseller,Suzuki,Jimny,2025,10000,133000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Allgrip 5 portes BVA sous garantie CFAO
+manual_batch1_043,2026-04-27,Akbaraly Akbaraly,reseller,Toyota,Land Cruiser,2025,3000,550000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,LC 300 V6 BiTurbo 7 places
+manual_batch1_044,2026-04-28,Harry Van,reseller,Chevrolet,Captiva,2015,,41000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,Phase 2 LTZ Luxury 184ch 4x4 7 places
+manual_batch1_045,2026-04-28,Harry Van,reseller,Chevrolet,Captiva,2015,,41000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,Phase 2 LTZ Luxury identique au precedent doublon
+manual_batch1_046,2026-04-29,Mahery Hasina,private,Hyundai,Starex,2001,,19600000,Ar,diesel,manual,van,good,Antananarivo,0.92,SVX 9 places 4D56 turbo 98 millions FMG
+manual_batch1_047,2026-04-29,Akbaraly Akbaraly,reseller,Chevrolet,Captiva,2014,65000,37900000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,LT phase 2 4x4 7 places
+manual_batch1_048,2026-04-28,Harry Van,reseller,SsangYong,Rexton,2013,110500,45000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.95,W 4x4 pont rigide 200ch
+manual_batch1_049,2026-04-29,Larry Garcia,private,Hyundai,H200,2001,,21000000,Ar,diesel,manual,van,good,Antananarivo,0.92,12 places vitre 4D56 turbo 105 millions FMG
+manual_batch1_050,2026-04-26,Akbaraly Akbaraly,reseller,Volkswagen,Amarok,2025,4000,237000000,Ar,diesel,automatic,pickup,excellent,Antananarivo,0.97,Bi turbo BVA10 sortie Sodiama doublon avec 041
+manual_batch1_051,2026-04-29,Akbaraly Akbaraly,reseller,JAC,B18,2018,80000,20700000,Ar,petrol,automatic,van,excellent,Antananarivo,0.92,Familiale 7 places cuir clim
+manual_batch1_052,2026-04-29,Tian Lawr,private,Volkswagen,Polo,2002,,11000000,Ar,petrol,manual,hatchback,good,Antananarivo,0.85,Polo 3 phase 1 1.4L MPI tompony direct
+manual_batch1_053,2026-04-29,Franck Rafidimanana,private,Nissan,Pathfinder,2011,,24000000,Ar,diesel,manual,suv,good,Antananarivo,0.85,4x4 2.5L DCI 120 fmg
+manual_batch1_054,2026-03-27,Shakur Fitah Mims,private,Renault,Megane,2002,,8000000,Ar,diesel,manual,sedan,good,Antananarivo,0.85,Phase 1 diesel economique
