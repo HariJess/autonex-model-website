@@ -1,0 +1,4 @@
+facebookUrl,time,sellerName,seller_type,brand,model,year,mileage_km,price_ar,currency_original,fuel_type,transmission,body_style,condition,city,confidence,notes
+manual_batch2_001,2026-04-30,Site annonce inconnu,private,Jeep,Wrangler Rubicon,2012,86000,150000000,Ar,diesel,automatic,suv,excellent,Antananarivo,0.97,Rubicon USA Origine 2.8 CRD off road kit suspension Fox edition limitee
+manual_batch2_002,2026-05-01,Bamada Madagascar,dealer,JAC,T8 Pickup,2025,0,125760000,Ar,diesel,manual,pickup,new,Antananarivo,0.98,JAC T8 NEUF dealer Bamada double cabine 2.0L diesel 150ch prix TTC
+manual_batch2_003,2026-05-01,Prestige Occasion,reseller,Nissan,Navara,2024,85000,64800000,Ar,diesel,manual,pickup,excellent,Antananarivo,0.95,2.5 DCI 160ch BVM6 4x4 sortie Madauto 5 unites a partir de
