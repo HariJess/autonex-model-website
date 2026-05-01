@@ -1,0 +1,159 @@
+source_file,source_sheet,source_kind,source_quality_weight,condition,dealer_name,brand,model,version,year,year_imputed,mileage_km,fuel_type,transmission,body_style,price_listing_mga,price_excl_tax_mga,price_negotiable_mga,forward_filled
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Kaiyi,X3,ADVANTAGE (BVM),2025,true,0,,manual,,94900000,94900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Kaiyi,X3,PRESTIGE (BVA cuir),2025,true,0,,automatic,,104900000,104900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Kaiyi,X3,PRESTIGE (BVA tissus),2025,true,0,,automatic,,99900000,99900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Kaiyi,X3 PRO,(BVA),2025,true,0,,automatic,,129900000,129900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Kaiyi,X7,5 places,2025,true,0,,,suv,159900000,159900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Kaiyi,X7,7 places,2025,true,0,,,suv,169900000,169900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Kaiyi,E-QUTE 02,,2025,true,0,electric,,,79900000,79900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,JOLION,PRO,2025,true,0,,,suv,139900000,139900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,JOLION,HIGH,2025,true,0,,,suv,129900000,129900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,JOLION,TOP AT,2025,true,0,,automatic,suv,139900000,139900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,H6,3RD GEN TOP 1.5L,2025,true,0,,,suv,149900000,149900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,H6,3RD GEN TOP 2.0L,2025,true,0,,,suv,159900000,159900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,ORA GOOD CAT,,2025,true,0,,,,189900000,189900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,H6 GT,,2025,true,0,,,suv,199900000,199900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,DARGO,4X2,2025,true,0,,,suv,179900000,179900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,DARGO,4X4,2025,true,0,,,suv,194900000,194900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,Haval,H6,HEV,2025,true,0,hybrid,,suv,149900000,149900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,POER,BOITE MANUELLE,2025,true,0,,manual,pickup,139900000,139900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,POER,AT,2025,true,0,,automatic,pickup,169900000,169900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,POER,BOITE AUTOMATIQUE - HIGH 2.4L,2025,true,0,,automatic,pickup,179900000,179900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,TANK 500,V6,2025,true,0,,,suv,389900000,389900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,TANK 500,HEV,2025,true,0,hybrid,,suv,299900000,299900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,WINGLE 5,SC 4X2 DIESEL,2025,true,0,diesel,,pickup,94900000,94900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,WINGLE 5,DC 4X4,2025,true,0,,,pickup,104900000,104900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,WINGLE 7,2025,2025,false,0,,,pickup,119900000,119900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,TANK 300,,2025,true,0,,,suv,259900000,259900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,TANK 300,HEV,2025,true,0,hybrid,,suv,249900000,249900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,WEY 80,4X4,2025,true,0,,,suv,339900000,339900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,TANK 400,PHEV,2025,true,0,hybrid,,suv,289900000,289900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,TANK 700,PHEV LUXURY SPORT TOP,2025,true,0,hybrid,,suv,499900000,499900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,TANK 700,PHEV TOP,2025,true,0,hybrid,,suv,399900000,399900000,,false
+Ct motors.xlsx,Neuf,dealer_official,1,new,CT Motors,GreatWall,POER KINGKONG,,2025,true,0,,,pickup,129900000,129900000,,false
+Ct motors.xlsx,Occasion,dealer_official,1,used,CT Motors,Kaiyi,X3,CVT 1.5L,,false,5200,,automatic,suv,99900000,,,false
+Ct motors.xlsx,Occasion,dealer_official,1,used,CT Motors,Haval,H6,AT,,false,22400,,automatic,suv,110000000,,,false
+Ct motors.xlsx,Occasion,dealer_official,1,used,CT Motors,Kaiyi,X7,1.6T BOITE AUTO CVT,,false,,,automatic,suv,122000000,,,false
+Ct motors.xlsx,Occasion,dealer_official,1,used,CT Motors,Haval,H6,1.5T BOITE AUTO DCT7,,false,4370,,automatic,suv,125000000,,,false
+Ct motors.xlsx,Occasion,dealer_official,1,used,CT Motors,Haval,H6 GT,2.0T BOITE AUTO DCT7,,false,,,automatic,suv,140000000,,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Mazda,CX30,PROPLUS,2025,true,0,petrol,automatic,suv,139800000,139800000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Mazda,CX30,PREMIUM,2025,true,0,petrol,automatic,suv,149800000,149800000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Mazda,CX60,GT PREMIUM,2025,true,0,petrol,automatic,suv,249800000,249800000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Mazda,CX90,GT PREMIUM,2025,true,0,petrol,automatic,suv,249800000,249800000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Mazda,CX90,BOSS EDITION,2025,true,0,petrol,automatic,suv,329800000,329800000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Mazda,BT50,BLACKBOLT,2025,true,0,diesel,automatic,pickup,229800000,191500000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Enranger,G3,LUXE,2025,true,0,petrol,manual,suv,63000000,52500000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Enranger,G5,MIVEC SPORT,2025,true,0,petrol,manual,suv,72000000,60000000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Renault,DUSTER,INTENSE CVT,2025,true,0,petrol,automatic,suv,117000000,97500000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,CONTINENTAL AUTO,Brilliance,V3,ELEGANCE MT,2025,true,0,petrol,manual,suv,77800000,64833333,,false
+OT new.xlsx,Neuf,dealer_official,1,new,CONTINENTAL AUTO,Brilliance,V4,ELEGANCE AT,2025,true,0,petrol,automatic,suv,84800000,70666667,,false
+OT new.xlsx,Neuf,dealer_official,1,new,OCEANTRADE,Jetta,VS5,,2025,true,0,petrol,automatic,suv,139800000,116500000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,CONTINENTAL AUTO,Isuzu,DMAX,XRIDER AT,2025,true,0,diesel,automatic,pickup,193800000,161500000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,CONTINENTAL AUTO,Isuzu,DMAX,TITANIUM,2025,true,0,diesel,automatic,pickup,225000000,187500000,,false
+OT new.xlsx,Neuf,dealer_official,1,new,CONTINENTAL AUTO,Isuzu,MUX,TITANIUM,2025,true,0,diesel,automatic,suv,309800000,258166667,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Volkswagen,T-Cross,Highline,2025,false,0,petrol,automatic,,150000000,150000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Volkswagen,Touareg,Elegance,2025,false,0,petrol,automatic,suv,500000000,500000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Volkswagen,Touareg,R-Line,2025,false,0,diesel,automatic,suv,550000000,550000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Volkswagen,Amarok,Life,2025,false,0,diesel,manual,pickup,220000000,220000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Volkswagen,Amarok,Life,2025,false,0,diesel,automatic,pickup,245000000,245000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Volkswagen,Amarok,Panamericana,2025,false,0,diesel,automatic,pickup,290000000,290000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Volkswagen,Amarok,Aventura,2025,false,0,diesel,automatic,pickup,300000000,300000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Mahindra,S11 Scorpio,Classic,2024,false,0,diesel,automatic,pickup,125000000,125000000,,false
+Sodiama.xlsx,Neuf,dealer_official,1,new,SODIAMA,Mahindra,XUV 300,W8,2024,false,0,petrol,manual,,125000000,125000000,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,Nom du vendeur,Toyota,Hilux,2.8 D-4D,2019,false,85000,diesel,automatic,pickup,125000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Hilux,Revo 5L,2021,false,145000,diesel,manual,pickup,160000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Hilux,Revo 5L,2014,false,180000,diesel,manual,pickup,85000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,100,2007,false,190000,diesel,manual,suv,145000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,105,2004,false,250000,diesel,manual,suv,130000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,200,2010,false,160000,diesel,automatic,suv,140000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,200,2014,false,110000,diesel,automatic,suv,190000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,200,2018,false,110000,diesel,automatic,suv,220000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,200,2021,false,60000,diesel,automatic,suv,260000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,300,2022,false,25000,diesel,automatic,suv,330000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,76,2016,false,130000,diesel,manual,suv,210000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,Land Cruiser,79,2018,false,70000,diesel,manual,suv,220000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,RAV4,phase I,1996,false,200000,diesel,manual,suv,17000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,RAV4,phase II,2002,false,160000,diesel,manual,suv,29000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,RAV4,phase III,2009,false,130000,diesel,manual,suv,55000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,RAV4,phase IV,2014,false,65000,diesel,automatic,suv,85000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Toyota,RAV4,phase V,2019,false,45000,hybrid,automatic,suv,170000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,NP300,,2011,false,180000,diesel,manual,pickup,40000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,NP300,,2017,false,110000,diesel,manual,pickup,65000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,NP300,,2021,false,60000,diesel,manual,pickup,80000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Navara,,2008,false,190000,diesel,manual,pickup,34000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Navara,,2014,false,115000,diesel,manual,pickup,55000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Navara,,2022,false,35000,diesel,manual,pickup,155000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Pathfinder,,2011,false,180000,diesel,manual,suv,30000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Pathfinder,,2014,false,120000,petrol,automatic,suv,65000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Xtrail,,2002,false,150000,diesel,manual,suv,25000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Xtrail,,2018,false,100000,diesel,automatic,suv,80000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Quashqai,,2015,false,100000,diesel,automatic,suv,65000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Patrol,Y61,2006,false,180000,diesel,manual,suv,140000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Patrol,Y62,2012,false,180000,diesel,manual,suv,180000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Patrol,V8,2023,false,60000,diesel,automatic,suv,240000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Nissan,Patrol,V8 phase II,2024,false,30000,petrol,automatic,suv,380000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Suzuki,Jimny,3p,2021,false,45000,diesel,automatic,suv,115000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Suzuki,Jimny,5p,2021,false,60000,diesel,manual,suv,118000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Suzuki,Swift,,2012,false,110000,petrol,manual,,65000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,picanto,,2008,false,180000,petrol,manual,,36000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,sorento,I,2008,false,145000,diesel,manual,suv,28000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,sorento,II,2012,false,155000,diesel,manual,suv,33000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,sorento,III,2015,false,130000,diesel,automatic,suv,37000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,sorento,IV,2018,false,100000,diesel,automatic,suv,47000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Rio,I,2006,false,160000,petrol,manual,,26000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Rio,II,2010,false,135000,petrol,manual,,31000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Pride,II,2011,false,145000,petrol,manual,sedan,35000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Pride,III,2016,false,110000,petrol,automatic,sedan,39000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Sportage,I,1998,false,200000,diesel,manual,suv,17000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Sportage,II,2004,false,170000,diesel,manual,suv,23000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Sportage,III,2011,false,125000,diesel,manual,suv,35000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Kia,Sportage,IV,2017,false,100000,diesel,automatic,suv,55000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,Santa fe,II,2008,false,170000,diesel,automatic,suv,28000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,Santa fe,III,2014,false,145000,diesel,automatic,suv,42000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,Tucson,,2012,false,145000,diesel,manual,suv,40000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,Ix35,,2011,false,160000,diesel,manual,suv,40000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,I30,,2015,false,90000,petrol,automatic,,38000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,i40,,2016,false,75000,petrol,automatic,wagon,44000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,Galoper,I,2003,false,240000,diesel,manual,suv,75000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Hyundai,Galoper,II,2007,false,190000,diesel,manual,suv,80000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Audi,Q3,,2014,false,100000,diesel,automatic,suv,75000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Audi,Q5,,2015,false,95000,diesel,automatic,suv,95000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Audi,Q7,,2015,false,90000,diesel,automatic,suv,110000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Audi,A3,,2009,false,170000,petrol,manual,,68000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Audi,A4,,2016,false,150000,diesel,automatic,sedan,72000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Audi,A6,,2016,false,150000,diesel,automatic,sedan,75000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,BMW,E30,,1989,false,220000,petrol,manual,sedan,16000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,BMW,E36,,1996,false,200000,petrol,manual,sedan,18000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,BMW,E90,,2009,false,160000,petrol,manual,sedan,45000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,BMW,F80,,2014,false,110000,petrol,manual,sedan,80000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,BMW,X3,,2006,false,190000,diesel,manual,suv,65000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,BMW,X6,,2013,false,135000,diesel,automatic,suv,110000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Mercedes-Benz,E200,,2004,false,240000,petrol,manual,sedan,40000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Mercedes-Benz,C200,,2002,false,180000,petrol,manual,sedan,45000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Mercedes-Benz,A200,,2002,false,200000,petrol,manual,,26000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Mercedes-Benz,ML,,2009,false,190000,diesel,automatic,suv,65000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Peugeot,206,,1999,false,250000,petrol,manual,,18000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Peugeot,207,,2010,false,190000,petrol,manual,,25000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Peugeot,208,,2014,false,140000,petrol,manual,,45000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Peugeot,307,,2007,false,200000,petrol,manual,,28000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Peugeot,2008,,2013,false,130000,petrol,automatic,suv,37000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Peugeot,3008,,2015,false,130000,petrol,automatic,suv,55000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Renault,Clio,II,2004,false,190000,petrol,manual,,12000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Renault,Clio,III,2009,false,175000,petrol,manual,,18000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Renault,Clio,IV,2013,false,145000,petrol,manual,,27000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Renault,Clio,V,2016,false,110000,petrol,manual,,44000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Renault,Duster,,2017,false,190000,diesel,manual,suv,55000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Renault,Kangoo,,2010,false,200000,diesel,manual,,37000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Citroen,DS3,,2014,false,145000,petrol,automatic,,55000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Citroen,DS4,,2014,false,145000,petrol,automatic,,60000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Citroen,DS5,,2016,false,120000,petrol,automatic,,67000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Land Rover,90,,1998,false,300000,diesel,manual,suv,110000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Land Rover,110,,2006,false,200000,diesel,manual,suv,170000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Chevrolet,Cruze,,2011,false,135000,petrol,manual,sedan,27000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Chevrolet,Malibu,,2016,false,150000,petrol,automatic,sedan,36000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Chevrolet,Spark,,2010,false,140000,petrol,automatic,,28000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Chevrolet,Captiva,I,2007,false,190000,diesel,manual,suv,25000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Chevrolet,Captiva,II,2011,false,165000,diesel,automatic,suv,37000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Jeep,Wrangler,3p,2013,false,180000,diesel,manual,suv,85000000,,,false
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Jeep,Wrangler,5p,2015,false,170000,diesel,manual,suv,95000000,,,true
+occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Jeep,cherokee,,2015,false,200000,diesel,automatic,suv,80000000,,,true
