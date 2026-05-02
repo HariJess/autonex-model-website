@@ -1400,6 +1400,7 @@
     "markAllAsRead": "Tout marquer comme lu",
     "empty": "Aucune notification pour le moment",
     "viewAll": "Voir toutes les notifications",
+    "preferencesLabel": "Préférences",
     "preferences": {
       "pageTitle": "Préférences de notifications",
       "heading": "Préférences de notifications",

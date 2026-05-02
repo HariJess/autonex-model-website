@@ -1400,6 +1400,7 @@
     "markAllAsRead": "Mark all as read",
     "empty": "No notifications yet",
     "viewAll": "View all notifications",
+    "preferencesLabel": "Preferences",
     "preferences": {
       "pageTitle": "Notification preferences",
       "heading": "Notification preferences",

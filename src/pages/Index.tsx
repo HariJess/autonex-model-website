@@ -242,8 +242,8 @@ const Index = () => {
     [dealCandidates],
   );
   const showDealsSection = !dealsLoading && discountedListings.length >= 3;
-  const renderThematicSection = (title: string, subtitle: string, linksTo: string, items: typeof listings) => (
-    <section className="container mx-auto py-5 md:py-6">
+  const renderThematicSection = (id: string, title: string, subtitle: string, linksTo: string, items: typeof listings) => (
+    <section key={id} className="container mx-auto py-5 md:py-6">
       <div className="flex items-start justify-between gap-3 mb-4 md:mb-5">
         <div className="min-w-0">
           <h3 className="font-sans text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
@@ -562,7 +562,7 @@ const Index = () => {
       </section>
 
       {themedSectionsToRender.map((section) =>
-        renderThematicSection(section.title, section.subtitle, section.linksTo, section.items),
+        renderThematicSection(section.id, section.title, section.subtitle, section.linksTo, section.items),
       )}
 
       {isLowInventory && themedSectionsToRender.length === 0 && (
