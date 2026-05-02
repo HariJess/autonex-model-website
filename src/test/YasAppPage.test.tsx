@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import YasAppPage from "@/features/yas-app/YasAppPage";
+import { YasProvider } from "@/features/yas-app/hooks/useYasContext";
 
 // Mock du tracking pour éviter d'appeler Supabase pendant les tests + vérifier
 // que `yas_autonex_open` fire bien au mount.
@@ -61,7 +62,9 @@ function renderYasAppPage(initialPath = "/yas-app?source=yas&embedded=true") {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={[initialPath]}>
-          <YasAppPage />
+          <YasProvider>
+            <YasAppPage />
+          </YasProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </HelmetProvider>,

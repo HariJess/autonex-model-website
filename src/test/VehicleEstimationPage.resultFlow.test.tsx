@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import type { ReactNode } from "react";
 import VehicleEstimationPage from "@/pages/VehicleEstimationPage";
 import type { EstimationRunResult } from "@/types/estimation";
 
@@ -10,6 +11,25 @@ const runVehicleEstimationMock = vi.fn();
 
 vi.mock("@/components/Header", () => ({ default: () => <div>Header</div> }));
 vi.mock("@/components/Footer", () => ({ default: () => <div>Footer</div> }));
+// YasProvider non monté : mock plat de useYasContext (utilisé par
+// VehicleEstimationPage + YasBackButton).
+vi.mock("@/features/yas-app/hooks/useYasContext", () => ({
+  useYasContext: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  readYasContextFromStorage: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  YasProvider: ({ children }: { children: ReactNode }) => children,
+}));
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), {
     success: vi.fn(),

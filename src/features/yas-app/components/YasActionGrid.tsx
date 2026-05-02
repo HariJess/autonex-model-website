@@ -4,9 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Car, Upload, Calculator, Flame, ChevronRight, type LucideIcon } from "lucide-react";
 import { buildYasUrl } from "@/features/yas-app/lib/buildYasUrl";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
+import { useYasDeals } from "@/features/yas-app/hooks/useYasDeals";
 import { trackYasEvent, type YasEventName } from "@/features/yas-app/lib/yasTracking";
-import { useDbListings } from "@/hooks/useListings";
-import { getDealMeta } from "@/lib/deals";
 
 type YasAction = {
   id: "buy" | "estimate" | "deals" | "sell";
@@ -100,15 +99,9 @@ export function YasActionGrid() {
   // Filtre dynamique : la card "Bonnes affaires" ne doit s'afficher que s'il y
   // a au moins une annonce avec un dealMeta valide (sinon dead-end UX — le user
   // tape la card, scroll vers `#deals`, et tombe sur "pas de bonne affaire").
-  // Réutilise la même query que YasFeaturedDeals : React Query dédupe par
-  // queryKey, donc pas de fetch supplémentaire.
-  const { data: listings = [] } = useDbListings({ limit: 24 });
-  const hasDeals = useMemo(() => {
-    for (const listing of listings) {
-      if (getDealMeta(listing)) return true;
-    }
-    return false;
-  }, [listings]);
+  // `useYasDeals` mutualise la même logique avec YasFeaturedDeals (cf. INC #2
+  // du Plan 2/4). React Query dédupe le fetch via la queryKey de useDbListings.
+  const { hasDeals } = useYasDeals();
 
   const visibleActions = useMemo(
     () => ACTIONS.filter((a) => a.id !== "deals" || hasDeals),

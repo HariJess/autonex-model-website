@@ -1,41 +1,26 @@
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronRight } from "lucide-react";
-import { useDbListings } from "@/hooks/useListings";
 import ListingCard from "@/components/ListingCard";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
-import { getDealMeta, type DealMeta } from "@/lib/deals";
-import type { DisplayListing } from "@/types/listing";
 import { buildYasUrl } from "@/features/yas-app/lib/buildYasUrl";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
+import { useYasDeals } from "@/features/yas-app/hooks/useYasDeals";
 import { trackYasEvent } from "@/features/yas-app/lib/yasTracking";
-
-type DealEntry = { listing: DisplayListing; deal: DealMeta };
-
-const PREVIEW_COUNT = 4;
 
 /**
  * Aperçu inline « bonnes affaires » pour la mini-app YAS.
  *
- * Réutilise `useDbListings` + `getDealMeta` (logique identique à
- * `Index.tsx:467-491`) et le composant `ListingCard` en `layout="compact"`,
- * déjà optimisé Marketplace-style sur mobile. Pas de duplication métier.
+ * La logique de fetch + filter (limit 24, `getDealMeta`, cap PREVIEW_COUNT) est
+ * mutualisée dans `useYasDeals` — partagée avec `YasActionGrid` qui s'en sert
+ * pour décider si la card menu "Bonnes affaires" est affichée. React Query
+ * dédoublonne naturellement la query via la queryKey, et le hook centralise la
+ * logique métier (cf. INC #2 du Plan 2/4).
  */
 export function YasFeaturedDeals() {
   const { t } = useTranslation();
   const yas = useYasContext();
-  const { data: listings = [], isLoading } = useDbListings({ limit: 24 });
-
-  const deals: DealEntry[] = useMemo(() => {
-    const filtered: DealEntry[] = [];
-    for (const listing of listings) {
-      const deal = getDealMeta(listing);
-      if (deal) filtered.push({ listing, deal });
-      if (filtered.length >= PREVIEW_COUNT) break;
-    }
-    return filtered;
-  }, [listings]);
+  const { deals, hasDeals, isLoading } = useYasDeals();
 
   const seeAllUrl = buildYasUrl("/recherche?sort=recent", {
     source: yas.source ?? "yas",
@@ -50,7 +35,6 @@ export function YasFeaturedDeals() {
   // navigateur ne scrolle pas (root cause du bug #deals identifié à l'audit).
   // Quand aucun deal n'est dispo, on affiche un fallback minimal + lien vers
   // toutes les annonces — meilleur UX que de masquer la section silencieusement.
-  const hasDeals = deals.length > 0;
 
   return (
     <section

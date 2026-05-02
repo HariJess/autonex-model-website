@@ -2305,6 +2305,9 @@
     "partnerBadge": "× YAS & Moi",
     "partnerLogoAlt": "YAS & Moi",
     "backToYasApp": "Retour à AutoNex",
+    "miniHeader": {
+      "aria": "Navigation AutoNex × YAS & Moi"
+    },
     "heroTitle": "Acheter, vendre ou estimer une voiture à Madagascar",
     "heroSubtitle": "Le portail auto N°1 de Madagascar.",
     "actions": {

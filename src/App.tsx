@@ -19,6 +19,8 @@ const CookieConsentBanner = lazy(() =>
   import("@/components/cookies/CookieConsentBanner").then((m) => ({ default: m.CookieConsentBanner })),
 );
 import { YasScrollToTop } from "@/features/yas-app/components/YasScrollToTop";
+import { YasMiniHeader } from "@/features/yas-app/components/YasMiniHeader";
+import { YasProvider } from "@/features/yas-app/hooks/useYasContext";
 import { initGA4IfConsented } from "@/lib/analytics/ga4";
 import { COOKIE_CONSENT_EVENT } from "@/lib/analytics/cookieConsentStorage";
 
@@ -101,9 +103,11 @@ const App = () => {
       <Sonner />
       <SentrySmokeTest />
       <BrowserRouter>
-        <YasScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <BetaLockGate>
+        <YasProvider>
+          <YasScrollToTop />
+          <YasMiniHeader />
+          <Suspense fallback={<PageLoader />}>
+            <BetaLockGate>
           <Routes>
             <Route path="/beta-login" element={<BetaLoginPage />} />
             <Route path="/" element={<Index />} />
@@ -158,11 +162,12 @@ const App = () => {
             <Route path="/yas-app" element={<YasAppPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          </BetaLockGate>
-          <Suspense fallback={null}>
-            <CookieConsentBanner />
+            </BetaLockGate>
+            <Suspense fallback={null}>
+              <CookieConsentBanner />
+            </Suspense>
           </Suspense>
-        </Suspense>
+        </YasProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
