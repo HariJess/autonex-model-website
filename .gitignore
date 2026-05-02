@@ -43,6 +43,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Cursor IDE (local config)
+.cursor/
+
 # Supabase local temp/state artifacts
 supabase/.temp/
 
@@ -77,3 +80,7 @@ deno.lock
 /scripts/data/output/*
 !/scripts/data/output/.gitkeep
 !/scripts/data/output/INGESTION_REPORT.md
+# Graphify (output, cache, config locale)
+graphify-out/
+.graphify_*
+.graphifyignore
