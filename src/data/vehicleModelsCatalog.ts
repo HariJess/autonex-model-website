@@ -528,6 +528,7 @@ export const VEHICLE_MODELS_BY_BRAND: Record<string, VehicleModelSuggestion[]> =
     { value: "mu-x", label: "MU-X", popular: true, category: "suv" },
     { value: "trooper", label: "Trooper", category: "suv" },
     { value: "rodeo", label: "Rodeo", category: "pickup" },
+    { value: "nlr", label: "NLR", category: "camion" },
     { value: "npr", label: "NPR", popular: true, category: "camion" },
     { value: "nqr", label: "NQR", category: "camion" },
     { value: "nps", label: "NPS", category: "camion" },
@@ -554,22 +555,57 @@ export const VEHICLE_MODELS_BY_BRAND: Record<string, VehicleModelSuggestion[]> =
     { value: "qq", label: "QQ", category: "citadine" },
   ],
 
+  // Sprint catalogue UI — Great Wall accessible via "great wall" (canonique) ET
+  // "gwm" (alias rétro pour annonces legacy stockées sous l'ancien naming).
   gwm: [
-    { value: "haval h2", label: "Haval H2", category: "suv" },
-    { value: "haval h6", label: "Haval H6", popular: true, category: "suv" },
-    { value: "haval h9", label: "Haval H9", category: "suv" },
-    { value: "wingle 5", label: "Wingle 5", category: "pickup" },
-    { value: "wingle 7", label: "Wingle 7", category: "pickup" },
-    { value: "poer", label: "Poer", popular: true, category: "pickup" },
-    { value: "ora", label: "Ora", category: "citadine" },
     { value: "cannon", label: "Cannon", category: "pickup" },
+    { value: "ora", label: "ORA", category: "citadine" },
+    { value: "poer", label: "Poer", popular: true, category: "pickup" },
+    { value: "poer-kingkong", label: "Poer Kingkong", category: "pickup" },
+    { value: "poer-at", label: "POER AT", category: "pickup" },
+    { value: "poer-mt", label: "POER MT", category: "pickup" },
+    { value: "steed", label: "Steed", category: "pickup" },
+    { value: "tank-300", label: "Tank 300", category: "suv" },
+    { value: "tank-400", label: "Tank 400", category: "suv" },
+    { value: "tank-500", label: "Tank 500", category: "suv" },
+    { value: "tank-700", label: "Tank 700", category: "suv" },
+    { value: "wey-80", label: "Wey 80", category: "suv" },
+    { value: "wingle-5", label: "Wingle 5", category: "pickup" },
+    { value: "wingle-5-neuf", label: "Wingle 5 (Neuf)", category: "pickup" },
+    { value: "wingle-5-simple-cabine", label: "Wingle 5 Simple Cabine", category: "pickup" },
+    { value: "wingle-5-upgrade", label: "Wingle 5 Upgrade", category: "pickup" },
+    { value: "wingle-7", label: "Wingle 7", category: "pickup" },
+  ],
+  "great wall": [
+    { value: "cannon", label: "Cannon", category: "pickup" },
+    { value: "ora", label: "ORA", category: "citadine" },
+    { value: "poer", label: "Poer", popular: true, category: "pickup" },
+    { value: "poer-kingkong", label: "Poer Kingkong", category: "pickup" },
+    { value: "poer-at", label: "POER AT", category: "pickup" },
+    { value: "poer-mt", label: "POER MT", category: "pickup" },
+    { value: "steed", label: "Steed", category: "pickup" },
+    { value: "tank-300", label: "Tank 300", category: "suv" },
+    { value: "tank-400", label: "Tank 400", category: "suv" },
+    { value: "tank-500", label: "Tank 500", category: "suv" },
+    { value: "tank-700", label: "Tank 700", category: "suv" },
+    { value: "wey-80", label: "Wey 80", category: "suv" },
+    { value: "wingle-5", label: "Wingle 5", category: "pickup" },
+    { value: "wingle-5-neuf", label: "Wingle 5 (Neuf)", category: "pickup" },
+    { value: "wingle-5-simple-cabine", label: "Wingle 5 Simple Cabine", category: "pickup" },
+    { value: "wingle-5-upgrade", label: "Wingle 5 Upgrade", category: "pickup" },
+    { value: "wingle-7", label: "Wingle 7", category: "pickup" },
   ],
 
   haval: [
+    { value: "dargo", label: "Dargo", category: "suv" },
     { value: "h2", label: "H2", category: "suv" },
     { value: "h6", label: "H6", popular: true, category: "suv" },
+    { value: "h6-3rd-gen", label: "H6 3rd Gen", category: "suv" },
+    { value: "h6-gt", label: "H6 GT", category: "suv" },
+    { value: "h6-hev", label: "H6 HEV", category: "suv" },
     { value: "h9", label: "H9", category: "suv" },
     { value: "jolion", label: "Jolion", category: "suv" },
+    { value: "ora-good-cat", label: "Ora Good Cat", category: "citadine" },
   ],
 
   geely: [
@@ -783,13 +819,19 @@ export const VEHICLE_MODELS_BY_BRAND: Record<string, VehicleModelSuggestion[]> =
 
   mahindra: [
     { value: "scorpio", label: "Scorpio", popular: true, category: "suv" },
-    { value: "scorpio-n", label: "Scorpio-N", category: "suv" },
+    { value: "scorpio-n", label: "Scorpio N", category: "suv" },
+    { value: "scorpio-classic", label: "Scorpio Classic", category: "suv" },
+    { value: "scorpio-pik-up", label: "Scorpio Pik-Up", category: "pickup" },
     { value: "xuv300", label: "XUV300", category: "suv" },
+    { value: "xuv3xo", label: "XUV3XO", category: "suv" },
     { value: "xuv500", label: "XUV500", category: "suv" },
     { value: "xuv700", label: "XUV700", category: "suv" },
     { value: "thar", label: "Thar", category: "suv" },
     { value: "pik-up", label: "Pik-Up", popular: true, category: "pickup" },
     { value: "bolero", label: "Bolero", category: "suv" },
+    { value: "bolero-neo", label: "Bolero Neo", category: "suv" },
+    { value: "kuv100", label: "KUV100", category: "suv" },
+    { value: "genio", label: "Genio", category: "pickup" },
   ],
 
   mg: [
@@ -1070,6 +1112,37 @@ export const VEHICLE_MODELS_BY_BRAND: Record<string, VehicleModelSuggestion[]> =
     { value: "charger", label: "Charger", category: "berline" },
     { value: "durango", label: "Durango", category: "suv" },
     { value: "ram 1500", label: "Ram 1500", category: "pickup" },
+  ],
+
+  // Sprint catalogue UI — marques chinoises ajoutées au front (Brilliance / Enranger /
+  // Kaiyi / Jetta = marque autonome FAW-VW, à ne pas confondre avec le modèle
+  // Volkswagen Jetta).
+  brilliance: [
+    { value: "v3", label: "V3", category: "suv" },
+    { value: "v5", label: "V5", category: "suv" },
+    { value: "v6", label: "V6", category: "suv" },
+    { value: "v7", label: "V7", category: "suv" },
+    { value: "h230", label: "H230", category: "berline" },
+    { value: "h320", label: "H320", category: "berline" },
+    { value: "h330", label: "H330", category: "berline" },
+    { value: "h530", label: "H530", category: "berline" },
+  ],
+
+  enranger: [
+    { value: "g3", label: "G3", category: "berline" },
+    { value: "g5", label: "G5", category: "suv" },
+  ],
+
+  kaiyi: [
+    { value: "x3", label: "X3", popular: true, category: "suv" },
+    { value: "x3-pro", label: "X3 Pro", category: "suv" },
+    { value: "e5", label: "E5", category: "berline" },
+  ],
+
+  jetta: [
+    { value: "vs5", label: "VS5", category: "suv" },
+    { value: "vs7", label: "VS7", category: "suv" },
+    { value: "va3", label: "VA3", category: "berline" },
   ],
 };
 

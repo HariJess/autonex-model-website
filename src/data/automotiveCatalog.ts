@@ -103,7 +103,7 @@ export const AUTO_DISCOVERY_CATEGORIES: AutoDiscoveryCategory[] = [
 export const AUTO_BRAND_GROUPS: AutoBrandGroup[] = [
   {
     group: "Marques généralistes",
-    brands: ["Toyota", "Nissan", "Hyundai", "Kia", "Suzuki", "Mitsubishi", "Isuzu", "Mazda", "Ford", "Renault", "Peugeot", "Volkswagen", "Honda", "Dacia", "Citroën", "Chevrolet", "Fiat", "Opel", "Skoda", "SEAT", "Cupra", "Tata", "Mahindra", "MG", "Subaru"],
+    brands: ["Toyota", "Nissan", "Hyundai", "Kia", "Suzuki", "Mitsubishi", "Isuzu", "Mazda", "Ford", "Renault", "Peugeot", "Volkswagen", "Honda", "Dacia", "Citroen", "Chevrolet", "Fiat", "Opel", "Skoda", "SEAT", "Cupra", "Tata", "Mahindra", "MG", "Subaru", "Brilliance", "Enranger", "Jetta", "Kaiyi"],
   },
   {
     group: "Premium & luxe",
@@ -111,7 +111,7 @@ export const AUTO_BRAND_GROUPS: AutoBrandGroup[] = [
   },
   {
     group: "Utilitaires & pros",
-    brands: ["GMC", "Jeep", "Dodge", "RAM", "JMC", "Foton", "GWM", "Haval", "Geely", "Chery", "BYD"],
+    brands: ["GMC", "Jeep", "Dodge", "RAM", "JMC", "Foton", "Great Wall", "Haval", "Geely", "Chery", "BYD"],
   },
   {
     group: "Moto & scooter",
@@ -282,7 +282,7 @@ export const AUTO_HOMEPAGE_BRANDS: AutoHomepageBrand[] = [
   { id: "bmw", label: "BMW", href: "/recherche?brand=BMW" },
   { id: "audi", label: "Audi", href: "/recherche?brand=Audi" },
   { id: "peugeot", label: "Peugeot", href: "/recherche?brand=Peugeot" },
-  { id: "citroen", label: "Citroën", href: "/recherche?brand=Citro%C3%ABn" },
+  { id: "citroen", label: "Citroen", href: "/recherche?brand=Citroen" },
   { id: "byd", label: "BYD", href: "/recherche?brand=BYD" },
   { id: "chery", label: "Chery", href: "/recherche?brand=Chery" },
   { id: "yamaha", label: "Yamaha", href: "/recherche?brand=Yamaha" },

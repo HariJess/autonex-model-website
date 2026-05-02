@@ -41,8 +41,8 @@
     "comment": "Si true, accepte les profils tier C avec ≥2 obs FB sans dealer Neuf. baseline_price = median des prix corrigés, decay = default_annual_depreciation_rate. baseline_year = median des années."
   },
   "brand_blacklist_for_seed": {
-    "brands": ["Brilliance", "Enranger", "Kaiyi"],
-    "comment": "Marques présentes dans data dealer mais absentes du catalogue UI vehicleUiCatalog.ts. Calibrées sans erreur, mais inutilisables côté front. À ré-évaluer vague 2 si on veut les ajouter au catalogue."
+    "brands": [],
+    "comment": "Marques présentes dans data dealer mais absentes du catalogue UI vehicleUiCatalog.ts. Calibrées sans erreur, mais inutilisables côté front. (Sprint catalogue UI — Brilliance/Enranger/Kaiyi retirés : ajoutés au front et au pipeline.)"
   },
   "quality_filters": {
     "hard_reject_cv_above": 0.70,

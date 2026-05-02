@@ -45,7 +45,7 @@ export const BRAND_ASSETS: BrandAsset[] = [
   buildAsset("yamaha", "Yamaha"),
   buildAsset("byd", "BYD", "byd.svg"),
   buildAsset("chery", "Chery", "chery.svg"),
-  buildAsset("citroen", "Citroën", "citroen.svg", ["citroen"]),
+  buildAsset("citroen", "Citroen", "citroen.svg", ["citroën", "citroen"]),
   buildAsset("chevrolet", "Chevrolet", "chevrolet.svg"),
   buildAsset("foton", "Foton", "foton.svg"),
   buildAsset("gmc", "GMC", "gmc.svg"),
@@ -83,6 +83,13 @@ export const BRAND_ASSETS: BrandAsset[] = [
   buildAsset("alfa-romeo", "Alfa Romeo", undefined, ["alfa romeo", "alfa"]),
   buildAsset("smart", "Smart"),
   buildAsset("cfmoto", "CFMoto", undefined, ["cf moto"]),
+  // Sprint catalogue UI — marques chinoises ajoutées au front + Mahindra (logo SVG
+  // à fournir ultérieurement, fallback chip lettre initiale en attendant).
+  buildAsset("brilliance", "Brilliance"),
+  buildAsset("enranger", "Enranger"),
+  buildAsset("kaiyi", "Kaiyi"),
+  buildAsset("jetta", "Jetta"),
+  buildAsset("mahindra", "Mahindra"),
 ];
 
 const brandAssetLookup = new Map<string, BrandAsset>();
