@@ -13,7 +13,13 @@
 export type Observation = {
   year: number;
   price_ar: number;
-  source: "fb_scrap" | "manual_structured" | "dealer";
+  source:
+    | "fb_scrap"
+    | "manual_structured"
+    | "dealer"
+    | "dealer_official"
+    | "expert_curated"
+    | "manual_curated";
   vehicle_status: "neuf" | "occasion";
 };
 
@@ -280,7 +286,12 @@ export function calibrateGroup(
   }
 
   // Cas 3 : 1-2 observations dont au moins une dealer Neuf
-  const neuf = obs.filter((o) => o.source === "dealer" && o.vehicle_status === "neuf");
+  // Sprint 8 — `dealer_official` (corpus _compiled.csv) compte aussi comme ancrage Neuf.
+  const neuf = obs.filter(
+    (o) =>
+      (o.source === "dealer" || o.source === "dealer_official") &&
+      o.vehicle_status === "neuf",
+  );
   if (neuf.length > 0) {
     const yearPivot = Math.min(Math.max(...neuf.map((o) => o.year)), opts.year_pivot_cap);
     const baseline = Math.round(median(neuf.map((o) => o.price_ar)));

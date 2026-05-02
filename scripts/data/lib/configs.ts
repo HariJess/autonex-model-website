@@ -18,7 +18,13 @@ function loadJson<T>(filename: string): T {
 export type PipelineConfig = {
   version: string;
   outputs: { migration_filename_prefix: string };
-  coefficients: { fb_listing_to_transaction: number; comment: string };
+  coefficients: {
+    fb_listing_to_transaction: number;
+    dealer_official_adjustment: number;
+    expert_curated_adjustment: number;
+    manual_curated_adjustment: number;
+    comment: string;
+  };
   caps: { max_listings_per_seller: number; comment: string };
   filters: {
     min_price_ar: number;
@@ -55,6 +61,10 @@ export type PipelineConfig = {
     hard_reject_year_span_above: number;
     comment_cv: string;
     comment_year_span: string;
+  };
+  observation_floors?: {
+    comment: string;
+    rules: ObservationFloorRule[];
   };
   plausibility_floors: {
     comment: string;
@@ -118,6 +128,20 @@ export type PlausibilityFloorRule = {
     body_type?: string;
     baseline_year_min?: number;
     make_in?: string[];
+  };
+  min_price_ar: number;
+  label: string;
+};
+
+/**
+ * Sprint 8.1 — règle de filtrage INDIVIDUEL d'observation (pré-calibration).
+ * Distinct de PlausibilityFloorRule qui agit POST-calibration sur baseline.
+ */
+export type ObservationFloorRule = {
+  match: {
+    make_in?: string[];
+    body_type?: string;
+    year_min?: number;
   };
   min_price_ar: number;
   label: string;

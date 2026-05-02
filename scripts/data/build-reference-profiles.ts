@@ -85,7 +85,13 @@ const INPUTS_DIR = resolve(__dirname, "inputs");
 const OUTPUT_DIR = resolve(__dirname, "output");
 const MIGRATIONS_DIR = resolve(ROOT, "supabase", "migrations");
 
-type Source = "fb_scrap" | "manual_structured" | "dealer";
+type Source =
+  | "fb_scrap"
+  | "manual_structured"
+  | "dealer"
+  | "dealer_official"
+  | "expert_curated"
+  | "manual_curated";
 
 type RawObservation = {
   source: Source;
@@ -158,6 +164,10 @@ function readInputs(): RawObservation[] {
   // Sprint 2 — extractions LLM (sortie de `npm run data:llm-extract`).
   // Source optionnelle : ne casse pas le pipeline si le fichier est absent.
   out.push(...readLlmExtractions(resolve(OUTPUT_DIR, "llm_extractions.csv")));
+  // Sprint 8 — corpus dealer-templates compilé (3 dealers OT/CT/Sodiama + ts.xlsx)
+  out.push(...readDealerTemplates(resolve(ROOT, "data/dealer-templates/_compiled.csv")));
+  // Sprint 8 — corpus FB manuellement annoté (3 batches mai 2026)
+  out.push(...readManualBatches(resolve(ROOT, "data/manual-reference-batches")));
   return out;
 }
 
@@ -310,11 +320,146 @@ function readLlmExtractions(path: string): RawObservation[] {
   });
 }
 
+/**
+ * Sprint 8 — lit `data/dealer-templates/_compiled.csv` (sortie de
+ * `scripts/data/ingest-dealer-templates.ts`). 19 colonnes, 214 records actuels :
+ *   - source_kind = "dealer_official" → source canonique pipeline = "dealer_official"
+ *     (CT Motors / OT / Sodiama / OceanTrade — prix client final TTC)
+ *   - source_kind = "expert_curated"  → source canonique pipeline = "expert_curated"
+ *     (occasion ts.xlsx — corpus ami expert annoté)
+ *
+ * Mapping condition→vehicle_status, dealer_name→seller_name, etc.
+ * source_detail = "dealer_template_<source_kind>" pour traçabilité.
+ *
+ * Pour les neufs (condition='new') sans année native, year a déjà été imputé à
+ * 2025 (DEALER_STOCK_YEAR_DEFAULT) côté ingest-dealer-templates.ts.
+ */
+function readDealerTemplates(path: string): RawObservation[] {
+  if (!existsSync(path)) {
+    console.warn(`[dealer_templates] fichier absent (skip): ${path}`);
+    return [];
+  }
+  const rows = parseCsv(readFileSync(path, "utf8"));
+  console.log(`[dealer_templates] lignes lues: ${rows.length}`);
+  return rows.map((r) => {
+    const sourceKind = (r.source_kind || "dealer_official").toLowerCase();
+    const canonicalSource: Source =
+      sourceKind === "expert_curated" ? "expert_curated" : "dealer_official";
+    const vehicleStatus = (r.condition || "").toLowerCase() === "new" ? "neuf" : "occasion";
+    // price_listing_mga déjà en Ariary ; currency_detected = "AR" pour bypass
+    // l'heuristique AR_DEFAULT.
+    const { price_ar } = parsePriceToAriary(r.price_listing_mga, "AR");
+    return {
+      source: canonicalSource,
+      source_detail: `dealer_template_${sourceKind}`,
+      vehicle_status: vehicleStatus,
+      brand_raw: (r.brand || "").trim(),
+      model_raw: (r.model || "").trim() || null,
+      version: r.version || null,
+      year: parseYear(r.year),
+      km: parseKm(r.mileage_km),
+      price_ar_raw: price_ar,
+      currency_detected: "AR" as const,
+      fuel_raw: r.fuel_type || null,
+      transmission_raw: r.transmission || null,
+      body_style_raw: r.body_style || null,
+      city: null,
+      condition: r.condition || null,
+      seller_name: (r.dealer_name || "").trim() || null,
+      source_url: null,
+      observed_at: null,
+      raw_text: null,
+    };
+  });
+}
+
+/**
+ * Sprint 8 — lit TOUS les fichiers `data/manual-reference-batches/*.csv`.
+ * 17 colonnes : facebookUrl, time, sellerName, seller_type, brand, model,
+ * year, mileage_km, price_ar, currency_original, fuel_type, transmission,
+ * body_style, condition, city, confidence, notes.
+ *
+ * source canonique = "manual_curated".
+ * source_detail   = nom du fichier (traçabilité par batch).
+ *
+ * vehicle_status : "neuf" si condition === "new", sinon "occasion".
+ *
+ * Devise : `parsePriceToAriary` ne gère pas USD/EUR. Pour ces records :
+ *   - si price_ar paraît être déjà en Ariary (cohérent avec les annotations
+ *     humaines des CSV — l'humain a pré-converti dans la colonne price_ar),
+ *     ON NE PEUT PAS le distinguer d'une valeur USD/EUR brute en sécurité.
+ *   - Décision Sprint 8 : skip avec console.warn pour currency_original ∉ {Ar, MGA}.
+ *     Volume impacté : 1 record (Porsche Macan S USD). Préférable au risque
+ *     d'introduire 1.15Md Ar mal convertis dans la baseline.
+ */
+function readManualBatches(dir: string): RawObservation[] {
+  if (!existsSync(dir)) {
+    console.warn(`[manual_batches] dossier absent (skip): ${dir}`);
+    return [];
+  }
+  const files = readdirSync(dir)
+    .filter((f) => f.toLowerCase().endsWith(".csv"))
+    .sort();
+  if (files.length === 0) {
+    console.warn(`[manual_batches] aucun .csv dans ${dir}`);
+    return [];
+  }
+  const out: RawObservation[] = [];
+  let skippedForeignCurrency = 0;
+  for (const fname of files) {
+    const fpath = resolve(dir, fname);
+    const rows = parseCsv(readFileSync(fpath, "utf8"));
+    for (const r of rows) {
+      const currencyOriginal = (r.currency_original || "").trim();
+      const isAriary = /^(ar|mga|ariary)$/i.test(currencyOriginal);
+      if (currencyOriginal && !isAriary) {
+        skippedForeignCurrency += 1;
+        console.warn(
+          `[manual_batches] skip record ${fname} ${r.facebookUrl} : currency_original="${currencyOriginal}" non gérée (${r.brand} ${r.model})`,
+        );
+        continue;
+      }
+      const { price_ar } = parsePriceToAriary(r.price_ar, "AR");
+      const condition = (r.condition || "").toLowerCase();
+      const vehicleStatus = condition === "new" ? "neuf" : "occasion";
+      out.push({
+        source: "manual_curated" as const,
+        source_detail: fname,
+        vehicle_status: vehicleStatus,
+        brand_raw: (r.brand || "").trim(),
+        model_raw: (r.model || "").trim() || null,
+        version: null,
+        year: parseYear(r.year),
+        km: parseKm(r.mileage_km),
+        price_ar_raw: price_ar,
+        currency_detected: "AR" as const,
+        fuel_raw: r.fuel_type || null,
+        transmission_raw: r.transmission || null,
+        body_style_raw: r.body_style || null,
+        city: r.city || null,
+        condition: r.condition || null,
+        seller_name: (r.sellerName || "").trim() || null,
+        source_url: r.facebookUrl || null,
+        observed_at: parseObservedAt(r.time),
+        raw_text: r.notes || null,
+      });
+    }
+  }
+  console.log(
+    `[manual_batches] ${files.length} fichier(s), ${out.length} record(s) lus${
+      skippedForeignCurrency > 0 ? ` (${skippedForeignCurrency} skippé(s) — devise étrangère)` : ""
+    }`,
+  );
+  return out;
+}
+
 function applyDealerNeufYearDefault(rows: RawObservation[]): RawObservation[] {
   if (pipelineConfig.dealer_neuf_year_default !== "ASSUME_CURRENT_YEAR") return rows;
   const currentYear = pipelineConfig.current_year_for_dealer_default;
   return rows.map((r) => {
-    if (r.source === "dealer" && r.vehicle_status === "neuf" && r.year === null) {
+    // Sprint 8 — `dealer_official` (corpus _compiled.csv) traité comme `dealer`.
+    const isDealerLike = r.source === "dealer" || r.source === "dealer_official";
+    if (isDealerLike && r.vehicle_status === "neuf" && r.year === null) {
       return { ...r, year: currentYear };
     }
     return r;
@@ -354,9 +499,29 @@ function normalizeRows(
     const fuel = normalizeFuel(r.fuel_raw);
     const trans = normalizeTransmission(r.transmission_raw);
 
+    // Sprint 8 — coefficients différenciés par source canonique. Les sources
+    // legacy `dealer` et `manual_structured` restent à 0 (compat ascendante).
     let priceCorrected: number | null = r.price_ar_raw;
-    if (r.source === "fb_scrap" && r.price_ar_raw !== null) {
-      priceCorrected = Math.round(r.price_ar_raw * (1 + pipelineConfig.coefficients.fb_listing_to_transaction));
+    if (r.price_ar_raw !== null) {
+      let coef = 0;
+      switch (r.source) {
+        case "fb_scrap":
+          coef = pipelineConfig.coefficients.fb_listing_to_transaction;
+          break;
+        case "dealer_official":
+          coef = pipelineConfig.coefficients.dealer_official_adjustment;
+          break;
+        case "expert_curated":
+          coef = pipelineConfig.coefficients.expert_curated_adjustment;
+          break;
+        case "manual_curated":
+          coef = pipelineConfig.coefficients.manual_curated_adjustment;
+          break;
+        // dealer + manual_structured : pas d'ajustement (legacy)
+      }
+      if (coef !== 0) {
+        priceCorrected = Math.round(r.price_ar_raw * (1 + coef));
+      }
     }
 
     return {
@@ -424,6 +589,29 @@ function applyFilters(
       });
       continue;
     }
+    // R-FLOOR-PREMIUM: Sprint 8.1 — filtre observation-level pour segments où
+    // la fourchette plancher est connue (ex: BMW/Audi/Mercedes 2010+ ne valent
+    // jamais < 30M Ar à Mada, donc une obs FB à 17M Ar est forcément bruit).
+    const obsFloorRules = pipelineConfig.observation_floors?.rules ?? [];
+    let floorMatched: { rule: (typeof obsFloorRules)[number] } | null = null;
+    for (const rule of obsFloorRules) {
+      let ok = true;
+      if (rule.match.make_in !== undefined && (!r.brand_canonical || !rule.match.make_in.includes(r.brand_canonical))) ok = false;
+      if (rule.match.body_type !== undefined && r.body_canonical !== rule.match.body_type) ok = false;
+      if (rule.match.year_min !== undefined && (r.year === null || r.year < rule.match.year_min)) ok = false;
+      if (ok) {
+        floorMatched = { rule };
+        break;
+      }
+    }
+    if (floorMatched && r.price_ar_corrected < floorMatched.rule.min_price_ar) {
+      rejected.push({
+        ...r,
+        rejection_code: "R-FLOOR-PREMIUM",
+        rejection_reason: `${floorMatched.rule.label} — obs ${r.price_ar_corrected} Ar < ${floorMatched.rule.min_price_ar}`,
+      });
+      continue;
+    }
     // R3: année hors bornes
     if (r.year !== null && (r.year < filters.min_year || r.year > filters.max_year)) {
       rejected.push({ ...r, rejection_code: "R3", rejection_reason: `année hors bornes: ${r.year}` });
@@ -435,8 +623,9 @@ function applyFilters(
       continue;
     }
     // R7: dealer Neuf sans année (après application du défaut, donc seulement si REJECT)
+    // Sprint 8 — `dealer_official` traité comme `dealer`.
     if (
-      r.source === "dealer" &&
+      (r.source === "dealer" || r.source === "dealer_official") &&
       r.vehicle_status === "neuf" &&
       r.year === null &&
       pipelineConfig.dealer_neuf_year_default === "REJECT"
@@ -1097,6 +1286,7 @@ function writeReport(args: {
     R7: "année manquante (dealer Neuf si REJECT)",
     R8: "doublon FB",
     "R-GEN": "année hors bucket générationnel (passe 4)",
+    "R-FLOOR-PREMIUM": "obs sous le plancher de plausibilité segment (Sprint 8.1)",
     CAP: "cap vendeur dépassé",
   };
   for (const [code, count] of Object.entries(args.rejectedPerCode).sort()) {
@@ -1386,6 +1576,10 @@ async function main(): Promise<void> {
     fb_scrap: rawAll.filter((r) => r.source === "fb_scrap").length,
     manual_structured: rawAll.filter((r) => r.source === "manual_structured").length,
     dealer: rawAll.filter((r) => r.source === "dealer").length,
+    // Sprint 8 — nouvelles sources canoniques.
+    dealer_official: rawAll.filter((r) => r.source === "dealer_official").length,
+    expert_curated: rawAll.filter((r) => r.source === "expert_curated").length,
+    manual_curated: rawAll.filter((r) => r.source === "manual_curated").length,
   };
   // Sprint 2 — breakdown source_detail (fb_scrap regex vs fb_scrap_llm).
   const linesPerSourceDetail: Record<string, number> = {};

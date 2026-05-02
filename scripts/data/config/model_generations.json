@@ -5,7 +5,7 @@
     "Hyundai": {
       "Tucson": [
         { "from": 2004, "to": 2015, "label": "2004-2015", "min_obs": 5 },
-        { "from": 2016, "to": 2026, "label": "2016-2026", "min_obs": 3 }
+        { "from": 2016, "to": 2026, "label": "2016-2026", "min_obs": 2 }
       ],
       "Santa Fe": [
         { "from": 2001, "to": 2018, "label": "2001-2018", "min_obs": 5 },

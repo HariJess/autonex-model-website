@@ -26,7 +26,13 @@ import type { NewUsedSplitConfig } from "./configs";
 export type SplitInputRow = {
   brand_canonical: string | null;
   model_canonical: string | null;
-  source: "fb_scrap" | "manual_structured" | "dealer";
+  source:
+    | "fb_scrap"
+    | "manual_structured"
+    | "dealer"
+    | "dealer_official"
+    | "expert_curated"
+    | "manual_curated";
   vehicle_status: "neuf" | "occasion";
 };
 
@@ -90,13 +96,20 @@ export function applyNewUsedSplit<T extends SplitInputRow>(
       byKey.set(key, { dealerNeuf: [], occasion: [], other: [] });
     }
     const bucket = byKey.get(key)!;
-    if (row.source === "dealer" && row.vehicle_status === "neuf") {
-      bucket.dealerNeuf.push(row);
-    } else if (
+    // Sprint 8 — `dealer_official` se comporte comme `dealer` (corpus
+    // _compiled.csv issu d'OT/CT/Sodiama, condition='new' = stock dealer).
+    // `expert_curated` (occasion ts.xlsx) et `manual_curated` (FB annoté
+    // manuellement) sont rangés selon vehicle_status.
+    const isDealerLike = row.source === "dealer" || row.source === "dealer_official";
+    const isOccasionLike =
       row.source === "fb_scrap" ||
       row.source === "manual_structured" ||
-      (row.source === "dealer" && row.vehicle_status === "occasion")
-    ) {
+      row.source === "expert_curated" ||
+      row.source === "manual_curated";
+
+    if (isDealerLike && row.vehicle_status === "neuf") {
+      bucket.dealerNeuf.push(row);
+    } else if (isOccasionLike || (isDealerLike && row.vehicle_status === "occasion")) {
       bucket.occasion.push(row);
     } else {
       bucket.other.push(row);

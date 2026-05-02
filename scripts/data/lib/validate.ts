@@ -58,7 +58,12 @@ export function assignTier(
   }
 
   // Fallback: si on a au moins 1 dealer Neuf parmi les observations, on accroche en C
-  const hasNeuf = observations.some((o) => o.source === "dealer" && o.vehicle_status === "neuf");
+  // Sprint 8 — `dealer_official` (corpus _compiled.csv) accroche aussi en C.
+  const hasNeuf = observations.some(
+    (o) =>
+      (o.source === "dealer" || o.source === "dealer_official") &&
+      o.vehicle_status === "neuf",
+  );
   if (hasNeuf && sample <= 2) return "C_anchor";
 
   return "REJECTED";

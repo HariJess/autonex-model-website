@@ -5,7 +5,10 @@
   },
   "coefficients": {
     "fb_listing_to_transaction": -0.12,
-    "comment": "Prix FB sont des prix d'annonce. Le marché Mada négocie -10/-15% en moyenne. -12% est notre best guess vague 1, à ré-calibrer selon retours users."
+    "dealer_official_adjustment": 0.0,
+    "expert_curated_adjustment": -0.05,
+    "manual_curated_adjustment": -0.05,
+    "comment": "Ajustements appliqués au prix annonce/listing pour estimer le prix de transaction. fb_listing_to_transaction=-0.12 : annonces FB négociées -10/-15% en moyenne (Sprint 1+). dealer_official_adjustment=0.0 : prix dealer dealer_templates = prix client final TTC, aucun ajustement. expert_curated_adjustment=-0.05 : corpus ami expert (occasion ts.xlsx) déjà curé mais légère marge négociation occasion. manual_curated_adjustment=-0.05 : corpus FB manuellement annoté (manual-reference-batches), prix annonce avec marge négociation. (Sprint 8)"
   },
   "caps": {
     "max_listings_per_seller": 5,
@@ -42,10 +45,23 @@
     "comment": "Marques présentes dans data dealer mais absentes du catalogue UI vehicleUiCatalog.ts. Calibrées sans erreur, mais inutilisables côté front. À ré-évaluer vague 2 si on veut les ajouter au catalogue."
   },
   "quality_filters": {
-    "hard_reject_cv_above": 0.85,
+    "hard_reject_cv_above": 0.70,
     "hard_reject_year_span_above": 22,
-    "comment_cv": "Au-delà de CV 0.85 la médiane est statistiquement non-significative. Mieux vaut tier D heuristique pur que prix faux. Cette règle s'applique APRÈS calibration : si le profil sort avec CV > 0.85 il est rejeté et logué dans unfinishable_profiles.csv avec raison 'CV_TOO_HIGH'.",
+    "comment_cv": "Sprint 8.1 — durci de 0.85 à 0.70 suite à régression de validation : profils CV>0.70 produisaient des extrapolations forward grotesques (BMW X3 baseline 2006 → estim 2018 +68%). Au-delà de CV 0.70 la médiane est statistiquement non-significative. Mieux vaut tier D heuristique pur que prix faux. Cette règle s'applique APRÈS calibration : si le profil sort avec CV > 0.70 il est rejeté et logué dans unfinishable_profiles.csv avec raison 'CV_TOO_HIGH'.",
     "comment_year_span": "Au-delà de 22 ans de span (= 23+), le modèle a connu plusieurs générations très différentes avec prix multipliés (ex Toyota RAV4 1996→2019, span 23 = phases I→V). Le seuil de 22 préserve Toyota Hilux/Land Cruiser (span 21, restent en B) mais rejette RAV4 (span 23). Spec patch=18 trop agressif (cassait la sanity-check Hilux/LC), ajusté à 22."
+  },
+  "observation_floors": {
+    "comment": "Sprint 8.1 — filtre INDIVIDUEL d'observation (pré-calibration). Rejette les obs price < min_price_ar selon match. rejection_code = 'R-FLOOR-PREMIUM'. Distinct de plausibility_floors (qui agit POST-calibration sur baseline). Sert à éliminer le bruit FB pré-calibration sur les segments où la fourchette plancher est connue (ex: aucun X6 occasion 2010+ ne peut valoir 17M Ar à Mada — record FMG mal converti).",
+    "rules": [
+      {
+        "match": {
+          "make_in": ["BMW", "Audi", "Mercedes-Benz", "Porsche", "Land Rover", "Lexus", "Jaguar", "Volvo"],
+          "year_min": 2010
+        },
+        "min_price_ar": 30000000,
+        "label": "Premium brands ≥2010 : minimum 30M Ar (anti-bruit FB Sprint 8.1)"
+      }
+    ]
   },
   "plausibility_floors": {
     "comment": "Garde-fous de plausibilité économique marché Mada. Tout profil dont la baseline_price_mga sort sous le floor de son segment est rejeté avec raison 'PRICE_BELOW_FLOOR'. Floors calibrés à partir des prix de transaction observés réels Mada 2025. Ordre des règles : la première qui matche s'applique (ranger les plus spécifiques en premier).",

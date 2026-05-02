@@ -62,6 +62,8 @@ type ReferenceProfileFixture = {
   annual_depreciation_rate: number;
   expected_km_per_year: number;
   popularity_score: number | null;
+  // Sprint 8.2 — tie-break L3 sur les buckets générationnels.
+  sample_size: number | null;
   is_active: boolean;
 };
 
@@ -211,6 +213,10 @@ vi.mock("@/integrations/supabase/client", () => ({
 
 import { computeVehicleEstimationV2 as legacyEngine } from "@/lib/estimation/engine";
 import { computeVehicleEstimationV2 as v2Engine } from "../../supabase/functions/compute-estimation/engine";
+// Sprint 8.2 — import direct des findReferenceProfile pour tester le matching cascade
+// indépendamment du moteur d'estimation complet.
+import { findReferenceProfile as findReferenceProfileLegacy } from "@/lib/estimation/referenceProfiles";
+import { findReferenceProfile as findReferenceProfileEdge } from "../../supabase/functions/compute-estimation/reference-profiles";
 
 // -----------------------------------------------------------------------------
 // Helpers de génération de fixtures
@@ -257,6 +263,7 @@ function makeProfile(partial: Partial<ReferenceProfileFixture> & { make_name: st
     annual_depreciation_rate: partial.annual_depreciation_rate ?? 0.1,
     expected_km_per_year: partial.expected_km_per_year ?? 15_000,
     popularity_score: partial.popularity_score ?? 50,
+    sample_size: partial.sample_size ?? null,
     is_active: partial.is_active ?? true,
   };
 }
@@ -709,5 +716,155 @@ describe("Estimation engine parity — legacy vs v2 (Edge port) — 30 cas", () 
     const legacy = await legacyEngine(input);
     const v2 = await v2Engine(mockSupabase as never, input);
     compareOutputs(legacy, v2);
+  });
+});
+
+// =============================================================================
+// Sprint 8.2 — Tests cascade matching reference profiles
+//
+// Vérifie que findReferenceProfile (legacy + Edge port) résout correctement les
+// profils suffixés "(Neuf)", "(Occasion)" et buckets générationnels "(YYYY-YYYY)".
+// On teste la fonction directement (pas le moteur complet) pour isoler la logique
+// de matching. Les deux ports (src + Edge) sont testés en parallèle pour parité.
+// =============================================================================
+
+describe("Sprint 8.2 — findReferenceProfile cascade matching", () => {
+  beforeAll(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(TODAY_ISO)); // 2026-04-30 → currentYear=2026
+  });
+  afterAll(() => {
+    vi.useRealTimers();
+  });
+  beforeEach(() => {
+    setFixtures([], []);
+  });
+
+  it("Test 1 — LC + year=2025 + mileage<10k → L2 match 'Land Cruiser (Neuf)'", async () => {
+    const input = baseInput({
+      makeName: "Toyota",
+      modelName: "Land Cruiser",
+      bodyType: "suv",
+      year: 2025,
+      mileage: 5_000,
+    });
+    setFixtures([], [
+      makeProfile({ make_name: "Toyota", model_name: "Land Cruiser (Neuf)",     body_type: "suv", baseline_price_mga: 450_000_000, baseline_year: 2025 }),
+      makeProfile({ make_name: "Toyota", model_name: "Land Cruiser (Occasion)", body_type: "suv", baseline_price_mga: 241_000_000, baseline_year: 2024 }),
+    ]);
+    const legacy = await findReferenceProfileLegacy(input);
+    const edge = await findReferenceProfileEdge(mockSupabase as never, input);
+    expect(legacy?.model_name).toBe("Land Cruiser (Neuf)");
+    expect(legacy?.baseline_price_mga).toBe(450_000_000);
+    expect(edge?.model_name).toBe("Land Cruiser (Neuf)");
+    expect(edge?.baseline_price_mga).toBe(450_000_000);
+  });
+
+  it("Test 2 — LC + year=2018 + mileage>10k → L2 match 'Land Cruiser (Occasion)'", async () => {
+    const input = baseInput({
+      makeName: "Toyota",
+      modelName: "Land Cruiser",
+      bodyType: "suv",
+      year: 2018,
+      mileage: 95_000,
+    });
+    setFixtures([], [
+      makeProfile({ make_name: "Toyota", model_name: "Land Cruiser (Neuf)",     body_type: "suv", baseline_price_mga: 450_000_000, baseline_year: 2025 }),
+      makeProfile({ make_name: "Toyota", model_name: "Land Cruiser (Occasion)", body_type: "suv", baseline_price_mga: 241_000_000, baseline_year: 2024 }),
+    ]);
+    const legacy = await findReferenceProfileLegacy(input);
+    const edge = await findReferenceProfileEdge(mockSupabase as never, input);
+    expect(legacy?.model_name).toBe("Land Cruiser (Occasion)");
+    expect(edge?.model_name).toBe("Land Cruiser (Occasion)");
+  });
+
+  it("Test 3 — Tucson + year=2010 → L3 match bucket '(2004-2015)'", async () => {
+    const input = baseInput({
+      makeName: "Hyundai",
+      modelName: "Tucson",
+      bodyType: "suv",
+      year: 2010,
+      mileage: 150_000,
+    });
+    setFixtures([], [
+      makeProfile({ make_name: "Hyundai", model_name: "Tucson (2004-2015)", body_type: "suv", baseline_price_mga: 40_000_000, baseline_year: 2012, sample_size: 14 }),
+      makeProfile({ make_name: "Hyundai", model_name: "Tucson (2016-2026)", body_type: "suv", baseline_price_mga: 95_000_000, baseline_year: 2020, sample_size: 6 }),
+    ]);
+    const legacy = await findReferenceProfileLegacy(input);
+    const edge = await findReferenceProfileEdge(mockSupabase as never, input);
+    expect(legacy?.model_name).toBe("Tucson (2004-2015)");
+    expect(edge?.model_name).toBe("Tucson (2004-2015)");
+  });
+
+  it("Test 4 — Tucson + year=2020 → L3 match bucket '(2016-2026)'", async () => {
+    const input = baseInput({
+      makeName: "Hyundai",
+      modelName: "Tucson",
+      bodyType: "suv",
+      year: 2020,
+      mileage: 60_000,
+    });
+    setFixtures([], [
+      makeProfile({ make_name: "Hyundai", model_name: "Tucson (2004-2015)", body_type: "suv", baseline_price_mga: 40_000_000, baseline_year: 2012, sample_size: 14 }),
+      makeProfile({ make_name: "Hyundai", model_name: "Tucson (2016-2026)", body_type: "suv", baseline_price_mga: 95_000_000, baseline_year: 2020, sample_size: 6 }),
+    ]);
+    const legacy = await findReferenceProfileLegacy(input);
+    const edge = await findReferenceProfileEdge(mockSupabase as never, input);
+    expect(legacy?.model_name).toBe("Tucson (2016-2026)");
+    expect(edge?.model_name).toBe("Tucson (2016-2026)");
+  });
+
+  it("Test 4b — Tucson + year=2030 (hors tous buckets) → fallback bucket le plus récent", async () => {
+    const input = baseInput({
+      makeName: "Hyundai",
+      modelName: "Tucson",
+      bodyType: "suv",
+      year: 2030,
+      mileage: 0,
+    });
+    setFixtures([], [
+      makeProfile({ make_name: "Hyundai", model_name: "Tucson (2004-2015)", body_type: "suv", baseline_price_mga: 40_000_000, baseline_year: 2012, sample_size: 14 }),
+      makeProfile({ make_name: "Hyundai", model_name: "Tucson (2016-2026)", body_type: "suv", baseline_price_mga: 95_000_000, baseline_year: 2020, sample_size: 6 }),
+    ]);
+    const legacy = await findReferenceProfileLegacy(input);
+    const edge = await findReferenceProfileEdge(mockSupabase as never, input);
+    expect(legacy?.model_name).toBe("Tucson (2016-2026)");
+    expect(edge?.model_name).toBe("Tucson (2016-2026)");
+  });
+
+  it("Test 5 — Sportage + year=2019 → L1 match exact 'Sportage'", async () => {
+    const input = baseInput({
+      makeName: "Kia",
+      modelName: "Sportage",
+      bodyType: "suv",
+      year: 2019,
+      mileage: 80_000,
+    });
+    setFixtures([], [
+      makeProfile({ make_name: "Kia", model_name: "Sportage", body_type: "suv", baseline_price_mga: 56_000_000, baseline_year: 2019, sample_size: 22 }),
+    ]);
+    const legacy = await findReferenceProfileLegacy(input);
+    const edge = await findReferenceProfileEdge(mockSupabase as never, input);
+    expect(legacy?.model_name).toBe("Sportage");
+    expect(edge?.model_name).toBe("Sportage");
+  });
+
+  it("Test 6 — InexistantModel → L4 null (aucun match)", async () => {
+    const input = baseInput({
+      makeName: "Renault",
+      modelName: "InexistantModel",
+      bodyType: "sedan",
+      year: 2020,
+      mileage: 50_000,
+    });
+    setFixtures([], [
+      // Profils Renault présents mais aucun ne match "InexistantModel"
+      makeProfile({ make_name: "Renault", model_name: "Duster (Neuf)",     body_type: "suv", baseline_price_mga: 107_000_000, baseline_year: 2025 }),
+      makeProfile({ make_name: "Renault", model_name: "Duster (Occasion)", body_type: "suv", baseline_price_mga: 61_000_000, baseline_year: 2022 }),
+    ]);
+    const legacy = await findReferenceProfileLegacy(input);
+    const edge = await findReferenceProfileEdge(mockSupabase as never, input);
+    expect(legacy).toBeNull();
+    expect(edge).toBeNull();
   });
 });

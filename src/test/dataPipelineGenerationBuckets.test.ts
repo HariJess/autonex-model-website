@@ -99,12 +99,12 @@ describe("applyGenerationBuckets", () => {
     });
   });
 
-  it("expose le min_obs configuré pour un bucket donné (Tucson 2016-2026 = 3)", () => {
+  it("expose le min_obs configuré pour un bucket donné (Tucson 2016-2026 = 2 depuis Sprint 8.1)", () => {
     const buckets = getBucketsForModel("Hyundai", "Tucson", modelGenerationsConfig);
     expect(buckets).not.toBeNull();
     const recent = buckets!.find((b) => b.label === "2016-2026");
     expect(recent).toBeDefined();
-    expect(recent!.min_obs).toBe(3);
+    expect(recent!.min_obs).toBe(2);
     const old = buckets!.find((b) => b.label === "2004-2015");
     expect(old!.min_obs).toBe(5);
   });
