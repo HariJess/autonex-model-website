@@ -45,14 +45,14 @@ export function YasMiniHeader() {
         className="flex min-h-11 items-center gap-1.5"
         aria-label={t("yas.backToYasApp", "Retour à AutoNex")}
       >
-        <img src={autonexLogo} alt="AutoNex" className="h-5 w-auto" />
-        <span className="text-xs text-muted-foreground" aria-hidden>
+        <img src={autonexLogo} alt="AutoNex" className="h-6 w-auto" />
+        <span className="text-sm text-muted-foreground" aria-hidden>
           ×
         </span>
         <img
           src={yasMoiLogo}
           alt={t("yas.partnerLogoAlt", "YAS & Moi")}
-          className="h-4 w-auto"
+          className="h-5 w-auto"
         />
       </Link>
     </header>
