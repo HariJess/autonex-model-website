@@ -17,16 +17,25 @@ const SESSION_KEY_PREFIX = "autonex.popup.dismissed.";
 export function HomePopupModal() {
   const { t } = useTranslation();
   const enabled = MONETIZATION_PLACEMENTS.homeModal;
-  const { data: campaign } = usePartnerCampaign("homeModal", enabled);
+  const [shouldFetchCampaign, setShouldFetchCampaign] = useState(false);
+  const { data: campaign } = usePartnerCampaign("homeModal", enabled && shouldFetchCampaign);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Defer the partner-campaign fetch by POPUP_DELAY_MS so it stays out of the
+  // critical-path of the first paint. The 2 s timer doubles as the UX grace
+  // period before the modal can appear, so removing the second setTimeout
+  // does not regress the perceived popup delay.
+  useEffect(() => {
+    if (!enabled) return;
+    const timer = setTimeout(() => setShouldFetchCampaign(true), POPUP_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [enabled]);
 
   useEffect(() => {
     if (!campaign) return;
     const sessionKey = `${SESSION_KEY_PREFIX}${campaign.id}`;
     if (typeof window !== "undefined" && window.sessionStorage.getItem(sessionKey)) return;
-
-    const timer = setTimeout(() => setIsOpen(true), POPUP_DELAY_MS);
-    return () => clearTimeout(timer);
+    setIsOpen(true);
   }, [campaign]);
 
   // Impression fires only when modal is actually visible to the user.
