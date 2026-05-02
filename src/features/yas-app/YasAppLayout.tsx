@@ -12,11 +12,11 @@ import type { ReactNode } from "react";
  */
 export function YasAppLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen min-h-[100dvh] bg-background text-foreground">
       <main
         id="main-content"
         tabIndex={-1}
-        className="mx-auto w-full max-w-xl px-4 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-5 sm:pt-6"
+        className="mx-auto w-full max-w-xl px-[max(1rem,env(safe-area-inset-left))] pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-5 sm:pt-6"
       >
         {children}
       </main>

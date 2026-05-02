@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import type { YasContext } from "@/features/yas-app/hooks/useYasContext";
 
@@ -100,8 +101,25 @@ export function trackYasEvent(
         () => {
           /* silent success */
         },
-        () => {
-          /* silent failure (table missing, RLS, network) */
+        (error: unknown) => {
+          // Visibilité observabilité : on ne casse pas l'UI mais on dépose un
+          // breadcrumb Sentry pour pouvoir diagnostiquer post-launch (table
+          // manquante, RLS bug, network down). En dev, on log en console pour
+          // feedback immédiat. Si Sentry n'est pas init au runtime,
+          // `addBreadcrumb` est no-op safe.
+          if (isDev) {
+            console.error("[yas-tracking] insert failed", { eventName, error });
+          } else {
+            Sentry.addBreadcrumb({
+              category: "yas-tracking",
+              level: "warning",
+              message: "yas_tracking_events insert failed",
+              data: {
+                event_name: eventName,
+                error_message: error instanceof Error ? error.message : String(error),
+              },
+            });
+          }
         },
       );
   } catch {

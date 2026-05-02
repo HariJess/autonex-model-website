@@ -24,7 +24,12 @@ export function YasScrollToTop() {
     } catch {
       // jsdom (tests) ne supporte pas scrollTo — fallback silencieux.
     }
-  }, [pathname, isEmbedded]);
+    // ESLint: deps volontairement réduites à `pathname` pour éviter une race
+    // condition avec le saut hash `#deals` (cf. AUDIT_YAS_WEBVIEW_FINAL #BUG3) :
+    // si `isEmbedded` était dans les deps, le mount initial qui passe
+    // `false → true` re-run l'effect et écrase le scroll vers la section.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return null;
 }

@@ -11,10 +11,36 @@ vi.mock("@/features/yas-app/lib/yasTracking", () => ({
   trackYasEvent: vi.fn(),
 }));
 
+// AuthProvider n'est pas monté dans ce smoke test : ListingCard (rendu via
+// YasFeaturedDeals) appelle `useAuth` indirectement via FavoriteButton.
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({ user: null, session: null, profile: null, loading: false }),
+}));
+
 // Mock useDbListings pour éviter l'appel réseau dans le smoke test.
+// Au moins une annonce minimale + dealMeta truthy (cf. mock plus bas) pour que
+// la card "Bonnes affaires" reste visible — sinon YasActionGrid la filtre via
+// `hasDeals` (Fix UX #4 du Plan 1).
 vi.mock("@/hooks/useListings", () => ({
-  useDbListings: () => ({ data: [], isLoading: false }),
+  useDbListings: () => ({
+    data: [
+      {
+        id: "stub-listing-1",
+        title: "Stub Listing",
+        price_mga: 10_000_000,
+        images: [],
+      },
+    ],
+    isLoading: false,
+  }),
   prefetchListing: () => undefined,
+}));
+
+// `getDealMeta` est appelé par YasActionGrid (filtre `hasDeals`) et par
+// YasFeaturedDeals. Forcer un retour truthy garantit que la card "Bonnes
+// affaires" est rendue dans le smoke test.
+vi.mock("@/lib/deals", () => ({
+  getDealMeta: () => ({ discountPercent: 10, originalPriceMga: 11_000_000 }),
 }));
 
 // Mock contextes globaux requis par ListingCard (rendu via YasFeaturedDeals).

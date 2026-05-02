@@ -83,12 +83,17 @@ export function YasFeaturedDeals() {
         </div>
       ) : hasDeals ? (
         <div className="grid grid-cols-2 gap-2.5">
-          {deals.map((entry) => (
+          {deals.map((entry, idx) => (
             <div
               key={entry.listing.id}
               onClick={() => trackYasEvent("yas_featured_deal_click", yas, { listing_id: entry.listing.id })}
             >
-              <ListingCard listing={entry.listing} dealMeta={entry.deal} layout="compact" />
+              <ListingCard
+                listing={entry.listing}
+                dealMeta={entry.deal}
+                layout="compact"
+                priority={idx === 0}
+              />
             </div>
           ))}
         </div>

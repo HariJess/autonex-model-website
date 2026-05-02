@@ -1,9 +1,12 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Car, Upload, Calculator, Flame, ChevronRight, type LucideIcon } from "lucide-react";
 import { buildYasUrl } from "@/features/yas-app/lib/buildYasUrl";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 import { trackYasEvent, type YasEventName } from "@/features/yas-app/lib/yasTracking";
+import { useDbListings } from "@/hooks/useListings";
+import { getDealMeta } from "@/lib/deals";
 
 type YasAction = {
   id: "buy" | "estimate" | "deals" | "sell";
@@ -94,6 +97,24 @@ export function YasActionGrid() {
   const { t } = useTranslation();
   const yas = useYasContext();
 
+  // Filtre dynamique : la card "Bonnes affaires" ne doit s'afficher que s'il y
+  // a au moins une annonce avec un dealMeta valide (sinon dead-end UX — le user
+  // tape la card, scroll vers `#deals`, et tombe sur "pas de bonne affaire").
+  // Réutilise la même query que YasFeaturedDeals : React Query dédupe par
+  // queryKey, donc pas de fetch supplémentaire.
+  const { data: listings = [] } = useDbListings({ limit: 24 });
+  const hasDeals = useMemo(() => {
+    for (const listing of listings) {
+      if (getDealMeta(listing)) return true;
+    }
+    return false;
+  }, [listings]);
+
+  const visibleActions = useMemo(
+    () => ACTIONS.filter((a) => a.id !== "deals" || hasDeals),
+    [hasDeals],
+  );
+
   // Solution A : tracking d'analytics seul, et on laisse le navigateur faire
   // le saut natif via `<a href="#deals">`. La cible `<section id="deals">`
   // est désormais toujours rendue dans le DOM (cf. YasFeaturedDeals.tsx) même
@@ -111,7 +132,7 @@ export function YasActionGrid() {
       aria-label={t("yas.actions.sectionAria", "Actions principales")}
       className="grid grid-cols-1 gap-2.5"
     >
-      {ACTIONS.map((action) => {
+      {visibleActions.map((action) => {
         const Icon = action.Icon;
         const iconNode = (
           <span
