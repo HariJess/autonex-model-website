@@ -48,16 +48,16 @@ describe("getOptimizedSrcSet", () => {
     const out = getOptimizedSrcSet(SAMPLE_OBJECT, [400, 800, 1200]);
     expect(out).toBe(
       [
-        `${EXPECTED_RENDER_BASE}?width=400&quality=75 400w`,
-        `${EXPECTED_RENDER_BASE}?width=800&quality=75 800w`,
-        `${EXPECTED_RENDER_BASE}?width=1200&quality=75 1200w`,
+        `${EXPECTED_RENDER_BASE}?width=400&quality=75&resize=contain 400w`,
+        `${EXPECTED_RENDER_BASE}?width=800&quality=75&resize=contain 800w`,
+        `${EXPECTED_RENDER_BASE}?width=1200&quality=75&resize=contain 1200w`,
       ].join(", "),
     );
   });
 
   it("honours the custom quality argument", () => {
     const out = getOptimizedSrcSet(SAMPLE_OBJECT, [400], 60);
-    expect(out).toBe(`${EXPECTED_RENDER_BASE}?width=400&quality=60 400w`);
+    expect(out).toBe(`${EXPECTED_RENDER_BASE}?width=400&quality=60&resize=contain 400w`);
   });
 
   it("returns empty string for null / undefined / empty input", () => {

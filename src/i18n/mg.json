@@ -1,4 +1,63 @@
 {
+  "admin": {
+    "yasAnalytics": {
+      "title": "Analytics YAS × AutoNex",
+      "subtitle": "Topimaso amin'ny session, funnel sy fihetsika ny mini-app YAS & Moi.",
+      "lastUpdate": "Fanavaozana farany : {{date}}",
+      "loading": "Mihantona ny angon-drakitra analytics...",
+      "error": "Tsy afaka naka ny angon-drakitra.",
+      "kpi": {
+        "heading": "Session YAS",
+        "subtitle": "Session miavaka isaky ny varavarankely fotoana (dedup amin'ny session_id).",
+        "sessions24h": "Session 24h",
+        "sessions7d": "Session 7 andro",
+        "sessions30d": "Session 30 andro",
+        "totalEvents30d": "Hetsika rehetra 30 andro"
+      },
+      "funnel": {
+        "title": "Funnel fanovana",
+        "subtitle": "Session miavaka tonga amin'ny dingana tsirairay (mandritra ny 30 andro).",
+        "legend": "Session",
+        "empty": "Tsy mbola misy angon-drakitra funnel mandritra ny 30 andro.",
+        "steps": {
+          "autonexOpen": "Fisokafan'ny mini-app",
+          "actionClick": "Kitio CTA",
+          "searchPerformed": "Fikarohana natao",
+          "listingView": "Fahitana annonce",
+          "sellerContactClick": "Fifandraisana mpivarotra",
+          "estimationStarted": "Fanombanana natomboka",
+          "estimationCompleted": "Fanombanana vita",
+          "publishStarted": "Famoahana natomboka",
+          "publishCompleted": "Famoahana tafita"
+        }
+      },
+      "dailyEvents": {
+        "title": "Hetsika isan'andro",
+        "subtitle": "Hetsika rehetra isan'andro mandritra ny 30 andro.",
+        "legend": "Hetsika",
+        "empty": "Tsy mbola misy hetsika mandritra ny 30 andro."
+      },
+      "topEvents": {
+        "title": "Hetsika malaza indrindra",
+        "subtitle": "Fahitana ny hetsika voarakitra (30 andro).",
+        "legend": "Fahitana",
+        "empty": "Tsy mbola misy hetsika."
+      },
+      "platforms": {
+        "title": "Sehatra",
+        "subtitle": "Fizarana iOS / Android / tsy fantatra mandritra ny 30 andro.",
+        "legend": "Hetsika",
+        "empty": "Tsy mbola misy hetsika."
+      },
+      "referrers": {
+        "title": "Loharanon'ny fifamoivoizana",
+        "subtitle": "10 voalohany amin'ny niavian'ny session (document.referrer, 30 andro).",
+        "colReferrer": "Referrer",
+        "colCount": "Hetsika",
+        "empty": "Tsy mbola misy referrer voarakitra."
+      }
+    }
+  },
   "ads": {
     "partnerCampaign": {
       "description": "Endrika natokana ho an'ny marika sy ny serivisy mpiara-miombon'antoka voafidin'ny AutoNex.",

@@ -1,4 +1,63 @@
 {
+  "admin": {
+    "yasAnalytics": {
+      "title": "Analytics YAS × AutoNex",
+      "subtitle": "Vue d'ensemble des sessions, du funnel et des performances de la mini-app embarquée dans YAS & Moi.",
+      "lastUpdate": "Dernière maj : {{date}}",
+      "loading": "Chargement des données analytics...",
+      "error": "Impossible de charger les données.",
+      "kpi": {
+        "heading": "Sessions YAS",
+        "subtitle": "Sessions distinctes par fenêtre temporelle (déduplication par session_id).",
+        "sessions24h": "Sessions 24h",
+        "sessions7d": "Sessions 7 jours",
+        "sessions30d": "Sessions 30 jours",
+        "totalEvents30d": "Événements totaux 30j"
+      },
+      "funnel": {
+        "title": "Funnel de conversion",
+        "subtitle": "Sessions distinctes ayant atteint chaque étape (sur 30 jours).",
+        "legend": "Sessions",
+        "empty": "Pas encore de données de funnel sur 30 jours.",
+        "steps": {
+          "autonexOpen": "Ouverture mini-app",
+          "actionClick": "Clic CTA action",
+          "searchPerformed": "Recherche lancée",
+          "listingView": "Vue annonce",
+          "sellerContactClick": "Contact vendeur",
+          "estimationStarted": "Estimation démarrée",
+          "estimationCompleted": "Estimation terminée",
+          "publishStarted": "Publication démarrée",
+          "publishCompleted": "Publication réussie"
+        }
+      },
+      "dailyEvents": {
+        "title": "Activité par jour",
+        "subtitle": "Événements totaux par jour sur 30 jours.",
+        "legend": "Événements",
+        "empty": "Pas encore d'événements sur 30 jours."
+      },
+      "topEvents": {
+        "title": "Top événements",
+        "subtitle": "Fréquence des événements trackés (30 jours).",
+        "legend": "Occurrences",
+        "empty": "Pas encore d'événements."
+      },
+      "platforms": {
+        "title": "Plateformes",
+        "subtitle": "Répartition iOS / Android / inconnu sur 30 jours (par événement).",
+        "legend": "Événements",
+        "empty": "Pas encore d'événements."
+      },
+      "referrers": {
+        "title": "Sources de trafic",
+        "subtitle": "Top 10 des origines de session (document.referrer, 30 jours).",
+        "colReferrer": "Referrer",
+        "colCount": "Événements",
+        "empty": "Aucun referrer capturé pour l'instant."
+      }
+    }
+  },
   "ads": {
     "partnerCampaign": {
       "description": "Format natif réservé aux marques et services partenaires sélectionnés par AutoNex.",

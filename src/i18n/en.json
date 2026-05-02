@@ -1,4 +1,63 @@
 {
+  "admin": {
+    "yasAnalytics": {
+      "title": "YAS × AutoNex analytics",
+      "subtitle": "Sessions, funnel and performance overview of the mini-app embedded in YAS & Moi.",
+      "lastUpdate": "Last updated: {{date}}",
+      "loading": "Loading analytics data...",
+      "error": "Failed to load data.",
+      "kpi": {
+        "heading": "YAS sessions",
+        "subtitle": "Distinct sessions per time window (deduplicated by session_id).",
+        "sessions24h": "Sessions 24h",
+        "sessions7d": "Sessions 7 days",
+        "sessions30d": "Sessions 30 days",
+        "totalEvents30d": "Total events 30d"
+      },
+      "funnel": {
+        "title": "Conversion funnel",
+        "subtitle": "Distinct sessions reaching each step (over 30 days).",
+        "legend": "Sessions",
+        "empty": "No funnel data yet over 30 days.",
+        "steps": {
+          "autonexOpen": "Mini-app open",
+          "actionClick": "Action CTA click",
+          "searchPerformed": "Search performed",
+          "listingView": "Listing viewed",
+          "sellerContactClick": "Seller contact",
+          "estimationStarted": "Estimation started",
+          "estimationCompleted": "Estimation completed",
+          "publishStarted": "Publish started",
+          "publishCompleted": "Publish completed"
+        }
+      },
+      "dailyEvents": {
+        "title": "Daily activity",
+        "subtitle": "Total events per day over 30 days.",
+        "legend": "Events",
+        "empty": "No events yet over 30 days."
+      },
+      "topEvents": {
+        "title": "Top events",
+        "subtitle": "Tracked event frequency (30 days).",
+        "legend": "Occurrences",
+        "empty": "No events yet."
+      },
+      "platforms": {
+        "title": "Platforms",
+        "subtitle": "iOS / Android / unknown breakdown over 30 days (by event).",
+        "legend": "Events",
+        "empty": "No events yet."
+      },
+      "referrers": {
+        "title": "Traffic sources",
+        "subtitle": "Top 10 session origins (document.referrer, 30 days).",
+        "colReferrer": "Referrer",
+        "colCount": "Events",
+        "empty": "No referrer captured yet."
+      }
+    }
+  },
   "ads": {
     "partnerCampaign": {
       "description": "Native ad format reserved for partner brands and services curated by AutoNex.",

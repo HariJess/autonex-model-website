@@ -12,6 +12,7 @@ const navItems = [
   { to: "/admin/revenus", label: "Revenus" },
   { to: "/admin/partenaires", label: "Partenaires" },
   { to: "/admin/recherche", label: "Recherche" },
+  { to: "/admin/yas-analytics", label: "Analytics YAS" },
 ] as const;
 
 function AdminLayout() {
