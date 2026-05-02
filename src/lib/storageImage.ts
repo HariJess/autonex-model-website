@@ -53,6 +53,6 @@ export function getOptimizedSrcSet(
 ): string {
   if (!url) return "";
   return widths
-    .map((w) => `${getOptimizedStorageUrl(url, { width: w, quality })} ${w}w`)
+    .map((w) => `${getOptimizedStorageUrl(url, { width: w, quality, resize: "contain" })} ${w}w`)
     .join(", ");
 }
