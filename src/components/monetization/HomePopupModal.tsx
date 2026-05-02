@@ -6,6 +6,7 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
 import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
+import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
 
 const POPUP_DELAY_MS = 2000;
 const SESSION_KEY_PREFIX = "autonex.popup.dismissed.";
@@ -116,13 +117,22 @@ export function HomePopupModalView({ campaign, onClick }: HomePopupModalViewProp
       >
         <picture>
           {campaign.image_url_mobile ? (
-            <source media="(max-width: 768px)" srcSet={campaign.image_url_mobile} />
+            <source
+              media="(max-width: 768px)"
+              srcSet={getOptimizedSrcSet(campaign.image_url_mobile, [400, 800, 1200], 80)}
+              type="image/webp"
+            />
           ) : null}
+          <source
+            srcSet={getOptimizedSrcSet(campaign.image_url, [400, 800, 1200], 80)}
+            type="image/webp"
+          />
           <img
-            src={campaign.image_url}
+            src={getOptimizedStorageUrl(campaign.image_url, { width: 800, quality: 80 }) || campaign.image_url}
             alt={campaign.advertiser_name}
             className="block h-auto w-full"
             loading="lazy"
+            decoding="async"
           />
         </picture>
         <span className="absolute right-3 bottom-3 z-10 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">

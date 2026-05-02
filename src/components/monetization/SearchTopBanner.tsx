@@ -5,6 +5,7 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { cn } from "@/lib/utils";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
 import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
+import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
 
 interface SearchTopBannerProps {
   className?: string;
@@ -69,13 +70,22 @@ export function SearchTopBannerView({ campaign, className, onClick }: SearchTopB
         <div className="relative w-full aspect-[2.5/1] md:aspect-[8/1]">
           <picture>
             {campaign.image_url_mobile ? (
-              <source media="(max-width: 768px)" srcSet={campaign.image_url_mobile} />
+              <source
+                media="(max-width: 768px)"
+                srcSet={getOptimizedSrcSet(campaign.image_url_mobile, [400, 800, 1200], 80)}
+                type="image/webp"
+              />
             ) : null}
+            <source
+              srcSet={getOptimizedSrcSet(campaign.image_url, [600, 1200, 1800], 80)}
+              type="image/webp"
+            />
             <img
-              src={campaign.image_url}
+              src={getOptimizedStorageUrl(campaign.image_url, { width: 1200, quality: 80 }) || campaign.image_url}
               alt={campaign.advertiser_name}
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
+              decoding="async"
             />
           </picture>
         </div>
