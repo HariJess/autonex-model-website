@@ -157,3 +157,59 @@ occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Chevrolet,Captiva,II,2011,fa
 occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Jeep,Wrangler,3p,2013,false,180000,diesel,manual,suv,85000000,,,false
 occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Jeep,Wrangler,5p,2015,false,170000,diesel,manual,suv,95000000,,,true
 occasion ts.xlsx,Occasion,expert_curated,0.95,used,,Jeep,cherokee,,2015,false,200000,diesel,automatic,suv,80000000,,,true
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,Base,2016,false,,diesel,manual,pickup,65000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,,2016,false,,diesel,manual,pickup,70000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,,2016,false,,diesel,manual,pickup,90000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,,2016,false,,diesel,automatic,pickup,100000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,Base,2022,false,,diesel,manual,pickup,90000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,Deluxe,2022,false,,diesel,manual,pickup,110000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,Deluxe,2022,false,,diesel,manual,pickup,130000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,BT50,Platinium,2022,false,,diesel,automatic,pickup,150000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX3,,2018,false,,petrol,automatic,suv,60000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX3,,2018,false,,petrol,automatic,suv,75000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX5,,2014,false,,petrol,automatic,suv,50000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX5,,2014,false,,petrol,automatic,suv,70000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX5,,2019,false,,petrol,automatic,suv,80000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX5,,2019,false,,petrol,automatic,suv,100000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX9,Executive,2019,false,,petrol,automatic,suv,120000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX9,Platinium,2019,false,,petrol,automatic,suv,150000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX30,,2021,false,,petrol,automatic,suv,75000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX30,,2021,false,,petrol,automatic,suv,90000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mazda,CX60,,2023,false,,petrol,automatic,suv,200000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,DMAX,GEN 6 PRO,2018,false,,diesel,manual,pickup,70000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,DMAX,GEN 6 ELEGANCE,2018,false,,diesel,manual,pickup,85000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,DMAX,GEN 6 KONFOR,2020,false,,diesel,automatic,pickup,100000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,DMAX,XRIDER,2018,false,,diesel,manual,pickup,85000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,DMAX,GEN 7 PRO,2022,false,,diesel,manual,pickup,110000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,DMAX,GEN 7 PREMIUM,2022,false,,diesel,automatic,pickup,120000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,DMAX,GEN 7,2022,false,,diesel,automatic,pickup,150000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,MUX,,2022,false,,diesel,automatic,pickup,160000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Isuzu,MUX,TITANIUM,2022,false,,diesel,automatic,pickup,230000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,REVO,BASE,2016,false,,diesel,manual,pickup,90000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,REVO,,2016,false,,diesel,manual,pickup,120000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,REVO,,2020,false,,diesel,manual,pickup,160000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,REVO,ROCCO,2020,false,,diesel,automatic,pickup,180000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,REVO,GR,2022,false,,diesel,automatic,pickup,200000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,LC200,GX,2012,false,,diesel,manual,suv,120000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,LC200,VX,2015,false,,diesel,automatic,suv,140000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,LC200,VX,2016,false,,diesel,automatic,suv,200000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Toyota,LC200,VX,2021,false,,diesel,automatic,suv,280000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mitsubishi,L200,GEN 4 SPORTERO,2008,false,,diesel,manual,pickup,40000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mitsubishi,L200,GEN 4 SPORTERO,2014,false,,diesel,manual,pickup,60000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mitsubishi,L200,GEN 5 TRITON,2016,false,,diesel,manual,pickup,70000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mitsubishi,L200,GEN 5 TRITON,2020,false,,diesel,automatic,pickup,120000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mitsubishi,PAJERO,V96,2014,false,,diesel,manual,suv,70000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Mitsubishi,PAJERO,V98,2014,false,,diesel,automatic,suv,90000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T6,2014,false,,diesel,manual,pickup,70000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T7,2018,false,,diesel,manual,pickup,80000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T7,2016,false,,diesel,automatic,pickup,90000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T7 WILDTRAK,2018,false,,diesel,automatic,pickup,110000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T8,2020,false,,diesel,manual,pickup,90000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T8,2020,false,,diesel,automatic,pickup,100000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T8 WILDTRAK,2020,false,,diesel,automatic,pickup,130000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T8 RAPTOR,2020,false,,diesel,automatic,pickup,190000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T9,2022,false,,diesel,manual,pickup,130000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T9 XLT,2022,false,,diesel,automatic,pickup,150000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T9 WILDTRAK,2022,false,,diesel,automatic,pickup,240000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T9 RAPTOR,2022,false,,diesel,automatic,pickup,280000000,,,false
+occaz oceantrade.xlsx,Occasion,dealer_official,1,used,OceanTrade,Ford,RANGER,T9 RAPTOR,2022,false,,petrol,automatic,pickup,320000000,,,false

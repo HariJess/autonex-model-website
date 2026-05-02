@@ -174,10 +174,18 @@ interface Record {
 
 // ---------- Détection format ----------
 
-type Format = "v1_neuf" | "v1_occasion" | "v0_ts" | null;
+type Format = "v1_neuf" | "v1_occasion" | "v1_occasion_oceantrade" | "v0_ts" | null;
 
-function detectFormat(headers: string[]): Format {
+function detectFormat(headers: string[], sheetName: string): Format {
   const h = new Set(headers.filter(Boolean));
+  if (
+    h.has("Annee_modele") &&
+    h.has("Concessionnaire") &&
+    h.has("Prix_net_MGA TTC") &&
+    sheetName.toLowerCase() === "occasion"
+  ) {
+    return "v1_occasion_oceantrade";
+  }
   if (h.has("Annee_modele") && h.has("Concessionnaire")) return "v1_neuf";
   if (h.has("Annee") && h.has("Vendeur_Concessionnaire")) return "v1_occasion";
   if (h.has("Modèle") && h.has("Année")) return "v0_ts";
@@ -216,7 +224,7 @@ function parseSheet(
   const found = findHeaderRow(rows);
   if (!found) return records;
 
-  const fmt = detectFormat(found.headers);
+  const fmt = detectFormat(found.headers, sheetName);
   if (!fmt) return records;
 
   const colIdx: Record<string, number> = {};
@@ -280,6 +288,20 @@ function parseSheet(
       rec.body_style = mapOrNull(r[colIdx.Carrosserie], BODY_MAP);
       rec.price_listing_mga =
         toNumber(r[colIdx.Prix_affiche_MGA]) ?? toNumber(r[colIdx.Prix_net_MGA]);
+    } else if (fmt === "v1_occasion_oceantrade") {
+      rec.source_kind = "dealer_official";
+      rec.source_quality_weight = 1.0;
+      rec.condition = "used";
+      rec.dealer_name = normStr(r[colIdx.Concessionnaire]) ?? "OceanTrade";
+      brandRaw = r[colIdx.Marque];
+      modelRaw = r[colIdx.Modele];
+      rec.version = normStr(r[colIdx.Version_Finition]);
+      rec.year = toNumber(r[colIdx.Annee_modele]);
+      rec.mileage_km = null;
+      rec.fuel_type = mapOrNull(r[colIdx.Carburant], FUEL_MAP);
+      rec.transmission = mapOrNull(r[colIdx.Transmission], TRANS_MAP);
+      rec.body_style = mapOrNull(r[colIdx.Carrosserie], BODY_MAP);
+      rec.price_listing_mga = toNumber(r[colIdx["Prix_net_MGA TTC"]]);
     } else if (fmt === "v0_ts") {
       rec.source_kind = "expert_curated";
       rec.source_quality_weight = 0.95;
