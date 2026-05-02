@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import autonexLogo from "@/assets/logo.png";
+import autonexLogo from "@/assets/autonex-logo-dark.png";
 import yasMoiLogo from "@/assets/yas-moi-logo.svg";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
 import { useYasHomeUrl } from "@/features/yas-app/hooks/useYasHomeUrl";
