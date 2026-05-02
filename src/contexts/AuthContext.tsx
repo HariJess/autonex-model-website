@@ -76,6 +76,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const profileTargetUserIdRef = useRef<string | null>(null);
   /** Last user id applied from session; when it changes, clear profile to avoid showing the previous account. */
   const lastSessionUserIdRef = useRef<string | null>(null);
+  /**
+   * Last user id whose profile fetch was kicked off. Used to short-circuit a
+   * duplicate fetch when supabase-js fires `SIGNED_IN` after the bootstrap
+   * `getSession()` has already loaded the same user. Distinct from the stale-
+   * response guards above: those drop a late response, this avoids the round-
+   * trip entirely.
+   */
+  const lastLoadedUserIdRef = useRef<string | null>(null);
   /** Mirrors `user` for callbacks that must not capture stale React state. */
   const userRef = useRef<User | null>(null);
   userRef.current = user;
@@ -95,13 +103,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    * Drops stale responses when auth changes mid-flight.
    */
   const loadProfileForUser = useCallback(async (userId: string | null) => {
+    // Skip duplicate fetches for the userId already loaded. Supabase-js fires
+    // `SIGNED_IN` shortly after the bootstrap `getSession()`, which would
+    // otherwise re-fetch the same profile. `refreshProfile()` clears this ref
+    // before delegating, so forced refreshes still go through.
+    if (userId === lastLoadedUserIdRef.current) return;
+
     const generation = ++profileFetchGenerationRef.current;
     profileTargetUserIdRef.current = userId;
 
     if (!userId) {
+      lastLoadedUserIdRef.current = null;
       setProfile(null);
       return;
     }
+
+    // Mark optimistically before the await so a concurrent call for the same
+    // userId is deduped, and reset to null on error so a retry can re-fetch.
+    lastLoadedUserIdRef.current = userId;
 
     const { data, error } = await supabase
       .from("profiles")
@@ -113,6 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (profileTargetUserIdRef.current !== userId) return;
 
     if (error) {
+      lastLoadedUserIdRef.current = null;
       console.warn("[AuthProvider] profile fetch failed:", error.message);
       setProfile(null);
       return;
@@ -124,6 +144,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const refreshProfile = useCallback(async () => {
     const uid = userRef.current?.id ?? null;
     if (!uid) return;
+    // Bypass the dedup guard so a forced refresh actually re-fetches.
+    lastLoadedUserIdRef.current = null;
     await loadProfileForUser(uid);
   }, [loadProfileForUser]);
 
@@ -232,6 +254,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     profileFetchGenerationRef.current += 1;
     profileTargetUserIdRef.current = null;
+    lastLoadedUserIdRef.current = null;
     await supabase.auth.signOut();
     setProfile(null);
   };
