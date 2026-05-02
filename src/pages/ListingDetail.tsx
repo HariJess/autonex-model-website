@@ -29,6 +29,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { applyImageFallback } from "@/lib/imageFallback";
+import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
 import { cn } from "@/lib/utils";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import BrandLogo from "@/components/BrandLogo";
@@ -343,13 +344,24 @@ const ListingDetail = () => {
 
             <div className="space-y-2.5 md:space-y-3">
               <div className="rounded-2xl overflow-hidden aspect-video relative border border-border/70 shadow-sm">
-                <img
-                  src={images[selectedImg]}
-                  alt={displayTitle}
-                  className="w-full h-full object-cover"
-                  decoding="async"
-                  onError={(e) => applyImageFallback(e.currentTarget)}
-                />
+                <picture>
+                  <source
+                    srcSet={getOptimizedSrcSet(images[selectedImg], [800, 1600, 2400], 80)}
+                    sizes="(max-width: 1024px) 100vw, 800px"
+                  />
+                  <img
+                    src={
+                      getOptimizedStorageUrl(images[selectedImg], { width: 1600, quality: 80 }) ||
+                      images[selectedImg]
+                    }
+                    alt={displayTitle}
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                    onError={(e) => applyImageFallback(e.currentTarget)}
+                  />
+                </picture>
                 {hasMultipleImages && (
                   <>
                     <button
@@ -387,14 +399,20 @@ const ListingDetail = () => {
                       aria-pressed={i === selectedImg}
                       className={`w-20 h-14 rounded-lg overflow-hidden border-2 motion-safe:transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}
                     >
-                      <img
-                        src={img}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => applyImageFallback(e.currentTarget)}
-                      />
+                      <picture>
+                        <source
+                          srcSet={getOptimizedSrcSet(img, [80, 160, 240])}
+                          sizes="80px"
+                        />
+                        <img
+                          src={getOptimizedStorageUrl(img, { width: 160, quality: 70 }) || img}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => applyImageFallback(e.currentTarget)}
+                        />
+                      </picture>
                     </button>
                   ))}
                 </div>
@@ -600,7 +618,7 @@ const ListingDetail = () => {
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
                     <img
-                      src={listing.agency_logo}
+                      src={getOptimizedStorageUrl(listing.agency_logo, { width: 168, quality: 80 }) || listing.agency_logo}
                       alt={listing.agency_name ?? ""}
                       className="w-full h-full object-cover"
                       loading="lazy"

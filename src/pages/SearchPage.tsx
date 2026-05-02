@@ -687,12 +687,13 @@ const SearchPage = () => {
                   </Suspense>
                 </div>
                 <div className="w-full lg:w-[42%] h-auto lg:h-full lg:max-h-full overflow-y-visible lg:overflow-y-auto space-y-3 pr-1 min-h-0">
-                  {displayListings.map((listing) => (
+                  {displayListings.map((listing, index) => (
                     <ListingCard
                       key={listing.id}
                       listing={listing}
                       matchBadge={showCloseMatchBadges ? closeMatchLabel(listing) : undefined}
                       variant="search"
+                      priority={index === 0}
                     />
                   ))}
                 </div>

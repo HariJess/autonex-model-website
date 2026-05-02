@@ -9,6 +9,7 @@ import type { DisplayListing } from "@/types/listing";
 import { getVehicleTypeLabel } from "@/data/vehicleTypes";
 import { prefetchListing } from "@/hooks/useListings";
 import { applyImageFallback } from "@/lib/imageFallback";
+import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
 import {
   formatVehicleMileage,
   getVehicleDisplayTitle,
@@ -31,11 +32,17 @@ interface ListingCardProps {
   dealMeta?: DealMeta | null;
   /** Layout density. "compact" applies Facebook-marketplace-style density on mobile only (desktop stays default). */
   layout?: "default" | "compact";
+  /**
+   * Hint that this card is part of the LCP candidate set (e.g. first card of
+   * the home rail). Skips lazy loading and adds `fetchpriority="high"` so the
+   * cover starts downloading earlier.
+   */
+  priority?: boolean;
 }
 
 const LOCAL_PLACEHOLDER = "/placeholder.svg";
 
-const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default", dealMeta = null, layout = "default" }: ListingCardProps) => {
+const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "default", dealMeta = null, layout = "default", priority = false }: ListingCardProps) => {
   const { t } = useTranslation();
   const images = useMemo(
     () => (listing.images.length > 0 ? listing.images : [LOCAL_PLACEHOLDER]),
@@ -100,30 +107,44 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         onTouchStart={handlePrefetchDetail}
       >
         {/* Mobile + tablet cover (< lg): single first photo, no carousel */}
-        <img
-          src={images[0]}
-          alt={displayTitle}
-          className="lg:hidden w-full h-full object-cover"
-          loading="lazy"
-          decoding="async"
-          onError={(e) => {
-            applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
-          }}
-        />
+        <picture>
+          <source
+            srcSet={getOptimizedSrcSet(images[0], [400, 800, 1200])}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          />
+          <img
+            src={getOptimizedStorageUrl(images[0], { width: 800, quality: 75 }) || images[0]}
+            alt={displayTitle}
+            className="lg:hidden w-full h-full object-cover"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : undefined}
+            decoding="async"
+            onError={(e) => {
+              applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
+            }}
+          />
+        </picture>
         {/* Desktop (>= lg): carousel-driven image (mobile cover already conveys alt) */}
-        <img
-          src={images[imgIndex]}
-          alt=""
-          aria-hidden="true"
-          className={`hidden lg:block w-full h-full object-cover transition-transform duration-500 ${
-            isSearchVariant ? "group-hover:scale-[1.045]" : "group-hover:scale-105"
-          }`}
-          loading="lazy"
-          decoding="async"
-          onError={(e) => {
-            applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
-          }}
-        />
+        <picture>
+          <source
+            srcSet={getOptimizedSrcSet(images[imgIndex], [400, 800, 1200])}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          />
+          <img
+            src={getOptimizedStorageUrl(images[imgIndex], { width: 800, quality: 75 }) || images[imgIndex]}
+            alt=""
+            aria-hidden="true"
+            className={`hidden lg:block w-full h-full object-cover transition-transform duration-500 ${
+              isSearchVariant ? "group-hover:scale-[1.045]" : "group-hover:scale-105"
+            }`}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : undefined}
+            decoding="async"
+            onError={(e) => {
+              applyImageFallback(e.currentTarget, LOCAL_PLACEHOLDER);
+            }}
+          />
+        </picture>
         <div className={`absolute z-[2] flex flex-col items-start ${
           isCompactLayout ? "top-2 left-2 gap-1 md:top-3 md:left-3 md:gap-2" : "top-3 left-3 gap-2"
         }`}>
@@ -201,7 +222,7 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
         {displayAgencyLogo && (
           <div className="absolute bottom-3 right-3 w-8 h-8 rounded-full overflow-hidden border-2 border-card shadow-sm">
             <img
-              src={displayAgencyLogo}
+              src={getOptimizedStorageUrl(displayAgencyLogo, { width: 96, quality: 80 }) || displayAgencyLogo}
               alt={displayAgencyName ?? ""}
               className="w-full h-full object-cover"
               loading="lazy"

@@ -549,8 +549,8 @@ const Index = () => {
           />
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} layout="compact" />
+            {listings.map((listing, index) => (
+              <ListingCard key={listing.id} listing={listing} layout="compact" priority={index === 0} />
             ))}
           </div>
         )}

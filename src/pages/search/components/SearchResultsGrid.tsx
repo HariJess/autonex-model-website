@@ -24,6 +24,7 @@ export function SearchResultsGrid({ listings, showCloseMatchBadges, getCloseMatc
             listing={listing}
             matchBadge={showCloseMatchBadges ? getCloseMatchLabel(listing) : undefined}
             layout="compact"
+            priority={index === 0}
           />,
         );
         return out;
