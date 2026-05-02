@@ -60,7 +60,15 @@ export type YasEventName =
   | "yas_action_estimate_click"
   | "yas_action_deals_click"
   | "yas_featured_deal_click"
-  | "yas_publish_cta_click";
+  | "yas_publish_cta_click"
+  // === Funnel pages destination (Plan 3/4 — TRACK #2) ===
+  | "yas_listing_view" // Mount /annonce/:id
+  | "yas_seller_contact_click" // Reveal numéro vendeur sur ListingDetail
+  | "yas_search_performed" // Mount /recherche avec filtres dans payload
+  | "yas_estimation_started" // Mount /estimation
+  | "yas_estimation_completed" // Wizard atteint l'écran "result"
+  | "yas_publish_started" // /publier détecté via route listener (sans toucher PublishPage)
+  | "yas_publish_completed"; // /dashboard?published=... détecté via route listener
 
 export type YasEventPayload = Record<string, string | number | boolean | null>;
 
@@ -80,6 +88,7 @@ export function trackYasEvent(
     embedded: context.isEmbedded,
     platform: context.platform,
     entry_point: context.entryPoint,
+    referrer: context.referrer,
     session_id: context.sessionId,
     payload: extra as Record<string, unknown>,
   };

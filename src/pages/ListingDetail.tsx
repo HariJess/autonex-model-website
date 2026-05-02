@@ -30,6 +30,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { applyImageFallback } from "@/lib/imageFallback";
 import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
+import { useYasTracker } from "@/features/yas-app/hooks/useYasTracker";
 import { cn } from "@/lib/utils";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import BrandLogo from "@/components/BrandLogo";
@@ -83,6 +84,20 @@ const ListingDetail = () => {
     location,
     t,
   });
+
+  // YAS tracking — DOIT être appelé AVANT les early returns plus bas, sinon
+  // ESLint (react-hooks/rules-of-hooks) catche un appel conditionnel. Pattern
+  // impératif (`useYasTracker` + `useEffect[listing?.id]`) plutôt que
+  // `useYasTrackerOnMount` : on ne track qu'une vraie view (listing chargé),
+  // pas une 404 ou un id malformé. Les hooks no-op-safe en dehors du mode YAS.
+  const trackListingView = useYasTracker("yas_listing_view");
+  const trackSellerContact = useYasTracker("yas_seller_contact_click");
+  useEffect(() => {
+    if (listing?.id) trackListingView({ listing_id: listing.id });
+    // `trackListingView` returned by useYasTracker n'est pas memoïsé — on
+    // dépend uniquement de `listing?.id` qui ne change qu'une fois au load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listing?.id]);
 
   const isOwner = Boolean(user?.id && listing?.owner_id && user.id === listing.owner_id);
 
@@ -178,6 +193,18 @@ const ListingDetail = () => {
     handleContact,
     handleWhatsApp,
   } = contact;
+
+  // Wrappers de tracking sur les CTAs contact vendeur (non-hooks, donc OK
+  // après les early returns). Le tracker `trackSellerContact` est lui-même
+  // remonté en haut du composant (cf. plus haut, react-hooks/rules-of-hooks).
+  const handleRevealPhoneTracked = () => {
+    trackSellerContact({ listing_id: listing.id, contact_method: "phone" });
+    void handleRevealPhone();
+  };
+  const handleWhatsAppTracked = () => {
+    trackSellerContact({ listing_id: listing.id, contact_method: "whatsapp" });
+    handleWhatsApp();
+  };
 
   return (
     <>
@@ -660,7 +687,7 @@ const ListingDetail = () => {
               <div className="hidden lg:grid grid-cols-1 gap-2">
                 <Button
                   type="button"
-                  onClick={handleRevealPhone}
+                  onClick={handleRevealPhoneTracked}
                   variant={phoneRevealed ? "outline" : "default"}
                   className={`w-full font-sans ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
                   style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
@@ -671,7 +698,7 @@ const ListingDetail = () => {
                 {listing.has_whatsapp_contact ? (
                   <Button
                     type="button"
-                    onClick={handleWhatsApp}
+                    onClick={handleWhatsAppTracked}
                     variant="outline"
                     className={cn("w-full font-sans", LISTING_WHATSAPP_BUTTON_CLASS)}
                     aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
@@ -770,7 +797,7 @@ const ListingDetail = () => {
           {listing.has_whatsapp_contact ? (
             <Button
               type="button"
-              onClick={handleWhatsApp}
+              onClick={handleWhatsAppTracked}
               variant="outline"
               className={cn("w-full font-sans min-h-12 touch-manipulation gap-2", LISTING_WHATSAPP_BUTTON_CLASS)}
               aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}

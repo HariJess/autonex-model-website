@@ -23,6 +23,7 @@ import { SidebarPromoSlot } from "@/components/monetization/SidebarPromoSlot";
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { recordSearchAnalytics } from "@/lib/searchAnalytics";
+import { useYasTrackerOnMount } from "@/features/yas-app/hooks/useYasTracker";
 import type { DisplayListing } from "@/types/listing";
 import {
   describeCloseMatchKind,
@@ -65,6 +66,18 @@ const SearchPage = () => {
     () => searchStateFromParams(searchParams),
     [searchParams]
   );
+
+  // YAS tracking — fire au mount avec un snapshot des filtres principaux dans
+  // le payload. Le hook no-op-safe en dehors du mode embedded YAS, et fire
+  // une seule fois par mount (changements de filtres ultérieurs ne re-track
+  // pas — choix MVP, à itérer plus tard via debounce sur searchParams si besoin).
+  useYasTrackerOnMount("yas_search_performed", {
+    transaction: filters.transaction ?? null,
+    ville: filters.ville ?? null,
+    types: filters.types && filters.types.length > 0 ? filters.types.join(",") : null,
+    vtypes: filters.vtypes && filters.vtypes.length > 0 ? filters.vtypes.join(",") : null,
+    sort,
+  });
 
   const vehicleTypeOptionMap = useMemo(
     () => new Map(AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.map((option) => [option.id, option])),

@@ -41,6 +41,7 @@ import {
 import { cn } from "@/lib/utils";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
+import { useYasTrackerOnMount, useYasTracker } from "@/features/yas-app/hooks/useYasTracker";
 
 const EstimationResultReport = lazy(() => import("@/components/estimation/EstimationResultReport"));
 
@@ -134,6 +135,26 @@ const VehicleEstimationPage = () => {
   const [result, setResult] = useState<EstimationRunResult | null>(null);
   /** Avoid duplicate "result viewed" telemetry without an extra render (StrictMode-safe single fire per request id). */
   const resultViewedRequestRef = useRef<string | null>(null);
+
+  // YAS tracking — mount = "started", screen=result = "completed".
+  // Hooks no-op-safe en dehors du mode embedded YAS.
+  useYasTrackerOnMount("yas_estimation_started", null);
+  const trackEstimationCompleted = useYasTracker("yas_estimation_completed");
+  const completedFiredRef = useRef(false);
+  useEffect(() => {
+    if (screen !== "result") return;
+    if (completedFiredRef.current) return;
+    completedFiredRef.current = true;
+    trackEstimationCompleted({
+      vehicle_make: form.makeName || null,
+      vehicle_model: form.modelName || null,
+      vehicle_year: form.year || null,
+      city: form.city || null,
+    });
+    // trackEstimationCompleted reference is stable (returned fresh each render
+    // but no-op-safe), and we use a ref to ensure single fire per mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen]);
 
   useEffect(() => {
     const raw = localStorage.getItem(ESTIMATION_DRAFT_KEY);

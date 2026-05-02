@@ -20,6 +20,7 @@ const CookieConsentBanner = lazy(() =>
 );
 import { YasScrollToTop } from "@/features/yas-app/components/YasScrollToTop";
 import { YasMiniHeader } from "@/features/yas-app/components/YasMiniHeader";
+import { YasPublishTracker } from "@/features/yas-app/components/YasPublishTracker";
 import { YasProvider } from "@/features/yas-app/hooks/useYasContext";
 import { initGA4IfConsented } from "@/lib/analytics/ga4";
 import { COOKIE_CONSENT_EVENT } from "@/lib/analytics/cookieConsentStorage";
@@ -106,6 +107,7 @@ const App = () => {
         <YasProvider>
           <YasScrollToTop />
           <YasMiniHeader />
+          <YasPublishTracker />
           <Suspense fallback={<PageLoader />}>
             <BetaLockGate>
           <Routes>

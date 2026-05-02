@@ -34,6 +34,13 @@ export type YasContext = {
   source: string | null;
   platform: Platform | null;
   entryPoint: string | null;
+  /**
+   * `document.referrer` capturé au tout 1er mount du Provider, persisté en
+   * sessionStorage. Permet d'observer en analytics d'où viennent vraiment les
+   * requêtes YAS (vrais users WebView vs URL partagées vs bookmarks). `null`
+   * si le navigateur ne l'expose pas (lien direct, restrictions Referrer-Policy).
+   */
+  referrer: string | null;
   sessionId: string;
 };
 
@@ -44,6 +51,7 @@ const EMPTY: StoredYasContext = {
   source: null,
   platform: null,
   entryPoint: null,
+  referrer: null,
 };
 
 function readStored(): StoredYasContext {
@@ -60,6 +68,7 @@ function readStored(): StoredYasContext {
           ? (parsed.platform as Platform)
           : null,
       entryPoint: typeof parsed.entryPoint === "string" ? parsed.entryPoint : null,
+      referrer: typeof parsed.referrer === "string" ? parsed.referrer : null,
     };
   } catch {
     return EMPTY;
@@ -103,7 +112,19 @@ function parseFromQuery(search: string): StoredYasContext | null {
         ? (platformParam as Platform)
         : null,
     entryPoint: entryParam ?? null,
+    referrer: null, // referrer capturé séparément au mount, pas via URL
   };
+}
+
+/**
+ * Lit `document.referrer` une seule fois (au tout 1er mount du Provider).
+ * Si jsdom ou environnement sans `document`, retourne `null`. Si le browser
+ * ne l'expose pas (ex. Referrer-Policy strict), retourne aussi `null`.
+ */
+function readInitialReferrer(): string | null {
+  if (typeof document === "undefined") return null;
+  const ref = document.referrer;
+  return ref && ref.length > 0 ? ref : null;
 }
 
 const YasContextInternal = createContext<YasContext | null>(null);
@@ -124,18 +145,30 @@ const YasContextInternal = createContext<YasContext | null>(null);
  */
 export function YasProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const [stored, setStored] = useState<StoredYasContext>(() => readStored());
+  const [stored, setStored] = useState<StoredYasContext>(() => {
+    // Au tout 1er mount, on capture document.referrer et on l'insert dans le
+    // stored si pas déjà présent (sessionStorage hérite du dernier referrer
+    // capturé en début de session — cf. SEC #2 du Plan 3/4).
+    const initial = readStored();
+    if (initial.referrer) return initial;
+    const referrer = readInitialReferrer();
+    if (!referrer) return initial;
+    const enriched: StoredYasContext = { ...initial, referrer };
+    writeStored(enriched);
+    return enriched;
+  });
 
   useEffect(() => {
     const fromQuery = parseFromQuery(location.search);
     if (fromQuery) {
-      // Merge : ne pas perdre platform/entryPoint si l'URL courante ne les
-      // contient plus mais la session les a déjà capturés.
+      // Merge : ne pas perdre platform/entryPoint/referrer si l'URL courante
+      // ne les contient plus mais la session les a déjà capturés.
       const merged: StoredYasContext = {
         isEmbedded: true,
         source: fromQuery.source ?? stored.source,
         platform: fromQuery.platform ?? stored.platform,
         entryPoint: fromQuery.entryPoint ?? stored.entryPoint,
+        referrer: stored.referrer, // captured at first mount, kept across navs
       };
       writeStored(merged);
       setStored(merged);
@@ -160,6 +193,7 @@ export function YasProvider({ children }: { children: ReactNode }) {
     stored.isEmbedded,
     stored.platform,
     stored.source,
+    stored.referrer,
   ]);
 
   const sessionId = useMemo(() => getOrCreateSessionId(), []);
@@ -170,9 +204,10 @@ export function YasProvider({ children }: { children: ReactNode }) {
       source: stored.source,
       platform: stored.platform,
       entryPoint: stored.entryPoint,
+      referrer: stored.referrer,
       sessionId,
     }),
-    [stored.isEmbedded, stored.source, stored.platform, stored.entryPoint, sessionId],
+    [stored.isEmbedded, stored.source, stored.platform, stored.entryPoint, stored.referrer, sessionId],
   );
 
   return <YasContextInternal.Provider value={value}>{children}</YasContextInternal.Provider>;
