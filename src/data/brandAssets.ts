@@ -83,13 +83,14 @@ export const BRAND_ASSETS: BrandAsset[] = [
   buildAsset("alfa-romeo", "Alfa Romeo", undefined, ["alfa romeo", "alfa"]),
   buildAsset("smart", "Smart"),
   buildAsset("cfmoto", "CFMoto", undefined, ["cf moto"]),
-  // Sprint catalogue UI — marques chinoises ajoutées au front + Mahindra (logo SVG
-  // à fournir ultérieurement, fallback chip lettre initiale en attendant).
+  // Sprint catalogue UI — marques chinoises ajoutées au front (logos SVG
+  // Brilliance/Enranger/Kaiyi/Jetta à fournir ultérieurement, fallback chip
+  // lettre initiale en attendant). Mahindra dispose désormais de son logo SVG.
   buildAsset("brilliance", "Brilliance"),
   buildAsset("enranger", "Enranger"),
   buildAsset("kaiyi", "Kaiyi"),
   buildAsset("jetta", "Jetta"),
-  buildAsset("mahindra", "Mahindra"),
+  buildAsset("mahindra", "Mahindra", "mahindra.svg"),
 ];
 
 const brandAssetLookup = new Map<string, BrandAsset>();
