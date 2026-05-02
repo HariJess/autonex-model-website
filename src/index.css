@@ -1,3 +1,15 @@
+/* Self-hosted Geist Variable (SIL Open Font License 1.1, see public/fonts/LICENSE-geist.txt).
+   Replaces the previous render-blocking Google Fonts <link> in index.html. The variable
+   font covers weights 100-900 in a single ~70 KB file. */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/geist-variable.woff2") format("woff2-variations"),
+       url("/fonts/geist-variable.woff2") format("woff2");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

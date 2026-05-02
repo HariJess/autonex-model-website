@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { useMemo, useRef } from "react";
+import { lazy, Suspense, useMemo, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroCinematic from "@/components/HeroCinematic";
@@ -14,7 +14,12 @@ import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { PremiumBillboard } from "@/components/monetization/PremiumBillboard";
 import { HomeSponsorStrip } from "@/components/monetization/HomeSponsorStrip";
-import { HomePopupModal } from "@/components/monetization/HomePopupModal";
+// HomePopupModal renders nothing for the first 2 s (POPUP_DELAY_MS gate added in
+// the perf sprint). Loading its module lazily moves ~5 kB gzip out of the initial
+// bundle without delaying the popup further than the existing 2 s timer already does.
+const HomePopupModal = lazy(() =>
+  import("@/components/monetization/HomePopupModal").then((m) => ({ default: m.HomePopupModal })),
+);
 import BrandsRibbon from "@/components/BrandsRibbon";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
@@ -580,7 +585,9 @@ const Index = () => {
       )}
 
       <Footer />
-      <HomePopupModal />
+      <Suspense fallback={null}>
+        <HomePopupModal />
+      </Suspense>
     </>
   );
 };

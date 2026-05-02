@@ -11,7 +11,13 @@ import { WheelSpinner } from "@/components/ui/wheel-spinner";
 // Eager load: landing page and layout
 import Index from "./pages/Index.tsx";
 import SentrySmokeTest from "./components/dev/SentrySmokeTest";
-import { CookieConsentBanner } from "@/components/cookies/CookieConsentBanner";
+// Cookie banner only matters before consent is recorded; loading it lazily lets
+// the first paint complete without its module on the critical path. The banner
+// pops in ~100 ms after first paint, well before any user interaction that would
+// require GDPR consent.
+const CookieConsentBanner = lazy(() =>
+  import("@/components/cookies/CookieConsentBanner").then((m) => ({ default: m.CookieConsentBanner })),
+);
 import { YasScrollToTop } from "@/features/yas-app/components/YasScrollToTop";
 import { initGA4IfConsented } from "@/lib/analytics/ga4";
 import { COOKIE_CONSENT_EVENT } from "@/lib/analytics/cookieConsentStorage";
@@ -153,7 +159,9 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BetaLockGate>
-          <CookieConsentBanner />
+          <Suspense fallback={null}>
+            <CookieConsentBanner />
+          </Suspense>
         </Suspense>
       </BrowserRouter>
     </TooltipProvider>
