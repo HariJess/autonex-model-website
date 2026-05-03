@@ -93,8 +93,8 @@ describe("formatAriary", () => {
 });
 
 describe("CREDIT_PACKS_CANONICAL", () => {
-  it("contient 5 packs", () => {
-    expect(CREDIT_PACKS_CANONICAL).toHaveLength(5);
+  it("contient 4 packs (post-PROMPT 1 : discover/standard/pro/power)", () => {
+    expect(CREDIT_PACKS_CANONICAL).toHaveLength(4);
   });
 
   it("a des sort_order uniques et croissants", () => {
