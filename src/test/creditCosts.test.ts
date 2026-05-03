@@ -63,14 +63,32 @@ describe("monetization constants — drift detector", () => {
     }
   });
 
-  it("4 packs canonical (post-PROMPT 1)", () => {
-    expect(CREDIT_PACKS_CANONICAL).toHaveLength(4);
+  it("6 packs canonical (post-PROMPT 3.5 recalibration)", () => {
+    expect(CREDIT_PACKS_CANONICAL).toHaveLength(6);
     expect(CREDIT_PACKS_CANONICAL.map((p) => p.id)).toEqual([
       "discover",
       "standard",
       "pro",
       "power",
+      "business",
+      "enterprise",
     ]);
+  });
+
+  it("CREDIT_PACK_BONUSES couvre les 6 IDs avec totaux corrects", () => {
+    const expected = {
+      discover: 25_000,
+      standard: 87_500,
+      pro: 200_000,
+      power: 450_000,
+      business: 1_200_000,
+      enterprise: 2_500_000,
+    } as const;
+    for (const [id, total] of Object.entries(expected)) {
+      const b = (CREDIT_PACK_BONUSES as Record<string, { total: number }>)[id];
+      expect(b, `missing pack ${id}`).toBeDefined();
+      expect(b.total).toBe(total);
+    }
   });
 
   it("constantes lifecycle alignées avec PROMPT 1+2", () => {
@@ -131,9 +149,55 @@ describe("creditFormatting helpers", () => {
     expect(describeCreditCost("unknown_key")).toBe("unknown_key");
   });
 
-  it("describePackBreakdown affiche base + bonus pour packs avec bonus", () => {
-    expect(describePackBreakdown("discover")).toMatch(/10\D?000\s*crédits/);
+  it("describePackBreakdown affiche base + bonus pour packs avec bonus (post-PROMPT 3.5)", () => {
+    // discover : 25 000 crédits sans bonus (pas de "+")
+    expect(describePackBreakdown("discover")).toMatch(/25\D?000\s*crédits/);
+    expect(describePackBreakdown("discover")).not.toContain("bonus");
+    // standard : 75 000 + 12 500 bonus = 87 500
     expect(describePackBreakdown("standard")).toContain("bonus");
-    expect(describePackBreakdown("power")).toContain("130");
+    expect(describePackBreakdown("standard")).toMatch(/87\D?500/);
+    // enterprise : MAX BONUS — total 2 500 000
+    expect(describePackBreakdown("enterprise")).toMatch(/2\D?500\D?000/);
+  });
+});
+
+describe("formatNumber / formatCredits / formatAriary — séparateur NBSP (PROMPT 3.8)", () => {
+  // U+00A0 escapé explicitement pour éviter qu'un éditeur le substitue en espace normal.
+  const NBSP = "\u00A0";
+
+  it("formatNumber utilise NBSP comme séparateur de milliers", async () => {
+    const { formatNumber } = await import("@/features/credits/lib/creditFormatting");
+    expect(formatNumber(0)).toBe("0");
+    expect(formatNumber(100)).toBe("100");
+    expect(formatNumber(1_000)).toBe(`1${NBSP}000`);
+    expect(formatNumber(87_500)).toBe(`87${NBSP}500`);
+    expect(formatNumber(200_000)).toBe(`200${NBSP}000`);
+    expect(formatNumber(1_200_000)).toBe(`1${NBSP}200${NBSP}000`);
+    expect(formatNumber(2_500_000)).toBe(`2${NBSP}500${NBSP}000`);
+  });
+
+  it("formatNumber gère les entrées invalides", async () => {
+    const { formatNumber } = await import("@/features/credits/lib/creditFormatting");
+    expect(formatNumber(NaN)).toBe("0");
+    expect(formatNumber(Infinity)).toBe("0");
+  });
+
+  it("formatCredits émet du NBSP entre les groupes de milliers", async () => {
+    const { formatCredits } = await import("@/features/credits/lib/creditFormatting");
+    expect(formatCredits(87_500)).toBe(`87${NBSP}500 crédits`);
+    expect(formatCredits(1_200_000)).toBe(`1${NBSP}200${NBSP}000 crédits`);
+  });
+
+  it("formatAriary (depuis monetization.ts) émet du NBSP + suffixe ' Ar'", async () => {
+    const { formatAriary: formatAriaryFromConfig } = await import("@/config/monetization");
+    expect(formatAriaryFromConfig(87_500)).toBe(`87${NBSP}500 Ar`);
+    expect(formatAriaryFromConfig(1_500_000)).toBe(`1${NBSP}500${NBSP}000 Ar`);
+    expect(formatAriaryFromConfig(0)).toBe("0 Ar");
+  });
+
+  it("formatAriary (depuis creditFormatting) émet du NBSP", async () => {
+    const { formatAriary: formatAriaryFromFeat } = await import("@/features/credits/lib/creditFormatting");
+    expect(formatAriaryFromFeat(87_500)).toBe(`87${NBSP}500 Ar`);
+    expect(formatAriaryFromFeat(1_500_000)).toBe(`1${NBSP}500${NBSP}000 Ar`);
   });
 });

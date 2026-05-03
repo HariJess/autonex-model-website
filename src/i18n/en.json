@@ -1532,7 +1532,68 @@
     "termsHintSuffix": " — credits are non-refundable and expire after 12 months.",
     "balance": {
       "insufficient": "Not enough yet to post a listing ({{count}} credits required).",
-      "scenariosWith": "With this balance: {{scenarios}}"
+      "scenariosWith": "With this balance: {{scenarios}}",
+      "empty": "Top up to publish your listings and activate boosts.",
+      "canDo": {
+        "title": "With this balance, you can:",
+        "listings_one": "Post {{count}} listing for 30 days",
+        "listings_other": "Post {{count}} listings for 30 days",
+        "bumps_one": "OR activate {{count}} Bump boost",
+        "bumps_other": "OR activate {{count}} Bump boosts",
+        "featured_one": "OR {{count}} Featured boost 7 days",
+        "featured_other": "OR {{count}} Featured boosts 7 days",
+        "topAd_one": "OR {{count}} Top Ad for 30 days",
+        "topAd_other": "OR {{count}} Top Ads for 30 days"
+      },
+      "tooltip": {
+        "total": "Total balance",
+        "granted": "Granted credits",
+        "paid": "Purchased credits",
+        "expires": "expires on {{date}}"
+      },
+      "recharge": "Top up",
+      "rechargeAria": "Top up credits",
+      "chipAria": "Balance: {{n}} credits",
+      "expiringSoonAria": "Granted credits expiring soon",
+      "loading": "Loading balance"
+    },
+    "packs": {
+      "recommended": "Recommended",
+      "bonusValue": "+{{amount}} bonus",
+      "choose": "Choose",
+      "subtitle": {
+        "intro": "The more you buy, the more you save. No subscription, credits valid 12 months."
+      },
+      "tooltip": {
+        "unitPrice": "{{price}} Ar / credit",
+        "equivalentListings": "≈ {{count}} listings 30 days",
+        "savings": "Save {{amount}} vs unit purchase"
+      },
+      "_DEPRECATED_PROMPT_3_5_3_6": "Keys below (bonus.*, ribbon.*, savings.label, unitPrice, unitPriceNoBonus, badges.*) were superseded by the PROMPT 3.7 minimalist redesign. Kept to avoid 404s if referenced elsewhere.",
+      "bonus": {
+        "label": "{{base}} + {{bonus}} bonus",
+        "suffix": "bonus",
+        "percent": "+{{percent}}% bonus"
+      },
+      "ribbon": {
+        "bonusPercent": "+{{percent}}% FREE BONUS"
+      },
+      "savings": {
+        "label": "Save {{amount}} vs unit purchase"
+      },
+      "unitPrice": "{{price}} Ar / credit (-{{discount}}%)",
+      "unitPriceNoBonus": "{{price}} Ar / credit",
+      "badges": {
+        "popular": "POPULAR",
+        "bestValue": "BEST VALUE",
+        "maxBonus": "MAX BONUS"
+      }
+    },
+    "welcome": {
+      "title": "Welcome to AutoNex!",
+      "body": "You received {{amount}} granted credits ({{listings}} free listings). Expires in {{days}} days.",
+      "cta": "Post my first listing",
+      "dismiss": "Close"
     },
     "balanceLabel": "Your balance",
     "pendingTitle": "Pending validation",

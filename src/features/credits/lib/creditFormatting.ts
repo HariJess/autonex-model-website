@@ -24,31 +24,60 @@ import {
   type PurchasableBoostType,
 } from "@/config/monetization";
 
-const FR_NUMBER_FORMATTER = new Intl.NumberFormat("fr-MG", {
-  maximumFractionDigits: 0,
-});
-
 /**
- * Formate un nombre de crédits avec séparateur fr-MG.
- * Exemple : `formatCredits(127500)` → `"127 500 crédits"` (singular géré pour ≤1).
+ * Formate un entier en groupes de 3 chiffres séparés par des espaces
+ * insécables (U+00A0). Indépendant de `Intl.NumberFormat` / locale ICU,
+ * donc résultat garanti identique sur Node minimal, jsdom, Safari, Edge,
+ * pré-rendu SEO, etc.
+ *
+ * Le bug récurrent "87500" sans séparateur observé dans certains
+ * environnements de prod (PROMPT 3.8) venait de `toLocaleString("fr-MG")`
+ * qui faisait silencieusement fallback sur le format en-US pur "87500"
+ * quand l'ICU était minimal.
+ *
+ * Exemples :
+ *   formatNumberFr(87500)    → "87 500"
+ *   formatNumberFr(1200000)  → "1 200 000"
+ *   formatNumberFr(0)        → "0"
+ *   formatNumberFr(NaN)      → "0"
  */
-export function formatCredits(n: number): string {
-  if (!Number.isFinite(n)) return "0 crédit";
-  const rounded = Math.round(n);
-  const word = Math.abs(rounded) <= 1 ? "crédit" : "crédits";
-  return `${FR_NUMBER_FORMATTER.format(rounded)} ${word}`;
+function formatNumberFr(n: number): string {
+  if (typeof n !== "number" || !Number.isFinite(n)) return "0";
+  const sign = n < 0 ? "-" : "";
+  const abs = Math.abs(Math.round(n));
+  return sign + abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
 }
 
 /**
- * Formate un montant en Ariary.
- * Exemple : `formatAriary(127500)` → `"127 500 Ar"`.
+ * Formate un nombre de crédits avec séparateur (espace insécable) +
+ * mot "crédit"/"crédits" selon pluriel.
  *
- * Note : la version dans `@/config/monetization` est conservée pour
- * compat existante. Celle-ci utilise le même `Intl.NumberFormat` cached.
+ * Exemple : `formatCredits(127500)` → `"127 500 crédits"`.
+ * Exemple : `formatCredits(1)` → `"1 crédit"`.
+ */
+export function formatCredits(n: number): string {
+  if (typeof n !== "number" || !Number.isFinite(n)) return "0 crédit";
+  const rounded = Math.round(n);
+  const word = Math.abs(rounded) <= 1 ? "crédit" : "crédits";
+  return `${formatNumberFr(rounded)} ${word}`;
+}
+
+/**
+ * Formate un entier brut (sans suffixe). Utile pour l'UI où le mot
+ * "crédits" est déjà rendu séparément (ex. `<span>{n}</span> <span>crédits</span>`).
+ */
+export function formatNumber(n: number): string {
+  return formatNumberFr(n);
+}
+
+/**
+ * Formate un montant en Ariary. Mêmes garanties que `formatCredits` :
+ * regex robuste, indépendant du runtime ICU.
+ *
+ * Exemple : `formatAriary(127500)` → `"127 500 Ar"`.
  */
 export function formatAriary(amount: number): string {
-  if (!Number.isFinite(amount)) return "0 Ar";
-  return `${FR_NUMBER_FORMATTER.format(Math.round(amount))} Ar`;
+  return `${formatNumberFr(amount)} Ar`;
 }
 
 // =============================================================================

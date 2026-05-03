@@ -1532,7 +1532,68 @@
     "termsHintSuffix": " — tsy averina ny crédits, lany aorian'ny 12 volana.",
     "balance": {
       "insufficient": "Tsy ampy mba hamoahana filazana ({{count}} crédits ilaina).",
-      "scenariosWith": "Amin'ity solde ity : {{scenarios}}"
+      "scenariosWith": "Amin'ity solde ity : {{scenarios}}",
+      "empty": "Hampitomboy ny solde mba hamoahanao filazana sy hampandehananao boost.",
+      "canDo": {
+        "title": "Amin'ity solde ity, azonao atao ny :",
+        "listings_one": "Mamoaka filazana {{count}} mandritra ny 30 andro",
+        "listings_other": "Mamoaka filazana {{count}} mandritra ny 30 andro",
+        "bumps_one": "NA mampandeha boost Remontée {{count}}",
+        "bumps_other": "NA mampandeha boost Remontée {{count}}",
+        "featured_one": "NA boost À la une {{count}} mandritra ny 7 andro",
+        "featured_other": "NA boost À la une {{count}} mandritra ny 7 andro",
+        "topAd_one": "NA Top Annonce {{count}} mandritra ny 30 andro",
+        "topAd_other": "NA Top Annonce {{count}} mandritra ny 30 andro"
+      },
+      "tooltip": {
+        "total": "Solde tontaly",
+        "granted": "Crédits maimaim-poana",
+        "paid": "Crédits novidiana",
+        "expires": "lany ny {{date}}"
+      },
+      "recharge": "Hampitomboana crédits",
+      "rechargeAria": "Hividy crédits fanampiny",
+      "chipAria": "Solde : {{n}} crédits",
+      "expiringSoonAria": "Hifarana tsy ho ela ireo crédits maimaim-poana",
+      "loading": "Mametahana ny solde…"
+    },
+    "packs": {
+      "recommended": "Soso-kevitra",
+      "bonusValue": "+{{amount}} bonus",
+      "choose": "Hisafidy",
+      "subtitle": {
+        "intro": "Arakaraky ny vidianao no itsitsianao. Tsy misy abonnement, mateza 12 volana ny crédits."
+      },
+      "tooltip": {
+        "unitPrice": "{{price}} Ar / crédit",
+        "equivalentListings": "≈ {{count}} filazana 30 andro",
+        "savings": "Mitsitsy {{amount}} miohatra amin'ny vidiny tsirairay"
+      },
+      "_DEPRECATED_PROMPT_3_5_3_6": "Ireo lakile etsy ambany (bonus.*, ribbon.*, savings.label, unitPrice, unitPriceNoBonus, badges.*) dia nosoloina amin'ny PROMPT 3.7. Tazonina mba tsy hahatonga 404 i18n raha ampiasaina hafa.",
+      "bonus": {
+        "label": "{{base}} + {{bonus}} maimaim-poana",
+        "suffix": "maimaim-poana",
+        "percent": "+{{percent}}% bonus"
+      },
+      "ribbon": {
+        "bonusPercent": "+{{percent}}% TOMBONY MAIMAIM-POANA"
+      },
+      "savings": {
+        "label": "Mitsitsy {{amount}} miohatra amin'ny vidiny tsirairay"
+      },
+      "unitPrice": "{{price}} Ar / crédit (-{{discount}}%)",
+      "unitPriceNoBonus": "{{price}} Ar / crédit",
+      "badges": {
+        "popular": "MALAZA",
+        "bestValue": "TSARA INDRINDRA",
+        "maxBonus": "BONUS BETSAKA"
+      }
+    },
+    "welcome": {
+      "title": "Tongasoa eto AutoNex !",
+      "body": "Nahazo {{amount}} crédits maimaim-poana ianao ({{listings}} filazana maimaim-poana). Hifarana ao anatin'ny {{days}} andro.",
+      "cta": "Mamoaka filazana voalohany",
+      "dismiss": "Hidio"
     },
     "balanceLabel": "Ny solde-nao",
     "pendingTitle": "Miandry fanamarinana",

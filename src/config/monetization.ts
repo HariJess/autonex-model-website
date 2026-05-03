@@ -135,41 +135,63 @@ export function totalPublicationCredits(
 // =============================================================================
 
 /**
- * Catalogue canonical des packs. IDs match DB `credit_packs.id` (post-PROMPT 1).
- * Total délivré au paiement = credits_amount + bonus_credits.
+ * Catalogue canonical des 6 packs (PROMPT 3.5 — recalibration). IDs match DB
+ * `credit_packs.id`. Total délivré au paiement = credits_amount + bonus_credits.
+ *
+ * Pricing logique :
+ *   - Découverte 25k = prix exact d'1 annonce (pas de friction "j'ai pas assez")
+ *   - Standard/Pro/Power = sweet spot particulier
+ *   - Business/Enterprise = pré-dealer en self-serve (prépare Phase 4)
+ *   - Bonus jusqu'à +67% sur Enterprise = "plus tu achètes, plus tu économises 40%"
  */
 export const CREDIT_PACKS_CANONICAL = [
   {
     id: "discover",
     name: "Pack Découverte",
-    credits_amount: 10_000,
+    credits_amount: 25_000,
     bonus_credits: 0,
-    price_mga: 10_000,
+    price_mga: 25_000,
     sort_order: 1,
   },
   {
     id: "standard",
     name: "Pack Standard",
-    credits_amount: 25_000,
-    bonus_credits: 2_500,
-    price_mga: 25_000,
+    credits_amount: 75_000,
+    bonus_credits: 12_500,
+    price_mga: 75_000,
     sort_order: 2,
   },
   {
     id: "pro",
     name: "Pack Pro",
-    credits_amount: 50_000,
-    bonus_credits: 10_000,
-    price_mga: 50_000,
+    credits_amount: 150_000,
+    bonus_credits: 50_000,
+    price_mga: 150_000,
     sort_order: 3,
   },
   {
     id: "power",
     name: "Pack Power",
-    credits_amount: 100_000,
-    bonus_credits: 30_000,
-    price_mga: 100_000,
+    credits_amount: 300_000,
+    bonus_credits: 150_000,
+    price_mga: 300_000,
     sort_order: 4,
+  },
+  {
+    id: "business",
+    name: "Pack Business",
+    credits_amount: 750_000,
+    bonus_credits: 450_000,
+    price_mga: 750_000,
+    sort_order: 5,
+  },
+  {
+    id: "enterprise",
+    name: "Pack Enterprise",
+    credits_amount: 1_500_000,
+    bonus_credits: 1_000_000,
+    price_mga: 1_500_000,
+    sort_order: 6,
   },
 ] as const;
 
@@ -181,11 +203,31 @@ export const CREDIT_PACK_BONUSES: Record<
   CreditPackId,
   { base: number; bonus: number; total: number; bonusPct: number }
 > = {
-  discover: { base: 10_000, bonus: 0, total: 10_000, bonusPct: 0 },
-  standard: { base: 25_000, bonus: 2_500, total: 27_500, bonusPct: 10 },
-  pro: { base: 50_000, bonus: 10_000, total: 60_000, bonusPct: 20 },
-  power: { base: 100_000, bonus: 30_000, total: 130_000, bonusPct: 30 },
+  discover: { base: 25_000, bonus: 0, total: 25_000, bonusPct: 0 },
+  standard: { base: 75_000, bonus: 12_500, total: 87_500, bonusPct: 17 },
+  pro: { base: 150_000, bonus: 50_000, total: 200_000, bonusPct: 33 },
+  power: { base: 300_000, bonus: 150_000, total: 450_000, bonusPct: 50 },
+  business: { base: 750_000, bonus: 450_000, total: 1_200_000, bonusPct: 60 },
+  enterprise: { base: 1_500_000, bonus: 1_000_000, total: 2_500_000, bonusPct: 67 },
 };
+
+/**
+ * Badges marketing affichés sur les cards de pack.
+ * IDs absents = pas de badge.
+ *
+ * @deprecated PROMPT 3.7 (refonte minimaliste) — la grid des packs ne rend
+ * plus de badges marketing. Pro est mis en avant par élévation (border + shadow
+ * + label "Recommandé"), pas par badge coloré. Constante conservée pour
+ * compat backend/typing si réutilisée ailleurs.
+ */
+export const CREDIT_PACK_BADGES: Partial<Record<CreditPackId, "popular" | "bestValue" | "maxBonus">> = {
+  standard: "popular",
+  pro: "bestValue",
+  enterprise: "maxBonus",
+};
+
+/** @deprecated voir CREDIT_PACK_BADGES (PROMPT 3.7). */
+export type CreditPackBadgeKey = NonNullable<(typeof CREDIT_PACK_BADGES)[CreditPackId]>;
 
 // =============================================================================
 // LIFECYCLE — durées listings + grants
@@ -210,9 +252,25 @@ export const VERIFIED_SELLER_BADGE_DURATION_DAYS = 365;
 // FORMATTING — helpers de présentation
 // =============================================================================
 
-/** Formate un montant Ariary avec séparateur fr-MG. */
+/**
+ * Formate un montant Ariary avec séparateur (espace insécable U+00A0).
+ *
+ * PROMPT 3.8 : passage à une regex robuste indépendante de l'ICU runtime.
+ * `toLocaleString("fr-MG")` faisait silencieusement fallback en `"87500"`
+ * sans séparateur quand l'ICU était minimal (Node prod, Safari ancien,
+ * pré-rendu SEO). La regex `\B(?=(\d{3})+(?!\d))` garantit le résultat
+ * sur n'importe quel runtime JS.
+ *
+ * Inlining intentionnel : cette fonction est utilisée par des composants
+ * qui importent depuis @/config/monetization. Si on importait formatCredits
+ * depuis @/features/credits/lib/creditFormatting, on créerait un risque
+ * de dépendance circulaire. La regex est minuscule, mieux vaut dupliquer.
+ */
 export function formatAriary(amount: number): string {
-  return `${amount.toLocaleString("fr-MG")} Ar`;
+  if (typeof amount !== "number" || !Number.isFinite(amount)) return "0 Ar";
+  const sign = amount < 0 ? "-" : "";
+  const abs = Math.abs(Math.round(amount));
+  return `${sign}${abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")} Ar`;
 }
 
 // =============================================================================

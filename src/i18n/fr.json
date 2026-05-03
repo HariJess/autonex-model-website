@@ -1532,7 +1532,68 @@
     "termsHintSuffix": " — crédits non remboursables, expiration 12 mois.",
     "balance": {
       "insufficient": "Pas encore assez pour publier une annonce ({{count}} crédits requis).",
-      "scenariosWith": "Avec ce solde : {{scenarios}}"
+      "scenariosWith": "Avec ce solde : {{scenarios}}",
+      "empty": "Rechargez pour publier vos annonces et activer des boosts.",
+      "canDo": {
+        "title": "Avec ce solde, vous pouvez :",
+        "listings_one": "Publier {{count}} annonce 30j",
+        "listings_other": "Publier {{count}} annonces 30j",
+        "bumps_one": "OU activer {{count}} boost Remontée",
+        "bumps_other": "OU activer {{count}} boosts Remontée",
+        "featured_one": "OU {{count}} boost À la une 7j",
+        "featured_other": "OU {{count}} boosts À la une 7j",
+        "topAd_one": "OU {{count}} Top Annonce 30j",
+        "topAd_other": "OU {{count}} Top Annonces 30j"
+      },
+      "tooltip": {
+        "total": "Solde total",
+        "granted": "Crédits offerts",
+        "paid": "Crédits achetés",
+        "expires": "expire le {{date}}"
+      },
+      "recharge": "Recharger",
+      "rechargeAria": "Recharger des crédits",
+      "chipAria": "Solde : {{n}} crédits",
+      "expiringSoonAria": "Crédits offerts expirent bientôt",
+      "loading": "Chargement du solde"
+    },
+    "packs": {
+      "recommended": "Recommandé",
+      "bonusValue": "+{{amount}} bonus",
+      "choose": "Choisir",
+      "subtitle": {
+        "intro": "Plus vous achetez, plus vous économisez. Pas d'abonnement, crédits valables 12 mois."
+      },
+      "tooltip": {
+        "unitPrice": "{{price}} Ar / crédit",
+        "equivalentListings": "≈ {{count}} annonces 30 jours",
+        "savings": "Économisez {{amount}} vs achat à l'annonce"
+      },
+      "_DEPRECATED_PROMPT_3_5_3_6": "Les clés ci-dessous (bonus.*, ribbon.*, savings.label, unitPrice, unitPriceNoBonus, badges.*) ont été remplacées par la refonte minimaliste du PROMPT 3.7. Conservées pour éviter 404 i18n si reused ailleurs.",
+      "bonus": {
+        "label": "{{base}} + {{bonus}} offerts",
+        "suffix": "offerts",
+        "percent": "+{{percent}}% bonus"
+      },
+      "ribbon": {
+        "bonusPercent": "+{{percent}}% BONUS OFFERT"
+      },
+      "savings": {
+        "label": "Économisez {{amount}} vs achat unitaire"
+      },
+      "unitPrice": "{{price}} Ar / crédit (-{{discount}}%)",
+      "unitPriceNoBonus": "{{price}} Ar / crédit",
+      "badges": {
+        "popular": "POPULAIRE",
+        "bestValue": "MEILLEUR RAPPORT",
+        "maxBonus": "MAX BONUS"
+      }
+    },
+    "welcome": {
+      "title": "Bienvenue sur AutoNex !",
+      "body": "Vous avez reçu {{amount}} crédits offerts ({{listings}} annonces gratuites). Expire dans {{days}} jours.",
+      "cta": "Publier ma première annonce",
+      "dismiss": "Fermer"
     },
     "balanceLabel": "Votre solde",
     "pendingTitle": "En attente de validation",
