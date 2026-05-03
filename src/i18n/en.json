@@ -238,6 +238,10 @@
     "listing": "Listing",
     "listingDeleted": "Listing deleted",
     "myListings": "My listings",
+    "viewAllListings": "My listings",
+    "section": {
+      "manageListings": "Manage my listings"
+    },
     "noLeads": "No contacts received yet.",
     "noListings": "No listings yet. Publish your first listing!",
     "pause": "Pause",
@@ -828,6 +832,7 @@
     "home": "Home",
     "login": "Log in",
     "logout": "Log out",
+    "myListings": "My listings",
     "newProjects": "New arrivals",
     "publish": "Publish listing",
     "rent": "Long-term rental",
@@ -1591,6 +1596,10 @@
     },
     "welcome": {
       "title": "Welcome to AutoNex!",
+      "titleRemaining": "Your free credits",
+      "bodyInitial": "You received {{amount}} free credits ({{listings}} free listings). Expire in {{days}} days.",
+      "bodyRemaining": "You have {{remaining}} free credits left (out of {{received}} received). That's {{listings}} free listings. Expire in {{days}} days.",
+      "_DEPRECATED_PROMPT_4_3": "credits.welcome.body replaced by bodyInitial/bodyRemaining (adaptive received vs remaining). Kept to avoid 404 i18n if used elsewhere.",
       "body": "You received {{amount}} granted credits ({{listings}} free listings). Expires in {{days}} days.",
       "cta": "Post my first listing",
       "dismiss": "Close"
@@ -1646,6 +1655,82 @@
     "calloutWarning": "Warning",
     "calloutInfo": "Good to know",
     "updatedOn": "Updated on {{date}}"
+  },
+  "myListings": {
+    "title": "My listings",
+    "subtitle": "Manage your listings, track performance, and boost visibility.",
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "expiringSoon": "Expiring soon",
+      "expired": "Expired",
+      "sold": "Sold",
+      "draft": "Drafts"
+    },
+    "card": {
+      "badge": {
+        "active": "Active",
+        "expiringSoon": "Expiring soon",
+        "expired": "Expired",
+        "sold": "Sold",
+        "draft": "Draft",
+        "other": "—"
+      },
+      "expiresInDays": "Expires in {{count}} days",
+      "expiredOn": "Expired on {{date}}",
+      "soldOn": "Sold on {{date}}",
+      "progressAria": "Listing lifetime progress"
+    },
+    "actions": {
+      "boost": "Boost",
+      "boostComingSoon": "Coming soon",
+      "edit": "Edit",
+      "markSold": "Mark sold",
+      "renew": "Renew ({{cost}} credits)",
+      "continueDraft": "Continue editing",
+      "deleteDraft": "Delete",
+      "viewDetails": "View details"
+    },
+    "renewModal": {
+      "title": "Renew {{title}}",
+      "subtitle": "Renewal for 30 days",
+      "cost": "Cost",
+      "balanceCurrent": "Current balance",
+      "balanceAfter": "Balance after",
+      "benefits": {
+        "active": "Your listing will be set back to Active",
+        "duration": "Visible for 30 more days",
+        "metrics": "View counter preserved"
+      },
+      "insufficient": "Insufficient balance",
+      "recharge": "Top up",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "success": "Listing renewed for 30 days",
+      "errorInsufficient": "Insufficient balance.",
+      "errorNotOwner": "You are not the owner of this listing.",
+      "priceContext": "Listing price: {{price}}"
+    },
+    "markSoldModal": {
+      "title": "Mark as sold",
+      "warning": "This action is irreversible.",
+      "description": "Your listing will be removed from search results. Active boosts will be cancelled.",
+      "priceLabel": "Sold at what price? (optional)",
+      "priceHelp": "Optional — used for anonymous analytics.",
+      "confirm": "Confirm sale",
+      "success": "Listing marked as sold 🎉",
+      "errorNotOwner": "You are not the owner.",
+      "errorInvalidPrice": "Invalid price."
+    },
+    "empty": {
+      "title": "No listing in this category",
+      "body": "Publish your first listing to start selling your vehicle.",
+      "cta": "Publish my first listing"
+    },
+    "error": {
+      "title": "Unable to load your listings.",
+      "retry": "Retry"
+    }
   },
   "contact": {
     "pageTitle": "Contact",

@@ -93,8 +93,16 @@ describe("formatAriary", () => {
 });
 
 describe("CREDIT_PACKS_CANONICAL", () => {
-  it("contient 4 packs (post-PROMPT 1 : discover/standard/pro/power)", () => {
-    expect(CREDIT_PACKS_CANONICAL).toHaveLength(4);
+  it("contient 6 packs (post-PROMPT 3.5 : discover/standard/pro/power/business/enterprise)", () => {
+    expect(CREDIT_PACKS_CANONICAL).toHaveLength(6);
+    expect(CREDIT_PACKS_CANONICAL.map((p) => p.id)).toEqual([
+      "discover",
+      "standard",
+      "pro",
+      "power",
+      "business",
+      "enterprise",
+    ]);
   });
 
   it("a des sort_order uniques et croissants", () => {

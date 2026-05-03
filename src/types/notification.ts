@@ -4,7 +4,16 @@
  * Les types DB sont en snake_case ; on expose ici la version camelCase
  * consommée par les hooks et composants. La conversion se fait dans
  * `mapDbRowToNotification` (src/hooks/useNotifications.ts).
+ *
+ * PROMPT 4 (2026-05-05) : NotificationType passe d'un union manuel (9 valeurs)
+ * à `Database['public']['Enums']['notification_type']` (auto-sync avec types
+ * regen). Les 13 nouvelles valeurs ajoutées par PROMPT 1 (listing_expiring_7d/3d/1d,
+ * listing_renewed, boost_ending_1d/ended, credits_grant/expiring_30d/expired,
+ * verif_approved/rejected, milestone_50_views/10_contacts) sont automatiquement
+ * couvertes — plus de drift TS.
  */
+
+import type { Database } from "@/integrations/supabase/types";
 
 export const NOTIFICATION_CATEGORIES = [
   "listings",
@@ -16,16 +25,7 @@ export const NOTIFICATION_CATEGORIES = [
 ] as const;
 export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 
-export type NotificationType =
-  | "listing_published"
-  | "listing_rejected"
-  | "listing_expiring_soon"
-  | "listing_expired"
-  | "credits_purchased"
-  | "credits_low"
-  | "welcome"
-  | "admin_moderation_needed"
-  | "system";
+export type NotificationType = Database["public"]["Enums"]["notification_type"];
 
 export type NotificationPriority = "critical" | "high" | "normal" | "low";
 

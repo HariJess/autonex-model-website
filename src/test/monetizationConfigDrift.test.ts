@@ -104,11 +104,12 @@ describe("monetization — credit_pricing TS ↔ SQL drift (M11, post-PROMPT 1)"
   });
 });
 
-describe("monetization — credit_packs TS ↔ SQL drift (M11, post-PROMPT 1)", () => {
-  // PROMPT 1 (20260503160000) fait DELETE FROM credit_packs puis INSERT
-  // les 4 nouveaux packs (discover, standard, pro, power) avec colonnes :
-  // (id, name, display_name, credits_amount, bonus_credits, price_mga, sort_order, is_active)
-  const sql = readSql("20260503160000_credits_monetization_realignment.sql");
+describe("monetization — credit_packs TS ↔ SQL drift (M11, post-PROMPT 3.5)", () => {
+  // PROMPT 3.5 (20260504160000) fait DELETE FROM credit_packs puis INSERT
+  // les 6 nouveaux packs (discover, standard, pro, power, business, enterprise)
+  // avec colonnes : (id, name, display_name, credits_amount, bonus_credits,
+  // price_mga, sort_order, is_active)
+  const sql = readSql("20260504160000_credit_packs_recalibration_v2.sql");
 
   // Match 8-tuples : ('discover', 'Pack Découverte', 'Pack Découverte', 10000, 0, 10000, 1, true)
   const packRegex =
@@ -137,9 +138,16 @@ describe("monetization — credit_packs TS ↔ SQL drift (M11, post-PROMPT 1)", 
     });
   }
 
-  it("extracts exactly 4 packs (discover/standard/pro/power) from PROMPT 1 seed", () => {
-    expect(seedPacks).toHaveLength(4);
-    expect(seedPacks.map((p) => p.id)).toEqual(["discover", "standard", "pro", "power"]);
+  it("extracts exactly 6 packs from PROMPT 3.5 seed", () => {
+    expect(seedPacks).toHaveLength(6);
+    expect(seedPacks.map((p) => p.id)).toEqual([
+      "discover",
+      "standard",
+      "pro",
+      "power",
+      "business",
+      "enterprise",
+    ]);
   });
 
   it("CREDIT_PACKS_CANONICAL has the same length as the SQL seed", () => {

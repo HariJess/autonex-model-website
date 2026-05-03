@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { User, Menu, X, LogOut, ChevronDown, Globe2, Settings as SettingsIcon, Heart } from "lucide-react";
+import { User, Menu, X, LogOut, ChevronDown, Globe2, Settings as SettingsIcon, Heart, ClipboardList, LayoutDashboard } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { CreditBalanceChip } from "@/features/credits/components/CreditBalanceChip";
 
 const Header = () => {
   const { t } = useTranslation();
@@ -144,6 +145,21 @@ const Header = () => {
           </Link>
         </nav>
 
+        {/* Section "Mon compte" : visible uniquement si auth, séparée
+            visuellement des liens publics (gauche) et des controls (droite). */}
+        {user && (
+          <div className="hidden lg:flex items-center px-4 mx-2 border-l border-r border-white/15">
+            <Link
+              to="/mes-annonces"
+              data-testid="nav-my-listings"
+              className={`${navLinkClass(location.pathname.startsWith("/mes-annonces"))} inline-flex items-center gap-1.5`}
+            >
+              <ClipboardList className="h-4 w-4" aria-hidden="true" />
+              {t("nav.myListings", "Mes annonces")}
+            </Link>
+          </div>
+        )}
+
         <div className="hidden lg:flex items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -180,6 +196,7 @@ const Header = () => {
           <Button onClick={() => navigate("/publier")} className="gradient-primary border-0 text-sm font-semibold text-navbar-foreground">
             {t("nav.publish")}
           </Button>
+          {user && <CreditBalanceChip />}
           {user && <NotificationBell />}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -190,7 +207,12 @@ const Header = () => {
             <DropdownMenuContent align="end" className="w-48 border-white/20 bg-dropdown text-navbar-foreground">
               {user ? (
                 <>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/mes-annonces")}>
+                    <ClipboardList className="mr-2 h-4 w-4" />
+                    {t("nav.myListings", "Mes annonces")}
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/dashboard")}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
                     {t("nav.dashboard")}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer focus:bg-white/10 focus:text-white" onSelect={() => navigate("/favoris")}>
@@ -231,6 +253,18 @@ const Header = () => {
       {menuOpen && (
         <div id="mobile-nav" className="lg:hidden border-t border-white/10 bg-navbar">
           <div className="container mx-auto pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2.5">
+            {/* "Mon compte" : visible uniquement si auth, première position */}
+            {user && (
+              <Link
+                to="/mes-annonces"
+                data-testid="nav-my-listings-mobile"
+                onClick={() => setMenuOpen(false)}
+                className="text-sm px-2 py-2.5 min-h-11 rounded-lg flex items-center gap-2 touch-manipulation bg-white/[0.04] active:bg-white/[0.1] text-navbar-foreground border border-white/10"
+              >
+                <ClipboardList className="h-4 w-4" aria-hidden="true" />
+                {t("nav.myListings", "Mes annonces")}
+              </Link>
+            )}
             <Link
               to={buyMode.href}
               onClick={() => setMenuOpen(false)}
@@ -326,6 +360,9 @@ const Header = () => {
               </Button>
               {user ? (
                 <>
+                  <div className="inline-flex items-center min-h-10" onClick={() => setMenuOpen(false)}>
+                    <CreditBalanceChip compact className="text-navbar-foreground" />
+                  </div>
                   <Button variant="ghost" size="sm" className="justify-start min-h-10 text-navbar-foreground" onClick={() => { navigate("/dashboard"); setMenuOpen(false); }}>
                     <User className="h-4 w-4 mr-1" /> {t("nav.dashboard")}
                   </Button>

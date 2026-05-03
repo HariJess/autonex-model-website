@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,12 @@ type Listing = Tables<"listings">;
 
 type DashboardListingsSectionProps = {
   title: string;
+  /**
+   * Action optionnelle rendue à droite du titre (pattern flex justify-between).
+   * Typiquement un Button "Gérer mes annonces →" pour navigate /mes-annonces.
+   * Si null/undefined, le titre est rendu seul (comportement legacy préservé).
+   */
+  headerAction?: ReactNode;
   listingsLoading: boolean;
   listingsErrorMessage?: string;
   publishedListings: Listing[];
@@ -121,6 +127,7 @@ function ListingBoostNotes({
 
 export function DashboardListingsSection({
   title,
+  headerAction,
   listingsLoading,
   listingsErrorMessage,
   publishedListings,
@@ -140,7 +147,15 @@ export function DashboardListingsSection({
 
   return (
     <div>
-      <h2 className="font-sans text-xl font-bold mb-4">{title}</h2>
+      {/* Header : titre seul (legacy) ou titre + action droite (flex justify-between) */}
+      {headerAction ? (
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-sans text-xl font-bold">{title}</h2>
+          {headerAction}
+        </div>
+      ) : (
+        <h2 className="font-sans text-xl font-bold mb-4">{title}</h2>
+      )}
 
       {listingsErrorMessage && (
         <div className="flex items-center gap-2 text-destructive mb-4">

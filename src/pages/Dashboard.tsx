@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import Footer from "@/components/Footer";
-import { Eye, Phone, MessageSquare, Home, Coins } from "lucide-react";
+import { Eye, Phone, MessageSquare, Home, Coins, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -23,6 +25,7 @@ import { DashboardCreditsSection } from "@/pages/dashboard/components/DashboardC
 import { DashboardListingsSection } from "@/pages/dashboard/components/DashboardListingsSection";
 import { DashboardLeadsSection } from "@/pages/dashboard/components/DashboardLeadsSection";
 import { MyAgencySection } from "@/components/dashboard/MyAgencySection";
+import { CreditWelcomeBanner } from "@/features/credits/components/CreditWelcomeBanner";
 
 type Listing = Tables<"listings">;
 
@@ -324,6 +327,8 @@ const Dashboard = () => {
           publishLabel={t("nav.publish")}
         />
 
+        <CreditWelcomeBanner />
+
         {profile?.agency_id ? <MyAgencySection /> : null}
 
         <DashboardStatsCards stats={stats} />
@@ -374,6 +379,16 @@ const Dashboard = () => {
 
         <DashboardListingsSection
           title={t("dashboard.myListings")}
+          headerAction={
+            publishedListings.length > 0 ? (
+              <Button asChild className="gradient-primary border-0 gap-2">
+                <Link to="/mes-annonces">
+                  {t("dashboard.section.manageListings", "Gérer mes annonces")}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            ) : undefined
+          }
           listingsLoading={listingsLoading}
           listingsErrorMessage={listingsError instanceof Error ? listingsError.message : undefined}
           publishedListings={publishedListings}

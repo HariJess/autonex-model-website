@@ -238,6 +238,10 @@
     "listing": "Filazana",
     "listingDeleted": "Voafafa ny filazana",
     "myListings": "Ny filazako",
+    "viewAllListings": "Ny filazako",
+    "section": {
+      "manageListings": "Hitantana ny filazana ahy"
+    },
     "noLeads": "Mbola tsy nahazo fifandraisana.",
     "noListings": "Tsy misy filazana. Avoaky ny filazana voalohany !",
     "pause": "Hampijanona",
@@ -828,6 +832,7 @@
     "home": "Fandraisana",
     "login": "Hiditra",
     "logout": "Hivoaka",
+    "myListings": "Ny filazana ahy",
     "newProjects": "Vaovao",
     "publish": "Hamoaka filazana",
     "rent": "Hofa maharitra",
@@ -1591,6 +1596,10 @@
     },
     "welcome": {
       "title": "Tongasoa eto AutoNex !",
+      "titleRemaining": "Ny crédits maimaim-poanao",
+      "bodyInitial": "Nahazo {{amount}} crédits maimaim-poana ianao ({{listings}} filazana maimaim-poana). Lany aorian'ny {{days}} andro.",
+      "bodyRemaining": "Mbola manana {{remaining}} crédits maimaim-poana ianao (amin'ny {{received}} nahazo). Mitovy amin'ny {{listings}} filazana maimaim-poana. Lany aorian'ny {{days}} andro.",
+      "_DEPRECATED_PROMPT_4_3": "credits.welcome.body nosoloina amin'ny bodyInitial/bodyRemaining. Tazonina mba tsy hahatonga 404 i18n.",
       "body": "Nahazo {{amount}} crédits maimaim-poana ianao ({{listings}} filazana maimaim-poana). Hifarana ao anatin'ny {{days}} andro.",
       "cta": "Mamoaka filazana voalohany",
       "dismiss": "Hidio"
@@ -1646,6 +1655,82 @@
     "calloutWarning": "Tandremo",
     "calloutInfo": "Tokony ho fantatra",
     "updatedOn": "Nohavaozina ny {{date}}"
+  },
+  "myListings": {
+    "title": "Ny filazana ahy",
+    "subtitle": "Tantano ny filazanao, jereo ny fampandehanana, ary ampandehano ny fahitana.",
+    "tabs": {
+      "all": "Rehetra",
+      "active": "Mavitrika",
+      "expiringSoon": "Ho lany tsy ho ela",
+      "expired": "Lany",
+      "sold": "Voavidy",
+      "draft": "Rohy"
+    },
+    "card": {
+      "badge": {
+        "active": "Mavitrika",
+        "expiringSoon": "Ho lany tsy ho ela",
+        "expired": "Lany",
+        "sold": "Voavidy",
+        "draft": "Rohy",
+        "other": "—"
+      },
+      "expiresInDays": "Ho lany ao anatin'ny {{count}} andro",
+      "expiredOn": "Lany ny {{date}}",
+      "soldOn": "Voavidy ny {{date}}",
+      "progressAria": "Fivoaran'ny faharetan'ny filazana"
+    },
+    "actions": {
+      "boost": "Booster",
+      "boostComingSoon": "Ho avy tsy ho ela",
+      "edit": "Hanova",
+      "markSold": "Mariho voavidy",
+      "renew": "Havaozina ({{cost}} crédits)",
+      "continueDraft": "Tohizo ny fanoratana",
+      "deleteDraft": "Foano",
+      "viewDetails": "Hijery antsipiriany"
+    },
+    "renewModal": {
+      "title": "Havaozina {{title}}",
+      "subtitle": "Fanavaozana mandritra ny 30 andro",
+      "cost": "Vidiny",
+      "balanceCurrent": "Solde ankehitriny",
+      "balanceAfter": "Solde aorian'ny",
+      "benefits": {
+        "active": "Hiverina Mavitrika ny filazanao",
+        "duration": "Hita mandritra ny 30 andro fanampiny",
+        "metrics": "Tahirina ny isan'ny fijery"
+      },
+      "insufficient": "Tsy ampy ny solde",
+      "recharge": "Hampitomboana crédits",
+      "cancel": "Hialana",
+      "confirm": "Hanamarina",
+      "success": "Voavaozina ho 30 andro ny filazana",
+      "errorInsufficient": "Tsy ampy ny solde.",
+      "errorNotOwner": "Tsy ianao no tompon'ity filazana ity.",
+      "priceContext": "Vidin'ny filazana : {{price}}"
+    },
+    "markSoldModal": {
+      "title": "Mariho hoe voavidy",
+      "warning": "Tsy azo averina intsony ity dingana ity.",
+      "description": "Esorina amin'ny vokatra fikarohana ny filazanao. Ho foanana ho azy ireo boost mavitrika.",
+      "priceLabel": "Vidiny inona no nivarotanao ? (tsy voatery)",
+      "priceHelp": "Tsy voatery — ampiasaina amin'ny analytics tsy fantatra anarana.",
+      "confirm": "Hanamarina ny varotra",
+      "success": "Mariky ny voavidy ny filazana 🎉",
+      "errorNotOwner": "Tsy ianao no tompony.",
+      "errorInvalidPrice": "Vidiny tsy mety."
+    },
+    "empty": {
+      "title": "Tsy misy filazana amin'ity sokajy ity",
+      "body": "Mamoaka filazana voalohany mba hanombohana ny fivarotana ny fiaranao.",
+      "cta": "Mamoaka filazana voalohany"
+    },
+    "error": {
+      "title": "Tsy afaka mametaha ny filazanao.",
+      "retry": "Andramo indray"
+    }
   },
   "contact": {
     "pageTitle": "Fifandraisana",

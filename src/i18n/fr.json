@@ -238,6 +238,10 @@
     "listing": "Annonce",
     "listingDeleted": "Annonce supprimée",
     "myListings": "Mes annonces",
+    "viewAllListings": "Mes annonces",
+    "section": {
+      "manageListings": "Gérer mes annonces"
+    },
     "noLeads": "Aucun contact reçu pour le moment.",
     "noListings": "Aucune annonce. Publiez votre première annonce !",
     "pause": "Mettre en pause",
@@ -828,6 +832,7 @@
     "home": "Accueil",
     "login": "Connexion",
     "logout": "Déconnexion",
+    "myListings": "Mes annonces",
     "newProjects": "Nouveautés",
     "publish": "Publier une annonce",
     "rent": "Location longue durée",
@@ -1591,6 +1596,10 @@
     },
     "welcome": {
       "title": "Bienvenue sur AutoNex !",
+      "titleRemaining": "Vos crédits offerts",
+      "bodyInitial": "Vous avez reçu {{amount}} crédits offerts ({{listings}} annonces gratuites). Expirent dans {{days}} jours.",
+      "bodyRemaining": "Il vous reste {{remaining}} crédits offerts (sur {{received}} reçus). Soit {{listings}} annonces gratuites. Expirent dans {{days}} jours.",
+      "_DEPRECATED_PROMPT_4_3": "credits.welcome.body remplacée par bodyInitial/bodyRemaining (logique adaptative reçu vs restant). Conservée pour éviter 404 i18n si reused ailleurs.",
       "body": "Vous avez reçu {{amount}} crédits offerts ({{listings}} annonces gratuites). Expire dans {{days}} jours.",
       "cta": "Publier ma première annonce",
       "dismiss": "Fermer"
@@ -1646,6 +1655,82 @@
     "calloutWarning": "Attention",
     "calloutInfo": "À savoir",
     "updatedOn": "Mis à jour le {{date}}"
+  },
+  "myListings": {
+    "title": "Mes annonces",
+    "subtitle": "Gérez vos annonces, suivez leurs performances, et boostez votre visibilité.",
+    "tabs": {
+      "all": "Toutes",
+      "active": "Actives",
+      "expiringSoon": "Expire bientôt",
+      "expired": "Expirées",
+      "sold": "Vendues",
+      "draft": "Brouillons"
+    },
+    "card": {
+      "badge": {
+        "active": "Active",
+        "expiringSoon": "Expire bientôt",
+        "expired": "Expirée",
+        "sold": "Vendue",
+        "draft": "Brouillon",
+        "other": "—"
+      },
+      "expiresInDays": "Expire dans {{count}} jours",
+      "expiredOn": "Expirée le {{date}}",
+      "soldOn": "Vendue le {{date}}",
+      "progressAria": "Progression de la durée de vie"
+    },
+    "actions": {
+      "boost": "Booster",
+      "boostComingSoon": "Bientôt disponible",
+      "edit": "Modifier",
+      "markSold": "Marquer vendue",
+      "renew": "Renouveler ({{cost}} crédits)",
+      "continueDraft": "Continuer la rédaction",
+      "deleteDraft": "Supprimer",
+      "viewDetails": "Voir détails"
+    },
+    "renewModal": {
+      "title": "Renouveler {{title}}",
+      "subtitle": "Renouvellement pour 30 jours",
+      "cost": "Coût",
+      "balanceCurrent": "Solde actuel",
+      "balanceAfter": "Solde après",
+      "benefits": {
+        "active": "Votre annonce repassera en Active",
+        "duration": "Visible 30 jours supplémentaires",
+        "metrics": "Compteur de vues conservé"
+      },
+      "insufficient": "Solde insuffisant",
+      "recharge": "Recharger",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "success": "Annonce renouvelée pour 30 jours",
+      "errorInsufficient": "Solde insuffisant.",
+      "errorNotOwner": "Vous n'êtes pas propriétaire de cette annonce.",
+      "priceContext": "Prix de l'annonce : {{price}}"
+    },
+    "markSoldModal": {
+      "title": "Marquer comme vendue",
+      "warning": "Cette action est irréversible.",
+      "description": "Votre annonce sera retirée des résultats de recherche. Les boosts actifs seront automatiquement annulés.",
+      "priceLabel": "Vendue à quel prix ? (optionnel)",
+      "priceHelp": "Optionnel — utilisé pour analytics anonymes.",
+      "confirm": "Confirmer la vente",
+      "success": "Annonce marquée vendue 🎉",
+      "errorNotOwner": "Vous n'êtes pas propriétaire.",
+      "errorInvalidPrice": "Prix invalide."
+    },
+    "empty": {
+      "title": "Aucune annonce dans cette catégorie",
+      "body": "Publiez votre première annonce pour commencer à vendre votre véhicule.",
+      "cta": "Publier ma première annonce"
+    },
+    "error": {
+      "title": "Impossible de charger vos annonces.",
+      "retry": "Réessayer"
+    }
   },
   "contact": {
     "pageTitle": "Contact",
