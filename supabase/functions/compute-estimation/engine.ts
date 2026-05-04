@@ -19,6 +19,7 @@ import type {
   ClaimMode,
   ConfidenceBand,
   ConfidenceDriver,
+  EstimationAuditV2,
   EvidenceMetrics,
   EvidenceTier,
   EvidenceTierDecision,
@@ -33,6 +34,15 @@ import type {
   TransmissionType,
 } from "./types.ts";
 import { computeFallbackBaseline, findReferenceProfile } from "./reference-profiles.ts";
+import {
+  FALLBACK_TRANSACTION_FACTORS,
+  fetchTransactionFactors,
+  resolveFactorKey,
+  type AppConfigSupabaseClient,
+  type ComparableSourceOrigin,
+  type TransactionFactorKey,
+  type TransactionFactorsConfig,
+} from "./transaction-factors.ts";
 
 /**
  * Interface minimale couvrant les appels supabase-js utilisés par le moteur.
@@ -64,6 +74,18 @@ type ComparableListingRow = {
   id: string;
   title: string;
   price_mga: number | null;
+  /** PROMPT 10A — prix avant application transaction factor (audit). */
+  raw_price_mga?: number | null;
+  /** PROMPT 10A — factor appliqué (1.0 si aucun). */
+  factor_applied?: number;
+  /** PROMPT 10A — clé de factor utilisée (audit). */
+  factor_key?: TransactionFactorKey;
+  /** PROMPT 10A — origine du comparable (UNION 2 sources). */
+  source_origin?: ComparableSourceOrigin;
+  /** PROMPT 10A — trim/version pour filtrage cascade. */
+  trim?: string | null;
+  /** PROMPT 10A — seller_type depuis market_listings_clean (factor key). */
+  seller_type?: string | null;
   year: number | null;
   mileage_km: number | null;
   ville: string | null;
@@ -90,6 +112,10 @@ type ComparableFetchResult = {
   selectedFreshnessAvg: number;
   selectedSameCityCount: number;
   selectedWithRegionCount: number;
+  sourceBreakdown: { marketClean: number; autonexActive: number };
+  transactionFactorAvg: number;
+  rawPrices: number[];
+  trimFiltering: EstimationAuditV2["trimFiltering"];
 };
 
 type QualityAcceptedCandidate = {
@@ -148,6 +174,49 @@ function removeOutliers(prices: number[]): number[] {
   if (mad === 0) return prices;
   const threshold = 2.8 * mad;
   return prices.filter((p) => Math.abs(p - med) <= threshold);
+}
+
+/** PROMPT 10A — Mirror du helper percentile (port pur, pas de lib externe). */
+export function percentile(values: number[], p: number): number {
+  if (values.length === 0) return 0;
+  if (values.length === 1) return values[0];
+  const sorted = [...values].sort((a, b) => a - b);
+  const idx = (sorted.length - 1) * p;
+  const lower = Math.floor(idx);
+  const upper = Math.ceil(idx);
+  if (lower === upper) return sorted[lower];
+  return Math.round(sorted[lower] + (sorted[upper] - sorted[lower]) * (idx - lower));
+}
+
+/** PROMPT 10A — Mirror du calcul de range Argus-grade. */
+export function computeRangeFromPercentiles(
+  prices: number[],
+  fallbackCenter: number,
+  fallbackSpread: number,
+): {
+  low: number;
+  high: number;
+  method: "percentile_p10_p90" | "percentile_p25_p75" | "synthetic_spread";
+} {
+  if (prices.length >= 8) {
+    return {
+      low: percentile(prices, 0.1),
+      high: percentile(prices, 0.9),
+      method: "percentile_p10_p90",
+    };
+  }
+  if (prices.length >= 5) {
+    return {
+      low: percentile(prices, 0.25),
+      high: percentile(prices, 0.75),
+      method: "percentile_p25_p75",
+    };
+  }
+  return {
+    low: Math.round(fallbackCenter * (1 - fallbackSpread)),
+    high: Math.round(fallbackCenter * (1 + fallbackSpread)),
+    method: "synthetic_spread",
+  };
 }
 
 function toNormalized(value: string | null | undefined): string {
@@ -316,28 +385,162 @@ async function fetchComparableRows(
     const message = (error as { message?: string }).message ?? "supabase_error";
     throw new Error(message);
   }
-  return (data ?? []) as ComparableListingRow[];
+  return (data ?? []).map((row) => ({
+    ...(row as ComparableListingRow),
+    source_origin: "autonex_active" as ComparableSourceOrigin,
+    trim: null,
+    raw_price_mga: (row as ComparableListingRow).price_mga,
+    factor_applied: 1.0,
+    factor_key: "autonex_active" as TransactionFactorKey,
+  })) as ComparableListingRow[];
+}
+
+/** PROMPT 10A — Mirror : fetch market_listings_clean + map vers ComparableListingRow. */
+type MarketCleanRow = {
+  id: string;
+  normalized_make: string | null;
+  normalized_model: string | null;
+  normalized_trim: string | null;
+  year: number | null;
+  mileage_km: number | null;
+  price_mga: number | null;
+  fuel_type: string | null;
+  transmission: string | null;
+  drivetrain: string | null;
+  body_style: string | null;
+  city: string | null;
+  seller_type: string | null;
+  source: string | null;
+  posted_at: string | null;
+  data_confidence: string | null;
+  include_in_estimation: boolean | null;
+  outlier_flag: boolean | null;
+  fingerprint: string | null;
+};
+
+function mapCleanRowToComparable(row: MarketCleanRow): ComparableListingRow {
+  const make = row.normalized_make ?? "";
+  const model = row.normalized_model ?? "";
+  const trim = row.normalized_trim ?? "";
+  const titleParts = [make, model, trim, row.year ? String(row.year) : ""].filter(Boolean);
+  const title = titleParts.join(" ").trim() || `${make} ${model}`.trim() || "comparable";
+  return {
+    id: `mkt:${row.id}`,
+    title,
+    price_mga: row.price_mga,
+    raw_price_mga: row.price_mga,
+    factor_applied: 1.0,
+    factor_key: undefined,
+    source_origin: "market_clean",
+    trim: row.normalized_trim,
+    seller_type: row.seller_type,
+    year: row.year,
+    mileage_km: row.mileage_km,
+    ville: row.city,
+    region: null,
+    body_style: row.body_style,
+    fuel: row.fuel_type,
+    transmission_gearbox: row.transmission,
+    description: row.normalized_trim ? `Trim: ${row.normalized_trim}` : null,
+    created_at: row.posted_at,
+    updated_at: row.posted_at,
+    status: "active",
+    make,
+    model,
+  };
+}
+
+async function fetchMarketCleanRows(
+  client: MinimalSupabaseClient,
+  input: EstimationInput,
+  params: { yearWindow: number; limit: number },
+): Promise<ComparableListingRow[]> {
+  try {
+    const { data, error } = (await client
+      .from("market_listings_clean")
+      .select(
+        "id,normalized_make,normalized_model,normalized_trim,year,mileage_km,price_mga,fuel_type,transmission,drivetrain,body_style,city,seller_type,source,posted_at,data_confidence,include_in_estimation,outlier_flag,fingerprint",
+      )
+      .eq("include_in_estimation", true)
+      .eq("outlier_flag", false)
+      .ilike("normalized_make", input.makeName)
+      .ilike("normalized_model", input.modelName)
+      .gte("year", input.year - params.yearWindow)
+      .lte("year", input.year + params.yearWindow)
+      .limit(params.limit)) as { data: MarketCleanRow[] | null; error: unknown };
+    if (error) return [];
+    const rows = (data ?? []) as MarketCleanRow[];
+    return rows.map(mapCleanRowToComparable);
+  } catch (_err) {
+    return [];
+  }
+}
+
+/** PROMPT 10A — Mirror du trim cascade filter. */
+function applyTrimFilter(
+  rows: ComparableListingRow[],
+  inputTrim: string | null | undefined,
+): { filtered: ComparableListingRow[]; mode: EstimationAuditV2["trimFiltering"] } {
+  if (!inputTrim || inputTrim.trim() === "") {
+    return { filtered: rows, mode: "unspecified" };
+  }
+  const target = inputTrim.toLowerCase().trim();
+  const matchTrim = (r: ComparableListingRow): boolean => {
+    const trim = (r.trim ?? "").toLowerCase().trim();
+    if (trim && trim.includes(target)) return true;
+    const title = (r.title ?? "").toLowerCase();
+    return title.includes(target);
+  };
+  const strict = rows.filter(matchTrim);
+  if (strict.length >= 3) {
+    return { filtered: strict, mode: "strict" };
+  }
+  const relaxed = rows.filter((r) => {
+    if (matchTrim(r)) return true;
+    const trim = (r.trim ?? "").trim();
+    return trim === "";
+  });
+  if (relaxed.length >= 3) {
+    return { filtered: relaxed, mode: "relaxed" };
+  }
+  return { filtered: rows, mode: "all_trims_warning" };
 }
 
 async function fetchComparables(
   client: MinimalSupabaseClient,
   input: EstimationInput,
+  config: TransactionFactorsConfig,
 ): Promise<ComparableFetchResult> {
-  const strictRows = await fetchComparableRows(client, input, { yearWindow: 3, strictAttributes: true, limit: 160 });
-  const needsBackup = strictRows.length < 10;
+  // PROMPT 10A — UNION 2 sources : market_listings_clean + listings autonex
+  const [marketCleanRows, strictRows] = await Promise.all([
+    fetchMarketCleanRows(client, input, { yearWindow: 4, limit: 160 }),
+    fetchComparableRows(client, input, { yearWindow: 3, strictAttributes: true, limit: 160 }),
+  ]);
+  const needsBackup = strictRows.length + marketCleanRows.length < 10;
   const backupRows = needsBackup
     ? await fetchComparableRows(client, input, { yearWindow: 6, strictAttributes: false, limit: 160 })
     : [];
 
   const allById = new Map<string, { row: ComparableListingRow; source: "strict" | "backup" }>();
-  strictRows.forEach((row) => allById.set(row.id, { row, source: "strict" }));
+  marketCleanRows.forEach((row) => allById.set(row.id, { row, source: "strict" }));
+  strictRows.forEach((row) => {
+    if (!allById.has(row.id)) allById.set(row.id, { row, source: "strict" });
+  });
   backupRows.forEach((row) => {
     if (!allById.has(row.id)) allById.set(row.id, { row, source: "backup" });
   });
 
+  const rowsArray = Array.from(allById.values()).map((c) => c.row);
+  const trimResult = applyTrimFilter(rowsArray, input.trim);
+  const filteredById = new Map<string, { row: ComparableListingRow; source: "strict" | "backup" }>();
+  for (const r of trimResult.filtered) {
+    const entry = allById.get(r.id);
+    if (entry) filteredById.set(r.id, entry);
+  }
+
   const rejectedByReason: Record<string, number> = {};
   const accepted: QualityAcceptedCandidate[] = [];
-  for (const candidate of allById.values()) {
+  for (const candidate of filteredById.values()) {
     const quality = evaluateCandidateQuality(input, candidate.row);
     if (!quality.accepted) {
       const reason = quality.reason ?? "unknown_rejection";
@@ -352,7 +555,27 @@ async function fetchComparables(
     });
   }
 
-  const scored: ScoredComparableCandidate[] = accepted
+  // PROMPT 10A — Application transaction factor par row
+  const factoredAccepted = accepted.map((c) => {
+    const factorKey = resolveFactorKey(
+      c.row.seller_type ?? null,
+      c.row.source_origin ?? "unknown",
+    );
+    const factor = config.factors[factorKey] ?? config.factors.unknown;
+    const rawPrice = c.row.raw_price_mga ?? c.row.price_mga ?? 0;
+    return {
+      ...c,
+      row: {
+        ...c.row,
+        raw_price_mga: rawPrice,
+        factor_applied: factor,
+        factor_key: factorKey,
+        price_mga: Math.round(rawPrice * factor),
+      },
+    };
+  });
+
+  const scored: ScoredComparableCandidate[] = factoredAccepted
     .map((candidate) => ({
       ...candidate,
       similarityScore: computeSimilarityScore(input, candidate),
@@ -366,16 +589,20 @@ async function fetchComparables(
   const selectedWithoutOutliers = selected.filter((s) => outlierPriceSet.has(s.row.price_mga ?? 0)).slice(0, 12);
   const finalSelected = selectedWithoutOutliers.length >= 4 ? selectedWithoutOutliers : selected.slice(0, 12);
 
-  const ids = finalSelected.map((s) => s.row.id);
-  const { data: photos } = (await client
-    .from("listing_photos")
-    .select("listing_id,url,position")
-    .in("listing_id", ids)
-    .order("position", { ascending: true })) as { data: Array<{ listing_id: string; url: string; position: number }> | null };
+  const autonexIds = finalSelected
+    .filter((s) => s.row.source_origin === "autonex_active")
+    .map((s) => s.row.id);
   const firstPhoto = new Map<string, string>();
-  (photos ?? []).forEach((p) => {
-    if (!firstPhoto.has(p.listing_id)) firstPhoto.set(p.listing_id, p.url);
-  });
+  if (autonexIds.length > 0) {
+    const { data: photos } = (await client
+      .from("listing_photos")
+      .select("listing_id,url,position")
+      .in("listing_id", autonexIds)
+      .order("position", { ascending: true })) as { data: Array<{ listing_id: string; url: string; position: number }> | null };
+    (photos ?? []).forEach((p) => {
+      if (!firstPhoto.has(p.listing_id)) firstPhoto.set(p.listing_id, p.url);
+    });
+  }
 
   const comparables: EstimationComparable[] = finalSelected
     .map((candidate) => ({ row: candidate.row, score: candidate.similarityScore }))
@@ -389,19 +616,33 @@ async function fetchComparables(
       score,
       imageUrl: firstPhoto.get(row.id),
     }));
+
+  const sourceBreakdown = {
+    marketClean: finalSelected.filter((s) => s.row.source_origin === "market_clean").length,
+    autonexActive: finalSelected.filter((s) => s.row.source_origin === "autonex_active").length,
+  };
+  const factorAvg = finalSelected.length
+    ? finalSelected.reduce((sum, s) => sum + (s.row.factor_applied ?? 1), 0) / finalSelected.length
+    : 1;
+  const rawPrices = finalSelected.map((s) => s.row.raw_price_mga ?? s.row.price_mga ?? 0);
+
   return {
     comparables,
     candidateCount: allById.size,
     qualityFilteredCount: accepted.length,
-    strictCandidateCount: strictRows.length,
+    strictCandidateCount: strictRows.length + marketCleanRows.length,
     backupCandidateCount: backupRows.length,
-    rejectedCount: allById.size - accepted.length,
+    rejectedCount: filteredById.size - accepted.length,
     rejectedByReason,
     selectedFreshnessAvg: finalSelected.length
       ? Math.round(finalSelected.reduce((sum, item) => sum + item.freshnessScore, 0) / finalSelected.length)
       : 0,
     selectedSameCityCount: finalSelected.filter((item) => toNormalized(item.row.ville) === toNormalized(input.city)).length,
     selectedWithRegionCount: finalSelected.filter((item) => Boolean(toNormalized(item.row.region))).length,
+    sourceBreakdown,
+    transactionFactorAvg: Math.round(factorAvg * 1000) / 1000,
+    rawPrices,
+    trimFiltering: trimResult.mode,
   };
 }
 
@@ -792,6 +1033,25 @@ function toInsightItems(
  * `computeVehicleEstimationV2` du moteur legacy `src/lib/estimation/engine.ts`.
  * Toute divergence casse les 30 tests de parité.
  */
+function emptyComparableFetchResult(): ComparableFetchResult {
+  return {
+    comparables: [],
+    candidateCount: 0,
+    qualityFilteredCount: 0,
+    strictCandidateCount: 0,
+    backupCandidateCount: 0,
+    rejectedCount: 0,
+    rejectedByReason: {},
+    selectedFreshnessAvg: 0,
+    selectedSameCityCount: 0,
+    selectedWithRegionCount: 0,
+    sourceBreakdown: { marketClean: 0, autonexActive: 0 },
+    transactionFactorAvg: 1,
+    rawPrices: [],
+    trimFiltering: "unspecified",
+  };
+}
+
 export async function computeVehicleEstimationV2(
   client: MinimalSupabaseClient,
   input: EstimationInput,
@@ -810,33 +1070,16 @@ export async function computeVehicleEstimationV2(
     Math.round(fallback.basePrice * Math.pow(1 - fallback.annualDepreciationRate, heuristicYearsDelta)),
   );
 
-  let comparableFetch: ComparableFetchResult = {
-    comparables: [],
-    candidateCount: 0,
-    qualityFilteredCount: 0,
-    strictCandidateCount: 0,
-    backupCandidateCount: 0,
-    rejectedCount: 0,
-    rejectedByReason: {},
-    selectedFreshnessAvg: 0,
-    selectedSameCityCount: 0,
-    selectedWithRegionCount: 0,
-  };
+  // PROMPT 10A — config transaction factors (best-effort, fallback hardcoded)
+  const factorConfig: TransactionFactorsConfig = await fetchTransactionFactors(
+    client as unknown as AppConfigSupabaseClient,
+  ).catch(() => FALLBACK_TRANSACTION_FACTORS);
+
+  let comparableFetch: ComparableFetchResult = emptyComparableFetchResult();
   try {
-    comparableFetch = await fetchComparables(client, normalized);
+    comparableFetch = await fetchComparables(client, normalized, factorConfig);
   } catch {
-    comparableFetch = {
-      comparables: [],
-      candidateCount: 0,
-      qualityFilteredCount: 0,
-      strictCandidateCount: 0,
-      backupCandidateCount: 0,
-      rejectedCount: 0,
-      rejectedByReason: {},
-      selectedFreshnessAvg: 0,
-      selectedSameCityCount: 0,
-      selectedWithRegionCount: 0,
-    };
+    comparableFetch = emptyComparableFetchResult();
   }
   const comparables = comparableFetch.comparables;
   const prices = comparables.map((c) => c.price);
@@ -933,22 +1176,53 @@ export async function computeVehicleEstimationV2(
   });
 
   const adjustments = buildAdjustmentFactors(normalized);
-  const adjustedPrice = Math.round(marketBasePrice * adjustments.multiplier);
+  const adjustedPriceRaw = Math.round(marketBasePrice * adjustments.multiplier);
+
+  // PROMPT 10A — Cap fix : safety net post-blend
+  const ratioBeforeCap = marketBasePrice > 0 ? adjustedPriceRaw / marketBasePrice : 1;
+  const ratioCapped = clamp(ratioBeforeCap, 0.8, 1.12);
+  const capApplied = ratioCapped !== ratioBeforeCap;
+  const adjustedPrice = capApplied ? Math.round(marketBasePrice * ratioCapped) : adjustedPriceRaw;
+
+  // PROMPT 10A — Pénalité confidence si trim non spécifié / mixed warning
+  const trimUnspecifiedPenalty = comparableFetch.trimFiltering === "unspecified" ? -5 : 0;
+  const trimMixedWarningPenalty = comparableFetch.trimFiltering === "all_trims_warning" ? -5 : 0;
 
   const { beforeCeiling, drivers } = computeConfidenceFromEvidence(evidence, evidence.canonicalModelCertainty);
-  const cappedConfidence = Math.min(beforeCeiling, policy.confidenceCeiling);
+  const beforeCeilingPenalized = clamp(
+    beforeCeiling + trimUnspecifiedPenalty + trimMixedWarningPenalty,
+    18,
+    96,
+  );
+  const cappedConfidence = Math.min(beforeCeilingPenalized, policy.confidenceCeiling);
   const confidenceBand = confidenceBandFromScore(cappedConfidence);
 
   const roundingStep = roundingStepFor(policy.precisionMode);
   const rangeSpread = getRangeSpreadFromPolicy(policy.rangeWidthMode, fallbackSeverity);
-  const lowRangePrice = Math.round(adjustedPrice * (1 - rangeSpread));
-  const highRangePrice = Math.round(adjustedPrice * (1 + rangeSpread));
+
+  // PROMPT 10A — Range Argus-grade : P10/P90 quand assez de comps
+  const comparablePrices = comparables.map((c) => c.price);
+  const rangeFromComps = computeRangeFromPercentiles(
+    comparablePrices,
+    adjustedPrice,
+    rangeSpread,
+  );
+  const lowRangePrice = rangeFromComps.low;
+  const highRangePrice = rangeFromComps.high;
+  const rangeMethod = rangeFromComps.method;
+
   const quickDiscount = confidenceBand === "high" ? 0.04 : confidenceBand === "medium" ? 0.065 : 0.085;
   const quickSalePrice = Math.round(adjustedPrice * (1 - quickDiscount));
   const recommendedListingPrice = Math.min(
     Math.round(adjustedPrice * (confidenceBand === "high" ? 1.03 : confidenceBand === "medium" ? 1.02 : 1.01)),
     Math.round(highRangePrice * 0.995),
   );
+
+  // PROMPT 10A — 3 valeurs Argus-grade
+  const formatMultipliers = factorConfig.price_format_multipliers;
+  const tradeInProRaw = Math.round(adjustedPrice * formatMultipliers.trade_in_pro);
+  const privateMarketRaw = adjustedPrice;
+  const dealerRetailRaw = Math.round(adjustedPrice * formatMultipliers.dealer_retail);
 
   const negativeFactors = [...adjustments.negative];
   if (!profile) negativeFactors.push("Modèle hors base de référence principale");
@@ -969,6 +1243,10 @@ export async function computeVehicleEstimationV2(
     quickSalePrice: roundToStep(quickSalePrice, roundingStep),
     recommendedListingPrice: roundToStep(recommendedListingPrice, roundingStep),
     roundingStepApplied: roundingStep,
+    // PROMPT 10A — 3 valeurs Argus-grade
+    tradeInPro: roundToStep(tradeInProRaw, roundingStep),
+    privateMarket: roundToStep(privateMarketRaw, roundingStep),
+    dealerRetail: roundToStep(dealerRetailRaw, roundingStep),
     internalUnrounded: {
       estimatedValueRaw: adjustedPrice,
       lowEstimateRaw: lowRangePrice,
@@ -1081,6 +1359,14 @@ export async function computeVehicleEstimationV2(
             ? "cautious"
             : "normal",
       requiredBadges: [policy.pricingMode],
+    },
+    audit: {
+      rangeMethod,
+      capApplied,
+      trimFiltering: comparableFetch.trimFiltering,
+      comparableSourceBreakdown: comparableFetch.sourceBreakdown,
+      transactionFactorAvg: comparableFetch.transactionFactorAvg,
+      transactionFactorVersion: factorConfig.version,
     },
   };
   return v2;

@@ -37,6 +37,8 @@ export interface EstimationInput {
   modelId?: string;
   makeName: string;
   modelName: string;
+  /** PROMPT 10A — Trim/version optionnel pour matching strict cascade. */
+  trim?: string | null;
   year: number;
   city: string;
   mileage: number;
@@ -154,6 +156,10 @@ export interface OutputValues {
   quickSalePrice: number;
   recommendedListingPrice: number;
   roundingStepApplied: number;
+  /** PROMPT 10A — 3 valeurs Argus-grade (additives). */
+  tradeInPro: number;
+  privateMarket: number;
+  dealerRetail: number;
   internalUnrounded?: {
     estimatedValueRaw: number;
     lowEstimateRaw: number;
@@ -217,6 +223,19 @@ export interface UiGovernance {
   >;
 }
 
+/** PROMPT 10A — Audit fields V2 (mirror du type côté src/types/estimation.ts). */
+export interface EstimationAuditV2 {
+  rangeMethod: "percentile_p10_p90" | "percentile_p25_p75" | "synthetic_spread";
+  capApplied: boolean;
+  trimFiltering: "strict" | "relaxed" | "all_trims_warning" | "unspecified";
+  comparableSourceBreakdown: {
+    marketClean: number;
+    autonexActive: number;
+  };
+  transactionFactorAvg: number;
+  transactionFactorVersion: string;
+}
+
 export interface EstimationOutputV2 {
   tierDecision: EvidenceTierDecision;
   modeGovernance: ModeGovernance;
@@ -228,4 +247,5 @@ export interface EstimationOutputV2 {
   comparables: EstimationComparable[];
   insights: InsightsPayload;
   uiGovernance: UiGovernance;
+  audit?: EstimationAuditV2;
 }
