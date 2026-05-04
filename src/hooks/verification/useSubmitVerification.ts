@@ -24,7 +24,7 @@ export type SubmitVerificationResult = {
 /**
  * Mappe les codes d'erreur RPC `submit_verification` vers une i18n key.
  * Codes émis par la RPC (RAISE EXCEPTION) :
- *   - 'auth_required'                → verification.errors.generic
+ *   - 'auth_required' / 'not_authenticated' → verification.errors.notAuthenticated
  *   - 'missing_documents'            → verification.errors.uploadFailed
  *   - 'invalid_full_name'            → verification.errors.invalidFullName
  *   - 'invalid_cin_number'           → verification.errors.invalidCinNumber
@@ -32,8 +32,14 @@ export type SubmitVerificationResult = {
  *   - 'verification_already_active'  → verification.errors.alreadyActive
  *   - 'pricing_not_found'            → verification.errors.generic
  *   - 'insufficient_credits'         → verification.errors.insufficientCredits
+ *
+ * Le hook `useUploadVerificationFile` peut aussi émettre directement la key
+ * `verification.errors.notAuthenticated` quand getSession() retourne null —
+ * dans ce cas le message EST déjà la i18n key, on la retourne telle quelle.
  */
 export function mapSubmitVerificationErrorToI18nKey(message: string): string {
+  // Pass-through : si le message est déjà une i18n key (cas upload hook).
+  if (message.startsWith("verification.errors.")) return message;
   const m = message.toLowerCase();
   if (m.includes("insufficient_credits")) return "verification.errors.insufficientCredits";
   if (m.includes("verification_already_active")) return "verification.errors.alreadyActive";
@@ -41,6 +47,9 @@ export function mapSubmitVerificationErrorToI18nKey(message: string): string {
   if (m.includes("invalid_cin_number")) return "verification.errors.invalidCinNumber";
   if (m.includes("missing_documents") || m.includes("invalid_document_path")) {
     return "verification.errors.uploadFailed";
+  }
+  if (m.includes("auth_required") || m.includes("not_authenticated")) {
+    return "verification.errors.notAuthenticated";
   }
   return "verification.errors.generic";
 }

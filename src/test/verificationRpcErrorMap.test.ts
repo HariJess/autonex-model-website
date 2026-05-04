@@ -14,8 +14,20 @@ describe("submit_verification error map", () => {
     ["invalid_cin_number", "verification.errors.invalidCinNumber"],
     ["missing_documents", "verification.errors.uploadFailed"],
     ["invalid_document_path", "verification.errors.uploadFailed"],
+    // HOTFIX : auth_required + not_authenticated → notAuthenticated key
+    ["auth_required", "verification.errors.notAuthenticated"],
+    ["not_authenticated", "verification.errors.notAuthenticated"],
   ])("maps `%s` → `%s`", (msg, expected) => {
     expect(mapSubmitVerificationErrorToI18nKey(msg)).toBe(expected);
+  });
+
+  it("pass-through quand le message EST déjà une i18n key (cas upload hook)", () => {
+    expect(
+      mapSubmitVerificationErrorToI18nKey("verification.errors.notAuthenticated"),
+    ).toBe("verification.errors.notAuthenticated");
+    expect(
+      mapSubmitVerificationErrorToI18nKey("verification.errors.uploadFailed"),
+    ).toBe("verification.errors.uploadFailed");
   });
 
   it("falls back to generic for unknown errors", () => {

@@ -2685,6 +2685,7 @@
       "fileSize": "Fichier trop volumineux (max 10 Mo)",
       "fileType": "Format non supporté",
       "uploadFailed": "Échec de l'upload, réessayez",
+      "notAuthenticated": "Session expirée. Veuillez vous reconnecter.",
       "insufficientCredits": "Crédits insuffisants pour la vérification",
       "alreadyActive": "Vous avez déjà une vérification en cours ou approuvée",
       "invalidFullName": "Nom complet invalide",

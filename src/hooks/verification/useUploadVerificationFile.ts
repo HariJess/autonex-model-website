@@ -13,6 +13,14 @@ import { supabase } from "@/integrations/supabase/client";
  *
  * `upsert: true` autorise l'utilisateur à re-uploader le même doc s'il
  * change d'avis avant submit. Cleanup orphans = backlog V2.
+ *
+ * HOTFIX (auth race) : la mutation force `await supabase.auth.getSession()`
+ * avant l'appel storage. Sans ça, dans certains scénarios (re-render React,
+ * token expired non-refresh, mutation cleanup), le client Supabase pouvait
+ * envoyer la requête Storage sans header Authorization — le bucket
+ * répondait alors 400 Bad Request ou 403 RLS (auth.uid() = NULL côté
+ * policy). Le user_id du path est désormais dérivé de `session.user.id`,
+ * pas d'un param React stale.
  */
 
 export type VerificationDocType = "cin_front" | "cin_back" | "selfie";
@@ -21,7 +29,6 @@ export type UploadVerificationFileInput = {
   file: File;
   sessionId: string;
   docType: VerificationDocType;
-  userId: string;
 };
 
 export type UploadVerificationFileResult = {
@@ -55,14 +62,31 @@ function extFromFile(file: File): string {
 
 export function useUploadVerificationFile() {
   return useMutation<UploadVerificationFileResult, Error, UploadVerificationFileInput>({
-    mutationFn: async ({ file, sessionId, docType, userId }) => {
+    mutationFn: async ({ file, sessionId, docType }) => {
       const validationKey = validateVerificationFile(file);
       if (validationKey) throw new Error(validationKey);
+
+      // HOTFIX : forcer la récupération de la session active avant l'appel
+      // storage. Garantit qu'un JWT est attaché à la requête (sinon RLS
+      // refuse) et utilise session.user.id comme source de vérité (vs un
+      // param React qui peut être stale).
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData?.session?.user?.id) {
+        throw new Error("verification.errors.notAuthenticated");
+      }
+      const userId = sessionData.session.user.id;
+
       const ext = extFromFile(file);
       const path = `${userId}/${sessionId}/${docType}.${ext}`;
       const { error } = await supabase.storage
         .from("verifications")
-        .upload(path, file, { upsert: true, cacheControl: "3600" });
+        .upload(path, file, {
+          upsert: true,
+          cacheControl: "3600",
+          // Force contentType pour éviter tout fallback application/octet-stream
+          // qui ne match pas le whitelist MIME du bucket (PROMPT 1).
+          contentType: file.type,
+        });
       if (error) {
         // Privacy : pas de path complet dans le message remonté à Sentry.
         // Le useMutation onError consumer mappe vers `verification.errors.uploadFailed`.

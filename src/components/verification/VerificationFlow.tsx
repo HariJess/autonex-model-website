@@ -169,11 +169,12 @@ export function VerificationFlow({ lastRejection }: VerificationFlowProps) {
       return;
     }
     try {
+      // HOTFIX : userId n'est plus passé en param — le hook le dérive de
+      // supabase.auth.getSession() pour garantir le JWT attaché à la requête.
       const { path } = await upload.mutateAsync({
         file,
         sessionId,
         docType,
-        userId: user.id,
       });
       setPaths((prev) => ({ ...prev, [docType]: path }));
     } catch (err) {

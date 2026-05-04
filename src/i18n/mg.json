@@ -2685,6 +2685,7 @@
       "fileSize": "Lehibe loatra ny rakitra (10 Mo farafahabetsany)",
       "fileType": "Tsy raisina ny endrika",
       "uploadFailed": "Tsy nahomby ny upload, andramo indray",
+      "notAuthenticated": "Tapitra ny session. Mihazonà indray.",
       "insufficientCredits": "Tsy ampy ny crédits ho an'ny fanamarinana",
       "alreadyActive": "Efa misy fanamarinana miandry na voankatoavy",
       "invalidFullName": "Anarana feno tsy ekena",

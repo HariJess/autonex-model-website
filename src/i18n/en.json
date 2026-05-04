@@ -2685,6 +2685,7 @@
       "fileSize": "File too large (max 10 MB)",
       "fileType": "Format not supported",
       "uploadFailed": "Upload failed, retry",
+      "notAuthenticated": "Session expired. Please log in again.",
       "insufficientCredits": "Insufficient credits for verification",
       "alreadyActive": "You already have a pending or approved verification",
       "invalidFullName": "Invalid full name",
