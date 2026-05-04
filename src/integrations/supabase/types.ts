@@ -2615,6 +2615,7 @@ export type Database = {
           id: string
           ledger_entry_id: string | null
           metadata: Json
+          rejection_category: string | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -2638,6 +2639,7 @@ export type Database = {
           id?: string
           ledger_entry_id?: string | null
           metadata?: Json
+          rejection_category?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -2661,6 +2663,7 @@ export type Database = {
           id?: string
           ledger_entry_id?: string | null
           metadata?: Json
+          rejection_category?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -3075,6 +3078,10 @@ export type Database = {
       }
       apply_boost: {
         Args: { p_boost_type: string; p_listing_id: string }
+        Returns: Json
+      }
+      approve_verification: {
+        Args: { p_verification_id: string }
         Returns: Json
       }
       archive_notification: {
@@ -3529,6 +3536,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      reject_verification: {
+        Args: {
+          p_category?: string
+          p_reason: string
+          p_verification_id: string
+        }
+        Returns: Json
+      }
       renew_listing: { Args: { p_listing_id: string }; Returns: Json }
       request_account_deletion: {
         Args: never
@@ -3564,6 +3579,17 @@ export type Database = {
           p_message: string
           p_subject: string
           p_whatsapp_phone?: string
+        }
+        Returns: Json
+      }
+      submit_verification: {
+        Args: {
+          p_cin_back_path: string
+          p_cin_front_path: string
+          p_cin_number: string
+          p_date_of_birth?: string
+          p_full_name: string
+          p_selfie_path: string
         }
         Returns: Json
       }
@@ -3686,6 +3712,8 @@ export type Database = {
         | "milestone_50_views"
         | "milestone_10_contacts"
         | "boost_activated"
+        | "verif_submitted"
+        | "verif_expiring_30d"
       payment_method:
         | "mvola"
         | "orange_money"
@@ -3893,6 +3921,8 @@ export const Constants = {
         "milestone_50_views",
         "milestone_10_contacts",
         "boost_activated",
+        "verif_submitted",
+        "verif_expiring_30d",
       ],
       payment_method: [
         "mvola",
