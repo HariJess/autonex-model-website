@@ -7,6 +7,9 @@ const navItems = [
   { to: "/admin/overview", label: "Vue d’ensemble" },
   { to: "/admin/utilisateurs", label: "Utilisateurs" },
   { to: "/admin/moderation", label: "Modération" },
+  // PROMPT 7 — entrée placée entre Modération (contenu) et Agences pour
+  // cohérence sémantique : modération de contenu → vérifications d'identité.
+  { to: "/admin/verifications", label: "Vérifications" },
   { to: "/admin/agences", label: "Agences" },
   { to: "/admin/monetisation", label: "Monétisation" },
   { to: "/admin/revenus", label: "Revenus" },
