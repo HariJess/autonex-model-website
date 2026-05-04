@@ -225,6 +225,8 @@ export type Database = {
       }
       boosts: {
         Row: {
+          created_by: string | null
+          credits_charged: number
           ends_at: string | null
           id: string
           listing_id: string
@@ -232,6 +234,8 @@ export type Database = {
           type: Database["public"]["Enums"]["boost_type"]
         }
         Insert: {
+          created_by?: string | null
+          credits_charged?: number
           ends_at?: string | null
           id?: string
           listing_id: string
@@ -239,6 +243,8 @@ export type Database = {
           type: Database["public"]["Enums"]["boost_type"]
         }
         Update: {
+          created_by?: string | null
+          credits_charged?: number
           ends_at?: string | null
           id?: string
           listing_id?: string
@@ -790,6 +796,7 @@ export type Database = {
           expires_at: string | null
           exterior_color: string | null
           favorite_count: number
+          featured_until: string | null
           features: Json | null
           fuel: string | null
           has_video: boolean
@@ -799,6 +806,7 @@ export type Database = {
           is_electric: boolean | null
           is_hybrid: boolean | null
           is_new_program: boolean | null
+          last_bumped_at: string | null
           lat: number | null
           listing_duration_days: number
           lng: number | null
@@ -823,8 +831,10 @@ export type Database = {
           seats: number | null
           seller_type: string | null
           sold_at: string | null
+          sold_price: number | null
           status: Database["public"]["Enums"]["listing_status"] | null
           title: string
+          top_ad_until: string | null
           transaction: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox: string | null
           type: string | null
@@ -858,6 +868,7 @@ export type Database = {
           expires_at?: string | null
           exterior_color?: string | null
           favorite_count?: number
+          featured_until?: string | null
           features?: Json | null
           fuel?: string | null
           has_video?: boolean
@@ -867,6 +878,7 @@ export type Database = {
           is_electric?: boolean | null
           is_hybrid?: boolean | null
           is_new_program?: boolean | null
+          last_bumped_at?: string | null
           lat?: number | null
           listing_duration_days?: number
           lng?: number | null
@@ -891,8 +903,10 @@ export type Database = {
           seats?: number | null
           seller_type?: string | null
           sold_at?: string | null
+          sold_price?: number | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title: string
+          top_ad_until?: string | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
           type?: string | null
@@ -926,6 +940,7 @@ export type Database = {
           expires_at?: string | null
           exterior_color?: string | null
           favorite_count?: number
+          featured_until?: string | null
           features?: Json | null
           fuel?: string | null
           has_video?: boolean
@@ -935,6 +950,7 @@ export type Database = {
           is_electric?: boolean | null
           is_hybrid?: boolean | null
           is_new_program?: boolean | null
+          last_bumped_at?: string | null
           lat?: number | null
           listing_duration_days?: number
           lng?: number | null
@@ -959,8 +975,10 @@ export type Database = {
           seats?: number | null
           seller_type?: string | null
           sold_at?: string | null
+          sold_price?: number | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title?: string
+          top_ad_until?: string | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
           type?: string | null
@@ -2810,16 +2828,29 @@ export type Database = {
         }
         Returns: Json
       }
-      add_credits: {
-        Args: {
-          p_amount: number
-          p_reason: string
-          p_ref_id?: string
-          p_ref_type?: string
-          p_user_id: string
-        }
-        Returns: undefined
-      }
+      add_credits:
+        | {
+            Args: {
+              p_amount: number
+              p_reason: string
+              p_ref_id?: string
+              p_ref_type?: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_amount: number
+              p_granted_expires_at?: string
+              p_is_granted?: boolean
+              p_reason: string
+              p_ref_id?: string
+              p_ref_type?: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
       admin_agency_detail: { Args: { p_id: string }; Returns: Json }
       admin_approve_agency: {
         Args: { p_id: string; p_verified: boolean }
@@ -3042,6 +3073,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      apply_boost: {
+        Args: { p_boost_type: string; p_listing_id: string }
+        Returns: Json
+      }
       archive_notification: {
         Args: { p_notification_id: string }
         Returns: undefined
@@ -3132,6 +3167,7 @@ export type Database = {
           submission_secret: string
         }[]
       }
+      enqueue_lifecycle_notifications: { Args: never; Returns: Json }
       execute_scheduled_deletions: {
         Args: never
         Returns: {
@@ -3139,6 +3175,12 @@ export type Database = {
           processed_user_ids: string[]
         }[]
       }
+      expire_all_granted_credits: { Args: never; Returns: Json }
+      expire_granted_credits_for_user: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      expire_listings_lifecycle: { Args: never; Returns: Json }
       export_user_data: { Args: never; Returns: Json }
       generate_agency_slug: { Args: { p_name: string }; Returns: string }
       get_active_listing_counts_by_ville: {
@@ -3161,6 +3203,10 @@ export type Database = {
           media_type: string
           placement_key: string
         }[]
+      }
+      get_active_top_ad_listings: {
+        Args: { p_limit?: number }
+        Returns: string[]
       }
       get_listing_owner_phone: {
         Args: { p_listing_id: string }
@@ -3265,6 +3311,10 @@ export type Database = {
         Returns: number
       }
       get_yas_analytics: { Args: never; Returns: Json }
+      grant_signup_bonus_for_user: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       immonex_is_admin: { Args: never; Returns: boolean }
       increment_views: { Args: { listing_uuid: string }; Returns: undefined }
       increment_views_public: {
@@ -3397,6 +3447,10 @@ export type Database = {
         Returns: string
       }
       mark_all_notifications_read: { Args: never; Returns: number }
+      mark_listing_sold: {
+        Args: { p_listing_id: string; p_sold_price?: number }
+        Returns: Json
+      }
       mark_notification_email_failed: {
         Args: {
           p_email_to: string
@@ -3475,6 +3529,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      renew_listing: { Args: { p_listing_id: string }; Returns: Json }
       request_account_deletion: {
         Args: never
         Returns: {
@@ -3630,6 +3685,7 @@ export type Database = {
         | "verif_rejected"
         | "milestone_50_views"
         | "milestone_10_contacts"
+        | "boost_activated"
       payment_method:
         | "mvola"
         | "orange_money"
@@ -3836,6 +3892,7 @@ export const Constants = {
         "verif_rejected",
         "milestone_50_views",
         "milestone_10_contacts",
+        "boost_activated",
       ],
       payment_method: [
         "mvola",
