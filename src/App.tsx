@@ -57,6 +57,7 @@ const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
 const ConcessionnairesIndexPage = lazy(() => import("./pages/ConcessionnairesIndexPage.tsx"));
 const VehicleEstimationPage = lazy(() => import("./pages/VehicleEstimationPage.tsx"));
+const MethodologiePage = lazy(() => import("./pages/MethodologiePage.tsx"));
 const BlogList = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogList })));
 const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogArticle })));
 const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.tsx"));
@@ -161,6 +162,7 @@ const App = () => {
             <Route path="/agences" element={<AgenciesListPage />} />
             <Route path="/concessionnaires" element={<ConcessionnairesIndexPage />} />
             <Route path="/estimation" element={<VehicleEstimationPage />} />
+            <Route path="/estimation/methodologie" element={<MethodologiePage />} />
             <Route path="/conseils" element={<BlogList />} />
             <Route path="/conseils/:slug" element={<BlogArticle />} />
             <Route path="/contact" element={<ContactPage />} />

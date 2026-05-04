@@ -51,6 +51,8 @@ const currentYear = new Date().getFullYear();
 const EMPTY_FORM: EstimationInput = {
   makeName: "",
   modelName: "",
+  // PROMPT 10B — Trim/version optionnel pour matching strict cascade côté engine V2.
+  trim: null,
   year: currentYear - 5,
   city: "",
   mileage: 75_000,
@@ -606,6 +608,33 @@ const VehicleEstimationPage = () => {
                   {visibleFieldError("model") && (
                     <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("model")}</p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="trim">
+                    {t("estimation.trimLabel", "Version / Trim")}{" "}
+                    <span className="font-sans text-xs text-muted-foreground">
+                      ({t("estimation.optional", "optionnel")})
+                    </span>
+                  </Label>
+                  <Input
+                    id="trim"
+                    type="text"
+                    maxLength={60}
+                    value={form.trim ?? ""}
+                    placeholder={t("estimation.trimPlaceholder", "Ex: SE Plus, Vigo, GT Line, X20")}
+                    className={ESTIMATION_UI.inputLike}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setForm((prev) => ({ ...prev, trim: v.trim() === "" ? null : v }));
+                    }}
+                    data-testid="estimation-trim-input"
+                  />
+                  <p className="font-sans text-xs text-muted-foreground">
+                    {t(
+                      "estimation.trimHelper",
+                      "Précisez la version exacte si vous la connaissez. Améliore la précision de l'estimation.",
+                    )}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="year">{t("search.year", "Année")}</Label>

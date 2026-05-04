@@ -1,7 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import EstimationResultReport from "@/components/estimation/EstimationResultReport";
+
+// PROMPT 10B — useDataFreshness (TanStack Query) appelé dans le composant
+// nécessite un QueryClientProvider. On le mock pour éviter le fetch DB.
+vi.mock("@/lib/estimation/dataFreshnessHelper", () => ({
+  useDataFreshness: () => ({
+    data: { lastUpdateIso: null, comparableTotalCount: 0 },
+    isLoading: false,
+  }),
+  fetchDataFreshness: vi.fn(),
+}));
 import { buildEstimationPresentation } from "@/lib/estimation/presentation";
 import type { EstimationRunResult } from "@/types/estimation";
 
@@ -111,18 +122,21 @@ function makeResult(overrides?: Partial<EstimationRunResult["outputV2"]>): Estim
 }
 
 function renderReport(result: EstimationRunResult) {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <MemoryRouter>
-      <EstimationResultReport
-        result={result}
-        presentation={buildEstimationPresentation(result)}
-        onPublish={vi.fn()}
-        onRefine={vi.fn()}
-        onCompare={vi.fn()}
-        onRestart={vi.fn()}
-        onViewComparable={vi.fn()}
-      />
-    </MemoryRouter>,
+    <QueryClientProvider client={qc}>
+      <MemoryRouter>
+        <EstimationResultReport
+          result={result}
+          presentation={buildEstimationPresentation(result)}
+          onPublish={vi.fn()}
+          onRefine={vi.fn()}
+          onCompare={vi.fn()}
+          onRestart={vi.fn()}
+          onViewComparable={vi.fn()}
+        />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 

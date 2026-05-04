@@ -4,9 +4,20 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { formatAriary } from "@/lib/estimation/constants";
 import { confidenceLabelFr, type EstimationPresentation } from "@/lib/estimation/presentation";
 import type { EstimationRunResult } from "@/types/estimation";
+import ArgusValuesCard from "@/components/estimation/ArgusValuesCard";
+import AdjustmentsBreakdown from "@/components/estimation/AdjustmentsBreakdown";
+import DataFreshnessBadge from "@/components/estimation/DataFreshnessBadge";
+import AuditFooter from "@/components/estimation/AuditFooter";
+import { useDataFreshness } from "@/lib/estimation/dataFreshnessHelper";
 
 function confidenceBadgeClass(label: "high" | "medium" | "low"): string {
   if (label === "high") return "bg-success text-white";
@@ -46,6 +57,9 @@ export default function EstimationResultReport({
   const comparables = v2.comparables;
   const showIndicative = presentation.indicativeRequired || presentation.confidenceBand === "low" || comparables.length === 0;
   const estimatedGroups = formatAriaryGroups(values.estimatedValue);
+  // PROMPT 10B — V2 detection : audit field présent => engine V2 (3 cards Argus)
+  const isV2 = Boolean(v2.audit);
+  const { data: freshness } = useDataFreshness();
 
   return (
     <section className="space-y-5 md:space-y-7" aria-label={t("estimation.report.sectionAria", "Rapport d'estimation AutoNex")}>
@@ -118,6 +132,24 @@ export default function EstimationResultReport({
         </CardContent>
       </Card>
 
+      {/* PROMPT 10B — Argus 3 cards (V2) ou 1 card (V1 fallback) */}
+      <ArgusValuesCard
+        values={{
+          tradeInPro: values.tradeInPro,
+          privateMarket: values.privateMarket,
+          dealerRetail: values.dealerRetail,
+          estimatedValue: values.estimatedValue,
+        }}
+        isV2={isV2}
+      />
+
+      {/* PROMPT 10B — Indicateur fraîcheur des données */}
+      <DataFreshnessBadge
+        comparableCountUsed={evidence.comparableCountUsed}
+        comparableSourceBreakdown={v2.audit?.comparableSourceBreakdown}
+        lastDataUpdate={freshness?.lastUpdateIso ?? null}
+      />
+
       <section className="space-y-3">
         <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] via-primary/[0.04] to-transparent px-4 py-3.5 md:px-5">
           <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-primary/80">{t("estimation.report.reportReading", "Lecture du rapport")}</p>
@@ -138,13 +170,29 @@ export default function EstimationResultReport({
               <p className="mt-1 font-sans text-xs text-muted-foreground">{t("estimation.report.fastConversionMarker", "Repère pour accélérer la conversion.")}</p>
             </div>
             <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
-              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">{t("estimation.report.marketBaseline", "Base marché")}</p>
+              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">{t("estimation.report.medianComparables", "Valeur médiane des comparables")}</p>
               <p className="mt-1 font-sans text-2xl">{formatAriary(v2.anchors.finalBaseAnchor)}</p>
               <p className="mt-1 font-sans text-xs text-muted-foreground">{t("estimation.report.anchorBeforeAdjustments", "Ancrage principal avant ajustements véhicule.")}</p>
             </div>
             <div className="rounded-lg px-3 py-3 md:rounded-none md:px-4">
-              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">{t("estimation.report.globalLevel", "Niveau global")}</p>
-              <p className="mt-1 font-sans text-2xl">{presentation.summaryLevel}</p>
+              <p className="text-[11px] font-sans uppercase tracking-wide text-muted-foreground">{t("estimation.report.reliabilityLevel", "Niveau de fiabilité")}</p>
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="mt-1 font-sans text-2xl cursor-help" data-testid="reliability-level">
+                      {presentation.summaryLevel}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-sans text-xs">
+                      {t(
+                        "estimation.report.reliabilityTooltip",
+                        "Niveau de fiabilité dérivé du tier (A/B/C/D) — voir la page méthodologie pour le détail.",
+                      )}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
@@ -183,6 +231,13 @@ export default function EstimationResultReport({
           )}
         </p>
       </div>
+
+      {/* PROMPT 10B — Breakdown détaillé des 6 ajustements véhicule (V2) */}
+      <AdjustmentsBreakdown
+        adjustments={v2.adjustments}
+        positiveLabels={insights.pricingFactorsPositive.map((p) => p.label)}
+        negativeLabels={insights.pricingFactorsNegative.map((n) => n.label)}
+      />
 
       <section className="space-y-3.5">
         <div className="flex items-center justify-between">
@@ -397,6 +452,9 @@ export default function EstimationResultReport({
           </div>
         </CardContent>
       </Card>
+
+      {/* PROMPT 10B — Footer méthodologie + audit V2 + disclaimer */}
+      <AuditFooter audit={v2.audit} />
     </section>
   );
 }
