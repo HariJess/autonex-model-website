@@ -59,11 +59,15 @@ export function ReportListingModal({
     (!detailsRequired || detailsTrimmed.length >= OTHER_MIN_CHARS) &&
     !mutation.isPending;
 
+  // PROMPT 8 : 7 reasons (ajout wrong_category + fake_photos).
+  // Ordre du plus grave au moins grave pour scan visuel rapide.
   const reasonOptions: { value: ReportReason; labelKey: string; fallback: string }[] = [
     { value: "scam", labelKey: "listing.report.reasons.scam", fallback: "Arnaque / Fraude" },
+    { value: "fake_photos", labelKey: "listing.report.reasons.fake_photos", fallback: "Photos volées ou non-réelles" },
     { value: "inappropriate", labelKey: "listing.report.reasons.inappropriate", fallback: "Contenu inapproprié" },
-    { value: "duplicate", labelKey: "listing.report.reasons.duplicate", fallback: "Doublon d'annonce" },
     { value: "wrong_price", labelKey: "listing.report.reasons.wrong_price", fallback: "Prix aberrant" },
+    { value: "wrong_category", labelKey: "listing.report.reasons.wrong_category", fallback: "Mauvaise catégorie / hors-sujet" },
+    { value: "duplicate", labelKey: "listing.report.reasons.duplicate", fallback: "Doublon d'annonce" },
     { value: "other", labelKey: "listing.report.reasons.other", fallback: "Autre" },
   ];
 

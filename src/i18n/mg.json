@@ -809,9 +809,11 @@
       "authRequired": "Midira aloha mba hampahafantarana filazana.",
       "reasons": {
         "scam": "Halatra / Fanodinkodinana",
+        "fake_photos": "Sary nangalarina na tsy marina",
         "inappropriate": "Votoaty tsy mety",
-        "duplicate": "Filazana miverimberina",
         "wrong_price": "Vidiny tsy mitombina",
+        "wrong_category": "Sokajy diso / tsy mifanaraka",
+        "duplicate": "Filazana miverimberina",
         "other": "Hafa"
       },
       "errors": {
@@ -1234,6 +1236,32 @@
       "whatsapp": {
         "format": "Tsy maintsy amin'ny endrika iraisam-pirenena (+261…) ny laharana WhatsApp."
       }
+    }
+  },
+  "rateLimit": {
+    "title": "Fetra famoahana",
+    "activeListings": {
+      "label": "Filazana mavitrika",
+      "usage": "{{count}} / {{limit}}"
+    },
+    "publishes24h": {
+      "label": "Famoahana 24 ora",
+      "usage": "Famoahana 24 ora : {{count}} / {{limit}}"
+    },
+    "exceeded": {
+      "activeLimit": {
+        "title": "Tratra ny fetran'ny filazana",
+        "body": "Manana {{count}} / {{limit}} filazana mavitrika ianao. Amidio na andraso lany ny iray vao afaka mamoaka indray.",
+        "upgradeCta": "Tonga mpivarotra voamarina (5 filazana)"
+      },
+      "publish24h": {
+        "title": "Tratra ny fetra isan'andro",
+        "body": "Namoaka filazana {{count}} ianao tao anatin'ny 24 ora farany. Ny fetra dia {{limit}}/andro. Andramo aoriana."
+      }
+    },
+    "cooldown": {
+      "title": "Andraso segondra vitsy",
+      "body": "Afaka mamoaka indray ianao ao anatin'ny {{seconds}} segondra."
     }
   },
   "search": {

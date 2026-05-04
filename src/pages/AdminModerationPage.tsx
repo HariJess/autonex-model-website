@@ -30,6 +30,9 @@ const REASON_LABELS: Record<string, string> = {
   inappropriate: "Inapproprié",
   duplicate: "Doublon",
   wrong_price: "Prix aberrant",
+  // PROMPT 8 V1 : nouveaux reasons
+  wrong_category: "Mauvaise catégorie",
+  fake_photos: "Photos volées",
   other: "Autre",
 };
 

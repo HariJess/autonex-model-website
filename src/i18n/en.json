@@ -809,9 +809,11 @@
       "authRequired": "Sign in to report a listing.",
       "reasons": {
         "scam": "Scam / Fraud",
+        "fake_photos": "Stolen or fake photos",
         "inappropriate": "Inappropriate content",
-        "duplicate": "Duplicate listing",
         "wrong_price": "Unrealistic price",
+        "wrong_category": "Wrong category / off-topic",
+        "duplicate": "Duplicate listing",
         "other": "Other"
       },
       "errors": {
@@ -1234,6 +1236,32 @@
       "whatsapp": {
         "format": "The WhatsApp number must be in international format (+261…)."
       }
+    }
+  },
+  "rateLimit": {
+    "title": "Publication limits",
+    "activeListings": {
+      "label": "Active listings",
+      "usage": "{{count}} / {{limit}}"
+    },
+    "publishes24h": {
+      "label": "Publishes 24h",
+      "usage": "Publishes 24h: {{count}} / {{limit}}"
+    },
+    "exceeded": {
+      "activeLimit": {
+        "title": "Listings limit reached",
+        "body": "You have {{count}} / {{limit}} active listings. Sell or wait for one to expire to publish again.",
+        "upgradeCta": "Become a verified seller (5 listings)"
+      },
+      "publish24h": {
+        "title": "Daily limit reached",
+        "body": "You published {{count}} listings in the last 24 hours. The limit is {{limit}}/day. Try again later."
+      }
+    },
+    "cooldown": {
+      "title": "Wait a few seconds",
+      "body": "You can publish again in {{seconds}} seconds."
     }
   },
   "search": {

@@ -809,9 +809,11 @@
       "authRequired": "Connectez-vous pour signaler une annonce.",
       "reasons": {
         "scam": "Arnaque / Fraude",
+        "fake_photos": "Photos volées ou non-réelles",
         "inappropriate": "Contenu inapproprié",
-        "duplicate": "Doublon d'annonce",
         "wrong_price": "Prix aberrant",
+        "wrong_category": "Mauvaise catégorie / hors-sujet",
+        "duplicate": "Doublon d'annonce",
         "other": "Autre"
       },
       "errors": {
@@ -1234,6 +1236,32 @@
       "whatsapp": {
         "format": "Le numéro WhatsApp doit être au format international (+261…)."
       }
+    }
+  },
+  "rateLimit": {
+    "title": "Limites de publication",
+    "activeListings": {
+      "label": "Annonces actives",
+      "usage": "{{count}} / {{limit}}"
+    },
+    "publishes24h": {
+      "label": "Publications 24h",
+      "usage": "Publications 24h : {{count}} / {{limit}}"
+    },
+    "exceeded": {
+      "activeLimit": {
+        "title": "Limite d'annonces atteinte",
+        "body": "Vous avez {{count}} / {{limit}} annonces actives. Vendez ou attendez l'expiration d'une annonce pour publier à nouveau.",
+        "upgradeCta": "Devenir vendeur vérifié (5 annonces)"
+      },
+      "publish24h": {
+        "title": "Limite quotidienne atteinte",
+        "body": "Vous avez publié {{count}} annonces dans les 24 dernières heures. La limite est de {{limit}}/jour. Réessayez plus tard."
+      }
+    },
+    "cooldown": {
+      "title": "Patientez quelques secondes",
+      "body": "Vous pourrez publier à nouveau dans {{seconds}} secondes."
     }
   },
   "search": {
