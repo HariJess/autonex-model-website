@@ -141,7 +141,7 @@ function renderReport(result: EstimationRunResult) {
 }
 
 describe("EstimationResultReport integration", () => {
-  it("renders stronger framing for strong market output", () => {
+  it("renders strong action framing for strong market output (P10C: presentation.actionHeadline rendered in CTA card)", () => {
     const result = makeResult({
       tierDecision: { tier: "A_STRONG_MARKET", tierReasonCode: "STRONG_COMPARABLE_SET", tierReasonSummary: "Strong." },
       modeGovernance: { pricingMode: "market_backed", claimMode: "ALLOW_STRONG_MARKET_CLAIM", precisionMode: "tight", rangeWidthMode: "tight" },
@@ -173,13 +173,12 @@ describe("EstimationResultReport integration", () => {
       comparables: [{ listingId: "1", title: "Toyota", price: 50_000_000, year: 2020, mileage: 70000, city: "Antananarivo", score: 80 }],
     });
     renderReport(result);
-    expect(screen.getByText(/Analyse marché robuste/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Estimation indicative/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Publiez maintenant/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Appui marché solide/i).length).toBeGreaterThanOrEqual(1);
+    // P10C : section K supprimée → "Appui marché solide" plus rendu dans le rapport principal
+    expect(screen.queryByText(/Appui marché solide/i)).not.toBeInTheDocument();
   });
 
-  it("forces indicative framing and hides exact confidence when governed", () => {
+  it("hides exact confidence in card hero when governance demands de-emphasis", () => {
     const result = makeResult({
       tierDecision: { tier: "D_HEURISTIC_ONLY", tierReasonCode: "NO_RELIABLE_COMPARABLES", tierReasonSummary: "Weak." },
       modeGovernance: { pricingMode: "heuristic_only", claimMode: "INDICATIVE_HEURISTIC_CLAIM_ONLY", precisionMode: "very_coarse", rangeWidthMode: "very_wide" },
@@ -211,95 +210,89 @@ describe("EstimationResultReport integration", () => {
       },
     });
     renderReport(result);
-    expect(screen.getByText("Estimation indicative exploratoire")).toBeInTheDocument();
+    // Card hero conserve l'affichage prudent (vs score exact) — c'est elle qui transmet le warning V2 (P10C)
     expect(screen.getByText(/Affichage prudent/i)).toBeInTheDocument();
     expect(screen.queryByText(/34\s*\/100/i)).not.toBeInTheDocument();
-    expect(screen.getAllByText(/Appui marché faible/i).length).toBeGreaterThanOrEqual(1);
+    // P10C : section K supprimée → "Appui marché faible" plus rendu
+    expect(screen.queryByText(/Appui marché faible/i)).not.toBeInTheDocument();
   });
 
-  it("keeps evidence notes/disclaimers separate from pricing factor sections", () => {
+  it("renders AdjustmentsBreakdown (P10C : sections I/J/K supprimées, breakdown reste seul source des facteurs)", () => {
     const result = makeResult({
-      insights: {
-        pricingFactorsPositive: [{ id: "p1", category: "pricing_factor", code: "P1", label: "Entretien suivi", polarity: "positive" }],
-        pricingFactorsNegative: [{ id: "n1", category: "pricing_factor", code: "N1", label: "Kilométrage élevé", polarity: "negative" }],
-        evidenceNotes: [{ id: "e1", category: "evidence_note", code: "E1", label: "Évidence partielle." }],
-        disclaimers: [{ id: "d1", category: "disclaimer", code: "D1", label: "Ceci reste indicatif.", severity: "warning" }],
-      },
-      uiGovernance: {
-        allowedMarketClaim: false,
-        mustShowIndicativeLabel: true,
-        shouldDeEmphasizePrecision: true,
-        shouldHideExactConfidenceScore: false,
-        allowedRangeTightness: "wide",
-        recommendedPrimaryCTAStyle: "normal",
-        requiredBadges: ["reference_assisted"],
+      adjustments: {
+        mileageAdjustment: { factor: 1.035, deltaPct: 3.5, bounded: true },
+        conditionAdjustment: { factor: 1, deltaPct: 0, bounded: true },
+        maintenanceAdjustment: { factor: 1.01, deltaPct: 1, bounded: true },
+        accidentAdjustment: { factor: 1, deltaPct: 0, bounded: true },
+        ownershipAdjustment: { factor: 1, deltaPct: 0, bounded: true },
+        usageAdjustment: { factor: 1, deltaPct: 0, bounded: true },
+        totalAdjustmentFactor: 1.045,
+        totalDeltaPct: 4.5,
+        adjustmentCapApplied: false,
       },
     });
     renderReport(result);
-    expect(screen.getByText("Facteurs qui renforcent la valeur")).toBeInTheDocument();
-    expect(screen.getByText("Points de vigilance prix")).toBeInTheDocument();
-    expect(screen.getByText("Lecture d'évidence")).toBeInTheDocument();
-    expect(screen.getAllByText("Ceci reste indicatif.").length).toBeGreaterThanOrEqual(1);
+    // Le breakdown V2 doit être présent
+    expect(screen.getByTestId("adjustments-breakdown")).toBeInTheDocument();
+    // Sections supprimées en P10C
+    expect(screen.queryByText("Facteurs qui renforcent la valeur")).not.toBeInTheDocument();
+    expect(screen.queryByText("Points de vigilance prix")).not.toBeInTheDocument();
+    expect(screen.queryByText("Lecture d'évidence")).not.toBeInTheDocument();
   });
 
-  it("shows intentional comparable empty-state messaging when support is weak", () => {
+  it("C1 : comparables.length === 0 → section 'Annonces comparables retenues' absente du DOM", () => {
     const result = makeResult({
       tierDecision: { tier: "C_REFERENCE_ASSISTED", tierReasonCode: "WEAK_COMPARABLES_REFERENCE_USED", tierReasonSummary: "Limited." },
-      modeGovernance: { pricingMode: "reference_assisted", claimMode: "INDICATIVE_REFERENCE_CLAIM_ONLY", precisionMode: "coarse", rangeWidthMode: "wide" },
-      evidence: {
-        comparableCountCandidate: 8,
-        comparableCountAfterQualityFilter: 3,
-        comparableCountUsed: 0,
-        comparableCountStrong: 0,
-        comparableSimilarityAvg: 0,
-        comparableSimilarityMedian: 0,
-        comparableRecencyScore: 40,
-        comparableDispersionScore: 0,
-        comparableLocationStrength: "weak",
-        canonicalModelCertainty: 70,
-        referenceProfileUsed: true,
-        referenceProfileStrength: 75,
-        fallbackUsed: true,
-        fallbackType: "profile_seeded",
-      },
       comparables: [],
     });
     renderReport(result);
-    expect(screen.getByText(/Comparables encore insuffisants|Comparaison marché en consolidation/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Le rapport s'appuie surtout sur des signaux de référence|Le rapport reste utile pour cadrer votre décision/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText(/Annonces comparables retenues/i)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("comparable-card")).not.toBeInTheDocument();
   });
 
-  it("keeps moderate evidence with comparables clearly qualified", () => {
+  it("C2 : comparables.length === 2 → section 'Annonces comparables retenues' présente avec 2 cards", () => {
     const result = makeResult({
       tierDecision: { tier: "B_MODERATE_MARKET", tierReasonCode: "MODERATE_COMPARABLE_SET", tierReasonSummary: "Moderate." },
-      modeGovernance: { pricingMode: "partially_market_backed", claimMode: "ALLOW_LIMITED_MARKET_CLAIM", precisionMode: "medium", rangeWidthMode: "standard" },
-      evidence: {
-        comparableCountCandidate: 20,
-        comparableCountAfterQualityFilter: 10,
-        comparableCountUsed: 5,
-        comparableCountStrong: 3,
-        comparableSimilarityAvg: 62,
-        comparableSimilarityMedian: 60,
-        comparableRecencyScore: 68,
-        comparableDispersionScore: 63,
-        comparableLocationStrength: "mixed",
-        canonicalModelCertainty: 79,
-        referenceProfileUsed: true,
-        referenceProfileStrength: 75,
-        fallbackUsed: false,
-        fallbackType: null,
-      },
       comparables: [
         { listingId: "1", title: "Toyota Corolla", price: 49_500_000, year: 2019, mileage: 83000, city: "Antananarivo", score: 74 },
         { listingId: "2", title: "Toyota Corolla S", price: 50_800_000, year: 2020, mileage: 76000, city: "Antananarivo", score: 71 },
       ],
     });
     renderReport(result);
-    expect(screen.getByText(/Analyse marché qualifiée/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Évidence marché partielle mais exploitable/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/Appui marché exploitable/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/positionnement calibré/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Appui marché solide/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Publiez maintenant avec un positionnement assumé/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Annonces comparables retenues/i)).toBeInTheDocument();
+    expect(screen.getAllByTestId("comparable-card").length).toBe(2);
+  });
+
+  it("C3 : page V2 ne contient PAS le texte 'Lecture du rapport' (section D supprimée)", () => {
+    renderReport(makeResult());
+    expect(screen.queryByText(/Lecture du rapport/i)).not.toBeInTheDocument();
+  });
+
+  it("C4 : page V2 ne contient PAS le texte 'Qualité d'évidence' (section G supprimée)", () => {
+    renderReport(makeResult());
+    expect(screen.queryByText(/Qualité d'évidence/i)).not.toBeInTheDocument();
+  });
+
+  it("C5 : page V2 ne contient PAS le texte 'Support marché' (section K supprimée)", () => {
+    renderReport(makeResult());
+    expect(screen.queryByText(/^Support marché$/i)).not.toBeInTheDocument();
+  });
+
+  it("C6 : page V2 ne contient PAS le texte 'Lecture d'évidence' (section J supprimée)", () => {
+    renderReport(makeResult());
+    expect(screen.queryByText(/Lecture d'évidence/i)).not.toBeInTheDocument();
+  });
+
+  it("C7 : page V2 ne contient PAS la sous-card 'Lecture finale' (sous-card N supprimée)", () => {
+    renderReport(makeResult());
+    expect(screen.queryByText(/Lecture finale/i)).not.toBeInTheDocument();
+  });
+
+  it("CTA buttons present and wired (4 boutons : Publier / Affiner / Comparer / Refaire)", () => {
+    renderReport(makeResult());
+    expect(screen.getByText("Publier cette voiture")).toBeInTheDocument();
+    expect(screen.getByText("Affiner l'estimation")).toBeInTheDocument();
+    expect(screen.getByText("Comparer les annonces")).toBeInTheDocument();
+    expect(screen.getByText("Refaire une estimation")).toBeInTheDocument();
   });
 });
