@@ -117,6 +117,7 @@ function mapListingRowToDisplayListing(
     agencySlug?: string | null;
     agencyLogo?: string | null;
     agencyVerified?: boolean;
+    sellerVerified?: boolean;
     hasWhatsappContact?: boolean;
   },
 ): DisplayListing {
@@ -182,6 +183,7 @@ function mapListingRowToDisplayListing(
     agency_slug: extras?.agencySlug ?? null,
     agency_logo: extras?.agencyLogo ?? null,
     agency_verified: extras?.agencyVerified ?? false,
+    seller_verified: extras?.sellerVerified ?? false,
     badge: extras?.badge ?? null,
     visibility_rank_score: extras?.visibilityRankScore,
     video_url: listing.video_url,
@@ -213,6 +215,7 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     profileRes,
     boostsRes,
     whatsappRes,
+    sellerBadgeRes,
   ] = await Promise.all([
     supabase
       .from("listing_photos")
@@ -228,6 +231,13 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     supabase.rpc("listing_has_whatsapp_contact", {
       p_listing_id: listing.id,
     }),
+    listing.owner_id
+      ? supabase
+          .from("active_seller_badges")
+          .select("user_id")
+          .eq("user_id", listing.owner_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null } as const),
   ]);
 
   const { data: photos } = photosRes;
@@ -251,6 +261,7 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
   const badge: DisplayListing["badge"] = badgeForListing(listing, boostTypes);
 
   const { data: hasWhatsappRaw, error: hasWhatsappErr } = whatsappRes;
+  const sellerVerified = !!sellerBadgeRes?.data;
 
   return mapListingRowToDisplayListing(listing, {
     images: photos?.map((p) => p.url) ?? [],
@@ -262,6 +273,7 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     agencySlug: agencyInfo?.slug ?? null,
     agencyLogo: agencyInfo?.logo_url ?? null,
     agencyVerified: agencyInfo?.verified ?? false,
+    sellerVerified,
   });
 }
 
@@ -346,7 +358,16 @@ async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promis
   if (listings.length === 0) return [];
 
   const listingIds = listings.map((l) => l.id);
-  const [{ data: allPhotos }, { data: allBoosts }] = await Promise.all([
+  // PROMPT 7 — batch query active_seller_badges pour propager seller_verified
+  const ownerIds = Array.from(
+    new Set(
+      listings
+        .map((l) => l.owner_id)
+        .filter((id): id is string => typeof id === "string"),
+    ),
+  );
+
+  const [{ data: allPhotos }, { data: allBoosts }, { data: verifiedRows }] = await Promise.all([
     supabase
       .from("listing_photos")
       .select("listing_id, url, position")
@@ -357,7 +378,18 @@ async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promis
       .select("listing_id, type, starts_at")
       .in("listing_id", listingIds)
       .gte("ends_at", new Date().toISOString()),
+    ownerIds.length > 0
+      ? supabase
+          .from("active_seller_badges")
+          .select("user_id")
+          .in("user_id", ownerIds)
+      : Promise.resolve({ data: [] as Array<{ user_id: string | null }>, error: null }),
   ]);
+
+  const verifiedSellers = new Set<string>();
+  for (const row of verifiedRows ?? []) {
+    if (typeof row?.user_id === "string") verifiedSellers.add(row.user_id);
+  }
 
   const photosByListing = new Map<string, string[]>();
   allPhotos?.forEach((p) => {
@@ -385,6 +417,7 @@ async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promis
       images: photosByListing.get(listing.id) ?? [],
       badge: badgeForListing(listing, tset),
       visibilityRankScore: visibilityRankScore(listing, tset, dailyBumpStarts),
+      sellerVerified: listing.owner_id ? verifiedSellers.has(listing.owner_id) : false,
     });
   });
 }

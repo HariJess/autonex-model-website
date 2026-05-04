@@ -56,6 +56,70 @@
         "colCount": "Événements",
         "empty": "Aucun referrer capturé pour l'instant."
       }
+    },
+    "verifications": {
+      "title": "Vérifications",
+      "empty": "Aucune vérification en attente",
+      "statusFilter": {
+        "label": "Filtrer par statut",
+        "all": "Toutes",
+        "pending": "En attente",
+        "reviewing": "En examen",
+        "approved": "Approuvées",
+        "rejected": "Refusées",
+        "expired": "Expirées"
+      },
+      "list": {
+        "user": "Utilisateur",
+        "fullName": "Nom",
+        "submitted": "Soumise",
+        "status": "Statut"
+      },
+      "drawer": {
+        "title": "Examiner la vérification",
+        "docs": {
+          "title": "Documents",
+          "cinFront": "CIN Recto",
+          "cinBack": "CIN Verso",
+          "selfie": "Selfie"
+        },
+        "metadata": {
+          "title": "Informations soumises"
+        },
+        "actions": {
+          "approve": "Approuver",
+          "reject": "Rejeter"
+        },
+        "approve": {
+          "confirmTitle": "Approuver cette vérification ?",
+          "confirmDesc": "L'utilisateur recevra le badge Vendeur vérifié pour 365 jours."
+        },
+        "reject": {
+          "categoryLabel": "Catégorie du rejet",
+          "categories": {
+            "blurry": "Documents flous",
+            "wrong_doc": "Mauvais document",
+            "fraud_suspect": "Suspicion de fraude",
+            "expired_doc": "Document expiré",
+            "other": "Autre"
+          },
+          "reasonLabel": "Raison (visible par l'utilisateur)",
+          "reasonPlaceholder": "Expliquez précisément le motif du rejet...",
+          "confirmCta": "Confirmer le rejet"
+        }
+      },
+      "success": {
+        "approved": "Vérification approuvée",
+        "rejected": "Vérification rejetée"
+      },
+      "errors": {
+        "adminRequired": "Action réservée aux administrateurs.",
+        "notFound": "Vérification introuvable.",
+        "notReviewable": "Cette vérification ne peut plus être traitée (déjà approuvée ou rejetée).",
+        "reasonTooShort": "La raison doit faire au moins 10 caractères.",
+        "invalidCategory": "Catégorie de rejet invalide.",
+        "generic": "Une erreur est survenue. Veuillez réessayer."
+      }
     }
   },
   "ads": {
@@ -809,7 +873,8 @@
       "featured": "À la une",
       "nouveau": "Nouveau",
       "topAd": "Top",
-      "urgent": "Urgent"
+      "urgent": "Urgent",
+      "verifiedSeller": "Vérifié"
     },
     "mapApproximate": "Position indiquée sur la carte."
   },
@@ -2531,6 +2596,101 @@
     "bodySuffix": "n'existe pas.",
     "backToHome": "Retour à l'accueil",
     "viewListings": "Voir les annonces"
+  },
+  "verification": {
+    "overline": "Identité",
+    "title": "Vendeur vérifié",
+    "subtitle": "Renforcez la confiance de vos acheteurs",
+    "intro": {
+      "benefits": {
+        "title": "Les avantages",
+        "b1": "Badge ✓ Vérifié sur toutes vos annonces",
+        "b2": "Visibilité accrue dans les résultats",
+        "b3": "Confiance accrue des acheteurs"
+      },
+      "requirements": {
+        "title": "Documents requis",
+        "r1": "Carte d'identité (recto)",
+        "r2": "Carte d'identité (verso)",
+        "r3": "Selfie tenant votre CIN"
+      },
+      "privacy": {
+        "title": "Confidentialité",
+        "body": "Vos documents sont chiffrés et utilisés uniquement pour la vérification. Conservés 90 jours en cas de rejet, supprimés à l'expiration du badge.",
+        "consentLabel": "J'accepte la politique de confidentialité"
+      },
+      "cost": "Coût",
+      "balanceLabel": "Solde",
+      "startCta": "Commencer"
+    },
+    "steps": {
+      "cinFront": { "title": "Carte d'identité — Recto" },
+      "cinBack":  { "title": "Carte d'identité — Verso" },
+      "selfie": {
+        "title": "Selfie avec votre CIN",
+        "tip": "Tenez votre CIN à côté de votre visage. Les deux doivent être nets et bien éclairés."
+      },
+      "upload": {
+        "dropzone": "Glissez votre fichier ici ou cliquez",
+        "formats": "JPG, PNG, WEBP ou PDF — max 10 Mo",
+        "uploading": "Upload en cours...",
+        "uploaded": "✓ Document uploadé",
+        "replaceHint": "Cliquez pour remplacer"
+      },
+      "metadata": {
+        "title": "Vos informations",
+        "fullName": { "label": "Nom complet (comme sur la CIN)" },
+        "cinNumber": { "label": "Numéro de CIN" },
+        "dateOfBirth": { "label": "Date de naissance (optionnel)" }
+      },
+      "recap": {
+        "title": "Récapitulatif",
+        "missingDocs": "Documents manquants. Revenez aux étapes précédentes.",
+        "confirmCta": "Soumettre ma demande",
+        "submitting": "Envoi en cours..."
+      },
+      "nav": {
+        "next": "Suivant",
+        "previous": "Précédent"
+      }
+    },
+    "flow": {
+      "previousRejection": "Précédente demande refusée :"
+    },
+    "statusCard": {
+      "none": {
+        "title": "Devenez vendeur vérifié",
+        "subtitle": "Renforcez la confiance des acheteurs. Plus de contacts sur vos annonces.",
+        "cta": "Commencer"
+      },
+      "pending": {
+        "title": "Vérification en cours",
+        "body": "Réponse sous 48h. Soumis le {{date}}."
+      },
+      "approved": {
+        "title": "Vendeur vérifié ✓",
+        "body": "Votre badge est actif jusqu'au {{date}}.",
+        "cta": "Détails"
+      },
+      "rejected": {
+        "title": "Vérification refusée",
+        "reasonLabel": "Raison :",
+        "cta": "Re-soumettre"
+      }
+    },
+    "success": {
+      "toast": "Demande envoyée"
+    },
+    "errors": {
+      "fileSize": "Fichier trop volumineux (max 10 Mo)",
+      "fileType": "Format non supporté",
+      "uploadFailed": "Échec de l'upload, réessayez",
+      "insufficientCredits": "Crédits insuffisants pour la vérification",
+      "alreadyActive": "Vous avez déjà une vérification en cours ou approuvée",
+      "invalidFullName": "Nom complet invalide",
+      "invalidCinNumber": "Numéro de CIN invalide",
+      "generic": "Une erreur est survenue. Veuillez réessayer."
+    }
   },
   "vehicleCombobox": {
     "modelPlaceholder": "Choisissez ou tapez un modèle",

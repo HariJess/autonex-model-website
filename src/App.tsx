@@ -39,6 +39,8 @@ const AdminRevenuesPage = lazy(() => import("./pages/AdminRevenuesPage.tsx"));
 const AdminSearchInsightsPage = lazy(() => import("./pages/AdminSearchInsightsPage.tsx"));
 const AdminPartnerAdsPage = lazy(() => import("./pages/AdminPartnerAdsPage.tsx"));
 const AdminYasAnalyticsPage = lazy(() => import("./pages/AdminYasAnalyticsPage.tsx"));
+const AdminVerificationsPage = lazy(() => import("./pages/AdminVerificationsPage.tsx"));
+const VerificationPage = lazy(() => import("./pages/verification/VerificationPage.tsx"));
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.tsx"));
 const AdminLayout = lazy(() => import("./pages/AdminLayout.tsx"));
 const AdminOverviewPage = lazy(() => import("./pages/AdminOverviewPage.tsx"));
@@ -147,10 +149,12 @@ const App = () => {
               <Route path="recherche" element={<AdminSearchInsightsPage />} />
               <Route path="partenaires" element={<AdminPartnerAdsPage />} />
               <Route path="yas-analytics" element={<AdminYasAnalyticsPage />} />
+              <Route path="verifications" element={<AdminVerificationsPage />} />
             </Route>
             <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
             <Route path="/credits" element={<ProtectedRoute><CreditsPage /></ProtectedRoute>} />
             <Route path="/mes-annonces" element={<ProtectedRoute><MyListingsPage /></ProtectedRoute>} />
+            <Route path="/verification" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
             <Route path="/paiement/retour" element={<ProtectedRoute><PaiementRetourPage /></ProtectedRoute>} />
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/concessionnaires/:slug" element={<AgencyProfile />} />

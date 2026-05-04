@@ -56,6 +56,70 @@
         "colCount": "Events",
         "empty": "No referrer captured yet."
       }
+    },
+    "verifications": {
+      "title": "Verifications",
+      "empty": "No pending verification",
+      "statusFilter": {
+        "label": "Filter by status",
+        "all": "All",
+        "pending": "Pending",
+        "reviewing": "Reviewing",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "expired": "Expired"
+      },
+      "list": {
+        "user": "User",
+        "fullName": "Name",
+        "submitted": "Submitted",
+        "status": "Status"
+      },
+      "drawer": {
+        "title": "Review verification",
+        "docs": {
+          "title": "Documents",
+          "cinFront": "ID Front",
+          "cinBack": "ID Back",
+          "selfie": "Selfie"
+        },
+        "metadata": {
+          "title": "Submitted information"
+        },
+        "actions": {
+          "approve": "Approve",
+          "reject": "Reject"
+        },
+        "approve": {
+          "confirmTitle": "Approve this verification?",
+          "confirmDesc": "User will receive the Verified Seller badge for 365 days."
+        },
+        "reject": {
+          "categoryLabel": "Rejection category",
+          "categories": {
+            "blurry": "Blurry documents",
+            "wrong_doc": "Wrong document",
+            "fraud_suspect": "Fraud suspicion",
+            "expired_doc": "Expired document",
+            "other": "Other"
+          },
+          "reasonLabel": "Reason (visible to user)",
+          "reasonPlaceholder": "Explain precisely the rejection reason...",
+          "confirmCta": "Confirm rejection"
+        }
+      },
+      "success": {
+        "approved": "Verification approved",
+        "rejected": "Verification rejected"
+      },
+      "errors": {
+        "adminRequired": "Admin-only action.",
+        "notFound": "Verification not found.",
+        "notReviewable": "This verification can no longer be reviewed (already approved or rejected).",
+        "reasonTooShort": "Reason must be at least 10 characters.",
+        "invalidCategory": "Invalid rejection category.",
+        "generic": "An error occurred. Please try again."
+      }
     }
   },
   "ads": {
@@ -809,7 +873,8 @@
       "featured": "Featured",
       "nouveau": "New",
       "topAd": "Top",
-      "urgent": "Urgent"
+      "urgent": "Urgent",
+      "verifiedSeller": "Verified"
     },
     "mapApproximate": "Position shown on the map."
   },
@@ -2531,6 +2596,101 @@
     "bodySuffix": "does not exist.",
     "backToHome": "Back to home",
     "viewListings": "View listings"
+  },
+  "verification": {
+    "overline": "Identity",
+    "title": "Verified seller",
+    "subtitle": "Build trust with your buyers",
+    "intro": {
+      "benefits": {
+        "title": "Benefits",
+        "b1": "✓ Verified badge on all your listings",
+        "b2": "Higher visibility in results",
+        "b3": "More trust from buyers"
+      },
+      "requirements": {
+        "title": "Required documents",
+        "r1": "ID card (front)",
+        "r2": "ID card (back)",
+        "r3": "Selfie holding your ID"
+      },
+      "privacy": {
+        "title": "Privacy",
+        "body": "Your documents are encrypted and used only for verification. Kept 90 days if rejected, deleted at badge expiry.",
+        "consentLabel": "I accept the privacy policy"
+      },
+      "cost": "Cost",
+      "balanceLabel": "Balance",
+      "startCta": "Start"
+    },
+    "steps": {
+      "cinFront": { "title": "ID card — Front" },
+      "cinBack":  { "title": "ID card — Back" },
+      "selfie": {
+        "title": "Selfie with your ID",
+        "tip": "Hold your ID next to your face. Both must be sharp and well-lit."
+      },
+      "upload": {
+        "dropzone": "Drop your file here or click",
+        "formats": "JPG, PNG, WEBP or PDF — max 10 MB",
+        "uploading": "Uploading...",
+        "uploaded": "✓ Document uploaded",
+        "replaceHint": "Click to replace"
+      },
+      "metadata": {
+        "title": "Your information",
+        "fullName": { "label": "Full name (as on ID)" },
+        "cinNumber": { "label": "ID number" },
+        "dateOfBirth": { "label": "Date of birth (optional)" }
+      },
+      "recap": {
+        "title": "Summary",
+        "missingDocs": "Missing documents. Go back to previous steps.",
+        "confirmCta": "Submit my request",
+        "submitting": "Submitting..."
+      },
+      "nav": {
+        "next": "Next",
+        "previous": "Previous"
+      }
+    },
+    "flow": {
+      "previousRejection": "Previous request rejected:"
+    },
+    "statusCard": {
+      "none": {
+        "title": "Become a verified seller",
+        "subtitle": "Build trust with buyers. More contacts on your listings.",
+        "cta": "Start"
+      },
+      "pending": {
+        "title": "Verification in progress",
+        "body": "Reply within 48h. Submitted on {{date}}."
+      },
+      "approved": {
+        "title": "Verified seller ✓",
+        "body": "Your badge is active until {{date}}.",
+        "cta": "Details"
+      },
+      "rejected": {
+        "title": "Verification rejected",
+        "reasonLabel": "Reason:",
+        "cta": "Re-submit"
+      }
+    },
+    "success": {
+      "toast": "Request sent"
+    },
+    "errors": {
+      "fileSize": "File too large (max 10 MB)",
+      "fileType": "Format not supported",
+      "uploadFailed": "Upload failed, retry",
+      "insufficientCredits": "Insufficient credits for verification",
+      "alreadyActive": "You already have a pending or approved verification",
+      "invalidFullName": "Invalid full name",
+      "invalidCinNumber": "Invalid ID number",
+      "generic": "An error occurred. Please try again."
+    }
   },
   "vehicleCombobox": {
     "modelPlaceholder": "Choose or type a model",

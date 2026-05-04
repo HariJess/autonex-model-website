@@ -56,6 +56,70 @@
         "colCount": "Hetsika",
         "empty": "Tsy mbola misy referrer voarakitra."
       }
+    },
+    "verifications": {
+      "title": "Fanamarinana",
+      "empty": "Tsy misy fanamarinana miandry",
+      "statusFilter": {
+        "label": "Sivana araka ny toetra",
+        "all": "Rehetra",
+        "pending": "Miandry",
+        "reviewing": "Eo am-pijerena",
+        "approved": "Voamarina",
+        "rejected": "Lavina",
+        "expired": "Lany"
+      },
+      "list": {
+        "user": "Mpampiasa",
+        "fullName": "Anarana",
+        "submitted": "Naroso",
+        "status": "Toetra"
+      },
+      "drawer": {
+        "title": "Mijery ny fanamarinana",
+        "docs": {
+          "title": "Antontan-taratasy",
+          "cinFront": "CIN Aloha",
+          "cinBack": "CIN Aoriana",
+          "selfie": "Selfie"
+        },
+        "metadata": {
+          "title": "Vaovao narosoina"
+        },
+        "actions": {
+          "approve": "Ankatoavy",
+          "reject": "Lavinao"
+        },
+        "approve": {
+          "confirmTitle": "Ankatoavy ity fanamarinana ity ?",
+          "confirmDesc": "Ho azon'ny mpampiasa ny baodzy Mpivarotra voamarina mandritra ny 365 andro."
+        },
+        "reject": {
+          "categoryLabel": "Sokajy lavina",
+          "categories": {
+            "blurry": "Sary tsy mazava",
+            "wrong_doc": "Antontan-taratasy diso",
+            "fraud_suspect": "Hosoka azo inoana",
+            "expired_doc": "Antontan-taratasy lany",
+            "other": "Hafa"
+          },
+          "reasonLabel": "Antony (hita amin'ny mpampiasa)",
+          "reasonPlaceholder": "Hazavao tsara ny antony nandavana...",
+          "confirmCta": "Hamarino ny fandavana"
+        }
+      },
+      "success": {
+        "approved": "Voankatoavy ny fanamarinana",
+        "rejected": "Voalavina ny fanamarinana"
+      },
+      "errors": {
+        "adminRequired": "Hetsika natokana ho an'ny mpitantana.",
+        "notFound": "Tsy hita ny fanamarinana.",
+        "notReviewable": "Tsy azo jerena intsony ity fanamarinana ity.",
+        "reasonTooShort": "Mila 10 litera farafahakeliny ny antony.",
+        "invalidCategory": "Sokajy fandavana tsy ekena.",
+        "generic": "Nisy fahadisoana. Andramo indray azafady."
+      }
     }
   },
   "ads": {
@@ -809,7 +873,8 @@
       "featured": "À la une",
       "nouveau": "Vaovao",
       "topAd": "Top",
-      "urgent": "Maika"
+      "urgent": "Maika",
+      "verifiedSeller": "Voamarina"
     },
     "mapApproximate": "Toerana hita amin'ny sarintany."
   },
@@ -2531,6 +2596,101 @@
     "bodySuffix": "tsy misy.",
     "backToHome": "Hiverina any am-pidirana",
     "viewListings": "Hijery ny filazana"
+  },
+  "verification": {
+    "overline": "Maha-izy",
+    "title": "Mpivarotra voamarina",
+    "subtitle": "Ampitomboy ny fitokisan'ny mpividy"  ,
+    "intro": {
+      "benefits": {
+        "title": "Tombontsoa",
+        "b1": "Baodzy ✓ Voamarina amin'ny filazanao rehetra",
+        "b2": "Hita kokoa amin'ny vokatra",
+        "b3": "Mahatoky kokoa amin'ny mpividy"
+      },
+      "requirements": {
+        "title": "Antontan-taratasy ilaina",
+        "r1": "Carte d'identité (aloha)",
+        "r2": "Carte d'identité (aoriana)",
+        "r3": "Selfie miaraka amin'ny CIN"
+      },
+      "privacy": {
+        "title": "Tsiambaratelo",
+        "body": "Voadrindra ny antontan-taratasinao ary ampiasaina ho an'ny fanamarinana ihany. Tehirizina 90 andro raha lavina, esorina rehefa lany ny baodzy.",
+        "consentLabel": "Ekeko ny politikan'ny tsiambaratelo"
+      },
+      "cost": "Vidiny",
+      "balanceLabel": "Solde",
+      "startCta": "Manomboka"
+    },
+    "steps": {
+      "cinFront": { "title": "CIN — Aloha" },
+      "cinBack":  { "title": "CIN — Aoriana" },
+      "selfie": {
+        "title": "Selfie miaraka amin'ny CIN",
+        "tip": "Tazomy ny CIN-nao manodidina ny tavanao. Mila mazava sy hazavain-tsoa avokoa izy roa."
+      },
+      "upload": {
+        "dropzone": "Atontao eto ny rakitrao na tsindrio",
+        "formats": "JPG, PNG, WEBP na PDF — 10 Mo farafahabetsany",
+        "uploading": "Andalam-pamoahana...",
+        "uploaded": "✓ Voakopia ny rakitra",
+        "replaceHint": "Tsindrio raha hanova"
+      },
+      "metadata": {
+        "title": "Ny mombamomba anao",
+        "fullName": { "label": "Anarana feno (toy ny ao amin'ny CIN)" },
+        "cinNumber": { "label": "Laharana CIN" },
+        "dateOfBirth": { "label": "Daty nahaterahana (tsy voatery)" }
+      },
+      "recap": {
+        "title": "Famintinana",
+        "missingDocs": "Tsy ampy ny antontan-taratasy. Miverena amin'ny dingana teo aloha.",
+        "confirmCta": "Hanaroso ny fangatahana",
+        "submitting": "Andalam-pandefasana..."
+      },
+      "nav": {
+        "next": "Manaraka",
+        "previous": "Aloha"
+      }
+    },
+    "flow": {
+      "previousRejection": "Lavina ny fangatahana teo aloha :"
+    },
+    "statusCard": {
+      "none": {
+        "title": "Aoka ho mpivarotra voamarina",
+        "subtitle": "Ampitomboy ny fitokisan'ny mpividy. Fifandraisana bebe kokoa amin'ny filazanao.",
+        "cta": "Manomboka"
+      },
+      "pending": {
+        "title": "Andalam-panamarinana",
+        "body": "Valiny ao anatin'ny 48 ora. Naroso ny {{date}}."
+      },
+      "approved": {
+        "title": "Mpivarotra voamarina ✓",
+        "body": "Mavitrika hatramin'ny {{date}} ny baodzy.",
+        "cta": "Antsipiriany"
+      },
+      "rejected": {
+        "title": "Lavina ny fanamarinana",
+        "reasonLabel": "Antony :",
+        "cta": "Mandefa indray"
+      }
+    },
+    "success": {
+      "toast": "Naroso ny fangatahana"
+    },
+    "errors": {
+      "fileSize": "Lehibe loatra ny rakitra (10 Mo farafahabetsany)",
+      "fileType": "Tsy raisina ny endrika",
+      "uploadFailed": "Tsy nahomby ny upload, andramo indray",
+      "insufficientCredits": "Tsy ampy ny crédits ho an'ny fanamarinana",
+      "alreadyActive": "Efa misy fanamarinana miandry na voankatoavy",
+      "invalidFullName": "Anarana feno tsy ekena",
+      "invalidCinNumber": "Laharana CIN tsy ekena",
+      "generic": "Nisy fahadisoana. Andramo indray azafady."
+    }
   },
   "vehicleCombobox": {
     "modelPlaceholder": "Mifidiana na soraty ny modely",

@@ -26,6 +26,7 @@ import { DashboardListingsSection } from "@/pages/dashboard/components/Dashboard
 import { DashboardLeadsSection } from "@/pages/dashboard/components/DashboardLeadsSection";
 import { MyAgencySection } from "@/components/dashboard/MyAgencySection";
 import { CreditWelcomeBanner } from "@/features/credits/components/CreditWelcomeBanner";
+import { VerificationStatusCard } from "@/components/verification/VerificationStatusCard";
 
 type Listing = Tables<"listings">;
 
@@ -328,6 +329,8 @@ const Dashboard = () => {
         />
 
         <CreditWelcomeBanner />
+
+        <VerificationStatusCard />
 
         {profile?.agency_id ? <MyAgencySection /> : null}
 

@@ -21,6 +21,7 @@ import { resolveBrandAsset } from "@/data/brandAssets";
 import type { DealMeta } from "@/lib/deals";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { VerifiedBadge } from "@/components/verification/VerifiedBadge";
 
 interface ListingCardProps {
   listing: DisplayListing;
@@ -263,6 +264,12 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
               {formatPrice(listing.price_mga)}
             </p>
             {listing.negotiable ? <NegotiableBadge size="sm" /> : null}
+            {/* PROMPT 7 — Verified Seller badge.
+                Anti-cumul : si l'annonce a une agency (déjà signal de trust),
+                on n'affiche pas le badge seller pour éviter de surcharger. */}
+            {listing.seller_verified && !listing.agency_name ? (
+              <VerifiedBadge size="sm" label={!isCompactLayout} />
+            ) : null}
           </div>
           {dealMeta && (
             <p className="text-xs font-sans text-muted-foreground line-through">
