@@ -794,6 +794,7 @@ export type Database = {
           drivetrain: string | null
           engine_displacement_l: number | null
           expires_at: string | null
+          expires_at_paused_at: string | null
           exterior_color: string | null
           favorite_count: number
           featured_until: string | null
@@ -866,6 +867,7 @@ export type Database = {
           drivetrain?: string | null
           engine_displacement_l?: number | null
           expires_at?: string | null
+          expires_at_paused_at?: string | null
           exterior_color?: string | null
           favorite_count?: number
           featured_until?: string | null
@@ -938,6 +940,7 @@ export type Database = {
           drivetrain?: string | null
           engine_displacement_l?: number | null
           expires_at?: string | null
+          expires_at_paused_at?: string | null
           exterior_color?: string | null
           favorite_count?: number
           featured_until?: string | null
@@ -1607,6 +1610,7 @@ export type Database = {
           full_name: string | null
           id: string
           is_anonymized: boolean
+          last_published_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           seller_type: string | null
@@ -1629,6 +1633,7 @@ export type Database = {
           full_name?: string | null
           id: string
           is_anonymized?: boolean
+          last_published_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
@@ -1651,6 +1656,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_anonymized?: boolean
+          last_published_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
@@ -3097,10 +3103,13 @@ export type Database = {
       can_publish_listing: {
         Args: { p_user_id: string }
         Returns: {
+          active_listings_count: number
+          active_listings_limit: number
           allowed: boolean
+          cooldown_remaining_seconds: number
+          publishes_24h_count: number
+          publishes_24h_limit: number
           reason: string
-          remaining: number
-          reset_at: string
         }[]
       }
       cancel_account_deletion: {
@@ -3714,6 +3723,10 @@ export type Database = {
         | "boost_activated"
         | "verif_submitted"
         | "verif_expiring_30d"
+        | "report_received"
+        | "listing_under_review"
+        | "listing_restored"
+        | "listing_deleted_by_admin"
       payment_method:
         | "mvola"
         | "orange_money"
@@ -3923,6 +3936,10 @@ export const Constants = {
         "boost_activated",
         "verif_submitted",
         "verif_expiring_30d",
+        "report_received",
+        "listing_under_review",
+        "listing_restored",
+        "listing_deleted_by_admin",
       ],
       payment_method: [
         "mvola",
