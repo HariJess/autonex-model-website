@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,16 +14,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AlertCircle, CarFront, Pause, Pencil, Play, Sparkles, Trash2 } from "lucide-react";
+import { AlertCircle, CarFront, Pause, Pencil, Play, Trash2 } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import type { Tables } from "@/integrations/supabase/types";
 import { isEditablePublishedListingStatus } from "@/lib/publishDraft";
 import {
   formatBoostEndDateFr,
-  isListingEligibleForPostPublishBoost,
   type ListingBoostPartition,
 } from "@/lib/listingBoosts";
-import { DashboardBoostPurchaseDialog } from "@/pages/dashboard/components/DashboardBoostPurchaseDialog";
+// PROMPT 6 — DashboardBoostPurchaseDialog deprecated. Le boost est désormais
+// géré exclusivement depuis /mes-annonces (cf. MyListingCard + BoostModal).
 
 type Listing = Tables<"listings">;
 
@@ -42,9 +42,6 @@ type DashboardListingsSectionProps = {
   statusLabels: Record<string, string>;
   boostLabels: Record<string, string>;
   listingBoostPartitions: Map<string, ListingBoostPartition>;
-  creditsBalance: number;
-  creditsBalancePending: boolean;
-  userId: string | undefined;
   pendingBoostsLabel: (raw: unknown) => string | null;
   labels: {
     noListings: string;
@@ -55,7 +52,6 @@ type DashboardListingsSectionProps = {
     pendingBoosts: string;
     activeBoosts: string;
     expiredBoosts: string;
-    boostListing: string;
     boostPendingReviewNote: string;
     listing: string;
     price: string;
@@ -135,16 +131,11 @@ export function DashboardListingsSection({
   statusLabels,
   boostLabels,
   listingBoostPartitions,
-  creditsBalance,
-  creditsBalancePending,
-  userId,
   pendingBoostsLabel,
   labels,
   onToggleStatus,
   onDelete,
 }: DashboardListingsSectionProps) {
-  const [boostDialogListing, setBoostDialogListing] = useState<Listing | null>(null);
-
   return (
     <div>
       {/* Header : titre seul (legacy) ou titre + action droite (flex justify-between) */}
@@ -210,17 +201,7 @@ export function DashboardListingsSection({
                       labels={labels}
                     />
                     <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                      {isListingEligibleForPostPublishBoost(listing.status) && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="font-sans touch-manipulation h-9 px-2 border-amber-600/40 text-amber-900 dark:text-amber-200"
-                          onClick={() => setBoostDialogListing(listing)}
-                        >
-                          <Sparkles className="h-3.5 w-3.5 mr-1 shrink-0" />
-                          {labels.boostListing}
-                        </Button>
-                      )}
+                      {/* PROMPT 6 : bouton « Booster » déplacé dans /mes-annonces (MyListingCard + BoostModal). */}
                       {isEditablePublishedListingStatus(listing.status) && (
                         <Button variant="outline" size="sm" className="font-sans touch-manipulation h-9 px-2" asChild>
                           <Link to={`/publier?edit=${listing.id}`}>
@@ -309,17 +290,7 @@ export function DashboardListingsSection({
                         <td className="p-4 font-sans text-sm hidden md:table-cell">{listing.views_count ?? 0}</td>
                         <td className="p-4">
                           <div className="flex items-center gap-1 flex-wrap">
-                            {isListingEligibleForPostPublishBoost(listing.status) && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="font-sans h-8 px-2 border-amber-600/40 text-amber-900 dark:text-amber-200"
-                                onClick={() => setBoostDialogListing(listing)}
-                              >
-                                <Sparkles className="h-3.5 w-3.5 mr-1 shrink-0" />
-                                {labels.boostListing}
-                              </Button>
-                            )}
+                            {/* PROMPT 6 : bouton « Booster » déplacé dans /mes-annonces. */}
                             {isEditablePublishedListingStatus(listing.status) && (
                               <Button variant="outline" size="sm" className="font-sans h-8 px-2" asChild>
                                 <Link to={`/publier?edit=${listing.id}`}>
@@ -367,18 +338,6 @@ export function DashboardListingsSection({
           </div>
         </>
       )}
-
-      <DashboardBoostPurchaseDialog
-        listing={boostDialogListing}
-        open={boostDialogListing !== null}
-        onOpenChange={(open) => {
-          if (!open) setBoostDialogListing(null);
-        }}
-        partition={boostDialogListing ? listingBoostPartitions.get(boostDialogListing.id) : undefined}
-        creditsBalance={creditsBalance}
-        creditsBalancePending={creditsBalancePending}
-        userId={userId}
-      />
     </div>
   );
 }

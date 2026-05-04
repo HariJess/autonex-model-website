@@ -58,6 +58,11 @@ const ListingCard = ({ listing, agencyName, agencyLogo, matchBadge, variant = "d
   }, [images, imgIndex]);
 
   const badgeLabels: Record<string, { labelKey: string; className: string }> = {
+    // PROMPT 6 V1 boost badges (priorité top_ad > featured > legacy)
+    top_ad: { labelKey: "listing.badge.topAd", className: "bg-violet-600 text-white" },
+    featured: { labelKey: "listing.badge.featured", className: "bg-amber-500 text-white" },
+    // Legacy aliases — conservés pour backward compat avec listings ayant encore
+    // un type "top"/"featured" dans la table boosts pré-PROMPT 6.
     boost: { labelKey: "listing.badge.boost", className: "gradient-primary" },
     coup_de_coeur: { labelKey: "listing.badge.coupDeCoeur", className: "bg-accent" },
     nouveau: { labelKey: "listing.badge.nouveau", className: "bg-success" },

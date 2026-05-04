@@ -396,9 +396,6 @@ const Dashboard = () => {
           statusLabels={statusLabels}
           boostLabels={boostLabels}
           listingBoostPartitions={listingBoostPartitions}
-          creditsBalance={creditsFromLedger}
-          creditsBalancePending={creditsBalancePending}
-          userId={user?.id}
           pendingBoostsLabel={pendingBoostsLabel}
           labels={{
             noListings: t("dashboard.noListings", "Aucune annonce. Publiez votre première annonce !"),
@@ -409,7 +406,6 @@ const Dashboard = () => {
             pendingBoosts: t("dashboard.pendingBoosts", "Visibilité après validation"),
             activeBoosts: t("dashboard.activeBoosts", "Boosts actifs"),
             expiredBoosts: t("dashboard.expiredBoosts", "Boosts expirés"),
-            boostListing: t("dashboard.boostListing", "Booster"),
             boostPendingReviewNote: t(
               "dashboard.boostPendingReviewNote",
               "Les boosts « après publication » seront disponibles une fois l’annonce validée. Les options payées à l’envoi restent en attente ci-dessus.",

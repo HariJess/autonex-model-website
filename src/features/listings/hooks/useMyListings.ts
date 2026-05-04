@@ -49,6 +49,12 @@ export type MyListingRow = Pick<
 > & {
   cover_url: string | null;
   sold_price: number | null;
+  // PROMPT 6 : colonnes boost denormalized. Cast `as unknown as` à la lecture
+  // tant que la migration boost_system n'est pas appliquée + types regen
+  // (alignement identique à sold_price PROMPT 4).
+  last_bumped_at: string | null;
+  featured_until: string | null;
+  top_ad_until: string | null;
 };
 
 export interface UseMyListingsResult {
@@ -74,7 +80,10 @@ const EMPTY_COUNTS: Record<MyListingsFilter, number> = {
 const SELECT_COLS =
   "id, title, price_mga, ville, type, status, expires_at, " +
   "published_at, sold_at, sold_price, views_count, contact_count, favorite_count, " +
-  "renewal_count, created_at, updated_at, listing_photos(url, position)";
+  "renewal_count, created_at, updated_at, " +
+  // PROMPT 6 boost denormalized cols.
+  "last_bumped_at, featured_until, top_ad_until, " +
+  "listing_photos(url, position)";
 
 export const myListingsQueryKey = (userId: string | null | undefined) =>
   ["my-listings-dashboard", userId ?? null] as const;

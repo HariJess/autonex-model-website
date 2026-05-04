@@ -806,7 +806,9 @@
     "badge": {
       "boost": "Boost",
       "coupDeCoeur": "Top pick",
+      "featured": "Featured",
       "nouveau": "New",
+      "topAd": "Top",
       "urgent": "Urgent"
     },
     "mapApproximate": "Position shown on the map."
@@ -1640,7 +1642,65 @@
     "insufficientBalance": "Insufficient balance for this cart.",
     "confirming": "Confirming…",
     "confirmWithCredits": "Confirm ({{count}} credits)",
-    "purchaseSuccess": "Boosts activated. Your listing now benefits from the chosen visibility."
+    "purchaseSuccess": "Boosts activated. Your listing now benefits from the chosen visibility.",
+    "errors": {
+      "cooldown": "You must wait 24h between two bumps.",
+      "insufficientCredits": "Insufficient credits for this boost.",
+      "notOwner": "You can only boost your own listings.",
+      "notBoostable": "This listing can no longer be boosted (sold or expired).",
+      "notFound": "Listing not found.",
+      "notAuthenticated": "Sign in to boost a listing.",
+      "invalidType": "Invalid boost type.",
+      "generic": "An error occurred. Please try again."
+    },
+    "success": {
+      "bumpToast": "Listing bumped 🚀",
+      "featuredToast": "Featured boost activated ⭐",
+      "topAdToast": "Top Ad activated 👑"
+    }
+  },
+  "boostModal": {
+    "title": "Boost your listing",
+    "subtitle": "Pick the option that suits you",
+    "boost": {
+      "bump": {
+        "title": "Instant bump",
+        "duration": "Instant effect",
+        "description": "Your listing moves back to the top of the feed right now."
+      },
+      "featured": {
+        "title": "Featured",
+        "duration": "7 days",
+        "description": "Appears in the « Featured » section + ⭐ badge on the card."
+      },
+      "top_ad": {
+        "title": "Top Ad",
+        "duration": "30 days",
+        "description": "Pinned 👑 at the top of the feed for 30 days."
+      }
+    },
+    "cardCostValue": "{{amount}} cr.",
+    "balanceLabel": "Balance",
+    "balanceValue": "{{amount}} credits",
+    "totalCostLabel": "Cost",
+    "totalCostValue": "{{amount}} credits",
+    "confirmCta": "Confirm boost",
+    "cancelCta": "Cancel",
+    "activating": "Activating...",
+    "insufficientCredits": {
+      "title": "Insufficient credits",
+      "cta": "Top up"
+    },
+    "cooldown": {
+      "bumpUnavailable": "Available in {{remaining}}"
+    },
+    "activeBoosts": {
+      "featuredUntil": "Active until {{date}} — extension will stack",
+      "topAdUntil": "Active until {{date}} — extension will stack"
+    },
+    "disclaimer": {
+      "noRefund": "Spent credits are not refunded if the listing is sold early."
+    }
   },
   "brands": {
     "scrollPrev": "Previous brands",
@@ -1694,6 +1754,10 @@
       "continueDraft": "Continue editing",
       "deleteDraft": "Delete",
       "viewDetails": "View details"
+    },
+    "boostStatus": {
+      "featuredUntil": "Featured until {{date}}",
+      "topAdUntil": "Top until {{date}}"
     },
     "renewModal": {
       "title": "Renew {{title}}",

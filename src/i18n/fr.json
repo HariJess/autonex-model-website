@@ -806,7 +806,9 @@
     "badge": {
       "boost": "Boost",
       "coupDeCoeur": "Coup de cœur",
+      "featured": "À la une",
       "nouveau": "Nouveau",
+      "topAd": "Top",
       "urgent": "Urgent"
     },
     "mapApproximate": "Position indiquée sur la carte."
@@ -1640,7 +1642,65 @@
     "insufficientBalance": "Solde insuffisant pour ce panier.",
     "confirming": "Confirmation…",
     "confirmWithCredits": "Confirmer ({{count}} crédits)",
-    "purchaseSuccess": "Boosts activés. Votre annonce bénéficie tout de suite de la visibilité choisie."
+    "purchaseSuccess": "Boosts activés. Votre annonce bénéficie tout de suite de la visibilité choisie.",
+    "errors": {
+      "cooldown": "Vous devez attendre 24h entre deux remontées.",
+      "insufficientCredits": "Crédits insuffisants pour ce boost.",
+      "notOwner": "Vous ne pouvez booster que vos propres annonces.",
+      "notBoostable": "Cette annonce ne peut plus être boostée (vendue ou expirée).",
+      "notFound": "Annonce introuvable.",
+      "notAuthenticated": "Connectez-vous pour booster une annonce.",
+      "invalidType": "Type de boost invalide.",
+      "generic": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "success": {
+      "bumpToast": "Annonce remontée 🚀",
+      "featuredToast": "Boost « À la une » activé ⭐",
+      "topAdToast": "Top Annonce activé 👑"
+    }
+  },
+  "boostModal": {
+    "title": "Booster votre annonce",
+    "subtitle": "Choisissez l'option qui vous convient",
+    "boost": {
+      "bump": {
+        "title": "Remontée immédiate",
+        "duration": "Effet instantané",
+        "description": "Votre annonce remonte en haut du feed maintenant."
+      },
+      "featured": {
+        "title": "À la une",
+        "duration": "7 jours",
+        "description": "Apparaît dans la section « À la une » + badge ⭐ sur la card."
+      },
+      "top_ad": {
+        "title": "Top Annonce",
+        "duration": "30 jours",
+        "description": "Épinglée 👑 en haut du feed pendant 30 jours."
+      }
+    },
+    "cardCostValue": "{{amount}} cr.",
+    "balanceLabel": "Solde",
+    "balanceValue": "{{amount}} crédits",
+    "totalCostLabel": "Coût",
+    "totalCostValue": "{{amount}} crédits",
+    "confirmCta": "Confirmer le boost",
+    "cancelCta": "Annuler",
+    "activating": "Activation en cours...",
+    "insufficientCredits": {
+      "title": "Crédits insuffisants",
+      "cta": "Recharger"
+    },
+    "cooldown": {
+      "bumpUnavailable": "Disponible dans {{remaining}}"
+    },
+    "activeBoosts": {
+      "featuredUntil": "Actif jusqu'au {{date}} — extension cumulera",
+      "topAdUntil": "Actif jusqu'au {{date}} — extension cumulera"
+    },
+    "disclaimer": {
+      "noRefund": "Les crédits engagés ne sont pas remboursés en cas de vente anticipée."
+    }
   },
   "brands": {
     "scrollPrev": "Marques précédentes",
@@ -1694,6 +1754,10 @@
       "continueDraft": "Continuer la rédaction",
       "deleteDraft": "Supprimer",
       "viewDetails": "Voir détails"
+    },
+    "boostStatus": {
+      "featuredUntil": "À la une jusqu'au {{date}}",
+      "topAdUntil": "Top jusqu'au {{date}}"
     },
     "renewModal": {
       "title": "Renouveler {{title}}",

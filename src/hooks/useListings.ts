@@ -67,9 +67,25 @@ const LISTING_SELECT_COLUMN_NAMES = [
   "pending_boost_types",
 ] as const satisfies readonly (keyof Tables<"listings">)[];
 
-type ListingRowLite = Pick<Tables<"listings">, typeof LISTING_SELECT_COLUMN_NAMES[number]>;
+// PROMPT 6 boost denormalized cols. Pas dans le strict array tant que la
+// migration boost_system n'a pas regen les types. Cast manuel ci-dessous.
+const BOOST_DENORMALIZED_COL_NAMES = [
+  "last_bumped_at",
+  "featured_until",
+  "top_ad_until",
+] as const;
 
-const LISTING_SELECT_COLUMNS = LISTING_SELECT_COLUMN_NAMES.join(",");
+type ListingRowLite = Pick<Tables<"listings">, typeof LISTING_SELECT_COLUMN_NAMES[number]> & {
+  // PROMPT 6 — cast manuel jusqu'au regen post-migration. Toutes nullables.
+  last_bumped_at?: string | null;
+  featured_until?: string | null;
+  top_ad_until?: string | null;
+};
+
+const LISTING_SELECT_COLUMNS = [
+  ...LISTING_SELECT_COLUMN_NAMES,
+  ...BOOST_DENORMALIZED_COL_NAMES,
+].join(",");
 
 function isListingRowLite(row: unknown): row is ListingRowLite {
   if (typeof row !== "object" || row === null) return false;
@@ -231,11 +247,8 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     agencyInfo = data;
   }
 
-  let badge: DisplayListing["badge"] = null;
   const boostTypes = new Set((boostsRes.data ?? []).map((b) => b.type));
-  if (boostTypes.has("top")) badge = "boost";
-  else if (boostTypes.has("featured")) badge = "coup_de_coeur";
-  else if (boostTypes.has("urgent")) badge = "urgent";
+  const badge: DisplayListing["badge"] = badgeForListing(listing, boostTypes);
 
   const { data: hasWhatsappRaw, error: hasWhatsappErr } = whatsappRes;
 
@@ -277,22 +290,54 @@ export function prefetchListing(queryClient: QueryClient, id: string | undefined
     .then(() => undefined);
 }
 
+/**
+ * Score composite côté client utilisé en fallback dans search (cf.
+ * `searchResultsModel.ts`). PROMPT 6 V1 : tiers basés sur les colonnes
+ * denormalized `top_ad_until`, `featured_until`, `last_bumped_at`. Les
+ * legacy types (`top`, `featured`, `daily_bump`, `urgent`) restent
+ * supportés en fallback pour les boosts insérés AVANT la migration
+ * (rétrocompat anti-régression).
+ */
 function visibilityRankScore(listing: ListingRowLite, types: Set<string>, dailyBumpStarts: Map<string, number>): number {
+  const now = Date.now();
   const created = new Date(listing.created_at ?? 0).getTime();
+  const topAdActive =
+    typeof listing.top_ad_until === "string" && new Date(listing.top_ad_until).getTime() > now;
+  const featuredActive =
+    typeof listing.featured_until === "string" && new Date(listing.featured_until).getTime() > now;
+  const lastBumped =
+    typeof listing.last_bumped_at === "string" ? new Date(listing.last_bumped_at).getTime() : null;
+
   let tier = 0;
-  if (types.has("top")) tier = 4;
-  else if (types.has("featured")) tier = 3;
-  else if (types.has("daily_bump")) tier = 2;
+  if (topAdActive || types.has("top_ad") || types.has("top")) tier = 4;
+  else if (featuredActive || types.has("featured")) tier = 3;
+  else if (lastBumped != null || types.has("bump") || types.has("daily_bump")) tier = 2;
   else if (types.has("urgent")) tier = 1;
+
   const bumpTs = dailyBumpStarts.get(listing.id);
-  const recency =
-    types.has("daily_bump") && bumpTs != null ? Math.max(created, bumpTs) : created;
+  const recency = lastBumped != null
+    ? Math.max(created, lastBumped)
+    : types.has("daily_bump") && bumpTs != null
+      ? Math.max(created, bumpTs)
+      : created;
   return tier * 1e15 + recency;
 }
 
-function badgeForTypes(types: Set<string>): DisplayListing["badge"] {
+/**
+ * PROMPT 6 V1 : priorité top_ad > featured > legacy. 1 badge max par card
+ * (pas de stacking V1, surface mobile limitée). Fallback sur les types
+ * boost insérés pré-PROMPT 6 si les colonnes denormalized sont vides.
+ */
+function badgeForListing(listing: ListingRowLite, types: Set<string>): DisplayListing["badge"] {
+  const now = Date.now();
+  const topAdActive =
+    typeof listing.top_ad_until === "string" && new Date(listing.top_ad_until).getTime() > now;
+  if (topAdActive || types.has("top_ad")) return "top_ad";
+  const featuredActive =
+    typeof listing.featured_until === "string" && new Date(listing.featured_until).getTime() > now;
+  if (featuredActive || types.has("featured")) return "featured";
+  // Legacy fallback (boosts pré-PROMPT 6)
   if (types.has("top")) return "boost";
-  if (types.has("featured")) return "coup_de_coeur";
   if (types.has("urgent")) return "urgent";
   return null;
 }
@@ -338,7 +383,7 @@ async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promis
     const tset = typesByListing.get(listing.id) ?? new Set<string>();
     return mapListingRowToDisplayListing(listing, {
       images: photosByListing.get(listing.id) ?? [],
-      badge: badgeForTypes(tset),
+      badge: badgeForListing(listing, tset),
       visibilityRankScore: visibilityRankScore(listing, tset, dailyBumpStarts),
     });
   });
@@ -351,10 +396,20 @@ export function useDbListings(filters: ListingsFilters = {}) {
     queryFn: async (): Promise<DisplayListing[]> => {
       if (filters.limit === 0) return [];
 
+      // PROMPT 6 — tri composite boost-aware. Index `idx_listings_feed_rank`
+      // garantit la perf. NULLS LAST = annonces sans boost en queue dans
+      // chaque tier. Cast `as any` sur les colonnes pas encore typées
+      // (regen post-migration nettoiera).
       const baseQuery = supabase
         .from("listings")
         .select(LISTING_SELECT_COLUMNS)
         .eq("status", "active")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .order("top_ad_until" as any, { ascending: false, nullsFirst: false })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .order("featured_until" as any, { ascending: false, nullsFirst: false })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .order("last_bumped_at" as any, { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
 
       let query = applyListingFilters(baseQuery as unknown as FilterableListingQuery, filters) as typeof baseQuery;

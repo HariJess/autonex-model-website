@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -6,8 +7,10 @@ import {
   Heart,
   Pencil,
   CheckCircle2,
+  Crown,
   RefreshCw,
   Rocket,
+  Star,
   Trash2,
   ImageIcon,
   ExternalLink,
@@ -17,6 +20,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { formatAriary } from "@/config/monetization";
 import { LISTING_RENEWAL_CREDIT_COST } from "@/config/monetization";
+import { BoostModal } from "@/components/listings/BoostModal";
 import type { MyListingRow } from "@/features/listings/hooks/useMyListings";
 
 interface MyListingCardProps {
@@ -87,8 +91,16 @@ const VARIANT_BADGE_LABEL: Record<CardVariant, { i18nKey: string; fallback: stri
 export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: MyListingCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [boostModalOpen, setBoostModalOpen] = useState(false);
 
   const variant = resolveVariant(listing);
+  const featuredUntil = listing.featured_until ?? null;
+  const topAdUntil = listing.top_ad_until ?? null;
+  const lastBumpedAt = listing.last_bumped_at ?? null;
+  const featuredActive =
+    featuredUntil != null && new Date(featuredUntil).getTime() > Date.now();
+  const topAdActive =
+    topAdUntil != null && new Date(topAdUntil).getTime() > Date.now();
   const days = daysUntil(listing.expires_at);
   const isUrgent = variant === "expiring_soon" && days !== null && days <= URGENT_THRESHOLD_DAYS;
 
@@ -230,6 +242,37 @@ export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: M
         </div>
       )}
 
+      {/* Active boost badges (PROMPT 6) — affichés au-dessus des actions */}
+      {isActiveLike && (featuredActive || topAdActive) && (
+        <div
+          className="flex flex-wrap items-center gap-1.5"
+          data-testid={`my-listing-${listing.id}-boost-badges`}
+        >
+          {topAdActive && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-800 dark:bg-violet-900/40 dark:text-violet-200"
+              data-testid={`my-listing-${listing.id}-top-ad-badge`}
+            >
+              <Crown className="h-3 w-3" aria-hidden="true" />
+              {t("myListings.boostStatus.topAdUntil", "Top jusqu'au {{date}}", {
+                date: formatDate(topAdUntil),
+              })}
+            </span>
+          )}
+          {featuredActive && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
+              data-testid={`my-listing-${listing.id}-featured-badge`}
+            >
+              <Star className="h-3 w-3" aria-hidden="true" />
+              {t("myListings.boostStatus.featuredUntil", "À la une jusqu'au {{date}}", {
+                date: formatDate(featuredUntil),
+              })}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Actions */}
       {isShowingActions && (
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -238,8 +281,7 @@ export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: M
               type="button"
               size="sm"
               variant="outline"
-              disabled
-              title={t("myListings.actions.boostComingSoon", "Bientôt disponible")}
+              onClick={() => setBoostModalOpen(true)}
               data-testid={`my-listing-${listing.id}-boost`}
               className="flex-1 gap-1.5"
             >
@@ -336,6 +378,21 @@ export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: M
             </Link>
           </Button>
         </div>
+      )}
+
+      {/* Lazy-mount BoostModal : ne charge useCreditsBalance + useApplyBoost
+          que lorsque l'utilisateur ouvre le modal. Évite aussi un cycle
+          AuthProvider en test sur les listings rendus sans modal ouvert. */}
+      {isShowingBoost && boostModalOpen && (
+        <BoostModal
+          listingId={listing.id}
+          listingTitle={listing.title}
+          lastBumpedAt={lastBumpedAt}
+          featuredUntil={featuredUntil}
+          topAdUntil={topAdUntil}
+          open={boostModalOpen}
+          onOpenChange={setBoostModalOpen}
+        />
       )}
     </article>
   );

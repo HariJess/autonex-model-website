@@ -806,7 +806,9 @@
     "badge": {
       "boost": "Boost",
       "coupDeCoeur": "Tena tia",
+      "featured": "À la une",
       "nouveau": "Vaovao",
+      "topAd": "Top",
       "urgent": "Maika"
     },
     "mapApproximate": "Toerana hita amin'ny sarintany."
@@ -1640,7 +1642,65 @@
     "insufficientBalance": "Tsy ampy ny solde ho an'ity panier ity.",
     "confirming": "Fanamarinana…",
     "confirmWithCredits": "Hamarino ({{count}} crédits)",
-    "purchaseSuccess": "Voasokatra ny boost. Misitraka avy hatrany ny fahitana voafidy ny filazanao."
+    "purchaseSuccess": "Voasokatra ny boost. Misitraka avy hatrany ny fahitana voafidy ny filazanao.",
+    "errors": {
+      "cooldown": "Mila miandry 24 ora ianao alohan'ny hanaovana bump fanindroany.",
+      "insufficientCredits": "Tsy ampy ny crédits ho an'ity boost ity.",
+      "notOwner": "Ny filazanao ihany no azonao boostina.",
+      "notBoostable": "Tsy azo boostina intsony ity filazana ity (voavidy na lany).",
+      "notFound": "Tsy hita ny filazana.",
+      "notAuthenticated": "Midira mba hanao boost amin'ny filazana iray.",
+      "invalidType": "Karazana boost tsy ekena.",
+      "generic": "Nisy fahadisoana. Andramo indray azafady."
+    },
+    "success": {
+      "bumpToast": "Niakatra ny filazana 🚀",
+      "featuredToast": "Boost « À la une » mavitrika ⭐",
+      "topAdToast": "Top Annonce mavitrika 👑"
+    }
+  },
+  "boostModal": {
+    "title": "Boostino ny filazanao",
+    "subtitle": "Safidio ilay safidy mety aminao",
+    "boost": {
+      "bump": {
+        "title": "Fiakarana avy hatrany",
+        "duration": "Vokatra avy hatrany",
+        "description": "Miverina any ambony amin'ny feed avy hatrany ny filazanao."
+      },
+      "featured": {
+        "title": "À la une",
+        "duration": "7 andro",
+        "description": "Miseho ao amin'ny faritra « À la une » + badge ⭐ amin'ny carte."
+      },
+      "top_ad": {
+        "title": "Top Annonce",
+        "duration": "30 andro",
+        "description": "Voafantsika 👑 any ambony amin'ny feed mandritra ny 30 andro."
+      }
+    },
+    "cardCostValue": "{{amount}} cr.",
+    "balanceLabel": "Solde",
+    "balanceValue": "{{amount}} crédits",
+    "totalCostLabel": "Vidiny",
+    "totalCostValue": "{{amount}} crédits",
+    "confirmCta": "Hamarino ny boost",
+    "cancelCta": "Foano",
+    "activating": "Andalam-pampandehanana...",
+    "insufficientCredits": {
+      "title": "Tsy ampy ny crédits",
+      "cta": "Hampitomboina"
+    },
+    "cooldown": {
+      "bumpUnavailable": "Hisy ao anatin'ny {{remaining}}"
+    },
+    "activeBoosts": {
+      "featuredUntil": "Mavitrika hatramin'ny {{date}} — manangona ny extension",
+      "topAdUntil": "Mavitrika hatramin'ny {{date}} — manangona ny extension"
+    },
+    "disclaimer": {
+      "noRefund": "Tsy averina ny crédits efa lany raha voavidy aloha ny filazana."
+    }
   },
   "brands": {
     "scrollPrev": "Marika teo aloha",
@@ -1694,6 +1754,10 @@
       "continueDraft": "Tohizo ny fanoratana",
       "deleteDraft": "Foano",
       "viewDetails": "Hijery antsipiriany"
+    },
+    "boostStatus": {
+      "featuredUntil": "À la une hatramin'ny {{date}}",
+      "topAdUntil": "Top hatramin'ny {{date}}"
     },
     "renewModal": {
       "title": "Havaozina {{title}}",
