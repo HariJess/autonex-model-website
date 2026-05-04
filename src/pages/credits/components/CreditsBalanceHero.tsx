@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Coins } from "lucide-react";
 import { useCreditsBalance } from "@/hooks/useCreditsBalance";
 import { usePricing, type PricingMap } from "@/hooks/usePricing";
+import { formatNumber } from "@/features/credits/lib/creditFormatting";
 
 /**
  * Hero card on /credits: shows the user's current balance and a concrete
@@ -96,7 +97,7 @@ export function CreditsBalanceHero() {
               </p>
               <p className="font-sans text-3xl md:text-4xl text-foreground">
                 <span data-testid="credits-balance">
-                  {balanceLoading ? "…" : balance.toLocaleString("fr-MG")}
+                  {balanceLoading ? "…" : formatNumber(balance)}
                 </span>{" "}
                 <span className="text-base text-muted-foreground">
                   {t("credits.unit", "crédits")}

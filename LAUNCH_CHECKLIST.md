@@ -13,7 +13,7 @@
 - [ ] Vérifier `VITE_SENTRY_DSN` rempli en prod (Vercel env)
 - [ ] Vérifier `VITE_GA4_MEASUREMENT_ID` rempli si GA4 souhaité
 - [ ] Vérifier que `VITE_ENABLE_MANUAL_PAYMENT` est `false` (VPI seul)
-- [ ] **Supabase Edge Function env** `VPI_MAX_AMOUNT_MGA` : décider si on garde 100 000 Ar (= pack max actuel `cp_1000`) ou bumpe à 500 000 pour packs Pro futurs. Modifier via Supabase Dashboard → Edge Functions → vpi-initiate-payment → Settings → Secrets (no redeploy needed, lue à runtime)
+- [ ] **Supabase Edge Function env** `VPI_MAX_AMOUNT_MGA` : décider quel plafond appliquer en fonction du catalogue actuel (recalibration PROMPT 3.5, 6 packs `discover` 25 000 Ar → `enterprise` 1 500 000 Ar). Default 100 000 Ar bloque tout pack ≥ Pro (150 000 Ar). Bumper au moins à 1 500 000 Ar pour autoriser Enterprise, ou raise progressif selon stratégie beta. Modifier via Supabase Dashboard → Edge Functions → vpi-initiate-payment → Settings → Secrets (no redeploy needed, lue à runtime)
 - [ ] **Rotation clé `service_role`** : Dashboard → Project Settings → API → Reset (item M-KEY-ROTATION, suivi de M-CRON-SECRET)
 - [ ] Sentry `tracesSampleRate` à 0.05 minimum (déjà fait via M3)
 - [ ] CSP testée sans erreur console en dev ET en preview prod
@@ -22,7 +22,7 @@
 
 - [ ] Publish flow particulier en DRY_RUN → bascule pending_review
 - [ ] Publish flow dealer en DRY_RUN → bascule active
-- [ ] Paiement VPI prod 1000 Ar (pack le moins cher) → credits accrédités
+- [ ] Paiement VPI prod 25 000 Ar (pack `discover` Découverte, le moins cher) → credits accrédités
 - [ ] Phone reveal → événement enregistré dans phone_reveal_events
 - [ ] Cookie consent banner s'affiche en première visite
 - [ ] Test mobile sur vrai téléphone (3G simulé si possible)

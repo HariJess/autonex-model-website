@@ -859,6 +859,7 @@
       "pendingMessage": "Votre paiement est en cours de traitement. Cette page se met à jour automatiquement.",
       "pollingTimeout": "Le délai de vérification est dépassé. Si votre paiement a été confirmé, vos crédits apparaîtront dans quelques minutes. Vérifiez votre historique sur /credits.",
       "processingPayment": "Initialisation du paiement...",
+      "redirecting": "Redirection en cours...",
       "retryButton": "Réessayer",
       "returnPageIntro": "Nous vérifions le statut de votre paiement...",
       "returnPageTitle": "Retour de paiement",
@@ -907,8 +908,11 @@
     "creditCard": "Carte bancaire (Stripe)",
     "creditPack": {
       "business": "Business",
+      "discover": "Découverte",
+      "enterprise": "Enterprise",
+      "power": "Power",
       "pro": "Pro",
-      "starter": "Starter"
+      "standard": "Standard"
     },
     "creditRequestSent": "Demande d’achat de crédits enregistrée.",
     "credits": "crédits",

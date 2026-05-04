@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -58,10 +59,18 @@ export function CreditsPurchaseFlow({
   const checkout = useVpiCheckout();
   const { isManualPaymentEnabled } = usePaymentFlags();
 
+  // PROMPT 5 — verrou anti double-submit entre la fin de la mutation
+  // (`isPending=false`) et la navigation effective vers VPI. La fenêtre de
+  // re-render React entre ces deux moments permettait théoriquement un
+  // 2e click qui aurait créé une transaction orpheline en DB. On garde le
+  // bouton disabled tant que la redirection est en cours.
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [redirectingMode, setRedirectingMode] = useState<VpiPaymentMode | null>(null);
+
   const historyVisible = showTransactionsHistory ?? variant === "standalone";
 
   const handleVpiPay = (paymentMode: VpiPaymentMode) => {
-    if (!purchase.selectedPackId || checkout.isPending) return;
+    if (!purchase.selectedPackId || checkout.isPending || isRedirecting) return;
     checkout.mutate(
       {
         creditPackId: purchase.selectedPackId,
@@ -70,28 +79,35 @@ export function CreditsPurchaseFlow({
       },
       {
         onSuccess: (data) => {
+          setRedirectingMode(paymentMode);
+          setIsRedirecting(true);
           window.location.assign(data.checkout_url);
         },
         onError: (err) => {
+          setIsRedirecting(false);
+          setRedirectingMode(null);
           toast.error(t(mapVpiCheckoutErrorToI18nKey(err.message)));
         },
       },
     );
   };
 
-  const vpiDisabled = !purchase.selectedPackId || checkout.isPending;
-  const activeMode: VpiPaymentMode | null = checkout.isPending
-    ? checkout.variables?.paymentMode ?? null
-    : null;
+  const vpiDisabled = !purchase.selectedPackId || checkout.isPending || isRedirecting;
+  const activeMode: VpiPaymentMode | null = isRedirecting
+    ? redirectingMode
+    : checkout.isPending
+      ? checkout.variables?.paymentMode ?? null
+      : null;
 
   const renderVpiButtonLabel = (mode: VpiPaymentMode, labelKey: string, fallback: string) => {
     if (activeMode === mode) {
+      const labelText = isRedirecting
+        ? t("payment.vanilla.redirecting", "Redirection en cours...")
+        : t("payment.vanilla.processingPayment", "Initialisation du paiement...");
       return (
         <>
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-          <span>
-            {t("payment.vanilla.processingPayment", "Initialisation du paiement...")}
-          </span>
+          <span>{labelText}</span>
         </>
       );
     }

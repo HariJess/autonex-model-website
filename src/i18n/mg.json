@@ -859,6 +859,7 @@
       "pendingMessage": "Andalam-pikarakarana ny fandoavam-bolanao. Hanavao ho azy ity pejy ity.",
       "pollingTimeout": "Lany ny fe-potoana fanamarinana. Raha voamarina ny fandoavam-bolanao, ho hita ao anatin'ny minitra vitsy ny crédit. Jereo ny tantara ao amin'ny /credits.",
       "processingPayment": "Manomboka ny fandoavam-bola...",
+      "redirecting": "Mandalo amin'ny fandoavam-bola...",
       "retryButton": "Andramo indray",
       "returnPageIntro": "Mijerena ny toetry ny fandoavam-bolanao...",
       "returnPageTitle": "Valim-pandoavam-bola",
@@ -907,8 +908,11 @@
     "creditCard": "Carte bancaire (Stripe)",
     "creditPack": {
       "business": "Business",
+      "discover": "Discover",
+      "enterprise": "Enterprise",
+      "power": "Power",
       "pro": "Pro",
-      "starter": "Starter"
+      "standard": "Standard"
     },
     "creditRequestSent": "Voatahiry ny fangatahana fividianana crédit.",
     "credits": "crédits",
