@@ -2610,9 +2610,9 @@
       },
       "requirements": {
         "title": "Documents requis",
-        "r1": "Carte d'identité (recto)",
-        "r2": "Carte d'identité (verso)",
-        "r3": "Selfie tenant votre CIN"
+        "r1": "Pièce d'identité — recto (CIN ou passeport)",
+        "r2": "Pièce d'identité — verso (CIN ou passeport)",
+        "r3": "Selfie tenant votre pièce d'identité"
       },
       "privacy": {
         "title": "Confidentialité",
@@ -2624,23 +2624,31 @@
       "startCta": "Commencer"
     },
     "steps": {
-      "cinFront": { "title": "Carte d'identité — Recto" },
-      "cinBack":  { "title": "Carte d'identité — Verso" },
+      "cinFront": {
+        "title": "Pièce d'identité — Recto",
+        "subtitle": "CIN ou passeport"
+      },
+      "cinBack": {
+        "title": "Pièce d'identité — Verso",
+        "subtitle": "CIN ou passeport"
+      },
       "selfie": {
-        "title": "Selfie avec votre CIN",
-        "tip": "Tenez votre CIN à côté de votre visage. Les deux doivent être nets et bien éclairés."
+        "title": "Selfie avec votre pièce d'identité",
+        "tip": "Tenez votre pièce d'identité (CIN ou passeport) à côté de votre visage. Les deux doivent être nets et bien éclairés."
       },
       "upload": {
         "dropzone": "Glissez votre fichier ici ou cliquez",
         "formats": "JPG, PNG, WEBP ou PDF — max 10 Mo",
+        "formatsImageOnly": "JPG, PNG ou WEBP — max 10 Mo",
         "uploading": "Upload en cours...",
         "uploaded": "✓ Document uploadé",
-        "replaceHint": "Cliquez pour remplacer"
+        "replaceHint": "Cliquez pour remplacer",
+        "remove": "Supprimer ce document"
       },
       "metadata": {
         "title": "Vos informations",
-        "fullName": { "label": "Nom complet (comme sur la CIN)" },
-        "cinNumber": { "label": "Numéro de CIN" },
+        "fullName": { "label": "Nom complet (comme sur la pièce d'identité)" },
+        "cinNumber": { "label": "Numéro CIN ou passeport" },
         "dateOfBirth": { "label": "Date de naissance (optionnel)" }
       },
       "recap": {

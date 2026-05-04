@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Loader2,
   Upload,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import {
 } from "@/hooks/verification/useUploadVerificationFile";
 import { useSubmitVerification } from "@/hooks/verification/useSubmitVerification";
 import { VERIFIED_SELLER_YEAR_CREDIT_COST } from "@/config/monetization";
+import { supabase } from "@/integrations/supabase/client";
 import type { MyVerificationRow } from "@/hooks/verification/useMyVerification";
 
 const DRAFT_KEY_PREFIX = "autonex.verificationDraft.";
@@ -161,16 +163,38 @@ export function VerificationFlow({ lastRejection }: VerificationFlowProps) {
   const canAfford = !balanceLoading && balance >= cost;
   const currentStep = STEP_ORDER[stepIdx];
 
+  // HOTFIX 2 : refs sur les inputs file pour pouvoir reset `value` après chaque
+  // upload. Sans ça, sélectionner le même nom de fichier au "remplacer" ne
+  // re-trigger pas `onChange` (comportement HTML standard).
+  const inputRefs = useRef<Record<VerificationDocType, HTMLInputElement | null>>({
+    cin_front: null,
+    cin_back: null,
+    selfie: null,
+  });
+
   const handleFileSelect = async (docType: VerificationDocType, file: File | null) => {
     if (!file || !user) return;
     const validationKey = validateVerificationFile(file);
     if (validationKey) {
       toast.error(t(validationKey));
+      // Reset input.value pour autoriser re-trigger sur même filename plus tard
+      const input = inputRefs.current[docType];
+      if (input) input.value = "";
       return;
     }
+    // HOTFIX 2 : best-effort cleanup du précédent path pour éviter le conflit
+    // RLS/UPDATE sur upsert d'un object existant. Silencieux si la policy
+    // DELETE n'est pas définie ou si l'objet n'existe plus.
+    const previousPath = paths[docType];
+    if (previousPath) {
+      try {
+        await supabase.storage.from("verifications").remove([previousPath]);
+      } catch {
+        /* swallow — best effort, l'upload qui suit gérera l'erreur si fatale */
+      }
+    }
     try {
-      // HOTFIX : userId n'est plus passé en param — le hook le dérive de
-      // supabase.auth.getSession() pour garantir le JWT attaché à la requête.
+      // HOTFIX 1 : userId dérivé de getSession() côté hook (pas en param).
       const { path } = await upload.mutateAsync({
         file,
         sessionId,
@@ -180,7 +204,30 @@ export function VerificationFlow({ lastRejection }: VerificationFlowProps) {
     } catch (err) {
       const message = err instanceof Error ? err.message : "verification.errors.uploadFailed";
       toast.error(t(message));
+    } finally {
+      // Reset input.value dans tous les cas (succès ou échec) pour autoriser
+      // re-pick du même filename au prochain "Cliquez pour remplacer".
+      const input = inputRefs.current[docType];
+      if (input) input.value = "";
     }
+  };
+
+  const handleClearUpload = async (docType: VerificationDocType) => {
+    const currentPath = paths[docType];
+    if (currentPath) {
+      try {
+        await supabase.storage.from("verifications").remove([currentPath]);
+      } catch {
+        /* swallow — best effort, état local reset quand même */
+      }
+    }
+    setPaths((prev) => ({ ...prev, [docType]: null }));
+    const input = inputRefs.current[docType];
+    if (input) input.value = "";
+  };
+
+  const registerInputRef = (docType: VerificationDocType) => (el: HTMLInputElement | null) => {
+    inputRefs.current[docType] = el;
   };
 
   const handleSubmit = async () => {
@@ -270,6 +317,8 @@ export function VerificationFlow({ lastRejection }: VerificationFlowProps) {
               currentPath={paths[currentStep]}
               isUploading={upload.isPending}
               onFileSelect={handleFileSelect}
+              onClearUpload={handleClearUpload}
+              inputRef={registerInputRef(currentStep)}
             />
           )}
 
@@ -465,79 +514,148 @@ type UploadStepProps = {
   currentPath: string | null;
   isUploading: boolean;
   onFileSelect: (docType: VerificationDocType, file: File | null) => void;
+  onClearUpload: (docType: VerificationDocType) => void;
+  /** Callback ref pour le hook parent qui reset input.value entre uploads. */
+  inputRef: (el: HTMLInputElement | null) => void;
 };
 
-function UploadStep({ docType, currentPath, isUploading, onFileSelect }: UploadStepProps) {
+/**
+ * HOTFIX 2 : capture attribute pour ouvrir directement la caméra mobile.
+ *   - cin_front / cin_back → environment (caméra arrière, photographier doc)
+ *   - selfie → user (caméra frontale, selfie)
+ * Ignoré sur desktop (file picker classique). Whitelist accept reste large
+ * (PDF accepté pour scan CIN sur desktop ; pour selfie, image-only).
+ */
+function getCaptureMode(docType: VerificationDocType): "environment" | "user" {
+  return docType === "selfie" ? "user" : "environment";
+}
+
+function getAcceptList(docType: VerificationDocType): string {
+  // Selfie : pas de PDF (logique — un selfie est une photo, pas un PDF)
+  if (docType === "selfie") return "image/jpeg,image/png,image/webp";
+  return "image/jpeg,image/png,image/webp,application/pdf";
+}
+
+function UploadStep({
+  docType,
+  currentPath,
+  isUploading,
+  onFileSelect,
+  onClearUpload,
+  inputRef,
+}: UploadStepProps) {
   const { t } = useTranslation();
 
   const titleKey = `verification.steps.${docType === "cin_front" ? "cinFront" : docType === "cin_back" ? "cinBack" : "selfie"}.title`;
   const titleFallback =
     docType === "cin_front"
-      ? "Carte d'identité — Recto"
+      ? "Pièce d'identité — Recto"
       : docType === "cin_back"
-        ? "Carte d'identité — Verso"
-        : "Selfie avec votre CIN";
+        ? "Pièce d'identité — Verso"
+        : "Selfie avec votre pièce d'identité";
+
+  const subtitleKey =
+    docType === "cin_front" || docType === "cin_back"
+      ? `verification.steps.${docType === "cin_front" ? "cinFront" : "cinBack"}.subtitle`
+      : null;
 
   return (
     <div className="space-y-3" data-testid={`verification-step-${docType}`}>
-      <p className="font-sans text-base font-semibold text-foreground">
-        {t(titleKey, titleFallback)}
-      </p>
+      <div className="space-y-0.5">
+        <p className="font-sans text-base font-semibold text-foreground">
+          {t(titleKey, titleFallback)}
+        </p>
+        {subtitleKey && (
+          <p className="font-sans text-xs text-muted-foreground">
+            {t(subtitleKey, "CIN ou passeport")}
+          </p>
+        )}
+      </div>
       {docType === "selfie" && (
         <p className="font-sans text-xs text-muted-foreground leading-relaxed">
           {t(
             "verification.steps.selfie.tip",
-            "Tenez votre CIN à côté de votre visage. Les deux doivent être nets et bien éclairés.",
+            "Tenez votre pièce d'identité (CIN ou passeport) à côté de votre visage. Les deux doivent être nets et bien éclairés.",
           )}
         </p>
       )}
 
-      <label
-        className={cn(
-          "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6 cursor-pointer transition-colors",
-          currentPath
-            ? "border-emerald-300 bg-emerald-50/30 dark:border-emerald-800/50 dark:bg-emerald-950/10"
-            : "border-border hover:border-primary hover:bg-muted/30",
-          isUploading && "opacity-60 cursor-not-allowed",
+      <div className="relative">
+        <label
+          className={cn(
+            "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6 cursor-pointer transition-colors",
+            currentPath
+              ? "border-emerald-300 bg-emerald-50/30 dark:border-emerald-800/50 dark:bg-emerald-950/10"
+              : "border-border hover:border-primary hover:bg-muted/30",
+            isUploading && "opacity-60 cursor-not-allowed",
+          )}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept={getAcceptList(docType)}
+            capture={getCaptureMode(docType)}
+            className="sr-only"
+            disabled={isUploading}
+            data-testid={`verification-flow-input-${docType}`}
+            onChange={(e) => onFileSelect(docType, e.target.files?.[0] ?? null)}
+          />
+          {isUploading ? (
+            <>
+              <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
+              <span className="font-sans text-sm text-foreground">
+                {t("verification.steps.upload.uploading", "Upload en cours...")}
+              </span>
+            </>
+          ) : currentPath ? (
+            <>
+              <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              <span className="font-sans text-sm font-medium text-emerald-900 dark:text-emerald-200">
+                {t("verification.steps.upload.uploaded", "✓ Document uploadé")}
+              </span>
+              <span className="font-sans text-xs text-muted-foreground">
+                {t("verification.steps.upload.replaceHint", "Cliquez pour remplacer")}
+              </span>
+            </>
+          ) : (
+            <>
+              <Upload className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+              <span className="font-sans text-sm font-medium text-foreground">
+                {t("verification.steps.upload.dropzone", "Glissez votre fichier ici ou cliquez")}
+              </span>
+              <span className="font-sans text-xs text-muted-foreground">
+                {t(
+                  docType === "selfie"
+                    ? "verification.steps.upload.formatsImageOnly"
+                    : "verification.steps.upload.formats",
+                  docType === "selfie"
+                    ? "JPG, PNG ou WEBP — max 10 Mo"
+                    : "JPG, PNG, WEBP ou PDF — max 10 Mo",
+                )}
+              </span>
+            </>
+          )}
+        </label>
+
+        {/* HOTFIX 2 : bouton ✕ pour clear un upload existant. */}
+        {currentPath && !isUploading && (
+          <button
+            type="button"
+            onClick={(e) => {
+              // Empêche le click de bubble vers le label parent (qui ouvrirait
+              // le file picker au lieu de clear).
+              e.preventDefault();
+              e.stopPropagation();
+              onClearUpload(docType);
+            }}
+            aria-label={t("verification.steps.upload.remove", "Supprimer ce document")}
+            data-testid={`verification-flow-clear-${docType}`}
+            className="absolute top-2 right-2 inline-flex items-center justify-center h-7 w-7 rounded-full bg-white shadow-sm border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
         )}
-      >
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp,application/pdf"
-          className="sr-only"
-          disabled={isUploading}
-          data-testid={`verification-flow-input-${docType}`}
-          onChange={(e) => onFileSelect(docType, e.target.files?.[0] ?? null)}
-        />
-        {isUploading ? (
-          <>
-            <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
-            <span className="font-sans text-sm text-foreground">
-              {t("verification.steps.upload.uploading", "Upload en cours...")}
-            </span>
-          </>
-        ) : currentPath ? (
-          <>
-            <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-            <span className="font-sans text-sm font-medium text-emerald-900 dark:text-emerald-200">
-              {t("verification.steps.upload.uploaded", "✓ Document uploadé")}
-            </span>
-            <span className="font-sans text-xs text-muted-foreground">
-              {t("verification.steps.upload.replaceHint", "Cliquez pour remplacer")}
-            </span>
-          </>
-        ) : (
-          <>
-            <Upload className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
-            <span className="font-sans text-sm font-medium text-foreground">
-              {t("verification.steps.upload.dropzone", "Glissez votre fichier ici ou cliquez")}
-            </span>
-            <span className="font-sans text-xs text-muted-foreground">
-              {t("verification.steps.upload.formats", "JPG, PNG, WEBP ou PDF — max 10 Mo")}
-            </span>
-          </>
-        )}
-      </label>
+      </div>
     </div>
   );
 }

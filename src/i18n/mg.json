@@ -2610,9 +2610,9 @@
       },
       "requirements": {
         "title": "Antontan-taratasy ilaina",
-        "r1": "Carte d'identité (aloha)",
-        "r2": "Carte d'identité (aoriana)",
-        "r3": "Selfie miaraka amin'ny CIN"
+        "r1": "Pièce d'identité — aloha (CIN na passeport)",
+        "r2": "Pièce d'identité — aoriana (CIN na passeport)",
+        "r3": "Selfie miaraka amin'ny pièce d'identité"
       },
       "privacy": {
         "title": "Tsiambaratelo",
@@ -2624,23 +2624,31 @@
       "startCta": "Manomboka"
     },
     "steps": {
-      "cinFront": { "title": "CIN — Aloha" },
-      "cinBack":  { "title": "CIN — Aoriana" },
+      "cinFront": {
+        "title": "Pièce d'identité — Aloha",
+        "subtitle": "CIN na passeport"
+      },
+      "cinBack": {
+        "title": "Pièce d'identité — Aoriana",
+        "subtitle": "CIN na passeport"
+      },
       "selfie": {
-        "title": "Selfie miaraka amin'ny CIN",
-        "tip": "Tazomy ny CIN-nao manodidina ny tavanao. Mila mazava sy hazavain-tsoa avokoa izy roa."
+        "title": "Selfie miaraka amin'ny pièce d'identité",
+        "tip": "Tazomy ny pièce d'identité (CIN na passeport) manodidina ny tavanao. Mila mazava sy hazavain-tsoa avokoa izy roa."
       },
       "upload": {
         "dropzone": "Atontao eto ny rakitrao na tsindrio",
         "formats": "JPG, PNG, WEBP na PDF — 10 Mo farafahabetsany",
+        "formatsImageOnly": "JPG, PNG na WEBP — 10 Mo farafahabetsany",
         "uploading": "Andalam-pamoahana...",
         "uploaded": "✓ Voakopia ny rakitra",
-        "replaceHint": "Tsindrio raha hanova"
+        "replaceHint": "Tsindrio raha hanova",
+        "remove": "Esory ity antontan-taratasy ity"
       },
       "metadata": {
         "title": "Ny mombamomba anao",
-        "fullName": { "label": "Anarana feno (toy ny ao amin'ny CIN)" },
-        "cinNumber": { "label": "Laharana CIN" },
+        "fullName": { "label": "Anarana feno (toy ny ao amin'ny pièce d'identité)" },
+        "cinNumber": { "label": "Laharana CIN na passeport" },
         "dateOfBirth": { "label": "Daty nahaterahana (tsy voatery)" }
       },
       "recap": {

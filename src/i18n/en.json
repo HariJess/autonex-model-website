@@ -2610,9 +2610,9 @@
       },
       "requirements": {
         "title": "Required documents",
-        "r1": "ID card (front)",
-        "r2": "ID card (back)",
-        "r3": "Selfie holding your ID"
+        "r1": "ID document — front (national ID or passport)",
+        "r2": "ID document — back (national ID or passport)",
+        "r3": "Selfie holding your ID document"
       },
       "privacy": {
         "title": "Privacy",
@@ -2624,23 +2624,31 @@
       "startCta": "Start"
     },
     "steps": {
-      "cinFront": { "title": "ID card — Front" },
-      "cinBack":  { "title": "ID card — Back" },
+      "cinFront": {
+        "title": "ID document — Front",
+        "subtitle": "National ID or passport"
+      },
+      "cinBack": {
+        "title": "ID document — Back",
+        "subtitle": "National ID or passport"
+      },
       "selfie": {
-        "title": "Selfie with your ID",
-        "tip": "Hold your ID next to your face. Both must be sharp and well-lit."
+        "title": "Selfie with your ID document",
+        "tip": "Hold your ID document (national ID or passport) next to your face. Both must be sharp and well-lit."
       },
       "upload": {
         "dropzone": "Drop your file here or click",
         "formats": "JPG, PNG, WEBP or PDF — max 10 MB",
+        "formatsImageOnly": "JPG, PNG or WEBP — max 10 MB",
         "uploading": "Uploading...",
         "uploaded": "✓ Document uploaded",
-        "replaceHint": "Click to replace"
+        "replaceHint": "Click to replace",
+        "remove": "Remove this document"
       },
       "metadata": {
         "title": "Your information",
         "fullName": { "label": "Full name (as on ID)" },
-        "cinNumber": { "label": "ID number" },
+        "cinNumber": { "label": "ID number (national ID or passport)" },
         "dateOfBirth": { "label": "Date of birth (optional)" }
       },
       "recap": {
