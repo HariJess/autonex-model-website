@@ -364,11 +364,19 @@ export function formToListingUpdate(input: {
   const titleOut =
     titleTrim.length > 0 ? titleTrim.slice(0, 120) : PUBLISH_DRAFT_TITLE_PLACEHOLDER;
   const currentYear = new Date().getFullYear() + 1;
-  const mileageKm = normalizeInt(input.mileageKmInput, 0);
-  const doorsFromLegacyInput = normalizeInt(input.doorsInput, 0);
-  const seats = normalizeInt(input.seatsInput, 0);
+  const mileageKm = input.mileageKmInput.trim() === ""
+    ? null
+    : normalizeInt(input.mileageKmInput, 0);
+  const doorsFromLegacyInput = input.doorsInput.trim() === ""
+    ? null
+    : normalizeInt(input.doorsInput, 0);
+  const seats = input.seatsInput.trim() === ""
+    ? null
+    : normalizeInt(input.seatsInput, 0);
   const year = normalizeInt(input.vehicleYear, 1950, currentYear);
-  const doors = normalizeInt(input.vehicleDoors, 0, 8) ?? doorsFromLegacyInput;
+  const doors = (input.vehicleDoors.trim() === ""
+    ? null
+    : normalizeInt(input.vehicleDoors, 0, 8)) ?? doorsFromLegacyInput;
   const make = normalizeText(input.vehicleMake, 80);
   const model = normalizeText(input.vehicleModel, 100);
   const fuel =
@@ -787,7 +795,9 @@ export function buildListingMaterialSnapshotFromForm(
     if (typeof max === "number" && intVal > max) return null;
     return intVal;
   };
-  const mileageKm = normalizeInt(input.mileageKmInput, 0);
+  const mileageKm = input.mileageKmInput.trim() === ""
+    ? null
+    : normalizeInt(input.mileageKmInput, 0);
 
   return JSON.stringify({
     title: input.title.trim(),

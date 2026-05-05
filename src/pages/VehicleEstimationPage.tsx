@@ -37,6 +37,7 @@ import EstimationProgressHeader from "@/pages/estimation/components/EstimationPr
 import {
   getCurrentEstimationStepIndex,
   getVehicleFieldErrors,
+  type EstimationFormStateForValidation as EstimationFormState,
 } from "@/pages/estimation/estimationPageModel";
 import { cn } from "@/lib/utils";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
@@ -47,6 +48,9 @@ const EstimationResultReport = lazy(() => import("@/components/estimation/Estima
 
 const ESTIMATION_DRAFT_KEY = "autonex:estimation:draft:v1";
 const currentYear = new Date().getFullYear();
+
+const parseNumberInput = (raw: string): number | null =>
+  raw === "" ? null : Number(raw);
 
 const EMPTY_FORM: EstimationInput = {
   makeName: "",
@@ -133,7 +137,7 @@ const VehicleEstimationPage = () => {
   const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">(
     isEmbedded ? "vehicle" : "landing",
   );
-  const [form, setForm] = useState<EstimationInput>(EMPTY_FORM);
+  const [form, setForm] = useState<EstimationFormState>(EMPTY_FORM);
   const [result, setResult] = useState<EstimationRunResult | null>(null);
   /** Avoid duplicate "result viewed" telemetry without an extra render (StrictMode-safe single fire per request id). */
   const resultViewedRequestRef = useRef<string | null>(null);
@@ -234,7 +238,11 @@ const VehicleEstimationPage = () => {
   }, [form.bodyType, form.modelName, modelBodyTypeOptions]);
 
   const runMutation = useMutation({
-    mutationFn: async () => runVehicleEstimation(form, user?.id ?? null),
+    mutationFn: async () =>
+      runVehicleEstimation(
+        { ...form, mileage: form.mileage ?? 0, year: form.year ?? currentYear },
+        user?.id ?? null,
+      ),
     onSuccess: (payload) => {
       setResult(payload);
       setScreen("result");
@@ -339,9 +347,9 @@ const VehicleEstimationPage = () => {
         prefill: {
           make: form.makeName,
           model: form.modelName,
-          year: String(form.year),
+          year: form.year !== null ? String(form.year) : "",
           city: form.city,
-          mileageKm: form.mileage,
+          mileageKm: form.mileage ?? 0,
           priceMga: result.output.recommendedListingPrice,
           fuelType: form.fuelType,
           transmissionType: form.transmissionType,
@@ -643,13 +651,13 @@ const VehicleEstimationPage = () => {
                     type="number"
                     min={1950}
                     max={currentYear}
-                    value={form.year}
+                    value={form.year ?? ""}
                     aria-invalid={Boolean(visibleFieldError("year")) || undefined}
                     className={cn(
                       ESTIMATION_UI.inputLike,
                       visibleFieldError("year") && "border-destructive focus-visible:ring-destructive/40",
                     )}
-                    onChange={(e) => setForm((prev) => ({ ...prev, year: Number(e.target.value) }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, year: parseNumberInput(e.target.value) }))}
                   />
                   {visibleFieldError("year") && (
                     <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("year")}</p>
@@ -680,13 +688,13 @@ const VehicleEstimationPage = () => {
                     type="number"
                     min={0}
                     max={1500000}
-                    value={form.mileage}
+                    value={form.mileage ?? ""}
                     aria-invalid={Boolean(visibleFieldError("mileage")) || undefined}
                     className={cn(
                       ESTIMATION_UI.inputLike,
                       visibleFieldError("mileage") && "border-destructive focus-visible:ring-destructive/40",
                     )}
-                    onChange={(e) => setForm((prev) => ({ ...prev, mileage: Number(e.target.value) }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, mileage: parseNumberInput(e.target.value) }))}
                   />
                   {visibleFieldError("mileage") && (
                     <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("mileage")}</p>

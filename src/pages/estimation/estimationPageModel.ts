@@ -12,8 +12,14 @@ export function getCurrentEstimationStepIndex(
 export type VehicleFieldErrorKey = "make" | "model" | "year" | "city" | "mileage";
 export type VehicleFieldErrors = Partial<Record<VehicleFieldErrorKey, string>>;
 
+export type EstimationFormStateForValidation =
+  Omit<EstimationInput, "mileage" | "year"> & {
+    mileage: number | null;
+    year: number | null;
+  };
+
 export function getVehicleFieldErrors(params: {
-  form: EstimationInput;
+  form: EstimationFormStateForValidation;
   currentYear: number;
   t: (key: string, defaultValue: string) => string;
 }): VehicleFieldErrors {
@@ -26,7 +32,9 @@ export function getVehicleFieldErrors(params: {
   if (!form.modelName.trim()) {
     errors.model = t("estimation.fieldRequired", "Champ obligatoire");
   }
-  if (!Number.isFinite(form.year) || form.year < 1950 || form.year > currentYear) {
+  if (form.year === null) {
+    errors.year = t("estimation.errorYearRequired", "Veuillez saisir l'année");
+  } else if (!Number.isFinite(form.year) || form.year < 1950 || form.year > currentYear) {
     errors.year = t(
       "estimation.errorYearRangeShort",
       "Année invalide (1950 — {{year}}).",
@@ -35,7 +43,9 @@ export function getVehicleFieldErrors(params: {
   if (!form.city.trim()) {
     errors.city = t("estimation.fieldRequired", "Champ obligatoire");
   }
-  if (!Number.isFinite(form.mileage) || form.mileage < 0 || form.mileage > 1_500_000) {
+  if (form.mileage === null) {
+    errors.mileage = t("estimation.errorMileageRequired", "Veuillez saisir le kilométrage");
+  } else if (!Number.isFinite(form.mileage) || form.mileage < 0 || form.mileage > 1_500_000) {
     errors.mileage = t(
       "estimation.errorMileageRangeShort",
       "Kilométrage invalide (0 — 1 500 000 km).",
@@ -51,7 +61,7 @@ export function getVehicleFieldErrors(params: {
  * la duplication de règles métier.
  */
 export function getVehicleStepErrors(params: {
-  form: EstimationInput;
+  form: EstimationFormStateForValidation;
   currentYear: number;
   t: (key: string, defaultValue: string) => string;
 }): string[] {
