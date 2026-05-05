@@ -1,6 +1,5 @@
-import { Building2, Users, Wrench } from "lucide-react";
+import { Building2, Wrench } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Tooltip,
@@ -12,11 +11,12 @@ import { formatAriary } from "@/lib/estimation/constants";
 import { cn } from "@/lib/utils";
 
 /**
- * PROMPT 10B — 3 cards Argus-grade (Reprise pro / Entre particuliers / En concession).
+ * PROMPT 10D — 2 cards Argus (Reprise pro / En concession).
  *
- * Mode V2 : 3 cards distinctes avec emphase sur la centrale (Entre particuliers).
- * Mode V1 (legacy fallback) : 1 seule card "Valeur de marché estimée" (= comportement
- * UI avant refonte, pas de regression visible si le backend renvoie un legacy output).
+ * La card "Entre particuliers" a été supprimée (doublon sémantique avec la
+ * valeur centrale du hero principal).
+ *
+ * Mode V1 (legacy fallback) : 1 seule card "Valeur de marché estimée".
  */
 
 export type ArgusValuesCardValues = {
@@ -33,12 +33,11 @@ export type ArgusValuesCardProps = {
 };
 
 type CardSpec = {
-  key: "trade_in_pro" | "private_market" | "dealer_retail";
+  key: "trade_in_pro" | "dealer_retail";
   title: string;
   subtitle: string;
   tooltip: string;
   icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
-  emphasis: "primary" | "secondary";
 };
 
 export function ArgusValuesCard({ values, isV2, className }: ArgusValuesCardProps) {
@@ -65,9 +64,7 @@ export function ArgusValuesCard({ values, isV2, className }: ArgusValuesCardProp
     );
   }
 
-  // V2 mode : 3 cards
   const tradeInPro = values.tradeInPro ?? 0;
-  const privateMarket = values.privateMarket ?? values.estimatedValue;
   const dealerRetail = values.dealerRetail ?? 0;
 
   const specs: CardSpec[] = [
@@ -80,24 +77,9 @@ export function ArgusValuesCard({ values, isV2, className }: ArgusValuesCardProp
       ),
       tooltip: t(
         "estimation.argus.tradeInPro.tooltip",
-        "× 0.78 du prix médian = ce que paie un dealer en rachat",
+        "Prix typique payé par un concessionnaire qui rachète votre voiture pour la revendre.",
       ),
       icon: Wrench,
-      emphasis: "secondary",
-    },
-    {
-      key: "private_market",
-      title: t("estimation.argus.privateMarket.title", "Entre particuliers"),
-      subtitle: t(
-        "estimation.argus.privateMarket.subtitle",
-        "Prix attendu pour une vente directe entre particuliers.",
-      ),
-      tooltip: t(
-        "estimation.argus.privateMarket.tooltip",
-        "× 1.00 = prix de transaction médian observé sur le marché",
-      ),
-      icon: Users,
-      emphasis: "primary",
     },
     {
       key: "dealer_retail",
@@ -108,16 +90,14 @@ export function ArgusValuesCard({ values, isV2, className }: ArgusValuesCardProp
       ),
       tooltip: t(
         "estimation.argus.dealerRetail.tooltip",
-        "× 1.15 du prix médian = retail avec marge et garantie",
+        "Prix retail typique en concession, incluant la marge et la garantie.",
       ),
       icon: Building2,
-      emphasis: "secondary",
     },
   ];
 
   const valueByKey: Record<CardSpec["key"], number> = {
     trade_in_pro: tradeInPro,
-    private_market: privateMarket,
     dealer_retail: dealerRetail,
   };
 
@@ -125,73 +105,34 @@ export function ArgusValuesCard({ values, isV2, className }: ArgusValuesCardProp
     <TooltipProvider delayDuration={200}>
       <section
         className={cn(
-          "grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4",
+          "grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4",
           className,
         )}
         aria-label={t(
           "estimation.argus.sectionAria",
-          "Trois valeurs Argus-grade : reprise pro, entre particuliers, en concession",
+          "Valeurs Argus-grade : reprise pro et en concession",
         )}
         data-testid="argus-values-v2"
       >
         {specs.map((spec) => {
           const Icon = spec.icon;
           const value = valueByKey[spec.key];
-          const isPrimary = spec.emphasis === "primary";
           return (
             <Tooltip key={spec.key}>
               <TooltipTrigger asChild>
                 <Card
-                  className={cn(
-                    "rounded-2xl shadow-sm transition-all duration-200 ease-out hover:shadow-md cursor-help",
-                    isPrimary
-                      ? "border-2 border-primary/45 bg-primary/[0.06] md:scale-[1.03] md:-mt-1"
-                      : "border border-border/60 bg-card/90",
-                  )}
+                  className="rounded-2xl border border-border/60 bg-card/90 shadow-sm transition-all duration-200 ease-out hover:shadow-md cursor-help"
                   data-testid={`argus-card-${spec.key}`}
-                  data-emphasis={spec.emphasis}
+                  data-emphasis="secondary"
                 >
-                  <CardContent
-                    className={cn(
-                      "flex flex-col gap-2 p-4 md:p-5",
-                      isPrimary && "md:p-6",
-                    )}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <Icon
-                          className={cn(
-                            "h-4 w-4",
-                            isPrimary ? "text-primary" : "text-muted-foreground",
-                          )}
-                          aria-hidden
-                        />
-                        <p
-                          className={cn(
-                            "font-sans text-[11px] uppercase tracking-[0.14em]",
-                            isPrimary ? "text-primary/85" : "text-muted-foreground",
-                          )}
-                        >
-                          {spec.title}
-                        </p>
-                      </div>
-                      {isPrimary && (
-                        <Badge
-                          variant="default"
-                          className="h-5 px-2 font-sans text-[10px] normal-case"
-                        >
-                          {t("estimation.argus.recommended", "Recommandé")}
-                        </Badge>
-                      )}
+                  <CardContent className="flex flex-col gap-2 p-4 md:p-5">
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
+                      <p className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                        {spec.title}
+                      </p>
                     </div>
-                    <p
-                      className={cn(
-                        "font-sans tabular-nums font-bold tracking-tight",
-                        isPrimary
-                          ? "text-3xl md:text-4xl text-primary"
-                          : "text-2xl md:text-2xl text-foreground",
-                      )}
-                    >
+                    <p className="font-sans tabular-nums font-bold tracking-tight text-2xl md:text-2xl text-foreground">
                       {formatAriary(value)}
                     </p>
                     <p className="font-sans text-xs leading-relaxed text-muted-foreground">

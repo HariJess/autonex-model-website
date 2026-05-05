@@ -39,7 +39,7 @@ describe("PROMPT 10B — Legacy V1 fallback rendering (zéro crash)", () => {
     expect(screen.queryByTestId("argus-values-v2")).not.toBeInTheDocument();
   });
 
-  it("ArgusValuesCard : isV2=true mais tradeInPro absent → fallback à 0 sans crash", () => {
+  it("ArgusValuesCard : isV2=true mais tradeInPro/dealerRetail absents → fallback à 0 sans crash", () => {
     // Edge case : audit présent mais champs partiels (incohérence backend)
     render(
       <ArgusValuesCard
@@ -48,9 +48,11 @@ describe("PROMPT 10B — Legacy V1 fallback rendering (zéro crash)", () => {
       />,
     );
     expect(screen.getByTestId("argus-values-v2")).toBeInTheDocument();
-    // Cards rendues avec privateMarket fallback à estimatedValue, tradeInPro/dealerRetail à 0
-    const central = screen.getByTestId("argus-card-private_market");
-    expect(central.textContent).toContain("87");
+    // P10D : 2 cards rendues (trade_in_pro / dealer_retail) sans crash
+    expect(screen.getByTestId("argus-card-trade_in_pro")).toBeInTheDocument();
+    expect(screen.getByTestId("argus-card-dealer_retail")).toBeInTheDocument();
+    // Card "Entre particuliers" supprimée en P10D
+    expect(screen.queryByTestId("argus-card-private_market")).not.toBeInTheDocument();
   });
 
   it("AuditFooter : sans audit → lien + disclaimer mais pas de détails techniques", () => {

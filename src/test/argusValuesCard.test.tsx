@@ -15,7 +15,7 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
-describe("PROMPT 10B — ArgusValuesCard", () => {
+describe("PROMPT 10D — ArgusValuesCard (2 cards)", () => {
   const v2Values = {
     tradeInPro: 23_000_000,
     privateMarket: 29_000_000,
@@ -23,38 +23,40 @@ describe("PROMPT 10B — ArgusValuesCard", () => {
     estimatedValue: 29_000_000,
   };
 
-  it("V2 mode : 3 cards rendues avec les bons titres", () => {
+  it("V2 mode : 2 cards rendues avec les bons titres (Reprise pro / En concession)", () => {
     render(<ArgusValuesCard values={v2Values} isV2 />);
     expect(screen.getByTestId("argus-values-v2")).toBeInTheDocument();
     expect(screen.getByTestId("argus-card-trade_in_pro")).toBeInTheDocument();
-    expect(screen.getByTestId("argus-card-private_market")).toBeInTheDocument();
     expect(screen.getByTestId("argus-card-dealer_retail")).toBeInTheDocument();
     expect(screen.getByText("Reprise pro")).toBeInTheDocument();
-    expect(screen.getByText("Entre particuliers")).toBeInTheDocument();
     expect(screen.getByText("En concession")).toBeInTheDocument();
   });
 
-  it("V2 mode : la card centrale a data-emphasis='primary'", () => {
+  it("V2 mode : pas de card 'Entre particuliers' (supprimé en P10D)", () => {
     render(<ArgusValuesCard values={v2Values} isV2 />);
-    const central = screen.getByTestId("argus-card-private_market");
-    expect(central.getAttribute("data-emphasis")).toBe("primary");
-    const left = screen.getByTestId("argus-card-trade_in_pro");
-    expect(left.getAttribute("data-emphasis")).toBe("secondary");
+    expect(screen.queryByTestId("argus-card-private_market")).not.toBeInTheDocument();
+    expect(screen.queryByText("Entre particuliers")).not.toBeInTheDocument();
   });
 
-  it("V2 mode : badge 'Recommandé' sur la card centrale uniquement", () => {
+  it("V2 mode : pas de badge 'Recommandé' (plus de card 'primary')", () => {
     render(<ArgusValuesCard values={v2Values} isV2 />);
-    const recommended = screen.getAllByText("Recommandé");
-    expect(recommended.length).toBe(1);
+    expect(screen.queryByText("Recommandé")).not.toBeInTheDocument();
+  });
+
+  it("V2 mode : les 2 cards ont data-emphasis='secondary' (égalitaires)", () => {
+    render(<ArgusValuesCard values={v2Values} isV2 />);
+    expect(screen.getByTestId("argus-card-trade_in_pro").getAttribute("data-emphasis")).toBe("secondary");
+    expect(screen.getByTestId("argus-card-dealer_retail").getAttribute("data-emphasis")).toBe("secondary");
   });
 
   it("V2 mode : prix MGA formatés (espaces fr-FR)", () => {
     render(<ArgusValuesCard values={v2Values} isV2 />);
-    // formatAriary produit "29 000 000 Ar" avec NBSP
-    const central = screen.getByTestId("argus-card-private_market");
-    expect(central.textContent).toContain("29");
-    expect(central.textContent).toContain("000");
-    expect(central.textContent).toContain("Ar");
+    const tradeIn = screen.getByTestId("argus-card-trade_in_pro");
+    expect(tradeIn.textContent).toContain("23");
+    expect(tradeIn.textContent).toContain("000");
+    expect(tradeIn.textContent).toContain("Ar");
+    const dealer = screen.getByTestId("argus-card-dealer_retail");
+    expect(dealer.textContent).toContain("34");
   });
 
   it("V1 legacy : affiche 1 seule card avec estimatedValue", () => {
@@ -78,8 +80,6 @@ describe("PROMPT 10B — ArgusValuesCard", () => {
     );
     expect(screen.queryByText("Reprise pro")).not.toBeInTheDocument();
     expect(screen.queryByText("En concession")).not.toBeInTheDocument();
-    // Le mot "indicative" ne doit PAS apparaître dans la card legacy
-    // (réservé au bandeau warning d'EstimationResultReport quand showIndicative=true).
     expect(screen.queryByText(/indicative/i)).not.toBeInTheDocument();
   });
 
