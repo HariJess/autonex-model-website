@@ -43,6 +43,13 @@ import {
   type TransactionFactorKey,
   type TransactionFactorsConfig,
 } from "./transaction-factors.ts";
+// PROMPT 10E — Couche 2 (proximity) + Couche 4 (sanity bounds) — parité TS
+import {
+  findProxyModels,
+  proximityFactorMid,
+  PROXIMITY_SIMILARITY_CEILING,
+} from "./modelProximity.ts";
+import { applySanityCheck } from "./sanityBounds.ts";
 
 /**
  * Interface minimale couvrant les appels supabase-js utilisés par le moteur.
@@ -99,6 +106,14 @@ type ComparableListingRow = {
   status: string | null;
   make: string | null;
   model: string | null;
+  /** PROMPT 10E — Couche 2 : type de proximité (undefined si exact). */
+  proximityType?: "segment_proche";
+  /** PROMPT 10E — Couche 2 : facteur correctif appliqué au price_mga proxy → cible. */
+  proximityFactor?: number;
+  /** PROMPT 10E — Couche 2 : label humain pour audit. */
+  proximityLabel?: string;
+  /** PROMPT 10E — Couche 2 : "Make|Model" du proxy effectivement utilisé. */
+  proximitySourceModel?: string;
 };
 
 type ComparableFetchResult = {
@@ -107,6 +122,12 @@ type ComparableFetchResult = {
   qualityFilteredCount: number;
   strictCandidateCount: number;
   backupCandidateCount: number;
+  /** PROMPT 10E — Couche 2 : ventilation par couche de raisonnement. */
+  layerBreakdown: { exact: number; segmentProche: number };
+  /** PROMPT 10E — Couche 2 : modèles proxy effectivement utilisés. */
+  proximityModelsUsed: Array<{ make: string; model: string; n: number }>;
+  /** PROMPT 10E — Couche 2 : moyenne des proximityFactor appliqués (1 = aucun). */
+  proximityFactorAvg: number;
   rejectedCount: number;
   rejectedByReason: Record<string, number>;
   selectedFreshnessAvg: number;
@@ -530,6 +551,43 @@ async function fetchComparables(
     if (!allById.has(row.id)) allById.set(row.id, { row, source: "backup" });
   });
 
+  const exactRowCount = allById.size;
+
+  // PROMPT 10E — Couche 2 : si la Couche 1 (exacts) est insuffisante, on élargit
+  // aux modèles de la même famille via MODEL_PROXIMITY. Les rows ainsi récupérées
+  // sont taggées proximityType="segment_proche" et leur price_mga est multiplié
+  // par le proximityFactor (moyenne du range défini dans la config).
+  const proxyConfig = exactRowCount < 5 ? findProxyModels(input.makeName, input.modelName) : null;
+  if (proxyConfig) {
+    const proximityFactor = proximityFactorMid(proxyConfig);
+    for (const proxyKey of proxyConfig.proxyModels) {
+      const [proxyMake, proxyModel] = proxyKey.split("|");
+      if (!proxyMake || !proxyModel) continue;
+      const proxyInput: EstimationInput = { ...input, makeName: proxyMake, modelName: proxyModel };
+      const [proxyMkt, proxyStrict] = await Promise.all([
+        fetchMarketCleanRows(client, proxyInput, { yearWindow: 5, limit: 80 }),
+        fetchComparableRows(client, proxyInput, { yearWindow: 4, strictAttributes: false, limit: 80 }),
+      ]);
+      const tag = (row: ComparableListingRow): ComparableListingRow => ({
+        ...row,
+        proximityType: "segment_proche",
+        proximityFactor,
+        proximityLabel: proxyConfig.proximityLabel,
+        proximitySourceModel: proxyKey,
+      });
+      proxyMkt.forEach((row) => {
+        if (!allById.has(row.id)) {
+          allById.set(row.id, { row: tag(row), source: "strict" });
+        }
+      });
+      proxyStrict.forEach((row) => {
+        if (!allById.has(row.id)) {
+          allById.set(row.id, { row: tag(row), source: "strict" });
+        }
+      });
+    }
+  }
+
   const rowsArray = Array.from(allById.values()).map((c) => c.row);
   const trimResult = applyTrimFilter(rowsArray, input.trim);
   const filteredById = new Map<string, { row: ComparableListingRow; source: "strict" | "backup" }>();
@@ -556,6 +614,7 @@ async function fetchComparables(
   }
 
   // PROMPT 10A — Application transaction factor par row
+  // PROMPT 10E — Couche 2 : applique aussi proximityFactor si row segment_proche
   const factoredAccepted = accepted.map((c) => {
     const factorKey = resolveFactorKey(
       c.row.seller_type ?? null,
@@ -563,6 +622,7 @@ async function fetchComparables(
     );
     const factor = config.factors[factorKey] ?? config.factors.unknown;
     const rawPrice = c.row.raw_price_mga ?? c.row.price_mga ?? 0;
+    const proximityFactor = c.row.proximityFactor ?? 1;
     return {
       ...c,
       row: {
@@ -570,16 +630,21 @@ async function fetchComparables(
         raw_price_mga: rawPrice,
         factor_applied: factor,
         factor_key: factorKey,
-        price_mga: Math.round(rawPrice * factor),
+        price_mga: Math.round(rawPrice * factor * proximityFactor),
       },
     };
   });
 
+  // PROMPT 10E — Couche 2 : plafond similarité PROXIMITY_SIMILARITY_CEILING (75) sur les proxy
   const scored: ScoredComparableCandidate[] = factoredAccepted
-    .map((candidate) => ({
-      ...candidate,
-      similarityScore: computeSimilarityScore(input, candidate),
-    }))
+    .map((candidate) => {
+      const baseScore = computeSimilarityScore(input, candidate);
+      const cappedScore =
+        candidate.row.proximityType === "segment_proche"
+          ? Math.min(baseScore, PROXIMITY_SIMILARITY_CEILING)
+          : baseScore;
+      return { ...candidate, similarityScore: cappedScore };
+    })
     .sort((a, b) => b.similarityScore - a.similarityScore);
 
   const selected = scored.slice(0, 24);
@@ -626,6 +691,23 @@ async function fetchComparables(
     : 1;
   const rawPrices = finalSelected.map((s) => s.row.raw_price_mga ?? s.row.price_mga ?? 0);
 
+  // PROMPT 10E — Couche 2 : breakdown by layer + proximity audit
+  const proximityRowsFinal = finalSelected.filter((s) => s.row.proximityType === "segment_proche");
+  const exactCount = finalSelected.length - proximityRowsFinal.length;
+  const layerBreakdown = { exact: exactCount, segmentProche: proximityRowsFinal.length };
+  const proximityModelsCount = new Map<string, number>();
+  proximityRowsFinal.forEach((s) => {
+    const key = s.row.proximitySourceModel ?? `${s.row.make ?? ""}|${s.row.model ?? ""}`;
+    proximityModelsCount.set(key, (proximityModelsCount.get(key) ?? 0) + 1);
+  });
+  const proximityModelsUsed = Array.from(proximityModelsCount.entries()).map(([key, n]) => {
+    const [m, mo] = key.split("|");
+    return { make: m ?? "", model: mo ?? "", n };
+  });
+  const proximityFactorAvg = proximityRowsFinal.length
+    ? proximityRowsFinal.reduce((sum, s) => sum + (s.row.proximityFactor ?? 1), 0) / proximityRowsFinal.length
+    : 1;
+
   return {
     comparables,
     candidateCount: allById.size,
@@ -643,6 +725,9 @@ async function fetchComparables(
     transactionFactorAvg: Math.round(factorAvg * 1000) / 1000,
     rawPrices,
     trimFiltering: trimResult.mode,
+    layerBreakdown,
+    proximityModelsUsed,
+    proximityFactorAvg: Math.round(proximityFactorAvg * 1000) / 1000,
   };
 }
 
@@ -1049,6 +1134,9 @@ function emptyComparableFetchResult(): ComparableFetchResult {
     transactionFactorAvg: 1,
     rawPrices: [],
     trimFiltering: "unspecified",
+    layerBreakdown: { exact: 0, segmentProche: 0 },
+    proximityModelsUsed: [],
+    proximityFactorAvg: 1,
   };
 }
 
@@ -1236,23 +1324,54 @@ export async function computeVehicleEstimationV2(
         ? "Nous n'avons pas encore assez d'annonces similaires sur AutoNex pour ce modèle, mais voici une estimation indicative basée sur les caractéristiques de votre véhicule."
         : undefined;
 
+  // PROMPT 10E — Couche 4 : sanity check par segment + année.
+  const sanityResult = applySanityCheck(adjustedPrice, normalized.makeName, normalized.modelName, normalized.year);
+  let finalAdjustedPrice = adjustedPrice;
+  let finalLowRange = lowRangePrice;
+  let finalHighRange = highRangePrice;
+  let finalQuickSale = quickSalePrice;
+  let finalRecommended = recommendedListingPrice;
+  let finalTradeInPro = tradeInProRaw;
+  let finalPrivateMarket = privateMarketRaw;
+  let finalDealerRetail = dealerRetailRaw;
+  let sanityConfidencePenalty = 0;
+  if (!sanityResult.inBounds) {
+    finalAdjustedPrice = sanityResult.adjustedEstimate;
+    const sanityRatio = adjustedPrice > 0 ? finalAdjustedPrice / adjustedPrice : 1;
+    finalLowRange = Math.round(lowRangePrice * sanityRatio);
+    finalHighRange = Math.round(highRangePrice * sanityRatio);
+    finalQuickSale = Math.round(quickSalePrice * sanityRatio);
+    finalRecommended = Math.round(recommendedListingPrice * sanityRatio);
+    finalTradeInPro = Math.round(tradeInProRaw * sanityRatio);
+    finalPrivateMarket = finalAdjustedPrice;
+    finalDealerRetail = Math.round(dealerRetailRaw * sanityRatio);
+    sanityConfidencePenalty = 15;
+    if (tierDecision.tier === "A_STRONG_MARKET" || tierDecision.tier === "B_MODERATE_MARKET") {
+      tierDecision.tier = "C_REFERENCE_ASSISTED";
+      tierDecision.tierReasonCode = "SANITY_BOUND_APPLIED";
+      tierDecision.tierReasonSummary = "Estimation hors plage attendue, recalibrée par segment.";
+    }
+  }
+  const cappedConfidenceFinal = clamp(cappedConfidence - sanityConfidencePenalty, 18, 96);
+  const confidenceBandFinal = confidenceBandFromScore(cappedConfidenceFinal);
+
   const outputValues = {
-    estimatedValue: roundToStep(adjustedPrice, roundingStep),
-    lowEstimate: roundToStep(lowRangePrice, roundingStep),
-    highEstimate: roundToStep(highRangePrice, roundingStep),
-    quickSalePrice: roundToStep(quickSalePrice, roundingStep),
-    recommendedListingPrice: roundToStep(recommendedListingPrice, roundingStep),
+    estimatedValue: roundToStep(finalAdjustedPrice, roundingStep),
+    lowEstimate: roundToStep(finalLowRange, roundingStep),
+    highEstimate: roundToStep(finalHighRange, roundingStep),
+    quickSalePrice: roundToStep(finalQuickSale, roundingStep),
+    recommendedListingPrice: roundToStep(finalRecommended, roundingStep),
     roundingStepApplied: roundingStep,
     // PROMPT 10A — 3 valeurs Argus-grade
-    tradeInPro: roundToStep(tradeInProRaw, roundingStep),
-    privateMarket: roundToStep(privateMarketRaw, roundingStep),
-    dealerRetail: roundToStep(dealerRetailRaw, roundingStep),
+    tradeInPro: roundToStep(finalTradeInPro, roundingStep),
+    privateMarket: roundToStep(finalPrivateMarket, roundingStep),
+    dealerRetail: roundToStep(finalDealerRetail, roundingStep),
     internalUnrounded: {
-      estimatedValueRaw: adjustedPrice,
-      lowEstimateRaw: lowRangePrice,
-      highEstimateRaw: highRangePrice,
-      quickSaleRaw: quickSalePrice,
-      recommendedRaw: recommendedListingPrice,
+      estimatedValueRaw: finalAdjustedPrice,
+      lowEstimateRaw: finalLowRange,
+      highEstimateRaw: finalHighRange,
+      quickSaleRaw: finalQuickSale,
+      recommendedRaw: finalRecommended,
     },
   };
 
@@ -1309,11 +1428,11 @@ export async function computeVehicleEstimationV2(
       adjustmentCapApplied: adjustments.multiplier <= 0.8 || adjustments.multiplier >= 1.12,
     },
     confidence: {
-      confidenceScore: cappedConfidence,
-      confidenceBand,
+      confidenceScore: cappedConfidenceFinal,
+      confidenceBand: confidenceBandFinal,
       confidenceCeiling: policy.confidenceCeiling,
       confidenceBeforeCeiling: beforeCeiling,
-      confidenceCapped: cappedConfidence !== beforeCeiling,
+      confidenceCapped: cappedConfidenceFinal !== beforeCeiling,
       drivers,
       explanationMode: "summary_only",
     },
@@ -1367,6 +1486,32 @@ export async function computeVehicleEstimationV2(
       comparableSourceBreakdown: comparableFetch.sourceBreakdown,
       transactionFactorAvg: comparableFetch.transactionFactorAvg,
       transactionFactorVersion: factorConfig.version,
+      // PROMPT 10E — Couche 2
+      comparablesBreakdownByLayer: {
+        exact: comparableFetch.layerBreakdown.exact,
+        segmentProche: comparableFetch.layerBreakdown.segmentProche,
+        fallbackCanonical: comparables.length === 0 && Boolean(profile) ? 1 : 0,
+      },
+      proximityModelsUsed: comparableFetch.proximityModelsUsed,
+      proximityFactorAvg: comparableFetch.proximityFactorAvg,
+      reasoningLayer:
+        comparableFetch.layerBreakdown.exact >= 5
+          ? "couche_1_exact"
+          : comparableFetch.layerBreakdown.segmentProche > 0
+            ? "couche_2_segment_proche"
+            : sanityResult.action !== "no_bound" && sanityResult.action !== "kept"
+              ? "couche_4_sanity_only"
+              : "fallback_canonical",
+      // PROMPT 10E — Couche 4
+      sanityCheck: {
+        applied: !sanityResult.inBounds,
+        action: sanityResult.action,
+        segmentKey: sanityResult.bound?.segmentKey ?? null,
+        segmentLabel: sanityResult.bound?.segmentLabel ?? null,
+        originalEstimate: sanityResult.originalEstimate,
+        adjustedEstimate: sanityResult.adjustedEstimate,
+        warning: sanityResult.warning,
+      },
     },
   };
   return v2;

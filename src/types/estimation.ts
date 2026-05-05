@@ -67,7 +67,8 @@ export interface EvidenceTierDecision {
     | "STRONG_COMPARABLE_SET"
     | "MODERATE_COMPARABLE_SET"
     | "WEAK_COMPARABLES_REFERENCE_USED"
-    | "NO_RELIABLE_COMPARABLES";
+    | "NO_RELIABLE_COMPARABLES"
+    | "SANITY_BOUND_APPLIED";
   tierReasonSummary: string;
 }
 
@@ -245,6 +246,46 @@ export interface EstimationAuditV2 {
   transactionFactorAvg: number;
   /** Version de la config transaction_factors_v2 utilisée. */
   transactionFactorVersion: string;
+  /**
+   * PROMPT 10E — Couche 2 : ventilation des comparables par couche de raisonnement.
+   * - exact          : match strict make+model+year (Couche 1)
+   * - segmentProche  : proxy via MODEL_PROXIMITY (Couche 2)
+   * - fallbackCanonical : fallback baseline / heuristique pure
+   */
+  comparablesBreakdownByLayer?: {
+    exact: number;
+    segmentProche: number;
+    fallbackCanonical: number;
+  };
+  /**
+   * PROMPT 10E — Couche 2 : modèles proxy effectivement utilisés (audit + UI optionnel).
+   */
+  proximityModelsUsed?: Array<{
+    make: string;
+    model: string;
+    n: number;
+  }>;
+  /** PROMPT 10E — Couche 2 : moyenne du facteur correctif appliqué aux proxy (1 = aucun). */
+  proximityFactorAvg?: number;
+  /** PROMPT 10E — Couche 2 : couche de raisonnement gagnante. */
+  reasoningLayer?:
+    | "couche_1_exact"
+    | "couche_2_segment_proche"
+    | "couche_4_sanity_only"
+    | "fallback_canonical";
+  /**
+   * PROMPT 10E — Couche 4 : trace du sanity check.
+   * Si `applied=true`, l'estimation a été ramenée dans les bornes du segment.
+   */
+  sanityCheck?: {
+    applied: boolean;
+    action: "kept" | "raised_to_floor" | "lowered_to_ceiling" | "no_bound";
+    segmentKey: string | null;
+    segmentLabel: string | null;
+    originalEstimate: number;
+    adjustedEstimate: number;
+    warning: string | null;
+  };
 }
 
 export interface EstimationOutputV2 {
