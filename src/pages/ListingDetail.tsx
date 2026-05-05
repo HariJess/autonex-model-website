@@ -36,6 +36,7 @@ import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import BrandLogo from "@/components/BrandLogo";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { ReportListingButton } from "@/components/listing/ReportListingButton";
+import { ShareButton } from "@/components/listing/ShareButton";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { buildCanonicalUrl } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -217,6 +218,11 @@ const ListingDetail = () => {
         <meta property="og:description" content={listingDescription} />
         <meta property="og:url" content={canonical} />
         {seoImage && <meta property="og:image" content={seoImage} />}
+        {seoImage && <meta property="og:image:width" content="1200" />}
+        {seoImage && <meta property="og:image:height" content="630" />}
+        <meta property="og:locale" content="fr_MG" />
+        <meta property="product:price:amount" content={String(listing.price_mga)} />
+        <meta property="product:price:currency" content="MGA" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={listingTitle} />
         <meta name="twitter:description" content={listingDescription} />
@@ -311,7 +317,19 @@ const ListingDetail = () => {
               </div>
               <div className="flex items-center justify-between gap-3">
                 <h1 className="font-sans text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground break-words">{displayTitle}</h1>
-                <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <ShareButton
+                    listing={{
+                      id: listing.id,
+                      title: displayTitle,
+                      url: canonical,
+                      priceMga: listing.price_mga,
+                      location: addressLine || null,
+                    }}
+                    variant="icon"
+                  />
+                  <FavoriteButton listingId={listing.id} size="md" variant="inline" />
+                </div>
               </div>
               {vehicleSummary && (
                 <p className="mt-1.5 text-[14px] text-muted-foreground font-sans leading-relaxed">{vehicleSummary}</p>
