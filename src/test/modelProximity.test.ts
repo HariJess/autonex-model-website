@@ -47,12 +47,18 @@ describe("PROMPT 10E — MODEL_PROXIMITY structure", () => {
     }
   });
 
-  it("priceFactorRange : [min, max] valides et dans [0.5, 1.5]", () => {
+  // Borne haute relâchée à 2.0 (sprint engine v2 — extension full-size US +
+  // Lexus). Garde-fou : au-delà de 2.0 = signal de proxy mal calibré.
+  // Cas légitimes au-dessus de 1.5 :
+  //   - Pickups full-size US (Silverado / F-150 / Ram 1500 / Sierra / Tundra)
+  //     vs mid-size jap (Hilux / Ranger / Navara) = ratio prix réel 1.2-1.7×
+  //   - Lexus LX vs Land Cruiser (sister technique luxury) = ratio 1.5-1.9×
+  it("priceFactorRange : [min, max] valides et dans [0.5, 2.0]", () => {
     for (const cfg of Object.values(MODEL_PROXIMITY)) {
       const [min, max] = cfg.priceFactorRange;
       expect(min).toBeLessThanOrEqual(max);
       expect(min).toBeGreaterThanOrEqual(0.5);
-      expect(max).toBeLessThanOrEqual(1.5);
+      expect(max).toBeLessThanOrEqual(2.0);
     }
   });
 

@@ -221,6 +221,109 @@ export const MODEL_PROXIMITY: Record<string, ModelProximityConfig> = {
     priceFactorRange: [0.95, 1.10],
     proximityLabel: "SUV milieu de gamme",
   },
+
+  // ===== Sprint engine v2 — extension full-size US + Toyota US + Lexus =====
+  // Cf. brief 2026-05-06 : fix bug Tahoe + couverture catalogue marché Mada.
+  // Casse des proxies alignée sur les clés existantes (ex: "Toyota|4runner")
+  // pour cohérence visuelle ; le lookup est case-insensitive (findProxyModels).
+
+  // SUV full-size US — proxy = SUV jap full-size existants (Land Cruiser/Patrol)
+  "Chevrolet|Tahoe": {
+    proxyModels: ["Toyota|Land Cruiser", "Nissan|Patrol"],
+    priceFactorRange: [0.85, 1.15],
+    proximityLabel: "SUV full-size US (équivalent body-on-frame premium)",
+  },
+
+  "Chevrolet|Suburban": {
+    proxyModels: ["Toyota|Land Cruiser", "Nissan|Patrol"],
+    priceFactorRange: [0.95, 1.25],
+    proximityLabel: "SUV full-size US allongé (Tahoe + 8%)",
+  },
+
+  "GMC|Yukon": {
+    proxyModels: ["Toyota|Land Cruiser", "Nissan|Patrol"],
+    priceFactorRange: [0.90, 1.20],
+    proximityLabel: "SUV full-size US (jumeau Tahoe positioning premium)",
+  },
+
+  "Ford|Expedition": {
+    proxyModels: ["Toyota|Land Cruiser", "Nissan|Patrol"],
+    priceFactorRange: [0.85, 1.15],
+    proximityLabel: "SUV full-size US (concurrent direct Tahoe)",
+  },
+
+  "Toyota|Sequoia": {
+    proxyModels: ["Toyota|Land Cruiser", "Nissan|Patrol"],
+    priceFactorRange: [0.85, 1.15],
+    proximityLabel: "SUV full-size Toyota US",
+  },
+
+  "Nissan|Armada": {
+    proxyModels: ["Toyota|Land Cruiser", "Nissan|Patrol"],
+    priceFactorRange: [0.80, 1.10],
+    proximityLabel: "SUV full-size US (Patrol US-spec)",
+  },
+
+  // Pickups full-size US — proxy = pickups mid-size jap (Hilux/Ranger/Navara)
+  // priceFactorRange élargi vers le haut : pickups full-size US sont
+  // 30-40 % plus chers que les mid-size mid-class japonais.
+  "Chevrolet|Silverado": {
+    proxyModels: ["Toyota|Hilux", "Ford|Ranger", "Nissan|Navara"],
+    priceFactorRange: [1.20, 1.60],
+    proximityLabel: "Pickup full-size US (famille Silverado/Sierra)",
+  },
+
+  "GMC|Sierra": {
+    proxyModels: ["Toyota|Hilux", "Ford|Ranger", "Nissan|Navara"],
+    priceFactorRange: [1.20, 1.60],
+    proximityLabel: "Pickup full-size US (jumeau Silverado)",
+  },
+
+  "Ford|F-150": {
+    proxyModels: ["Toyota|Hilux", "Ford|Ranger", "Nissan|Navara"],
+    priceFactorRange: [1.20, 1.60],
+    proximityLabel: "Pickup full-size US (le plus vendu USA)",
+  },
+
+  "Dodge|Ram 1500": {
+    proxyModels: ["Toyota|Hilux", "Ford|Ranger", "Nissan|Navara"],
+    priceFactorRange: [1.20, 1.60],
+    proximityLabel: "Pickup full-size US (concurrent F-150 / Silverado)",
+  },
+
+  "Toyota|Tundra": {
+    proxyModels: ["Toyota|Hilux", "Ford|Ranger", "Nissan|Navara"],
+    priceFactorRange: [1.30, 1.70],
+    proximityLabel: "Pickup full-size Toyota US (Tundra haut de gamme)",
+  },
+
+  // Lifestyle 4×4 — proxy = SUV mid-size off-road (4Runner/Pajero)
+  // Décote lente, positionnement lifestyle premium.
+  "Jeep|Wrangler": {
+    proxyModels: ["Toyota|4runner", "Mitsubishi|Pajero"],
+    priceFactorRange: [1.30, 1.70],
+    proximityLabel: "Lifestyle 4×4 premium (Wrangler iconique)",
+  },
+
+  "Jeep|Gladiator": {
+    proxyModels: ["Toyota|Hilux", "Ford|Ranger", "Mitsubishi|L200"],
+    priceFactorRange: [1.30, 1.70],
+    proximityLabel: "Pickup lifestyle 4×4 (Wrangler-based)",
+  },
+
+  "Jeep|Grand Cherokee": {
+    proxyModels: ["Toyota|Land Cruiser Prado", "Toyota|4runner"],
+    priceFactorRange: [0.90, 1.20],
+    proximityLabel: "SUV mid-size premium (concurrent Prado)",
+  },
+
+  // Lexus LX — proxy = Land Cruiser (sister technique Toyota)
+  // LX = Land Cruiser luxury : +50-90 % prix.
+  "Lexus|LX": {
+    proxyModels: ["Toyota|Land Cruiser"],
+    priceFactorRange: [1.50, 1.90],
+    proximityLabel: "SUV ultra-premium (Land Cruiser luxury sister)",
+  },
 };
 
 /**

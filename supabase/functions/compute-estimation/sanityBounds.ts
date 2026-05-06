@@ -34,6 +34,7 @@ export interface SanityBound {
  * plus spécifiques d'abord).
  */
 const PREMIUM_PICKUP_SUV_MODELS = [
+  // Toyota / Land Rover / Mitsubishi / Ford / Nissan jap-UK (existants)
   "Toyota|Land Cruiser",
   "Toyota|Land Cruiser Prado",
   "Toyota|Hilux",
@@ -48,6 +49,23 @@ const PREMIUM_PICKUP_SUV_MODELS = [
   "Ford|Everest",
   "Nissan|Patrol",
   "Nissan|Navara",
+  // Sprint engine v2 — extension full-size US + Toyota US + Lexus (15 modèles)
+  // Cf. brief 2026-05-06 : fix bug Tahoe + couverture catalogue marché Mada.
+  "Chevrolet|Tahoe",
+  "Chevrolet|Suburban",
+  "Chevrolet|Silverado",
+  "GMC|Yukon",
+  "GMC|Sierra",
+  "Ford|Expedition",
+  "Ford|F-150",
+  "Dodge|Ram 1500",
+  "Jeep|Grand Cherokee",
+  "Jeep|Wrangler",
+  "Jeep|Gladiator",
+  "Toyota|Tundra",
+  "Toyota|Sequoia",
+  "Nissan|Armada",
+  "Lexus|LX",
 ];
 
 const SUV_STANDARD_MODELS = [
