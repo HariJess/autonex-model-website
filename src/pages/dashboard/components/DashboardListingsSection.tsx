@@ -18,21 +18,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AlertCircle, CarFront, Flame, Pause, Pencil, Play, Trash2, X } from "lucide-react";
+import { AlertCircle, CarFront, Flame, Pause, Pencil, Play, Rocket, Trash2, X } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import type { Tables } from "@/integrations/supabase/types";
 import { isEditablePublishedListingStatus } from "@/lib/publishDraft";
 import {
   formatBoostEndDateFr,
+  isListingEligibleForPostPublishBoost,
   type ListingBoostPartition,
 } from "@/lib/listingBoosts";
 // PROMPT 6 — DashboardBoostPurchaseDialog deprecated. Le boost est désormais
 // géré exclusivement depuis /mes-annonces (cf. MyListingCard + BoostModal).
+import { BoostModal } from "@/components/listings/BoostModal";
 import { DealActivationModal } from "@/features/deals/components/DealActivationModal";
 import { DealStatusBadge } from "@/features/deals/components/DealStatusBadge";
 import { useCancelDeal } from "@/features/deals/hooks/useDealMutations";
 
-type Listing = Tables<"listings">;
+// Boost denormalized cols — pas dans Tables<"listings"> tant que les types Supabase
+// n'ont pas été régénérés post-migration boost_system. Cohérent avec
+// `ListingRowLite` dans useListings.ts. La query Dashboard.tsx (`select("*")`)
+// les charge bien au runtime.
+type Listing = Tables<"listings"> & {
+  last_bumped_at?: string | null;
+  featured_until?: string | null;
+  top_ad_until?: string | null;
+};
 
 type DashboardListingsSectionProps = {
   title: string;
@@ -151,6 +161,7 @@ export function DashboardListingsSection({
       ? formatPriceCompact(mgaToEur(mga), "EUR")
       : formatPriceCompact(mga, "MGA");
   const [dealModalListing, setDealModalListing] = useState<Listing | null>(null);
+  const [boostModalListing, setBoostModalListing] = useState<Listing | null>(null);
   const cancelDeal = useCancelDeal();
 
   const handleCancelDeal = (listingId: string) => {
@@ -266,6 +277,17 @@ export function DashboardListingsSection({
                           {t("deals.dashboardButton.cancel", "Annuler le deal")}
                         </Button>
                       )}
+                      {isListingEligibleForPostPublishBoost(listing.status) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="font-sans touch-manipulation h-9 px-2 border-amber-600/40 text-amber-900 dark:text-amber-200"
+                          onClick={() => setBoostModalListing(listing)}
+                        >
+                          <Rocket className="h-3.5 w-3.5 mr-1 shrink-0" />
+                          {t("dashboard.boostListing", "Booster")}
+                        </Button>
+                      )}
                       {isEditablePublishedListingStatus(listing.status) && (
                         <Button variant="outline" size="sm" className="font-sans touch-manipulation h-9 px-2" asChild>
                           <Link to={`/publier?edit=${listing.id}`}>
@@ -347,7 +369,7 @@ export function DashboardListingsSection({
                         </td>
                         <td className="p-4 font-sans text-sm hidden sm:table-cell">
                           {listing.deal_active && listing.deal_original_price_mga && listing.deal_ends_at && listing.deal_discount_percent != null ? (
-                            <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs text-muted-foreground line-through">
                                 {formatPriceCompactInDashboard(Number(listing.deal_original_price_mga))}
                               </span>
@@ -393,6 +415,17 @@ export function DashboardListingsSection({
                               >
                                 <X className="h-3.5 w-3.5 mr-1 shrink-0" />
                                 {t("deals.dashboardButton.cancel", "Annuler le deal")}
+                              </Button>
+                            )}
+                            {isListingEligibleForPostPublishBoost(listing.status) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="font-sans h-8 px-2 border-amber-600/40 text-amber-900 dark:text-amber-200"
+                                onClick={() => setBoostModalListing(listing)}
+                              >
+                                <Rocket className="h-3.5 w-3.5 mr-1 shrink-0" />
+                                {t("dashboard.boostListing", "Booster")}
                               </Button>
                             )}
                             {isEditablePublishedListingStatus(listing.status) && (
@@ -455,6 +488,20 @@ export function DashboardListingsSection({
             if (!open) setDealModalListing(null);
           }}
           onSuccess={() => setDealModalListing(null)}
+        />
+      )}
+
+      {boostModalListing && (
+        <BoostModal
+          listingId={boostModalListing.id}
+          listingTitle={boostModalListing.title}
+          lastBumpedAt={boostModalListing.last_bumped_at ?? null}
+          featuredUntil={boostModalListing.featured_until ?? null}
+          topAdUntil={boostModalListing.top_ad_until ?? null}
+          open={boostModalListing !== null}
+          onOpenChange={(open) => {
+            if (!open) setBoostModalListing(null);
+          }}
         />
       )}
     </div>

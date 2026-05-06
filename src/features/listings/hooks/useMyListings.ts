@@ -37,6 +37,7 @@ export type MyListingRow = Pick<
   | "ville"
   | "type"
   | "status"
+  | "transaction"
   | "expires_at"
   | "published_at"
   | "sold_at"
@@ -55,6 +56,12 @@ export type MyListingRow = Pick<
   last_bumped_at: string | null;
   featured_until: string | null;
   top_ad_until: string | null;
+  // Sprint 7 deals — colonnes nécessaires pour le bouton "Mettre en bonne affaire" /
+  // "Annuler le deal" + le visuel deal sur la card. Toutes nullables (deal optionnel).
+  deal_active: boolean | null;
+  deal_discount_percent: number | null;
+  deal_ends_at: string | null;
+  deal_original_price_mga: number | null;
 };
 
 export interface UseMyListingsResult {
@@ -78,11 +85,14 @@ const EMPTY_COUNTS: Record<MyListingsFilter, number> = {
 // Le types regen Supabase ne typant pas encore sold_price (migration PROMPT 4
 // pas encore appliquée), on cast la réponse en `unknown as ...` pour passer.
 const SELECT_COLS =
-  "id, title, price_mga, ville, type, status, expires_at, " +
+  "id, title, price_mga, ville, type, status, transaction, expires_at, " +
   "published_at, sold_at, sold_price, views_count, contact_count, favorite_count, " +
   "renewal_count, created_at, updated_at, " +
   // PROMPT 6 boost denormalized cols.
   "last_bumped_at, featured_until, top_ad_until, " +
+  // Sprint 7 deals — colonnes nécessaires pour bouton "Mettre en bonne affaire" /
+  // "Annuler le deal" + visuel deal sur la card (cohérent DashboardListingsSection).
+  "deal_active, deal_discount_percent, deal_ends_at, deal_original_price_mga, " +
   "listing_photos(url, position)";
 
 export const myListingsQueryKey = (userId: string | null | undefined) =>

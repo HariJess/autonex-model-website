@@ -8,10 +8,12 @@ import {
   Pencil,
   CheckCircle2,
   Crown,
+  Flame,
   RefreshCw,
   Rocket,
   Star,
   Trash2,
+  X,
   ImageIcon,
   ExternalLink,
 } from "lucide-react";
@@ -21,6 +23,8 @@ import { cn } from "@/lib/utils";
 import { formatAriary } from "@/config/monetization";
 import { LISTING_RENEWAL_CREDIT_COST } from "@/config/monetization";
 import { BoostModal } from "@/components/listings/BoostModal";
+import { DealActivationModal } from "@/features/deals/components/DealActivationModal";
+import { useCancelDeal } from "@/features/deals/hooks/useDealMutations";
 import type { MyListingRow } from "@/features/listings/hooks/useMyListings";
 
 interface MyListingCardProps {
@@ -92,6 +96,7 @@ export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: M
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [boostModalOpen, setBoostModalOpen] = useState(false);
+  const [dealModalOpen, setDealModalOpen] = useState(false);
 
   const variant = resolveVariant(listing);
   const featuredUntil = listing.featured_until ?? null;
@@ -127,6 +132,12 @@ export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: M
   const isShowingMarkSold: boolean = isActiveLike;
   const isShowingRenew: boolean = isExpired || variant === "expiring_soon";
   const isShowingBoost: boolean = isActiveLike;
+  // Sprint 7 deals — cohérence stricte avec DashboardListingsSection :
+  // status === "active" strict (pas isActiveLike), transaction "vente" only.
+  const isShowingActivateDeal: boolean =
+    listing.status === "active" && listing.transaction === "vente" && !listing.deal_active;
+  const isShowingCancelDeal: boolean =
+    listing.status === "active" && listing.deal_active === true;
 
   return (
     <article
@@ -289,6 +300,20 @@ export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: M
               {t("myListings.actions.boost", "Booster")}
             </Button>
           )}
+          {isShowingActivateDeal && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setDealModalOpen(true)}
+              data-testid={`my-listing-${listing.id}-activate-deal`}
+              className="flex-1 gap-1.5 text-orange-700 hover:text-orange-800 dark:text-orange-300"
+            >
+              <Flame className="h-3.5 w-3.5" aria-hidden="true" />
+              {t("deals.dashboardButton.activate", "Mettre en bonne affaire")}
+            </Button>
+          )}
+          {isShowingCancelDeal && <CancelDealButton listingId={listing.id} />}
           {isShowingRenew && (
             <Button
               type="button"
@@ -394,6 +419,60 @@ export function MyListingCard({ listing, onRenew, onMarkSold, onDeleteDraft }: M
           onOpenChange={setBoostModalOpen}
         />
       )}
+
+      {/* Lazy-mount DealActivationModal : ne charge useActivateDeal que lorsque
+          l'utilisateur ouvre le modal (cohérent pattern BoostModal ci-dessus). */}
+      {isShowingActivateDeal && dealModalOpen && (
+        <DealActivationModal
+          listing={{
+            id: listing.id,
+            title: listing.title,
+            price_mga: listing.price_mga ?? 0,
+          }}
+          open={dealModalOpen}
+          onOpenChange={setDealModalOpen}
+          onSuccess={() => setDealModalOpen(false)}
+        />
+      )}
     </article>
+  );
+}
+
+/**
+ * Sous-composant isolé pour le bouton "Annuler le deal".
+ *
+ * Pourquoi : `useCancelDeal()` appelle `useQueryClient()` qui requiert un
+ * QueryClientProvider. En l'extrayant dans un sous-composant rendu uniquement
+ * quand `listing.deal_active === true`, on évite que les tests qui montent
+ * MyListingCard sans deal actif (markSoldModal, myListingCardBoost,
+ * renewListingModal, etc.) soient forcés de fournir un QueryClient. Pattern
+ * cohérent avec le lazy-mount de BoostModal au-dessus.
+ */
+function CancelDealButton({ listingId }: { listingId: string }) {
+  const { t } = useTranslation();
+  const cancelDeal = useCancelDeal();
+
+  const handleClick = () => {
+    const confirmMsg = t(
+      "deals.confirm.cancel",
+      "Êtes-vous sûr de vouloir annuler ce deal ? Le prix verrouillé sera maintenu pendant 30 jours.",
+    );
+    if (typeof window !== "undefined" && !window.confirm(confirmMsg)) return;
+    cancelDeal.mutate(listingId);
+  };
+
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant="outline"
+      onClick={handleClick}
+      disabled={cancelDeal.isPending}
+      data-testid={`my-listing-${listingId}-cancel-deal`}
+      className="flex-1 gap-1.5 text-red-600 hover:text-red-700 dark:text-red-400"
+    >
+      <X className="h-3.5 w-3.5" aria-hidden="true" />
+      {t("deals.dashboardButton.cancel", "Annuler le deal")}
+    </Button>
   );
 }

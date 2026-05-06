@@ -150,4 +150,72 @@ describe("DealActivationModal", () => {
       durationDays: 30,
     });
   });
+
+  // ─── Sprint 7 deals — mode "tape directement le nouveau prix" ────────────
+
+  it("priceMode: typing a valid new price derives the % and enables activate", () => {
+    renderModal();
+    const priceInput = screen.getByLabelText("Ou saisis directement le nouveau prix") as HTMLInputElement;
+    // 100M → 80M = -20%
+    fireEvent.change(priceInput, { target: { value: "80000000" } });
+    fireEvent.click(screen.getByRole("button", { name: "7 jours" }));
+
+    // Helper "Soit -20 % (économie 20000000 Ar)"
+    expect(screen.getByText(/Soit -20 %/)).toBeInTheDocument();
+
+    // Aperçu utilise floor(price * (1 - 20/100)) = 80_000_000
+    const preview = screen.getByText("Aperçu").parentElement!;
+    expect(within(preview).getByText("80000000 Ar")).toBeInTheDocument();
+
+    // Activate doit être activable
+    expect(screen.getByRole("button", { name: "Activer le deal" })).not.toBeDisabled();
+  });
+
+  it("priceMode: typing a price > current price shows priceTooHigh error and disables activate", () => {
+    renderModal();
+    const priceInput = screen.getByLabelText("Ou saisis directement le nouveau prix") as HTMLInputElement;
+    fireEvent.change(priceInput, { target: { value: "110000000" } });
+    fireEvent.click(screen.getByRole("button", { name: "7 jours" }));
+
+    expect(
+      screen.getByText("Le nouveau prix doit être inférieur au prix actuel."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Activer le deal" })).toBeDisabled();
+  });
+
+  it("priceMode: typing a price that implies discount > 30% shows discountTooHigh error", () => {
+    renderModal();
+    const priceInput = screen.getByLabelText("Ou saisis directement le nouveau prix") as HTMLInputElement;
+    // 100M → 50M = -50% (au-delà du max 30%)
+    fireEvent.change(priceInput, { target: { value: "50000000" } });
+    fireEvent.click(screen.getByRole("button", { name: "7 jours" }));
+
+    expect(screen.getByText(/Remise maximum : 30 %/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Activer le deal" })).toBeDisabled();
+  });
+
+  it("priceMode: typing a price that implies discount < 5% shows discountTooLow error", () => {
+    renderModal();
+    const priceInput = screen.getByLabelText("Ou saisis directement le nouveau prix") as HTMLInputElement;
+    // 100M → 98M = -2% (sous le min 5%)
+    fireEvent.change(priceInput, { target: { value: "98000000" } });
+    fireEvent.click(screen.getByRole("button", { name: "7 jours" }));
+
+    expect(screen.getByText(/Remise minimum : 5 %/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Activer le deal" })).toBeDisabled();
+  });
+
+  it("priceMode ↔ presetMode sync: clicking chip -10% after typing price updates the input value", () => {
+    renderModal();
+    const priceInput = screen.getByLabelText("Ou saisis directement le nouveau prix") as HTMLInputElement;
+    // 1) user tape un prix
+    fireEvent.change(priceInput, { target: { value: "80000000" } });
+    expect(priceInput.value).toBe("80000000");
+
+    // 2) puis clique chip -10%
+    fireEvent.click(screen.getByRole("button", { name: "-10%" }));
+
+    // L'input prix doit afficher le prix dérivé : floor(100M * 0.9) = 90M
+    expect(priceInput.value).toBe("90000000");
+  });
 });

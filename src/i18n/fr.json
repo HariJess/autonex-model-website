@@ -293,6 +293,7 @@
     "accountIndividual": "Compte particulier",
     "activate": "Activer",
     "activeListings": "Annonces actives",
+    "boostListing": "Booster",
     "buyCredits": "Acheter des crédits",
     "contacts": "Contacts reçus",
     "credits": "Crédits",
@@ -367,6 +368,16 @@
       "discountLabel": "Choisissez votre remise",
       "discountCustom": "Personnalisé",
       "discountCustomInvalid": "Choisissez un entier entre 5 et 30.",
+      "priceMode": {
+        "label": "Ou saisis directement le nouveau prix",
+        "placeholder": "ex: 179 910 000",
+        "helper": "Soit -{{percent}} % (économie {{savings}}).",
+        "errors": {
+          "priceTooHigh": "Le nouveau prix doit être inférieur au prix actuel.",
+          "discountTooLow": "Remise minimum : 5 % (nouveau prix maximum : {{maxPrice}}).",
+          "discountTooHigh": "Remise maximum : 30 % (nouveau prix minimum : {{minPrice}})."
+        }
+      },
       "durationLabel": "Durée du deal",
       "durationDays": "{{count}} jours",
       "previewTitle": "Aperçu",

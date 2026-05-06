@@ -70,6 +70,10 @@ export function useActivateDeal() {
       // (`db-listings` clé utilisée par useDbListings) pour que le badge -X% et
       // le prix barré apparaissent immédiatement partout.
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
+      // Sprint 7 deals — invalidation MyListingCard /mes-annonces (queryKey
+      // distincte `my-listings-dashboard` utilisée par useMyListings, qui ne
+      // matche pas `my-listings` en préfixe segments TanStack).
+      queryClient.invalidateQueries({ queryKey: ["my-listings-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["db-listings"] });
       queryClient.invalidateQueries({ queryKey: ["listing"] });
       toast.success(t("deals.toast.activated", "Deal activé avec succès !"));
@@ -99,6 +103,8 @@ export function useCancelDeal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
+      // Sprint 7 deals — invalidation MyListingCard /mes-annonces (cf. useActivateDeal).
+      queryClient.invalidateQueries({ queryKey: ["my-listings-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["db-listings"] });
       queryClient.invalidateQueries({ queryKey: ["listing"] });
       toast.success(t("deals.toast.cancelled", "Deal annulé"));

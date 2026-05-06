@@ -56,6 +56,12 @@ export function DealActivationModal({
   const [customMode, setCustomMode] = useState<boolean>(false);
   const [customDiscountInput, setCustomDiscountInput] = useState<string>("");
   const [durationDays, setDurationDays] = useState<7 | 14 | 30 | null>(null);
+  // Sprint 7 deals — mode "saisir le nouveau prix directement" (alternative au
+  // pourcentage). Mutuellement exclusif avec presetDiscount + customMode.
+  // Source de vérité : `priceInputValue` libre, on dérive le pourcentage à la
+  // volée. Quand user clique une chip %, on reset priceMode (et inversement).
+  const [priceMode, setPriceMode] = useState<boolean>(false);
+  const [priceInputValue, setPriceInputValue] = useState<string>("");
 
   // Discount effectif = preset ou custom (les deux exclusifs).
   const customDiscountValue = useMemo(() => {
@@ -68,7 +74,52 @@ export function DealActivationModal({
     return parsed;
   }, [customMode, customDiscountInput]);
 
-  const effectiveDiscount = customMode ? customDiscountValue : presetDiscount;
+  // Discount déduit du prix tapé dans l'input "Nouveau prix" (mode price).
+  // Math.round → integer aligné avec la contrainte RPC (discount_percent INT).
+  const priceInputDiscount = useMemo(() => {
+    if (!priceMode) return null;
+    const trimmed = priceInputValue.trim().replace(/\s/g, "");
+    if (trimmed === "") return null;
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed) || parsed <= 0) return null;
+    if (parsed >= listing.price_mga) return null;
+    return Math.round((1 - parsed / listing.price_mga) * 100);
+  }, [priceMode, priceInputValue, listing.price_mga]);
+
+  // Message d'erreur live pour l'input prix. Null si pas en priceMode, vide,
+  // ou si le prix tapé est valide dans la plage [5%, 30%].
+  const priceInputErrorMessage = useMemo<string | null>(() => {
+    if (!priceMode) return null;
+    const trimmed = priceInputValue.trim().replace(/\s/g, "");
+    if (trimmed === "") return null;
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed) || parsed <= 0) return null;
+    if (parsed >= listing.price_mga) {
+      return t(
+        "deals.modal.priceMode.errors.priceTooHigh",
+        "Le nouveau prix doit être inférieur au prix actuel.",
+      );
+    }
+    const pctRaw = (1 - parsed / listing.price_mga) * 100;
+    if (pctRaw < MIN_DISCOUNT) {
+      const maxPrice = Math.floor(listing.price_mga * (1 - MIN_DISCOUNT / 100));
+      return t("deals.modal.priceMode.errors.discountTooLow", {
+        maxPrice: formatPrice(maxPrice),
+        defaultValue: "Remise minimum : 5 % (nouveau prix maximum : {{maxPrice}}).",
+      });
+    }
+    if (pctRaw > MAX_DISCOUNT) {
+      const minPrice = Math.floor(listing.price_mga * (1 - MAX_DISCOUNT / 100));
+      return t("deals.modal.priceMode.errors.discountTooHigh", {
+        minPrice: formatPrice(minPrice),
+        defaultValue: "Remise maximum : 30 % (nouveau prix minimum : {{minPrice}}).",
+      });
+    }
+    return null;
+  }, [priceMode, priceInputValue, listing.price_mga, t, formatPrice]);
+
+  const nonPriceModeDiscount = customMode ? customDiscountValue : presetDiscount;
+  const effectiveDiscount = priceMode ? priceInputDiscount : nonPriceModeDiscount;
   const customDiscountValid =
     customDiscountValue !== null &&
     customDiscountValue >= MIN_DISCOUNT &&
@@ -78,7 +129,18 @@ export function DealActivationModal({
     effectiveDiscount !== null &&
     effectiveDiscount >= MIN_DISCOUNT &&
     effectiveDiscount <= MAX_DISCOUNT &&
-    durationDays !== null;
+    durationDays !== null &&
+    priceInputErrorMessage === null;
+
+  // Value affichée dans l'input prix :
+  //   - mode "price" → ce que l'user tape (buffer libre)
+  //   - mode "preset"/"custom" avec discount défini → prix arrondi dérivé
+  //   - sinon → vide
+  const priceInputDisplayValue = priceMode
+    ? priceInputValue
+    : nonPriceModeDiscount !== null && nonPriceModeDiscount >= MIN_DISCOUNT && nonPriceModeDiscount <= MAX_DISCOUNT
+      ? String(Math.floor(listing.price_mga * (1 - nonPriceModeDiscount / 100)))
+      : "";
 
   // Calcul preview — EXACTEMENT le même que floor(price * (1 - %/100)) côté RPC.
   const previewNewPrice = useMemo(() => {
@@ -107,6 +169,8 @@ export function DealActivationModal({
     setCustomMode(false);
     setCustomDiscountInput("");
     setDurationDays(null);
+    setPriceMode(false);
+    setPriceInputValue("");
   };
 
   const handleOpenChange = (next: boolean) => {
@@ -173,6 +237,8 @@ export function DealActivationModal({
                       setCustomMode(false);
                       setCustomDiscountInput("");
                       setPresetDiscount(p);
+                      setPriceMode(false);
+                      setPriceInputValue("");
                     }}
                     className={
                       "rounded-full border px-3 py-1.5 text-sm font-sans font-medium transition-colors " +
@@ -191,6 +257,8 @@ export function DealActivationModal({
                 onClick={() => {
                   setPresetDiscount(null);
                   setCustomMode(true);
+                  setPriceMode(false);
+                  setPriceInputValue("");
                 }}
                 className={
                   "rounded-full border px-3 py-1.5 text-sm font-sans font-medium transition-colors " +
@@ -223,6 +291,50 @@ export function DealActivationModal({
                   </p>
                 )}
               </div>
+            )}
+          </div>
+
+          {/* Price input — alternative au pourcentage, toujours visible.
+              Synchronisé via state unique : taper ici dérive le %, cliquer une
+              chip % dérive le prix affiché ici (cf. priceInputDisplayValue). */}
+          <div className="space-y-2">
+            <Label
+              className="font-sans text-sm text-muted-foreground"
+              htmlFor={`deal-price-input-${listing.id}`}
+            >
+              {t("deals.modal.priceMode.label", "Ou saisis directement le nouveau prix")}
+            </Label>
+            <Input
+              id={`deal-price-input-${listing.id}`}
+              type="text"
+              inputMode="numeric"
+              value={priceInputDisplayValue}
+              onChange={(e) => {
+                setPriceMode(true);
+                setPresetDiscount(null);
+                setCustomMode(false);
+                setCustomDiscountInput("");
+                setPriceInputValue(e.target.value);
+              }}
+              placeholder={t("deals.modal.priceMode.placeholder", "ex: 179 910 000")}
+              aria-label={t("deals.modal.priceMode.label", "Ou saisis directement le nouveau prix")}
+              aria-invalid={priceInputErrorMessage !== null}
+              className="font-sans"
+            />
+            {priceInputErrorMessage && (
+              <p className="text-xs text-destructive font-sans">{priceInputErrorMessage}</p>
+            )}
+            {priceMode && priceInputDiscount !== null && priceInputErrorMessage === null && (
+              <p className="text-xs text-muted-foreground font-sans">
+                {t("deals.modal.priceMode.helper", {
+                  percent: priceInputDiscount,
+                  savings: formatPrice(
+                    listing.price_mga -
+                      Math.floor(listing.price_mga * (1 - priceInputDiscount / 100)),
+                  ),
+                  defaultValue: "Soit -{{percent}} % (économie {{savings}}).",
+                })}
+              </p>
             )}
           </div>
 

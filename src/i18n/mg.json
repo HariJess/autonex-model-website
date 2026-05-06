@@ -293,6 +293,7 @@
     "accountIndividual": "Kaonty tsotra",
     "activate": "Hampandeha",
     "activeListings": "Filazana mavitrika",
+    "boostListing": "Booster",
     "buyCredits": "Hividy crédits",
     "contacts": "Fifandraisana azo",
     "credits": "Crédits",
@@ -367,6 +368,16 @@
       "discountLabel": "Safidio ny fihenam-bidinao",
       "discountCustom": "Manokana",
       "discountCustomInvalid": "Misafidiana isa manelanelana ny 5 sy 30.",
+      "priceMode": {
+        "label": "Ou saisis directement le nouveau prix",
+        "placeholder": "ex: 179 910 000",
+        "helper": "Soit -{{percent}} % (économie {{savings}}).",
+        "errors": {
+          "priceTooHigh": "Le nouveau prix doit être inférieur au prix actuel.",
+          "discountTooLow": "Remise minimum : 5 % (nouveau prix maximum : {{maxPrice}}).",
+          "discountTooHigh": "Remise maximum : 30 % (nouveau prix minimum : {{minPrice}})."
+        }
+      },
       "durationLabel": "Fe-potoanan'ny varotra",
       "durationDays": "{{count}} andro",
       "previewTitle": "Topi-maso",
