@@ -68,10 +68,12 @@ export const BRAND_ASSETS: BrandAsset[] = [
   // BrandAsset (label) instead of null. ListingCard falls back to an
   // initial-letter chip for these until assets land.
   buildAsset("dacia", "Dacia"),
+  buildAsset("dodge", "Dodge"),
   buildAsset("fiat", "Fiat"),
   buildAsset("opel", "Opel"),
   buildAsset("seat", "Seat"),
   buildAsset("skoda", "Škoda", undefined, ["skoda"]),
+  buildAsset("ssangyong", "SsangYong"),
   buildAsset("subaru", "Subaru"),
   buildAsset("tesla", "Tesla"),
   buildAsset("volvo", "Volvo"),
