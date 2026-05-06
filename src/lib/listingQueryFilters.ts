@@ -8,6 +8,7 @@ import { resolveVehicleTypeFilters } from "@/data/automotiveCatalog";
 /** Chain methods used by listing filters — shared by full row select and `{ count: 'exact', head: true }` queries */
 export type FilterableListingQuery = {
   eq(column: string, value: unknown): FilterableListingQuery;
+  gt(column: string, value: unknown): FilterableListingQuery;
   gte(column: string, value: unknown): FilterableListingQuery;
   lte(column: string, value: unknown): FilterableListingQuery;
   or(filters: string): FilterableListingQuery;
@@ -38,6 +39,13 @@ export interface ListingsFilters {
   modelQuery?: string;
   yearMin?: number;
   yearMax?: number;
+  /**
+   * Filtre « Bonnes affaires » : `deal_active = true ET deal_ends_at > now()`.
+   * Sert la chip toggle dans /recherche et la page /bonnes-affaires (via
+   * `useActiveDeals` qui n'utilise PAS ce flag — il duplique les conditions
+   * pour pouvoir trier par discount_percent DESC).
+   */
+  hasDeal?: boolean;
   fuels?: string[];
   transmissions?: string[];
   drivetrains?: string[];
@@ -234,6 +242,12 @@ export function applyListingFilters(query: FilterableListingQuery, filters: List
   }
   if (filters.engineDisplacementMax && filters.engineDisplacementMax > 0) {
     q = q.lte("engine_displacement_l", filters.engineDisplacementMax);
+  }
+  // Filtre « Bonnes affaires » — chip /recherche. Strict : on n'inclut que
+  // les deals officiels actifs ET non expirés. Pas de fallback legacy ici
+  // (la décision Q4 sprint 0 réserve le badge contractuel à ce cas).
+  if (filters.hasDeal) {
+    q = q.eq("deal_active", true).gt("deal_ends_at", new Date().toISOString());
   }
 
   return q;

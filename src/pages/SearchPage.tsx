@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { ChevronRight, Home, Sparkles } from "lucide-react";
+import { ChevronRight, Flame, Home, Sparkles } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { getVehicleTypeLabel } from "@/data/vehicleTypes";
@@ -243,6 +243,12 @@ const SearchPage = () => {
         key: "transaction",
       });
     }
+    if (filters.hasDeal) {
+      chips.push({
+        label: t("search.filterChips.hasDeal", "Bonnes affaires"),
+        key: "hasDeal",
+      });
+    }
     const vehicleTypeLabelMap = new Map(AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.map((opt) => [opt.id, opt.label]));
     filters.vehicleTypes.forEach((vehicleTypeId) =>
       chips.push({ label: vehicleTypeLabelMap.get(vehicleTypeId) ?? vehicleTypeId, key: `vehicleType-${vehicleTypeId}` }),
@@ -297,6 +303,7 @@ const SearchPage = () => {
   const removeChip = (key: string) => {
     const newFilters = { ...filters };
     if (key === "transaction") newFilters.transaction = "";
+    else if (key === "hasDeal") newFilters.hasDeal = false;
     else if (key.startsWith("vehicleType-")) newFilters.vehicleTypes = newFilters.vehicleTypes.filter((id) => id !== key.slice(12));
     else if (key.startsWith("type-")) newFilters.types = newFilters.types.filter((tp) => tp !== key.slice(5));
     else if (key === "ville") {
@@ -568,6 +575,22 @@ const SearchPage = () => {
             </span>
           )}
         </h1>
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => updateFilters({ ...filters, hasDeal: !filters.hasDeal })}
+            aria-pressed={filters.hasDeal}
+            className={
+              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-sans font-medium transition-colors " +
+              (filters.hasDeal
+                ? "border-orange-600 bg-orange-600 text-white shadow-sm"
+                : "border-orange-300 bg-orange-50/60 text-orange-800 hover:bg-orange-100/70 dark:border-orange-900/60 dark:bg-orange-950/40 dark:text-orange-200")
+            }
+          >
+            <Flame className="h-3.5 w-3.5" aria-hidden />
+            {t("search.filterChips.hasDeal", "Bonnes affaires")}
+          </button>
+        </div>
         <SearchActiveChips
           chips={activeChips}
           clearAllLabel={t("common.clearAll", "Effacer tout")}

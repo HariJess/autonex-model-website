@@ -80,6 +80,7 @@ export function filtersFromSearchParams(sp: URLSearchParams): SearchFilters {
     modelQuery: sp.get("model")?.trim() ?? "",
     yearMin: parseFiniteNumber(sp.get("year_min")),
     yearMax: parseFiniteNumber(sp.get("year_max")),
+    hasDeal: sp.get("has_deal") === "1",
   };
 }
 
@@ -112,6 +113,7 @@ export function filtersToSearchParams(f: SearchFilters): URLSearchParams {
   if (f.modelQuery.trim()) p.set("model", f.modelQuery.trim());
   if (f.yearMin > 0) p.set("year_min", String(f.yearMin));
   if (f.yearMax > 0) p.set("year_max", String(f.yearMax));
+  if (f.hasDeal) p.set("has_deal", "1");
   return p;
 }
 

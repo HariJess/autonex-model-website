@@ -134,6 +134,14 @@ export interface DisplayListing {
   rejection_reason?: string | null;
   /** Boost types requested at publish; applied after moderation when listing goes live */
   pending_boost_types?: string[];
+  /** Deal vendeur actif (cf. feature « Bonnes affaires », sprint 1). */
+  deal_active?: boolean;
+  deal_started_at?: string | null;
+  deal_ends_at?: string | null;
+  deal_duration_days?: number | null;
+  deal_discount_percent?: number | null;
+  deal_original_price_mga?: number | null;
+  deal_price_lock_until?: string | null;
   /**
    * Score for search « Plus récent » ordering: combines active boosts (top, featured, daily_bump, urgent)
    * with listing creation / bump recency. Higher = shown first.

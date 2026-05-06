@@ -1,5 +1,9 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { formatPriceCompact, mgaToEur } from "@/config/currency";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AlertCircle, CarFront, Pause, Pencil, Play, Trash2 } from "lucide-react";
+import { AlertCircle, CarFront, Flame, Pause, Pencil, Play, Trash2, X } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import type { Tables } from "@/integrations/supabase/types";
 import { isEditablePublishedListingStatus } from "@/lib/publishDraft";
@@ -24,6 +28,9 @@ import {
 } from "@/lib/listingBoosts";
 // PROMPT 6 — DashboardBoostPurchaseDialog deprecated. Le boost est désormais
 // géré exclusivement depuis /mes-annonces (cf. MyListingCard + BoostModal).
+import { DealActivationModal } from "@/features/deals/components/DealActivationModal";
+import { DealStatusBadge } from "@/features/deals/components/DealStatusBadge";
+import { useCancelDeal } from "@/features/deals/hooks/useDealMutations";
 
 type Listing = Tables<"listings">;
 
@@ -38,7 +45,6 @@ type DashboardListingsSectionProps = {
   listingsLoading: boolean;
   listingsErrorMessage?: string;
   publishedListings: Listing[];
-  formatPrice: (price: number) => string;
   statusLabels: Record<string, string>;
   boostLabels: Record<string, string>;
   listingBoostPartitions: Map<string, ListingBoostPartition>;
@@ -127,7 +133,6 @@ export function DashboardListingsSection({
   listingsLoading,
   listingsErrorMessage,
   publishedListings,
-  formatPrice,
   statusLabels,
   boostLabels,
   listingBoostPartitions,
@@ -136,6 +141,27 @@ export function DashboardListingsSection({
   onToggleStatus,
   onDelete,
 }: DashboardListingsSectionProps) {
+  const { t } = useTranslation();
+  const { currency } = useCurrency();
+  // Sprint 5 — format compact dans le dashboard pour cohérence avec la
+  // grille publique. Le vendeur connaît son prix, on lui évite les 9
+  // chiffres qui cassent la lisibilité du tableau.
+  const formatPriceCompactInDashboard = (mga: number) =>
+    currency === "EUR"
+      ? formatPriceCompact(mgaToEur(mga), "EUR")
+      : formatPriceCompact(mga, "MGA");
+  const [dealModalListing, setDealModalListing] = useState<Listing | null>(null);
+  const cancelDeal = useCancelDeal();
+
+  const handleCancelDeal = (listingId: string) => {
+    const confirmMsg = t(
+      "deals.confirm.cancel",
+      "Êtes-vous sûr de vouloir annuler ce deal ? Le prix verrouillé sera maintenu pendant 30 jours.",
+    );
+    if (typeof window !== "undefined" && !window.confirm(confirmMsg)) return;
+    cancelDeal.mutate(listingId);
+  };
+
   return (
     <div>
       {/* Header : titre seul (legacy) ou titre + action droite (flex justify-between) */}
@@ -185,7 +211,22 @@ export function DashboardListingsSection({
                         {listing.ville}
                         {listing.quartier ? ` • ${listing.quartier}` : ""}
                       </p>
-                      <p className="text-sm font-sans font-medium">{formatPrice(listing.price_mga)}</p>
+                      {listing.deal_active && listing.deal_original_price_mga && listing.deal_ends_at && listing.deal_discount_percent != null ? (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-xs text-muted-foreground font-sans line-through">
+                            {formatPriceCompactInDashboard(Number(listing.deal_original_price_mga))}
+                          </span>
+                          <span className="text-sm font-sans font-semibold text-orange-700 dark:text-orange-300">
+                            {formatPriceCompactInDashboard(listing.price_mga)}
+                          </span>
+                          <DealStatusBadge
+                            discountPercent={listing.deal_discount_percent}
+                            endsAt={listing.deal_ends_at}
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-sm font-sans font-medium">{formatPriceCompactInDashboard(listing.price_mga)}</p>
+                      )}
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant={statusVariant(listing.status)} className="font-sans text-xs">
@@ -202,6 +243,29 @@ export function DashboardListingsSection({
                     />
                     <div className="flex items-center justify-end gap-1.5 flex-wrap">
                       {/* PROMPT 6 : bouton « Booster » déplacé dans /mes-annonces (MyListingCard + BoostModal). */}
+                      {listing.status === "active" && listing.transaction === "vente" && !listing.deal_active && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="font-sans touch-manipulation h-9 px-2 border-orange-600/40 text-orange-900 dark:text-orange-200"
+                          onClick={() => setDealModalListing(listing)}
+                        >
+                          <Flame className="h-3.5 w-3.5 mr-1 shrink-0" />
+                          {t("deals.dashboardButton.activate", "Mettre en bonne affaire")}
+                        </Button>
+                      )}
+                      {listing.deal_active && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="font-sans touch-manipulation h-9 px-2 border-red-600/40 text-red-700 dark:text-red-300"
+                          onClick={() => handleCancelDeal(listing.id)}
+                          disabled={cancelDeal.isPending}
+                        >
+                          <X className="h-3.5 w-3.5 mr-1 shrink-0" />
+                          {t("deals.dashboardButton.cancel", "Annuler le deal")}
+                        </Button>
+                      )}
                       {isEditablePublishedListingStatus(listing.status) && (
                         <Button variant="outline" size="sm" className="font-sans touch-manipulation h-9 px-2" asChild>
                           <Link to={`/publier?edit=${listing.id}`}>
@@ -281,7 +345,24 @@ export function DashboardListingsSection({
                             />
                           </div>
                         </td>
-                        <td className="p-4 font-sans text-sm hidden sm:table-cell">{formatPrice(listing.price_mga)}</td>
+                        <td className="p-4 font-sans text-sm hidden sm:table-cell">
+                          {listing.deal_active && listing.deal_original_price_mga && listing.deal_ends_at && listing.deal_discount_percent != null ? (
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs text-muted-foreground line-through">
+                                {formatPriceCompactInDashboard(Number(listing.deal_original_price_mga))}
+                              </span>
+                              <span className="font-semibold text-orange-700 dark:text-orange-300">
+                                {formatPriceCompactInDashboard(listing.price_mga)}
+                              </span>
+                              <DealStatusBadge
+                                discountPercent={listing.deal_discount_percent}
+                                endsAt={listing.deal_ends_at}
+                              />
+                            </div>
+                          ) : (
+                            formatPriceCompactInDashboard(listing.price_mga)
+                          )}
+                        </td>
                         <td className="p-4">
                           <Badge variant={statusVariant(listing.status)} className="font-sans text-xs">
                             {statusLabels[listing.status ?? "draft"] ?? listing.status}
@@ -291,6 +372,29 @@ export function DashboardListingsSection({
                         <td className="p-4">
                           <div className="flex items-center gap-1 flex-wrap">
                             {/* PROMPT 6 : bouton « Booster » déplacé dans /mes-annonces. */}
+                            {listing.status === "active" && listing.transaction === "vente" && !listing.deal_active && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="font-sans h-8 px-2 border-orange-600/40 text-orange-900 dark:text-orange-200"
+                                onClick={() => setDealModalListing(listing)}
+                              >
+                                <Flame className="h-3.5 w-3.5 mr-1 shrink-0" />
+                                {t("deals.dashboardButton.activate", "Mettre en bonne affaire")}
+                              </Button>
+                            )}
+                            {listing.deal_active && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="font-sans h-8 px-2 border-red-600/40 text-red-700 dark:text-red-300"
+                                onClick={() => handleCancelDeal(listing.id)}
+                                disabled={cancelDeal.isPending}
+                              >
+                                <X className="h-3.5 w-3.5 mr-1 shrink-0" />
+                                {t("deals.dashboardButton.cancel", "Annuler le deal")}
+                              </Button>
+                            )}
                             {isEditablePublishedListingStatus(listing.status) && (
                               <Button variant="outline" size="sm" className="font-sans h-8 px-2" asChild>
                                 <Link to={`/publier?edit=${listing.id}`}>
@@ -337,6 +441,21 @@ export function DashboardListingsSection({
             </div>
           </div>
         </>
+      )}
+
+      {dealModalListing && (
+        <DealActivationModal
+          listing={{
+            id: dealModalListing.id,
+            title: dealModalListing.title,
+            price_mga: dealModalListing.price_mga,
+          }}
+          open={dealModalListing !== null}
+          onOpenChange={(open) => {
+            if (!open) setDealModalListing(null);
+          }}
+          onSuccess={() => setDealModalListing(null)}
+        />
       )}
     </div>
   );

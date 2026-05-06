@@ -359,6 +359,43 @@
     "boostPendingReviewNote": "Ho azo atao ny boost « aorian'ny famoahana » rehefa avy nohamarinin'ny ekipa ny filazana. Ny safidy aloha amin'ny fandefasana dia mijanona miandry etsy ambony.",
     "editListing": "Hovaina"
   },
+  "deals": {
+    "modal": {
+      "title": "Apetraho ho varotra mahafinaritra ny dokam-barotrao",
+      "subtitle": "Mahasarika mpividy bebe kokoa amin'ny fihenam-bidy vonjimaika",
+      "currentPriceLabel": "Vidiny ankehitriny",
+      "discountLabel": "Safidio ny fihenam-bidinao",
+      "discountCustom": "Manokana",
+      "discountCustomInvalid": "Misafidiana isa manelanelana ny 5 sy 30.",
+      "durationLabel": "Fe-potoanan'ny varotra",
+      "durationDays": "{{count}} andro",
+      "previewTitle": "Topi-maso",
+      "previewBefore": "Talohan'izay",
+      "previewAfter": "Vidiny vaovao",
+      "previewSavings": "Tombony ho an'ny mpividy",
+      "previewVisibleUntil": "Hita hatramin'ny {{date}}",
+      "guarantee30d": "Mandritra ny 30 andro aorian'ny faran'ny varotra dia tsy afaka mampiakatra ny vidiny mihoatra ny {{originalPrice}} ianao. Io fiarovana io dia mampatoky ny mpividy ary manamarina ny fahamarinan'ny tolotrao.",
+      "ctaActivate": "Avoaka ny varotra",
+      "ctaCancel": "Hanafoana"
+    },
+    "dashboardButton": {
+      "activate": "Hatao varotra mahafinaritra",
+      "cancel": "Hanafoana ny varotra"
+    },
+    "status": {
+      "activeUntil": "-{{discount}}% hatramin'ny {{date}}"
+    },
+    "confirm": {
+      "cancel": "Tena tianao foanana ity varotra ity ? Ny vidiny voafehy dia hijanona mandritra ny 30 andro."
+    },
+    "toast": {
+      "activated": "Voavaha tsara ny varotra !",
+      "activateFailed": "Tsy tafita ny famoahana ny varotra",
+      "cancelled": "Voafoana ny varotra",
+      "cancelFailed": "Tsy tafita ny fanafoanana",
+      "priceLocked": "Voafehy ny vidiny mandra-pahatongan'ny faran'ny vanim-potoanan'ny fiarovana."
+    }
+  },
   "estimation": {
     "accidentDeclaredDesc": "Misy fiantraikany amin'ny vidiny tombanana.",
     "accidentDeclaredTitle": "Accident voalaza",
@@ -437,34 +474,6 @@
     "reliableInput": "Fampidirana azo itokisana",
     "reliableTransparentDesc": "Mampifangaro angon-drakitra fototra sy famantarana tsena ny fitaovana. Ahitana elanelam-bidy sy haavon'ny fitokisana ny tombana tsirairay.",
     "reliableTransparentTitle": "Azo itokisana sy mangarahara",
-    "report": "Tatitra momba ny tombana",
-    "reportConfidence": "Fitokisana amin'ny tatitra",
-    "resultSectionAria": "Vokatry ny tombana fiara",
-    "searchBrand": "Hitady marika...",
-    "searchCity": "Hitady tanàna / faritra...",
-    "searchModel": "Hitady modely...",
-    "selectBrand": "Safidio ny marika",
-    "selectCity": "Safidio ny tanàna / faritra",
-    "selectModel": "Safidio ny modely",
-    "start": "Hanomboka tombana",
-    "stepCondition": "Toetry ny fiara",
-    "stepConditionHelper": "Tantara sy fampiasana",
-    "stepResult": "Vokatra",
-    "stepResultHelper": "Tatitra tombanana",
-    "stepVehicle": "Fiara",
-    "stepVehicleHelper": "Fanazavana fototra",
-    "title": "Tombana",
-    "unavailableTitle": "Tsy misy tombana amin'izao",
-    "usage": "Fampiasana",
-    "usageAdviceAria": "Torohevitra fampiasana ny tatitra tombana",
-    "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana filazana mifanaraka tsara.",
-    "usageFrameAria": "Fetran'ny fampiasana ny tombana",
-    "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy fanombanana ara-mekanika, ary tsy vidiny voaantoka.",
-    "vehicleIdentity": "Mombamomba ny fiara",
-    "vehicleIdentityLead": "Fenoy ny vaovao fototra momba ny fiara mba hahazoana tombana azo itokisana sy azo ampiasaina.",
-    "viewMyEstimate": "Hijery ny tombanako",
-    "whyTheseInfo": "Nahoana ireo fanazavana ireo?",
-    "whyUseful": "Antony maha-ilaina azy",
     "report": {
       "claimModeStrong": "Famakafakana tsena matanjaka",
       "claimModeLimited": "Famakafakana tsena voamarina",
@@ -584,7 +593,34 @@
         "comparablesEmptyMessage": "Miorina indrindra amin'ny famantarana fanondroana ity tatitra ity. Tazomy ny paikady mitandrina amin'ny vidiny.",
         "ctaFootnote": "Torohevitra AutoNex : ao anatin'ny tontolo porofo malemy, aleo paikady mitandrina alohan'ny famerana ny vidiny."
       }
-    }
+    },
+    "reportConfidence": "Fitokisana amin'ny tatitra",
+    "resultSectionAria": "Vokatry ny tombana fiara",
+    "searchBrand": "Hitady marika...",
+    "searchCity": "Hitady tanàna / faritra...",
+    "searchModel": "Hitady modely...",
+    "selectBrand": "Safidio ny marika",
+    "selectCity": "Safidio ny tanàna / faritra",
+    "selectModel": "Safidio ny modely",
+    "start": "Hanomboka tombana",
+    "stepCondition": "Toetry ny fiara",
+    "stepConditionHelper": "Tantara sy fampiasana",
+    "stepResult": "Vokatra",
+    "stepResultHelper": "Tatitra tombanana",
+    "stepVehicle": "Fiara",
+    "stepVehicleHelper": "Fanazavana fototra",
+    "title": "Tombana",
+    "unavailableTitle": "Tsy misy tombana amin'izao",
+    "usage": "Fampiasana",
+    "usageAdviceAria": "Torohevitra fampiasana ny tatitra tombana",
+    "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana filazana mifanaraka tsara.",
+    "usageFrameAria": "Fetran'ny fampiasana ny tombana",
+    "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy fanombanana ara-mekanika, ary tsy vidiny voaantoka.",
+    "vehicleIdentity": "Mombamomba ny fiara",
+    "vehicleIdentityLead": "Fenoy ny vaovao fototra momba ny fiara mba hahazoana tombana azo itokisana sy azo ampiasaina.",
+    "viewMyEstimate": "Hijery ny tombanako",
+    "whyTheseInfo": "Nahoana ireo fanazavana ireo?",
+    "whyUseful": "Antony maha-ilaina azy"
   },
   "favorites": {
     "title": "Ny ankafiziko",
@@ -907,7 +943,8 @@
     "rent": "Hofa maharitra",
     "rentSubmenu": "Sokafy ny menio fanofana maharitra",
     "settings": "Paramètres",
-    "signup": "Hisoratra anarana"
+    "signup": "Hisoratra anarana",
+    "bonnesAffaires": "Varotra mahafinaritra"
   },
   "payment": {
     "vanilla": {
@@ -1405,6 +1442,9 @@
       "verifiedByStatus": "Filazana voamarina arakaraka ny status famoahana",
       "guidedByCriteria": "Famakiana entin'ireo fepetranao",
       "similarModeActive": "Mode safidy hafa akaiky mavitrika"
+    },
+    "filterChips": {
+      "hasDeal": "Varotra mahafinaritra"
     }
   },
   "sections": {
@@ -2842,6 +2882,33 @@
         "autosave": "Tehirizina ho azy",
         "guided": "Vohitra mitarika"
       }
+    }
+  },
+  "bonnesAffaires": {
+    "title": "Varotra mahafinaritra fiara eto Madagasikara",
+    "subtitle": "Doka misy fihenam-bidy marina, voamarina amin'ny AutoNex.",
+    "empty": "Tsy misy varotra mahafinaritra amin'izao fotoana izao. Avereno tsy ho ela !",
+    "error": "Tsy afaka naka ny varotra mahafinaritra. Andramo indray afaka kelikely.",
+    "loadMore": "Hijery bebe kokoa",
+    "filters": {
+      "title": "Sivana",
+      "make": "Marika",
+      "minDiscount": "Fihenam-bidy farany ambany",
+      "maxPrice": "Tetibola farany ambony",
+      "ville": "Tanàna",
+      "reset": "Hamerina",
+      "apply": "Hampihatra"
+    },
+    "seo": {
+      "title": "Varotra mahafinaritra fiara eto Madagasikara — AutoNex",
+      "description": "Hitao ireo varotra mahafinaritra indrindra eto Madagasikara. Doka misy fihenam-bidy marina, voamarina sy voantanteraka avy amin'ny AutoNex.",
+      "ogTitle": "Varotra mahafinaritra fiara — AutoNex",
+      "ogDescription": "Fiara amin'ny vidiny mihena marina, tsy misy fihenam-bidy mamitaka. Ny fanoloran-tena AutoNex."
+    },
+    "count_one": "Fiara {{count}} amin'ny varotra mahafinaritra",
+    "count_other": "Fiara {{count}} amin'ny varotra mahafinaritra",
+    "pagination": {
+      "shown": "{{shown}} amin'ny {{total}} fiara aseho"
     }
   }
 }

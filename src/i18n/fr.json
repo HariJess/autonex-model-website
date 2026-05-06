@@ -359,6 +359,43 @@
     "boostPendingReviewNote": "Les boosts « après publication » seront disponibles une fois l’annonce validée. Les options payées à l’envoi restent en attente ci-dessus.",
     "editListing": "Modifier"
   },
+  "deals": {
+    "modal": {
+      "title": "Mettre votre annonce en bonne affaire",
+      "subtitle": "Attirez plus d'acheteurs avec une remise temporaire",
+      "currentPriceLabel": "Prix actuel",
+      "discountLabel": "Choisissez votre remise",
+      "discountCustom": "Personnalisé",
+      "discountCustomInvalid": "Choisissez un entier entre 5 et 30.",
+      "durationLabel": "Durée du deal",
+      "durationDays": "{{count}} jours",
+      "previewTitle": "Aperçu",
+      "previewBefore": "Avant",
+      "previewAfter": "Nouveau prix",
+      "previewSavings": "Économie pour l'acheteur",
+      "previewVisibleUntil": "Visible jusqu'au {{date}}",
+      "guarantee30d": "Pendant 30 jours après la fin du deal, vous ne pourrez pas remonter votre prix au-dessus de {{originalPrice}}. Cette protection rassure les acheteurs et garantit l'authenticité de votre offre.",
+      "ctaActivate": "Activer le deal",
+      "ctaCancel": "Annuler"
+    },
+    "dashboardButton": {
+      "activate": "Mettre en bonne affaire",
+      "cancel": "Annuler le deal"
+    },
+    "status": {
+      "activeUntil": "-{{discount}}% jusqu'au {{date}}"
+    },
+    "confirm": {
+      "cancel": "Êtes-vous sûr de vouloir annuler ce deal ? Le prix verrouillé sera maintenu pendant 30 jours."
+    },
+    "toast": {
+      "activated": "Deal activé avec succès !",
+      "activateFailed": "Échec de l'activation du deal",
+      "cancelled": "Deal annulé",
+      "cancelFailed": "Échec de l'annulation",
+      "priceLocked": "Le prix est verrouillé jusqu'à la fin de la période de protection."
+    }
+  },
   "estimation": {
     "accidentDeclaredDesc": "Impacte le prix estimé.",
     "accidentDeclaredTitle": "Accident déclaré",
@@ -437,34 +474,6 @@
     "reliableInput": "Saisie fiable",
     "reliableTransparentDesc": "L'outil combine profils de référence et signaux de marché. Chaque estimation inclut sa fourchette et son niveau de confiance.",
     "reliableTransparentTitle": "Fiable et transparent",
-    "report": "Rapport d’estimation",
-    "reportConfidence": "Confiance du rapport",
-    "resultSectionAria": "Résultat d'estimation véhicule",
-    "searchBrand": "Rechercher une marque...",
-    "searchCity": "Rechercher une ville / région...",
-    "searchModel": "Rechercher un modèle...",
-    "selectBrand": "Sélectionner une marque",
-    "selectCity": "Sélectionner une ville / région",
-    "selectModel": "Sélectionner un modèle",
-    "start": "Commencer l'estimation",
-    "stepCondition": "Condition",
-    "stepConditionHelper": "Historique et usage",
-    "stepResult": "Résultat",
-    "stepResultHelper": "Rapport de valorisation",
-    "stepVehicle": "Véhicule",
-    "stepVehicleHelper": "Informations principales",
-    "title": "Estimation",
-    "unavailableTitle": "Estimation indisponible",
-    "usage": "Usage",
-    "usageAdviceAria": "Conseil d'utilisation du rapport d'estimation",
-    "usageAdviceText": "Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.",
-    "usageFrameAria": "Cadre d'usage de l'estimation",
-    "usageFrameText": "Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle, ni une expertise mécanique, ni un prix garanti.",
-    "vehicleIdentity": "Identité du véhicule",
-    "vehicleIdentityLead": "Renseignez les informations clés du véhicule pour établir une base d’estimation fiable et exploitable.",
-    "viewMyEstimate": "Voir mon estimation",
-    "whyTheseInfo": "Pourquoi ces informations ?",
-    "whyUseful": "Pourquoi c'est utile",
     "report": {
       "claimModeStrong": "Analyse marché robuste",
       "claimModeLimited": "Analyse marché qualifiée",
@@ -584,7 +593,34 @@
         "comparablesEmptyMessage": "Le rapport s'appuie surtout sur des signaux de référence. Gardez une stratégie de prix prudente.",
         "ctaFootnote": "Conseil AutoNex : en contexte d'évidence faible, privilégiez une stratégie prudente avant de figer le prix."
       }
-    }
+    },
+    "reportConfidence": "Confiance du rapport",
+    "resultSectionAria": "Résultat d'estimation véhicule",
+    "searchBrand": "Rechercher une marque...",
+    "searchCity": "Rechercher une ville / région...",
+    "searchModel": "Rechercher un modèle...",
+    "selectBrand": "Sélectionner une marque",
+    "selectCity": "Sélectionner une ville / région",
+    "selectModel": "Sélectionner un modèle",
+    "start": "Commencer l'estimation",
+    "stepCondition": "Condition",
+    "stepConditionHelper": "Historique et usage",
+    "stepResult": "Résultat",
+    "stepResultHelper": "Rapport de valorisation",
+    "stepVehicle": "Véhicule",
+    "stepVehicleHelper": "Informations principales",
+    "title": "Estimation",
+    "unavailableTitle": "Estimation indisponible",
+    "usage": "Usage",
+    "usageAdviceAria": "Conseil d'utilisation du rapport d'estimation",
+    "usageAdviceText": "Utilisez ce rapport pour arbitrer votre timing de vente et préparer une annonce cohérente.",
+    "usageFrameAria": "Cadre d'usage de l'estimation",
+    "usageFrameText": "Cette estimation est une indication de marché basée sur les données disponibles. Elle ne constitue ni une valeur officielle, ni une expertise mécanique, ni un prix garanti.",
+    "vehicleIdentity": "Identité du véhicule",
+    "vehicleIdentityLead": "Renseignez les informations clés du véhicule pour établir une base d’estimation fiable et exploitable.",
+    "viewMyEstimate": "Voir mon estimation",
+    "whyTheseInfo": "Pourquoi ces informations ?",
+    "whyUseful": "Pourquoi c'est utile"
   },
   "favorites": {
     "title": "Mes favoris",
@@ -907,7 +943,8 @@
     "rent": "Location longue durée",
     "rentSubmenu": "Ouvrir le sous-menu location longue durée",
     "settings": "Paramètres",
-    "signup": "Inscription"
+    "signup": "Inscription",
+    "bonnesAffaires": "Bonnes affaires"
   },
   "payment": {
     "vanilla": {
@@ -1405,6 +1442,9 @@
       "verifiedByStatus": "Annonces vérifiées par statut de publication",
       "guidedByCriteria": "Lecture guidée par vos critères",
       "similarModeActive": "Mode alternatives proches activé"
+    },
+    "filterChips": {
+      "hasDeal": "Bonnes affaires"
     }
   },
   "sections": {
@@ -2842,6 +2882,33 @@
         "autosave": "Auto-save",
         "guided": "Parcours guidé"
       }
+    }
+  },
+  "bonnesAffaires": {
+    "title": "Bonnes affaires véhicules à Madagascar",
+    "subtitle": "Annonces avec prix réellement réduits, vérifiées sur AutoNex.",
+    "empty": "Aucune bonne affaire pour le moment. Revenez bientôt !",
+    "error": "Impossible de charger les bonnes affaires. Réessayez dans un instant.",
+    "loadMore": "Voir plus",
+    "filters": {
+      "title": "Filtres",
+      "make": "Marque",
+      "minDiscount": "Remise minimum",
+      "maxPrice": "Budget max",
+      "ville": "Ville",
+      "reset": "Réinitialiser",
+      "apply": "Appliquer"
+    },
+    "seo": {
+      "title": "Bonnes affaires véhicules à Madagascar — AutoNex",
+      "description": "Découvrez les meilleures bonnes affaires automobiles à Madagascar. Annonces avec prix réellement réduits, vérifiées et garanties par AutoNex.",
+      "ogTitle": "Bonnes affaires auto à Madagascar — AutoNex",
+      "ogDescription": "Voitures à prix réduits, sans faux rabais. La promesse AutoNex."
+    },
+    "count_one": "{{count}} véhicule en bonne affaire",
+    "count_other": "{{count}} véhicules en bonnes affaires",
+    "pagination": {
+      "shown": "{{shown}} sur {{total}} véhicules affichés"
     }
   }
 }

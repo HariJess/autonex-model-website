@@ -17,7 +17,7 @@ export type { ListingsFilters } from "@/lib/listingQueryFilters";
 // the compile-time `ListingRowLite` Pick are derived from this one array, so
 // adding a column means editing exactly one place. Without this, the array
 // and the Pick had to be kept in sync manually (51 entries × 2).
-const LISTING_SELECT_COLUMN_NAMES = [
+export const LISTING_SELECT_COLUMN_NAMES = [
   "id",
   "title",
   "description",
@@ -65,6 +65,13 @@ const LISTING_SELECT_COLUMN_NAMES = [
   "is_new_program",
   "rejection_reason",
   "pending_boost_types",
+  "deal_active",
+  "deal_started_at",
+  "deal_ends_at",
+  "deal_duration_days",
+  "deal_discount_percent",
+  "deal_original_price_mga",
+  "deal_price_lock_until",
 ] as const satisfies readonly (keyof Tables<"listings">)[];
 
 // PROMPT 6 boost denormalized cols. Pas dans le strict array tant que la
@@ -75,7 +82,7 @@ const BOOST_DENORMALIZED_COL_NAMES = [
   "top_ad_until",
 ] as const;
 
-type ListingRowLite = Pick<Tables<"listings">, typeof LISTING_SELECT_COLUMN_NAMES[number]> & {
+export type ListingRowLite = Pick<Tables<"listings">, typeof LISTING_SELECT_COLUMN_NAMES[number]> & {
   // PROMPT 6 — cast manuel jusqu'au regen post-migration. Toutes nullables.
   last_bumped_at?: string | null;
   featured_until?: string | null;
@@ -87,7 +94,7 @@ const LISTING_SELECT_COLUMNS = [
   ...BOOST_DENORMALIZED_COL_NAMES,
 ].join(",");
 
-function isListingRowLite(row: unknown): row is ListingRowLite {
+export function isListingRowLite(row: unknown): row is ListingRowLite {
   if (typeof row !== "object" || row === null) return false;
   const r = row as Record<string, unknown>;
   return typeof r.id === "string" && typeof r.title === "string" && typeof r.owner_id === "string";
@@ -192,6 +199,13 @@ function mapListingRowToDisplayListing(
     is_new_program: listing.is_new_program,
     rejection_reason: listing.rejection_reason,
     pending_boost_types: pendingBoosts.length > 0 ? pendingBoosts : undefined,
+    deal_active: Boolean(listing.deal_active),
+    deal_started_at: listing.deal_started_at,
+    deal_ends_at: listing.deal_ends_at,
+    deal_duration_days: listing.deal_duration_days,
+    deal_discount_percent: listing.deal_discount_percent,
+    deal_original_price_mga: listing.deal_original_price_mga,
+    deal_price_lock_until: listing.deal_price_lock_until,
     vehicle,
   };
 }
@@ -354,7 +368,7 @@ function badgeForListing(listing: ListingRowLite, types: Set<string>): DisplayLi
   return null;
 }
 
-async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promise<DisplayListing[]> {
+export async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promise<DisplayListing[]> {
   if (listings.length === 0) return [];
 
   const listingIds = listings.map((l) => l.id);

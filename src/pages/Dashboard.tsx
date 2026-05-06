@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useCurrency } from "@/contexts/CurrencyContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useEffect, useMemo } from "react";
@@ -34,7 +33,6 @@ type Listing = Tables<"listings">;
 const Dashboard = () => {
   const { t } = useTranslation();
   const { user, profile } = useAuth();
-  const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
   // Lot 9.1c — Lecture du param `?published=<id>` passé après une publication
   // réussie (cf. PublishPage.handlePublish). Sert à scroller vers l'annonce
@@ -398,7 +396,6 @@ const Dashboard = () => {
           listingsLoading={listingsLoading}
           listingsErrorMessage={listingsError instanceof Error ? listingsError.message : undefined}
           publishedListings={publishedListings}
-          formatPrice={formatPrice}
           statusLabels={statusLabels}
           boostLabels={boostLabels}
           listingBoostPartitions={listingBoostPartitions}

@@ -61,8 +61,12 @@ const ACTIONS: YasAction[] = [
     fallbackHelper: "Annonces avec prix réellement réduits.",
     Icon: Flame,
     tone: "orange",
-    href: null,
-    scrollTo: "deals",
+    // Sprint 2 deals — pointe vers la nouvelle page dédiée /bonnes-affaires
+    // (au lieu du scroll-hash #deals qui marchait mal et limitait à la
+    // section preview de YAS). Les params YAS sont injectés par buildYasUrl
+    // donc la page s'ouvre en mode embedded si l'utilisateur vient de la
+    // mini-app.
+    href: "/bonnes-affaires",
     eventName: "yas_action_deals_click",
   },
   {

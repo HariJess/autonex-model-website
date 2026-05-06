@@ -77,6 +77,7 @@ export function YasFeaturedDeals() {
                 dealMeta={entry.deal}
                 layout="compact"
                 priority={idx === 0}
+                feedContext="deals"
               />
             </div>
           ))}

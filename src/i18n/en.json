@@ -359,6 +359,43 @@
     "boostPendingReviewNote": "“After publication” boosts will become available once the listing is validated. Options paid at submission stay pending above.",
     "editListing": "Edit"
   },
+  "deals": {
+    "modal": {
+      "title": "Turn your listing into a deal",
+      "subtitle": "Attract more buyers with a temporary discount",
+      "currentPriceLabel": "Current price",
+      "discountLabel": "Choose your discount",
+      "discountCustom": "Custom",
+      "discountCustomInvalid": "Pick an integer between 5 and 30.",
+      "durationLabel": "Deal duration",
+      "durationDays": "{{count}} days",
+      "previewTitle": "Preview",
+      "previewBefore": "Before",
+      "previewAfter": "New price",
+      "previewSavings": "Savings for the buyer",
+      "previewVisibleUntil": "Visible until {{date}}",
+      "guarantee30d": "For 30 days after the deal ends, you will not be able to raise your price above {{originalPrice}}. This protection reassures buyers and guarantees the authenticity of your offer.",
+      "ctaActivate": "Activate deal",
+      "ctaCancel": "Cancel"
+    },
+    "dashboardButton": {
+      "activate": "Set as a deal",
+      "cancel": "Cancel deal"
+    },
+    "status": {
+      "activeUntil": "-{{discount}}% until {{date}}"
+    },
+    "confirm": {
+      "cancel": "Are you sure you want to cancel this deal? The price lock will remain active for 30 days."
+    },
+    "toast": {
+      "activated": "Deal activated successfully!",
+      "activateFailed": "Failed to activate deal",
+      "cancelled": "Deal cancelled",
+      "cancelFailed": "Failed to cancel deal",
+      "priceLocked": "The price is locked until the protection period ends."
+    }
+  },
   "estimation": {
     "accidentDeclaredDesc": "Declared major incidents can impact suggested range.",
     "accidentDeclaredTitle": "Incident history",
@@ -437,34 +474,6 @@
     "reliableInput": "Reliable inputs",
     "reliableTransparentDesc": "The tool combines reference profiles and market signals. Each estimate includes range and confidence.",
     "reliableTransparentTitle": "Reliable and transparent",
-    "report": "Estimation report",
-    "reportConfidence": "Report confidence",
-    "resultSectionAria": "Valuation result section",
-    "searchBrand": "Search make...",
-    "searchCity": "Search city / region...",
-    "searchModel": "Search model...",
-    "selectBrand": "Select make",
-    "selectCity": "Select city / region",
-    "selectModel": "Select model",
-    "start": "Start valuation",
-    "stepCondition": "Condition",
-    "stepConditionHelper": "History and usage",
-    "stepResult": "Result",
-    "stepResultHelper": "Valuation report",
-    "stepVehicle": "Vehicle",
-    "stepVehicleHelper": "Main information",
-    "title": "Valuation",
-    "unavailableTitle": "Valuation unavailable",
-    "usage": "Usage",
-    "usageAdviceAria": "Usage guidance",
-    "usageAdviceText": "Pick the closest usage profile for better consistency.",
-    "usageFrameAria": "Vehicle usage context",
-    "usageFrameText": "These details help frame valuation relative to actual use.",
-    "vehicleIdentity": "Vehicle identity",
-    "vehicleIdentityLead": "Provide key vehicle information to build a reliable and actionable estimate base.",
-    "viewMyEstimate": "View my estimate",
-    "whyTheseInfo": "Why this information matters",
-    "whyUseful": "Why this is useful",
     "report": {
       "claimModeStrong": "Robust market analysis",
       "claimModeLimited": "Qualified market analysis",
@@ -584,7 +593,34 @@
         "comparablesEmptyMessage": "The report mainly relies on reference signals. Keep a cautious pricing strategy.",
         "ctaFootnote": "AutoNex tip: in a low-evidence context, prefer a cautious strategy before locking the price."
       }
-    }
+    },
+    "reportConfidence": "Report confidence",
+    "resultSectionAria": "Valuation result section",
+    "searchBrand": "Search make...",
+    "searchCity": "Search city / region...",
+    "searchModel": "Search model...",
+    "selectBrand": "Select make",
+    "selectCity": "Select city / region",
+    "selectModel": "Select model",
+    "start": "Start valuation",
+    "stepCondition": "Condition",
+    "stepConditionHelper": "History and usage",
+    "stepResult": "Result",
+    "stepResultHelper": "Valuation report",
+    "stepVehicle": "Vehicle",
+    "stepVehicleHelper": "Main information",
+    "title": "Valuation",
+    "unavailableTitle": "Valuation unavailable",
+    "usage": "Usage",
+    "usageAdviceAria": "Usage guidance",
+    "usageAdviceText": "Pick the closest usage profile for better consistency.",
+    "usageFrameAria": "Vehicle usage context",
+    "usageFrameText": "These details help frame valuation relative to actual use.",
+    "vehicleIdentity": "Vehicle identity",
+    "vehicleIdentityLead": "Provide key vehicle information to build a reliable and actionable estimate base.",
+    "viewMyEstimate": "View my estimate",
+    "whyTheseInfo": "Why this information matters",
+    "whyUseful": "Why this is useful"
   },
   "favorites": {
     "title": "My favorites",
@@ -907,7 +943,8 @@
     "rent": "Long-term rental",
     "rentSubmenu": "Open long-term rental submenu",
     "settings": "Settings",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "bonnesAffaires": "Deals"
   },
   "payment": {
     "vanilla": {
@@ -1405,6 +1442,9 @@
       "verifiedByStatus": "Listings verified by publication status",
       "guidedByCriteria": "Reading guided by your criteria",
       "similarModeActive": "Close-alternative mode active"
+    },
+    "filterChips": {
+      "hasDeal": "Deals"
     }
   },
   "sections": {
@@ -2842,6 +2882,33 @@
         "autosave": "Auto-save",
         "guided": "Guided flow"
       }
+    }
+  },
+  "bonnesAffaires": {
+    "title": "Best vehicle deals in Madagascar",
+    "subtitle": "Listings with truly reduced prices, verified by AutoNex.",
+    "empty": "No deals available right now. Come back soon!",
+    "error": "Could not load deals. Please try again in a moment.",
+    "loadMore": "Load more",
+    "filters": {
+      "title": "Filters",
+      "make": "Make",
+      "minDiscount": "Minimum discount",
+      "maxPrice": "Max budget",
+      "ville": "City",
+      "reset": "Reset",
+      "apply": "Apply"
+    },
+    "seo": {
+      "title": "Vehicle deals in Madagascar — AutoNex",
+      "description": "Discover the best automotive deals in Madagascar. Listings with truly reduced prices, verified and guaranteed by AutoNex.",
+      "ogTitle": "Auto deals in Madagascar — AutoNex",
+      "ogDescription": "Cars with real discounts, no fake rebates. The AutoNex promise."
+    },
+    "count_one": "{{count}} vehicle on sale",
+    "count_other": "{{count}} vehicles on sale",
+    "pagination": {
+      "shown": "{{shown}} of {{total}} vehicles shown"
     }
   }
 }

@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { useMyFavoritesList } from "@/hooks/useFavorites";
+import { getDealMeta } from "@/lib/deals";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 
 const FavoritesPage = () => {
@@ -72,7 +73,12 @@ const FavoritesPage = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
             {favorites.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
+              <ListingCard
+                key={listing.id}
+                listing={listing}
+                dealMeta={getDealMeta(listing)}
+                feedContext="filtered"
+              />
             ))}
           </div>
         )}

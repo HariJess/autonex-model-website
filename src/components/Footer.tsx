@@ -38,6 +38,7 @@ const Footer = () => {
             <div className="flex flex-col gap-1.5 text-[0.95rem] leading-relaxed font-sans opacity-75">
               <Link to="/recherche?transaction=vente" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.buy")}</Link>
               <Link to="/recherche?transaction=location" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.rent")}</Link>
+              <Link to="/bonnes-affaires" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.bonnesAffaires", "Bonnes affaires")}</Link>
               <Link to="/agences" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.agencies")}</Link>
               <Link to="/publier" className="inline-flex min-h-10 items-center hover:opacity-100 transition-opacity">{t("nav.publish")}</Link>
             </div>

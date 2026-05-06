@@ -66,6 +66,7 @@ const BetaLoginPage = lazy(() => import("./pages/BetaLoginPage.tsx"));
 const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage.tsx"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage.tsx"));
+const BonnesAffairesPage = lazy(() => import("./pages/BonnesAffairesPage.tsx"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage.tsx"));
 const SettingsNotificationsPage = lazy(() => import("./pages/SettingsNotificationsPage.tsx"));
 const MentionsLegalesPage = lazy(() => import("./pages/legal/MentionsLegalesPage.tsx"));
@@ -119,6 +120,7 @@ const App = () => {
             <Route path="/beta-login" element={<BetaLoginPage />} />
             <Route path="/" element={<Index />} />
             <Route path="/recherche" element={<SearchPage />} />
+            <Route path="/bonnes-affaires" element={<BonnesAffairesPage />} />
             <Route path="/acheter" element={<SeoLandingPage />} />
             <Route path="/location-longue-duree" element={<SeoLandingPage />} />
             <Route path="/location-courte-duree" element={<SeoLandingPage />} />

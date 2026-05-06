@@ -131,6 +131,7 @@ async function main() {
   const staticUrls = [
     makeUrl(`${SITE_URL}/`, { changefreq: "daily", priority: 1.0 }),
     makeUrl(`${SITE_URL}/recherche`, { changefreq: "hourly", priority: 0.8 }),
+    makeUrl(`${SITE_URL}/bonnes-affaires`, { changefreq: "daily", priority: 0.9 }),
     makeUrl(`${SITE_URL}/agences`, { changefreq: "daily", priority: 0.7 }),
     makeUrl(`${SITE_URL}/estimation`, { changefreq: "weekly", priority: 0.6 }),
     makeUrl(`${SITE_URL}/conseils`, { changefreq: "weekly", priority: 0.5 }),
@@ -167,6 +168,7 @@ async function main() {
     const staticRoutes = [
       "/",
       "/recherche",
+      "/bonnes-affaires",
       "/agences",
       "/estimation",
       "/conseils",
