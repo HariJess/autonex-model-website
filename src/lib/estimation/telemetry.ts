@@ -34,12 +34,27 @@ export type EstimationAuditSnapshot = {
 export type EstimationAuditSupportLevel = "strong" | "moderate" | "limited" | "weak";
 export type EstimationAuditSeverity = "low" | "medium" | "high";
 
+/**
+ * Optional metadata produced par l'orchestration `runVehicleEstimation`
+ * indiquant quel moteur a été utilisé pour cette exécution. Sert à corréler
+ * un éventuel skew de comportement (legacy vs v2) lors du rollout v2.
+ */
+export type EstimationEngineTelemetry = {
+  engineVersion: "legacy" | "v2";
+  /** True si v2 a été demandé puis a échoué et qu'on a fallback automatiquement vers legacy. */
+  v2FallbackToLegacy: boolean;
+};
+
 export type EstimationAuditInspection = {
   supportLevel: EstimationAuditSupportLevel;
   severity: EstimationAuditSeverity;
   headline: string;
   summaryLines: string[];
   flags: string[];
+  /** Présent dès qu'un orchestrateur fournit l'info ; absent dans les snapshots purs (tests, audit offline). */
+  engineVersion?: "legacy" | "v2";
+  /** True si v2 a été tenté puis fallback vers legacy. Absent quand le contexte n'est pas fourni. */
+  v2FallbackToLegacy?: boolean;
 };
 
 export function buildEstimationAuditSnapshot(outputV2: EstimationOutputV2): EstimationAuditSnapshot {
@@ -82,7 +97,10 @@ export function deriveSupportLevel(snapshot: EstimationAuditSnapshot): Estimatio
   return "weak";
 }
 
-export function buildEstimationAuditInspection(snapshot: EstimationAuditSnapshot): EstimationAuditInspection {
+export function buildEstimationAuditInspection(
+  snapshot: EstimationAuditSnapshot,
+  engineTelemetry?: EstimationEngineTelemetry,
+): EstimationAuditInspection {
   const supportLevel = deriveSupportLevel(snapshot);
   const severity: EstimationAuditSeverity =
     snapshot.claimMode === "INDICATIVE_HEURISTIC_CLAIM_ONLY" || snapshot.fallbackType === "generic_heuristic"
@@ -106,6 +124,11 @@ export function buildEstimationAuditInspection(snapshot: EstimationAuditSnapshot
     `Comparables: ${snapshot.comparableCountUsed} retenus, ${snapshot.comparableCountStrong} solides, similarité médiane ${Math.round(snapshot.comparableSimilarityMedian)}/100`,
     `Fallback: ${snapshot.fallbackUsed ? snapshot.fallbackType ?? "oui" : "non"} ; blend ${snapshot.anchorBlendMode}`,
   ];
+  if (engineTelemetry) {
+    summaryLines.push(
+      `Moteur: ${engineTelemetry.engineVersion}${engineTelemetry.v2FallbackToLegacy ? " (fallback v2→legacy)" : ""}`,
+    );
+  }
 
   const flags: string[] = [];
   if (snapshot.fallbackUsed) flags.push("fallback_used");
@@ -113,6 +136,7 @@ export function buildEstimationAuditInspection(snapshot: EstimationAuditSnapshot
   if (snapshot.comparableCountUsed === 0) flags.push("no_comparables_used");
   if (snapshot.claimMode.includes("INDICATIVE")) flags.push("indicative_claim_mode");
   if (snapshot.referenceProfileUsed) flags.push("reference_profile_used");
+  if (engineTelemetry?.v2FallbackToLegacy) flags.push("v2_fallback_to_legacy");
 
   return {
     supportLevel,
@@ -120,6 +144,12 @@ export function buildEstimationAuditInspection(snapshot: EstimationAuditSnapshot
     headline,
     summaryLines,
     flags,
+    ...(engineTelemetry
+      ? {
+          engineVersion: engineTelemetry.engineVersion,
+          v2FallbackToLegacy: engineTelemetry.v2FallbackToLegacy,
+        }
+      : {}),
   };
 }
 

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { useMemo, useRef } from "react";
+import { lazy, Suspense, useMemo, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroCinematic from "@/components/HeroCinematic";
@@ -14,7 +14,12 @@ import { useDbListings } from "@/hooks/useListings";
 import { FeaturedListingsSection } from "@/components/monetization/FeaturedListingsSection";
 import { PremiumBillboard } from "@/components/monetization/PremiumBillboard";
 import { HomeSponsorStrip } from "@/components/monetization/HomeSponsorStrip";
-import { HomePopupModal } from "@/components/monetization/HomePopupModal";
+// HomePopupModal renders nothing for the first 2 s (POPUP_DELAY_MS gate added in
+// the perf sprint). Loading its module lazily moves ~5 kB gzip out of the initial
+// bundle without delaying the popup further than the existing 2 s timer already does.
+const HomePopupModal = lazy(() =>
+  import("@/components/monetization/HomePopupModal").then((m) => ({ default: m.HomePopupModal })),
+);
 import BrandsRibbon from "@/components/BrandsRibbon";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { buildCanonicalUrl, toAbsoluteUrl, truncateMetaDescription } from "@/lib/seo";
@@ -236,9 +241,13 @@ const Index = () => {
         .slice(0, 8),
     [dealCandidates],
   );
-  const showDealsSection = !dealsLoading && discountedListings.length >= 3;
-  const renderThematicSection = (title: string, subtitle: string, linksTo: string, items: typeof listings) => (
-    <section className="container mx-auto py-5 md:py-6">
+  // Sprint 5 fix #23 — relâche le seuil d'affichage de la section deals home
+  // (avant : 3 deals minimum). Désormais : 2 deals suffisent pour ne pas
+  // laisser un trou visible dans le grid mobile (2 colonnes). Si aucun deal,
+  // la section reste masquée pour ne pas afficher une rangée vide.
+  const showDealsSection = !dealsLoading && discountedListings.length >= 2;
+  const renderThematicSection = (id: string, title: string, subtitle: string, linksTo: string, items: typeof listings) => (
+    <section key={id} className="container mx-auto py-5 md:py-6">
       <div className="flex items-start justify-between gap-3 mb-4 md:mb-5">
         <div className="min-w-0">
           <h3 className="font-sans text-lg md:text-2xl font-bold text-foreground leading-tight">{title}</h3>
@@ -259,7 +268,7 @@ const Index = () => {
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
           {items.map((listing) => (
-            <ListingCard key={`${title}-${listing.id}`} listing={listing} layout="compact" />
+            <ListingCard key={`${title}-${listing.id}`} listing={listing} layout="compact" dealMeta={getDealMeta(listing)} feedContext="mixed" />
           ))}
         </div>
       )}
@@ -476,7 +485,7 @@ const Index = () => {
               </p>
             </div>
             <Link
-              to="/recherche?sort=recent"
+              to="/bonnes-affaires"
               className="hidden md:inline-flex items-center text-sm font-sans text-primary hover:underline rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2"
             >
               {t("sections.viewAll", "Voir tout")}
@@ -484,7 +493,7 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
             {discountedListings.map((entry) => (
-              <ListingCard key={`deal-${entry.listing.id}`} listing={entry.listing} dealMeta={entry.deal} layout="compact" />
+              <ListingCard key={`deal-${entry.listing.id}`} listing={entry.listing} dealMeta={entry.deal} layout="compact" feedContext="deals" />
             ))}
           </div>
         </section>
@@ -549,15 +558,22 @@ const Index = () => {
           />
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-6">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} layout="compact" />
+            {listings.map((listing, index) => (
+              <ListingCard
+                key={listing.id}
+                listing={listing}
+                layout="compact"
+                priority={index === 0}
+                dealMeta={getDealMeta(listing)}
+                feedContext="mixed"
+              />
             ))}
           </div>
         )}
       </section>
 
       {themedSectionsToRender.map((section) =>
-        renderThematicSection(section.title, section.subtitle, section.linksTo, section.items),
+        renderThematicSection(section.id, section.title, section.subtitle, section.linksTo, section.items),
       )}
 
       {isLowInventory && themedSectionsToRender.length === 0 && (
@@ -580,7 +596,9 @@ const Index = () => {
       )}
 
       <Footer />
-      <HomePopupModal />
+      <Suspense fallback={null}>
+        <HomePopupModal />
+      </Suspense>
     </>
   );
 };

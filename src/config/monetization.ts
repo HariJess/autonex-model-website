@@ -1,40 +1,89 @@
 /**
  * Central monetization config — credit packs (Ar), publication cost, boosts, agency products.
  *
- * The six credit prices below (LISTING_PUBLISH_CREDIT_COST, BOOST_CREDIT_COSTS,
- * AGENCY_SPOTLIGHT_CREDIT_COST) are FALLBACK VALUES ONLY. The source of truth is
- * the DB `credit_pricing` table, exposed to the front via the get_pricing RPC
- * and consumed through the usePricing hook (src/hooks/usePricing.ts). The
- * fallback keeps the UI functional during the initial query and on unstable
- * networks; server-side RPCs (publish_listing_with_credits,
- * purchase_listing_boosts) always read from the DB directly.
+ * Ratio actuel : 1 crédit = 1 Ariary (PROMPT 1 du 2026-05-03, commit 994e7f1).
  *
- * When prices change, update BOTH the DB (via a new migration or an admin
- * UPDATE) AND this file, so the fallback stays aligned with production.
+ * Les valeurs ci-dessous sont des FALLBACKS uniquement. La source de vérité est la
+ * table DB `credit_pricing`, exposée au front via la RPC get_pricing et consommée
+ * via le hook usePricing (src/hooks/usePricing.ts). Le fallback garde l'UI fonctionnelle
+ * pendant la requête initiale et sur réseau instable ; les RPCs server-side
+ * (publish_listing_with_credits, purchase_listing_boosts, service_approve_provider_transaction)
+ * lisent toujours depuis la DB directement.
+ *
+ * Quand les prix changent, mettre à jour À LA FOIS la DB (via une nouvelle migration ou
+ * un UPDATE admin) ET ce fichier, pour que le fallback reste aligné avec la prod.
  */
 
-/** Fallback only — see usePricing for live value. */
-export const LISTING_PUBLISH_CREDIT_COST = 100;
+// =============================================================================
+// COÛTS UNITAIRES (fallbacks pour usePricing)
+// =============================================================================
 
-/** Fallback only — see usePricing for live values. */
+/** Fallback only — see usePricing for live value. Source : credit_pricing.publish_listing */
+export const LISTING_PUBLISH_CREDIT_COST = 25_000;
+
+/** Fallback only — see usePricing for live value. Source : credit_pricing.publish_listing_60d */
+export const LISTING_PUBLISH_60D_CREDIT_COST = 40_000;
+
+/** Fallback only — see usePricing for live value. Source : credit_pricing.renewal_listing */
+export const LISTING_RENEWAL_CREDIT_COST = 15_000;
+
+/**
+ * Fallback only — boosts legacy mappés sur boost_type historique.
+ * Les valeurs viennent de credit_pricing (boost_urgent, boost_daily_bump, etc.).
+ *
+ * @deprecated Utilise BOOST_COSTS_V2 pour les nouveaux flows. Cette constante
+ * reste pour publish_listing_with_credits et purchase_listing_boosts qui
+ * utilisent encore les anciens boost_type.
+ */
 export const BOOST_CREDIT_COSTS = {
-  urgent: 20,
-  daily_bump: 30,
-  featured: 40,
-  top: 60,
+  urgent: 20,        // Inchangé — non touché par PROMPT 1
+  daily_bump: 5_000, // Aligné avec credit_pricing.boost_daily_bump
+  featured: 30_000,  // Aligné avec credit_pricing.boost_featured
+  top: 100_000,      // Aligné avec credit_pricing.boost_top
 } as const;
 
 export type PurchasableBoostType = keyof typeof BOOST_CREDIT_COSTS;
 
-/** Order shown in publish flow (cheapest → premium feel). */
+/**
+ * Nouveaux boost types V2 (PROMPT 1) — pas encore acceptés par
+ * purchase_listing_boosts (sera traité au PROMPT 4).
+ */
+export const BOOST_COSTS_V2 = {
+  bump: 5_000,           // credit_pricing.boost_bump
+  featured_7d: 30_000,   // credit_pricing.boost_featured (alias sémantique 7j)
+  top_ad_30d: 100_000,   // credit_pricing.boost_top_ad
+  combo: 120_000,        // credit_pricing.boost_combo (À la une + Top)
+  video: 15_000,         // credit_pricing.boost_video
+  express_pack: 60_000,  // credit_pricing.boost_express_pack
+} as const;
+
+export type BoostV2Key = keyof typeof BOOST_COSTS_V2;
+
+/** Verified Seller Badge — coût annuel. Source : credit_pricing.verified_seller_year */
+export const VERIFIED_SELLER_YEAR_CREDIT_COST = 75_000;
+
+/** Crédits offerts au signup. Source : credit_pricing.signup_bonus */
+export const SIGNUP_BONUS_CREDIT_AMOUNT = 100_000;
+
+/** Order shown in publish flow (cheapest → premium feel). Mapping legacy. */
 export const BOOST_ORDER: PurchasableBoostType[] = ["urgent", "daily_bump", "featured", "top"];
 
-/** French labels for UI (publish, dashboard, tooltips). */
+/** French labels for UI (publish, dashboard, tooltips). Mapping legacy. */
 export const BOOST_LABELS_FR: Record<PurchasableBoostType, string> = {
   urgent: "Badge Urgent",
   daily_bump: "Actualisation quotidienne",
   featured: "Annonce mise en avant",
   top: "Top annonce",
+};
+
+/** French labels for V2 boosts. */
+export const BOOST_V2_LABELS_FR: Record<BoostV2Key, string> = {
+  bump: "Remontée",
+  featured_7d: "À la une (7 jours)",
+  top_ad_30d: "Top Annonce (30 jours)",
+  combo: "Pack Combo (À la une + Top)",
+  video: "Vidéo annonce",
+  express_pack: "Vente Express",
 };
 
 /** Duration in days — must match `purchase_listing_boosts` and `admin_approve_listing_moderation` SQL. */
@@ -45,7 +94,16 @@ export const BOOST_DURATION_DAYS: Record<PurchasableBoostType, number> = {
   top: 7,
 };
 
-/** Short French copy: what the boost changes for visibility (dashboard / purchase dialog). */
+export const BOOST_V2_DURATION_DAYS: Record<BoostV2Key, number | null> = {
+  bump: null,        // ponctuel (~48-72h)
+  featured_7d: 7,
+  top_ad_30d: 30,
+  combo: 30,
+  video: 30,
+  express_pack: 30,
+};
+
+/** Short French copy: what the boost changes for visibility. */
 export const BOOST_VISIBILITY_FR: Record<PurchasableBoostType, string> = {
   urgent:
     "Badge « Urgent » sur la carte et la fiche : votre annonce se distingue tout de suite.",
@@ -54,7 +112,7 @@ export const BOOST_VISIBILITY_FR: Record<PurchasableBoostType, string> = {
   top: "Priorité maximale dans les résultats pendant la durée du boost.",
 };
 
-/** Fallback only — see usePricing for live value. */
+/** Fallback only — see usePricing for live value. Source : credit_pricing.agency_spotlight (inchangé PROMPT 1) */
 export const AGENCY_SPOTLIGHT_CREDIT_COST = 120;
 
 /** Fallback-backed helper. Components that need live prices should call usePricing().totalBoosts. */
@@ -72,20 +130,152 @@ export function totalPublicationCredits(
   return sum;
 }
 
-/** Canonical launch packs (Ariary). IDs match DB `credit_packs.id`. */
+// =============================================================================
+// PACKS — 4 packs au ratio 1:1 (PROMPT 1)
+// =============================================================================
+
+/**
+ * Catalogue canonical des 6 packs (PROMPT 3.5 — recalibration). IDs match DB
+ * `credit_packs.id`. Total délivré au paiement = credits_amount + bonus_credits.
+ *
+ * Pricing logique :
+ *   - Découverte 25k = prix exact d'1 annonce (pas de friction "j'ai pas assez")
+ *   - Standard/Pro/Power = sweet spot particulier
+ *   - Business/Enterprise = pré-dealer en self-serve (prépare Phase 4)
+ *   - Bonus jusqu'à +67% sur Enterprise = "plus tu achètes, plus tu économises 40%"
+ */
 export const CREDIT_PACKS_CANONICAL = [
-  { id: "cp_200", name: "Pack 200 crédits", credits_amount: 200, price_mga: 25_000, sort_order: 1 },
-  { id: "cp_400", name: "Pack 400 crédits", credits_amount: 400, price_mga: 45_000, sort_order: 2 },
-  { id: "cp_600", name: "Pack 600 crédits", credits_amount: 600, price_mga: 65_000, sort_order: 3 },
-  { id: "cp_800", name: "Pack 800 crédits", credits_amount: 800, price_mga: 85_000, sort_order: 4 },
-  { id: "cp_1000", name: "Pack 1000 crédits", credits_amount: 1000, price_mga: 100_000, sort_order: 5 },
+  {
+    id: "discover",
+    name: "Pack Découverte",
+    credits_amount: 25_000,
+    bonus_credits: 0,
+    price_mga: 25_000,
+    sort_order: 1,
+  },
+  {
+    id: "standard",
+    name: "Pack Standard",
+    credits_amount: 75_000,
+    bonus_credits: 12_500,
+    price_mga: 75_000,
+    sort_order: 2,
+  },
+  {
+    id: "pro",
+    name: "Pack Pro",
+    credits_amount: 150_000,
+    bonus_credits: 50_000,
+    price_mga: 150_000,
+    sort_order: 3,
+  },
+  {
+    id: "power",
+    name: "Pack Power",
+    credits_amount: 300_000,
+    bonus_credits: 150_000,
+    price_mga: 300_000,
+    sort_order: 4,
+  },
+  {
+    id: "business",
+    name: "Pack Business",
+    credits_amount: 750_000,
+    bonus_credits: 450_000,
+    price_mga: 750_000,
+    sort_order: 5,
+  },
+  {
+    id: "enterprise",
+    name: "Pack Enterprise",
+    credits_amount: 1_500_000,
+    bonus_credits: 1_000_000,
+    price_mga: 1_500_000,
+    sort_order: 6,
+  },
 ] as const;
 
 export type CanonicalCreditPack = (typeof CREDIT_PACKS_CANONICAL)[number];
+export type CreditPackId = CanonicalCreditPack["id"];
 
+/** Quick-access map id → bonuses (utile pour drift detector + UI). */
+export const CREDIT_PACK_BONUSES: Record<
+  CreditPackId,
+  { base: number; bonus: number; total: number; bonusPct: number }
+> = {
+  discover: { base: 25_000, bonus: 0, total: 25_000, bonusPct: 0 },
+  standard: { base: 75_000, bonus: 12_500, total: 87_500, bonusPct: 17 },
+  pro: { base: 150_000, bonus: 50_000, total: 200_000, bonusPct: 33 },
+  power: { base: 300_000, bonus: 150_000, total: 450_000, bonusPct: 50 },
+  business: { base: 750_000, bonus: 450_000, total: 1_200_000, bonusPct: 60 },
+  enterprise: { base: 1_500_000, bonus: 1_000_000, total: 2_500_000, bonusPct: 67 },
+};
+
+/**
+ * Badges marketing affichés sur les cards de pack.
+ * IDs absents = pas de badge.
+ *
+ * @deprecated PROMPT 3.7 (refonte minimaliste) — la grid des packs ne rend
+ * plus de badges marketing. Pro est mis en avant par élévation (border + shadow
+ * + label "Recommandé"), pas par badge coloré. Constante conservée pour
+ * compat backend/typing si réutilisée ailleurs.
+ */
+export const CREDIT_PACK_BADGES: Partial<Record<CreditPackId, "popular" | "bestValue" | "maxBonus">> = {
+  standard: "popular",
+  pro: "bestValue",
+  enterprise: "maxBonus",
+};
+
+/** @deprecated voir CREDIT_PACK_BADGES (PROMPT 3.7). */
+export type CreditPackBadgeKey = NonNullable<(typeof CREDIT_PACK_BADGES)[CreditPackId]>;
+
+// =============================================================================
+// LIFECYCLE — durées listings + grants
+// =============================================================================
+
+/** Durée par défaut d'une annonce (days). Doit matcher listings.listing_duration_days DEFAULT. */
+export const LISTING_DURATION_DAYS_DEFAULT = 30;
+
+/** Durée alternative payante. Source : credit_pricing.publish_listing_60d. */
+export const LISTING_DURATION_DAYS_EXTENDED = 60;
+
+/** Fenêtre J-N avant expiration où status passe à 'expiring_soon'. Doit matcher expire_listings_lifecycle. */
+export const LISTING_EXPIRING_SOON_THRESHOLD_DAYS = 7;
+
+/** Durée de validité du signup grant (days). Doit matcher grant_signup_bonus_for_user. */
+export const SIGNUP_GRANT_EXPIRY_DAYS = 90;
+
+/** Durée du Verified Seller Badge (days). Doit matcher la RPC verification_approve (PROMPT 7). */
+export const VERIFIED_SELLER_BADGE_DURATION_DAYS = 365;
+
+// =============================================================================
+// FORMATTING — helpers de présentation
+// =============================================================================
+
+/**
+ * Formate un montant Ariary avec séparateur (espace insécable U+00A0).
+ *
+ * PROMPT 3.8 : passage à une regex robuste indépendante de l'ICU runtime.
+ * `toLocaleString("fr-MG")` faisait silencieusement fallback en `"87500"`
+ * sans séparateur quand l'ICU était minimal (Node prod, Safari ancien,
+ * pré-rendu SEO). La regex `\B(?=(\d{3})+(?!\d))` garantit le résultat
+ * sur n'importe quel runtime JS.
+ *
+ * Inlining intentionnel : cette fonction est utilisée par des composants
+ * qui importent depuis @/config/monetization. Si on importait formatCredits
+ * depuis @/features/credits/lib/creditFormatting, on créerait un risque
+ * de dépendance circulaire. La regex est minuscule, mieux vaut dupliquer.
+ */
 export function formatAriary(amount: number): string {
-  return `${amount.toLocaleString("fr-MG")} Ar`;
+  if (typeof amount !== "number" || !Number.isFinite(amount)) return "0 Ar";
+  const sign = amount < 0 ? "-" : "";
+  const abs = Math.abs(Math.round(amount));
+  return `${sign}${abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")} Ar`;
 }
+
+// =============================================================================
+// FEATURE FLAGS — placements monétisation (slots ads)
+// =============================================================================
 
 /** Feature flags for ad slots (toggle without removing components). */
 export const MONETIZATION_PLACEMENTS = {

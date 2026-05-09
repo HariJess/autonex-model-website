@@ -11,8 +11,17 @@ import { WheelSpinner } from "@/components/ui/wheel-spinner";
 // Eager load: landing page and layout
 import Index from "./pages/Index.tsx";
 import SentrySmokeTest from "./components/dev/SentrySmokeTest";
-import { CookieConsentBanner } from "@/components/cookies/CookieConsentBanner";
+// Cookie banner only matters before consent is recorded; loading it lazily lets
+// the first paint complete without its module on the critical path. The banner
+// pops in ~100 ms after first paint, well before any user interaction that would
+// require GDPR consent.
+const CookieConsentBanner = lazy(() =>
+  import("@/components/cookies/CookieConsentBanner").then((m) => ({ default: m.CookieConsentBanner })),
+);
 import { YasScrollToTop } from "@/features/yas-app/components/YasScrollToTop";
+import { YasMiniHeader } from "@/features/yas-app/components/YasMiniHeader";
+import { YasPublishTracker } from "@/features/yas-app/components/YasPublishTracker";
+import { YasProvider } from "@/features/yas-app/hooks/useYasContext";
 import { initGA4IfConsented } from "@/lib/analytics/ga4";
 import { COOKIE_CONSENT_EVENT } from "@/lib/analytics/cookieConsentStorage";
 
@@ -29,6 +38,9 @@ const AdminMonetizationPage = lazy(() => import("./pages/AdminMonetizationPage.t
 const AdminRevenuesPage = lazy(() => import("./pages/AdminRevenuesPage.tsx"));
 const AdminSearchInsightsPage = lazy(() => import("./pages/AdminSearchInsightsPage.tsx"));
 const AdminPartnerAdsPage = lazy(() => import("./pages/AdminPartnerAdsPage.tsx"));
+const AdminYasAnalyticsPage = lazy(() => import("./pages/AdminYasAnalyticsPage.tsx"));
+const AdminVerificationsPage = lazy(() => import("./pages/AdminVerificationsPage.tsx"));
+const VerificationPage = lazy(() => import("./pages/verification/VerificationPage.tsx"));
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.tsx"));
 const AdminLayout = lazy(() => import("./pages/AdminLayout.tsx"));
 const AdminOverviewPage = lazy(() => import("./pages/AdminOverviewPage.tsx"));
@@ -39,11 +51,13 @@ const AdminAgencyDetailPage = lazy(() => import("./pages/AdminAgencyDetailPage.t
 const AdminModerationPage = lazy(() => import("./pages/AdminModerationPage.tsx"));
 const PublishPage = lazy(() => import("./pages/PublishPage.tsx"));
 const CreditsPage = lazy(() => import("./pages/credits/CreditsPage.tsx"));
+const MyListingsPage = lazy(() => import("./pages/myListings/MyListingsPage.tsx"));
 const PaiementRetourPage = lazy(() => import("./pages/PaiementRetourPage.tsx"));
 const AgencyProfile = lazy(() => import("./pages/AgencyProfile.tsx"));
 const AgenciesListPage = lazy(() => import("./pages/AgenciesListPage.tsx"));
 const ConcessionnairesIndexPage = lazy(() => import("./pages/ConcessionnairesIndexPage.tsx"));
 const VehicleEstimationPage = lazy(() => import("./pages/VehicleEstimationPage.tsx"));
+const MethodologiePage = lazy(() => import("./pages/MethodologiePage.tsx"));
 const BlogList = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogList })));
 const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogArticle })));
 const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.tsx"));
@@ -52,6 +66,7 @@ const BetaLoginPage = lazy(() => import("./pages/BetaLoginPage.tsx"));
 const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage.tsx"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage.tsx"));
+const BonnesAffairesPage = lazy(() => import("./pages/BonnesAffairesPage.tsx"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage.tsx"));
 const SettingsNotificationsPage = lazy(() => import("./pages/SettingsNotificationsPage.tsx"));
 const MentionsLegalesPage = lazy(() => import("./pages/legal/MentionsLegalesPage.tsx"));
@@ -95,13 +110,17 @@ const App = () => {
       <Sonner />
       <SentrySmokeTest />
       <BrowserRouter>
-        <YasScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <BetaLockGate>
+        <YasProvider>
+          <YasScrollToTop />
+          <YasMiniHeader />
+          <YasPublishTracker />
+          <Suspense fallback={<PageLoader />}>
+            <BetaLockGate>
           <Routes>
             <Route path="/beta-login" element={<BetaLoginPage />} />
             <Route path="/" element={<Index />} />
             <Route path="/recherche" element={<SearchPage />} />
+            <Route path="/bonnes-affaires" element={<BonnesAffairesPage />} />
             <Route path="/acheter" element={<SeoLandingPage />} />
             <Route path="/location-longue-duree" element={<SeoLandingPage />} />
             <Route path="/location-courte-duree" element={<SeoLandingPage />} />
@@ -132,15 +151,20 @@ const App = () => {
               <Route path="revenus" element={<AdminRevenuesPage />} />
               <Route path="recherche" element={<AdminSearchInsightsPage />} />
               <Route path="partenaires" element={<AdminPartnerAdsPage />} />
+              <Route path="yas-analytics" element={<AdminYasAnalyticsPage />} />
+              <Route path="verifications" element={<AdminVerificationsPage />} />
             </Route>
             <Route path="/publier" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
             <Route path="/credits" element={<ProtectedRoute><CreditsPage /></ProtectedRoute>} />
+            <Route path="/mes-annonces" element={<ProtectedRoute><MyListingsPage /></ProtectedRoute>} />
+            <Route path="/verification" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
             <Route path="/paiement/retour" element={<ProtectedRoute><PaiementRetourPage /></ProtectedRoute>} />
             <Route path="/agence/:slug" element={<AgencyProfile />} />
             <Route path="/concessionnaires/:slug" element={<AgencyProfile />} />
             <Route path="/agences" element={<AgenciesListPage />} />
             <Route path="/concessionnaires" element={<ConcessionnairesIndexPage />} />
             <Route path="/estimation" element={<VehicleEstimationPage />} />
+            <Route path="/estimation/methodologie" element={<MethodologiePage />} />
             <Route path="/conseils" element={<BlogList />} />
             <Route path="/conseils/:slug" element={<BlogArticle />} />
             <Route path="/contact" element={<ContactPage />} />
@@ -152,9 +176,12 @@ const App = () => {
             <Route path="/yas-app" element={<YasAppPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          </BetaLockGate>
-          <CookieConsentBanner />
-        </Suspense>
+            </BetaLockGate>
+            <Suspense fallback={null}>
+              <CookieConsentBanner />
+            </Suspense>
+          </Suspense>
+        </YasProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

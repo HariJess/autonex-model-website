@@ -56,6 +56,15 @@ const STATUS_BADGES: Record<ListingStatus, BadgeMeta> = {
     label: "Masquée (signalements)",
     className: "bg-orange-200 text-orange-900 border-orange-300",
   },
+  // PROMPT 1 (2026-05-03) : nouvelles enum values listing_status (lifecycle V2).
+  expiring_soon: {
+    label: "Expire bientôt",
+    className: "bg-orange-100 text-orange-800 border-orange-200",
+  },
+  sold: {
+    label: "Vendue",
+    className: "bg-blue-100 text-blue-800 border-blue-200",
+  },
 };
 
 const OWNER_SUSPENDED_BADGE: BadgeMeta = {

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import type { YasContext } from "@/features/yas-app/hooks/useYasContext";
 
@@ -59,7 +60,15 @@ export type YasEventName =
   | "yas_action_estimate_click"
   | "yas_action_deals_click"
   | "yas_featured_deal_click"
-  | "yas_publish_cta_click";
+  | "yas_publish_cta_click"
+  // === Funnel pages destination (Plan 3/4 — TRACK #2) ===
+  | "yas_listing_view" // Mount /annonce/:id
+  | "yas_seller_contact_click" // Reveal numéro vendeur sur ListingDetail
+  | "yas_search_performed" // Mount /recherche avec filtres dans payload
+  | "yas_estimation_started" // Mount /estimation
+  | "yas_estimation_completed" // Wizard atteint l'écran "result"
+  | "yas_publish_started" // /publier détecté via route listener (sans toucher PublishPage)
+  | "yas_publish_completed"; // /dashboard?published=... détecté via route listener
 
 export type YasEventPayload = Record<string, string | number | boolean | null>;
 
@@ -79,6 +88,7 @@ export function trackYasEvent(
     embedded: context.isEmbedded,
     platform: context.platform,
     entry_point: context.entryPoint,
+    referrer: context.referrer,
     session_id: context.sessionId,
     payload: extra as Record<string, unknown>,
   };
@@ -100,8 +110,25 @@ export function trackYasEvent(
         () => {
           /* silent success */
         },
-        () => {
-          /* silent failure (table missing, RLS, network) */
+        (error: unknown) => {
+          // Visibilité observabilité : on ne casse pas l'UI mais on dépose un
+          // breadcrumb Sentry pour pouvoir diagnostiquer post-launch (table
+          // manquante, RLS bug, network down). En dev, on log en console pour
+          // feedback immédiat. Si Sentry n'est pas init au runtime,
+          // `addBreadcrumb` est no-op safe.
+          if (isDev) {
+            console.error("[yas-tracking] insert failed", { eventName, error });
+          } else {
+            Sentry.addBreadcrumb({
+              category: "yas-tracking",
+              level: "warning",
+              message: "yas_tracking_events insert failed",
+              data: {
+                event_name: eventName,
+                error_message: error instanceof Error ? error.message : String(error),
+              },
+            });
+          }
         },
       );
   } catch {

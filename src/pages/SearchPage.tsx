@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { ChevronRight, Home, Sparkles } from "lucide-react";
+import { ChevronRight, Flame, Home, Sparkles } from "lucide-react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import { LISTING_TYPE_LABELS_PLURAL, LISTING_TYPE_LABELS, TRANSACTION_LABELS } from "@/types/listing";
 import { getVehicleTypeLabel } from "@/data/vehicleTypes";
@@ -23,6 +23,7 @@ import { SidebarPromoSlot } from "@/components/monetization/SidebarPromoSlot";
 import { FeaturedAgenciesSection } from "@/components/monetization/FeaturedAgenciesSection";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { recordSearchAnalytics } from "@/lib/searchAnalytics";
+import { useYasTrackerOnMount } from "@/features/yas-app/hooks/useYasTracker";
 import type { DisplayListing } from "@/types/listing";
 import {
   describeCloseMatchKind,
@@ -65,6 +66,18 @@ const SearchPage = () => {
     () => searchStateFromParams(searchParams),
     [searchParams]
   );
+
+  // YAS tracking — fire au mount avec un snapshot des filtres principaux dans
+  // le payload. Le hook no-op-safe en dehors du mode embedded YAS, et fire
+  // une seule fois par mount (changements de filtres ultérieurs ne re-track
+  // pas — choix MVP, à itérer plus tard via debounce sur searchParams si besoin).
+  useYasTrackerOnMount("yas_search_performed", {
+    transaction: filters.transaction ?? null,
+    ville: filters.ville ?? null,
+    types: filters.types && filters.types.length > 0 ? filters.types.join(",") : null,
+    vtypes: filters.vtypes && filters.vtypes.length > 0 ? filters.vtypes.join(",") : null,
+    sort,
+  });
 
   const vehicleTypeOptionMap = useMemo(
     () => new Map(AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.map((option) => [option.id, option])),
@@ -230,6 +243,12 @@ const SearchPage = () => {
         key: "transaction",
       });
     }
+    if (filters.hasDeal) {
+      chips.push({
+        label: t("search.filterChips.hasDeal", "Bonnes affaires"),
+        key: "hasDeal",
+      });
+    }
     const vehicleTypeLabelMap = new Map(AUTO_SEARCH_VEHICLE_TYPE_OPTIONS.map((opt) => [opt.id, opt.label]));
     filters.vehicleTypes.forEach((vehicleTypeId) =>
       chips.push({ label: vehicleTypeLabelMap.get(vehicleTypeId) ?? vehicleTypeId, key: `vehicleType-${vehicleTypeId}` }),
@@ -284,6 +303,7 @@ const SearchPage = () => {
   const removeChip = (key: string) => {
     const newFilters = { ...filters };
     if (key === "transaction") newFilters.transaction = "";
+    else if (key === "hasDeal") newFilters.hasDeal = false;
     else if (key.startsWith("vehicleType-")) newFilters.vehicleTypes = newFilters.vehicleTypes.filter((id) => id !== key.slice(12));
     else if (key.startsWith("type-")) newFilters.types = newFilters.types.filter((tp) => tp !== key.slice(5));
     else if (key === "ville") {
@@ -555,6 +575,22 @@ const SearchPage = () => {
             </span>
           )}
         </h1>
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => updateFilters({ ...filters, hasDeal: !filters.hasDeal })}
+            aria-pressed={filters.hasDeal}
+            className={
+              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-sans font-medium transition-colors " +
+              (filters.hasDeal
+                ? "border-orange-600 bg-orange-600 text-white shadow-sm"
+                : "border-orange-300 bg-orange-50/60 text-orange-800 hover:bg-orange-100/70 dark:border-orange-900/60 dark:bg-orange-950/40 dark:text-orange-200")
+            }
+          >
+            <Flame className="h-3.5 w-3.5" aria-hidden />
+            {t("search.filterChips.hasDeal", "Bonnes affaires")}
+          </button>
+        </div>
         <SearchActiveChips
           chips={activeChips}
           clearAllLabel={t("common.clearAll", "Effacer tout")}
@@ -687,12 +723,13 @@ const SearchPage = () => {
                   </Suspense>
                 </div>
                 <div className="w-full lg:w-[42%] h-auto lg:h-full lg:max-h-full overflow-y-visible lg:overflow-y-auto space-y-3 pr-1 min-h-0">
-                  {displayListings.map((listing) => (
+                  {displayListings.map((listing, index) => (
                     <ListingCard
                       key={listing.id}
                       listing={listing}
                       matchBadge={showCloseMatchBadges ? closeMatchLabel(listing) : undefined}
                       variant="search"
+                      priority={index === 0}
                     />
                   ))}
                 </div>

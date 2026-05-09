@@ -37,19 +37,26 @@ import EstimationProgressHeader from "@/pages/estimation/components/EstimationPr
 import {
   getCurrentEstimationStepIndex,
   getVehicleFieldErrors,
+  type EstimationFormStateForValidation as EstimationFormState,
 } from "@/pages/estimation/estimationPageModel";
 import { cn } from "@/lib/utils";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
+import { useYasTrackerOnMount, useYasTracker } from "@/features/yas-app/hooks/useYasTracker";
 
 const EstimationResultReport = lazy(() => import("@/components/estimation/EstimationResultReport"));
 
 const ESTIMATION_DRAFT_KEY = "autonex:estimation:draft:v1";
 const currentYear = new Date().getFullYear();
 
+const parseNumberInput = (raw: string): number | null =>
+  raw === "" ? null : Number(raw);
+
 const EMPTY_FORM: EstimationInput = {
   makeName: "",
   modelName: "",
+  // PROMPT 10B — Trim/version optionnel pour matching strict cascade côté engine V2.
+  trim: null,
   year: currentYear - 5,
   city: "",
   mileage: 75_000,
@@ -130,10 +137,30 @@ const VehicleEstimationPage = () => {
   const [screen, setScreen] = useState<"landing" | "vehicle" | "condition" | "result">(
     isEmbedded ? "vehicle" : "landing",
   );
-  const [form, setForm] = useState<EstimationInput>(EMPTY_FORM);
+  const [form, setForm] = useState<EstimationFormState>(EMPTY_FORM);
   const [result, setResult] = useState<EstimationRunResult | null>(null);
   /** Avoid duplicate "result viewed" telemetry without an extra render (StrictMode-safe single fire per request id). */
   const resultViewedRequestRef = useRef<string | null>(null);
+
+  // YAS tracking — mount = "started", screen=result = "completed".
+  // Hooks no-op-safe en dehors du mode embedded YAS.
+  useYasTrackerOnMount("yas_estimation_started", null);
+  const trackEstimationCompleted = useYasTracker("yas_estimation_completed");
+  const completedFiredRef = useRef(false);
+  useEffect(() => {
+    if (screen !== "result") return;
+    if (completedFiredRef.current) return;
+    completedFiredRef.current = true;
+    trackEstimationCompleted({
+      vehicle_make: form.makeName || null,
+      vehicle_model: form.modelName || null,
+      vehicle_year: form.year || null,
+      city: form.city || null,
+    });
+    // trackEstimationCompleted reference is stable (returned fresh each render
+    // but no-op-safe), and we use a ref to ensure single fire per mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen]);
 
   useEffect(() => {
     const raw = localStorage.getItem(ESTIMATION_DRAFT_KEY);
@@ -211,7 +238,11 @@ const VehicleEstimationPage = () => {
   }, [form.bodyType, form.modelName, modelBodyTypeOptions]);
 
   const runMutation = useMutation({
-    mutationFn: async () => runVehicleEstimation(form, user?.id ?? null),
+    mutationFn: async () =>
+      runVehicleEstimation(
+        { ...form, mileage: form.mileage ?? 0, year: form.year ?? currentYear },
+        user?.id ?? null,
+      ),
     onSuccess: (payload) => {
       setResult(payload);
       setScreen("result");
@@ -316,9 +347,9 @@ const VehicleEstimationPage = () => {
         prefill: {
           make: form.makeName,
           model: form.modelName,
-          year: String(form.year),
+          year: form.year !== null ? String(form.year) : "",
           city: form.city,
-          mileageKm: form.mileage,
+          mileageKm: form.mileage ?? 0,
           priceMga: result.output.recommendedListingPrice,
           fuelType: form.fuelType,
           transmissionType: form.transmissionType,
@@ -587,19 +618,46 @@ const VehicleEstimationPage = () => {
                   )}
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="trim">
+                    {t("estimation.trimLabel", "Version / Trim")}{" "}
+                    <span className="font-sans text-xs text-muted-foreground">
+                      ({t("estimation.optional", "optionnel")})
+                    </span>
+                  </Label>
+                  <Input
+                    id="trim"
+                    type="text"
+                    maxLength={60}
+                    value={form.trim ?? ""}
+                    placeholder={t("estimation.trimPlaceholder", "Ex: SE Plus, Vigo, GT Line, X20")}
+                    className={ESTIMATION_UI.inputLike}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setForm((prev) => ({ ...prev, trim: v.trim() === "" ? null : v }));
+                    }}
+                    data-testid="estimation-trim-input"
+                  />
+                  <p className="font-sans text-xs text-muted-foreground">
+                    {t(
+                      "estimation.trimHelper",
+                      "Précisez la version exacte si vous la connaissez. Améliore la précision de l'estimation.",
+                    )}
+                  </p>
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="year">{t("search.year", "Année")}</Label>
                   <Input
                     id="year"
                     type="number"
                     min={1950}
                     max={currentYear}
-                    value={form.year}
+                    value={form.year ?? ""}
                     aria-invalid={Boolean(visibleFieldError("year")) || undefined}
                     className={cn(
                       ESTIMATION_UI.inputLike,
                       visibleFieldError("year") && "border-destructive focus-visible:ring-destructive/40",
                     )}
-                    onChange={(e) => setForm((prev) => ({ ...prev, year: Number(e.target.value) }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, year: parseNumberInput(e.target.value) }))}
                   />
                   {visibleFieldError("year") && (
                     <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("year")}</p>
@@ -630,13 +688,13 @@ const VehicleEstimationPage = () => {
                     type="number"
                     min={0}
                     max={1500000}
-                    value={form.mileage}
+                    value={form.mileage ?? ""}
                     aria-invalid={Boolean(visibleFieldError("mileage")) || undefined}
                     className={cn(
                       ESTIMATION_UI.inputLike,
                       visibleFieldError("mileage") && "border-destructive focus-visible:ring-destructive/40",
                     )}
-                    onChange={(e) => setForm((prev) => ({ ...prev, mileage: Number(e.target.value) }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, mileage: parseNumberInput(e.target.value) }))}
                   />
                   {visibleFieldError("mileage") && (
                     <p className="mt-1 font-sans text-xs text-destructive">{visibleFieldError("mileage")}</p>

@@ -29,11 +29,14 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { applyImageFallback } from "@/lib/imageFallback";
+import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
+import { useYasTracker } from "@/features/yas-app/hooks/useYasTracker";
 import { cn } from "@/lib/utils";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 import BrandLogo from "@/components/BrandLogo";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { ReportListingButton } from "@/components/listing/ReportListingButton";
+import { ShareButton } from "@/components/listing/ShareButton";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { buildCanonicalUrl } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -82,6 +85,20 @@ const ListingDetail = () => {
     location,
     t,
   });
+
+  // YAS tracking — DOIT être appelé AVANT les early returns plus bas, sinon
+  // ESLint (react-hooks/rules-of-hooks) catche un appel conditionnel. Pattern
+  // impératif (`useYasTracker` + `useEffect[listing?.id]`) plutôt que
+  // `useYasTrackerOnMount` : on ne track qu'une vraie view (listing chargé),
+  // pas une 404 ou un id malformé. Les hooks no-op-safe en dehors du mode YAS.
+  const trackListingView = useYasTracker("yas_listing_view");
+  const trackSellerContact = useYasTracker("yas_seller_contact_click");
+  useEffect(() => {
+    if (listing?.id) trackListingView({ listing_id: listing.id });
+    // `trackListingView` returned by useYasTracker n'est pas memoïsé — on
+    // dépend uniquement de `listing?.id` qui ne change qu'une fois au load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listing?.id]);
 
   const isOwner = Boolean(user?.id && listing?.owner_id && user.id === listing.owner_id);
 
@@ -178,6 +195,18 @@ const ListingDetail = () => {
     handleWhatsApp,
   } = contact;
 
+  // Wrappers de tracking sur les CTAs contact vendeur (non-hooks, donc OK
+  // après les early returns). Le tracker `trackSellerContact` est lui-même
+  // remonté en haut du composant (cf. plus haut, react-hooks/rules-of-hooks).
+  const handleRevealPhoneTracked = () => {
+    trackSellerContact({ listing_id: listing.id, contact_method: "phone" });
+    void handleRevealPhone();
+  };
+  const handleWhatsAppTracked = () => {
+    trackSellerContact({ listing_id: listing.id, contact_method: "whatsapp" });
+    handleWhatsApp();
+  };
+
   return (
     <>
       <Helmet>
@@ -189,6 +218,11 @@ const ListingDetail = () => {
         <meta property="og:description" content={listingDescription} />
         <meta property="og:url" content={canonical} />
         {seoImage && <meta property="og:image" content={seoImage} />}
+        {seoImage && <meta property="og:image:width" content="1200" />}
+        {seoImage && <meta property="og:image:height" content="630" />}
+        <meta property="og:locale" content="fr_MG" />
+        <meta property="product:price:amount" content={String(listing.price_mga)} />
+        <meta property="product:price:currency" content="MGA" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={listingTitle} />
         <meta name="twitter:description" content={listingDescription} />
@@ -283,7 +317,19 @@ const ListingDetail = () => {
               </div>
               <div className="flex items-center justify-between gap-3">
                 <h1 className="font-sans text-[1.45rem] leading-tight md:text-3xl font-bold text-foreground break-words">{displayTitle}</h1>
-                <FavoriteButton listingId={listing.id} size="md" variant="inline" className="shrink-0" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <ShareButton
+                    listing={{
+                      id: listing.id,
+                      title: displayTitle,
+                      url: canonical,
+                      priceMga: listing.price_mga,
+                      location: addressLine || null,
+                    }}
+                    variant="icon"
+                  />
+                  <FavoriteButton listingId={listing.id} size="md" variant="inline" />
+                </div>
               </div>
               {vehicleSummary && (
                 <p className="mt-1.5 text-[14px] text-muted-foreground font-sans leading-relaxed">{vehicleSummary}</p>
@@ -343,13 +389,24 @@ const ListingDetail = () => {
 
             <div className="space-y-2.5 md:space-y-3">
               <div className="rounded-2xl overflow-hidden aspect-video relative border border-border/70 shadow-sm">
-                <img
-                  src={images[selectedImg]}
-                  alt={displayTitle}
-                  className="w-full h-full object-cover"
-                  decoding="async"
-                  onError={(e) => applyImageFallback(e.currentTarget)}
-                />
+                <picture>
+                  <source
+                    srcSet={getOptimizedSrcSet(images[selectedImg], [800, 1600, 2400], 80)}
+                    sizes="(max-width: 1024px) 100vw, 800px"
+                  />
+                  <img
+                    src={
+                      getOptimizedStorageUrl(images[selectedImg], { width: 1600, quality: 80 }) ||
+                      images[selectedImg]
+                    }
+                    alt={displayTitle}
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                    onError={(e) => applyImageFallback(e.currentTarget)}
+                  />
+                </picture>
                 {hasMultipleImages && (
                   <>
                     <button
@@ -387,14 +444,20 @@ const ListingDetail = () => {
                       aria-pressed={i === selectedImg}
                       className={`w-20 h-14 rounded-lg overflow-hidden border-2 motion-safe:transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 flex-shrink-0 ${i === selectedImg ? "border-primary" : "border-transparent"}`}
                     >
-                      <img
-                        src={img}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => applyImageFallback(e.currentTarget)}
-                      />
+                      <picture>
+                        <source
+                          srcSet={getOptimizedSrcSet(img, [80, 160, 240])}
+                          sizes="80px"
+                        />
+                        <img
+                          src={getOptimizedStorageUrl(img, { width: 160, quality: 70 }) || img}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => applyImageFallback(e.currentTarget)}
+                        />
+                      </picture>
                     </button>
                   ))}
                 </div>
@@ -600,7 +663,7 @@ const ListingDetail = () => {
                 {listing.agency_logo ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden border border-border">
                     <img
-                      src={listing.agency_logo}
+                      src={getOptimizedStorageUrl(listing.agency_logo, { width: 168, quality: 80 }) || listing.agency_logo}
                       alt={listing.agency_name ?? ""}
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -642,7 +705,7 @@ const ListingDetail = () => {
               <div className="hidden lg:grid grid-cols-1 gap-2">
                 <Button
                   type="button"
-                  onClick={handleRevealPhone}
+                  onClick={handleRevealPhoneTracked}
                   variant={phoneRevealed ? "outline" : "default"}
                   className={`w-full font-sans ${!phoneRevealed ? "gradient-primary border-0" : ""}`}
                   style={!phoneRevealed ? { color: "#FAFAFA" } : undefined}
@@ -653,7 +716,7 @@ const ListingDetail = () => {
                 {listing.has_whatsapp_contact ? (
                   <Button
                     type="button"
-                    onClick={handleWhatsApp}
+                    onClick={handleWhatsAppTracked}
                     variant="outline"
                     className={cn("w-full font-sans", LISTING_WHATSAPP_BUTTON_CLASS)}
                     aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}
@@ -752,7 +815,7 @@ const ListingDetail = () => {
           {listing.has_whatsapp_contact ? (
             <Button
               type="button"
-              onClick={handleWhatsApp}
+              onClick={handleWhatsAppTracked}
               variant="outline"
               className={cn("w-full font-sans min-h-12 touch-manipulation gap-2", LISTING_WHATSAPP_BUTTON_CLASS)}
               aria-label={t("listing.whatsappAria", "Contacter l’annonceur via WhatsApp")}

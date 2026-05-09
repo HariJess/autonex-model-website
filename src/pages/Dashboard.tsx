@@ -3,10 +3,11 @@ import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import { YasBackButton } from "@/features/yas-app/components/YasBackButton";
 import Footer from "@/components/Footer";
-import { Eye, Phone, MessageSquare, Home, Coins } from "lucide-react";
+import { Eye, Phone, MessageSquare, Home, Coins, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useCurrency } from "@/contexts/CurrencyContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useEffect, useMemo } from "react";
@@ -23,13 +24,15 @@ import { DashboardCreditsSection } from "@/pages/dashboard/components/DashboardC
 import { DashboardListingsSection } from "@/pages/dashboard/components/DashboardListingsSection";
 import { DashboardLeadsSection } from "@/pages/dashboard/components/DashboardLeadsSection";
 import { MyAgencySection } from "@/components/dashboard/MyAgencySection";
+import { CreditWelcomeBanner } from "@/features/credits/components/CreditWelcomeBanner";
+import { VerificationStatusCard } from "@/components/verification/VerificationStatusCard";
+import { RateLimitStatusCard } from "@/components/dashboard/RateLimitStatusCard";
 
 type Listing = Tables<"listings">;
 
 const Dashboard = () => {
   const { t } = useTranslation();
   const { user, profile } = useAuth();
-  const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
   // Lot 9.1c — Lecture du param `?published=<id>` passé après une publication
   // réussie (cf. PublishPage.handlePublish). Sert à scroller vers l'annonce
@@ -324,6 +327,12 @@ const Dashboard = () => {
           publishLabel={t("nav.publish")}
         />
 
+        <CreditWelcomeBanner />
+
+        <VerificationStatusCard />
+
+        <RateLimitStatusCard />
+
         {profile?.agency_id ? <MyAgencySection /> : null}
 
         <DashboardStatsCards stats={stats} />
@@ -374,16 +383,22 @@ const Dashboard = () => {
 
         <DashboardListingsSection
           title={t("dashboard.myListings")}
+          headerAction={
+            publishedListings.length > 0 ? (
+              <Button asChild className="gradient-primary border-0 gap-2">
+                <Link to="/mes-annonces">
+                  {t("dashboard.section.manageListings", "Gérer mes annonces")}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            ) : undefined
+          }
           listingsLoading={listingsLoading}
           listingsErrorMessage={listingsError instanceof Error ? listingsError.message : undefined}
           publishedListings={publishedListings}
-          formatPrice={formatPrice}
           statusLabels={statusLabels}
           boostLabels={boostLabels}
           listingBoostPartitions={listingBoostPartitions}
-          creditsBalance={creditsFromLedger}
-          creditsBalancePending={creditsBalancePending}
-          userId={user?.id}
           pendingBoostsLabel={pendingBoostsLabel}
           labels={{
             noListings: t("dashboard.noListings", "Aucune annonce. Publiez votre première annonce !"),
@@ -394,7 +409,6 @@ const Dashboard = () => {
             pendingBoosts: t("dashboard.pendingBoosts", "Visibilité après validation"),
             activeBoosts: t("dashboard.activeBoosts", "Boosts actifs"),
             expiredBoosts: t("dashboard.expiredBoosts", "Boosts expirés"),
-            boostListing: t("dashboard.boostListing", "Booster"),
             boostPendingReviewNote: t(
               "dashboard.boostPendingReviewNote",
               "Les boosts « après publication » seront disponibles une fois l’annonce validée. Les options payées à l’envoi restent en attente ci-dessus.",

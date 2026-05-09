@@ -56,7 +56,7 @@ const NotificationsPage = () => {
               </Button>
             )}
             <Button asChild variant="ghost" size="sm">
-              <Link to="/settings/notifications">{t("notifications.preferences")}</Link>
+              <Link to="/settings/notifications">{t("notifications.preferencesLabel")}</Link>
             </Button>
           </div>
         </div>

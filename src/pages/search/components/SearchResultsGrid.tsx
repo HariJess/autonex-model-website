@@ -1,6 +1,7 @@
 import ListingCard from "@/components/ListingCard";
 import { SponsoredNativeCard } from "@/components/monetization/SponsoredNativeCard";
 import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
+import { getDealMeta } from "@/lib/deals";
 import type { DisplayListing } from "@/types/listing";
 import type { ReactNode } from "react";
 
@@ -18,12 +19,20 @@ export function SearchResultsGrid({ listings, showCloseMatchBadges, getCloseMatc
         if (MONETIZATION_PLACEMENTS.searchSponsoredCard && index === 5) {
           out.push(<SponsoredNativeCard key="monetization-sponsored" />);
         }
+        // Sprint 5 fix #2 — calcul dealMeta côté grille pour que les badges
+        // -X% / Vérifié apparaissent sur les annonces en deal officiel ou
+        // legacy (la home le faisait déjà via getDealMeta inline ; cette
+        // grille filtrée l'oubliait, c'est corrigé).
+        const dealMeta = getDealMeta(listing);
         out.push(
           <ListingCard
             key={listing.id}
             listing={listing}
             matchBadge={showCloseMatchBadges ? getCloseMatchLabel(listing) : undefined}
             layout="compact"
+            priority={index === 0}
+            dealMeta={dealMeta}
+            feedContext="filtered"
           />,
         );
         return out;

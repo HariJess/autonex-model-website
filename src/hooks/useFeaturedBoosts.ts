@@ -9,7 +9,8 @@ export function useFeaturedBoostListingIds(limit = 16) {
       const { data, error } = await supabase
         .from("boosts")
         .select("listing_id")
-        .in("type", ["top", "featured"])
+        // PROMPT 6 : V1 types `top_ad` (ex `top` legacy) + `featured`.
+        .in("type", ["top_ad", "featured"])
         .gte("ends_at", new Date().toISOString());
       if (error) throw new Error(error.message);
       const seen = new Set<string>();

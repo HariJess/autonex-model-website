@@ -114,3 +114,13 @@ For destructive migrations, Claude Code must:
 - Status enum `payment_status` est plus large que prévu : `pending | under_review | approved | rejected | failed | cancelled | success`. Pour le revenu, seul `approved` compte. Pour les buckets opérationnels, `rejected_count = rejected + failed + cancelled`, `pending_count = pending + under_review`
 - `profiles` table n'a PAS de colonne `email` — l'email vit dans `auth.users`. RPC SECURITY DEFINER pour le joindre quand admin
 - Les tests dans ce repo vivent sous `src/test/`, pas `src/test/__tests__/` ni `__tests__/`. Suivre la convention existante
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
+- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)

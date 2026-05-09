@@ -3,6 +3,26 @@ import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+
+// YasProvider non monté dans ce smoke test : mock plat pour Header / Footer.
+vi.mock("@/features/yas-app/hooks/useYasContext", () => ({
+  useYasContext: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  readYasContextFromStorage: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  YasProvider: ({ children }: { children: ReactNode }) => children,
+}));
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({

@@ -52,9 +52,17 @@ const CreditsPage = () => {
         <CreditsBalanceHero />
 
         <section className="space-y-3">
-          <h2 className="font-sans text-lg text-foreground">
-            {t("credits.purchaseSectionTitle", "Choisissez votre pack")}
-          </h2>
+          <div className="space-y-1">
+            <h2 className="font-sans text-lg text-foreground">
+              {t("credits.purchaseSectionTitle", "Choisissez votre pack")}
+            </h2>
+            <p className="font-sans text-sm text-muted-foreground">
+              {t(
+                "credits.packs.subtitle.intro",
+                "Plus vous achetez, plus vous économisez. Pas d'abonnement, crédits valables 12 mois.",
+              )}
+            </p>
+          </div>
           <CreditsPurchaseFlow variant="standalone" />
         </section>
       </main>

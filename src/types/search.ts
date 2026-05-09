@@ -35,6 +35,11 @@ export interface SearchFilters {
   modelQuery: string;
   yearMin: number;
   yearMax: number;
+  /**
+   * `true` quand l'acheteur a activé la chip « Bonnes affaires » dans
+   * `/recherche`. Filtre `deal_active = true AND deal_ends_at > now()`.
+   */
+  hasDeal: boolean;
 }
 
 export const EMPTY_SEARCH_FILTERS: SearchFilters = {
@@ -63,6 +68,7 @@ export const EMPTY_SEARCH_FILTERS: SearchFilters = {
   modelQuery: "",
   yearMin: 0,
   yearMax: 0,
+  hasDeal: false,
 };
 
 export type SearchSortMode = "recent" | "priceAsc" | "priceDesc";

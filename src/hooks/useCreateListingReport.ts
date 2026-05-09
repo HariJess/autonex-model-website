@@ -6,6 +6,8 @@ export type ReportReason =
   | "inappropriate"
   | "duplicate"
   | "wrong_price"
+  | "wrong_category"
+  | "fake_photos"
   | "other";
 
 export type CreateListingReportInput = {

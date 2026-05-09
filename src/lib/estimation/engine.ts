@@ -1,9 +1,26 @@
 import { supabase } from "@/integrations/supabase/client";
 import { computeFallbackBaseline, findReferenceProfile } from "@/lib/estimation/referenceProfiles";
+import {
+  FALLBACK_TRANSACTION_FACTORS,
+  fetchTransactionFactors,
+  resolveFactorKey,
+  type AppConfigSupabaseClient,
+  type ComparableSourceOrigin,
+  type TransactionFactorKey,
+  type TransactionFactorsConfig,
+} from "@/lib/estimation/transactionFactors";
+// PROMPT 10E — Couche 2 (proximity) + Couche 4 (sanity bounds)
+import {
+  findProxyModels,
+  proximityFactorMid,
+  PROXIMITY_SIMILARITY_CEILING,
+} from "@/lib/estimation/modelProximity";
+import { applySanityCheck } from "@/lib/estimation/sanityBounds";
 import type {
   ClaimMode,
   ConfidenceBand,
   ConfidenceDriver,
+  EstimationAuditV2,
   EvidenceMetrics,
   EvidenceTier,
   EvidenceTierDecision,
@@ -23,6 +40,18 @@ type ComparableListingRow = {
   id: string;
   title: string;
   price_mga: number | null;
+  /** PROMPT 10A — prix avant application transaction factor (audit). */
+  raw_price_mga?: number | null;
+  /** PROMPT 10A — factor appliqué (1.0 si aucun). */
+  factor_applied?: number;
+  /** PROMPT 10A — clé de factor utilisée (audit). */
+  factor_key?: TransactionFactorKey;
+  /** PROMPT 10A — origine du comparable (UNION 2 sources). */
+  source_origin?: ComparableSourceOrigin;
+  /** PROMPT 10A — trim/version pour filtrage cascade. */
+  trim?: string | null;
+  /** PROMPT 10A — seller_type depuis market_listings_clean (factor key). */
+  seller_type?: string | null;
   year: number | null;
   mileage_km: number | null;
   ville: string | null;
@@ -36,6 +65,14 @@ type ComparableListingRow = {
   status: string | null;
   make: string | null;
   model: string | null;
+  /** PROMPT 10E — Couche 2 : type de proximité (undefined si exact, "segment_proche" sinon). */
+  proximityType?: "segment_proche";
+  /** PROMPT 10E — Couche 2 : facteur correctif appliqué au price_mga proxy → cible. */
+  proximityFactor?: number;
+  /** PROMPT 10E — Couche 2 : label humain pour audit. */
+  proximityLabel?: string;
+  /** PROMPT 10E — Couche 2 : "Make|Model" du proxy effectivement utilisé. */
+  proximitySourceModel?: string;
 };
 
 type ComparableFetchResult = {
@@ -49,6 +86,20 @@ type ComparableFetchResult = {
   selectedFreshnessAvg: number;
   selectedSameCityCount: number;
   selectedWithRegionCount: number;
+  /** PROMPT 10A — ventilation des comparables retenus par origine. */
+  sourceBreakdown: { marketClean: number; autonexActive: number };
+  /** PROMPT 10A — moyenne des factors appliqués sur la sélection finale. */
+  transactionFactorAvg: number;
+  /** PROMPT 10A — moyenne des prix BRUTS pour audit. */
+  rawPrices: number[];
+  /** PROMPT 10A — état du filtrage trim. */
+  trimFiltering: EstimationAuditV2["trimFiltering"];
+  /** PROMPT 10E — Couche 2 : ventilation par couche de raisonnement. */
+  layerBreakdown: { exact: number; segmentProche: number };
+  /** PROMPT 10E — Couche 2 : modèles proxy effectivement utilisés. */
+  proximityModelsUsed: Array<{ make: string; model: string; n: number }>;
+  /** PROMPT 10E — Couche 2 : moyenne des proximityFactor appliqués (1 = aucun). */
+  proximityFactorAvg: number;
 };
 
 type QualityAcceptedCandidate = {
@@ -107,6 +158,64 @@ function removeOutliers(prices: number[]): number[] {
   if (mad === 0) return prices;
   const threshold = 2.8 * mad;
   return prices.filter((p) => Math.abs(p - med) <= threshold);
+}
+
+/**
+ * PROMPT 10A — Helper percentile (linéaire, sans dépendance externe).
+ *
+ * Cas spéciaux :
+ *   - Liste vide → 0
+ *   - Liste singleton → la valeur
+ *   - Sinon : interpolation linéaire entre les voisins, arrondi entier
+ */
+export function percentile(values: number[], p: number): number {
+  if (values.length === 0) return 0;
+  if (values.length === 1) return values[0];
+  const sorted = [...values].sort((a, b) => a - b);
+  const idx = (sorted.length - 1) * p;
+  const lower = Math.floor(idx);
+  const upper = Math.ceil(idx);
+  if (lower === upper) return sorted[lower];
+  return Math.round(sorted[lower] + (sorted[upper] - sorted[lower]) * (idx - lower));
+}
+
+/**
+ * PROMPT 10A — Range Argus-grade : P10/P90 réels quand assez de comps,
+ * P25/P75 quand modeste, sinon fallback synthétique ±%.
+ *
+ * Décision :
+ *   - n ≥ 8  → P10/P90 (range "large" honnête)
+ *   - n ≥ 5  → P25/P75 (range resserré, on n'extrapole pas)
+ *   - n < 5  → synthetic ±fallbackSpread sur fallbackCenter
+ */
+export function computeRangeFromPercentiles(
+  prices: number[],
+  fallbackCenter: number,
+  fallbackSpread: number,
+): {
+  low: number;
+  high: number;
+  method: "percentile_p10_p90" | "percentile_p25_p75" | "synthetic_spread";
+} {
+  if (prices.length >= 8) {
+    return {
+      low: percentile(prices, 0.1),
+      high: percentile(prices, 0.9),
+      method: "percentile_p10_p90",
+    };
+  }
+  if (prices.length >= 5) {
+    return {
+      low: percentile(prices, 0.25),
+      high: percentile(prices, 0.75),
+      method: "percentile_p25_p75",
+    };
+  }
+  return {
+    low: Math.round(fallbackCenter * (1 - fallbackSpread)),
+    high: Math.round(fallbackCenter * (1 + fallbackSpread)),
+    method: "synthetic_spread",
+  };
 }
 
 function toNormalized(value: string | null | undefined): string {
@@ -278,25 +387,239 @@ async function fetchComparableRows(
   }
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return (data ?? []) as ComparableListingRow[];
+  // PROMPT 10A — tag chaque row avec son origine (autonex listings = active)
+  return (data ?? []).map((row) => ({
+    ...(row as ComparableListingRow),
+    source_origin: "autonex_active" as ComparableSourceOrigin,
+    trim: null,
+    raw_price_mga: (row as ComparableListingRow).price_mga,
+    factor_applied: 1.0,
+    factor_key: "autonex_active" as TransactionFactorKey,
+  })) as ComparableListingRow[];
 }
 
-async function fetchComparables(input: EstimationInput): Promise<ComparableFetchResult> {
-  const strictRows = await fetchComparableRows(input, { yearWindow: 3, strictAttributes: true, limit: 160 });
-  const needsBackup = strictRows.length < 10;
+/**
+ * PROMPT 10A — Fetch des comparables depuis `market_listings_clean`
+ * (CSV scrap FB / partner / dealer official, ingéré par PROMPT 11.b).
+ *
+ * Mappe les colonnes natives `market_listings_clean.*` vers le shape canonique
+ * `ComparableListingRow` consommé par la pipeline existante (scoring/median/
+ * outliers). On synthétise un `title` lisible à partir de make+model+year.
+ *
+ * Filtrage minimal côté SQL :
+ *   - normalized_make ILIKE input.makeName
+ *   - normalized_model ILIKE input.modelName
+ *   - year ∈ [input.year - yearWindow, input.year + yearWindow]
+ *   - include_in_estimation=true ET outlier_flag=false (RLS filtre déjà mais on belt-and-suspenders)
+ *
+ * Le filtrage trim est fait en TS post-fetch dans `fetchComparables` (cascade).
+ */
+type MarketCleanRow = {
+  id: string;
+  normalized_make: string | null;
+  normalized_model: string | null;
+  normalized_trim: string | null;
+  year: number | null;
+  mileage_km: number | null;
+  price_mga: number | null;
+  fuel_type: string | null;
+  transmission: string | null;
+  drivetrain: string | null;
+  body_style: string | null;
+  city: string | null;
+  seller_type: string | null;
+  source: string | null;
+  posted_at: string | null;
+  data_confidence: string | null;
+  include_in_estimation: boolean | null;
+  outlier_flag: boolean | null;
+  fingerprint: string | null;
+};
+
+function mapCleanRowToComparable(row: MarketCleanRow): ComparableListingRow {
+  const make = row.normalized_make ?? "";
+  const model = row.normalized_model ?? "";
+  const trim = row.normalized_trim ?? "";
+  const titleParts = [make, model, trim, row.year ? String(row.year) : ""].filter(Boolean);
+  const title = titleParts.join(" ").trim() || `${make} ${model}`.trim() || "comparable";
+  return {
+    id: `mkt:${row.id}`,
+    title,
+    price_mga: row.price_mga,
+    raw_price_mga: row.price_mga,
+    factor_applied: 1.0,
+    factor_key: undefined,
+    source_origin: "market_clean",
+    trim: row.normalized_trim,
+    seller_type: row.seller_type,
+    year: row.year,
+    mileage_km: row.mileage_km,
+    ville: row.city,
+    region: null,
+    body_style: row.body_style,
+    fuel: row.fuel_type,
+    transmission_gearbox: row.transmission,
+    description: row.normalized_trim ? `Trim: ${row.normalized_trim}` : null,
+    created_at: row.posted_at,
+    updated_at: row.posted_at,
+    status: "active",
+    make,
+    model,
+  };
+}
+
+async function fetchMarketCleanRows(
+  input: EstimationInput,
+  params: { yearWindow: number; limit: number },
+): Promise<ComparableListingRow[]> {
+  try {
+    const { data, error } = await supabase
+      .from("market_listings_clean")
+      .select(
+        "id,normalized_make,normalized_model,normalized_trim,year,mileage_km,price_mga,fuel_type,transmission,drivetrain,body_style,city,seller_type,source,posted_at,data_confidence,include_in_estimation,outlier_flag,fingerprint",
+      )
+      .eq("include_in_estimation", true)
+      .eq("outlier_flag", false)
+      .ilike("normalized_make", input.makeName)
+      .ilike("normalized_model", input.modelName)
+      .gte("year", input.year - params.yearWindow)
+      .lte("year", input.year + params.yearWindow)
+      .limit(params.limit);
+    if (error) {
+      // Best-effort : on ne casse pas la pipeline si market_listings_clean indispo
+      return [];
+    }
+    const rows = (data ?? []) as unknown as MarketCleanRow[];
+    return rows.map(mapCleanRowToComparable).map((r) => ({
+      ...r,
+      // tag seller_type depuis le row clean d'origine pour le factor key
+      // (on doit retrouver ce champ — le mapper ne l'a pas inclus dans le shape Comparable)
+    }));
+  } catch (_err) {
+    return [];
+  }
+}
+
+/**
+ * PROMPT 10A — Filtrage trim cascade.
+ *
+ * Si `input.trim` non null :
+ *   1. Strict : `comparable.trim ILIKE input.trim` OR `title contains input.trim`
+ *   2. Si < 3 comps après strict → relâcher : ajoute aussi les comps sans trim renseigné
+ *   3. Si toujours < 3 → fallback all_trims_warning (tous les comps du modèle)
+ *
+ * Si `input.trim` null/undefined :
+ *   - Pas de filtre, audit flag `unspecified` (matching imprécis, pénalité confidence -0.05 plus tard)
+ */
+function applyTrimFilter(
+  rows: ComparableListingRow[],
+  inputTrim: string | null | undefined,
+): { filtered: ComparableListingRow[]; mode: EstimationAuditV2["trimFiltering"] } {
+  if (!inputTrim || inputTrim.trim() === "") {
+    return { filtered: rows, mode: "unspecified" };
+  }
+  const target = inputTrim.toLowerCase().trim();
+  const matchTrim = (r: ComparableListingRow): boolean => {
+    const trim = (r.trim ?? "").toLowerCase().trim();
+    if (trim && trim.includes(target)) return true;
+    const title = (r.title ?? "").toLowerCase();
+    return title.includes(target);
+  };
+  const strict = rows.filter(matchTrim);
+  if (strict.length >= 3) {
+    return { filtered: strict, mode: "strict" };
+  }
+  // Relâcher : ajouter aussi les comps sans trim renseigné
+  const relaxed = rows.filter((r) => {
+    if (matchTrim(r)) return true;
+    const trim = (r.trim ?? "").trim();
+    return trim === "";
+  });
+  if (relaxed.length >= 3) {
+    return { filtered: relaxed, mode: "relaxed" };
+  }
+  // Fallback : tous les trims du modèle, mais flagger
+  return { filtered: rows, mode: "all_trims_warning" };
+}
+
+async function fetchComparables(
+  input: EstimationInput,
+  config: TransactionFactorsConfig,
+): Promise<ComparableFetchResult> {
+  // PROMPT 10A — UNION 2 sources : market_listings_clean (scrap/partner) + listings (autonex active)
+  const [marketCleanRows, strictRows] = await Promise.all([
+    fetchMarketCleanRows(input, { yearWindow: 4, limit: 160 }),
+    fetchComparableRows(input, { yearWindow: 3, strictAttributes: true, limit: 160 }),
+  ]);
+  const needsBackup = strictRows.length + marketCleanRows.length < 10;
   const backupRows = needsBackup
     ? await fetchComparableRows(input, { yearWindow: 6, strictAttributes: false, limit: 160 })
     : [];
 
   const allById = new Map<string, { row: ComparableListingRow; source: "strict" | "backup" }>();
-  strictRows.forEach((row) => allById.set(row.id, { row, source: "strict" }));
+  // Market_clean en premier (priorité tier B/C — données externes calibrées)
+  marketCleanRows.forEach((row) => allById.set(row.id, { row, source: "strict" }));
+  strictRows.forEach((row) => {
+    if (!allById.has(row.id)) allById.set(row.id, { row, source: "strict" });
+  });
   backupRows.forEach((row) => {
     if (!allById.has(row.id)) allById.set(row.id, { row, source: "backup" });
   });
 
+  const exactRowCount = allById.size;
+
+  // PROMPT 10E — Couche 2 : si la Couche 1 (exacts) est insuffisante, on élargit
+  // aux modèles de la même famille via MODEL_PROXIMITY. Les rows ainsi récupérées
+  // sont taggées proximityType="segment_proche" et leur price_mga est multiplié
+  // par le proximityFactor (moyenne du range défini dans la config).
+  const proxyConfig = exactRowCount < 5 ? findProxyModels(input.makeName, input.modelName) : null;
+  const proxyHits: Array<{ row: ComparableListingRow; source: "strict" | "backup" }> = [];
+  if (proxyConfig) {
+    const proximityFactor = proximityFactorMid(proxyConfig);
+    for (const proxyKey of proxyConfig.proxyModels) {
+      const [proxyMake, proxyModel] = proxyKey.split("|");
+      if (!proxyMake || !proxyModel) continue;
+      const proxyInput: EstimationInput = { ...input, makeName: proxyMake, modelName: proxyModel };
+      const [proxyMkt, proxyStrict] = await Promise.all([
+        fetchMarketCleanRows(proxyInput, { yearWindow: 5, limit: 80 }),
+        fetchComparableRows(proxyInput, { yearWindow: 4, strictAttributes: false, limit: 80 }),
+      ]);
+      const tag = (row: ComparableListingRow): ComparableListingRow => ({
+        ...row,
+        proximityType: "segment_proche",
+        proximityFactor,
+        proximityLabel: proxyConfig.proximityLabel,
+        proximitySourceModel: proxyKey,
+      });
+      proxyMkt.forEach((row) => {
+        if (!allById.has(row.id)) {
+          const tagged = tag(row);
+          allById.set(tagged.id, { row: tagged, source: "strict" });
+          proxyHits.push({ row: tagged, source: "strict" });
+        }
+      });
+      proxyStrict.forEach((row) => {
+        if (!allById.has(row.id)) {
+          const tagged = tag(row);
+          allById.set(tagged.id, { row: tagged, source: "strict" });
+          proxyHits.push({ row: tagged, source: "strict" });
+        }
+      });
+    }
+  }
+
+  // PROMPT 10A — Filtrage trim cascade (avant scoring qualité)
+  const rowsArray = Array.from(allById.values()).map((c) => c.row);
+  const trimResult = applyTrimFilter(rowsArray, input.trim);
+  const filteredById = new Map<string, { row: ComparableListingRow; source: "strict" | "backup" }>();
+  for (const r of trimResult.filtered) {
+    const entry = allById.get(r.id);
+    if (entry) filteredById.set(r.id, entry);
+  }
+
   const rejectedByReason: Record<string, number> = {};
   const accepted: QualityAcceptedCandidate[] = [];
-  for (const candidate of allById.values()) {
+  for (const candidate of filteredById.values()) {
     const quality = evaluateCandidateQuality(input, candidate.row);
     if (!quality.accepted) {
       const reason = quality.reason ?? "unknown_rejection";
@@ -311,11 +634,42 @@ async function fetchComparables(input: EstimationInput): Promise<ComparableFetch
     });
   }
 
-  const scored: ScoredComparableCandidate[] = accepted
-    .map((candidate) => ({
-      ...candidate,
-      similarityScore: computeSimilarityScore(input, candidate),
-    }))
+  // PROMPT 10A — Application transaction factor par row.
+  // PROMPT 10E — Couche 2 : si row.proximityType="segment_proche", on applique
+  // ÉGALEMENT le proximityFactor au prix (pour convertir le prix proxy en
+  // équivalent du modèle cible).
+  const factoredAccepted = accepted.map((c) => {
+    const factorKey = resolveFactorKey(
+      c.row.seller_type ?? null,
+      c.row.source_origin ?? "unknown",
+    );
+    const factor = config.factors[factorKey] ?? config.factors.unknown;
+    const rawPrice = c.row.raw_price_mga ?? c.row.price_mga ?? 0;
+    const proximityFactor = c.row.proximityFactor ?? 1;
+    return {
+      ...c,
+      row: {
+        ...c.row,
+        raw_price_mga: rawPrice,
+        factor_applied: factor,
+        factor_key: factorKey,
+        price_mga: Math.round(rawPrice * factor * proximityFactor),
+      },
+    };
+  });
+
+  // PROMPT 10E — Couche 2 : pour les rows segment_proche, on plafonne le score de
+  // similarité à PROXIMITY_SIMILARITY_CEILING (75) : les proxy restent utiles
+  // mais ne peuvent pas dominer la médiane comme un match exact.
+  const scored: ScoredComparableCandidate[] = factoredAccepted
+    .map((candidate) => {
+      const baseScore = computeSimilarityScore(input, candidate);
+      const cappedScore =
+        candidate.row.proximityType === "segment_proche"
+          ? Math.min(baseScore, PROXIMITY_SIMILARITY_CEILING)
+          : baseScore;
+      return { ...candidate, similarityScore: cappedScore };
+    })
     .sort((a, b) => b.similarityScore - a.similarityScore);
 
   const selected = scored.slice(0, 24);
@@ -325,16 +679,21 @@ async function fetchComparables(input: EstimationInput): Promise<ComparableFetch
   const selectedWithoutOutliers = selected.filter((s) => outlierPriceSet.has(s.row.price_mga ?? 0)).slice(0, 12);
   const finalSelected = selectedWithoutOutliers.length >= 4 ? selectedWithoutOutliers : selected.slice(0, 12);
 
-  const ids = finalSelected.map((s) => s.row.id);
-  const { data: photos } = await supabase
-    .from("listing_photos")
-    .select("listing_id,url,position")
-    .in("listing_id", ids)
-    .order("position", { ascending: true });
+  // Photos — uniquement pour les rows autonex (les ids préfixés "mkt:" n'existent pas en listings)
+  const autonexIds = finalSelected
+    .filter((s) => s.row.source_origin === "autonex_active")
+    .map((s) => s.row.id);
   const firstPhoto = new Map<string, string>();
-  (photos ?? []).forEach((p) => {
-    if (!firstPhoto.has(p.listing_id)) firstPhoto.set(p.listing_id, p.url);
-  });
+  if (autonexIds.length > 0) {
+    const { data: photos } = await supabase
+      .from("listing_photos")
+      .select("listing_id,url,position")
+      .in("listing_id", autonexIds)
+      .order("position", { ascending: true });
+    (photos ?? []).forEach((p) => {
+      if (!firstPhoto.has(p.listing_id)) firstPhoto.set(p.listing_id, p.url);
+    });
+  }
 
   const comparables = finalSelected.map((candidate) => ({
     row: candidate.row,
@@ -349,19 +708,54 @@ async function fetchComparables(input: EstimationInput): Promise<ComparableFetch
     score,
     imageUrl: firstPhoto.get(row.id),
   }));
+
+  // PROMPT 10A — Audit metadata
+  const sourceBreakdown = {
+    marketClean: finalSelected.filter((s) => s.row.source_origin === "market_clean").length,
+    autonexActive: finalSelected.filter((s) => s.row.source_origin === "autonex_active").length,
+  };
+  const factorAvg = finalSelected.length
+    ? finalSelected.reduce((sum, s) => sum + (s.row.factor_applied ?? 1), 0) / finalSelected.length
+    : 1;
+  const rawPrices = finalSelected.map((s) => s.row.raw_price_mga ?? s.row.price_mga ?? 0);
+
+  // PROMPT 10E — Couche 2 : breakdown by layer + proximity audit
+  const proximityRowsFinal = finalSelected.filter((s) => s.row.proximityType === "segment_proche");
+  const exactCount = finalSelected.length - proximityRowsFinal.length;
+  const layerBreakdown = { exact: exactCount, segmentProche: proximityRowsFinal.length };
+  const proximityModelsCount = new Map<string, number>();
+  proximityRowsFinal.forEach((s) => {
+    const key = s.row.proximitySourceModel ?? `${s.row.make ?? ""}|${s.row.model ?? ""}`;
+    proximityModelsCount.set(key, (proximityModelsCount.get(key) ?? 0) + 1);
+  });
+  const proximityModelsUsed = Array.from(proximityModelsCount.entries()).map(([key, n]) => {
+    const [m, mo] = key.split("|");
+    return { make: m ?? "", model: mo ?? "", n };
+  });
+  const proximityFactorAvg = proximityRowsFinal.length
+    ? proximityRowsFinal.reduce((sum, s) => sum + (s.row.proximityFactor ?? 1), 0) / proximityRowsFinal.length
+    : 1;
+
   return {
     comparables,
     candidateCount: allById.size,
     qualityFilteredCount: accepted.length,
-    strictCandidateCount: strictRows.length,
+    strictCandidateCount: strictRows.length + marketCleanRows.length,
     backupCandidateCount: backupRows.length,
-    rejectedCount: allById.size - accepted.length,
+    rejectedCount: filteredById.size - accepted.length,
     rejectedByReason,
     selectedFreshnessAvg: finalSelected.length
       ? Math.round(finalSelected.reduce((sum, item) => sum + item.freshnessScore, 0) / finalSelected.length)
       : 0,
     selectedSameCityCount: finalSelected.filter((item) => toNormalized(item.row.ville) === toNormalized(input.city)).length,
     selectedWithRegionCount: finalSelected.filter((item) => Boolean(toNormalized(item.row.region))).length,
+    sourceBreakdown,
+    transactionFactorAvg: Math.round(factorAvg * 1000) / 1000,
+    rawPrices,
+    trimFiltering: trimResult.mode,
+    layerBreakdown,
+    proximityModelsUsed,
+    proximityFactorAvg: Math.round(proximityFactorAvg * 1000) / 1000,
   };
 }
 
@@ -763,6 +1157,28 @@ function toLegacyEstimationOutput(v2: EstimationOutputV2): EstimationLegacyOutpu
   };
 }
 
+function emptyComparableFetchResult(): ComparableFetchResult {
+  return {
+    comparables: [],
+    candidateCount: 0,
+    qualityFilteredCount: 0,
+    strictCandidateCount: 0,
+    backupCandidateCount: 0,
+    rejectedCount: 0,
+    rejectedByReason: {},
+    selectedFreshnessAvg: 0,
+    selectedSameCityCount: 0,
+    selectedWithRegionCount: 0,
+    sourceBreakdown: { marketClean: 0, autonexActive: 0 },
+    transactionFactorAvg: 1,
+    rawPrices: [],
+    trimFiltering: "unspecified",
+    layerBreakdown: { exact: 0, segmentProche: 0 },
+    proximityModelsUsed: [],
+    proximityFactorAvg: 1,
+  };
+}
+
 export async function computeVehicleEstimationV2(input: EstimationInput): Promise<EstimationOutputV2> {
   const normalized = normalizeInput(input);
   const profile = await findReferenceProfile(normalized);
@@ -778,33 +1194,16 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
     Math.round(fallback.basePrice * Math.pow(1 - fallback.annualDepreciationRate, heuristicYearsDelta)),
   );
 
-  let comparableFetch: ComparableFetchResult = {
-    comparables: [],
-    candidateCount: 0,
-    qualityFilteredCount: 0,
-    strictCandidateCount: 0,
-    backupCandidateCount: 0,
-    rejectedCount: 0,
-    rejectedByReason: {},
-    selectedFreshnessAvg: 0,
-    selectedSameCityCount: 0,
-    selectedWithRegionCount: 0,
-  };
+  // PROMPT 10A — config transaction factors (best-effort, fallback hardcoded)
+  const factorConfig: TransactionFactorsConfig = await fetchTransactionFactors(
+    supabase as unknown as AppConfigSupabaseClient,
+  ).catch(() => FALLBACK_TRANSACTION_FACTORS);
+
+  let comparableFetch: ComparableFetchResult = emptyComparableFetchResult();
   try {
-    comparableFetch = await fetchComparables(normalized);
+    comparableFetch = await fetchComparables(normalized, factorConfig);
   } catch {
-    comparableFetch = {
-      comparables: [],
-      candidateCount: 0,
-      qualityFilteredCount: 0,
-      strictCandidateCount: 0,
-      backupCandidateCount: 0,
-      rejectedCount: 0,
-      rejectedByReason: {},
-      selectedFreshnessAvg: 0,
-      selectedSameCityCount: 0,
-      selectedWithRegionCount: 0,
-    };
+    comparableFetch = emptyComparableFetchResult();
   }
   const comparables = comparableFetch.comparables;
   const prices = comparables.map((c) => c.price);
@@ -901,22 +1300,57 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
   });
 
   const adjustments = buildAdjustmentFactors(normalized);
-  const adjustedPrice = Math.round(marketBasePrice * adjustments.multiplier);
+  const adjustedPriceRaw = Math.round(marketBasePrice * adjustments.multiplier);
+
+  // PROMPT 10A — Fix cap +12% : safety net post-blend.
+  // Le clamp additif `clamp(adjustment, -0.20, 0.12)` est déjà appliqué dans
+  // buildAdjustmentFactors mais on belt-and-suspenders ici au cas où une
+  // future modification du blend introduirait du delta non-cappé.
+  const ratioBeforeCap = marketBasePrice > 0 ? adjustedPriceRaw / marketBasePrice : 1;
+  const ratioCapped = clamp(ratioBeforeCap, 0.8, 1.12);
+  const capApplied = ratioCapped !== ratioBeforeCap;
+  const adjustedPrice = capApplied ? Math.round(marketBasePrice * ratioCapped) : adjustedPriceRaw;
+
+  // PROMPT 10A — Pénalité confidence si trim non spécifié (matching imprécis)
+  const trimUnspecifiedPenalty = comparableFetch.trimFiltering === "unspecified" ? -5 : 0;
+  const trimMixedWarningPenalty = comparableFetch.trimFiltering === "all_trims_warning" ? -5 : 0;
 
   const { beforeCeiling, drivers } = computeConfidenceFromEvidence(evidence, evidence.canonicalModelCertainty);
-  const cappedConfidence = Math.min(beforeCeiling, policy.confidenceCeiling);
+  const beforeCeilingPenalized = clamp(
+    beforeCeiling + trimUnspecifiedPenalty + trimMixedWarningPenalty,
+    18,
+    96,
+  );
+  const cappedConfidence = Math.min(beforeCeilingPenalized, policy.confidenceCeiling);
   const confidenceBand = confidenceBandFromScore(cappedConfidence);
 
   const roundingStep = roundingStepFor(policy.precisionMode);
   const rangeSpread = getRangeSpreadFromPolicy(policy.rangeWidthMode, fallbackSeverity);
-  const lowRangePrice = Math.round(adjustedPrice * (1 - rangeSpread));
-  const highRangePrice = Math.round(adjustedPrice * (1 + rangeSpread));
+
+  // PROMPT 10A — Range Argus-grade : P10/P90 réels quand assez de comps.
+  // Utilise les prix factor-adjusted (déjà dans comparables[].price).
+  const comparablePrices = comparables.map((c) => c.price);
+  const rangeFromComps = computeRangeFromPercentiles(
+    comparablePrices,
+    adjustedPrice,
+    rangeSpread,
+  );
+  const lowRangePrice = rangeFromComps.low;
+  const highRangePrice = rangeFromComps.high;
+  const rangeMethod = rangeFromComps.method;
+
   const quickDiscount = confidenceBand === "high" ? 0.04 : confidenceBand === "medium" ? 0.065 : 0.085;
   const quickSalePrice = Math.round(adjustedPrice * (1 - quickDiscount));
   const recommendedListingPrice = Math.min(
     Math.round(adjustedPrice * (confidenceBand === "high" ? 1.03 : confidenceBand === "medium" ? 1.02 : 1.01)),
     Math.round(highRangePrice * 0.995),
   );
+
+  // PROMPT 10A — 3 valeurs Argus-grade depuis la centrale (=privateMarket=adjustedPrice)
+  const formatMultipliers = factorConfig.price_format_multipliers;
+  const tradeInProRaw = Math.round(adjustedPrice * formatMultipliers.trade_in_pro);
+  const privateMarketRaw = adjustedPrice;
+  const dealerRetailRaw = Math.round(adjustedPrice * formatMultipliers.dealer_retail);
 
   const negativeFactors = [...adjustments.negative];
   if (!profile) negativeFactors.push("Modèle hors base de référence principale");
@@ -930,19 +1364,58 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
         ? "Nous n'avons pas encore assez d'annonces similaires sur AutoNex pour ce modèle, mais voici une estimation indicative basée sur les caractéristiques de votre véhicule."
         : undefined;
 
+  // PROMPT 10E — Couche 4 : sanity check par segment + année.
+  // Si l'estimation centrale tombe hors des bornes raisonnables du segment,
+  // on l'ajuste vers le plancher/plafond, on rééchelonne low/high autour du
+  // nouveau central, on rabaisse le tier vers C et on réduit la confiance.
+  const sanityResult = applySanityCheck(adjustedPrice, normalized.makeName, normalized.modelName, normalized.year);
+  let finalAdjustedPrice = adjustedPrice;
+  let finalLowRange = lowRangePrice;
+  let finalHighRange = highRangePrice;
+  let finalQuickSale = quickSalePrice;
+  let finalRecommended = recommendedListingPrice;
+  let finalTradeInPro = tradeInProRaw;
+  let finalPrivateMarket = privateMarketRaw;
+  let finalDealerRetail = dealerRetailRaw;
+  let sanityConfidencePenalty = 0;
+  if (!sanityResult.inBounds) {
+    finalAdjustedPrice = sanityResult.adjustedEstimate;
+    const sanityRatio = adjustedPrice > 0 ? finalAdjustedPrice / adjustedPrice : 1;
+    finalLowRange = Math.round(lowRangePrice * sanityRatio);
+    finalHighRange = Math.round(highRangePrice * sanityRatio);
+    finalQuickSale = Math.round(quickSalePrice * sanityRatio);
+    finalRecommended = Math.round(recommendedListingPrice * sanityRatio);
+    finalTradeInPro = Math.round(tradeInProRaw * sanityRatio);
+    finalPrivateMarket = finalAdjustedPrice;
+    finalDealerRetail = Math.round(dealerRetailRaw * sanityRatio);
+    sanityConfidencePenalty = 15;
+    // Rabaisser le tier si plus haut que C
+    if (tierDecision.tier === "A_STRONG_MARKET" || tierDecision.tier === "B_MODERATE_MARKET") {
+      tierDecision.tier = "C_REFERENCE_ASSISTED";
+      tierDecision.tierReasonCode = "SANITY_BOUND_APPLIED";
+      tierDecision.tierReasonSummary = "Estimation hors plage attendue, recalibrée par segment.";
+    }
+  }
+  const cappedConfidenceFinal = clamp(cappedConfidence - sanityConfidencePenalty, 18, 96);
+  const confidenceBandFinal = confidenceBandFromScore(cappedConfidenceFinal);
+
   const outputValues = {
-    estimatedValue: roundToStep(adjustedPrice, roundingStep),
-    lowEstimate: roundToStep(lowRangePrice, roundingStep),
-    highEstimate: roundToStep(highRangePrice, roundingStep),
-    quickSalePrice: roundToStep(quickSalePrice, roundingStep),
-    recommendedListingPrice: roundToStep(recommendedListingPrice, roundingStep),
+    estimatedValue: roundToStep(finalAdjustedPrice, roundingStep),
+    lowEstimate: roundToStep(finalLowRange, roundingStep),
+    highEstimate: roundToStep(finalHighRange, roundingStep),
+    quickSalePrice: roundToStep(finalQuickSale, roundingStep),
+    recommendedListingPrice: roundToStep(finalRecommended, roundingStep),
     roundingStepApplied: roundingStep,
+    // PROMPT 10A — 3 valeurs Argus-grade (additives pour rétro-compat)
+    tradeInPro: roundToStep(finalTradeInPro, roundingStep),
+    privateMarket: roundToStep(finalPrivateMarket, roundingStep),
+    dealerRetail: roundToStep(finalDealerRetail, roundingStep),
     internalUnrounded: {
-      estimatedValueRaw: adjustedPrice,
-      lowEstimateRaw: lowRangePrice,
-      highEstimateRaw: highRangePrice,
-      quickSaleRaw: quickSalePrice,
-      recommendedRaw: recommendedListingPrice,
+      estimatedValueRaw: finalAdjustedPrice,
+      lowEstimateRaw: finalLowRange,
+      highEstimateRaw: finalHighRange,
+      quickSaleRaw: finalQuickSale,
+      recommendedRaw: finalRecommended,
     },
   };
 
@@ -999,11 +1472,11 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
       adjustmentCapApplied: adjustments.multiplier <= 0.8 || adjustments.multiplier >= 1.12,
     },
     confidence: {
-      confidenceScore: cappedConfidence,
-      confidenceBand,
+      confidenceScore: cappedConfidenceFinal,
+      confidenceBand: confidenceBandFinal,
       confidenceCeiling: policy.confidenceCeiling,
       confidenceBeforeCeiling: beforeCeiling,
-      confidenceCapped: cappedConfidence !== beforeCeiling,
+      confidenceCapped: cappedConfidenceFinal !== beforeCeiling,
       drivers,
       explanationMode: "summary_only",
     },
@@ -1049,6 +1522,40 @@ export async function computeVehicleEstimationV2(input: EstimationInput): Promis
             ? "cautious"
             : "normal",
       requiredBadges: [policy.pricingMode],
+    },
+    audit: {
+      rangeMethod,
+      capApplied,
+      trimFiltering: comparableFetch.trimFiltering,
+      comparableSourceBreakdown: comparableFetch.sourceBreakdown,
+      transactionFactorAvg: comparableFetch.transactionFactorAvg,
+      transactionFactorVersion: factorConfig.version,
+      // PROMPT 10E — Couche 2
+      comparablesBreakdownByLayer: {
+        exact: comparableFetch.layerBreakdown.exact,
+        segmentProche: comparableFetch.layerBreakdown.segmentProche,
+        fallbackCanonical: comparables.length === 0 && Boolean(profile) ? 1 : 0,
+      },
+      proximityModelsUsed: comparableFetch.proximityModelsUsed,
+      proximityFactorAvg: comparableFetch.proximityFactorAvg,
+      reasoningLayer:
+        comparableFetch.layerBreakdown.exact >= 5
+          ? "couche_1_exact"
+          : comparableFetch.layerBreakdown.segmentProche > 0
+            ? "couche_2_segment_proche"
+            : sanityResult.action !== "no_bound" && sanityResult.action !== "kept"
+              ? "couche_4_sanity_only"
+              : "fallback_canonical",
+      // PROMPT 10E — Couche 4
+      sanityCheck: {
+        applied: !sanityResult.inBounds,
+        action: sanityResult.action,
+        segmentKey: sanityResult.bound?.segmentKey ?? null,
+        segmentLabel: sanityResult.bound?.segmentLabel ?? null,
+        originalEstimate: sanityResult.originalEstimate,
+        adjustedEstimate: sanityResult.adjustedEstimate,
+        warning: sanityResult.warning,
+      },
     },
   };
   return v2;

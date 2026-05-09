@@ -17,6 +17,22 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
+import { createElement, type ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// useNotifications utilise désormais @tanstack/react-query (useQuery + useMutation).
+// renderHook(...) sans QueryClientProvider ancestral throw « No QueryClient set ».
+// Wrapper avec QueryClient frais par test pour préserver l'isolation.
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 },
+      mutations: { retry: false },
+    },
+  });
+  return ({ children }: { children: ReactNode }) =>
+    createElement(QueryClientProvider, { client: queryClient }, children);
+}
 
 const { mockAuthState, mockState } = vi.hoisted(() => ({
   mockAuthState: {
@@ -133,8 +149,9 @@ afterEach(() => {
 
 describe("useNotifications — Realtime subscription (Sentry ee5c9353)", () => {
   it("mount / unmount / remount : ne throw jamais sur `.on()`", async () => {
+    const wrapper = createWrapper();
     // Premier mount
-    const { result: r1, unmount: u1 } = renderHook(() => useNotifications());
+    const { result: r1, unmount: u1 } = renderHook(() => useNotifications(), { wrapper });
     await waitFor(() => expect(r1.current.loading).toBe(false));
     expect(mockState.createdChannelNames).toHaveLength(1);
 
@@ -149,7 +166,7 @@ describe("useNotifications — Realtime subscription (Sentry ee5c9353)", () => {
     await act(async () => {
       await new Promise((r) => setTimeout(r, 2)); // garantit un Date.now() différent
     });
-    const { result: r2 } = renderHook(() => useNotifications());
+    const { result: r2 } = renderHook(() => useNotifications(), { wrapper });
     await waitFor(() => expect(r2.current.loading).toBe(false));
 
     expect(mockState.createdChannelNames).toHaveLength(2);
@@ -162,7 +179,7 @@ describe("useNotifications — Realtime subscription (Sentry ee5c9353)", () => {
 
   it("try/catch défensif : si `.on()` throw, le hook ne crash pas", async () => {
     mockState.forceOnThrow = true;
-    const { result } = renderHook(() => useNotifications());
+    const { result } = renderHook(() => useNotifications(), { wrapper: createWrapper() });
 
     // Le fetch REST initial fonctionne toujours, le hook reste utilisable.
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -175,7 +192,7 @@ describe("useNotifications — Realtime subscription (Sentry ee5c9353)", () => {
   });
 
   it("cleanup : removeChannel est appelé avec le channel créé", async () => {
-    const { result, unmount } = renderHook(() => useNotifications());
+    const { result, unmount } = renderHook(() => useNotifications(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(mockState.createdChannelNames).toHaveLength(1);
@@ -186,7 +203,8 @@ describe("useNotifications — Realtime subscription (Sentry ee5c9353)", () => {
   });
 
   it("nom de channel : contient bien un suffixe unique par mount (Date.now)", async () => {
-    const { result, unmount } = renderHook(() => useNotifications());
+    const wrapper = createWrapper();
+    const { result, unmount } = renderHook(() => useNotifications(), { wrapper });
     await waitFor(() => expect(result.current.loading).toBe(false));
     unmount();
 
@@ -194,7 +212,7 @@ describe("useNotifications — Realtime subscription (Sentry ee5c9353)", () => {
       await new Promise((r) => setTimeout(r, 2));
     });
 
-    const { result: result2, unmount: unmount2 } = renderHook(() => useNotifications());
+    const { result: result2, unmount: unmount2 } = renderHook(() => useNotifications(), { wrapper });
     await waitFor(() => expect(result2.current.loading).toBe(false));
     unmount2();
 

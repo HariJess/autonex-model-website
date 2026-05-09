@@ -36,6 +36,40 @@ export default function YasAppPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Prefetch des routes les plus probablement cliquées par un user YAS, en
+  // idle après le first paint pour éviter de concurrencer le rendu critique.
+  // - SearchPage : la card "Acheter" est la plus cliquée (cf. yasTracking).
+  // - VehicleEstimationPage : 2e CTA dominant + section "Hésitant à vendre".
+  // ListingDetail est couvert par les deal cards au tap (prefetchListing déjà
+  // fait dans ListingCard.handlePrefetchDetail). PublishPage n'est PAS
+  // prefetchée — son chunk est gros et tombe dans la zone garde-fou publish/.
+  useEffect(() => {
+    if (!yas.isEmbedded) return;
+    if (typeof window === "undefined") return;
+
+    const prefetch = () => {
+      void import("@/pages/SearchPage");
+      void import("@/pages/VehicleEstimationPage");
+    };
+
+    type IdleWindow = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    const w = window as IdleWindow;
+
+    if (typeof w.requestIdleCallback === "function") {
+      const handle = w.requestIdleCallback(prefetch, { timeout: 3000 });
+      return () => {
+        if (typeof w.cancelIdleCallback === "function") {
+          w.cancelIdleCallback(handle);
+        }
+      };
+    }
+    const timer = window.setTimeout(prefetch, 1500);
+    return () => window.clearTimeout(timer);
+  }, [yas.isEmbedded]);
+
   const estimationUrl = buildYasUrl("/estimation", {
     source: yas.source ?? "yas",
     embedded: yas.isEmbedded ? "true" : null,
@@ -52,6 +86,9 @@ export default function YasAppPage() {
           name="description"
           content="Mini-app AutoNex intégrée à YAS & Moi : acheter, vendre ou estimer une voiture à Madagascar."
         />
+        {yas.isEmbedded && (
+          <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        )}
       </Helmet>
       <YasAppLayout>
         <div className="space-y-5">

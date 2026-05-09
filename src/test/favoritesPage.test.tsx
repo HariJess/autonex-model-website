@@ -17,6 +17,26 @@ vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: mockUser, session: { user: mockUser } }),
 }));
 
+// YasProvider non monté dans ce smoke test : mock plat pour que `useYasContext`
+// fonctionne sans crash dans Header / Footer / autres composants partagés.
+vi.mock("@/features/yas-app/hooks/useYasContext", () => ({
+  useYasContext: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  readYasContextFromStorage: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  YasProvider: ({ children }: { children: ReactNode }) => children,
+}));
+
 vi.mock("@/contexts/CurrencyContext", async () => {
   const actual = await vi.importActual<typeof import("@/contexts/CurrencyContext")>("@/contexts/CurrencyContext");
   return actual;

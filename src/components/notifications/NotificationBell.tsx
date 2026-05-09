@@ -78,7 +78,7 @@ export function NotificationBell() {
             className="text-xs font-sans text-muted-foreground hover:text-foreground hover:underline"
             onClick={() => setOpen(false)}
           >
-            {t("notifications.preferences")}
+            {t("notifications.preferencesLabel")}
           </Link>
         </div>
       </PopoverContent>

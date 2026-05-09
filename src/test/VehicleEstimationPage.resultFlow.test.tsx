@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import type { ReactNode } from "react";
 import VehicleEstimationPage from "@/pages/VehicleEstimationPage";
 import type { EstimationRunResult } from "@/types/estimation";
 
@@ -10,6 +11,25 @@ const runVehicleEstimationMock = vi.fn();
 
 vi.mock("@/components/Header", () => ({ default: () => <div>Header</div> }));
 vi.mock("@/components/Footer", () => ({ default: () => <div>Footer</div> }));
+// YasProvider non monté : mock plat de useYasContext (utilisé par
+// VehicleEstimationPage + YasBackButton).
+vi.mock("@/features/yas-app/hooks/useYasContext", () => ({
+  useYasContext: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  readYasContextFromStorage: () => ({
+    isEmbedded: false,
+    source: null,
+    platform: null,
+    entryPoint: null,
+    sessionId: "test-session",
+  }),
+  YasProvider: ({ children }: { children: ReactNode }) => children,
+}));
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), {
     success: vi.fn(),
@@ -236,9 +256,10 @@ describe("VehicleEstimationPage result flow", () => {
       }),
     );
 
-    await waitFor(() => expect(screen.getByText("Analyse marché robuste")).toBeInTheDocument());
-    expect(screen.getAllByText(/Appui marché solide/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Publiez maintenant avec un positionnement assumé/i)).toBeInTheDocument();
+    // P10C : "Analyse marché robuste" reste rendu (Badge claimLabel dans card hero)
+    // mais section D ("Lecture du rapport") + section K (Appui marché solide) supprimées.
+    await waitFor(() => expect(screen.getByText(/Publiez maintenant avec un positionnement assumé/i)).toBeInTheDocument());
+    expect(screen.queryByText(/Appui marché solide/i)).not.toBeInTheDocument();
   });
 
   it("forces indicative and confidence de-emphasis for weak governance", async () => {
@@ -275,9 +296,11 @@ describe("VehicleEstimationPage result flow", () => {
       }),
     );
 
-    await waitFor(() => expect(screen.getByText("Estimation indicative exploratoire")).toBeInTheDocument());
-    expect(screen.getByText(/Affichage prudent/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Appui marché faible/i).length).toBeGreaterThanOrEqual(1);
+    // P10C : "Estimation indicative exploratoire" reste rendu (Badge claimLabel hero).
+    // Section D ("Lecture du rapport") supprimée — on n'asserte plus sa présence.
+    // "Affichage prudent" reste dans la card hero. "Appui marché faible" supprimé avec K.
+    await waitFor(() => expect(screen.getByText(/Affichage prudent/i)).toBeInTheDocument());
+    expect(screen.queryByText(/Appui marché faible/i)).not.toBeInTheDocument();
   });
 
   it("keeps moderate-empty support state qualified and actionable", async () => {
@@ -305,10 +328,10 @@ describe("VehicleEstimationPage result flow", () => {
       }),
     );
 
-    await waitFor(() => expect(screen.getByText("Analyse marché qualifiée")).toBeInTheDocument());
-    expect(screen.getByText(/Comparaison marché en consolidation/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Le rapport reste utile pour cadrer votre décision avec prudence/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Publiez avec un positionnement calibré/i)).toBeInTheDocument();
+    // P10C : marketSupportHeadline ("Comparaison marché en consolidation") + comparablesEmptyMessage
+    // supprimés avec section K. claimLabel reste rendu dans Badge hero. actionHeadline dans CTA card.
+    await waitFor(() => expect(screen.getByText(/Publiez avec un positionnement calibré/i)).toBeInTheDocument());
+    expect(screen.queryByText(/Comparaison marché en consolidation/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Appui marché solide/i)).not.toBeInTheDocument();
   });
 });

@@ -4,6 +4,7 @@ import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import { cn } from "@/lib/utils";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
 import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
+import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
 
 interface PremiumBillboardProps {
   enabled?: boolean;
@@ -69,13 +70,22 @@ export function PremiumBillboardView({ campaign, className, onClick }: PremiumBi
         <div className="relative w-full aspect-[2/1] md:aspect-[6/1]">
           <picture>
             {campaign.image_url_mobile ? (
-              <source media="(max-width: 768px)" srcSet={campaign.image_url_mobile} />
+              <source
+                media="(max-width: 768px)"
+                srcSet={getOptimizedSrcSet(campaign.image_url_mobile, [400, 800, 1200], 80)}
+                type="image/webp"
+              />
             ) : null}
+            <source
+              srcSet={getOptimizedSrcSet(campaign.image_url, [800, 1600, 2400], 80)}
+              type="image/webp"
+            />
             <img
-              src={campaign.image_url}
+              src={getOptimizedStorageUrl(campaign.image_url, { width: 1600, quality: 80 }) || campaign.image_url}
               alt={campaign.advertiser_name}
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
               loading="lazy"
+              decoding="async"
             />
           </picture>
         </div>

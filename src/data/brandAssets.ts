@@ -45,7 +45,7 @@ export const BRAND_ASSETS: BrandAsset[] = [
   buildAsset("yamaha", "Yamaha"),
   buildAsset("byd", "BYD", "byd.svg"),
   buildAsset("chery", "Chery", "chery.svg"),
-  buildAsset("citroen", "Citroën", "citroen.svg", ["citroen"]),
+  buildAsset("citroen", "Citroen", "citroen.svg", ["citroën", "citroen"]),
   buildAsset("chevrolet", "Chevrolet", "chevrolet.svg"),
   buildAsset("foton", "Foton", "foton.svg"),
   buildAsset("gmc", "GMC", "gmc.svg"),
@@ -68,10 +68,12 @@ export const BRAND_ASSETS: BrandAsset[] = [
   // BrandAsset (label) instead of null. ListingCard falls back to an
   // initial-letter chip for these until assets land.
   buildAsset("dacia", "Dacia"),
+  buildAsset("dodge", "Dodge"),
   buildAsset("fiat", "Fiat"),
   buildAsset("opel", "Opel"),
   buildAsset("seat", "Seat"),
   buildAsset("skoda", "Škoda", undefined, ["skoda"]),
+  buildAsset("ssangyong", "SsangYong"),
   buildAsset("subaru", "Subaru"),
   buildAsset("tesla", "Tesla"),
   buildAsset("volvo", "Volvo"),
@@ -83,6 +85,14 @@ export const BRAND_ASSETS: BrandAsset[] = [
   buildAsset("alfa-romeo", "Alfa Romeo", undefined, ["alfa romeo", "alfa"]),
   buildAsset("smart", "Smart"),
   buildAsset("cfmoto", "CFMoto", undefined, ["cf moto"]),
+  // Sprint catalogue UI — marques chinoises ajoutées au front (logos SVG
+  // Brilliance/Enranger/Kaiyi/Jetta à fournir ultérieurement, fallback chip
+  // lettre initiale en attendant). Mahindra dispose désormais de son logo SVG.
+  buildAsset("brilliance", "Brilliance"),
+  buildAsset("enranger", "Enranger"),
+  buildAsset("kaiyi", "Kaiyi"),
+  buildAsset("jetta", "Jetta"),
+  buildAsset("mahindra", "Mahindra", "mahindra.svg"),
 ];
 
 const brandAssetLookup = new Map<string, BrandAsset>();

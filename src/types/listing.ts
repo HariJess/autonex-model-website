@@ -124,7 +124,9 @@ export interface DisplayListing {
   agency_slug?: string | null;
   agency_logo?: string | null;
   agency_verified?: boolean;
-  badge?: "boost" | "coup_de_coeur" | "nouveau" | "urgent" | null;
+  /** PROMPT 7 — true si owner a un seller_badge actif (active_seller_badges VIEW). */
+  seller_verified?: boolean;
+  badge?: "boost" | "coup_de_coeur" | "nouveau" | "urgent" | "top_ad" | "featured" | null;
   video_url?: string | null;
   virtual_tour_url?: string | null;
   internal_ref?: string | null;
@@ -132,6 +134,14 @@ export interface DisplayListing {
   rejection_reason?: string | null;
   /** Boost types requested at publish; applied after moderation when listing goes live */
   pending_boost_types?: string[];
+  /** Deal vendeur actif (cf. feature « Bonnes affaires », sprint 1). */
+  deal_active?: boolean;
+  deal_started_at?: string | null;
+  deal_ends_at?: string | null;
+  deal_duration_days?: number | null;
+  deal_discount_percent?: number | null;
+  deal_original_price_mga?: number | null;
+  deal_price_lock_until?: string | null;
   /**
    * Score for search « Plus récent » ordering: combines active boosts (top, featured, daily_bump, urgent)
    * with listing creation / bump recency. Higher = shown first.

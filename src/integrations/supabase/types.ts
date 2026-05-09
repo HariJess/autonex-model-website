@@ -12,33 +12,23 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
+      _backup_20260503: {
+        Row: {
+          data: Json | null
+          src: string | null
+        }
+        Insert: {
+          data?: Json | null
+          src?: string | null
+        }
+        Update: {
+          data?: Json | null
+          src?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -168,6 +158,27 @@ export type Database = {
         }
         Relationships: []
       }
+      app_config: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -214,6 +225,8 @@ export type Database = {
       }
       boosts: {
         Row: {
+          created_by: string | null
+          credits_charged: number
           ends_at: string | null
           id: string
           listing_id: string
@@ -221,6 +234,8 @@ export type Database = {
           type: Database["public"]["Enums"]["boost_type"]
         }
         Insert: {
+          created_by?: string | null
+          credits_charged?: number
           ends_at?: string | null
           id?: string
           listing_id: string
@@ -228,6 +243,8 @@ export type Database = {
           type: Database["public"]["Enums"]["boost_type"]
         }
         Update: {
+          created_by?: string | null
+          credits_charged?: number
           ends_at?: string | null
           id?: string
           listing_id?: string
@@ -304,22 +321,31 @@ export type Database = {
       }
       credit_packs: {
         Row: {
+          bonus_credits: number
           credits_amount: number
+          display_name: string
           id: string
+          is_active: boolean
           name: string
           price_mga: number
           sort_order: number | null
         }
         Insert: {
+          bonus_credits?: number
           credits_amount: number
+          display_name: string
           id: string
+          is_active?: boolean
           name: string
           price_mga: number
           sort_order?: number | null
         }
         Update: {
+          bonus_credits?: number
           credits_amount?: number
+          display_name?: string
           id?: string
+          is_active?: boolean
           name?: string
           price_mga?: number
           sort_order?: number | null
@@ -354,7 +380,9 @@ export type Database = {
         Row: {
           created_at: string | null
           delta: number
+          granted_expires_at: string | null
           id: string
+          is_granted: boolean
           meta: Json | null
           reason: string | null
           ref_id: string | null
@@ -364,7 +392,9 @@ export type Database = {
         Insert: {
           created_at?: string | null
           delta: number
+          granted_expires_at?: string | null
           id?: string
+          is_granted?: boolean
           meta?: Json | null
           reason?: string | null
           ref_id?: string | null
@@ -374,7 +404,9 @@ export type Database = {
         Update: {
           created_at?: string | null
           delta?: number
+          granted_expires_at?: string | null
           id?: string
+          is_granted?: boolean
           meta?: Json | null
           reason?: string | null
           ref_id?: string | null
@@ -529,6 +561,63 @@ export type Database = {
           },
         ]
       }
+      listing_deal_history: {
+        Row: {
+          created_at: string
+          discount_percent: number
+          duration_days: number
+          ended_at: string | null
+          id: string
+          listing_id: string
+          new_price_mga: number
+          original_price_mga: number
+          outcome: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          discount_percent: number
+          duration_days: number
+          ended_at?: string | null
+          id?: string
+          listing_id: string
+          new_price_mga: number
+          original_price_mga: number
+          outcome?: string
+          started_at: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          discount_percent?: number
+          duration_days?: number
+          ended_at?: string | null
+          id?: string
+          listing_id?: string
+          new_price_mga?: number
+          original_price_mga?: number
+          outcome?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_deal_history_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_deal_history_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_photos: {
         Row: {
           id: string
@@ -649,28 +738,78 @@ export type Database = {
           },
         ]
       }
+      listing_views_daily: {
+        Row: {
+          listing_id: string
+          unique_visitors: number
+          view_count: number
+          view_date: string
+        }
+        Insert: {
+          listing_id: string
+          unique_visitors?: number
+          view_count?: number
+          view_date: string
+        }
+        Update: {
+          listing_id?: string
+          unique_visitors?: number
+          view_count?: number
+          view_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_views_daily_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_views_daily_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_vehicle_semantics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           arrondissement: string | null
           availability_status: string | null
           body_style: string | null
+          contact_count: number
           created_at: string | null
+          deal_active: boolean
+          deal_discount_percent: number | null
+          deal_duration_days: number | null
+          deal_ends_at: string | null
+          deal_original_price_mga: number | null
+          deal_price_lock_until: string | null
+          deal_started_at: string | null
           description: string | null
           doors: number | null
           draft_step: number
           drivetrain: string | null
           engine_displacement_l: number | null
           expires_at: string | null
+          expires_at_paused_at: string | null
           exterior_color: string | null
+          favorite_count: number
+          featured_until: string | null
           features: Json | null
           fuel: string | null
+          has_video: boolean
           id: string
           interior_color: string | null
           internal_ref: string | null
           is_electric: boolean | null
           is_hybrid: boolean | null
           is_new_program: boolean | null
+          last_bumped_at: string | null
           lat: number | null
+          listing_duration_days: number
           lng: number | null
           make: string | null
           mileage_km: number | null
@@ -682,16 +821,21 @@ export type Database = {
           price_eur: number | null
           price_mga: number
           publication_credits_charged: number | null
+          published_at: string | null
           quartier: string | null
           quartier_libre: string | null
           region: string | null
           rejection_reason: string | null
+          renewal_count: number
           rental_mode: string | null
           search_vector: unknown
           seats: number | null
           seller_type: string | null
+          sold_at: string | null
+          sold_price: number | null
           status: Database["public"]["Enums"]["listing_status"] | null
           title: string
+          top_ad_until: string | null
           transaction: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox: string | null
           type: string | null
@@ -708,23 +852,37 @@ export type Database = {
           arrondissement?: string | null
           availability_status?: string | null
           body_style?: string | null
+          contact_count?: number
           created_at?: string | null
+          deal_active?: boolean
+          deal_discount_percent?: number | null
+          deal_duration_days?: number | null
+          deal_ends_at?: string | null
+          deal_original_price_mga?: number | null
+          deal_price_lock_until?: string | null
+          deal_started_at?: string | null
           description?: string | null
           doors?: number | null
           draft_step?: number
           drivetrain?: string | null
           engine_displacement_l?: number | null
           expires_at?: string | null
+          expires_at_paused_at?: string | null
           exterior_color?: string | null
+          favorite_count?: number
+          featured_until?: string | null
           features?: Json | null
           fuel?: string | null
+          has_video?: boolean
           id?: string
           interior_color?: string | null
           internal_ref?: string | null
           is_electric?: boolean | null
           is_hybrid?: boolean | null
           is_new_program?: boolean | null
+          last_bumped_at?: string | null
           lat?: number | null
+          listing_duration_days?: number
           lng?: number | null
           make?: string | null
           mileage_km?: number | null
@@ -736,16 +894,21 @@ export type Database = {
           price_eur?: number | null
           price_mga?: number
           publication_credits_charged?: number | null
+          published_at?: string | null
           quartier?: string | null
           quartier_libre?: string | null
           region?: string | null
           rejection_reason?: string | null
+          renewal_count?: number
           rental_mode?: string | null
           search_vector?: unknown
           seats?: number | null
           seller_type?: string | null
+          sold_at?: string | null
+          sold_price?: number | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title: string
+          top_ad_until?: string | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
           type?: string | null
@@ -762,23 +925,37 @@ export type Database = {
           arrondissement?: string | null
           availability_status?: string | null
           body_style?: string | null
+          contact_count?: number
           created_at?: string | null
+          deal_active?: boolean
+          deal_discount_percent?: number | null
+          deal_duration_days?: number | null
+          deal_ends_at?: string | null
+          deal_original_price_mga?: number | null
+          deal_price_lock_until?: string | null
+          deal_started_at?: string | null
           description?: string | null
           doors?: number | null
           draft_step?: number
           drivetrain?: string | null
           engine_displacement_l?: number | null
           expires_at?: string | null
+          expires_at_paused_at?: string | null
           exterior_color?: string | null
+          favorite_count?: number
+          featured_until?: string | null
           features?: Json | null
           fuel?: string | null
+          has_video?: boolean
           id?: string
           interior_color?: string | null
           internal_ref?: string | null
           is_electric?: boolean | null
           is_hybrid?: boolean | null
           is_new_program?: boolean | null
+          last_bumped_at?: string | null
           lat?: number | null
+          listing_duration_days?: number
           lng?: number | null
           make?: string | null
           mileage_km?: number | null
@@ -790,16 +967,21 @@ export type Database = {
           price_eur?: number | null
           price_mga?: number
           publication_credits_charged?: number | null
+          published_at?: string | null
           quartier?: string | null
           quartier_libre?: string | null
           region?: string | null
           rejection_reason?: string | null
+          renewal_count?: number
           rental_mode?: string | null
           search_vector?: unknown
           seats?: number | null
           seller_type?: string | null
+          sold_at?: string | null
+          sold_price?: number | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title?: string
+          top_ad_until?: string | null
           transaction?: Database["public"]["Enums"]["transaction_type"]
           transmission_gearbox?: string | null
           type?: string | null
@@ -1364,15 +1546,15 @@ export type Database = {
             foreignKeyName: "partner_ad_events_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
-            referencedRelation: "partner_ad_campaigns"
-            referencedColumns: ["id"]
+            referencedRelation: "partner_ad_campaign_stats"
+            referencedColumns: ["campaign_id"]
           },
           {
             foreignKeyName: "partner_ad_events_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
-            referencedRelation: "partner_ad_campaign_stats"
-            referencedColumns: ["campaign_id"]
+            referencedRelation: "partner_ad_campaigns"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1428,6 +1610,7 @@ export type Database = {
           full_name: string | null
           id: string
           is_anonymized: boolean
+          last_published_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           seller_type: string | null
@@ -1450,6 +1633,7 @@ export type Database = {
           full_name?: string | null
           id: string
           is_anonymized?: boolean
+          last_published_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
@@ -1472,6 +1656,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_anonymized?: boolean
+          last_published_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           seller_type?: string | null
@@ -1656,6 +1841,44 @@ export type Database = {
           ville?: string | null
         }
         Relationships: []
+      }
+      seller_badges: {
+        Row: {
+          badge_type: string
+          created_at: string
+          expires_at: string
+          granted_at: string
+          id: string
+          user_id: string
+          verification_id: string | null
+        }
+        Insert: {
+          badge_type?: string
+          created_at?: string
+          expires_at: string
+          granted_at?: string
+          id?: string
+          user_id: string
+          verification_id?: string | null
+        }
+        Update: {
+          badge_type?: string
+          created_at?: string
+          expires_at?: string
+          granted_at?: string
+          id?: string
+          user_id?: string
+          verification_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_badges_verification_id_fkey"
+            columns: ["verification_id"]
+            isOneToOne: false
+            referencedRelation: "verifications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -2227,6 +2450,7 @@ export type Database = {
           baseline_year: number
           body_type: string
           created_at: string
+          data_quality_tier: string | null
           expected_km_per_year: number
           fuel_type: string | null
           id: string
@@ -2234,7 +2458,10 @@ export type Database = {
           make_name: string
           model_name: string
           popularity_score: number | null
+          sample_size: number | null
+          source_versions: string[] | null
           transmission_type: string | null
+          updated_at: string | null
         }
         Insert: {
           annual_depreciation_rate?: number
@@ -2242,6 +2469,7 @@ export type Database = {
           baseline_year: number
           body_type: string
           created_at?: string
+          data_quality_tier?: string | null
           expected_km_per_year?: number
           fuel_type?: string | null
           id?: string
@@ -2249,7 +2477,10 @@ export type Database = {
           make_name: string
           model_name: string
           popularity_score?: number | null
+          sample_size?: number | null
+          source_versions?: string[] | null
           transmission_type?: string | null
+          updated_at?: string | null
         }
         Update: {
           annual_depreciation_rate?: number
@@ -2257,6 +2488,7 @@ export type Database = {
           baseline_year?: number
           body_type?: string
           created_at?: string
+          data_quality_tier?: string | null
           expected_km_per_year?: number
           fuel_type?: string | null
           id?: string
@@ -2264,7 +2496,70 @@ export type Database = {
           make_name?: string
           model_name?: string
           popularity_score?: number | null
+          sample_size?: number | null
+          source_versions?: string[] | null
           transmission_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vehicle_price_reference_profiles_backup_2026_05_02: {
+        Row: {
+          annual_depreciation_rate: number | null
+          baseline_price_mga: number | null
+          baseline_year: number | null
+          body_type: string | null
+          created_at: string | null
+          data_quality_tier: string | null
+          expected_km_per_year: number | null
+          fuel_type: string | null
+          id: string | null
+          is_active: boolean | null
+          make_name: string | null
+          model_name: string | null
+          popularity_score: number | null
+          sample_size: number | null
+          source_versions: string[] | null
+          transmission_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          annual_depreciation_rate?: number | null
+          baseline_price_mga?: number | null
+          baseline_year?: number | null
+          body_type?: string | null
+          created_at?: string | null
+          data_quality_tier?: string | null
+          expected_km_per_year?: number | null
+          fuel_type?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          make_name?: string | null
+          model_name?: string | null
+          popularity_score?: number | null
+          sample_size?: number | null
+          source_versions?: string[] | null
+          transmission_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          annual_depreciation_rate?: number | null
+          baseline_price_mga?: number | null
+          baseline_year?: number | null
+          body_type?: string | null
+          created_at?: string | null
+          data_quality_tier?: string | null
+          expected_km_per_year?: number | null
+          fuel_type?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          make_name?: string | null
+          model_name?: string | null
+          popularity_score?: number | null
+          sample_size?: number | null
+          source_versions?: string[] | null
+          transmission_type?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2312,8 +2607,180 @@ export type Database = {
           },
         ]
       }
+      verifications: {
+        Row: {
+          carte_grise_path: string | null
+          cin_back_path: string
+          cin_front_path: string
+          cin_number: string
+          created_at: string
+          credits_spent: number
+          date_of_birth: string | null
+          expires_at: string | null
+          full_name: string
+          id: string
+          ledger_entry_id: string | null
+          metadata: Json
+          rejection_category: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          selfie_path: string
+          status: string
+          submitted_at: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          carte_grise_path?: string | null
+          cin_back_path: string
+          cin_front_path: string
+          cin_number: string
+          created_at?: string
+          credits_spent?: number
+          date_of_birth?: string | null
+          expires_at?: string | null
+          full_name: string
+          id?: string
+          ledger_entry_id?: string | null
+          metadata?: Json
+          rejection_category?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_path: string
+          status?: string
+          submitted_at?: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          carte_grise_path?: string | null
+          cin_back_path?: string
+          cin_front_path?: string
+          cin_number?: string
+          created_at?: string
+          credits_spent?: number
+          date_of_birth?: string | null
+          expires_at?: string | null
+          full_name?: string
+          id?: string
+          ledger_entry_id?: string | null
+          metadata?: Json
+          rejection_category?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_path?: string
+          status?: string
+          submitted_at?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verifications_ledger_entry_id_fkey"
+            columns: ["ledger_entry_id"]
+            isOneToOne: false
+            referencedRelation: "credits_ledger"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      yas_tracking_events: {
+        Row: {
+          campaign: string
+          created_at: string
+          embedded: boolean
+          entry_point: string | null
+          event_name: string
+          id: string
+          listing_id: string | null
+          medium: string
+          payload: Json
+          platform: string | null
+          referrer: string | null
+          session_id: string
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          campaign?: string
+          created_at?: string
+          embedded?: boolean
+          entry_point?: string | null
+          event_name: string
+          id?: string
+          listing_id?: string | null
+          medium?: string
+          payload?: Json
+          platform?: string | null
+          referrer?: string | null
+          session_id: string
+          source?: string
+          user_id?: string | null
+        }
+        Update: {
+          campaign?: string
+          created_at?: string
+          embedded?: boolean
+          entry_point?: string | null
+          event_name?: string
+          id?: string
+          listing_id?: string | null
+          medium?: string
+          payload?: Json
+          platform?: string | null
+          referrer?: string | null
+          session_id?: string
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
+      active_seller_badges: {
+        Row: {
+          badge_type: string | null
+          created_at: string | null
+          expires_at: string | null
+          granted_at: string | null
+          id: string | null
+          user_id: string | null
+          verification_id: string | null
+        }
+        Insert: {
+          badge_type?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          id?: string | null
+          user_id?: string | null
+          verification_id?: string | null
+        }
+        Update: {
+          badge_type?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          id?: string | null
+          user_id?: string | null
+          verification_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_badges_verification_id_fkey"
+            columns: ["verification_id"]
+            isOneToOne: false
+            referencedRelation: "verifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings_vehicle_semantics: {
         Row: {
           doors_effective: number | null
@@ -2362,16 +2829,37 @@ export type Database = {
       }
     }
     Functions: {
-      add_credits: {
+      activate_deal_for_listing: {
         Args: {
-          p_amount: number
-          p_reason: string
-          p_ref_id?: string
-          p_ref_type?: string
-          p_user_id: string
+          p_discount_percent: number
+          p_duration_days: number
+          p_listing_id: string
         }
-        Returns: undefined
+        Returns: Json
       }
+      add_credits:
+        | {
+            Args: {
+              p_amount: number
+              p_reason: string
+              p_ref_id?: string
+              p_ref_type?: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_amount: number
+              p_granted_expires_at?: string
+              p_is_granted?: boolean
+              p_reason: string
+              p_ref_id?: string
+              p_ref_type?: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
       admin_agency_detail: { Args: { p_id: string }; Returns: Json }
       admin_approve_agency: {
         Args: { p_id: string; p_verified: boolean }
@@ -2594,6 +3082,14 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      apply_boost: {
+        Args: { p_boost_type: string; p_listing_id: string }
+        Returns: Json
+      }
+      approve_verification: {
+        Args: { p_verification_id: string }
+        Returns: Json
+      }
       archive_notification: {
         Args: { p_notification_id: string }
         Returns: undefined
@@ -2607,10 +3103,13 @@ export type Database = {
       can_publish_listing: {
         Args: { p_user_id: string }
         Returns: {
+          active_listings_count: number
+          active_listings_limit: number
           allowed: boolean
+          cooldown_remaining_seconds: number
+          publishes_24h_count: number
+          publishes_24h_limit: number
           reason: string
-          remaining: number
-          reset_at: string
         }[]
       }
       cancel_account_deletion: {
@@ -2620,6 +3119,7 @@ export type Database = {
           was_scheduled_for: string
         }[]
       }
+      cancel_deal_for_listing: { Args: { p_listing_id: string }; Returns: Json }
       consume_credits: {
         Args: {
           p_amount: number
@@ -2683,6 +3183,7 @@ export type Database = {
           submission_secret: string
         }[]
       }
+      enqueue_lifecycle_notifications: { Args: never; Returns: Json }
       execute_scheduled_deletions: {
         Args: never
         Returns: {
@@ -2690,6 +3191,12 @@ export type Database = {
           processed_user_ids: string[]
         }[]
       }
+      expire_all_granted_credits: { Args: never; Returns: Json }
+      expire_granted_credits_for_user: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      expire_listings_lifecycle: { Args: never; Returns: Json }
       export_user_data: { Args: never; Returns: Json }
       generate_agency_slug: { Args: { p_name: string }; Returns: string }
       get_active_listing_counts_by_ville: {
@@ -2713,6 +3220,10 @@ export type Database = {
           placement_key: string
         }[]
       }
+      get_active_top_ad_listings: {
+        Args: { p_limit?: number }
+        Returns: string[]
+      }
       get_listing_owner_phone: {
         Args: { p_listing_id: string }
         Returns: string
@@ -2722,7 +3233,7 @@ export type Database = {
         Returns: string
       }
       get_monetization_breakdowns: {
-        Args: { p_days: number }
+        Args: { p_days?: number }
         Returns: {
           approved_count: number
           dimension: string
@@ -2731,7 +3242,7 @@ export type Database = {
         }[]
       }
       get_monetization_overview: {
-        Args: { p_days: number }
+        Args: { p_days?: number }
         Returns: {
           approved_count: number
           day: string
@@ -2763,37 +3274,28 @@ export type Database = {
         }[]
       }
       get_monetization_top_users: {
-        Args: {
-          p_days: number
-          p_limit: number
-        }
+        Args: { p_days?: number; p_limit?: number }
         Returns: {
           approved_count: number
-          email: string | null
-          full_name: string | null
+          email: string
+          full_name: string
           last_purchase_at: string
           total_net_revenue_mga: number
           user_id: string
         }[]
       }
       get_partner_ad_events_export: {
-        Args: {
-          p_campaign_id: string
-          p_days: number
-        }
+        Args: { p_campaign_id: string; p_days?: number }
         Returns: {
           event_type: string
           occurred_at: string
           placement_key: string
           session_id: string
-          user_id: string | null
+          user_id: string
         }[]
       }
       get_partner_ad_stats_timeseries: {
-        Args: {
-          p_campaign_id: string
-          p_days: number
-        }
+        Args: { p_campaign_id: string; p_days?: number }
         Returns: {
           day: string
           total_clicks: number
@@ -2823,6 +3325,11 @@ export type Database = {
       get_user_email_sent_today_count: {
         Args: { p_user_id: string }
         Returns: number
+      }
+      get_yas_analytics: { Args: never; Returns: Json }
+      grant_signup_bonus_for_user: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       immonex_is_admin: { Args: never; Returns: boolean }
       increment_views: { Args: { listing_uuid: string }; Returns: undefined }
@@ -2956,6 +3463,10 @@ export type Database = {
         Returns: string
       }
       mark_all_notifications_read: { Args: never; Returns: number }
+      mark_listing_sold: {
+        Args: { p_listing_id: string; p_sold_price?: number }
+        Returns: Json
+      }
       mark_notification_email_failed: {
         Args: {
           p_email_to: string
@@ -3034,6 +3545,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      reject_verification: {
+        Args: {
+          p_category?: string
+          p_reason: string
+          p_verification_id: string
+        }
+        Returns: Json
+      }
+      renew_listing: { Args: { p_listing_id: string }; Returns: Json }
       request_account_deletion: {
         Args: never
         Returns: {
@@ -3068,6 +3588,17 @@ export type Database = {
           p_message: string
           p_subject: string
           p_whatsapp_phone?: string
+        }
+        Returns: Json
+      }
+      submit_verification: {
+        Args: {
+          p_cin_back_path: string
+          p_cin_front_path: string
+          p_cin_number: string
+          p_date_of_birth?: string
+          p_full_name: string
+          p_selfie_path: string
         }
         Returns: Json
       }
@@ -3139,6 +3670,10 @@ export type Database = {
         | "urgent"
         | "daily_bump"
         | "agency_spotlight"
+        | "bump"
+        | "top_ad"
+        | "video"
+        | "express_pack"
       email_log_status: "sent" | "failed" | "skipped_quota"
       lead_type: "contact_form" | "phone_reveal" | "whatsapp"
       listing_status:
@@ -3152,6 +3687,8 @@ export type Database = {
         | "pending_payment_verification"
         | "archived"
         | "hidden_pending_review"
+        | "expiring_soon"
+        | "sold"
       notification_category:
         | "listings"
         | "payments"
@@ -3170,6 +3707,26 @@ export type Database = {
         | "welcome"
         | "admin_moderation_needed"
         | "system"
+        | "listing_expiring_7d"
+        | "listing_expiring_3d"
+        | "listing_expiring_1d"
+        | "listing_renewed"
+        | "boost_ending_1d"
+        | "boost_ended"
+        | "credits_grant"
+        | "credits_expiring_30d"
+        | "credits_expired"
+        | "verif_approved"
+        | "verif_rejected"
+        | "milestone_50_views"
+        | "milestone_10_contacts"
+        | "boost_activated"
+        | "verif_submitted"
+        | "verif_expiring_30d"
+        | "report_received"
+        | "listing_under_review"
+        | "listing_restored"
+        | "listing_deleted_by_admin"
       payment_method:
         | "mvola"
         | "orange_money"
@@ -3313,9 +3870,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       agency_status: ["pending_review", "approved", "rejected", "suspended"],
@@ -3326,6 +3880,10 @@ export const Constants = {
         "urgent",
         "daily_bump",
         "agency_spotlight",
+        "bump",
+        "top_ad",
+        "video",
+        "express_pack",
       ],
       email_log_status: ["sent", "failed", "skipped_quota"],
       lead_type: ["contact_form", "phone_reveal", "whatsapp"],
@@ -3340,6 +3898,8 @@ export const Constants = {
         "pending_payment_verification",
         "archived",
         "hidden_pending_review",
+        "expiring_soon",
+        "sold",
       ],
       notification_category: [
         "listings",
@@ -3360,6 +3920,26 @@ export const Constants = {
         "welcome",
         "admin_moderation_needed",
         "system",
+        "listing_expiring_7d",
+        "listing_expiring_3d",
+        "listing_expiring_1d",
+        "listing_renewed",
+        "boost_ending_1d",
+        "boost_ended",
+        "credits_grant",
+        "credits_expiring_30d",
+        "credits_expired",
+        "verif_approved",
+        "verif_rejected",
+        "milestone_50_views",
+        "milestone_10_contacts",
+        "boost_activated",
+        "verif_submitted",
+        "verif_expiring_30d",
+        "report_received",
+        "listing_under_review",
+        "listing_restored",
+        "listing_deleted_by_admin",
       ],
       payment_method: [
         "mvola",

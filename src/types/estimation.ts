@@ -22,6 +22,12 @@ export interface EstimationInputV2 {
   modelId?: string;
   makeName: string;
   modelName: string;
+  /**
+   * PROMPT 10A — Trim/version optionnel pour matching strict (ex "LC79", "Vigo").
+   * Si null/undefined : pas de filtre trim → flag `trim_unspecified` dans audit
+   * + pénalité confidence -0.05 (matching imprécis).
+   */
+  trim?: string | null;
   year: number;
   city: string;
   mileage: number;
@@ -61,7 +67,8 @@ export interface EvidenceTierDecision {
     | "STRONG_COMPARABLE_SET"
     | "MODERATE_COMPARABLE_SET"
     | "WEAK_COMPARABLES_REFERENCE_USED"
-    | "NO_RELIABLE_COMPARABLES";
+    | "NO_RELIABLE_COMPARABLES"
+    | "SANITY_BOUND_APPLIED";
   tierReasonSummary: string;
 }
 
@@ -142,6 +149,18 @@ export interface OutputValues {
   quickSalePrice: number;
   recommendedListingPrice: number;
   roundingStepApplied: number;
+  /**
+   * PROMPT 10A — 3 valeurs Argus-grade distinctes (additives, retro-compat).
+   * - tradeInPro     : Reprise pro (centrale × 0.78)
+   * - privateMarket  : Entre particuliers (centrale × 1.00) ≡ estimatedValue
+   * - dealerRetail   : En concession (centrale × 1.15)
+   *
+   * `estimatedValue` reste populé avec privateMarket pour rétro-compat UI
+   * legacy en attendant PROMPT 10B (cards 3 valeurs).
+   */
+  tradeInPro: number;
+  privateMarket: number;
+  dealerRetail: number;
   internalUnrounded?: {
     estimatedValueRaw: number;
     lowEstimateRaw: number;
@@ -205,6 +224,70 @@ export interface UiGovernance {
   >;
 }
 
+/**
+ * PROMPT 10A — Audit fields V2 (trace de pipeline pour debug + transparency UI).
+ *
+ * Ajouté en additif sur `EstimationOutputV2.audit` pour pouvoir consommer
+ * dans la page méthodologie (PROMPT 10B) sans casser les contrats existants.
+ */
+export interface EstimationAuditV2 {
+  /** Méthode de calcul du range (low/high). */
+  rangeMethod: "percentile_p10_p90" | "percentile_p25_p75" | "synthetic_spread";
+  /** True si le clamp post-blend [0.80, 1.12] est intervenu. */
+  capApplied: boolean;
+  /** État du filtrage trim après cascade. */
+  trimFiltering: "strict" | "relaxed" | "all_trims_warning" | "unspecified";
+  /** Ventilation des comparables par origine. */
+  comparableSourceBreakdown: {
+    marketClean: number;
+    autonexActive: number;
+  };
+  /** Moyenne des transaction factors appliqués (1.0 = aucun gap asking↔transaction). */
+  transactionFactorAvg: number;
+  /** Version de la config transaction_factors_v2 utilisée. */
+  transactionFactorVersion: string;
+  /**
+   * PROMPT 10E — Couche 2 : ventilation des comparables par couche de raisonnement.
+   * - exact          : match strict make+model+year (Couche 1)
+   * - segmentProche  : proxy via MODEL_PROXIMITY (Couche 2)
+   * - fallbackCanonical : fallback baseline / heuristique pure
+   */
+  comparablesBreakdownByLayer?: {
+    exact: number;
+    segmentProche: number;
+    fallbackCanonical: number;
+  };
+  /**
+   * PROMPT 10E — Couche 2 : modèles proxy effectivement utilisés (audit + UI optionnel).
+   */
+  proximityModelsUsed?: Array<{
+    make: string;
+    model: string;
+    n: number;
+  }>;
+  /** PROMPT 10E — Couche 2 : moyenne du facteur correctif appliqué aux proxy (1 = aucun). */
+  proximityFactorAvg?: number;
+  /** PROMPT 10E — Couche 2 : couche de raisonnement gagnante. */
+  reasoningLayer?:
+    | "couche_1_exact"
+    | "couche_2_segment_proche"
+    | "couche_4_sanity_only"
+    | "fallback_canonical";
+  /**
+   * PROMPT 10E — Couche 4 : trace du sanity check.
+   * Si `applied=true`, l'estimation a été ramenée dans les bornes du segment.
+   */
+  sanityCheck?: {
+    applied: boolean;
+    action: "kept" | "raised_to_floor" | "lowered_to_ceiling" | "no_bound";
+    segmentKey: string | null;
+    segmentLabel: string | null;
+    originalEstimate: number;
+    adjustedEstimate: number;
+    warning: string | null;
+  };
+}
+
 export interface EstimationOutputV2 {
   tierDecision: EvidenceTierDecision;
   modeGovernance: ModeGovernance;
@@ -216,6 +299,8 @@ export interface EstimationOutputV2 {
   comparables: EstimationComparable[];
   insights: InsightsPayload;
   uiGovernance: UiGovernance;
+  /** PROMPT 10A — additif, optionnel pour rétro-compat des consumers. */
+  audit?: EstimationAuditV2;
 }
 
 // Legacy shape preserved for existing UI consumers.

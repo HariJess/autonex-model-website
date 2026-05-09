@@ -1,8 +1,10 @@
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Car, Upload, Calculator, Flame, ChevronRight, type LucideIcon } from "lucide-react";
 import { buildYasUrl } from "@/features/yas-app/lib/buildYasUrl";
 import { useYasContext } from "@/features/yas-app/hooks/useYasContext";
+import { useYasDeals } from "@/features/yas-app/hooks/useYasDeals";
 import { trackYasEvent, type YasEventName } from "@/features/yas-app/lib/yasTracking";
 
 type YasAction = {
@@ -59,8 +61,12 @@ const ACTIONS: YasAction[] = [
     fallbackHelper: "Annonces avec prix réellement réduits.",
     Icon: Flame,
     tone: "orange",
-    href: null,
-    scrollTo: "deals",
+    // Sprint 2 deals — pointe vers la nouvelle page dédiée /bonnes-affaires
+    // (au lieu du scroll-hash #deals qui marchait mal et limitait à la
+    // section preview de YAS). Les params YAS sont injectés par buildYasUrl
+    // donc la page s'ouvre en mode embedded si l'utilisateur vient de la
+    // mini-app.
+    href: "/bonnes-affaires",
     eventName: "yas_action_deals_click",
   },
   {
@@ -94,24 +100,45 @@ export function YasActionGrid() {
   const { t } = useTranslation();
   const yas = useYasContext();
 
+  // Filtre dynamique : la card "Bonnes affaires" ne doit s'afficher que s'il y
+  // a au moins une annonce avec un dealMeta valide (sinon dead-end UX — le user
+  // tape la card, scroll vers `#deals`, et tombe sur "pas de bonne affaire").
+  // `useYasDeals` mutualise la même logique avec YasFeaturedDeals (cf. INC #2
+  // du Plan 2/4). React Query dédupe le fetch via la queryKey de useDbListings.
+  const { hasDeals } = useYasDeals();
+
+  const visibleActions = useMemo(
+    () => ACTIONS.filter((a) => a.id !== "deals" || hasDeals),
+    [hasDeals],
+  );
+
+  // UX #5 (Plan 3/4) : feedback visuel + anti double-clic pendant la nav
+  // (les routes destination sont lazy-chargées, ~200-500ms en 4G Madagascar).
+  // Le state ne se reset pas — la nav démonte le composant. Si la nav échoue
+  // (chunk lazy fail), le user reload, comportement acceptable.
+  const [isNavigating, setIsNavigating] = useState(false);
+
   // Solution A : tracking d'analytics seul, et on laisse le navigateur faire
   // le saut natif via `<a href="#deals">`. La cible `<section id="deals">`
   // est désormais toujours rendue dans le DOM (cf. YasFeaturedDeals.tsx) même
   // sans listings, donc le saut hash natif fonctionne en local comme en prod.
+  // Pas de loading state ici car le saut hash est instantané (anchor scroll).
   const handleAnchorClick = (action: YasAction) => () => {
     trackYasEvent(action.eventName, yas, { action_id: action.id });
   };
 
   const handleNavClick = (action: YasAction) => () => {
+    if (isNavigating) return;
+    setIsNavigating(true);
     trackYasEvent(action.eventName, yas, { action_id: action.id });
   };
 
   return (
     <section
       aria-label={t("yas.actions.sectionAria", "Actions principales")}
-      className="grid grid-cols-1 gap-2.5"
+      className={`grid grid-cols-1 gap-2.5 ${isNavigating ? "pointer-events-none opacity-70 transition-opacity" : ""}`}
     >
-      {ACTIONS.map((action) => {
+      {visibleActions.map((action) => {
         const Icon = action.Icon;
         const iconNode = (
           <span

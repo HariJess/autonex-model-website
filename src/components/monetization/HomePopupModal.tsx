@@ -6,6 +6,7 @@ import { MONETIZATION_PLACEMENTS } from "@/config/monetization";
 import { usePartnerCampaign } from "@/hooks/usePartnerCampaign";
 import type { PublicPartnerCampaign } from "@/lib/partnerAds";
 import { trackPartnerAdEvent } from "@/lib/trackPartnerAdEvent";
+import { getOptimizedStorageUrl, getOptimizedSrcSet } from "@/lib/storageImage";
 
 const POPUP_DELAY_MS = 2000;
 const SESSION_KEY_PREFIX = "autonex.popup.dismissed.";
@@ -17,16 +18,25 @@ const SESSION_KEY_PREFIX = "autonex.popup.dismissed.";
 export function HomePopupModal() {
   const { t } = useTranslation();
   const enabled = MONETIZATION_PLACEMENTS.homeModal;
-  const { data: campaign } = usePartnerCampaign("homeModal", enabled);
+  const [shouldFetchCampaign, setShouldFetchCampaign] = useState(false);
+  const { data: campaign } = usePartnerCampaign("homeModal", enabled && shouldFetchCampaign);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Defer the partner-campaign fetch by POPUP_DELAY_MS so it stays out of the
+  // critical-path of the first paint. The 2 s timer doubles as the UX grace
+  // period before the modal can appear, so removing the second setTimeout
+  // does not regress the perceived popup delay.
+  useEffect(() => {
+    if (!enabled) return;
+    const timer = setTimeout(() => setShouldFetchCampaign(true), POPUP_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [enabled]);
 
   useEffect(() => {
     if (!campaign) return;
     const sessionKey = `${SESSION_KEY_PREFIX}${campaign.id}`;
     if (typeof window !== "undefined" && window.sessionStorage.getItem(sessionKey)) return;
-
-    const timer = setTimeout(() => setIsOpen(true), POPUP_DELAY_MS);
-    return () => clearTimeout(timer);
+    setIsOpen(true);
   }, [campaign]);
 
   // Impression fires only when modal is actually visible to the user.
@@ -107,13 +117,22 @@ export function HomePopupModalView({ campaign, onClick }: HomePopupModalViewProp
       >
         <picture>
           {campaign.image_url_mobile ? (
-            <source media="(max-width: 768px)" srcSet={campaign.image_url_mobile} />
+            <source
+              media="(max-width: 768px)"
+              srcSet={getOptimizedSrcSet(campaign.image_url_mobile, [400, 800, 1200], 80)}
+              type="image/webp"
+            />
           ) : null}
+          <source
+            srcSet={getOptimizedSrcSet(campaign.image_url, [400, 800, 1200], 80)}
+            type="image/webp"
+          />
           <img
-            src={campaign.image_url}
+            src={getOptimizedStorageUrl(campaign.image_url, { width: 800, quality: 80 }) || campaign.image_url}
             alt={campaign.advertiser_name}
             className="block h-auto w-full"
             loading="lazy"
+            decoding="async"
           />
         </picture>
         <span className="absolute right-3 bottom-3 z-10 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">

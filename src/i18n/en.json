@@ -1,4 +1,127 @@
 {
+  "admin": {
+    "yasAnalytics": {
+      "title": "YAS × AutoNex analytics",
+      "subtitle": "Sessions, funnel and performance overview of the mini-app embedded in YAS & Moi.",
+      "lastUpdate": "Last updated: {{date}}",
+      "loading": "Loading analytics data...",
+      "error": "Failed to load data.",
+      "kpi": {
+        "heading": "YAS sessions",
+        "subtitle": "Distinct sessions per time window (deduplicated by session_id).",
+        "sessions24h": "Sessions 24h",
+        "sessions7d": "Sessions 7 days",
+        "sessions30d": "Sessions 30 days",
+        "totalEvents30d": "Total events 30d"
+      },
+      "funnel": {
+        "title": "Conversion funnel",
+        "subtitle": "Distinct sessions reaching each step (over 30 days).",
+        "legend": "Sessions",
+        "empty": "No funnel data yet over 30 days.",
+        "steps": {
+          "autonexOpen": "Mini-app open",
+          "actionClick": "Action CTA click",
+          "searchPerformed": "Search performed",
+          "listingView": "Listing viewed",
+          "sellerContactClick": "Seller contact",
+          "estimationStarted": "Estimation started",
+          "estimationCompleted": "Estimation completed",
+          "publishStarted": "Publish started",
+          "publishCompleted": "Publish completed"
+        }
+      },
+      "dailyEvents": {
+        "title": "Daily activity",
+        "subtitle": "Total events per day over 30 days.",
+        "legend": "Events",
+        "empty": "No events yet over 30 days."
+      },
+      "topEvents": {
+        "title": "Top events",
+        "subtitle": "Tracked event frequency (30 days).",
+        "legend": "Occurrences",
+        "empty": "No events yet."
+      },
+      "platforms": {
+        "title": "Platforms",
+        "subtitle": "iOS / Android / unknown breakdown over 30 days (by event).",
+        "legend": "Events",
+        "empty": "No events yet."
+      },
+      "referrers": {
+        "title": "Traffic sources",
+        "subtitle": "Top 10 session origins (document.referrer, 30 days).",
+        "colReferrer": "Referrer",
+        "colCount": "Events",
+        "empty": "No referrer captured yet."
+      }
+    },
+    "verifications": {
+      "title": "Verifications",
+      "empty": "No pending verification",
+      "statusFilter": {
+        "label": "Filter by status",
+        "all": "All",
+        "pending": "Pending",
+        "reviewing": "Reviewing",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "expired": "Expired"
+      },
+      "list": {
+        "user": "User",
+        "fullName": "Name",
+        "submitted": "Submitted",
+        "status": "Status"
+      },
+      "drawer": {
+        "title": "Review verification",
+        "docs": {
+          "title": "Documents",
+          "cinFront": "ID Front",
+          "cinBack": "ID Back",
+          "selfie": "Selfie"
+        },
+        "metadata": {
+          "title": "Submitted information"
+        },
+        "actions": {
+          "approve": "Approve",
+          "reject": "Reject"
+        },
+        "approve": {
+          "confirmTitle": "Approve this verification?",
+          "confirmDesc": "User will receive the Verified Seller badge for 365 days."
+        },
+        "reject": {
+          "categoryLabel": "Rejection category",
+          "categories": {
+            "blurry": "Blurry documents",
+            "wrong_doc": "Wrong document",
+            "fraud_suspect": "Fraud suspicion",
+            "expired_doc": "Expired document",
+            "other": "Other"
+          },
+          "reasonLabel": "Reason (visible to user)",
+          "reasonPlaceholder": "Explain precisely the rejection reason...",
+          "confirmCta": "Confirm rejection"
+        }
+      },
+      "success": {
+        "approved": "Verification approved",
+        "rejected": "Verification rejected"
+      },
+      "errors": {
+        "adminRequired": "Admin-only action.",
+        "notFound": "Verification not found.",
+        "notReviewable": "This verification can no longer be reviewed (already approved or rejected).",
+        "reasonTooShort": "Reason must be at least 10 characters.",
+        "invalidCategory": "Invalid rejection category.",
+        "generic": "An error occurred. Please try again."
+      }
+    }
+  },
   "ads": {
     "partnerCampaign": {
       "description": "Native ad format reserved for partner brands and services curated by AutoNex.",
@@ -170,6 +293,7 @@
     "accountIndividual": "Individual account",
     "activate": "Activate",
     "activeListings": "Active listings",
+    "boostListing": "Boost",
     "buyCredits": "Buy credits",
     "contacts": "Contacts received",
     "credits": "Credits",
@@ -179,6 +303,10 @@
     "listing": "Listing",
     "listingDeleted": "Listing deleted",
     "myListings": "My listings",
+    "viewAllListings": "My listings",
+    "section": {
+      "manageListings": "Manage my listings"
+    },
     "noLeads": "No contacts received yet.",
     "noListings": "No listings yet. Publish your first listing!",
     "pause": "Pause",
@@ -231,6 +359,53 @@
     "boostListing": "Boost",
     "boostPendingReviewNote": "“After publication” boosts will become available once the listing is validated. Options paid at submission stay pending above.",
     "editListing": "Edit"
+  },
+  "deals": {
+    "modal": {
+      "title": "Turn your listing into a deal",
+      "subtitle": "Attract more buyers with a temporary discount",
+      "currentPriceLabel": "Current price",
+      "discountLabel": "Choose your discount",
+      "discountCustom": "Custom",
+      "discountCustomInvalid": "Pick an integer between 5 and 30.",
+      "priceMode": {
+        "label": "Or type the new price directly",
+        "placeholder": "e.g. 179 910 000",
+        "helper": "Equals -{{percent}}% (savings {{savings}}).",
+        "errors": {
+          "priceTooHigh": "The new price must be lower than the current price.",
+          "discountTooLow": "Minimum discount: 5% (maximum new price: {{maxPrice}}).",
+          "discountTooHigh": "Maximum discount: 30% (minimum new price: {{minPrice}})."
+        }
+      },
+      "durationLabel": "Deal duration",
+      "durationDays": "{{count}} days",
+      "previewTitle": "Preview",
+      "previewBefore": "Before",
+      "previewAfter": "New price",
+      "previewSavings": "Savings for the buyer",
+      "previewVisibleUntil": "Visible until {{date}}",
+      "guarantee30d": "For 30 days after the deal ends, you will not be able to raise your price above {{originalPrice}}. This protection reassures buyers and guarantees the authenticity of your offer.",
+      "ctaActivate": "Activate deal",
+      "ctaCancel": "Cancel"
+    },
+    "dashboardButton": {
+      "activate": "Set as a deal",
+      "cancel": "Cancel deal"
+    },
+    "status": {
+      "activeUntil": "-{{discount}}% until {{date}}"
+    },
+    "confirm": {
+      "cancel": "Are you sure you want to cancel this deal? The price lock will remain active for 30 days."
+    },
+    "toast": {
+      "activated": "Deal activated successfully!",
+      "activateFailed": "Failed to activate deal",
+      "cancelled": "Deal cancelled",
+      "cancelFailed": "Failed to cancel deal",
+      "priceLocked": "The price is locked until the protection period ends."
+    }
   },
   "estimation": {
     "accidentDeclaredDesc": "Declared major incidents can impact suggested range.",
@@ -310,34 +485,6 @@
     "reliableInput": "Reliable inputs",
     "reliableTransparentDesc": "The tool combines reference profiles and market signals. Each estimate includes range and confidence.",
     "reliableTransparentTitle": "Reliable and transparent",
-    "report": "Estimation report",
-    "reportConfidence": "Report confidence",
-    "resultSectionAria": "Valuation result section",
-    "searchBrand": "Search make...",
-    "searchCity": "Search city / region...",
-    "searchModel": "Search model...",
-    "selectBrand": "Select make",
-    "selectCity": "Select city / region",
-    "selectModel": "Select model",
-    "start": "Start valuation",
-    "stepCondition": "Condition",
-    "stepConditionHelper": "History and usage",
-    "stepResult": "Result",
-    "stepResultHelper": "Valuation report",
-    "stepVehicle": "Vehicle",
-    "stepVehicleHelper": "Main information",
-    "title": "Valuation",
-    "unavailableTitle": "Valuation unavailable",
-    "usage": "Usage",
-    "usageAdviceAria": "Usage guidance",
-    "usageAdviceText": "Pick the closest usage profile for better consistency.",
-    "usageFrameAria": "Vehicle usage context",
-    "usageFrameText": "These details help frame valuation relative to actual use.",
-    "vehicleIdentity": "Vehicle identity",
-    "vehicleIdentityLead": "Provide key vehicle information to build a reliable and actionable estimate base.",
-    "viewMyEstimate": "View my estimate",
-    "whyTheseInfo": "Why this information matters",
-    "whyUseful": "Why this is useful",
     "report": {
       "claimModeStrong": "Robust market analysis",
       "claimModeLimited": "Qualified market analysis",
@@ -457,7 +604,34 @@
         "comparablesEmptyMessage": "The report mainly relies on reference signals. Keep a cautious pricing strategy.",
         "ctaFootnote": "AutoNex tip: in a low-evidence context, prefer a cautious strategy before locking the price."
       }
-    }
+    },
+    "reportConfidence": "Report confidence",
+    "resultSectionAria": "Valuation result section",
+    "searchBrand": "Search make...",
+    "searchCity": "Search city / region...",
+    "searchModel": "Search model...",
+    "selectBrand": "Select make",
+    "selectCity": "Select city / region",
+    "selectModel": "Select model",
+    "start": "Start valuation",
+    "stepCondition": "Condition",
+    "stepConditionHelper": "History and usage",
+    "stepResult": "Result",
+    "stepResultHelper": "Valuation report",
+    "stepVehicle": "Vehicle",
+    "stepVehicleHelper": "Main information",
+    "title": "Valuation",
+    "unavailableTitle": "Valuation unavailable",
+    "usage": "Usage",
+    "usageAdviceAria": "Usage guidance",
+    "usageAdviceText": "Pick the closest usage profile for better consistency.",
+    "usageFrameAria": "Vehicle usage context",
+    "usageFrameText": "These details help frame valuation relative to actual use.",
+    "vehicleIdentity": "Vehicle identity",
+    "vehicleIdentityLead": "Provide key vehicle information to build a reliable and actionable estimate base.",
+    "viewMyEstimate": "View my estimate",
+    "whyTheseInfo": "Why this information matters",
+    "whyUseful": "Why this is useful"
   },
   "favorites": {
     "title": "My favorites",
@@ -682,9 +856,11 @@
       "authRequired": "Sign in to report a listing.",
       "reasons": {
         "scam": "Scam / Fraud",
+        "fake_photos": "Stolen or fake photos",
         "inappropriate": "Inappropriate content",
-        "duplicate": "Duplicate listing",
         "wrong_price": "Unrealistic price",
+        "wrong_category": "Wrong category / off-topic",
+        "duplicate": "Duplicate listing",
         "other": "Other"
       },
       "errors": {
@@ -743,8 +919,11 @@
     "badge": {
       "boost": "Boost",
       "coupDeCoeur": "Top pick",
+      "featured": "Featured",
       "nouveau": "New",
-      "urgent": "Urgent"
+      "topAd": "Top",
+      "urgent": "Urgent",
+      "verifiedSeller": "Verified"
     },
     "mapApproximate": "Position shown on the map."
   },
@@ -769,12 +948,14 @@
     "home": "Home",
     "login": "Log in",
     "logout": "Log out",
+    "myListings": "My listings",
     "newProjects": "New arrivals",
     "publish": "Publish listing",
     "rent": "Long-term rental",
     "rentSubmenu": "Open long-term rental submenu",
     "settings": "Settings",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "bonnesAffaires": "Deals"
   },
   "payment": {
     "vanilla": {
@@ -795,6 +976,7 @@
       "pendingMessage": "Your payment is being processed. This page refreshes automatically.",
       "pollingTimeout": "The verification timed out. If your payment went through, credits will appear within a few minutes. Check your history on /credits.",
       "processingPayment": "Initiating payment...",
+      "redirecting": "Redirecting...",
       "retryButton": "Retry",
       "returnPageIntro": "We are verifying the status of your payment...",
       "returnPageTitle": "Payment return",
@@ -843,8 +1025,11 @@
     "creditCard": "Credit card (Stripe)",
     "creditPack": {
       "business": "Business",
+      "discover": "Discover",
+      "enterprise": "Enterprise",
+      "power": "Power",
       "pro": "Pro",
-      "starter": "Starter"
+      "standard": "Standard"
     },
     "creditRequestSent": "Credit purchase request saved.",
     "credits": "credits",
@@ -1101,6 +1286,32 @@
       }
     }
   },
+  "rateLimit": {
+    "title": "Publication limits",
+    "activeListings": {
+      "label": "Active listings",
+      "usage": "{{count}} / {{limit}}"
+    },
+    "publishes24h": {
+      "label": "Publishes 24h",
+      "usage": "Publishes 24h: {{count}} / {{limit}}"
+    },
+    "exceeded": {
+      "activeLimit": {
+        "title": "Listings limit reached",
+        "body": "You have {{count}} / {{limit}} active listings. Sell or wait for one to expire to publish again.",
+        "upgradeCta": "Become a verified seller (5 listings)"
+      },
+      "publish24h": {
+        "title": "Daily limit reached",
+        "body": "You published {{count}} listings in the last 24 hours. The limit is {{limit}}/day. Try again later."
+      }
+    },
+    "cooldown": {
+      "title": "Wait a few seconds",
+      "body": "You can publish again in {{seconds}} seconds."
+    }
+  },
   "search": {
     "activeSelection": "Active selection: {{value}}",
     "allExteriorColors": "All exterior colors",
@@ -1242,6 +1453,9 @@
       "verifiedByStatus": "Listings verified by publication status",
       "guidedByCriteria": "Reading guided by your criteria",
       "similarModeActive": "Close-alternative mode active"
+    },
+    "filterChips": {
+      "hasDeal": "Deals"
     }
   },
   "sections": {
@@ -1400,6 +1614,7 @@
     "markAllAsRead": "Mark all as read",
     "empty": "No notifications yet",
     "viewAll": "View all notifications",
+    "preferencesLabel": "Preferences",
     "preferences": {
       "pageTitle": "Notification preferences",
       "heading": "Notification preferences",
@@ -1472,7 +1687,72 @@
     "termsHintSuffix": " — credits are non-refundable and expire after 12 months.",
     "balance": {
       "insufficient": "Not enough yet to post a listing ({{count}} credits required).",
-      "scenariosWith": "With this balance: {{scenarios}}"
+      "scenariosWith": "With this balance: {{scenarios}}",
+      "empty": "Top up to publish your listings and activate boosts.",
+      "canDo": {
+        "title": "With this balance, you can:",
+        "listings_one": "Post {{count}} listing for 30 days",
+        "listings_other": "Post {{count}} listings for 30 days",
+        "bumps_one": "OR activate {{count}} Bump boost",
+        "bumps_other": "OR activate {{count}} Bump boosts",
+        "featured_one": "OR {{count}} Featured boost 7 days",
+        "featured_other": "OR {{count}} Featured boosts 7 days",
+        "topAd_one": "OR {{count}} Top Ad for 30 days",
+        "topAd_other": "OR {{count}} Top Ads for 30 days"
+      },
+      "tooltip": {
+        "total": "Total balance",
+        "granted": "Granted credits",
+        "paid": "Purchased credits",
+        "expires": "expires on {{date}}"
+      },
+      "recharge": "Top up",
+      "rechargeAria": "Top up credits",
+      "chipAria": "Balance: {{n}} credits",
+      "expiringSoonAria": "Granted credits expiring soon",
+      "loading": "Loading balance"
+    },
+    "packs": {
+      "recommended": "Recommended",
+      "bonusValue": "+{{amount}} bonus",
+      "choose": "Choose",
+      "subtitle": {
+        "intro": "The more you buy, the more you save. No subscription, credits valid 12 months."
+      },
+      "tooltip": {
+        "unitPrice": "{{price}} Ar / credit",
+        "equivalentListings": "≈ {{count}} listings 30 days",
+        "savings": "Save {{amount}} vs unit purchase"
+      },
+      "_DEPRECATED_PROMPT_3_5_3_6": "Keys below (bonus.*, ribbon.*, savings.label, unitPrice, unitPriceNoBonus, badges.*) were superseded by the PROMPT 3.7 minimalist redesign. Kept to avoid 404s if referenced elsewhere.",
+      "bonus": {
+        "label": "{{base}} + {{bonus}} bonus",
+        "suffix": "bonus",
+        "percent": "+{{percent}}% bonus"
+      },
+      "ribbon": {
+        "bonusPercent": "+{{percent}}% FREE BONUS"
+      },
+      "savings": {
+        "label": "Save {{amount}} vs unit purchase"
+      },
+      "unitPrice": "{{price}} Ar / credit (-{{discount}}%)",
+      "unitPriceNoBonus": "{{price}} Ar / credit",
+      "badges": {
+        "popular": "POPULAR",
+        "bestValue": "BEST VALUE",
+        "maxBonus": "MAX BONUS"
+      }
+    },
+    "welcome": {
+      "title": "Welcome to AutoNex!",
+      "titleRemaining": "Your free credits",
+      "bodyInitial": "You received {{amount}} free credits ({{listings}} free listings). Expire in {{days}} days.",
+      "bodyRemaining": "You have {{remaining}} free credits left (out of {{received}} received). That's {{listings}} free listings. Expire in {{days}} days.",
+      "_DEPRECATED_PROMPT_4_3": "credits.welcome.body replaced by bodyInitial/bodyRemaining (adaptive received vs remaining). Kept to avoid 404 i18n if used elsewhere.",
+      "body": "You received {{amount}} granted credits ({{listings}} free listings). Expires in {{days}} days.",
+      "cta": "Post my first listing",
+      "dismiss": "Close"
     },
     "balanceLabel": "Your balance",
     "pendingTitle": "Pending validation",
@@ -1506,7 +1786,65 @@
     "insufficientBalance": "Insufficient balance for this cart.",
     "confirming": "Confirming…",
     "confirmWithCredits": "Confirm ({{count}} credits)",
-    "purchaseSuccess": "Boosts activated. Your listing now benefits from the chosen visibility."
+    "purchaseSuccess": "Boosts activated. Your listing now benefits from the chosen visibility.",
+    "errors": {
+      "cooldown": "You must wait 24h between two bumps.",
+      "insufficientCredits": "Insufficient credits for this boost.",
+      "notOwner": "You can only boost your own listings.",
+      "notBoostable": "This listing can no longer be boosted (sold or expired).",
+      "notFound": "Listing not found.",
+      "notAuthenticated": "Sign in to boost a listing.",
+      "invalidType": "Invalid boost type.",
+      "generic": "An error occurred. Please try again."
+    },
+    "success": {
+      "bumpToast": "Listing bumped 🚀",
+      "featuredToast": "Featured boost activated ⭐",
+      "topAdToast": "Top Ad activated 👑"
+    }
+  },
+  "boostModal": {
+    "title": "Boost your listing",
+    "subtitle": "Pick the option that suits you",
+    "boost": {
+      "bump": {
+        "title": "Instant bump",
+        "duration": "Instant effect",
+        "description": "Your listing moves back to the top of the feed right now."
+      },
+      "featured": {
+        "title": "Featured",
+        "duration": "7 days",
+        "description": "Appears in the « Featured » section + ⭐ badge on the card."
+      },
+      "top_ad": {
+        "title": "Top Ad",
+        "duration": "30 days",
+        "description": "Pinned 👑 at the top of the feed for 30 days."
+      }
+    },
+    "cardCostValue": "{{amount}} cr.",
+    "balanceLabel": "Balance",
+    "balanceValue": "{{amount}} credits",
+    "totalCostLabel": "Cost",
+    "totalCostValue": "{{amount}} credits",
+    "confirmCta": "Confirm boost",
+    "cancelCta": "Cancel",
+    "activating": "Activating...",
+    "insufficientCredits": {
+      "title": "Insufficient credits",
+      "cta": "Top up"
+    },
+    "cooldown": {
+      "bumpUnavailable": "Available in {{remaining}}"
+    },
+    "activeBoosts": {
+      "featuredUntil": "Active until {{date}} — extension will stack",
+      "topAdUntil": "Active until {{date}} — extension will stack"
+    },
+    "disclaimer": {
+      "noRefund": "Spent credits are not refunded if the listing is sold early."
+    }
   },
   "brands": {
     "scrollPrev": "Previous brands",
@@ -1525,6 +1863,86 @@
     "calloutWarning": "Warning",
     "calloutInfo": "Good to know",
     "updatedOn": "Updated on {{date}}"
+  },
+  "myListings": {
+    "title": "My listings",
+    "subtitle": "Manage your listings, track performance, and boost visibility.",
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "expiringSoon": "Expiring soon",
+      "expired": "Expired",
+      "sold": "Sold",
+      "draft": "Drafts"
+    },
+    "card": {
+      "badge": {
+        "active": "Active",
+        "expiringSoon": "Expiring soon",
+        "expired": "Expired",
+        "sold": "Sold",
+        "draft": "Draft",
+        "other": "—"
+      },
+      "expiresInDays": "Expires in {{count}} days",
+      "expiredOn": "Expired on {{date}}",
+      "soldOn": "Sold on {{date}}",
+      "progressAria": "Listing lifetime progress"
+    },
+    "actions": {
+      "boost": "Boost",
+      "boostComingSoon": "Coming soon",
+      "edit": "Edit",
+      "markSold": "Mark sold",
+      "renew": "Renew ({{cost}} credits)",
+      "continueDraft": "Continue editing",
+      "deleteDraft": "Delete",
+      "viewDetails": "View details"
+    },
+    "boostStatus": {
+      "featuredUntil": "Featured until {{date}}",
+      "topAdUntil": "Top until {{date}}"
+    },
+    "renewModal": {
+      "title": "Renew {{title}}",
+      "subtitle": "Renewal for 30 days",
+      "cost": "Cost",
+      "balanceCurrent": "Current balance",
+      "balanceAfter": "Balance after",
+      "benefits": {
+        "active": "Your listing will be set back to Active",
+        "duration": "Visible for 30 more days",
+        "metrics": "View counter preserved"
+      },
+      "insufficient": "Insufficient balance",
+      "recharge": "Top up",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "success": "Listing renewed for 30 days",
+      "errorInsufficient": "Insufficient balance.",
+      "errorNotOwner": "You are not the owner of this listing.",
+      "priceContext": "Listing price: {{price}}"
+    },
+    "markSoldModal": {
+      "title": "Mark as sold",
+      "warning": "This action is irreversible.",
+      "description": "Your listing will be removed from search results. Active boosts will be cancelled.",
+      "priceLabel": "Sold at what price? (optional)",
+      "priceHelp": "Optional — used for anonymous analytics.",
+      "confirm": "Confirm sale",
+      "success": "Listing marked as sold 🎉",
+      "errorNotOwner": "You are not the owner.",
+      "errorInvalidPrice": "Invalid price."
+    },
+    "empty": {
+      "title": "No listing in this category",
+      "body": "Publish your first listing to start selling your vehicle.",
+      "cta": "Publish my first listing"
+    },
+    "error": {
+      "title": "Unable to load your listings.",
+      "retry": "Retry"
+    }
   },
   "contact": {
     "pageTitle": "Contact",
@@ -2258,6 +2676,110 @@
     "backToHome": "Back to home",
     "viewListings": "View listings"
   },
+  "verification": {
+    "overline": "Identity",
+    "title": "Verified seller",
+    "subtitle": "Build trust with your buyers",
+    "intro": {
+      "benefits": {
+        "title": "Benefits",
+        "b1": "✓ Verified badge on all your listings",
+        "b2": "Higher visibility in results",
+        "b3": "More trust from buyers"
+      },
+      "requirements": {
+        "title": "Required documents",
+        "r1": "ID document — front (national ID or passport)",
+        "r2": "ID document — back (national ID or passport)",
+        "r3": "Selfie holding your ID document"
+      },
+      "privacy": {
+        "title": "Privacy",
+        "body": "Your documents are encrypted and used only for verification. Kept 90 days if rejected, deleted at badge expiry.",
+        "consentLabel": "I accept the privacy policy"
+      },
+      "cost": "Cost",
+      "balanceLabel": "Balance",
+      "startCta": "Start"
+    },
+    "steps": {
+      "cinFront": {
+        "title": "ID document — Front",
+        "subtitle": "National ID or passport"
+      },
+      "cinBack": {
+        "title": "ID document — Back",
+        "subtitle": "National ID or passport"
+      },
+      "selfie": {
+        "title": "Selfie with your ID document",
+        "tip": "Hold your ID document (national ID or passport) next to your face. Both must be sharp and well-lit."
+      },
+      "upload": {
+        "dropzone": "Drop your file here or click",
+        "formats": "JPG, PNG, WEBP or PDF — max 10 MB",
+        "formatsImageOnly": "JPG, PNG or WEBP — max 10 MB",
+        "uploading": "Uploading...",
+        "uploaded": "✓ Document uploaded",
+        "replaceHint": "Click to replace",
+        "remove": "Remove this document"
+      },
+      "metadata": {
+        "title": "Your information",
+        "fullName": { "label": "Full name (as on ID)" },
+        "cinNumber": { "label": "ID number (national ID or passport)" },
+        "dateOfBirth": { "label": "Date of birth (optional)" }
+      },
+      "recap": {
+        "title": "Summary",
+        "missingDocs": "Missing documents. Go back to previous steps.",
+        "confirmCta": "Submit my request",
+        "submitting": "Submitting..."
+      },
+      "nav": {
+        "next": "Next",
+        "previous": "Previous"
+      }
+    },
+    "flow": {
+      "previousRejection": "Previous request rejected:"
+    },
+    "statusCard": {
+      "none": {
+        "title": "Become a verified seller",
+        "subtitle": "Build trust with buyers. More contacts on your listings.",
+        "cta": "Start"
+      },
+      "pending": {
+        "title": "Verification in progress",
+        "body": "Reply within 48h. Submitted on {{date}}."
+      },
+      "approved": {
+        "title": "Verified seller ✓",
+        "body": "Your badge is active until {{date}}.",
+        "cta": "Details"
+      },
+      "rejected": {
+        "title": "Verification rejected",
+        "reasonLabel": "Reason:",
+        "cta": "Re-submit"
+      }
+    },
+    "success": {
+      "toast": "Request sent"
+    },
+    "errors": {
+      "fileSize": "File too large (max 10 MB)",
+      "fileType": "Format not supported",
+      "uploadFailed": "Upload failed, retry",
+      "notAuthenticated": "Session expired. Please log in again.",
+      "insufficientCredits": "Insufficient credits for verification",
+      "alreadyActive": "You already have a pending or approved verification",
+      "invalidFullName": "Invalid full name",
+      "invalidCinNumber": "Invalid ID number",
+      "generic": "An error occurred. Please try again."
+    }
+  },
   "vehicleCombobox": {
     "modelPlaceholder": "Choose or type a model",
     "typePlaceholder": "Choose or type a type",
@@ -2304,6 +2826,9 @@
     "partnerBadge": "× YAS & Moi",
     "partnerLogoAlt": "YAS & Moi",
     "backToYasApp": "Back to AutoNex",
+    "miniHeader": {
+      "aria": "AutoNex × YAS & Moi navigation"
+    },
     "heroTitle": "Buy, sell or value a car in Madagascar",
     "heroSubtitle": "Madagascar's #1 car portal.",
     "actions": {
@@ -2368,6 +2893,33 @@
         "autosave": "Auto-save",
         "guided": "Guided flow"
       }
+    }
+  },
+  "bonnesAffaires": {
+    "title": "Best vehicle deals in Madagascar",
+    "subtitle": "Listings with truly reduced prices, verified by AutoNex.",
+    "empty": "No deals available right now. Come back soon!",
+    "error": "Could not load deals. Please try again in a moment.",
+    "loadMore": "Load more",
+    "filters": {
+      "title": "Filters",
+      "make": "Make",
+      "minDiscount": "Minimum discount",
+      "maxPrice": "Max budget",
+      "ville": "City",
+      "reset": "Reset",
+      "apply": "Apply"
+    },
+    "seo": {
+      "title": "Vehicle deals in Madagascar — AutoNex",
+      "description": "Discover the best automotive deals in Madagascar. Listings with truly reduced prices, verified and guaranteed by AutoNex.",
+      "ogTitle": "Auto deals in Madagascar — AutoNex",
+      "ogDescription": "Cars with real discounts, no fake rebates. The AutoNex promise."
+    },
+    "count_one": "{{count}} vehicle on sale",
+    "count_other": "{{count}} vehicles on sale",
+    "pagination": {
+      "shown": "{{shown}} of {{total}} vehicles shown"
     }
   }
 }

@@ -37,6 +37,10 @@ describe("applyListingFilters", () => {
         ops.push({ kind: "eq", payload: [col, val] });
         return chain;
       },
+      gt(col: string, val: unknown) {
+        ops.push({ kind: "gt", payload: [col, val] });
+        return chain;
+      },
       gte(col: string, val: unknown) {
         ops.push({ kind: "gte", payload: [col, val] });
         return chain;

@@ -1,4 +1,127 @@
 {
+  "admin": {
+    "yasAnalytics": {
+      "title": "Analytics YAS × AutoNex",
+      "subtitle": "Topimaso amin'ny session, funnel sy fihetsika ny mini-app YAS & Moi.",
+      "lastUpdate": "Fanavaozana farany : {{date}}",
+      "loading": "Mihantona ny angon-drakitra analytics...",
+      "error": "Tsy afaka naka ny angon-drakitra.",
+      "kpi": {
+        "heading": "Session YAS",
+        "subtitle": "Session miavaka isaky ny varavarankely fotoana (dedup amin'ny session_id).",
+        "sessions24h": "Session 24h",
+        "sessions7d": "Session 7 andro",
+        "sessions30d": "Session 30 andro",
+        "totalEvents30d": "Hetsika rehetra 30 andro"
+      },
+      "funnel": {
+        "title": "Funnel fanovana",
+        "subtitle": "Session miavaka tonga amin'ny dingana tsirairay (mandritra ny 30 andro).",
+        "legend": "Session",
+        "empty": "Tsy mbola misy angon-drakitra funnel mandritra ny 30 andro.",
+        "steps": {
+          "autonexOpen": "Fisokafan'ny mini-app",
+          "actionClick": "Kitio CTA",
+          "searchPerformed": "Fikarohana natao",
+          "listingView": "Fahitana annonce",
+          "sellerContactClick": "Fifandraisana mpivarotra",
+          "estimationStarted": "Fanombanana natomboka",
+          "estimationCompleted": "Fanombanana vita",
+          "publishStarted": "Famoahana natomboka",
+          "publishCompleted": "Famoahana tafita"
+        }
+      },
+      "dailyEvents": {
+        "title": "Hetsika isan'andro",
+        "subtitle": "Hetsika rehetra isan'andro mandritra ny 30 andro.",
+        "legend": "Hetsika",
+        "empty": "Tsy mbola misy hetsika mandritra ny 30 andro."
+      },
+      "topEvents": {
+        "title": "Hetsika malaza indrindra",
+        "subtitle": "Fahitana ny hetsika voarakitra (30 andro).",
+        "legend": "Fahitana",
+        "empty": "Tsy mbola misy hetsika."
+      },
+      "platforms": {
+        "title": "Sehatra",
+        "subtitle": "Fizarana iOS / Android / tsy fantatra mandritra ny 30 andro.",
+        "legend": "Hetsika",
+        "empty": "Tsy mbola misy hetsika."
+      },
+      "referrers": {
+        "title": "Loharanon'ny fifamoivoizana",
+        "subtitle": "10 voalohany amin'ny niavian'ny session (document.referrer, 30 andro).",
+        "colReferrer": "Referrer",
+        "colCount": "Hetsika",
+        "empty": "Tsy mbola misy referrer voarakitra."
+      }
+    },
+    "verifications": {
+      "title": "Fanamarinana",
+      "empty": "Tsy misy fanamarinana miandry",
+      "statusFilter": {
+        "label": "Sivana araka ny toetra",
+        "all": "Rehetra",
+        "pending": "Miandry",
+        "reviewing": "Eo am-pijerena",
+        "approved": "Voamarina",
+        "rejected": "Lavina",
+        "expired": "Lany"
+      },
+      "list": {
+        "user": "Mpampiasa",
+        "fullName": "Anarana",
+        "submitted": "Naroso",
+        "status": "Toetra"
+      },
+      "drawer": {
+        "title": "Mijery ny fanamarinana",
+        "docs": {
+          "title": "Antontan-taratasy",
+          "cinFront": "CIN Aloha",
+          "cinBack": "CIN Aoriana",
+          "selfie": "Selfie"
+        },
+        "metadata": {
+          "title": "Vaovao narosoina"
+        },
+        "actions": {
+          "approve": "Ankatoavy",
+          "reject": "Lavinao"
+        },
+        "approve": {
+          "confirmTitle": "Ankatoavy ity fanamarinana ity ?",
+          "confirmDesc": "Ho azon'ny mpampiasa ny baodzy Mpivarotra voamarina mandritra ny 365 andro."
+        },
+        "reject": {
+          "categoryLabel": "Sokajy lavina",
+          "categories": {
+            "blurry": "Sary tsy mazava",
+            "wrong_doc": "Antontan-taratasy diso",
+            "fraud_suspect": "Hosoka azo inoana",
+            "expired_doc": "Antontan-taratasy lany",
+            "other": "Hafa"
+          },
+          "reasonLabel": "Antony (hita amin'ny mpampiasa)",
+          "reasonPlaceholder": "Hazavao tsara ny antony nandavana...",
+          "confirmCta": "Hamarino ny fandavana"
+        }
+      },
+      "success": {
+        "approved": "Voankatoavy ny fanamarinana",
+        "rejected": "Voalavina ny fanamarinana"
+      },
+      "errors": {
+        "adminRequired": "Hetsika natokana ho an'ny mpitantana.",
+        "notFound": "Tsy hita ny fanamarinana.",
+        "notReviewable": "Tsy azo jerena intsony ity fanamarinana ity.",
+        "reasonTooShort": "Mila 10 litera farafahakeliny ny antony.",
+        "invalidCategory": "Sokajy fandavana tsy ekena.",
+        "generic": "Nisy fahadisoana. Andramo indray azafady."
+      }
+    }
+  },
   "ads": {
     "partnerCampaign": {
       "description": "Endrika natokana ho an'ny marika sy ny serivisy mpiara-miombon'antoka voafidin'ny AutoNex.",
@@ -170,6 +293,7 @@
     "accountIndividual": "Kaonty tsotra",
     "activate": "Hampandeha",
     "activeListings": "Filazana mavitrika",
+    "boostListing": "Booster",
     "buyCredits": "Hividy crédits",
     "contacts": "Fifandraisana azo",
     "credits": "Crédits",
@@ -179,6 +303,10 @@
     "listing": "Filazana",
     "listingDeleted": "Voafafa ny filazana",
     "myListings": "Ny filazako",
+    "viewAllListings": "Ny filazako",
+    "section": {
+      "manageListings": "Hitantana ny filazana ahy"
+    },
     "noLeads": "Mbola tsy nahazo fifandraisana.",
     "noListings": "Tsy misy filazana. Avoaky ny filazana voalohany !",
     "pause": "Hampijanona",
@@ -231,6 +359,53 @@
     "boostListing": "Hampoizina",
     "boostPendingReviewNote": "Ho azo atao ny boost « aorian'ny famoahana » rehefa avy nohamarinin'ny ekipa ny filazana. Ny safidy aloha amin'ny fandefasana dia mijanona miandry etsy ambony.",
     "editListing": "Hovaina"
+  },
+  "deals": {
+    "modal": {
+      "title": "Apetraho ho varotra mahafinaritra ny dokam-barotrao",
+      "subtitle": "Mahasarika mpividy bebe kokoa amin'ny fihenam-bidy vonjimaika",
+      "currentPriceLabel": "Vidiny ankehitriny",
+      "discountLabel": "Safidio ny fihenam-bidinao",
+      "discountCustom": "Manokana",
+      "discountCustomInvalid": "Misafidiana isa manelanelana ny 5 sy 30.",
+      "priceMode": {
+        "label": "Ou saisis directement le nouveau prix",
+        "placeholder": "ex: 179 910 000",
+        "helper": "Soit -{{percent}} % (économie {{savings}}).",
+        "errors": {
+          "priceTooHigh": "Le nouveau prix doit être inférieur au prix actuel.",
+          "discountTooLow": "Remise minimum : 5 % (nouveau prix maximum : {{maxPrice}}).",
+          "discountTooHigh": "Remise maximum : 30 % (nouveau prix minimum : {{minPrice}})."
+        }
+      },
+      "durationLabel": "Fe-potoanan'ny varotra",
+      "durationDays": "{{count}} andro",
+      "previewTitle": "Topi-maso",
+      "previewBefore": "Talohan'izay",
+      "previewAfter": "Vidiny vaovao",
+      "previewSavings": "Tombony ho an'ny mpividy",
+      "previewVisibleUntil": "Hita hatramin'ny {{date}}",
+      "guarantee30d": "Mandritra ny 30 andro aorian'ny faran'ny varotra dia tsy afaka mampiakatra ny vidiny mihoatra ny {{originalPrice}} ianao. Io fiarovana io dia mampatoky ny mpividy ary manamarina ny fahamarinan'ny tolotrao.",
+      "ctaActivate": "Avoaka ny varotra",
+      "ctaCancel": "Hanafoana"
+    },
+    "dashboardButton": {
+      "activate": "Hatao varotra mahafinaritra",
+      "cancel": "Hanafoana ny varotra"
+    },
+    "status": {
+      "activeUntil": "-{{discount}}% hatramin'ny {{date}}"
+    },
+    "confirm": {
+      "cancel": "Tena tianao foanana ity varotra ity ? Ny vidiny voafehy dia hijanona mandritra ny 30 andro."
+    },
+    "toast": {
+      "activated": "Voavaha tsara ny varotra !",
+      "activateFailed": "Tsy tafita ny famoahana ny varotra",
+      "cancelled": "Voafoana ny varotra",
+      "cancelFailed": "Tsy tafita ny fanafoanana",
+      "priceLocked": "Voafehy ny vidiny mandra-pahatongan'ny faran'ny vanim-potoanan'ny fiarovana."
+    }
   },
   "estimation": {
     "accidentDeclaredDesc": "Misy fiantraikany amin'ny vidiny tombanana.",
@@ -310,34 +485,6 @@
     "reliableInput": "Fampidirana azo itokisana",
     "reliableTransparentDesc": "Mampifangaro angon-drakitra fototra sy famantarana tsena ny fitaovana. Ahitana elanelam-bidy sy haavon'ny fitokisana ny tombana tsirairay.",
     "reliableTransparentTitle": "Azo itokisana sy mangarahara",
-    "report": "Tatitra momba ny tombana",
-    "reportConfidence": "Fitokisana amin'ny tatitra",
-    "resultSectionAria": "Vokatry ny tombana fiara",
-    "searchBrand": "Hitady marika...",
-    "searchCity": "Hitady tanàna / faritra...",
-    "searchModel": "Hitady modely...",
-    "selectBrand": "Safidio ny marika",
-    "selectCity": "Safidio ny tanàna / faritra",
-    "selectModel": "Safidio ny modely",
-    "start": "Hanomboka tombana",
-    "stepCondition": "Toetry ny fiara",
-    "stepConditionHelper": "Tantara sy fampiasana",
-    "stepResult": "Vokatra",
-    "stepResultHelper": "Tatitra tombanana",
-    "stepVehicle": "Fiara",
-    "stepVehicleHelper": "Fanazavana fototra",
-    "title": "Tombana",
-    "unavailableTitle": "Tsy misy tombana amin'izao",
-    "usage": "Fampiasana",
-    "usageAdviceAria": "Torohevitra fampiasana ny tatitra tombana",
-    "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana filazana mifanaraka tsara.",
-    "usageFrameAria": "Fetran'ny fampiasana ny tombana",
-    "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy fanombanana ara-mekanika, ary tsy vidiny voaantoka.",
-    "vehicleIdentity": "Mombamomba ny fiara",
-    "vehicleIdentityLead": "Fenoy ny vaovao fototra momba ny fiara mba hahazoana tombana azo itokisana sy azo ampiasaina.",
-    "viewMyEstimate": "Hijery ny tombanako",
-    "whyTheseInfo": "Nahoana ireo fanazavana ireo?",
-    "whyUseful": "Antony maha-ilaina azy",
     "report": {
       "claimModeStrong": "Famakafakana tsena matanjaka",
       "claimModeLimited": "Famakafakana tsena voamarina",
@@ -457,7 +604,34 @@
         "comparablesEmptyMessage": "Miorina indrindra amin'ny famantarana fanondroana ity tatitra ity. Tazomy ny paikady mitandrina amin'ny vidiny.",
         "ctaFootnote": "Torohevitra AutoNex : ao anatin'ny tontolo porofo malemy, aleo paikady mitandrina alohan'ny famerana ny vidiny."
       }
-    }
+    },
+    "reportConfidence": "Fitokisana amin'ny tatitra",
+    "resultSectionAria": "Vokatry ny tombana fiara",
+    "searchBrand": "Hitady marika...",
+    "searchCity": "Hitady tanàna / faritra...",
+    "searchModel": "Hitady modely...",
+    "selectBrand": "Safidio ny marika",
+    "selectCity": "Safidio ny tanàna / faritra",
+    "selectModel": "Safidio ny modely",
+    "start": "Hanomboka tombana",
+    "stepCondition": "Toetry ny fiara",
+    "stepConditionHelper": "Tantara sy fampiasana",
+    "stepResult": "Vokatra",
+    "stepResultHelper": "Tatitra tombanana",
+    "stepVehicle": "Fiara",
+    "stepVehicleHelper": "Fanazavana fototra",
+    "title": "Tombana",
+    "unavailableTitle": "Tsy misy tombana amin'izao",
+    "usage": "Fampiasana",
+    "usageAdviceAria": "Torohevitra fampiasana ny tatitra tombana",
+    "usageAdviceText": "Ampiasao ity tatitra ity handanjana ny fotoana hivarotana sy hanomanana filazana mifanaraka tsara.",
+    "usageFrameAria": "Fetran'ny fampiasana ny tombana",
+    "usageFrameText": "Ity tombana ity dia famantarana ny tsena mifototra amin'ny angona misy. Tsy sanda ofisialy, tsy fanombanana ara-mekanika, ary tsy vidiny voaantoka.",
+    "vehicleIdentity": "Mombamomba ny fiara",
+    "vehicleIdentityLead": "Fenoy ny vaovao fototra momba ny fiara mba hahazoana tombana azo itokisana sy azo ampiasaina.",
+    "viewMyEstimate": "Hijery ny tombanako",
+    "whyTheseInfo": "Nahoana ireo fanazavana ireo?",
+    "whyUseful": "Antony maha-ilaina azy"
   },
   "favorites": {
     "title": "Ny ankafiziko",
@@ -682,9 +856,11 @@
       "authRequired": "Midira aloha mba hampahafantarana filazana.",
       "reasons": {
         "scam": "Halatra / Fanodinkodinana",
+        "fake_photos": "Sary nangalarina na tsy marina",
         "inappropriate": "Votoaty tsy mety",
-        "duplicate": "Filazana miverimberina",
         "wrong_price": "Vidiny tsy mitombina",
+        "wrong_category": "Sokajy diso / tsy mifanaraka",
+        "duplicate": "Filazana miverimberina",
         "other": "Hafa"
       },
       "errors": {
@@ -743,8 +919,11 @@
     "badge": {
       "boost": "Boost",
       "coupDeCoeur": "Tena tia",
+      "featured": "À la une",
       "nouveau": "Vaovao",
-      "urgent": "Maika"
+      "topAd": "Top",
+      "urgent": "Maika",
+      "verifiedSeller": "Voamarina"
     },
     "mapApproximate": "Toerana hita amin'ny sarintany."
   },
@@ -769,12 +948,14 @@
     "home": "Fandraisana",
     "login": "Hiditra",
     "logout": "Hivoaka",
+    "myListings": "Ny filazana ahy",
     "newProjects": "Vaovao",
     "publish": "Hamoaka filazana",
     "rent": "Hofa maharitra",
     "rentSubmenu": "Sokafy ny menio fanofana maharitra",
     "settings": "Paramètres",
-    "signup": "Hisoratra anarana"
+    "signup": "Hisoratra anarana",
+    "bonnesAffaires": "Varotra mahafinaritra"
   },
   "payment": {
     "vanilla": {
@@ -795,6 +976,7 @@
       "pendingMessage": "Andalam-pikarakarana ny fandoavam-bolanao. Hanavao ho azy ity pejy ity.",
       "pollingTimeout": "Lany ny fe-potoana fanamarinana. Raha voamarina ny fandoavam-bolanao, ho hita ao anatin'ny minitra vitsy ny crédit. Jereo ny tantara ao amin'ny /credits.",
       "processingPayment": "Manomboka ny fandoavam-bola...",
+      "redirecting": "Mandalo amin'ny fandoavam-bola...",
       "retryButton": "Andramo indray",
       "returnPageIntro": "Mijerena ny toetry ny fandoavam-bolanao...",
       "returnPageTitle": "Valim-pandoavam-bola",
@@ -843,8 +1025,11 @@
     "creditCard": "Carte bancaire (Stripe)",
     "creditPack": {
       "business": "Business",
+      "discover": "Discover",
+      "enterprise": "Enterprise",
+      "power": "Power",
       "pro": "Pro",
-      "starter": "Starter"
+      "standard": "Standard"
     },
     "creditRequestSent": "Voatahiry ny fangatahana fividianana crédit.",
     "credits": "crédits",
@@ -1101,6 +1286,32 @@
       }
     }
   },
+  "rateLimit": {
+    "title": "Fetra famoahana",
+    "activeListings": {
+      "label": "Filazana mavitrika",
+      "usage": "{{count}} / {{limit}}"
+    },
+    "publishes24h": {
+      "label": "Famoahana 24 ora",
+      "usage": "Famoahana 24 ora : {{count}} / {{limit}}"
+    },
+    "exceeded": {
+      "activeLimit": {
+        "title": "Tratra ny fetran'ny filazana",
+        "body": "Manana {{count}} / {{limit}} filazana mavitrika ianao. Amidio na andraso lany ny iray vao afaka mamoaka indray.",
+        "upgradeCta": "Tonga mpivarotra voamarina (5 filazana)"
+      },
+      "publish24h": {
+        "title": "Tratra ny fetra isan'andro",
+        "body": "Namoaka filazana {{count}} ianao tao anatin'ny 24 ora farany. Ny fetra dia {{limit}}/andro. Andramo aoriana."
+      }
+    },
+    "cooldown": {
+      "title": "Andraso segondra vitsy",
+      "body": "Afaka mamoaka indray ianao ao anatin'ny {{seconds}} segondra."
+    }
+  },
   "search": {
     "activeSelection": "Safidy mavitrika: {{value}}",
     "allExteriorColors": "Loko ivelany rehetra",
@@ -1242,6 +1453,9 @@
       "verifiedByStatus": "Filazana voamarina arakaraka ny status famoahana",
       "guidedByCriteria": "Famakiana entin'ireo fepetranao",
       "similarModeActive": "Mode safidy hafa akaiky mavitrika"
+    },
+    "filterChips": {
+      "hasDeal": "Varotra mahafinaritra"
     }
   },
   "sections": {
@@ -1400,6 +1614,7 @@
     "markAllAsRead": "Marihy ho voavaky avokoa",
     "empty": "Tsy mbola misy fampahafantarana",
     "viewAll": "Hijery ny fampahafantarana rehetra",
+    "preferencesLabel": "Safidy",
     "preferences": {
       "pageTitle": "Safidin'ny fampahafantarana",
       "heading": "Safidin'ny fampahafantarana",
@@ -1472,7 +1687,72 @@
     "termsHintSuffix": " — tsy averina ny crédits, lany aorian'ny 12 volana.",
     "balance": {
       "insufficient": "Tsy ampy mba hamoahana filazana ({{count}} crédits ilaina).",
-      "scenariosWith": "Amin'ity solde ity : {{scenarios}}"
+      "scenariosWith": "Amin'ity solde ity : {{scenarios}}",
+      "empty": "Hampitomboy ny solde mba hamoahanao filazana sy hampandehananao boost.",
+      "canDo": {
+        "title": "Amin'ity solde ity, azonao atao ny :",
+        "listings_one": "Mamoaka filazana {{count}} mandritra ny 30 andro",
+        "listings_other": "Mamoaka filazana {{count}} mandritra ny 30 andro",
+        "bumps_one": "NA mampandeha boost Remontée {{count}}",
+        "bumps_other": "NA mampandeha boost Remontée {{count}}",
+        "featured_one": "NA boost À la une {{count}} mandritra ny 7 andro",
+        "featured_other": "NA boost À la une {{count}} mandritra ny 7 andro",
+        "topAd_one": "NA Top Annonce {{count}} mandritra ny 30 andro",
+        "topAd_other": "NA Top Annonce {{count}} mandritra ny 30 andro"
+      },
+      "tooltip": {
+        "total": "Solde tontaly",
+        "granted": "Crédits maimaim-poana",
+        "paid": "Crédits novidiana",
+        "expires": "lany ny {{date}}"
+      },
+      "recharge": "Hampitomboana crédits",
+      "rechargeAria": "Hividy crédits fanampiny",
+      "chipAria": "Solde : {{n}} crédits",
+      "expiringSoonAria": "Hifarana tsy ho ela ireo crédits maimaim-poana",
+      "loading": "Mametahana ny solde…"
+    },
+    "packs": {
+      "recommended": "Soso-kevitra",
+      "bonusValue": "+{{amount}} bonus",
+      "choose": "Hisafidy",
+      "subtitle": {
+        "intro": "Arakaraky ny vidianao no itsitsianao. Tsy misy abonnement, mateza 12 volana ny crédits."
+      },
+      "tooltip": {
+        "unitPrice": "{{price}} Ar / crédit",
+        "equivalentListings": "≈ {{count}} filazana 30 andro",
+        "savings": "Mitsitsy {{amount}} miohatra amin'ny vidiny tsirairay"
+      },
+      "_DEPRECATED_PROMPT_3_5_3_6": "Ireo lakile etsy ambany (bonus.*, ribbon.*, savings.label, unitPrice, unitPriceNoBonus, badges.*) dia nosoloina amin'ny PROMPT 3.7. Tazonina mba tsy hahatonga 404 i18n raha ampiasaina hafa.",
+      "bonus": {
+        "label": "{{base}} + {{bonus}} maimaim-poana",
+        "suffix": "maimaim-poana",
+        "percent": "+{{percent}}% bonus"
+      },
+      "ribbon": {
+        "bonusPercent": "+{{percent}}% TOMBONY MAIMAIM-POANA"
+      },
+      "savings": {
+        "label": "Mitsitsy {{amount}} miohatra amin'ny vidiny tsirairay"
+      },
+      "unitPrice": "{{price}} Ar / crédit (-{{discount}}%)",
+      "unitPriceNoBonus": "{{price}} Ar / crédit",
+      "badges": {
+        "popular": "MALAZA",
+        "bestValue": "TSARA INDRINDRA",
+        "maxBonus": "BONUS BETSAKA"
+      }
+    },
+    "welcome": {
+      "title": "Tongasoa eto AutoNex !",
+      "titleRemaining": "Ny crédits maimaim-poanao",
+      "bodyInitial": "Nahazo {{amount}} crédits maimaim-poana ianao ({{listings}} filazana maimaim-poana). Lany aorian'ny {{days}} andro.",
+      "bodyRemaining": "Mbola manana {{remaining}} crédits maimaim-poana ianao (amin'ny {{received}} nahazo). Mitovy amin'ny {{listings}} filazana maimaim-poana. Lany aorian'ny {{days}} andro.",
+      "_DEPRECATED_PROMPT_4_3": "credits.welcome.body nosoloina amin'ny bodyInitial/bodyRemaining. Tazonina mba tsy hahatonga 404 i18n.",
+      "body": "Nahazo {{amount}} crédits maimaim-poana ianao ({{listings}} filazana maimaim-poana). Hifarana ao anatin'ny {{days}} andro.",
+      "cta": "Mamoaka filazana voalohany",
+      "dismiss": "Hidio"
     },
     "balanceLabel": "Ny solde-nao",
     "pendingTitle": "Miandry fanamarinana",
@@ -1506,7 +1786,65 @@
     "insufficientBalance": "Tsy ampy ny solde ho an'ity panier ity.",
     "confirming": "Fanamarinana…",
     "confirmWithCredits": "Hamarino ({{count}} crédits)",
-    "purchaseSuccess": "Voasokatra ny boost. Misitraka avy hatrany ny fahitana voafidy ny filazanao."
+    "purchaseSuccess": "Voasokatra ny boost. Misitraka avy hatrany ny fahitana voafidy ny filazanao.",
+    "errors": {
+      "cooldown": "Mila miandry 24 ora ianao alohan'ny hanaovana bump fanindroany.",
+      "insufficientCredits": "Tsy ampy ny crédits ho an'ity boost ity.",
+      "notOwner": "Ny filazanao ihany no azonao boostina.",
+      "notBoostable": "Tsy azo boostina intsony ity filazana ity (voavidy na lany).",
+      "notFound": "Tsy hita ny filazana.",
+      "notAuthenticated": "Midira mba hanao boost amin'ny filazana iray.",
+      "invalidType": "Karazana boost tsy ekena.",
+      "generic": "Nisy fahadisoana. Andramo indray azafady."
+    },
+    "success": {
+      "bumpToast": "Niakatra ny filazana 🚀",
+      "featuredToast": "Boost « À la une » mavitrika ⭐",
+      "topAdToast": "Top Annonce mavitrika 👑"
+    }
+  },
+  "boostModal": {
+    "title": "Boostino ny filazanao",
+    "subtitle": "Safidio ilay safidy mety aminao",
+    "boost": {
+      "bump": {
+        "title": "Fiakarana avy hatrany",
+        "duration": "Vokatra avy hatrany",
+        "description": "Miverina any ambony amin'ny feed avy hatrany ny filazanao."
+      },
+      "featured": {
+        "title": "À la une",
+        "duration": "7 andro",
+        "description": "Miseho ao amin'ny faritra « À la une » + badge ⭐ amin'ny carte."
+      },
+      "top_ad": {
+        "title": "Top Annonce",
+        "duration": "30 andro",
+        "description": "Voafantsika 👑 any ambony amin'ny feed mandritra ny 30 andro."
+      }
+    },
+    "cardCostValue": "{{amount}} cr.",
+    "balanceLabel": "Solde",
+    "balanceValue": "{{amount}} crédits",
+    "totalCostLabel": "Vidiny",
+    "totalCostValue": "{{amount}} crédits",
+    "confirmCta": "Hamarino ny boost",
+    "cancelCta": "Foano",
+    "activating": "Andalam-pampandehanana...",
+    "insufficientCredits": {
+      "title": "Tsy ampy ny crédits",
+      "cta": "Hampitomboina"
+    },
+    "cooldown": {
+      "bumpUnavailable": "Hisy ao anatin'ny {{remaining}}"
+    },
+    "activeBoosts": {
+      "featuredUntil": "Mavitrika hatramin'ny {{date}} — manangona ny extension",
+      "topAdUntil": "Mavitrika hatramin'ny {{date}} — manangona ny extension"
+    },
+    "disclaimer": {
+      "noRefund": "Tsy averina ny crédits efa lany raha voavidy aloha ny filazana."
+    }
   },
   "brands": {
     "scrollPrev": "Marika teo aloha",
@@ -1525,6 +1863,86 @@
     "calloutWarning": "Tandremo",
     "calloutInfo": "Tokony ho fantatra",
     "updatedOn": "Nohavaozina ny {{date}}"
+  },
+  "myListings": {
+    "title": "Ny filazana ahy",
+    "subtitle": "Tantano ny filazanao, jereo ny fampandehanana, ary ampandehano ny fahitana.",
+    "tabs": {
+      "all": "Rehetra",
+      "active": "Mavitrika",
+      "expiringSoon": "Ho lany tsy ho ela",
+      "expired": "Lany",
+      "sold": "Voavidy",
+      "draft": "Rohy"
+    },
+    "card": {
+      "badge": {
+        "active": "Mavitrika",
+        "expiringSoon": "Ho lany tsy ho ela",
+        "expired": "Lany",
+        "sold": "Voavidy",
+        "draft": "Rohy",
+        "other": "—"
+      },
+      "expiresInDays": "Ho lany ao anatin'ny {{count}} andro",
+      "expiredOn": "Lany ny {{date}}",
+      "soldOn": "Voavidy ny {{date}}",
+      "progressAria": "Fivoaran'ny faharetan'ny filazana"
+    },
+    "actions": {
+      "boost": "Booster",
+      "boostComingSoon": "Ho avy tsy ho ela",
+      "edit": "Hanova",
+      "markSold": "Mariho voavidy",
+      "renew": "Havaozina ({{cost}} crédits)",
+      "continueDraft": "Tohizo ny fanoratana",
+      "deleteDraft": "Foano",
+      "viewDetails": "Hijery antsipiriany"
+    },
+    "boostStatus": {
+      "featuredUntil": "À la une hatramin'ny {{date}}",
+      "topAdUntil": "Top hatramin'ny {{date}}"
+    },
+    "renewModal": {
+      "title": "Havaozina {{title}}",
+      "subtitle": "Fanavaozana mandritra ny 30 andro",
+      "cost": "Vidiny",
+      "balanceCurrent": "Solde ankehitriny",
+      "balanceAfter": "Solde aorian'ny",
+      "benefits": {
+        "active": "Hiverina Mavitrika ny filazanao",
+        "duration": "Hita mandritra ny 30 andro fanampiny",
+        "metrics": "Tahirina ny isan'ny fijery"
+      },
+      "insufficient": "Tsy ampy ny solde",
+      "recharge": "Hampitomboana crédits",
+      "cancel": "Hialana",
+      "confirm": "Hanamarina",
+      "success": "Voavaozina ho 30 andro ny filazana",
+      "errorInsufficient": "Tsy ampy ny solde.",
+      "errorNotOwner": "Tsy ianao no tompon'ity filazana ity.",
+      "priceContext": "Vidin'ny filazana : {{price}}"
+    },
+    "markSoldModal": {
+      "title": "Mariho hoe voavidy",
+      "warning": "Tsy azo averina intsony ity dingana ity.",
+      "description": "Esorina amin'ny vokatra fikarohana ny filazanao. Ho foanana ho azy ireo boost mavitrika.",
+      "priceLabel": "Vidiny inona no nivarotanao ? (tsy voatery)",
+      "priceHelp": "Tsy voatery — ampiasaina amin'ny analytics tsy fantatra anarana.",
+      "confirm": "Hanamarina ny varotra",
+      "success": "Mariky ny voavidy ny filazana 🎉",
+      "errorNotOwner": "Tsy ianao no tompony.",
+      "errorInvalidPrice": "Vidiny tsy mety."
+    },
+    "empty": {
+      "title": "Tsy misy filazana amin'ity sokajy ity",
+      "body": "Mamoaka filazana voalohany mba hanombohana ny fivarotana ny fiaranao.",
+      "cta": "Mamoaka filazana voalohany"
+    },
+    "error": {
+      "title": "Tsy afaka mametaha ny filazanao.",
+      "retry": "Andramo indray"
+    }
   },
   "contact": {
     "pageTitle": "Fifandraisana",
@@ -2258,6 +2676,110 @@
     "backToHome": "Hiverina any am-pidirana",
     "viewListings": "Hijery ny filazana"
   },
+  "verification": {
+    "overline": "Maha-izy",
+    "title": "Mpivarotra voamarina",
+    "subtitle": "Ampitomboy ny fitokisan'ny mpividy"  ,
+    "intro": {
+      "benefits": {
+        "title": "Tombontsoa",
+        "b1": "Baodzy ✓ Voamarina amin'ny filazanao rehetra",
+        "b2": "Hita kokoa amin'ny vokatra",
+        "b3": "Mahatoky kokoa amin'ny mpividy"
+      },
+      "requirements": {
+        "title": "Antontan-taratasy ilaina",
+        "r1": "Pièce d'identité — aloha (CIN na passeport)",
+        "r2": "Pièce d'identité — aoriana (CIN na passeport)",
+        "r3": "Selfie miaraka amin'ny pièce d'identité"
+      },
+      "privacy": {
+        "title": "Tsiambaratelo",
+        "body": "Voadrindra ny antontan-taratasinao ary ampiasaina ho an'ny fanamarinana ihany. Tehirizina 90 andro raha lavina, esorina rehefa lany ny baodzy.",
+        "consentLabel": "Ekeko ny politikan'ny tsiambaratelo"
+      },
+      "cost": "Vidiny",
+      "balanceLabel": "Solde",
+      "startCta": "Manomboka"
+    },
+    "steps": {
+      "cinFront": {
+        "title": "Pièce d'identité — Aloha",
+        "subtitle": "CIN na passeport"
+      },
+      "cinBack": {
+        "title": "Pièce d'identité — Aoriana",
+        "subtitle": "CIN na passeport"
+      },
+      "selfie": {
+        "title": "Selfie miaraka amin'ny pièce d'identité",
+        "tip": "Tazomy ny pièce d'identité (CIN na passeport) manodidina ny tavanao. Mila mazava sy hazavain-tsoa avokoa izy roa."
+      },
+      "upload": {
+        "dropzone": "Atontao eto ny rakitrao na tsindrio",
+        "formats": "JPG, PNG, WEBP na PDF — 10 Mo farafahabetsany",
+        "formatsImageOnly": "JPG, PNG na WEBP — 10 Mo farafahabetsany",
+        "uploading": "Andalam-pamoahana...",
+        "uploaded": "✓ Voakopia ny rakitra",
+        "replaceHint": "Tsindrio raha hanova",
+        "remove": "Esory ity antontan-taratasy ity"
+      },
+      "metadata": {
+        "title": "Ny mombamomba anao",
+        "fullName": { "label": "Anarana feno (toy ny ao amin'ny pièce d'identité)" },
+        "cinNumber": { "label": "Laharana CIN na passeport" },
+        "dateOfBirth": { "label": "Daty nahaterahana (tsy voatery)" }
+      },
+      "recap": {
+        "title": "Famintinana",
+        "missingDocs": "Tsy ampy ny antontan-taratasy. Miverena amin'ny dingana teo aloha.",
+        "confirmCta": "Hanaroso ny fangatahana",
+        "submitting": "Andalam-pandefasana..."
+      },
+      "nav": {
+        "next": "Manaraka",
+        "previous": "Aloha"
+      }
+    },
+    "flow": {
+      "previousRejection": "Lavina ny fangatahana teo aloha :"
+    },
+    "statusCard": {
+      "none": {
+        "title": "Aoka ho mpivarotra voamarina",
+        "subtitle": "Ampitomboy ny fitokisan'ny mpividy. Fifandraisana bebe kokoa amin'ny filazanao.",
+        "cta": "Manomboka"
+      },
+      "pending": {
+        "title": "Andalam-panamarinana",
+        "body": "Valiny ao anatin'ny 48 ora. Naroso ny {{date}}."
+      },
+      "approved": {
+        "title": "Mpivarotra voamarina ✓",
+        "body": "Mavitrika hatramin'ny {{date}} ny baodzy.",
+        "cta": "Antsipiriany"
+      },
+      "rejected": {
+        "title": "Lavina ny fanamarinana",
+        "reasonLabel": "Antony :",
+        "cta": "Mandefa indray"
+      }
+    },
+    "success": {
+      "toast": "Naroso ny fangatahana"
+    },
+    "errors": {
+      "fileSize": "Lehibe loatra ny rakitra (10 Mo farafahabetsany)",
+      "fileType": "Tsy raisina ny endrika",
+      "uploadFailed": "Tsy nahomby ny upload, andramo indray",
+      "notAuthenticated": "Tapitra ny session. Mihazonà indray.",
+      "insufficientCredits": "Tsy ampy ny crédits ho an'ny fanamarinana",
+      "alreadyActive": "Efa misy fanamarinana miandry na voankatoavy",
+      "invalidFullName": "Anarana feno tsy ekena",
+      "invalidCinNumber": "Laharana CIN tsy ekena",
+      "generic": "Nisy fahadisoana. Andramo indray azafady."
+    }
+  },
   "vehicleCombobox": {
     "modelPlaceholder": "Mifidiana na soraty ny modely",
     "typePlaceholder": "Mifidiana na soraty ny karazana",
@@ -2304,6 +2826,9 @@
     "partnerBadge": "× YAS & Moi",
     "partnerLogoAlt": "YAS & Moi",
     "backToYasApp": "Hiverina any AutoNex",
+    "miniHeader": {
+      "aria": "Fivezivezena AutoNex × YAS & Moi"
+    },
     "heroTitle": "Hividy, hivarotra na hanombatombana fiara eto Madagasikara",
     "heroSubtitle": "Ny portail auto laharana voalohany eto Madagasikara.",
     "actions": {
@@ -2368,6 +2893,33 @@
         "autosave": "Tehirizina ho azy",
         "guided": "Vohitra mitarika"
       }
+    }
+  },
+  "bonnesAffaires": {
+    "title": "Varotra mahafinaritra fiara eto Madagasikara",
+    "subtitle": "Doka misy fihenam-bidy marina, voamarina amin'ny AutoNex.",
+    "empty": "Tsy misy varotra mahafinaritra amin'izao fotoana izao. Avereno tsy ho ela !",
+    "error": "Tsy afaka naka ny varotra mahafinaritra. Andramo indray afaka kelikely.",
+    "loadMore": "Hijery bebe kokoa",
+    "filters": {
+      "title": "Sivana",
+      "make": "Marika",
+      "minDiscount": "Fihenam-bidy farany ambany",
+      "maxPrice": "Tetibola farany ambony",
+      "ville": "Tanàna",
+      "reset": "Hamerina",
+      "apply": "Hampihatra"
+    },
+    "seo": {
+      "title": "Varotra mahafinaritra fiara eto Madagasikara — AutoNex",
+      "description": "Hitao ireo varotra mahafinaritra indrindra eto Madagasikara. Doka misy fihenam-bidy marina, voamarina sy voantanteraka avy amin'ny AutoNex.",
+      "ogTitle": "Varotra mahafinaritra fiara — AutoNex",
+      "ogDescription": "Fiara amin'ny vidiny mihena marina, tsy misy fihenam-bidy mamitaka. Ny fanoloran-tena AutoNex."
+    },
+    "count_one": "Fiara {{count}} amin'ny varotra mahafinaritra",
+    "count_other": "Fiara {{count}} amin'ny varotra mahafinaritra",
+    "pagination": {
+      "shown": "{{shown}} amin'ny {{total}} fiara aseho"
     }
   }
 }

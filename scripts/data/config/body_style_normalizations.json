@@ -1,0 +1,15 @@
+{
+  "alias_to_canonical": {
+    "Pick-up": "pickup", "Pickup": "pickup", "Pick up": "pickup", "PICKUP": "pickup", "pick-up": "pickup",
+    "SUV": "suv", "Sport Utility": "suv", "suv": "suv",
+    "Berline": "sedan", "Sedan": "sedan", "Saloon": "sedan", "berline": "sedan",
+    "Hatchback": "hatchback", "5 portes": "hatchback", "hatchback": "hatchback",
+    "Station Wagon": "wagon", "Break": "wagon", "SW": "wagon", "Wagon": "wagon",
+    "4x4": "suv", "4X4": "suv",
+    "Cabriolet": "convertible", "Décapotable": "convertible", "Decapotable": "convertible",
+    "Coupé": "coupe", "Coupe": "coupe",
+    "Mini-Space": "van", "Monospace": "van", "MPV": "van", "Van": "van", "van": "van",
+    "Autre": "other", "Other": "other"
+  },
+  "canonical_values": ["sedan","suv","pickup","hatchback","wagon","convertible","coupe","van","other"]
+}

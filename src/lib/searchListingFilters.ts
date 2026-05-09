@@ -35,6 +35,7 @@ function coreListingFiltersFromSearch(filters: SearchFilters): Omit<
     exteriorColor: filters.exteriorColor || undefined,
     engineDisplacementMin: filters.engineDisplacementMin || undefined,
     engineDisplacementMax: filters.engineDisplacementMax || undefined,
+    hasDeal: filters.hasDeal || undefined,
   };
 }
 

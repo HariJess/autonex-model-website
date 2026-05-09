@@ -1,0 +1,130 @@
+{
+  "version": "v1",
+  "outputs": {
+    "migration_filename_prefix": "seed_reference_profiles_v1"
+  },
+  "coefficients": {
+    "fb_listing_to_transaction": -0.12,
+    "dealer_official_adjustment": 0.0,
+    "expert_curated_adjustment": -0.05,
+    "manual_curated_adjustment": -0.05,
+    "comment": "Ajustements appliqués au prix annonce/listing pour estimer le prix de transaction. fb_listing_to_transaction=-0.12 : annonces FB négociées -10/-15% en moyenne (Sprint 1+). dealer_official_adjustment=0.0 : prix dealer dealer_templates = prix client final TTC, aucun ajustement. expert_curated_adjustment=-0.05 : corpus ami expert (occasion ts.xlsx) déjà curé mais légère marge négociation occasion. manual_curated_adjustment=-0.05 : corpus FB manuellement annoté (manual-reference-batches), prix annonce avec marge négociation. (Sprint 8)"
+  },
+  "caps": {
+    "max_listings_per_seller": 5,
+    "comment": "Anti-biais vendeurs pros qui spam. Top 10 vendeurs FB représentaient 27% du corpus."
+  },
+  "filters": {
+    "min_price_ar": 3000000,
+    "max_price_ar": 1500000000,
+    "min_year": 1985,
+    "max_year": 2026,
+    "min_km": 0,
+    "max_km": 500000
+  },
+  "calibration": {
+    "min_observations_for_strong_profile": 5,
+    "min_observations_for_weak_profile": 3,
+    "min_year_range_for_decay_calibration": 3,
+    "default_annual_depreciation_rate": 0.10,
+    "max_cv_for_acceptance": 0.65,
+    "comment_cv": "Coefficient de variation. Sur le marché Mada le CV est naturellement élevé (état véhicules très hétérogène TBE/TBN/à retaper). 0.65 permet d'accepter Hilux/L200/Serie3/Picanto/Patrol etc. tout en flaggant tier B (qualité moyenne, fourchette élargie)."
+  },
+  "tier_thresholds": {
+    "A_strong": { "min_obs": 5, "max_cv": 0.30, "min_year_span": 4 },
+    "B_moderate": { "min_obs": 3, "max_cv": 0.65, "min_year_span": 2 },
+    "C_anchor_only": { "comment": "1-2 observations + ancrage prix neuf concess, fallback heuristique 10%/an" }
+  },
+  "tier_c_policy": {
+    "allow_fb_only": true,
+    "min_observations_fb_only": 2,
+    "comment": "Si true, accepte les profils tier C avec ≥2 obs FB sans dealer Neuf. baseline_price = median des prix corrigés, decay = default_annual_depreciation_rate. baseline_year = median des années."
+  },
+  "brand_blacklist_for_seed": {
+    "brands": [],
+    "comment": "Marques présentes dans data dealer mais absentes du catalogue UI vehicleUiCatalog.ts. Calibrées sans erreur, mais inutilisables côté front. (Sprint catalogue UI — Brilliance/Enranger/Kaiyi retirés : ajoutés au front et au pipeline.)"
+  },
+  "quality_filters": {
+    "hard_reject_cv_above": 0.70,
+    "hard_reject_year_span_above": 22,
+    "comment_cv": "Sprint 8.1 — durci de 0.85 à 0.70 suite à régression de validation : profils CV>0.70 produisaient des extrapolations forward grotesques (BMW X3 baseline 2006 → estim 2018 +68%). Au-delà de CV 0.70 la médiane est statistiquement non-significative. Mieux vaut tier D heuristique pur que prix faux. Cette règle s'applique APRÈS calibration : si le profil sort avec CV > 0.70 il est rejeté et logué dans unfinishable_profiles.csv avec raison 'CV_TOO_HIGH'.",
+    "comment_year_span": "Au-delà de 22 ans de span (= 23+), le modèle a connu plusieurs générations très différentes avec prix multipliés (ex Toyota RAV4 1996→2019, span 23 = phases I→V). Le seuil de 22 préserve Toyota Hilux/Land Cruiser (span 21, restent en B) mais rejette RAV4 (span 23). Spec patch=18 trop agressif (cassait la sanity-check Hilux/LC), ajusté à 22."
+  },
+  "observation_floors": {
+    "comment": "Sprint 8.1 — filtre INDIVIDUEL d'observation (pré-calibration). Rejette les obs price < min_price_ar selon match. rejection_code = 'R-FLOOR-PREMIUM'. Distinct de plausibility_floors (qui agit POST-calibration sur baseline). Sert à éliminer le bruit FB pré-calibration sur les segments où la fourchette plancher est connue (ex: aucun X6 occasion 2010+ ne peut valoir 17M Ar à Mada — record FMG mal converti).",
+    "rules": [
+      {
+        "match": {
+          "make_in": ["BMW", "Audi", "Mercedes-Benz", "Porsche", "Land Rover", "Lexus", "Jaguar", "Volvo"],
+          "year_min": 2010
+        },
+        "min_price_ar": 30000000,
+        "label": "Premium brands ≥2010 : minimum 30M Ar (anti-bruit FB Sprint 8.1)"
+      }
+    ]
+  },
+  "plausibility_floors": {
+    "comment": "Garde-fous de plausibilité économique marché Mada. Tout profil dont la baseline_price_mga sort sous le floor de son segment est rejeté avec raison 'PRICE_BELOW_FLOOR'. Floors calibrés à partir des prix de transaction observés réels Mada 2025. Ordre des règles : la première qui matche s'applique (ranger les plus spécifiques en premier).",
+    "rules": [
+      {
+        "match": { "body_type": "pickup", "baseline_year_min": 2020 },
+        "min_price_ar": 50000000,
+        "label": "Pickup année 2020+ : minimum 50M Ar"
+      },
+      {
+        "match": { "body_type": "pickup", "baseline_year_min": 2015 },
+        "min_price_ar": 25000000,
+        "label": "Pickup année 2015+ : minimum 25M Ar"
+      },
+      {
+        "match": { "body_type": "suv", "baseline_year_min": 2020 },
+        "min_price_ar": 40000000,
+        "label": "SUV année 2020+ : minimum 40M Ar"
+      },
+      {
+        "match": { "body_type": "suv", "baseline_year_min": 2015 },
+        "min_price_ar": 18000000,
+        "label": "SUV année 2015+ : minimum 18M Ar"
+      },
+      {
+        "match": { "make_in": ["BMW","Mercedes-Benz","Audi","Land Rover","Porsche","Lexus","Jaguar","Volvo"] },
+        "min_price_ar": 12000000,
+        "label": "Marques premium : minimum 12M Ar (toutes années)"
+      }
+    ]
+  },
+  "dealer_neuf_year_default": "ASSUME_CURRENT_YEAR",
+  "current_year_for_dealer_default": 2026,
+  "year_pivot_cap": 2025,
+  "decay_clip_range": [0.04, 0.20],
+  "deduplication": {
+    "fb_price_tolerance_ratio": 0.05,
+    "comment": "Doublon FB = même seller+brand+model+year ET prix corrigés à ±5%."
+  },
+  "new_used_split": {
+    "enabled": true,
+    "comment": "Si un modèle a >=1 obs dealer (vehicle_status='neuf') ET >=3 obs FB occasion, on crée 2 profils distincts: 'Modèle (Neuf)' calibré sur dealer year=current, et 'Modèle (Occasion)' calibré sur FB. Évite la pollution baseline + permet decay calibré occasion réaliste.",
+    "min_obs_dealer_for_split": 1,
+    "min_obs_fb_for_split": 3
+  },
+  "decay_calibration": {
+    "enabled": true,
+    "comment": "Calibrage du decay annuel (taux de dépréciation) par régression log-linéaire sur les obs du profil. Remplace le decay générique 10%/an quand on a assez de signal. Garde le clip [0.04, 0.20] pour rejeter les decays aberrants. R² minimum 0.30 pour considérer la régression fiable.",
+    "min_obs_for_calibration": 4,
+    "min_year_span_for_calibration": 4,
+    "min_r_squared": 0.30,
+    "default_decay_rate": 0.10,
+    "decay_clip_range": [0.04, 0.20]
+  },
+  "outlier_filter": {
+    "enabled": true,
+    "method": "mad_modified_zscore",
+    "threshold": 3.5,
+    "min_observations_for_filter": 5,
+    "max_outlier_pct": 0.20,
+    "comment": "Filtre outlier MAD (Median Absolute Deviation). Pour chaque profil avec >= min_observations_for_filter obs, on calcule la médiane et le MAD des prix. Toute obs avec un modified z-score > threshold est considérée comme outlier et exclue de la calibration. Si le pourcentage d'outliers dépasse max_outlier_pct, on n'applique pas le filtre (suspect : peut-être que la médiane elle-même est fausse). Threshold 3.5 = standard Iglewicz & Hoaglin 1993.",
+    "log_rejected": true
+  },
+  "conflict_strategy": "DO_UPDATE",
+  "expected_km_per_year_default": 15000
+}

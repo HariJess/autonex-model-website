@@ -18,15 +18,14 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === "development" && componentTagger(),
-    // Bundle treemap. Generated only when ANALYZE=1 to avoid extra work on
-    // every build. View with `npm run build:analyze` then open dist/stats.html.
-    process.env.ANALYZE === "1" &&
+    mode === "production" &&
       visualizer({
         filename: "dist/stats.html",
-        template: "treemap",
+        open: false,
         gzipSize: true,
         brotliSize: true,
-        open: false,
+        template: "treemap",
+        emitFile: false,
       }),
   ].filter(Boolean),
   resolve: {

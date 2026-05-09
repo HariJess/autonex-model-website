@@ -17,7 +17,7 @@ export type { ListingsFilters } from "@/lib/listingQueryFilters";
 // the compile-time `ListingRowLite` Pick are derived from this one array, so
 // adding a column means editing exactly one place. Without this, the array
 // and the Pick had to be kept in sync manually (51 entries × 2).
-const LISTING_SELECT_COLUMN_NAMES = [
+export const LISTING_SELECT_COLUMN_NAMES = [
   "id",
   "title",
   "description",
@@ -65,13 +65,36 @@ const LISTING_SELECT_COLUMN_NAMES = [
   "is_new_program",
   "rejection_reason",
   "pending_boost_types",
+  "deal_active",
+  "deal_started_at",
+  "deal_ends_at",
+  "deal_duration_days",
+  "deal_discount_percent",
+  "deal_original_price_mga",
+  "deal_price_lock_until",
 ] as const satisfies readonly (keyof Tables<"listings">)[];
 
-type ListingRowLite = Pick<Tables<"listings">, typeof LISTING_SELECT_COLUMN_NAMES[number]>;
+// PROMPT 6 boost denormalized cols. Pas dans le strict array tant que la
+// migration boost_system n'a pas regen les types. Cast manuel ci-dessous.
+const BOOST_DENORMALIZED_COL_NAMES = [
+  "last_bumped_at",
+  "featured_until",
+  "top_ad_until",
+] as const;
 
-const LISTING_SELECT_COLUMNS = LISTING_SELECT_COLUMN_NAMES.join(",");
+export type ListingRowLite = Pick<Tables<"listings">, typeof LISTING_SELECT_COLUMN_NAMES[number]> & {
+  // PROMPT 6 — cast manuel jusqu'au regen post-migration. Toutes nullables.
+  last_bumped_at?: string | null;
+  featured_until?: string | null;
+  top_ad_until?: string | null;
+};
 
-function isListingRowLite(row: unknown): row is ListingRowLite {
+const LISTING_SELECT_COLUMNS = [
+  ...LISTING_SELECT_COLUMN_NAMES,
+  ...BOOST_DENORMALIZED_COL_NAMES,
+].join(",");
+
+export function isListingRowLite(row: unknown): row is ListingRowLite {
   if (typeof row !== "object" || row === null) return false;
   const r = row as Record<string, unknown>;
   return typeof r.id === "string" && typeof r.title === "string" && typeof r.owner_id === "string";
@@ -101,6 +124,7 @@ function mapListingRowToDisplayListing(
     agencySlug?: string | null;
     agencyLogo?: string | null;
     agencyVerified?: boolean;
+    sellerVerified?: boolean;
     hasWhatsappContact?: boolean;
   },
 ): DisplayListing {
@@ -166,6 +190,7 @@ function mapListingRowToDisplayListing(
     agency_slug: extras?.agencySlug ?? null,
     agency_logo: extras?.agencyLogo ?? null,
     agency_verified: extras?.agencyVerified ?? false,
+    seller_verified: extras?.sellerVerified ?? false,
     badge: extras?.badge ?? null,
     visibility_rank_score: extras?.visibilityRankScore,
     video_url: listing.video_url,
@@ -174,6 +199,13 @@ function mapListingRowToDisplayListing(
     is_new_program: listing.is_new_program,
     rejection_reason: listing.rejection_reason,
     pending_boost_types: pendingBoosts.length > 0 ? pendingBoosts : undefined,
+    deal_active: Boolean(listing.deal_active),
+    deal_started_at: listing.deal_started_at,
+    deal_ends_at: listing.deal_ends_at,
+    deal_duration_days: listing.deal_duration_days,
+    deal_discount_percent: listing.deal_discount_percent,
+    deal_original_price_mga: listing.deal_original_price_mga,
+    deal_price_lock_until: listing.deal_price_lock_until,
     vehicle,
   };
 }
@@ -197,6 +229,7 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     profileRes,
     boostsRes,
     whatsappRes,
+    sellerBadgeRes,
   ] = await Promise.all([
     supabase
       .from("listing_photos")
@@ -212,6 +245,13 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     supabase.rpc("listing_has_whatsapp_contact", {
       p_listing_id: listing.id,
     }),
+    listing.owner_id
+      ? supabase
+          .from("active_seller_badges")
+          .select("user_id")
+          .eq("user_id", listing.owner_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null } as const),
   ]);
 
   const { data: photos } = photosRes;
@@ -231,13 +271,11 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     agencyInfo = data;
   }
 
-  let badge: DisplayListing["badge"] = null;
   const boostTypes = new Set((boostsRes.data ?? []).map((b) => b.type));
-  if (boostTypes.has("top")) badge = "boost";
-  else if (boostTypes.has("featured")) badge = "coup_de_coeur";
-  else if (boostTypes.has("urgent")) badge = "urgent";
+  const badge: DisplayListing["badge"] = badgeForListing(listing, boostTypes);
 
   const { data: hasWhatsappRaw, error: hasWhatsappErr } = whatsappRes;
+  const sellerVerified = !!sellerBadgeRes?.data;
 
   return mapListingRowToDisplayListing(listing, {
     images: photos?.map((p) => p.url) ?? [],
@@ -249,6 +287,7 @@ async function fetchListingById(id: string | undefined): Promise<DisplayListing 
     agencySlug: agencyInfo?.slug ?? null,
     agencyLogo: agencyInfo?.logo_url ?? null,
     agencyVerified: agencyInfo?.verified ?? false,
+    sellerVerified,
   });
 }
 
@@ -277,31 +316,72 @@ export function prefetchListing(queryClient: QueryClient, id: string | undefined
     .then(() => undefined);
 }
 
+/**
+ * Score composite côté client utilisé en fallback dans search (cf.
+ * `searchResultsModel.ts`). PROMPT 6 V1 : tiers basés sur les colonnes
+ * denormalized `top_ad_until`, `featured_until`, `last_bumped_at`. Les
+ * legacy types (`top`, `featured`, `daily_bump`, `urgent`) restent
+ * supportés en fallback pour les boosts insérés AVANT la migration
+ * (rétrocompat anti-régression).
+ */
 function visibilityRankScore(listing: ListingRowLite, types: Set<string>, dailyBumpStarts: Map<string, number>): number {
+  const now = Date.now();
   const created = new Date(listing.created_at ?? 0).getTime();
+  const topAdActive =
+    typeof listing.top_ad_until === "string" && new Date(listing.top_ad_until).getTime() > now;
+  const featuredActive =
+    typeof listing.featured_until === "string" && new Date(listing.featured_until).getTime() > now;
+  const lastBumped =
+    typeof listing.last_bumped_at === "string" ? new Date(listing.last_bumped_at).getTime() : null;
+
   let tier = 0;
-  if (types.has("top")) tier = 4;
-  else if (types.has("featured")) tier = 3;
-  else if (types.has("daily_bump")) tier = 2;
+  if (topAdActive || types.has("top_ad") || types.has("top")) tier = 4;
+  else if (featuredActive || types.has("featured")) tier = 3;
+  else if (lastBumped != null || types.has("bump") || types.has("daily_bump")) tier = 2;
   else if (types.has("urgent")) tier = 1;
+
   const bumpTs = dailyBumpStarts.get(listing.id);
-  const recency =
-    types.has("daily_bump") && bumpTs != null ? Math.max(created, bumpTs) : created;
+  const recency = lastBumped != null
+    ? Math.max(created, lastBumped)
+    : types.has("daily_bump") && bumpTs != null
+      ? Math.max(created, bumpTs)
+      : created;
   return tier * 1e15 + recency;
 }
 
-function badgeForTypes(types: Set<string>): DisplayListing["badge"] {
+/**
+ * PROMPT 6 V1 : priorité top_ad > featured > legacy. 1 badge max par card
+ * (pas de stacking V1, surface mobile limitée). Fallback sur les types
+ * boost insérés pré-PROMPT 6 si les colonnes denormalized sont vides.
+ */
+function badgeForListing(listing: ListingRowLite, types: Set<string>): DisplayListing["badge"] {
+  const now = Date.now();
+  const topAdActive =
+    typeof listing.top_ad_until === "string" && new Date(listing.top_ad_until).getTime() > now;
+  if (topAdActive || types.has("top_ad")) return "top_ad";
+  const featuredActive =
+    typeof listing.featured_until === "string" && new Date(listing.featured_until).getTime() > now;
+  if (featuredActive || types.has("featured")) return "featured";
+  // Legacy fallback (boosts pré-PROMPT 6)
   if (types.has("top")) return "boost";
-  if (types.has("featured")) return "coup_de_coeur";
   if (types.has("urgent")) return "urgent";
   return null;
 }
 
-async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promise<DisplayListing[]> {
+export async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promise<DisplayListing[]> {
   if (listings.length === 0) return [];
 
   const listingIds = listings.map((l) => l.id);
-  const [{ data: allPhotos }, { data: allBoosts }] = await Promise.all([
+  // PROMPT 7 — batch query active_seller_badges pour propager seller_verified
+  const ownerIds = Array.from(
+    new Set(
+      listings
+        .map((l) => l.owner_id)
+        .filter((id): id is string => typeof id === "string"),
+    ),
+  );
+
+  const [{ data: allPhotos }, { data: allBoosts }, { data: verifiedRows }] = await Promise.all([
     supabase
       .from("listing_photos")
       .select("listing_id, url, position")
@@ -312,7 +392,18 @@ async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promis
       .select("listing_id, type, starts_at")
       .in("listing_id", listingIds)
       .gte("ends_at", new Date().toISOString()),
+    ownerIds.length > 0
+      ? supabase
+          .from("active_seller_badges")
+          .select("user_id")
+          .in("user_id", ownerIds)
+      : Promise.resolve({ data: [] as Array<{ user_id: string | null }>, error: null }),
   ]);
+
+  const verifiedSellers = new Set<string>();
+  for (const row of verifiedRows ?? []) {
+    if (typeof row?.user_id === "string") verifiedSellers.add(row.user_id);
+  }
 
   const photosByListing = new Map<string, string[]>();
   allPhotos?.forEach((p) => {
@@ -338,8 +429,9 @@ async function enrichListingsWithRelatedData(listings: ListingRowLite[]): Promis
     const tset = typesByListing.get(listing.id) ?? new Set<string>();
     return mapListingRowToDisplayListing(listing, {
       images: photosByListing.get(listing.id) ?? [],
-      badge: badgeForTypes(tset),
+      badge: badgeForListing(listing, tset),
       visibilityRankScore: visibilityRankScore(listing, tset, dailyBumpStarts),
+      sellerVerified: listing.owner_id ? verifiedSellers.has(listing.owner_id) : false,
     });
   });
 }
@@ -351,10 +443,20 @@ export function useDbListings(filters: ListingsFilters = {}) {
     queryFn: async (): Promise<DisplayListing[]> => {
       if (filters.limit === 0) return [];
 
+      // PROMPT 6 — tri composite boost-aware. Index `idx_listings_feed_rank`
+      // garantit la perf. NULLS LAST = annonces sans boost en queue dans
+      // chaque tier. Cast `as any` sur les colonnes pas encore typées
+      // (regen post-migration nettoiera).
       const baseQuery = supabase
         .from("listings")
         .select(LISTING_SELECT_COLUMNS)
         .eq("status", "active")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .order("top_ad_until" as any, { ascending: false, nullsFirst: false })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .order("featured_until" as any, { ascending: false, nullsFirst: false })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .order("last_bumped_at" as any, { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
 
       let query = applyListingFilters(baseQuery as unknown as FilterableListingQuery, filters) as typeof baseQuery;

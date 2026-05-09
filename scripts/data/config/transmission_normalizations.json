@@ -1,0 +1,9 @@
+{
+  "alias_to_canonical": {
+    "BVA": "automatic", "Automatique": "automatic", "AUTO": "automatic", "AT": "automatic", "Auto": "automatic",
+    "BVA cuir": "automatic", "BVA tissus": "automatic", "Automatic": "automatic",
+    "BVM": "manual", "Manuelle": "manual", "Manuel": "manual", "MAN": "manual", "MT": "manual", "Manual": "manual",
+    "CVT": "cvt", "cvt": "cvt"
+  },
+  "canonical_values": ["manual", "automatic", "cvt"]
+}
