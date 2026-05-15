@@ -6,6 +6,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Wrench,
+  type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +40,7 @@ type AdjustmentLine = {
   labelKey: string;
   labelDefault: string;
   deltaPct: number;
-  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  icon: LucideIcon;
 };
 
 function formatDelta(deltaPct: number): string {

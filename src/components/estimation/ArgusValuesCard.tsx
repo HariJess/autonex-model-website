@@ -1,4 +1,4 @@
-import { Building2, Wrench } from "lucide-react";
+import { Building2, Wrench, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -37,7 +37,7 @@ type CardSpec = {
   title: string;
   subtitle: string;
   tooltip: string;
-  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  icon: LucideIcon;
 };
 
 export function ArgusValuesCard({ values, isV2, className }: ArgusValuesCardProps) {

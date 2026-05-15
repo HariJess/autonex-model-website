@@ -43,7 +43,6 @@ const { mockSupabase, setFixtures } = vi.hoisted(() => {
     private filters: Filter[] = [];
     private limitN: number | null = null;
     private orderBy: { col: string; ascending: boolean } | null = null;
-    private isMaybeSingle = false;
 
     constructor(private readonly table: string) {}
 
@@ -79,7 +78,6 @@ const { mockSupabase, setFixtures } = vi.hoisted(() => {
       return this;
     }
     maybeSingle() {
-      this.isMaybeSingle = true;
       const value = this.resolve();
       const data = (value.data as Record<string, unknown>[])[0] ?? null;
       return Promise.resolve({ data, error: value.error });

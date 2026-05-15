@@ -26,7 +26,9 @@ export function useApproveVerification() {
 
   return useMutation<ApproveVerificationResult, Error, { verificationId: string }>({
     mutationFn: async ({ verificationId }) => {
-      const { data, error } = await wrapRpc("approve_verification", () =>
+      const { data, error } = await wrapRpc<ApproveVerificationResult, { message: string } | null>(
+        "approve_verification",
+        () =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase.rpc as any)("approve_verification", {
           p_verification_id: verificationId,

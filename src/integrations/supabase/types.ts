@@ -1015,6 +1015,7 @@ export type Database = {
           fingerprint: string | null
           fuel_type: string | null
           id: string
+          include_in_estimation: boolean
           listing_status: string
           mileage_km: number | null
           normalized_generation: string | null
@@ -1053,6 +1054,7 @@ export type Database = {
           outlier_flag?: boolean
           parsing_notes?: Json
           posted_at?: string | null
+          include_in_estimation?: boolean
           price_mga?: number | null
           raw_listing_id: string
           seller_type?: string | null
@@ -1082,6 +1084,7 @@ export type Database = {
           outlier_flag?: boolean
           parsing_notes?: Json
           posted_at?: string | null
+          include_in_estimation?: boolean
           price_mga?: number | null
           raw_listing_id?: string
           seller_type?: string | null

@@ -45,6 +45,14 @@ const TEST_LISTING: MyListingRow = {
   views_count: 247, contact_count: 8, favorite_count: 14, renewal_count: 0,
   created_at: new Date(Date.now() - 31 * 86_400_000).toISOString(),
   updated_at: new Date().toISOString(),
+  transaction: "vente",
+  last_bumped_at: null,
+  featured_until: null,
+  top_ad_until: null,
+  deal_active: null,
+  deal_discount_percent: null,
+  deal_ends_at: null,
+  deal_original_price_mga: null,
 };
 
 function renderModal(listing: MyListingRow | null = TEST_LISTING) {

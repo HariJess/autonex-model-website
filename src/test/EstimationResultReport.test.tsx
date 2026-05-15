@@ -99,6 +99,9 @@ function makeResult(overrides?: Partial<EstimationRunResult["outputV2"]>): Estim
         quickSalePrice: 50_000_000,
         recommendedListingPrice: 53_000_000,
         roundingStepApplied: 250_000,
+        tradeInPro: 40_560_000,
+        privateMarket: 52_000_000,
+        dealerRetail: 59_800_000,
       },
       comparables: [],
       insights: {

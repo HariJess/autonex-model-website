@@ -80,7 +80,9 @@ export function useApplyBoost() {
 
   return useMutation<ApplyBoostResult, Error, ApplyBoostInput>({
     mutationFn: async (input) => {
-      const { data, error } = await wrapRpc("apply_boost", () =>
+      const { data, error } = await wrapRpc<ApplyBoostResult, { message: string } | null>(
+        "apply_boost",
+        () =>
         // Cast `any` car la RPC apply_boost n'est pas encore dans le types regen
         // (migration appliquée manuellement par Ali post-implementation).
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -207,7 +207,6 @@ function makeMockSupabase(opts: {
       throw new Error("Unexpected table " + table);
     }),
     // expose spies for assertions
-    // @ts-expect-error utility extension for test spies access
     __spies: { rawInsertSpy, cleanInsertSpy, rawCallCount },
   } as unknown as SupabaseLikeClient;
   return mock;

@@ -71,6 +71,8 @@ const SAMPLE_LISTINGS: MyListingRow[] = [
     published_at: new Date(NOW - 5 * DAY_MS).toISOString(), sold_at: null, sold_price: null,
     views_count: 10, contact_count: 1, favorite_count: 2, renewal_count: 0,
     created_at: new Date(NOW - 5 * DAY_MS).toISOString(), updated_at: new Date(NOW - 1 * DAY_MS).toISOString(),
+    transaction: "vente", last_bumped_at: null, featured_until: null, top_ad_until: null,
+    deal_active: null, deal_discount_percent: null, deal_ends_at: null, deal_original_price_mga: null,
   },
   // 1× expiring_soon (J+5)
   {
@@ -79,6 +81,8 @@ const SAMPLE_LISTINGS: MyListingRow[] = [
     published_at: new Date(NOW - 25 * DAY_MS).toISOString(), sold_at: null, sold_price: null,
     views_count: 50, contact_count: 3, favorite_count: 5, renewal_count: 1,
     created_at: new Date(NOW - 25 * DAY_MS).toISOString(), updated_at: new Date().toISOString(),
+    transaction: "vente", last_bumped_at: null, featured_until: null, top_ad_until: null,
+    deal_active: null, deal_discount_percent: null, deal_ends_at: null, deal_original_price_mga: null,
   },
   // 1× expired
   {
@@ -87,6 +91,8 @@ const SAMPLE_LISTINGS: MyListingRow[] = [
     published_at: new Date(NOW - 31 * DAY_MS).toISOString(), sold_at: null, sold_price: null,
     views_count: 100, contact_count: 5, favorite_count: 8, renewal_count: 0,
     created_at: new Date(NOW - 31 * DAY_MS).toISOString(), updated_at: new Date().toISOString(),
+    transaction: "vente", last_bumped_at: null, featured_until: null, top_ad_until: null,
+    deal_active: null, deal_discount_percent: null, deal_ends_at: null, deal_original_price_mga: null,
   },
   // 1× sold
   {
@@ -95,6 +101,8 @@ const SAMPLE_LISTINGS: MyListingRow[] = [
     published_at: new Date(NOW - 10 * DAY_MS).toISOString(), sold_at: new Date(NOW - 1 * DAY_MS).toISOString(),
     sold_price: 4500, views_count: 200, contact_count: 10, favorite_count: 15, renewal_count: 0,
     created_at: new Date(NOW - 10 * DAY_MS).toISOString(), updated_at: new Date().toISOString(),
+    transaction: "vente", last_bumped_at: null, featured_until: null, top_ad_until: null,
+    deal_active: null, deal_discount_percent: null, deal_ends_at: null, deal_original_price_mga: null,
   },
   // 1× draft
   {
@@ -103,6 +111,8 @@ const SAMPLE_LISTINGS: MyListingRow[] = [
     published_at: null, sold_at: null, sold_price: null,
     views_count: 0, contact_count: 0, favorite_count: 0, renewal_count: 0,
     created_at: new Date(NOW - 1 * DAY_MS).toISOString(), updated_at: new Date().toISOString(),
+    transaction: "vente", last_bumped_at: null, featured_until: null, top_ad_until: null,
+    deal_active: null, deal_discount_percent: null, deal_ends_at: null, deal_original_price_mga: null,
   },
 ];
 

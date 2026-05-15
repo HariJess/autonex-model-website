@@ -60,7 +60,9 @@ export function useSubmitVerification() {
 
   return useMutation<SubmitVerificationResult, Error, SubmitVerificationInput>({
     mutationFn: async (input) => {
-      const { data, error } = await wrapRpc("submit_verification", () =>
+      const { data, error } = await wrapRpc<SubmitVerificationResult, { message: string } | null>(
+        "submit_verification",
+        () =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase.rpc as any)("submit_verification", {
           p_cin_front_path: input.cin_front_path,

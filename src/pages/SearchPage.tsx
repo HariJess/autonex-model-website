@@ -75,7 +75,7 @@ const SearchPage = () => {
     transaction: filters.transaction ?? null,
     ville: filters.ville ?? null,
     types: filters.types && filters.types.length > 0 ? filters.types.join(",") : null,
-    vtypes: filters.vtypes && filters.vtypes.length > 0 ? filters.vtypes.join(",") : null,
+    vtypes: filters.vehicleTypes && filters.vehicleTypes.length > 0 ? filters.vehicleTypes.join(",") : null,
     sort,
   });
 

@@ -72,6 +72,9 @@ function makeOutputV2(): EstimationOutputV2 {
       quickSalePrice: 46_500_000,
       recommendedListingPrice: 50_000_000,
       roundingStepApplied: 250_000,
+      tradeInPro: 38_220_000,
+      privateMarket: 49_000_000,
+      dealerRetail: 56_350_000,
     },
     comparables: [],
     insights: {

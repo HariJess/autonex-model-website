@@ -39,6 +39,14 @@ function makeListing(overrides: Partial<MyListingRow>): MyListingRow {
     renewal_count: 0,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    transaction: "vente",
+    last_bumped_at: null,
+    featured_until: null,
+    top_ad_until: null,
+    deal_active: null,
+    deal_discount_percent: null,
+    deal_ends_at: null,
+    deal_original_price_mga: null,
     ...overrides,
   };
 }

@@ -47,7 +47,9 @@ export function useRejectVerification() {
 
   return useMutation<RejectVerificationResult, Error, RejectVerificationInput>({
     mutationFn: async (input) => {
-      const { data, error } = await wrapRpc("reject_verification", () =>
+      const { data, error } = await wrapRpc<RejectVerificationResult, { message: string } | null>(
+        "reject_verification",
+        () =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase.rpc as any)("reject_verification", {
           p_verification_id: input.verificationId,

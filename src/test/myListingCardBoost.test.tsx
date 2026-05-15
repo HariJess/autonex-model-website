@@ -57,6 +57,11 @@ const baseListing: MyListingRow = {
   last_bumped_at: null,
   featured_until: null,
   top_ad_until: null,
+  transaction: "vente",
+  deal_active: null,
+  deal_discount_percent: null,
+  deal_ends_at: null,
+  deal_original_price_mga: null,
 };
 
 async function renderCard(listing: MyListingRow) {
