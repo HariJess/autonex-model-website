@@ -239,7 +239,7 @@ export function useYasContext(): YasContext {
  *
  * Reste exporté tel quel post-refactor : la fonction n'utilise pas le Provider
  * et peut donc être appelée n'importe où, y compris dans les composants montés
- * AVANT le Provider (ex. `BetaLockGate` qui détecte le YAS flow via storage).
+ * AVANT le Provider.
  */
 export function readYasContextFromStorage(): YasContext {
   const stored = readStored();

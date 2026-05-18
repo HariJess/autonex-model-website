@@ -7,7 +7,6 @@ User-agent: *
 # Zones privées / techniques — pas d'indexation
 Disallow: /admin/
 Disallow: /auth/
-Disallow: /beta-login
 Disallow: /dashboard/
 Disallow: /publier
 Disallow: /api/

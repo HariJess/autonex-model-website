@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
-import { BetaLockGate } from "@/components/auth/BetaLockGate";
 import { lazy, Suspense, useEffect } from "react";
 import { WheelSpinner } from "@/components/ui/wheel-spinner";
 
@@ -62,7 +61,6 @@ const BlogList = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default
 const BlogArticle = lazy(() => import("./pages/BlogPages.tsx").then(m => ({ default: m.BlogArticle })));
 const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
-const BetaLoginPage = lazy(() => import("./pages/BetaLoginPage.tsx"));
 const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage.tsx"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage.tsx"));
@@ -115,9 +113,7 @@ const App = () => {
           <YasMiniHeader />
           <YasPublishTracker />
           <Suspense fallback={<PageLoader />}>
-            <BetaLockGate>
           <Routes>
-            <Route path="/beta-login" element={<BetaLoginPage />} />
             <Route path="/" element={<Index />} />
             <Route path="/recherche" element={<SearchPage />} />
             <Route path="/bonnes-affaires" element={<BonnesAffairesPage />} />
@@ -176,7 +172,6 @@ const App = () => {
             <Route path="/yas-app" element={<YasAppPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-            </BetaLockGate>
             <Suspense fallback={null}>
               <CookieConsentBanner />
             </Suspense>

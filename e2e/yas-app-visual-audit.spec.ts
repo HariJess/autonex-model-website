@@ -80,22 +80,7 @@ function dumpConsoleLog(projectName: string, entries: ConsoleEntry[]): void {
 const YAS_QUERY = "source=yas&embedded=true";
 
 test.describe("YAS visual audit", () => {
-  test.beforeEach(async ({ page, context }) => {
-    // Cookie beta-unlock — `.env.local` a `VITE_BETA_LOCK_ENABLED=true` qui
-    // active BetaLockGate sur le dev server. /yas-app *devrait* bypasser le
-    // gate (cf. commit 588473a) mais BetaLockGate.tsx ligne 55 retourne null
-    // au render même quand le redirect est bypass — bug P0 identifié par cet
-    // audit, à fixer dans un sprint séparé. Pour permettre la capture des
-    // screenshots, on set le cookie d'unlock avant chaque test.
-    await context.addCookies([
-      {
-        name: "autonex_beta_access",
-        value: "unlocked",
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
-
+  test.beforeEach(async ({ page }) => {
     // Désactive les animations CSS pour des captures stables.
     await page.addInitScript(() => {
       const style = document.createElement("style");

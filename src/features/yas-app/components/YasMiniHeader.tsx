@@ -21,7 +21,7 @@ import { useYasHomeUrl } from "@/features/yas-app/hooks/useYasHomeUrl";
  *   surcharger l'UI mobile en WebView.
  *
  * Position dans l'arbre : monté au niveau `App.tsx`, à l'intérieur du
- * `<YasProvider>` mais à l'extérieur de `<BetaLockGate>` + `<Routes>`, pour
+ * `<YasProvider>` mais à l'extérieur de `<Routes>`, pour
  * qu'il soit affiché AVANT chaque page destination. Le composant retourne
  * `null` quand pas applicable, donc impact zéro sur le site normal.
  */
